@@ -41,12 +41,13 @@ object Program extends SimpleSwingApplication {
     val parent = graph.getDefaultParent
     for(vertex <- new JSetWrapper(origin.vertexSet))
     {
-      val cell = graph.insertVertex(parent, null, vertex.toString, 20, 20, 80, 30)
+      val cell = graph.insertVertex(parent, null, "", 20, 20, 80, 30).asInstanceOf[mxCell]
+      cell.setValue(vertex.toString)
       vertexMap.put(vertex, cell)
     }
     for(edge <- new JSetWrapper(origin.edgeSet()))
     {
-      graph.insertEdge(parent, null, "Edge", vertexMap(origin.getEdgeSource(edge)), vertexMap(origin.getEdgeTarget(edge))).asInstanceOf[mxCell]
+      graph.insertEdge(parent, null, "", vertexMap(origin.getEdgeSource(edge)), vertexMap(origin.getEdgeTarget(edge))).asInstanceOf[mxCell]
     }
     graph
   }

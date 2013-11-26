@@ -5,10 +5,13 @@ import scala.collection.mutable
 import SSM._
 
 object AddStatementToSSM extends ProgramTransformation {
-  val block = "block"
-  val statements = "statements"
 
   def getStatementToLines(state: TransformationState) = state.data(this).asInstanceOf[mutable.Map[String, MetaObject => Seq[MetaObject]]]
+
+  def convertStatement(statement: MetaObject, state: TransformationState) = {
+    val statementToSSMLines = getStatementToLines(state)
+    statementToSSMLines(statement.clazz)(statement)
+  }
 
   def transform(program: MetaObject, state: TransformationState) = {
     val statementToSSMLines = getStatementToLines(state)
@@ -25,4 +28,9 @@ object AddStatementToSSM extends ProgramTransformation {
   }
 
   def dependencies: Set[ProgramTransformation] = Set.empty
+
+  def createBlock(statements: MetaObject*) =
+  {
+    new MetaObject(block) { data.put(AddStatementToSSM.statements,statements) }
+  }
 }

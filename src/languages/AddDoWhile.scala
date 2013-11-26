@@ -1,24 +1,22 @@
 package languages
 
-import transformation.{MetaObject, TransformationState, ProgramTransformation}
-import SSM._
+import transformation.{TransformationState, MetaObject, ProgramTransformation}
+import languages.SSM._
 
-object AddWhile extends ProgramTransformation {
+object AddDoWhile extends ProgramTransformation {
   val body = "body"
   val condition = "condition"
-  val _while = "while"
+  val _while = "doWhile"
+
   def transform(program: MetaObject, state: TransformationState) = {
     AddStatementToSSM.getStatementToLines(state).put(_while,(_while : MetaObject) => {
       val guid = state.getGUID
       val startLabel = "whileStart" + guid
-      val endLabel = "whileEnd" + guid
       val startLabelInstruction = createLabel(startLabel)
       val condition = _while(AddWhile.condition).asInstanceOf[MetaObject]
-      val jumpEnd = jumpOnFalse(endLabel)
       val body = _while(AddWhile.body).asInstanceOf[MetaObject]
-      val jumpStart = jumpAlways(startLabel)
-      val endLabelInstruction = createLabel(endLabel)
-      Seq.apply(startLabelInstruction, condition, jumpEnd, body, jumpStart, endLabelInstruction).flatMap(statement => AddStatementToSSM.convertStatement(statement,state))
+      val jumpStart = jumpOnTrue(startLabel)
+      Seq.apply(startLabelInstruction, body, condition, jumpStart).flatMap(statement => AddStatementToSSM.convertStatement(statement,state))
     })
   }
 

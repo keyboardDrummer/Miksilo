@@ -10,4 +10,7 @@ object SSM {
   val lines = "lines"
 
   def createLabel(target: String) = createInstruction("label",target)
+  def jumpOnFalse(target: String) = createInstruction("brf",target)
+  def jumpOnTrue(target: String) = createInstruction("brt",target)
+  def jumpAlways(target: String) = createInstruction("bra", target)
 }

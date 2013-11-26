@@ -1,13 +1,13 @@
 package graphing
 
-import languages.{AddWhile, AddStatementToSSM}
+import languages.{AddIfElse, AddWhile, AddStatementToSSM}
 import org.jgrapht.DirectedGraph
 import transformation.ProgramTransformation
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import TransformationVertex._
 
 object TransformationGraph {
-  val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM)
+  val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse)
 
   def getGraph: DirectedGraph[TransformationVertex,DefaultEdge] = {
     val result = new DefaultDirectedGraph[TransformationVertex,DefaultEdge](classOf[DefaultEdge])
@@ -19,7 +19,7 @@ object TransformationGraph {
     for(transformation <- transformations)
     {
       for(dependency <- transformation.dependencies)
-        result.addEdge(transformation,dependency)
+        result.addEdge(dependency, transformation)
     }
     result
   }
