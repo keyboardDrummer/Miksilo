@@ -1,0 +1,28 @@
+package languages
+
+import transformation.{MetaObject, TransformationState, ProgramTransformation}
+import scala.collection.mutable
+import SSM._
+
+object AddStatementToSSM extends ProgramTransformation {
+  val block = "block"
+  val statements = "statements"
+
+  def getStatementToLines(state: TransformationState) = state.data(this).asInstanceOf[mutable.Map[String, MetaObject => Seq[MetaObject]]]
+
+  def transform(program: MetaObject, state: TransformationState) = {
+    val statementToSSMLines = getStatementToLines(state)
+    def convertStatement(statement: MetaObject) = {
+      statementToSSMLines(statement.clazz)(statement)
+    }
+    statementToSSMLines.put(block, (block: MetaObject) => {
+      block(statements).asInstanceOf[Seq[MetaObject]].flatMap(convertStatement)
+    })
+    statementToSSMLines.put(instruction, (instruction: MetaObject) => {
+      Seq(instruction)
+    })
+    program.data.put(lines, convertStatement(program))
+  }
+
+  def dependencies: Set[ProgramTransformation] = Set.empty
+}
