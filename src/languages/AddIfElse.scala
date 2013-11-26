@@ -23,8 +23,8 @@ object AddIfElse extends ProgramTransformation{
       val jumpEnd = jumpAlways(endLabel)
       val jumpElse = jumpOnFalse(elseLabel)
       val endLabelInstruction = createLabel(endLabel)
-      val ifElseBlock = createBlock(condition, jumpElse, jumpEnd, _then, jumpEnd, elseLabelInstruction, _else, endLabelInstruction)
-      AddStatementToSSM.convertStatement(ifElseBlock, state)
+      val statements = Seq(condition, jumpElse, jumpEnd, _then, jumpEnd, elseLabelInstruction, _else, endLabelInstruction)
+      statements.flatMap(statement => convertStatement(statement,state))
     })
   }
 

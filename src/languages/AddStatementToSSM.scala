@@ -18,9 +18,6 @@ object AddStatementToSSM extends ProgramTransformation {
     def convertStatement(statement: MetaObject) = {
       statementToSSMLines(statement.clazz)(statement)
     }
-    statementToSSMLines.put(block, (block: MetaObject) => {
-      block(statements).asInstanceOf[Seq[MetaObject]].flatMap(convertStatement)
-    })
     statementToSSMLines.put(instruction, (instruction: MetaObject) => {
       Seq(instruction)
     })
@@ -28,9 +25,4 @@ object AddStatementToSSM extends ProgramTransformation {
   }
 
   def dependencies: Set[ProgramTransformation] = Set.empty
-
-  def createBlock(statements: MetaObject*) =
-  {
-    new MetaObject(block) { data.put(AddStatementToSSM.statements,statements) }
-  }
 }

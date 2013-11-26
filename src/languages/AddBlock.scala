@@ -15,4 +15,9 @@ object AddBlock extends ProgramTransformation {
   }
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+
+  def createBlock(statements: MetaObject*) =
+  {
+    new MetaObject(block) { data.put(AddBlock.statements,statements) }
+  }
 }

@@ -2,6 +2,8 @@ package languages
 
 import transformation.{MetaObject, TransformationState, ProgramTransformation}
 import SSM._
+import org.junit.Test
+import org.scalatest.junit.AssertionsForJUnit
 
 object AddWhile extends ProgramTransformation {
   val body = "body"
@@ -23,4 +25,13 @@ object AddWhile extends ProgramTransformation {
   }
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+}
+
+class TestWhile
+{
+  @Test
+  def testWhile()
+  {
+
+  }
 }
