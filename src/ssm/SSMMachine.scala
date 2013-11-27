@@ -21,8 +21,12 @@ class SSMMachine(program: SSMProgram) {
   def goTo(label: String) = programCounter = labelLines(label)
 
   def run() {
-    val instruction = program.instructions(programCounter)
-    instruction.execute(this)
-    programCounter += 1
+    val instructions = program.instructions
+    while(programCounter < instructions.length)
+    {
+      val instruction = instructions(programCounter)
+      programCounter += 1
+      instruction.execute(this)
+    }
   }
 }

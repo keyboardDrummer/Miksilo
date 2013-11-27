@@ -1,8 +1,12 @@
 package languages
 
-import transformation.{TransformationState, MetaObject, ProgramTransformation}
+import transformation.{TransformationManager, TransformationState, MetaObject, ProgramTransformation}
 import languages.SSM._
 import languages.AddStatementToSSM._
+import org.junit.Test
+import languages.AddBlock._
+import ssm.SSMMachine
+import org.scalatest.junit.AssertionsForJUnit._
 
 object AddIfElse extends ProgramTransformation{
   val _if = "if"
@@ -23,10 +27,50 @@ object AddIfElse extends ProgramTransformation{
       val jumpEnd = jumpAlways(endLabel)
       val jumpElse = jumpOnFalse(elseLabel)
       val endLabelInstruction = createLabel(endLabel)
-      val statements = Seq(condition, jumpElse, jumpEnd, _then, jumpEnd, elseLabelInstruction, _else, endLabelInstruction)
+      val statements = Seq(condition, jumpElse, _then, jumpEnd, elseLabelInstruction, _else, endLabelInstruction)
       statements.flatMap(statement => convertStatement(statement,state))
     })
   }
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+
+  def createIfElse(condition: MetaObject, then: MetaObject, _else: MetaObject) = new MetaObject(_if)
+  {
+    data.put(AddIfElse.condition,condition)
+    data.put(AddIfElse._then,then)
+    data.put(AddIfElse._else,_else)
+  }
+}
+
+class TestIfElse
+{
+  @Test
+  def testThen()
+  {
+    val condition = loadTrue()
+    val _then = loadConstant(5)
+    val _else = loadConstant(9)
+    val _if = AddIfElse.createIfElse(condition,_then,_else)
+    val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
+    compiler.compile(_if)
+    val typedSSM = languages.SSM.toTyped(_if)
+    val machine = new SSMMachine(typedSSM)
+    machine.run()
+    assertResult(5)(machine.pop())
+  }
+
+  @Test
+  def testElse()
+  {
+    val condition = loadFalse()
+    val _then = loadConstant(5)
+    val _else = loadConstant(9)
+    val _if = AddIfElse.createIfElse(condition,_then,_else)
+    val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
+    compiler.compile(_if)
+    val typedSSM = languages.SSM.toTyped(_if)
+    val machine = new SSMMachine(typedSSM)
+    machine.run()
+    assertResult(9)(machine.pop())
+  }
 }

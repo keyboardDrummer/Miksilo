@@ -35,6 +35,8 @@ object SSM {
   def loadRegister(index: Int) = createInstruction(classOf[LoadRegister],index)
   def loadFreeRegister(index: Int) = loadRegister(index + 4)
   def loadConstant(value: Int) = createInstruction(classOf[LoadConstant], value)
+  def loadTrue() = loadConstant(1)
+  def loadFalse() = loadConstant(0)
   def addition = createInstruction(classOf[Addition])
   def storeRegister(index: Int) = createInstruction(classOf[StoreRegister],index)
   def storeFreeRegister(index: Int) = storeRegister(index + 4)
