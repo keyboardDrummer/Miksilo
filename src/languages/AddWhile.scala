@@ -1,9 +1,12 @@
 package languages
 
-import transformation.{MetaObject, TransformationState, ProgramTransformation}
+import transformation.{TransformationManager, MetaObject, TransformationState, ProgramTransformation}
 import SSM._
 import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.junit.AssertionsForJUnit._
+import languages.AddBlock._
+import ssm.SSMMachine
+import org.scalatest.Assertions
 
 object AddWhile extends ProgramTransformation {
   val body = "body"
@@ -25,6 +28,10 @@ object AddWhile extends ProgramTransformation {
   }
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+
+  def createWhile(condition: MetaObject, body: MetaObject) = {
+    new MetaObject(_while) { data.put(AddWhile.condition,condition); data.put(AddWhile.body,body) }
+  }
 }
 
 class TestWhile
@@ -32,6 +39,14 @@ class TestWhile
   @Test
   def testWhile()
   {
-
+    val condition = createBlock(loadFreeRegister(0), loadConstant(3), notEquals)
+    val body = createBlock(loadFreeRegister(0), loadConstant(1), addition, storeFreeRegister(0))
+    val _while = AddWhile.createWhile(condition,body)
+    val compiler = TransformationManager.buildCompiler(Seq(AddWhile, AddBlock, AddStatementToSSM))
+    compiler.compile(_while)
+    val typedSSM = languages.SSM.toTyped(_while)
+    val machine = new SSMMachine(typedSSM)
+    machine.run()
+    assertResult(3)(machine.registers(4))
   }
 }
