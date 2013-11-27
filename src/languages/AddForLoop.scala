@@ -1,7 +1,11 @@
 package languages
 
-import transformation.{TransformationState, MetaObject, ProgramTransformation}
+import transformation.{TransformationManager, TransformationState, MetaObject, ProgramTransformation}
 import languages.SSM._
+import org.junit.Test
+import languages.AddBlock._
+import ssm.SSMMachine
+import org.scalatest.junit.AssertionsForJUnit._
 
 object AddForLoop extends ProgramTransformation
 {
@@ -29,4 +33,34 @@ object AddForLoop extends ProgramTransformation
   }
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+  
+  def createForLoop(initializer: MetaObject, condition: MetaObject, increment: MetaObject, body: MetaObject) = new MetaObject(forLoop)
+  {
+    data.put(AddForLoop.initialisation,initializer)
+    data.put(AddForLoop.condition, condition)
+    data.put(AddForLoop.increment, increment)
+    data.put(AddForLoop.body, body)
+  }
 }
+
+class TestForLoop
+{
+  @Test
+  def test()
+  {
+    val loopVariableIndex = 0
+    val accumulatorIndex = 1
+    val initializer = createBlock(loadConstant(1),storeFreeRegister(loopVariableIndex))
+    val condition = createBlock(loadFreeRegister(loopVariableIndex), loadConstant(4), lessThen)
+    val increment = createBlock(loadFreeRegister(loopVariableIndex), loadConstant(1), addition, storeFreeRegister(loopVariableIndex))
+    val body = createBlock(loadFreeRegister(accumulatorIndex), loadConstant(2), addition, storeFreeRegister(accumulatorIndex))
+    val forLoop = AddForLoop.createForLoop(initializer, condition, increment, body)
+    val compiler = TransformationManager.buildCompiler(Seq(AddForLoop, AddBlock, AddStatementToSSM))
+    compiler.compile(forLoop)
+    val typedSSM = languages.SSM.toTyped(forLoop)
+    val machine = new SSMMachine(typedSSM)
+    machine.run()
+    assertResult(6)(machine.registers(5))
+  }
+}
+

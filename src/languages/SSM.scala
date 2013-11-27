@@ -41,4 +41,5 @@ object SSM {
   def storeRegister(index: Int) = createInstruction(classOf[StoreRegister],index)
   def storeFreeRegister(index: Int) = storeRegister(index + 4)
   def notEquals = createInstruction(classOf[NotEquals])
+  def lessThen = createInstruction(classOf[LessThen])
 }

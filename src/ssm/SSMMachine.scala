@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 class SSMMachine(program: SSMProgram) {
   val stack = mutable.Stack[Int]()
-  val registers = Array.range(0,10)
+  val registers = Array.fill(10)(0)
   val labelLines = program.instructions.zipWithIndex
     .filter(p => p._1.isInstanceOf[Label])
     .map(p => (p._1.asInstanceOf[Label].name, p._2)).toMap

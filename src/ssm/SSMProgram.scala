@@ -57,6 +57,15 @@ case class StoreRegister(index: java.lang.Integer) extends Instruction {
   }
 }
 
+case class LessThen extends Instruction {
+  def command: String = "lt"
+  def execute(machine: SSMMachine): Unit = {
+    val second = machine.pop()
+    val first = machine.pop()
+    machine.push(first < second)
+  }
+}
+
 case class LoadConstant(value: java.lang.Integer) extends Instruction {
   def command = "ldc"
 
@@ -67,9 +76,9 @@ case class NotEquals extends Instruction {
   def command = "ne"
 
   def execute(machine: SSMMachine): Unit = {
-    val first = machine.pop()
     val second = machine.pop()
-    machine.push(first == second)
+    val first = machine.pop()
+    machine.push(first != second)
   }
 }
 
