@@ -11,7 +11,7 @@ object SSM {
 
   private def instructionToTyped(untypedInstruction: MetaObject) : Instruction = {
     val clazz = untypedInstruction(SSM.clazz).asInstanceOf[Class[_]]
-    val arguments = untypedInstruction(SSM.arguments).asInstanceOf[Seq[Any]].toArray
+    val arguments = untypedInstruction(SSM.arguments).asInstanceOf[Seq[AnyRef]].toArray
     val constructor = clazz.getConstructors()(0)
     constructor.newInstance(arguments:_*).asInstanceOf[Instruction]
   }
@@ -36,7 +36,7 @@ object SSM {
   def loadFreeRegister(index: Int) = loadRegister(index + 4)
   def loadConstant(value: Int) = createInstruction(classOf[LoadConstant], value)
   def addition = createInstruction(classOf[Addition])
-  def storeRegister(index: Int) = createInstruction(classOf[JumpOnFalse],index)
+  def storeRegister(index: Int) = createInstruction(classOf[StoreRegister],index)
   def storeFreeRegister(index: Int) = storeRegister(index + 4)
   def notEquals = createInstruction(classOf[NotEquals])
 }

@@ -47,6 +47,6 @@ class TestWhile
     val typedSSM = languages.SSM.toTyped(_while)
     val machine = new SSMMachine(typedSSM)
     machine.run()
-    assertResult(3)(machine.registers(4))
+    assertResult(4)(machine.registers(4))
   }
 }

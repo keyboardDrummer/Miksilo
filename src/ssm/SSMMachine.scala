@@ -4,14 +4,14 @@ import scala.collection.mutable
 
 class SSMMachine(program: SSMProgram) {
   val stack = mutable.Stack[Int]()
-  val registers = mutable.Map.empty[Int,Int]
+  val registers = Array.range(0,10)
   val labelLines = program.instructions.zipWithIndex
     .filter(p => p._1.isInstanceOf[Label])
     .map(p => (p._1.asInstanceOf[Label].name, p._2)).toMap
 
   def programCounter = registers(0)
   def programCounter_=(value: Int) {
-    registers.put(0,value)
+    registers.update(0,value)
   }
 
   def popBoolean() = pop() != 0

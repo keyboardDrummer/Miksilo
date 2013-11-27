@@ -41,7 +41,7 @@ case class JumpAlways(target: String) extends Instruction {
   }
 }
 
-case class LoadRegister(index: Int) extends Instruction {
+case class LoadRegister(index: java.lang.Integer) extends Instruction {
   def command = "ldr"
 
   def execute(machine: SSMMachine) {
@@ -49,15 +49,15 @@ case class LoadRegister(index: Int) extends Instruction {
   }
 }
 
-case class StoreRegister(index: Int) extends Instruction {
+case class StoreRegister(index: java.lang.Integer) extends Instruction {
   def command = "str"
 
   def execute(machine: SSMMachine) {
-    machine.registers.put(index, machine.pop())
+    machine.registers.update(index, machine.pop())
   }
 }
 
-case class LoadConstant(value: Int) extends Instruction {
+case class LoadConstant(value: java.lang.Integer) extends Instruction {
   def command = "ldc"
 
   def execute(machine: SSMMachine): Unit = machine.push(value)
