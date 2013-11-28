@@ -1,7 +1,7 @@
 package cLanguage
 
-class Statement {
-
+trait Statement {
+  def execute(machine: CMachine)
 }
 
 case class Switch(value: Expression, cases: Seq[SwitchCase])

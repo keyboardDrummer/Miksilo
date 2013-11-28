@@ -6,4 +6,9 @@ case class Function(name: String, returnType: Type, parameters: Seq[FunctionPara
 
 }
 
-case class Return(value: Expression) extends Statement
+case class Return(value: Expression) extends Statement{
+  def execute(machine: CMachine): Unit = {
+    machine.returnValue = machine.evaluate(value)
+    machine.stack(0).scheduledStatements.clear()
+  }
+}
