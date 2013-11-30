@@ -1,7 +1,11 @@
 package cLanguage
 
-class Expression extends Statement {
-
+abstract class Expression extends Statement {
+  def execute(machine: CMachine): StatementResult = {
+    evaluate()
+    Done
+  }
+  def evaluate(machine: CMachine) : Any
 }
 
 case class LiteralInt(value: Int) extends Literal

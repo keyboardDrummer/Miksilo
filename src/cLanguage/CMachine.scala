@@ -6,16 +6,24 @@ import scala.collection.mutable
 
 
 class StackFrame {
-  val scheduledStatements = mutable.Queue.empty[Statement]
+  val env = Map[String,Any]
 }
+
+abstract class StatementResult
+object ContinueResult extends StatementResult
+object BreakResult extends StatementResult
+case class ReturnResult(value: Any) extends StatementResult
+object Done extends StatementResult
 
 class CMachine {
   val env = new StackedMap[String, Any]()
   env.push()
 
   val stack = mutable.Stack[StackFrame]()
-  var returnValue
 
+  def getStatements(statement: Statement) : Seq[Statement] {
+
+  }
   def run(program: CProgram) {
     for(function <- program.functions)
       env.put(function.name, function)
@@ -24,16 +32,9 @@ class CMachine {
     initialStatement.execute(this)
   }
 
-  def runBlock(statements: Seq[Statement]){
-    statements.foreach(statement => scheduledStatements.enqueue(statement))
-  }
 
   def evaluate(expression: Expression) : Any = {
 
-  }
-
-  def returnFunction(expression: Expression) {
-    scheduledStatements.clear()
   }
 
   def callFunction(function: Function)
