@@ -21,6 +21,9 @@ class CMachine {
 
   val stack = mutable.Stack[StackFrame]()
 
+  def getType(expression: Expression) : Type = {
+
+  }
   def getStatements(statement: Statement) : Seq[Statement] {
 
   }

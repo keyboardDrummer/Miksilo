@@ -1,7 +1,7 @@
 package cLanguage
 
 case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) extends Expression {
-  def evaluate(machine: CMachine): Any =
+  override def execute(machine: CMachine): Any =
   {
     val function = machine.evaluate(callee).asInstanceOf[Function]
     val functionStack = new StackFrame()
@@ -19,5 +19,13 @@ case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) exte
       }
     }
     Done
+  }
+
+  def evaluate(machine: CMachine): Any ={
+    val result = execute(machine)
+    result match {
+      case Return(value) => value
+      case _ => throw new RuntimeException("function call expression returned nothing")
+    }
   }
 }

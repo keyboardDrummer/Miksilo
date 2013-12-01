@@ -7,5 +7,5 @@ class Type {
 object CDouble extends Type
 object CInt extends Type
 object CFloat extends Type
-case class Pointer(on: Type)
-case class Array(on: Type, size: Int)
+case class PointerType(on: Type) extends Type
+case class ArrayType(on: Type, size: Int) extends Type
