@@ -15,7 +15,7 @@ case class ForLoop(initializer: Expression, condition: Expression, increment: Ex
   }
 
   def runIteration(machine: CMachine) : StatementResult = {
-    for (statement <- machine.getStatements(body)) {
+    for (statement <- body.statements) {
       val result = statement.execute(machine)
       result match {
         case ContinueResult => return Done

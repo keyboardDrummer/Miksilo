@@ -1,7 +1,7 @@
 package cLanguage
 
 case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) extends Expression {
-  override def execute(machine: CMachine): Any =
+  override def execute(machine: CMachine): StatementResult =
   {
     val function = machine.evaluate(callee).asInstanceOf[Function]
     val functionStack = new StackFrame()
@@ -12,7 +12,7 @@ case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) exte
   }
 
   def executeFunctionBody(machine: CMachine, function: Function) : StatementResult = {
-    for (statement <- machine.getStatements(function.body)) {
+    for (statement <- function.body.statements) {
       val result = statement.execute(machine)
       result match {
         case ReturnResult(value) => return ReturnResult(value)
@@ -24,8 +24,10 @@ case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) exte
   def evaluate(machine: CMachine): Any ={
     val result = execute(machine)
     result match {
-      case Return(value) => value
+      case ReturnResult(value) => value
       case _ => throw new RuntimeException("function call expression returned nothing")
     }
   }
+
+  def _type(machine: CMachine): Type = callee._type(machine).asInstanceOf[FunctionType].returnType
 }
