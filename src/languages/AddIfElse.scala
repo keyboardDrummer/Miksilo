@@ -34,10 +34,10 @@ object AddIfElse extends ProgramTransformation{
 
   def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
 
-  def createIfElse(condition: MetaObject, then: MetaObject, _else: MetaObject) = new MetaObject(_if)
+  def createIfElse(condition: MetaObject, _then: MetaObject, _else: MetaObject) = new MetaObject(_if)
   {
     data.put(AddIfElse.condition,condition)
-    data.put(AddIfElse._then,then)
+    data.put(AddIfElse._then,_then)
     data.put(AddIfElse._else,_else)
   }
 }

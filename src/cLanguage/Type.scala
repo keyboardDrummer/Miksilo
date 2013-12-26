@@ -17,10 +17,12 @@ object CFloat extends Type{
 case class PointerType(on: Type) extends Type{
   def size: Int = CInt.size
 }
-case class ArrayType(on: Type, count: Int) extends Type
+
+class ArrayType(on: Type, count: Int) extends PointerType(on)
 {
-  def size: Int = on.size * count
+  override def size: Int = on.size * count
 }
+
 case class FunctionType(returnType: Type, parameterTypes: Seq[Type]) extends Type{
   def size: Int = 1
 }

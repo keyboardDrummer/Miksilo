@@ -9,27 +9,48 @@ class StackFrame {
   val env = Map[String,Any]()
 }
 
+
 abstract class StatementResult
 object ContinueResult extends StatementResult
 object BreakResult extends StatementResult
 case class ReturnResult(value: Any) extends StatementResult
 object Done extends StatementResult
 
+class FunctionStack(machine: CMachine) extends  mutable.Map[String,EnvEntry] {
+  val env = new StackedMap[String, EnvEntry]()
+  def push() {
+    env.push()
+  }
+
+  def pop()
+  {
+    for(entry <- env.stack(0).values)
+      machine.memory.remove(entry.location)
+    env.pop()
+  }
+
+  def get(key: String): Option[EnvEntry] = env.get(key)
+
+  def iterator: Iterator[(String, EnvEntry)] = env.iterator
+
+  def +=(kv: (String, EnvEntry)): this.type = { env.+=(kv); this }
+
+  def -=(key: String): this.type = { env.-=(key); this }
+}
+
 case class EnvEntry(location: Int, _type: Type)
 class CMachine {
-  val memory = new Memory()
-  val env = new StackedMap[String, EnvEntry]()
-  env.push()
 
-  val stack = mutable.Stack[StackFrame]()
+  val memory = new Memory()
+  val env = new FunctionStack(this)
 
   def getType(expression: Expression) : Type = {
     expression._type(this)
   }
 
-  def getStatements(statement: Statement) : Seq[Statement] = ???
-
   def run(program: CProgram) {
+    env.push()
+
     for(function <- program.functions)
     {
       val _type = function._type(this)
@@ -37,23 +58,13 @@ class CMachine {
       env.put(function.name, new EnvEntry(location,_type))
     }
 
+    for(global <- program.globalVariables)
+    {
+      global.execute(this)
+    }
+
     val initialStatement = new Call(new Variable("main"))
     initialStatement.execute(this)
   }
-
-
-  def evaluate(expression: Expression) : Any = {
-
-  }
-
-  def callFunction(function: Function)
-  {
-
-  }
-}
-
-class Continuation
-{
-
 }
 

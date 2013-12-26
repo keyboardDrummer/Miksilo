@@ -2,7 +2,7 @@ package cLanguage
 
 class While(condition: Expression, body: Block) extends Statement {
   def execute(machine: CMachine): StatementResult = {
-    while(machine.evaluate(condition).asInstanceOf[Boolean])
+    while(condition.evaluate(machine).asInstanceOf[Boolean])
     {
       val result = runIteration(machine)
       result match {

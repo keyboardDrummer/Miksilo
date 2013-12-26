@@ -6,7 +6,7 @@ import cLanguage.Variable._
 class CTests {
 
   def runProgram(program: CProgram) {
-    new CMachine(program).run()
+    new CMachine().run(program)
   }
 
   def runStatementsAsMain(statements: Seq[Statement]) {
@@ -18,12 +18,12 @@ class CTests {
   def testPointers1() {
     object TestStatement extends Statement {
       def execute(machine: CMachine): StatementResult = {
-        Assert.assertEquals(2, machine.environment("j").value)
+        Assert.assertEquals(2, machine.memory(machine.env("j").location))
         Done
       }
     }
     val globalVariables = Seq(new VariableDeclaration("j", CInt), new VariableDeclaration("k", CInt), new VariableDeclaration("ptr", new PointerType(CInt)))
-    val statements = Seq(
+    val statements = Seq[Statement](
       new Assignment("k", 2),
       new Assignment("ptr", new GetAddress("k")),
       new Assignment("j", new Dereference("ptr")),
@@ -36,7 +36,7 @@ class CTests {
 
   @Test
   def testSubtraction() {
-    val statements = Seq(new VariableDeclaration("arr",new ArrayType(CInt,10))
+    val statements = Seq[Statement](new VariableDeclaration("arr",new ArrayType(CInt,10))
       , new VariableDeclaration("p1", new PointerType(CInt), Some(new Add("arr", 2)))
       , new VariableDeclaration("p2", new PointerType(CInt), Some(new Add("arr", 2)))
       , new Statement {

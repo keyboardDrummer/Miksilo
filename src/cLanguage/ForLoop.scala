@@ -2,8 +2,8 @@ package cLanguage
 
 case class ForLoop(initializer: Expression, condition: Expression, increment: Expression, body: Block) extends Statement {
   def execute(machine: CMachine): StatementResult = {
-    machine.evaluate(initializer)
-    while(machine.evaluate(condition).asInstanceOf[Boolean])
+    initializer.evaluate(machine)
+    while(condition.evaluate(machine).asInstanceOf[Boolean])
     {
       val result = runIteration(machine)
       result match {
@@ -23,7 +23,7 @@ case class ForLoop(initializer: Expression, condition: Expression, increment: Ex
         case _ => result
       }
     }
-    machine.evaluate(increment)
+    increment.evaluate(machine)
     Done
   }
 }

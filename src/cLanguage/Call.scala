@@ -3,11 +3,10 @@ package cLanguage
 case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) extends Expression {
   override def execute(machine: CMachine): StatementResult =
   {
-    val function = machine.evaluate(callee).asInstanceOf[Function]
-    val functionStack = new StackFrame()
-    machine.stack.push(functionStack)
+    val function = callee.evaluate(machine).asInstanceOf[Function]
+    machine.env.push()
     val result = executeFunctionBody(machine, function)
-    machine.stack.pop()
+    machine.env.pop()
     result
   }
 
@@ -16,6 +15,7 @@ case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) exte
       val result = statement.execute(machine)
       result match {
         case ReturnResult(value) => return ReturnResult(value)
+        case _ =>
       }
     }
     Done
