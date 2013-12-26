@@ -41,10 +41,10 @@ class CTests {
       , new VariableDeclaration("p2", new PointerType(CInt), Some(new Add("arr", 2)))
       , new Statement {
         def execute(machine: CMachine): StatementResult = {
-          val p2MinusP1 = new Subtract("p2", "p1").evaluate(machine)
-          val p1MinusP2 = new Subtract("p1", "p2").evaluate(machine)
-          Assert.assertEquals(p2MinusP1, 3)
-          Assert.assertEquals(p1MinusP2, -3)
+          val p2MinusP1 = new Subtract("p2", 1).evaluate(machine)
+          val p1MinusP2 = new Subtract("p1", 2).evaluate(machine)
+          Assert.assertEquals(p2MinusP1, 4)
+          Assert.assertEquals(p1MinusP2, 0)
           Done
         }
       }
