@@ -29,5 +29,5 @@ case class Call(callee: Expression, arguments: Seq[Expression] = Seq.empty) exte
     }
   }
 
-  def _type(machine: CMachine): Type = callee._type(machine).asInstanceOf[FunctionType].returnType
+  def getType(machine: CMachine): Type = callee.getType(machine).asInstanceOf[FunctionType].returnType
 }

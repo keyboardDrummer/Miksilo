@@ -3,6 +3,7 @@ package cLanguage
 import util.StackedMap
 import scala.collection.immutable.Queue
 import scala.collection.mutable
+import java.io.StringWriter
 
 
 class StackFrame {
@@ -40,12 +41,12 @@ class FunctionStack(machine: CMachine) extends  mutable.Map[String,EnvEntry] {
 
 case class EnvEntry(location: Int, _type: Type)
 class CMachine {
-
   val memory = new Memory()
   val env = new FunctionStack(this)
+  val standardOut = new StringWriter()
 
   def getType(expression: Expression) : Type = {
-    expression._type(this)
+    expression.getType(this)
   }
 
   def run(program: CProgram) {
@@ -53,7 +54,7 @@ class CMachine {
 
     for(function <- program.functions)
     {
-      val _type = function._type(this)
+      val _type = function.getType(this)
       val location = memory.putAlloc(function,_type)
       env.put(function.name, new EnvEntry(location,_type))
     }

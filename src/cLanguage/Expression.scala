@@ -6,7 +6,7 @@ abstract class Expression extends Statement {
     Done
   }
   def evaluate(machine: CMachine) : Any
-  def _type(machine: CMachine) : Type
+  def getType(machine: CMachine) : Type
 }
 
 case class Assignment(target: HiddenPointer, value: Expression) extends Expression{
@@ -14,7 +14,7 @@ case class Assignment(target: HiddenPointer, value: Expression) extends Expressi
     machine.memory.alter(target.getAddress(machine),value.evaluate(machine))
   }
 
-  def _type(machine: CMachine): Type = value._type(machine)
+  def getType(machine: CMachine): Type = value.getType(machine)
 }
 
 trait HiddenPointer extends Expression
@@ -29,7 +29,7 @@ case class Dereference(target: Expression) extends HiddenPointer{
     machine.memory(pointer)
   }
 
-  def _type(machine: CMachine): Type = target._type(machine).asInstanceOf[PointerType].on
+  def getType(machine: CMachine): Type = target.getType(machine).asInstanceOf[PointerType].on
 
   def getAddress(machine: CMachine): Int = target.evaluate(machine).asInstanceOf[Int]
 }
@@ -38,7 +38,7 @@ case class Select(target: Expression, selector: String) extends HiddenPointer{
 
   def evaluate(machine: CMachine): Any = ???
 
-  def _type(machine: CMachine): Type = target._type(machine).asInstanceOf[StructType].fields(selector)
+  def getType(machine: CMachine): Type = target.getType(machine).asInstanceOf[StructType].fields(selector)
 
   def getAddress(machine: CMachine): Int = ???
 }
@@ -46,14 +46,14 @@ case class Select(target: Expression, selector: String) extends HiddenPointer{
 case class GetAddress(target: HiddenPointer) extends Expression{
   def evaluate(machine: CMachine): Any = target.getAddress(machine)
 
-  def _type(machine: CMachine): Type = new PointerType(target._type(machine))
+  def getType(machine: CMachine): Type = new PointerType(target.getType(machine))
 }
 
 case class IndexArray(arrayExpression: Expression, index: Expression) extends HiddenPointer{
 
   def evaluate(machine: CMachine): Any = machine.memory(getAddress(machine))
 
-  def _type(machine: CMachine): Type = arrayExpression._type(machine).asInstanceOf[PointerType].on
+  def getType(machine: CMachine): Type = arrayExpression.getType(machine).asInstanceOf[PointerType].on
 
   def getAddress(machine: CMachine): Int = new AddPointer(arrayExpression, index).evaluate(machine)
 }
@@ -62,12 +62,12 @@ case class Variable(name: String) extends HiddenPointer {
   def evaluate(machine: CMachine): Any = machine.memory(machine.env(name).location)
 
 
-  def _type(machine: CMachine): Type = machine.env(name)._type
+  def getType(machine: CMachine): Type = machine.env(name)._type
 
   def getAddress(machine: CMachine): Int = machine.env(name).location
 }
 
 object Variable
 {
-  implicit def stringToVariable(name: String) : Variable = new Variable(name)
+  def $(name: String) = new Variable(name)
 }

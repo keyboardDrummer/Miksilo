@@ -13,6 +13,13 @@ object CInt extends Type{
 object CFloat extends Type{
   def size: Int = 16
 }
+object CChar extends Type {
+  def size = 4
+}
+object CBool extends Type {
+  def size = 4
+}
+object CString extends PointerType(CChar)
 
 case class PointerType(on: Type) extends Type{
   def size: Int = CInt.size

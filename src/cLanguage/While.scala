@@ -8,6 +8,7 @@ class While(condition: Expression, body: Block) extends Statement {
       result match {
         case BreakResult => return Done
         case ReturnResult(value) => return result
+        case Done =>
       }
     }
     Done

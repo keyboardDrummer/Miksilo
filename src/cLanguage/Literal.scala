@@ -12,27 +12,36 @@ object LiteralInt
 }
 
 case class LiteralInt(value: Int) extends Literal {
-  def _type(machine: CMachine): Type = CInt
+  def getType(machine: CMachine): Type = CInt
 }
 
 case class LiteralChar(value: Char) extends Literal{
-  def _type(machine: CMachine): Type = ???
+  def getType(machine: CMachine): Type = CChar
 }
 
 case class LiteralString(value: String) extends Literal{
-  def _type(machine: CMachine): Type = ???
+  def getType(machine: CMachine): Type = CString
+
+  override def evaluate(machine: CMachine): Any = {
+    machine.memory.putAlloc(value, getType(machine))
+  }
 }
 
 case class LiteralFloat(value: Float) extends Literal{
-  def _type(machine: CMachine): Type = CFloat
+  def getType(machine: CMachine): Type = CFloat
 }
 
 case class LiteralDouble(value: Double) extends Literal{
-  def _type(machine: CMachine): Type = CDouble
+  def getType(machine: CMachine): Type = CDouble
 }
 
 case class LiteralArray[T <: Literal](values: Seq[T]) extends Expression {
-  def _type(machine: CMachine): Type = ???
+  def getType(machine: CMachine): Type = values(0).getType(machine)
 
-  def evaluate(machine: CMachine): Any = ???
+  def evaluate(machine: CMachine): Any = {
+    val _type = getType(machine)
+    val size = _type.size
+    val location = machine.memory.heapAlloc(values.size * size)
+    Stream.from(0).map(index => machine.memory.put(location + index * size, values(index), _type))
+  }
 }
