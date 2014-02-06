@@ -7,7 +7,7 @@ import SSM._
 object AddStatementToSSM extends ProgramTransformation {
 
   def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, mutable.Map.empty)
-    .asInstanceOf[mutable.Map[String, MetaObject => Seq[MetaObject]]]
+    .asInstanceOf[mutable.Map[AnyRef, MetaObject => Seq[MetaObject]]]
 
   def convertStatement(statement: MetaObject, state: TransformationState) = {
     val statementToSSMLines = getStatementToLines(state)

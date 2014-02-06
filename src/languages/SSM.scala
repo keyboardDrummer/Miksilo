@@ -18,8 +18,8 @@ object SSM {
 
   private def createInstruction[T <: Instruction](clazz : Class[T], arguments: Any*) = {
     val result = new MetaObject(instruction)
-    result(SSM.clazz,clazz)
-    result(SSM.arguments, arguments)
+    result(SSM.clazz) = clazz
+    result(SSM.arguments) = arguments
     result
   }
 

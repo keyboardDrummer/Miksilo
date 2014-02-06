@@ -1,0 +1,6 @@
+package javaBytecode
+
+class FieldDescriptor {
+
+}
+
