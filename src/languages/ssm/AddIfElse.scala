@@ -1,12 +1,12 @@
-package languages
+package languages.ssm
 
 import transformation.{TransformationManager, TransformationState, MetaObject, ProgramTransformation}
-import languages.SSM._
-import languages.AddStatementToSSM._
 import org.junit.Test
-import languages.AddBlock._
 import ssm.SSMMachine
 import org.scalatest.junit.AssertionsForJUnit._
+import languages.ssm
+import SSM._
+import AddStatementToSSM._
 
 object AddIfElse extends ProgramTransformation{
   val _if = "if"
@@ -53,7 +53,7 @@ class TestIfElse
     val _if = AddIfElse.createIfElse(condition,_then,_else)
     val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
     compiler.compile(_if)
-    val typedSSM = languages.SSM.toTyped(_if)
+    val typedSSM = SSM.toTyped(_if)
     val machine = new SSMMachine(typedSSM)
     machine.run()
     assertResult(5)(machine.pop())
@@ -68,7 +68,7 @@ class TestIfElse
     val _if = AddIfElse.createIfElse(condition,_then,_else)
     val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
     compiler.compile(_if)
-    val typedSSM = languages.SSM.toTyped(_if)
+    val typedSSM = ssm.SSM.toTyped(_if)
     val machine = new SSMMachine(typedSSM)
     machine.run()
     assertResult(9)(machine.pop())

@@ -1,4 +1,4 @@
-package languages
+package languages.ssm
 
 import transformation.{MetaObject, TransformationState, ProgramTransformation}
 import scala.collection.mutable

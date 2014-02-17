@@ -1,6 +1,8 @@
 package javaBytecode
 
-class FieldType extends FieldDescriptor with ReturnDescriptor
+class ReturnType
+class VoidType extends ReturnType
+class FieldType extends ReturnType
 
 class ClassType(name: Identifier) extends FieldType {
 

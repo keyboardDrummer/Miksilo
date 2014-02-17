@@ -1,6 +1,6 @@
-package languages
+package languages.ssm
 
-import transformation.MetaObject
+import transformation.{ProgramTransformation, MetaObject}
 import ssm._
 
 object SSM {

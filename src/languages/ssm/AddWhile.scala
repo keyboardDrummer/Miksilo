@@ -1,15 +1,15 @@
-package languages
+package languages.ssm
 
 import transformation.{TransformationManager, MetaObject, TransformationState, ProgramTransformation}
 import SSM._
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit._
-import languages.AddBlock._
 import ssm.SSMMachine
 import org.scalatest.Assertions
-
+import languages.ssm
+import AddBlock._
 object AddWhile extends ProgramTransformation {
-  val body = "body"
+  val body = "_body"
   val condition = "condition"
   val _while = "while"
   def transform(program: MetaObject, state: TransformationState) = {
@@ -44,7 +44,7 @@ class TestWhile
     val _while = AddWhile.createWhile(condition,body)
     val compiler = TransformationManager.buildCompiler(Seq(AddWhile, AddBlock, AddStatementToSSM))
     compiler.compile(_while)
-    val typedSSM = languages.SSM.toTyped(_while)
+    val typedSSM = ssm.SSM.toTyped(_while)
     val machine = new SSMMachine(typedSSM)
     machine.run()
     assertResult(3)(machine.registers(4))

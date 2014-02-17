@@ -2,6 +2,7 @@ package javaBytecode
 
 import scala.collection.mutable
 import util.TestConsole
+import transformation.MetaObject
 
 class Frame
 {
@@ -15,4 +16,5 @@ class JavaByteCodeMachine(val console: TestConsole) {
   def operands = currentFrame.operands
   def variables = currentFrame.variables
 
+  def run(byteCode: ClassFile) = ???
 }

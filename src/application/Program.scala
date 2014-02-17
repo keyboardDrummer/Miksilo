@@ -66,7 +66,7 @@ object Program extends SimpleSwingApplication {
     layout.execute(mxGraph.getDefaultParent)
     val graphComponent = new mxGraphComponent(mxGraph)
     graphComponent.setConnectable(false)
-    //graphComponent.setEn
+    graphComponent.setEnabled(true)
     contents = Component.wrap(graphComponent)
     //contents = Component.wrap(jGraph)
   }

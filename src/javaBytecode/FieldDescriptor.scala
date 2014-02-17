@@ -1,6 +1,0 @@
-package javaBytecode
-
-class FieldDescriptor {
-
-}
-

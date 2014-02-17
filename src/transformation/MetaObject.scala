@@ -3,6 +3,7 @@ package transformation
 import scala.collection.mutable
 
 object MetaObject {
+
   def deepEquality(first: MetaObject, second: MetaObject) : Boolean = {
     deepEquality(first,second, mutable.Set[(MetaObject,MetaObject)]())
   }
@@ -35,8 +36,8 @@ object MetaObject {
 }
 
 class MetaObject(val clazz: AnyRef) {
-  val data: mutable.Map[String,Any] = mutable.Map.empty
+  val data: mutable.Map[Any,Any] = mutable.Map.empty
 
-  def apply(key: String) = data(key)
-  def update(key: String, value: Any) = data.put(key, value)
+  def apply(key: Any) = data(key)
+  def update(key: Any, value: Any) = data.put(key, value)
 }

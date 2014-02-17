@@ -1,7 +1,7 @@
-package languages
+package languages.ssm
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.AddStatementToSSM._
+import AddStatementToSSM._
 
 object AddBlock extends ProgramTransformation {
   val block = "block"

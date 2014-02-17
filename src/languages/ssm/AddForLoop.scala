@@ -1,15 +1,15 @@
-package languages
+package languages.ssm
 
 import transformation.{TransformationManager, TransformationState, MetaObject, ProgramTransformation}
-import languages.SSM._
 import org.junit.Test
-import languages.AddBlock._
 import ssm.SSMMachine
 import org.scalatest.junit.AssertionsForJUnit._
+import SSM._
+import AddBlock._
 
 object AddForLoop extends ProgramTransformation
 {
-  val body = "body"
+  val body = "_body"
   val condition = "condition"
   val forLoop = "forLoop"
   val initialisation = "initialisation"
@@ -57,7 +57,7 @@ class TestForLoop
     val forLoop = AddForLoop.createForLoop(initializer, condition, increment, body)
     val compiler = TransformationManager.buildCompiler(Seq(AddForLoop, AddBlock, AddStatementToSSM))
     compiler.compile(forLoop)
-    val typedSSM = languages.SSM.toTyped(forLoop)
+    val typedSSM = SSM.toTyped(forLoop)
     val machine = new SSMMachine(typedSSM)
     machine.run()
     assertResult(6)(machine.registers(5))

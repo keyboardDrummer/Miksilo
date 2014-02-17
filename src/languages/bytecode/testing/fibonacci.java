@@ -1,4 +1,6 @@
-class Fiboacci {
+package languages.bytecode.testing;
+
+class Fibonacci {
 	public static void main(String[] args)
 	{
 		System.console().printf("%s", fibonacci(5));

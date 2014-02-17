@@ -1,10 +1,11 @@
-package languages
+package languages.ssm
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.SSM._
+import AddStatementToSSM._
+import SSM._
 
 object AddDoWhile extends ProgramTransformation {
-  val body = "body"
+  val body = "_body"
   val condition = "condition"
   val _while = "doWhile"
 

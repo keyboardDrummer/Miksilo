@@ -1,11 +1,8 @@
 package javaBytecode
 
-class MethodDescriptor(parameters: Seq[ParameterDescriptor], _return: ReturnDescriptor) {
+class MethodDescriptor(parameters: Seq[FieldType], _return: ReturnType) {
 
 }
 
-class ParameterDescriptor
 
-trait ReturnDescriptor
-class VoidDescriptor extends ReturnDescriptor
 
