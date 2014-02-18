@@ -25,6 +25,38 @@ class TestFibonacciCompilation {
       ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
+      ByteCode.integerConstant(0),
+      ByteCode.ifIntegerCompareGreater(9),
+      ByteCode.integerConstant(1),
+      ByteCode.goTo(22),
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(1),
+      ByteCode.subtractInteger,
+      ByteCode.invokeStatic(2),
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(2),
+      ByteCode.subtractInteger,
+      ByteCode.invokeStatic(2),
+      ByteCode.addInteger,
+      ByteCode.doReturn
+    )
+    val method = ByteCode.methodInfo(0,0,Seq(ByteCode.codeAttribute(0,0,0,0,instructions,Seq(),Seq())))
+    val nativeClass = ByteCode.clazz(className, Seq(), Seq(method))
+    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false)))
+  }
+
+  @Test
+  def compareCompiledVersusOptimizedNativeCode() {
+    val className = "test"
+    val fibonacci = clazz(className, Seq(getFibonacciMethod))
+    val compiler = JavaCompiler.getCompiler
+    val compiledCode = compiler.compile(fibonacci)
+    val instructions = Seq(
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(0),
+      ByteCode.ifIntegerCompareGreater(9),
+      ByteCode.integerConstant(1),
+      ByteCode.goTo(22),
       ByteCode.addressLoad(0),
       ByteCode.integerConstant(1),
       ByteCode.subtractInteger,

@@ -23,10 +23,10 @@ object MetaObject {
     def deepEqualityMeta(first: MetaObject, second: MetaObject, closed: mutable.Set[(MetaObject,MetaObject)]) : Boolean = {
       val key = (first,second)
       if (!closed.add(key))
-        true
+        return true
 
       if (!first.clazz.equals(second.clazz))
-        false
+        return false
 
       val sharedKeys = if (options.compareKeyUnion) first.data.keySet ++ second.data.keySet else first.data.keySet.intersect(second.data.keySet)
       sharedKeys.forall(key => (first.data.get(key),second.data.get(key)) match {
