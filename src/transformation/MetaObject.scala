@@ -40,4 +40,6 @@ class MetaObject(val clazz: AnyRef) {
 
   def apply(key: Any) = data(key)
   def update(key: Any, value: Any) = data.put(key, value)
+
+  override def toString: String = s"${clazz.toString}: ${data.toString}"
 }

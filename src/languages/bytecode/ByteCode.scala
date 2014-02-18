@@ -4,13 +4,19 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 
 object ByteCode extends ProgramTransformation {
-  def goTo(target: Int): MetaObject = instruction("goTo", Seq(target))
+  def instructionSize(instruction: MetaObject) = ???
 
-  def ifIntegerCompareGreater(target: Int): MetaObject = instruction("ifIntegerCompareGreater", Seq(target))
+  def goTo(target: Int): MetaObject = instruction(GoToKey, Seq(target))
+
+  def ifIntegerCompareGreater(target: Int): MetaObject = instruction(IfIntegerCompareGreater, Seq(target))
 
 
-  def methodInfo(nameIndex: Int, descriptorIndex: Int, annotations: Seq[MetaObject]) = new MetaObject(MethodInfoKey) {
-    
+  def getMethodAnnotations(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
+  def methodInfo(nameIndex: Int, descriptorIndex: Int, annotations: Seq[MetaObject]) = new MetaObject(MethodInfoKey)
+  {
+    data.put(MethodAnnotations, annotations)
+    data.put(MethodNameIndex, nameIndex)
+    data.put(MethodDescriptorIndex, descriptorIndex)
   }
   object MethodInfoKey
   object MethodNameIndex
@@ -18,7 +24,8 @@ object ByteCode extends ProgramTransformation {
   object MethodAnnotations
 
 
-  def integerIncrement(location: Int, amount: Int) = instruction("integerIncrement", Seq(location,amount))
+  object IntegerIncrementKey
+  def integerIncrement(location: Int, amount: Int) = instruction(IntegerIncrementKey, Seq(location,amount))
 
   def addressStore(location: Int) = instruction("addressStore", Seq(location))
 
@@ -27,12 +34,19 @@ object ByteCode extends ProgramTransformation {
 
   def subtractInteger = instruction("subtractIntegers")
 
-  def addInteger = instruction("addIntegers")
+  object IntegerConstantKey
+  object AddIntegersKey
+  def addInteger = instruction(AddIntegersKey)
 
-  def integerConstant(value: Integer) = instruction("integerConstant", Seq(value))
+  def integerConstant(value: Integer) = instruction(IntegerConstantKey, Seq(value))
 
-  def instruction(_type: String, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
-    data.put("arguments",arguments)
+  object InstructionArgumentsKey
+  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
+    data.put(InstructionArgumentsKey,arguments)
+  }
+  def getInstructionArguments(instruction: MetaObject) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Any]]
+  def setInstructionArguments(instruction: MetaObject, arguments: Seq[Any]) {
+    instruction(InstructionArgumentsKey) = arguments
   }
 
   def ifNotEqual(target: Short) = new MetaObject("ifNotEquals")
@@ -43,13 +57,29 @@ object ByteCode extends ProgramTransformation {
     }
   }
 
+  object CodeKey
+  object CodeLengthKey
+  object CodeMaxStackKey
+  object CodeMaxLocalsKey
+  object CodeInstructionsKey
+  object CodeExceptionTableKey
+  object CodeAttributesKey
   def codeAttribute(nameIndex: Integer, length: Integer, maxStack: Integer, maxLocals: Integer,
-                    code: Seq[MetaObject],
+                    instructions: Seq[MetaObject],
                     exceptionTable: Seq[MetaObject],
                     attributes: Seq[MetaObject]) =
   {
-    ???
+    new MetaObject(CodeKey) {
+      data.put(CodeLengthKey, length)
+      data.put(CodeMaxStackKey, maxStack)
+      data.put(CodeMaxLocalsKey, maxLocals)
+      data.put(CodeInstructionsKey, instructions)
+      data.put(CodeExceptionTableKey, exceptionTable)
+      data.put(CodeAttributesKey, attributes)
+    }
   }
+
+  def getCodeInstructions(code: MetaObject) = code(CodeInstructionsKey).asInstanceOf[Seq[MetaObject]]
 
   val nameIndex: String = "nameIndex"
 
@@ -63,8 +93,12 @@ object ByteCode extends ProgramTransformation {
     data.put(ClassConstantPool, constantPool)
   }
 
+  def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
   def transform(program: MetaObject, state: TransformationState): Unit = {}
 
   def dependencies: Set[ProgramTransformation] = Set.empty
+
+  object GoToKey
+  object IfIntegerCompareGreater
 }
