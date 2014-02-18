@@ -3,8 +3,10 @@ package languages.java.base
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import JavaBaseModel._
+import JavaMethodModel._
 import languages.bytecode.{ByteCodeGoTo, ByteCode}
 import languages.java.base.JavaTypes.{DoubleType, IntegerType}
+import languages.java.base.JavaMethodModel.Return
 
 class VariablePool {
   var offset = 0
@@ -59,6 +61,11 @@ object JavaBase extends ProgramTransformation {
         case SelectorKey => ???
       }
       argumentInstructions ++ Seq(ByteCode.invokeStatic(methodInfo.location))
+    })
+    result.put(Return, (_return,compiler) => {
+      val returnValue = getReturnValue(_return)
+      val returnValueInstructions = statementToInstructions(returnValue, compiler)
+      returnValueInstructions ++ Seq(ByteCode.integerReturn)
     })
     result
   }

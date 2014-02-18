@@ -4,8 +4,9 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 
 object ByteCode extends ProgramTransformation {
-  object ReturnKey
-  def doReturn: MetaObject = instruction(ReturnKey)
+  
+  object IntegerReturn
+  def integerReturn: MetaObject = instruction(IntegerReturn)
 
   object InvokeStaticKey
   def invokeStatic(constantIndex: Int): MetaObject = instruction(InvokeStaticKey, Seq(constantIndex))

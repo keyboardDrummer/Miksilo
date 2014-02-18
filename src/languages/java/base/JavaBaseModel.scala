@@ -15,6 +15,13 @@ object JavaClassModel {
 
 object JavaMethodModel {
 
+  object Return
+  object ReturnValue
+  def _return(value: MetaObject): MetaObject = new MetaObject(Return) {
+    data.put(ReturnValue, value)
+  }
+  def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[MetaObject]
+
   def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
 
   object MethodBodyKey
