@@ -2,12 +2,12 @@ package transformation
 
 import languages._
 import languages.ssm._
-import languages.bytecode.{TernaryC, JavaBase, ByteCodeGoTo, ByteCode}
+import languages.bytecode._
 
 object TransformationManager {
   val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse, AddBlock,
     AddDoWhile, AddIfElse, AddForLoop,
-    ByteCode, ByteCodeGoTo, JavaBase, TernaryC)
+    ByteCode, ByteCodeGoTo, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC)
 
   def buildCompiler(transformations: Seq[ProgramTransformation]) : Compiler = {
     new Compiler {

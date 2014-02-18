@@ -2,7 +2,7 @@ package languages.bytecode
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 
-object StringLiteral extends ProgramTransformation {
+object StringLiteralC extends ProgramTransformation {
   object StringClazz
   object ValueField
   def literal(value: String) = {

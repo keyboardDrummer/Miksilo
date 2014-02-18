@@ -8,7 +8,7 @@ class VariablePool {
   var offset = 0
   val variables = mutable.Map[String,Integer]()
 
-  def add(variable: String, _type: MetaObject) {
+  def add(variable: String, _type: Any) {
     variables(variable) = offset
     offset += JavaBase.getSize(_type)
   }
@@ -31,6 +31,7 @@ object JavaBase extends ProgramTransformation {
   def getSize(_type: Any): Int = _type match {
     case IntegerType => 1
     case DoubleType => 1
+    case _ => throw new RuntimeException()
   }
 
   def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, getInitialStatementToLines)
@@ -117,13 +118,13 @@ object JavaBase extends ProgramTransformation {
 
       def addMethodDescriptor(method: MetaObject, parameters: Seq[MetaObject]) {
         val returnType = getMethodReturnType(method)
-        method.data.remove(returnTypeKey)
+        method.data.remove(ReturnTypeKey)
 
         ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
             ,parameters.map(p => javaTypeToByteCodeType(getParameterType(p))))
       }
 
-      def javaTypeToByteCodeType(_type: MetaObject) : MetaObject = {
+      def javaTypeToByteCodeType(_type: Any) : Any = {
         _type
       }
 
@@ -146,7 +147,7 @@ object JavaBase extends ProgramTransformation {
                static: Boolean = false, visibility: String = privateVisibility) = {
     new MetaObject("JavaMethod") {
       data.put(parameterNameKey, name)
-      data.put(returnTypeKey, _returnType)
+      data.put(ReturnTypeKey, _returnType)
       data.put(methodParametersKey, _parameters)
       data.put(methodBodyKey,_body)
       data.put(StaticKey, static)
@@ -183,7 +184,7 @@ object JavaBase extends ProgramTransformation {
     }
   }
 
-  def getParameterType(metaObject: MetaObject) : MetaObject = metaObject(parameterTypeKey).asInstanceOf[MetaObject]
+  def getParameterType(metaObject: MetaObject) : Any = metaObject(parameterTypeKey)
   def getParameterName(metaObject: MetaObject) = metaObject(parameterNameKey).asInstanceOf[String]
   val parameterTypeKey: String = "_type"
 
@@ -193,10 +194,10 @@ object JavaBase extends ProgramTransformation {
   }
 
   def getMethodReturnType(metaObject: MetaObject) = {
-    metaObject(returnTypeKey).asInstanceOf[MetaObject]
+    metaObject(ReturnTypeKey)
   }
 
-  val returnTypeKey = "returnType"
+  object ReturnTypeKey
   val methodNameKey: String = parameterNameKey
 
   def getMethodName(metaObject: MetaObject) = {

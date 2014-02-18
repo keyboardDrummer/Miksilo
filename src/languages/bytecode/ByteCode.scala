@@ -4,6 +4,12 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 
 object ByteCode extends ProgramTransformation {
+  object ReturnKey
+  def doReturn: MetaObject = instruction(ReturnKey)
+
+  object InvokeStaticKey
+  def invokeStatic(constantIndex: Int): MetaObject = instruction(InvokeStaticKey, Seq(constantIndex))
+
   def instructionSize(instruction: MetaObject) = ???
 
   def goTo(target: Int): MetaObject = instruction(GoToKey, Seq(target))
@@ -50,7 +56,7 @@ object ByteCode extends ProgramTransformation {
   }
 
   def ifNotEqual(target: Short) = new MetaObject("ifNotEquals")
-  def methodDescriptor(returnDescriptor: MetaObject, parameterDescriptors: Seq[MetaObject]) = {
+  def methodDescriptor(returnDescriptor: Any, parameterDescriptors: Seq[Any]) = {
     new MetaObject("methodDescriptor") {
       data.put("parameters", parameterDescriptors)
       data.put("returnType", returnDescriptor)

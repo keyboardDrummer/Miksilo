@@ -2,7 +2,7 @@ package languages.bytecode.testing
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
-import transformation.{TransformationManager, MetaObject}
+import transformation.{ComparisonOptions, TransformationManager, MetaObject}
 import javaInterpreter.{JavaClass, Ternary}
 import JavaBase._
 import javaInterpreter.Ternary
@@ -10,8 +10,37 @@ import util.TestConsole
 import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
 
 class TestFibonacciCompilation {
+
   @Test
-  def test() {
+  def compareCompiledVersusNativeCode() {
+    val className = "test"
+    val fibonacci = JavaBase.clazz(Seq(getFibonacciMethod))
+    val compiler = JavaCompiler.getCompiler
+    val compiledCode = compiler.compile(fibonacci)
+    val instructions = Seq(
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(0),
+      ByteCode.ifIntegerCompareGreater(9),
+      ByteCode.integerConstant(1),
+      ByteCode.goTo(22),
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(1),
+      ByteCode.subtractInteger,
+      ByteCode.invokeStatic(2),
+      ByteCode.addressLoad(0),
+      ByteCode.integerConstant(2),
+      ByteCode.subtractInteger,
+      ByteCode.invokeStatic(2),
+      ByteCode.addInteger,
+      ByteCode.doReturn
+    )
+    val method = ByteCode.methodInfo(0,0,Seq(ByteCode.codeAttribute(0,0,0,0,instructions,Seq(),Seq())))
+    val nativeClass = ByteCode.clazz(className, Seq(), Seq(method))
+    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false)))
+  }
+
+  @Test
+  def testCompiledCodeInterpretation() {
     val fibonacci: MetaObject = getFibonacciMethod
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
@@ -29,7 +58,7 @@ class TestFibonacciCompilation {
   def getMainMethod: MetaObject = {
     val parameters = Seq(parameter("args", JavaBase.arrayType(StringType)))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(call(variable("Console.printf"), Seq(StringLiteral.literal("%i"), fibCall)))
+    val body = Seq(call(variable("Console.printf"), Seq(StringLiteralC.literal("%i"), fibCall)))
     method("main",VoidType, parameters, body, true, publicVisibility)
   }
 
