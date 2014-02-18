@@ -3,9 +3,11 @@ package javaInterpreter
 import transformation.MetaObject
 import util.TypedToMetaProgramConverter
 import org.junit.{Assert, Test}
-import languages.bytecode.{JavaBase, SubtractionC, AdditionC, LiteralC}
-import JavaBase._
-import languages.bytecode.{SubtractionC, AdditionC, LiteralC}
+import languages.bytecode._
+import languages.java.base.{JavaMethodModel, JavaBaseModel}
+import JavaBaseModel._
+import JavaMethodModel._
+import languages.java.base.JavaTypes.IntegerType
 
 object JavaASTToMetaProgramConversions extends TypedToMetaProgramConverter {
   def toMetaProgram(java: JavaClass) : MetaObject = convert(java)
@@ -33,19 +35,15 @@ class JavaASTToMetaProgramConversionsTest {
       program
     }
 
-    val parameters = Seq(parameter("i","Integer"))
+    val parameters = Seq(parameter("i",IntegerType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
-    val condition = new MetaObject("LessThan") {
-      data.put("first", variable("i"))
-      data.put("second", LiteralC.literal(2))
-    }
-    val body = Seq(new MetaObject(classOf[Ternary].getSimpleName) {
-      data.put("condition", condition)
-      data.put("trueResult", LiteralC.literal(1))
-      data.put("falseResult", AdditionC.addition(recursiveCall1, recursiveCall2))
-    })
-    val methods = Seq(method("fibonacci","Integer",parameters, body))
+    val condition = LessThanC.lessThan(variable("i"),LiteralC.literal(2))
+    val body = Seq(TernaryC.ternary(condition,
+      LiteralC.literal(1),
+      AdditionC.addition(recursiveCall1, recursiveCall2)
+    ))
+    val methods = Seq(method("fibonacci",IntegerType,parameters, body))
     val expectedFibonacciMeta = new MetaObject(classOf[JavaClass].getSimpleName) {
       data.put("methods",methods)
     }

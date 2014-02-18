@@ -28,8 +28,6 @@ object ByteCodeGoTo extends ProgramTransformation {
     case _ => 1
   }
 
-  def integerCompareGreater(target: String) = instruction("integerCompareGreater", Seq(target))
-
   def transform(program: MetaObject, state: TransformationState): Unit = {
 
     for(codeAnnotation <- ByteCode.getMethods(program)

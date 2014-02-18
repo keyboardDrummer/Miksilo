@@ -2,11 +2,11 @@ package transformation
 
 import scala.collection.mutable
 
-case class ComparisonOptions(compareIntegers: Boolean)
+case class ComparisonOptions(compareIntegers: Boolean, compareKeyUnion: Boolean)
 object MetaObject {
 
   def deepEquality(first: MetaObject, second: MetaObject, options: ComparisonOptions =
-                    new ComparisonOptions(true)) : Boolean = {
+                    new ComparisonOptions(true, true)) : Boolean = {
 
     def deepEquality(first: Any, second: Any, closed: mutable.Set[(MetaObject,MetaObject)]) : Boolean = {
       if (first == second)
@@ -28,7 +28,7 @@ object MetaObject {
       if (!first.clazz.equals(second.clazz))
         false
 
-      val sharedKeys = first.data.keySet ++ second.data.keySet
+      val sharedKeys = if (options.compareKeyUnion) first.data.keySet ++ second.data.keySet else first.data.keySet.intersect(second.data.keySet)
       sharedKeys.forall(key => (first.data.get(key),second.data.get(key)) match {
         case (Some(firstVal),Some(secondVal)) => deepEquality(firstVal, secondVal, closed)
         case _ => false
@@ -45,5 +45,10 @@ class MetaObject(val clazz: AnyRef) {
   def apply(key: Any) = data(key)
   def update(key: Any, value: Any) = data.put(key, value)
 
-  override def toString: String = s"${clazz.toString}: ${data.toString}"
+  def classDebugRepresentation(_clazz: Any) = _clazz match {
+    case string: String => string
+    case anyRef: AnyRef => anyRef.getClass.getSimpleName
+    case _ => clazz.toString
+  }
+  override def toString: String = s"${classDebugRepresentation(clazz)}: ${data.map(kv => (classDebugRepresentation(kv._1),kv._2)).toString}"
 }

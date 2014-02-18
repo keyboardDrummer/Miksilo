@@ -36,7 +36,7 @@ object ByteCode extends ProgramTransformation {
   def addressStore(location: Int) = instruction("addressStore", Seq(location))
 
   def addressLoad(location: Integer) = instruction("loadAddress",Seq(location))
-  def getInstructionStackSizeModification(metaObject: MetaObject) : Integer = ???
+  def getInstructionStackSizeModification(metaObject: MetaObject) : Integer = -1
 
   def subtractInteger = instruction("subtractIntegers")
 

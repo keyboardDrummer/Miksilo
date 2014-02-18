@@ -2,19 +2,21 @@ package languages.bytecode.testing
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
-import transformation.{ComparisonOptions, TransformationManager, MetaObject}
-import javaInterpreter.{JavaClass, Ternary}
-import JavaBase._
-import javaInterpreter.Ternary
+import transformation.{ComparisonOptions, MetaObject}
+import languages.java.base.{JavaClassModel, JavaBaseModel, JavaBase}
+import JavaBaseModel._
+import JavaClassModel._
 import util.TestConsole
 import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
+import languages.java.base.JavaTypes._
+import languages.java.base.JavaMethodModel._
 
 class TestFibonacciCompilation {
 
   @Test
   def compareCompiledVersusNativeCode() {
     val className = "test"
-    val fibonacci = JavaBase.clazz(Seq(getFibonacciMethod))
+    val fibonacci = clazz(className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     val instructions = Seq(
@@ -36,12 +38,13 @@ class TestFibonacciCompilation {
     )
     val method = ByteCode.methodInfo(0,0,Seq(ByteCode.codeAttribute(0,0,0,0,instructions,Seq(),Seq())))
     val nativeClass = ByteCode.clazz(className, Seq(), Seq(method))
-    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false)))
+    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false)))
   }
 
   @Test
   def testCompiledCodeInterpretation() {
-    val fibonacci: MetaObject = getFibonacciMethod
+    val className = "test"
+    val fibonacci = clazz(className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     val console = new TestConsole
@@ -50,31 +53,20 @@ class TestFibonacciCompilation {
     machine.run(typedByteCode)
     Assert.assertEquals("8",console.stdOut.toString())
   }
-  
-  def getClazz = {
-    JavaBase.clazz(Seq(getMainMethod, getFibonacciMethod))
-  }
 
   def getMainMethod: MetaObject = {
-    val parameters = Seq(parameter("args", JavaBase.arrayType(StringType)))
+    val parameters = Seq(parameter("args", arrayType(StringType)))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(call(variable("Console.printf"), Seq(StringLiteralC.literal("%i"), fibCall)))
-    method("main",VoidType, parameters, body, true, publicVisibility)
+    method("main",VoidType, parameters, body, static = true, publicVisibility)
   }
 
   def getFibonacciMethod: MetaObject = {
-    val parameters = Seq(parameter("i", "Integer"))
+    val parameters = Seq(parameter("i", IntegerType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
-    val condition = new MetaObject("LessThan") {
-      data.put("first", variable("i"))
-      data.put("second", LiteralC.literal(2))
-    }
-    val body = Seq(new MetaObject(classOf[Ternary].getSimpleName) {
-      data.put("condition", condition)
-      data.put("trueResult", LiteralC.literal(1))
-      data.put("falseResult", AdditionC.addition(recursiveCall1, recursiveCall2))
-    })
-    method("fibonacci", IntegerType, parameters, body, true)
+    val condition = LessThanC.lessThan(variable("i"),LiteralC.literal(2))
+    val body = Seq(TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2)))
+    method("fibonacci", IntegerType, parameters, body, static = true)
   }
 }

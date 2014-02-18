@@ -1,6 +1,7 @@
 package languages.bytecode
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
+import languages.java.base.JavaBase
 
 object AdditionC extends ProgramTransformation {
   val clazz: String = "Addition"

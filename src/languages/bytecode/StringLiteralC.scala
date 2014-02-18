@@ -1,6 +1,7 @@
 package languages.bytecode
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
+import languages.java.base.JavaBase
 
 object StringLiteralC extends ProgramTransformation {
   object StringClazz

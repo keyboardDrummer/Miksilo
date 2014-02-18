@@ -1,8 +1,9 @@
 package languages.bytecode
 
 import transformation.TransformationManager
+import languages.java.base.JavaBase
 
 object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(Seq(
-    AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, ByteCodeGoTo))
+    LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, ByteCodeGoTo))
 }
