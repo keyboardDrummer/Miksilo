@@ -13,7 +13,11 @@ object MetaObject {
         return true
 
       (first,second) match {
-        case (seq1: Seq[_], seq2: Seq[_]) => seq1.zip(seq2).forall(p => deepEquality(p._1,p._2, closed))
+        case (seq1: Seq[_], seq2: Seq[_]) => {
+          if (seq1.length != seq2.length)
+            return false
+          seq1.zip(seq2).forall(p => deepEquality(p._1,p._2, closed))
+        }
         case (meta1:MetaObject,meta2:MetaObject) => deepEqualityMeta(meta1,meta2,closed)
         case (int1: Integer, int2: Integer) => if (options.compareIntegers) first == second else true
         case _ => first == second

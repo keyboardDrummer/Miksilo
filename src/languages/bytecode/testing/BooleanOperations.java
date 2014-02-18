@@ -6,5 +6,13 @@ public class BooleanOperations {
         int four = 4;
         boolean lessThanResult = three < four;
         boolean andResult = lessThanResult && (4 == 5);
+        if (andResult || false)
+        {
+            int berp = 0;
+        }
+        else
+        {
+            int barp = 1;
+        }
     }
 }
