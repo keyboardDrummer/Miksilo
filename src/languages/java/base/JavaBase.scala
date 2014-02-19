@@ -129,7 +129,7 @@ object JavaBase extends ProgramTransformation {
 
       def convertMethod(method: MetaObject) {
         val index = classCompiler.constantPool.storeUtf8(JavaMethodModel.getMethodName(method))
-        method(ByteCode.nameIndex) = index
+        method(ByteCode.MethodNameIndex) = index
         method.data.remove(JavaMethodModel.MethodNameKey)
         val parameters = JavaMethodModel.getMethodParameters(method)
         addMethodDescriptor(method, parameters)
@@ -142,8 +142,9 @@ object JavaBase extends ProgramTransformation {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         method.data.remove(JavaMethodModel.ReturnTypeKey)
 
-        ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
-            ,parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p))))
+        val index = classCompiler.constantPool.store(ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
+          ,parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p)))))
+        method(ByteCode.MethodDescriptorIndex) = index
       }
 
       def javaTypeToByteCodeType(_type: Any) : Any = {

@@ -2,11 +2,11 @@ package transformation
 
 import scala.collection.mutable
 
-case class ComparisonOptions(compareIntegers: Boolean, compareKeyUnion: Boolean)
+case class ComparisonOptions(compareIntegers: Boolean, takeAllLeftKeys: Boolean, takeAllRightKeys: Boolean)
 object MetaObject {
 
   def deepEquality(first: MetaObject, second: MetaObject, options: ComparisonOptions =
-                    new ComparisonOptions(true, true)) : Boolean = {
+                    new ComparisonOptions(true, true, true)) : Boolean = {
 
     def deepEquality(first: Any, second: Any, closed: mutable.Set[(MetaObject,MetaObject)]) : Boolean = {
       if (first == second)
@@ -32,7 +32,12 @@ object MetaObject {
       if (!first.clazz.equals(second.clazz))
         return false
 
-      val sharedKeys = if (options.compareKeyUnion) first.data.keySet ++ second.data.keySet else first.data.keySet.intersect(second.data.keySet)
+      val sharedKeys = (options.takeAllLeftKeys, options.takeAllRightKeys) match {
+        case (true,true) => first.data.keySet ++ second.data.keySet
+        case (false,false) => first.data.keySet.intersect(second.data.keySet)
+        case (true,false) => first.data.keySet
+        case (false,true) => second.data.keySet
+      }
       sharedKeys.forall(key => (first.data.get(key),second.data.get(key)) match {
         case (Some(firstVal),Some(secondVal)) => deepEquality(firstVal, secondVal, closed)
         case _ => false

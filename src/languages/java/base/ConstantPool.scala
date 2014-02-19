@@ -9,6 +9,13 @@ class ConstantPool {
   val constants: Seq[Any] = mutable.Seq()
   val reverseRouter = mutable.Map[Any,Integer]()
 
+  def store(ref: Any) : Int = {
+    val index = constants.length
+    reverseRouter(ref) = index
+    constants.+:(ref)
+    index
+  }
+
   def storeMethodRef(ref: MethodRef) : Int = {
     val index = constants.length
     reverseRouter(ref) = index

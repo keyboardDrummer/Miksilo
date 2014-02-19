@@ -21,6 +21,7 @@ object JavaASTToMetaProgramConversions extends TypedToMetaProgramConverter {
 }
 
 class JavaASTToMetaProgramConversionsTest {
+
   @Test
   def testFibonacciConversion() {
     val fibonacciTyped = {

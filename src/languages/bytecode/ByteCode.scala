@@ -88,8 +88,6 @@ object ByteCode extends ProgramTransformation {
 
   def getCodeInstructions(code: MetaObject) = code(CodeInstructionsKey).asInstanceOf[Seq[MetaObject]]
 
-  val nameIndex: String = "nameIndex"
-
   object ClassFileKey
   object ClassMethodsKey
   object ClassNameKey
