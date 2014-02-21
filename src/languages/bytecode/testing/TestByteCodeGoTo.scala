@@ -1,7 +1,7 @@
 package languages.bytecode.testing
 
 import org.junit.{Assert, Test}
-import languages.bytecode.{ByteCodeGoTo, ByteCode}
+import languages.bytecode.{ByteCode, ByteCodeGoTo}
 import transformation.{TransformationManager, MetaObject}
 
 class TestByteCodeGoTo {

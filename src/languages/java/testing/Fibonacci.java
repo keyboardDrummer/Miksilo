@@ -1,4 +1,4 @@
-package languages.bytecode.testing;
+package languages.java.testing;
 
 class Fibonacci {
     public static void main(String[] args)

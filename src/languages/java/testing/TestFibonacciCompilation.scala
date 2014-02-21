@@ -1,15 +1,18 @@
-package languages.bytecode.testing
+package languages.java.testing
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.{ComparisonOptions, MetaObject}
-import languages.java.base.{JavaMethodModel, JavaClassModel, JavaBaseModel, JavaBase}
+import languages.java.base._
 import JavaBaseModel._
 import JavaClassModel._
 import util.TestConsole
 import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
 import languages.java.base.JavaTypes._
 import languages.java.base.JavaMethodModel._
+import languages.java._
+import transformation.ComparisonOptions
+import transformation.ComparisonOptions
 
 class TestFibonacciCompilation {
   val className = "test"
@@ -37,7 +40,7 @@ class TestFibonacciCompilation {
   }
 
   @Test
-  def compareCompiledVersusNativeCode3() {
+  def testDefaultConstructorGeneration() {
     val compiledCode: MetaObject = getCompiledFibonacci
     val nativeClass: MetaObject = getNativeUnoptimizedFibonacci()
     Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(true, false, true)))
@@ -72,8 +75,26 @@ class TestFibonacciCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
+    val methodName = "fibonacci"
+    val constantPool = Seq(ByteCode.methodRef(4, 14),
+      ByteCode.methodRef(3, 15),
+      ByteCode.classRef(16),
+      ByteCode.classRef(17),
+      "<init>",
+      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
+      "Code",
+      "LineNumberTable",
+      methodName,
+      ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
+      "StackMapTable",
+      "SourceFile",
+      "OnlyFibonacci.java",
+      ByteCode.nameAndType(5, 6),
+      ByteCode.nameAndType(9, 10),
+      "languages/bytecode/testing/OnlyFibonacci",
+      "java/lang/Object")
     val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, 0, instructions, Seq(), Seq())))
-    val nativeClass = ByteCode.clazz(className, Seq(), Seq(method))
+    val nativeClass = ByteCode.clazz(className, constantPool, Seq(method))
     nativeClass
   }
 
@@ -100,7 +121,7 @@ class TestFibonacciCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val method = ByteCode.methodInfo(0,0,Seq(ByteCode.codeAttribute(0,0,0,0,instructions,Seq(),Seq())))
+    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, 0, instructions, Seq(), Seq())))
     val nativeClass = ByteCode.clazz(className, Seq(), Seq(method))
     Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false, false)))
   }
@@ -115,21 +136,21 @@ class TestFibonacciCompilation {
     val machine = new JavaByteCodeMachine(console)
     val typedByteCode = ByteCodeTypedUnTypedConversions.toTyped(byteCode)
     machine.run(typedByteCode)
-    Assert.assertEquals("8",console.stdOut.toString())
+    Assert.assertEquals("8", console.stdOut.toString())
   }
 
   def getMainMethod: MetaObject = {
     val parameters = Seq(parameter("args", arrayType(StringType)))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(call(variable("Console.printf"), Seq(StringLiteralC.literal("%i"), fibCall)))
-    method("main",VoidType, parameters, body, static = true, publicVisibility)
+    method("main", VoidType, parameters, body, static = true, publicVisibility)
   }
 
   def getFibonacciMethod: MetaObject = {
     val parameters = Seq(parameter("i", IntegerType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
-    val condition = LessThanC.lessThan(variable("i"),LiteralC.literal(2))
+    val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
     val body = Seq(JavaMethodModel._return(TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))))
     method("fibonacci", IntegerType, parameters, body, static = true)
   }

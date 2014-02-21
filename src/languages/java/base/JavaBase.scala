@@ -3,10 +3,12 @@ package languages.java.base
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import JavaBaseModel._
-import JavaMethodModel._
+import languages.java.base.JavaMethodModel._
 import languages.bytecode.{ByteCodeGoTo, ByteCode}
 import languages.java.base.JavaTypes.{DoubleType, IntegerType}
-import languages.java.base.JavaMethodModel.Return
+import languages.java.base.ClassCompiler
+import languages.java.base.MethodInfo
+import languages.java.base.InstructionCompiler
 
 class VariablePool {
   var offset = 0
@@ -89,12 +91,21 @@ object JavaBase extends ProgramTransformation {
   def getLocalCount(instructions: Seq[MetaObject]): Integer = ???
 
 
+
   def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
       val className = JavaClassModel.getClassName(clazz)
       val classCompiler = new ClassCompiler(state)
+
+      def getClassRef(name: String) = {
+        val nameIndex = classCompiler.constantPool.store(name)
+        classCompiler.constantPool.store(ByteCode.classRef(nameIndex))
+      }
+
+      val classRefIndex = getClassRef(className)
+      clazz(ByteCode.ClassConstantPool) = classCompiler.constantPool.constants
       val methods = JavaClassModel.getMethods(clazz)
       for(method <- methods)
         bindMethod(method)
@@ -102,9 +113,20 @@ object JavaBase extends ProgramTransformation {
       for(method <- methods)
         convertMethod(method)
 
+
+      def getMethodNameAndType(method: MetaObject): Int = {
+        val methodNameIndex = getMethodNameIndex(method)
+        val result: MetaObject = ByteCode.nameAndType(methodNameIndex, getMethodDescriptor(method))
+        classCompiler.constantPool.store(result)
+      }
+
+      def getMethodRefIndex(method: MetaObject): Int = {
+        val nameAndTypeIndex = getMethodNameAndType(method)
+        classCompiler.constantPool.store(ByteCode.methodRef(classRefIndex, nameAndTypeIndex))
+      }
       def bindMethod(method: MetaObject) = {
         val methodName = JavaMethodModel.getMethodName(method)
-        val location = classCompiler.constantPool.storeMethodRef(new MethodRef(className, methodName))
+        val location: Int = getMethodRefIndex(method)
         classCompiler.localStaticMethodRefLocations(methodName) = new MethodInfo(location, method)
       }
 
@@ -127,31 +149,39 @@ object JavaBase extends ProgramTransformation {
         methodState
       }
 
-      def convertMethod(method: MetaObject) {
+      def getMethodNameIndex(method: MetaObject): Int = {
         val index = classCompiler.constantPool.storeUtf8(JavaMethodModel.getMethodName(method))
+        index
+      }
+      def convertMethod(method: MetaObject) {
+        val index: Int = getMethodNameIndex(method)
         method(ByteCode.MethodNameIndex) = index
         method.data.remove(JavaMethodModel.MethodNameKey)
         val parameters = JavaMethodModel.getMethodParameters(method)
-        addMethodDescriptor(method, parameters)
+        val methodDescriptorIndex = getMethodDescriptor(method)
+        method(ByteCode.MethodDescriptorIndex) = methodDescriptorIndex
+        method.data.remove(JavaMethodModel.ReturnTypeKey)
         addCodeAnnotation(method, parameters)
 
         method.data.remove(JavaMethodModel.MethodParametersKey)
       }
 
-      def addMethodDescriptor(method: MetaObject, parameters: Seq[MetaObject]) {
+      def getMethodDescriptor(method: MetaObject): Int = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
-        method.data.remove(JavaMethodModel.ReturnTypeKey)
-
-        val index = classCompiler.constantPool.store(ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
-          ,parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p)))))
-        method(ByteCode.MethodDescriptorIndex) = index
+        val parameters = JavaMethodModel.getMethodParameters(method)
+        val methodDescriptor = ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
+          , parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p))))
+        classCompiler.constantPool.store(methodDescriptor)
       }
 
-      def javaTypeToByteCodeType(_type: Any) : Any = {
-        _type
+      def addMethodDescriptor(method: MetaObject) {
       }
 
     }
+    def javaTypeToByteCodeType(_type: Any) : Any = {
+      _type
+    }
+
 
   }
 

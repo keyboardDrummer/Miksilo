@@ -1,9 +1,9 @@
-package languages.bytecode
+package languages.java
 
 import transformation.{ProgramTransformation, TransformationState, MetaObject}
 import languages.java.base.JavaBase
 import JavaBase._
-import languages.ssm.AddStatementToSSM
+import languages.bytecode.ByteCodeGoTo
 
 object TernaryC extends ProgramTransformation {
 

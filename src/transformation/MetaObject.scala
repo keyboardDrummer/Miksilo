@@ -5,7 +5,7 @@ import scala.collection.mutable
 case class ComparisonOptions(compareIntegers: Boolean, takeAllLeftKeys: Boolean, takeAllRightKeys: Boolean)
 object MetaObject {
 
-  def deepEquality(first: MetaObject, second: MetaObject, options: ComparisonOptions =
+  def deepEquality(first: Any, second: Any, options: ComparisonOptions =
                     new ComparisonOptions(true, true, true)) : Boolean = {
 
     def deepEquality(first: Any, second: Any, closed: mutable.Set[(MetaObject,MetaObject)]) : Boolean = {

@@ -8,6 +8,17 @@ import languages.java.base.{JavaMethodModel, JavaBaseModel}
 import JavaBaseModel._
 import JavaMethodModel._
 import languages.java.base.JavaTypes.IntegerType
+import languages.java._
+import javaInterpreter.Call
+import javaInterpreter.Variable
+import javaInterpreter.JavaParameter
+import javaInterpreter.JavaMethod
+import javaInterpreter.JavaClass
+import javaInterpreter.JavaSubtraction
+import javaInterpreter.Literal
+import javaInterpreter.Addition
+import javaInterpreter.LessThan
+import javaInterpreter.Ternary
 
 object JavaASTToMetaProgramConversions extends TypedToMetaProgramConverter {
   def toMetaProgram(java: JavaClass) : MetaObject = convert(java)

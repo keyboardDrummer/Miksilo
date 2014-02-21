@@ -1,4 +1,4 @@
-package languages.bytecode.testing;
+package languages.java.testing;
 
 class OnlyFibonacci {
 	public static int fibonacci(int index) {

@@ -3,8 +3,50 @@ package languages.bytecode
 import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 
+case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 object ByteCode extends ProgramTransformation {
-  
+  object LineNumberKey
+  object LineNumberTableLines
+  def lineNumberTable(nameIndex: Int, length: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberKey) {
+    data.put(AttributeNameKey, nameIndex)
+    data.put(AttributeLengthKey, length)
+    data.put(LineNumberTableLines, lines)
+  }
+
+  object InvokeSpecial
+  def invokeSpecial(location: Int): MetaObject = instruction(InvokeSpecial,Seq(location))
+
+  object VoidReturn
+  def voidReturn: MetaObject = instruction(VoidReturn)
+
+  object LineNumberTableId
+  object SourceFileId
+
+  val constructorName: String = "init"
+
+  object NameAndTypeKey
+  object NameAndTypeName
+  object NameAndTypeType
+  def nameAndType(nameIndex: Int, typeIndex: Int): MetaObject = new MetaObject(NameAndTypeKey) {
+    data.put(NameAndTypeName, nameIndex)
+    data.put(NameAndTypeType, typeIndex)
+  }
+
+  object ClassRefKey
+  object ClassRefName
+  def classRef(classRefNameIndex: Int): MetaObject = new MetaObject(ClassRefKey) {
+    data.put(ClassRefName, classRefNameIndex)
+  }
+
+
+  object MethodRefKey
+  object MethodRefClassName
+  object MethodRefMethodName
+  def methodRef(classNameIndex: Int, methodNameIndex: Int) = new MetaObject(MethodRefKey) {
+    data.put(MethodRefClassName, classNameIndex)
+    data.put(MethodRefMethodName, methodNameIndex)
+  }
+
   object IntegerReturn
   def integerReturn: MetaObject = instruction(IntegerReturn)
 
@@ -56,16 +98,22 @@ object ByteCode extends ProgramTransformation {
     instruction(InstructionArgumentsKey) = arguments
   }
 
+  object MethodDescriptor
+  object MethodDescriptorParameters
+  object MethodReturnType
   def ifNotEqual(target: Short) = new MetaObject("ifNotEquals")
   def methodDescriptor(returnDescriptor: Any, parameterDescriptors: Seq[Any]) = {
-    new MetaObject("methodDescriptor") {
-      data.put("parameters", parameterDescriptors)
-      data.put("returnType", returnDescriptor)
+    new MetaObject(MethodDescriptor) {
+      data.put(MethodDescriptorParameters, parameterDescriptors)
+      data.put(MethodReturnType, returnDescriptor)
     }
   }
 
+  object AttributeKey
+  object CodeAttributeId
   object CodeKey
-  object CodeLengthKey
+  object AttributeNameKey
+  object AttributeLengthKey
   object CodeMaxStackKey
   object CodeMaxLocalsKey
   object CodeInstructionsKey
@@ -77,7 +125,8 @@ object ByteCode extends ProgramTransformation {
                     attributes: Seq[MetaObject]) =
   {
     new MetaObject(CodeKey) {
-      data.put(CodeLengthKey, length)
+      data.put(AttributeNameKey, nameIndex)
+      data.put(AttributeLengthKey, length)
       data.put(CodeMaxStackKey, maxStack)
       data.put(CodeMaxLocalsKey, maxLocals)
       data.put(CodeInstructionsKey, instructions)
@@ -92,11 +141,12 @@ object ByteCode extends ProgramTransformation {
   object ClassMethodsKey
   object ClassNameKey
   object ClassConstantPool
-  def clazz(name: String, constantPool: Seq[MetaObject], methods: Seq[MetaObject]) = new MetaObject(ClassFileKey) {
+  def clazz(name: String, constantPool: Seq[Any], methods: Seq[MetaObject]) = new MetaObject(ClassFileKey) {
     data.put(ClassMethodsKey, methods)
     data.put(ClassNameKey, name)
     data.put(ClassConstantPool, constantPool)
   }
+  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[Seq[MetaObject]]
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 

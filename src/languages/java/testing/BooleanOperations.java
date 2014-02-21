@@ -1,4 +1,4 @@
-package languages.bytecode.testing;
+package languages.java.testing;
 
 public class BooleanOperations {
     public void main() {

@@ -2,7 +2,7 @@ Classfile /D:/Dropbox/Projects/Code/modularCompiler/src/languages/bytecode/testi
   Last modified 18-feb-2014; size 344 bytes
   MD5 checksum ab8d499021ab89c88249c565fed08858
   Compiled from "OnlyFibonacci.java"
-class languages.bytecode.testing.OnlyFibonacci
+class languages.java.testing.OnlyFibonacci
   SourceFile: "OnlyFibonacci.java"
   minor version: 0
   major version: 51
@@ -27,7 +27,7 @@ Constant pool:
   #16 = Utf8               languages/bytecode/testing/OnlyFibonacci
   #17 = Utf8               java/lang/Object
 {
-  languages.bytecode.testing.OnlyFibonacci();
+  languages.java.testing.OnlyFibonacci();
     flags: 
 
     Code:

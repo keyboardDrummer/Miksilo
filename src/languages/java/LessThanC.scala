@@ -1,7 +1,8 @@
-package languages.bytecode
+package languages.java
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.java.base.JavaBase
+import languages.bytecode.{ByteCodeGoTo, ByteCode}
 
 object LessThanC extends ProgramTransformation {
   object LessThanKey
