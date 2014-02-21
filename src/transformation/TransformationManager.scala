@@ -8,8 +8,9 @@ import languages.java._
 
 object TransformationManager {
   val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse, AddBlock,
-    AddDoWhile, AddIfElse, AddForLoop, JavaMinus,
+    AddDoWhile, AddIfElse, AddForLoop, JavaMinus, DefaultConstructor, LessThanC,
     ByteCode, ByteCodeGoTo, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC)
+
 
   def buildCompiler(transformations: Seq[ProgramTransformation]) : Compiler = {
     new Compiler {

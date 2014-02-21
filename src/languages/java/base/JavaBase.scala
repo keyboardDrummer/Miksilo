@@ -109,7 +109,7 @@ object JavaBase extends ProgramTransformation {
       val methods = JavaClassModel.getMethods(clazz)
       for(method <- methods)
         bindMethod(method)
-
+      
       for(method <- methods)
         convertMethod(method)
 

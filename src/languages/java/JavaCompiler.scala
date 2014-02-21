@@ -9,13 +9,13 @@ object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
-    Seq(LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, ByteCodeGoTo)
+    Seq(DefaultConstructor, LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, ByteCodeGoTo)
   }
 }
 
 object JavaMinus extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] =
-    Set(LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase)
+    Set(DefaultConstructor, LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 

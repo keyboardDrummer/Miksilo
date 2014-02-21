@@ -143,7 +143,7 @@ class TestFibonacciCompilation {
     val parameters = Seq(parameter("args", arrayType(StringType)))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(call(variable("Console.printf"), Seq(StringLiteralC.literal("%i"), fibCall)))
-    method("main", VoidType, parameters, body, static = true, publicVisibility)
+    method("main", VoidType, parameters, body, static = true, PublicVisibility)
   }
 
   def getFibonacciMethod: MetaObject = {

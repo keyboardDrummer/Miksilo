@@ -7,6 +7,7 @@ import languages.java.JavaCompiler
 import java.util
 import transformation.{ComparisonOptions, MetaObject}
 import java.util.Comparator
+import scala.collection.mutable
 
 class TestEmptyClassCompilation {
   val classname: String = "EmptyClass"
@@ -33,7 +34,7 @@ class TestEmptyClassCompilation {
   }
 
   def getEmptyClass() = {
-    JavaClassModel.clazz(classname, Seq())
+    JavaClassModel.clazz(classname, Seq[MetaObject]())
   }
 
   @Test
