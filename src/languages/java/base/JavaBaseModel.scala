@@ -7,7 +7,7 @@ import scala.collection.mutable
 object JavaClassModel {
 
   def clazz(name: String, methods: Seq[MetaObject]) = new MetaObject(ByteCode.ClassFileKey) {
-    data.put(ByteCode.ClassMethodsKey, mutable.Buffer(methods))
+    data.put(ByteCode.ClassMethodsKey, methods.toBuffer)
     data.put(ByteCode.ClassNameKey, name)
   }
   def getClassName(clazz: MetaObject) = clazz(ByteCode.ClassNameKey).asInstanceOf[String]
@@ -74,7 +74,6 @@ object JavaMethodModel {
   def getMethodReturnType(metaObject: MetaObject) = {
     metaObject(ReturnTypeKey)
   }
-
 
   def getParameterType(metaObject: MetaObject) : Any = metaObject(ParameterTypeKey)
   def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
