@@ -3,7 +3,7 @@ package languages.java.testing
 import languages.bytecode.{LineNumberRef, ByteCode}
 import languages.java.base.{JavaMethodModel, JavaClassModel, JavaTypes}
 import org.junit.{Assert, Test}
-import languages.java.JavaCompiler
+import languages.java.{ConstructorC, JavaCompiler}
 import java.util
 import transformation.{ComparisonOptions, MetaObject}
 import java.util.Comparator
@@ -16,7 +16,7 @@ class TestEmptyClassCompilation {
     val constantPool = Seq(ByteCode.methodRef(3, 10),
       ByteCode.classRef(11),
       ByteCode.classRef(12),
-      ByteCode.constructorName,
+      ConstructorC.constructorName,
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
       ByteCode.CodeAttributeId,
       ByteCode.LineNumberTableId,

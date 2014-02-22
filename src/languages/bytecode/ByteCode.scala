@@ -22,7 +22,6 @@ object ByteCode extends ProgramTransformation {
   object LineNumberTableId
   object SourceFileId
 
-  val constructorName: String = "init"
 
   object NameAndTypeKey
   object NameAndTypeName

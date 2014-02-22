@@ -26,8 +26,10 @@ object Program extends SimpleSwingApplication {
     val parent = graph.getDefaultParent
     for(vertex <- new JSetWrapper(origin.vertexSet))
     {
-      val cell = graph.insertVertex(parent, null, "", 20, 20, 80, 30).asInstanceOf[mxCell]
-      cell.setValue(vertex.toString)
+      val vertexLabel = vertex.toString
+      val width = vertexLabel.length * 5 + 20
+      val cell = graph.insertVertex(parent, null, "", 20, 20, width, 30).asInstanceOf[mxCell]
+      cell.setValue(vertexLabel)
       vertexMap.put(vertex, cell)
     }
     for(edge <- new JSetWrapper(origin.edgeSet()))

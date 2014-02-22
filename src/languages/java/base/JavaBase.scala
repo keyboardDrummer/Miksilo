@@ -123,14 +123,9 @@ object JavaBase extends ProgramTransformation {
         val nameAndTypeIndex = getMethodNameAndType(method)
         classCompiler.constantPool.store(ByteCode.methodRef(classRefIndex, nameAndTypeIndex))
       }
-      def getMethodName(method: MetaObject): String = {
-        method.clazz match {
-          case JavaMethodModel.Constructor => ByteCode.constructorName
-          case ByteCode.MethodInfoKey => JavaMethodModel.getMethodName(method)
-        }
-      }
+
       def bindMethod(method: MetaObject) = {
-        val methodName: String = getMethodName(method)
+        val methodName: String = JavaMethodModel.getMethodName(method)
         val location: Int = getMethodRefIndex(method)
         classCompiler.localStaticMethodRefLocations(methodName) = new MethodInfo(location, method)
       }
@@ -139,7 +134,7 @@ object JavaBase extends ProgramTransformation {
         val instructionCompiler = getInstructionCompiler(parameters)
         val statements = JavaMethodModel.getMethodBody(method)
         val instructions = statements.flatMap(statement => statementToInstructions(statement, instructionCompiler))
-        val codeIndex = classCompiler.constantPool.storeUtf8("Code")
+        val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
         val length = 0
@@ -155,19 +150,13 @@ object JavaBase extends ProgramTransformation {
       }
 
       def getMethodNameIndex(method: MetaObject): Int = {
-        classCompiler.constantPool.storeUtf8(getMethodName(method))
+        classCompiler.constantPool.storeUtf8(JavaMethodModel.getMethodName(method))
       }
 
       def convertMethod(method: MetaObject) {
-        if (method.clazz == ByteCode.MethodInfoKey)
-        {
-          val index: Int = getMethodNameIndex(method)
-          method(ByteCode.MethodNameIndex) = index
-          method.data.remove(JavaMethodModel.MethodNameKey)
-        }
-        else if (method.clazz == JavaMethodModel.Constructor) {
-          method(ByteCode.MethodNameIndex) = classCompiler.constantPool.storeUtf8(ByteCode.constructorName)
-        }
+        val index: Int = getMethodNameIndex(method)
+        method(ByteCode.MethodNameIndex) = index
+        method.data.remove(JavaMethodModel.MethodNameKey)
         val methodDescriptorIndex = getMethodDescriptor(method)
         method(ByteCode.MethodDescriptorIndex) = methodDescriptorIndex
         val parameters = JavaMethodModel.getMethodParameters(method)
@@ -176,22 +165,12 @@ object JavaBase extends ProgramTransformation {
         method.data.remove(JavaMethodModel.MethodParametersKey)
       }
 
-      def getMethodReturnType(method: MetaObject) = {
-        method.clazz match {
-          case JavaMethodModel.Constructor => JavaTypes.objectType(className)
-          case ByteCode.MethodInfoKey => JavaMethodModel.getMethodReturnType(method)
-        }
-      }
-
       def getMethodDescriptor(method: MetaObject): Int = {
-        val returnType = getMethodReturnType(method)
+        val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
         val methodDescriptor = ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
           , parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p))))
         classCompiler.constantPool.store(methodDescriptor)
-      }
-
-      def addMethodDescriptor(method: MetaObject) {
       }
 
     }

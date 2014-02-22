@@ -25,13 +25,7 @@ object JavaMethodModel {
 
   def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
 
-  object Constructor
   object MethodBodyKey
-  def constructor(_parameters: Seq[MetaObject], _body: Seq[MetaObject], visibility: Visibility = PublicVisibility) = new MetaObject(Constructor) {
-    data.put(MethodParametersKey, _parameters)
-    data.put(MethodBodyKey,_body)
-    data.put(VisibilityKey, visibility)
-  }
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
