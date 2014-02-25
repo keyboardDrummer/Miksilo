@@ -23,9 +23,8 @@ class TestEmptyClassCompilation {
       new QualifiedClassName(Seq("languages","java","testing","EmptyClass")),
       new QualifiedClassName(Seq("java","lang","Object"))
     )
-    val lineNumberTable = ByteCode.lineNumberTable(6, 0, Seq(new LineNumberRef(3,0)))
     val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
-    val codeAttribute = Seq(ByteCode.codeAttribute(5, 0, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
+    val codeAttribute = Seq(ByteCode.codeAttribute(5, 0, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute)
     ByteCode.clazz(classname, constantPool, Seq(defaultConstructor))
   }
@@ -61,7 +60,7 @@ class TestEmptyClassCompilation {
 
     val expectedMethod = ByteCode.getMethods(expectedByteCode)(0)
     val compiledMethod = ByteCode.getMethods(compiledCode)(0)
-    Assert.assertTrue(MetaObject.deepEquality(expectedMethod,compiledMethod,
+    Assert.assertTrue(MetaObject.deepEquality(compiledMethod,expectedMethod,
         new ComparisonOptions(false,false,true)))
 
   }

@@ -152,7 +152,8 @@ class TestFibonacciCompilation {
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
-    val body = Seq(JavaMethodModel._return(TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))))
+    val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
+    val body = Seq(JavaMethodModel._return(Some(returnValue)))
     method("fibonacci", IntegerType, parameters, body, static = true)
   }
 }

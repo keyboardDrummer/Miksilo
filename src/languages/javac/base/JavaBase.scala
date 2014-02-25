@@ -59,9 +59,13 @@ object JavaBase extends ProgramTransformation {
     })
 
     result.put(Return, (_return,compiler) => {
-      val returnValue = getReturnValue(_return)
-      val returnValueInstructions = statementToInstructions(returnValue, compiler)
-      returnValueInstructions ++ Seq(ByteCode.integerReturn)
+      val mbValue = getReturnValue(_return)
+      mbValue match {
+        case Some(value) =>
+          val returnValueInstructions = statementToInstructions(value, compiler)
+          returnValueInstructions ++ Seq(ByteCode.integerReturn)
+        case None => Seq(ByteCode.voidReturn)
+      }
     })
     result
   }
