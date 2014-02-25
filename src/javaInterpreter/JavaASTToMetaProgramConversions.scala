@@ -4,11 +4,11 @@ import transformation.MetaObject
 import util.TypedToMetaProgramConverter
 import org.junit.{Assert, Test}
 import languages.bytecode._
-import languages.java.base.{JavaMethodModel, JavaBaseModel}
+import languages.javac.base.{JavaMethodModel, JavaBaseModel}
 import JavaBaseModel._
 import JavaMethodModel._
-import languages.java.base.JavaTypes.IntegerType
-import languages.java._
+import languages.javac.base.JavaTypes.IntegerType
+import languages.javac._
 import javaInterpreter.Call
 import javaInterpreter.Variable
 import javaInterpreter.JavaParameter

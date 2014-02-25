@@ -1,4 +1,4 @@
-package languages.java.testing;
+package languages.javac.testing;
 
 class Fibonacci {
     public static void main(String[] args)

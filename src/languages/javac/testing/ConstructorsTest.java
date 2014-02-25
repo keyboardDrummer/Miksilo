@@ -1,4 +1,4 @@
-package languages.java.testing;
+package languages.javac.testing;
 
 public class ConstructorsTest {
     public ConstructorsTest(int x) {

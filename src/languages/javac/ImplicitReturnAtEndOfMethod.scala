@@ -1,8 +1,8 @@
-package languages.java
+package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.bytecode.ByteCode
-import languages.java.base.JavaBase
+import languages.javac.base.JavaBase
 
 object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)

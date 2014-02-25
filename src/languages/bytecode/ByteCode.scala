@@ -41,9 +41,9 @@ object ByteCode extends ProgramTransformation {
   object MethodRefKey
   object MethodRefClassName
   object MethodRefMethodName
-  def methodRef(classNameIndex: Int, methodNameIndex: Int) = new MetaObject(MethodRefKey) {
+  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey) {
     data.put(MethodRefClassName, classNameIndex)
-    data.put(MethodRefMethodName, methodNameIndex)
+    data.put(MethodRefMethodName, methodNameAndTypeIndex)
   }
 
   object IntegerReturn
@@ -145,7 +145,7 @@ object ByteCode extends ProgramTransformation {
     data.put(ClassNameKey, name)
     data.put(ClassConstantPool, constantPool)
   }
-  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[Seq[MetaObject]]
+  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[Seq[Any]]
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 

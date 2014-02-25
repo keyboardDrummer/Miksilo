@@ -48,7 +48,7 @@ object MetaObject {
   }
 }
 
-class MetaObject(val clazz: AnyRef) {
+class MetaObject(var clazz: AnyRef) {
   val data: mutable.Map[Any,Any] = mutable.Map.empty
 
   def apply(key: Any) = data(key)
@@ -60,4 +60,19 @@ class MetaObject(val clazz: AnyRef) {
     case _ => clazz.toString
   }
   override def toString: String = s"${classDebugRepresentation(clazz)}: ${data.map(kv => (classDebugRepresentation(kv._1),kv._2)).toString}"
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[MetaObject]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: MetaObject =>
+      (that canEqual this) &&
+        data == that.data &&
+        clazz == that.clazz
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(data, clazz)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
 }

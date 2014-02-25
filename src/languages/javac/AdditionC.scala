@@ -1,7 +1,7 @@
-package languages.java
+package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.java.base.JavaBase
+import languages.javac.base.JavaBase
 import languages.bytecode.ByteCode
 
 object AdditionC extends ProgramTransformation {

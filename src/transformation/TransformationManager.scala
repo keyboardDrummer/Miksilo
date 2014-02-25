@@ -3,8 +3,8 @@ package transformation
 import languages._
 import languages.ssm._
 import languages.bytecode._
-import languages.java.base.JavaBase
-import languages.java._
+import languages.javac.base.JavaBase
+import languages.javac._
 
 object TransformationManager {
   val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse, AddBlock,

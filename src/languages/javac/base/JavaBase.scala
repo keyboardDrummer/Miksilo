@@ -1,14 +1,12 @@
-package languages.java.base
+package languages.javac.base
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import JavaBaseModel._
-import languages.java.base.JavaMethodModel._
+import languages.javac.base.JavaMethodModel._
 import languages.bytecode.{ByteCodeGoTo, ByteCode}
-import languages.java.base.JavaTypes.{DoubleType, IntegerType}
-import languages.java.base.ClassCompiler
-import languages.java.base.MethodInfo
-import languages.java.base.InstructionCompiler
+import languages.javac.base.JavaTypes.{DoubleType, IntegerType}
+import languages.javac.base.{MethodInfo, MethodKey, ClassCompiler}
 
 class VariablePool {
   var offset = 0
@@ -20,18 +18,11 @@ class VariablePool {
   }
 }
 
-case class MethodInfo(location: Integer, method: MetaObject)
 
 case class InstructionCompiler(classCompiler: ClassCompiler) {
-  def findMethod(name: String, argumentTypes: Seq[MetaObject]) : MethodInfo = classCompiler.localStaticMethodRefLocations(name)
   def transformationState = classCompiler.transformationState
   val variables = new VariablePool()
   var localCount = 0
-}
-
-case class ClassCompiler(transformationState: TransformationState) {
-  val localStaticMethodRefLocations = mutable.Map[String,MethodInfo]()
-  val constantPool = new ConstantPool()
 }
 
 
@@ -53,17 +44,20 @@ object JavaBase extends ProgramTransformation {
       val variableAddress = compiler.variables.variables(getVariableName(variable))
       Seq(ByteCode.addressLoad(variableAddress))
     })
+
     result.put(CallKey, (call, compiler) => {
       val callCallee = getCallCallee(call)
-      val callArguments = getCallArguments(call)
-      val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
-      val methodInfo : MethodInfo = callCallee.clazz match {
+      val methodKey : MethodKey = callCallee.clazz match {
         case VariableKey =>
-          compiler.findMethod(getVariableName(callCallee), Seq())
+          new MethodKey(getQualifiedClassName(compiler.classCompiler.currentClass), getVariableName(callCallee))
         case SelectorKey => ???
       }
-      argumentInstructions ++ Seq(ByteCode.invokeStatic(methodInfo.location))
+      val callArguments = getCallArguments(call)
+      val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
+      val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
+      argumentInstructions ++ Seq(ByteCode.invokeStatic(methodRefIndex))
     })
+
     result.put(Return, (_return,compiler) => {
       val returnValue = getReturnValue(_return)
       val returnValueInstructions = statementToInstructions(returnValue, compiler)
@@ -88,23 +82,18 @@ object JavaBase extends ProgramTransformation {
     maxStack
   }
 
-  def getLocalCount(instructions: Seq[MetaObject]): Integer = ???
-
-
-
   def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
+      val qualifiedClassName: QualifiedClassName = getQualifiedClassName(clazz)
       val className = JavaClassModel.getClassName(clazz)
-      val classCompiler = new ClassCompiler(state)
+      val classCompiler = new ClassCompiler(clazz, state)
+      val myPackage = classCompiler.compiler.getPackage(JavaClassModel.getPackage(clazz).toList)
+      val classInfo = new ClassInfo()
+      myPackage.content(className) = classInfo
 
-      def getClassRef(name: String) = {
-        val nameIndex = classCompiler.constantPool.store(name)
-        classCompiler.constantPool.store(ByteCode.classRef(nameIndex))
-      }
-
-      val classRefIndex = getClassRef(className)
+      classCompiler.getClassRef(qualifiedClassName) //TODO Just to store the classRef. I don't think this is really necessary but Javac also generates this classRef in the constantpool.
       clazz(ByteCode.ClassConstantPool) = classCompiler.constantPool.constants
       val methods = JavaClassModel.getMethods(clazz)
       for(method <- methods)
@@ -113,21 +102,10 @@ object JavaBase extends ProgramTransformation {
       for(method <- methods)
         convertMethod(method)
 
-      def getMethodNameAndType(method: MetaObject): Int = {
-        val methodNameIndex = getMethodNameIndex(method)
-        val result: MetaObject = ByteCode.nameAndType(methodNameIndex, getMethodDescriptor(method))
-        classCompiler.constantPool.store(result)
-      }
-
-      def getMethodRefIndex(method: MetaObject): Int = {
-        val nameAndTypeIndex = getMethodNameAndType(method)
-        classCompiler.constantPool.store(ByteCode.methodRef(classRefIndex, nameAndTypeIndex))
-      }
-
       def bindMethod(method: MetaObject) = {
         val methodName: String = JavaMethodModel.getMethodName(method)
-        val location: Int = getMethodRefIndex(method)
-        classCompiler.localStaticMethodRefLocations(methodName) = new MethodInfo(location, method)
+        val descriptor = getMethodDescriptor(method)
+        classInfo.content(methodName) = new MethodInfo(descriptor)
       }
 
       def addCodeAnnotation(method: MetaObject, parameters: Seq[MetaObject]) {
@@ -149,15 +127,11 @@ object JavaBase extends ProgramTransformation {
         methodState
       }
 
-      def getMethodNameIndex(method: MetaObject): Int = {
-        classCompiler.constantPool.storeUtf8(JavaMethodModel.getMethodName(method))
-      }
-
       def convertMethod(method: MetaObject) {
-        val index: Int = getMethodNameIndex(method)
-        method(ByteCode.MethodNameIndex) = index
+        val methodNameIndex: Int = classCompiler.getMethodNameIndex(JavaMethodModel.getMethodName(method))
+        method(ByteCode.MethodNameIndex) = methodNameIndex
         method.data.remove(JavaMethodModel.MethodNameKey)
-        val methodDescriptorIndex = getMethodDescriptor(method)
+        val methodDescriptorIndex = getMethodDescriptorIndex(method)
         method(ByteCode.MethodDescriptorIndex) = methodDescriptorIndex
         val parameters = JavaMethodModel.getMethodParameters(method)
         addCodeAnnotation(method, parameters)
@@ -165,12 +139,12 @@ object JavaBase extends ProgramTransformation {
         method.data.remove(JavaMethodModel.MethodParametersKey)
       }
 
-      def getMethodDescriptor(method: MetaObject): Int = {
+      def getMethodDescriptorIndex(method: MetaObject) : Int = classCompiler.constantPool.store(getMethodDescriptor(method))
+      def getMethodDescriptor(method: MetaObject) : MetaObject = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
-        val methodDescriptor = ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
+        ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
           , parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p))))
-        classCompiler.constantPool.store(methodDescriptor)
       }
 
     }
@@ -179,6 +153,13 @@ object JavaBase extends ProgramTransformation {
     }
 
 
+  }
+
+
+  def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
+    val className = JavaClassModel.getClassName(clazz)
+    val qualifiedClassName = new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
+    qualifiedClassName
   }
 
   def dependencies: Set[ProgramTransformation] = Set(ByteCodeGoTo)

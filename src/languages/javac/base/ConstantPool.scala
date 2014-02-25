@@ -1,4 +1,4 @@
-package languages.java.base
+package languages.javac.base
 
 import scala.collection.mutable
 
@@ -11,7 +11,7 @@ class ConstantPool {
       val index = constants.length
       reverseRouter(ref) = index
       constants.append(ref)
-      index
+      index + 1
     })
   }
 

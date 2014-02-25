@@ -1,15 +1,29 @@
-package languages.java.base
+package languages.javac.base
 
 import transformation.MetaObject
 import languages.bytecode.ByteCode
 import scala.collection.mutable
 
-object JavaClassModel {
+case class QualifiedClassName(parts: Seq[String])
 
-  def clazz(name: String, methods: Seq[MetaObject]) = new MetaObject(ByteCode.ClassFileKey) {
+case class JavaImport(_package: Seq[String], end: Option[String])
+object JavaClassModel {
+  def getPackage(clazz: MetaObject) : Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
+  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
+  object ClassPackage
+  object ClassImports
+  object ClassParent
+  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCode.ClassFileKey) {
     data.put(ByteCode.ClassMethodsKey, methods.toBuffer)
+    data.put(ClassPackage, _package)
     data.put(ByteCode.ClassNameKey, name)
+    data.put(ClassImports, imports)
+    mbParent match {
+      case Some(parent) => data.put(ClassParent, parent)
+      case _ =>
+    }
   }
+  def getParent(clazz: MetaObject) : Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
   def getClassName(clazz: MetaObject) = clazz(ByteCode.ClassNameKey).asInstanceOf[String]
   def getMethods(clazz: MetaObject) = clazz(ByteCode.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
 }

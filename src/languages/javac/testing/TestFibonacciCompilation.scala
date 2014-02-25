@@ -1,16 +1,16 @@
-package languages.java.testing
+package languages.javac.testing
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.{ComparisonOptions, MetaObject}
-import languages.java.base._
+import languages.javac.base._
 import JavaBaseModel._
 import JavaClassModel._
 import util.TestConsole
 import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
-import languages.java.base.JavaTypes._
-import languages.java.base.JavaMethodModel._
-import languages.java._
+import languages.javac.base.JavaTypes._
+import languages.javac.base.JavaMethodModel._
+import languages.javac._
 import transformation.ComparisonOptions
 import transformation.ComparisonOptions
 
@@ -47,7 +47,7 @@ class TestFibonacciCompilation {
   }
 
   def getCompiledFibonacci: MetaObject = {
-    val fibonacci = clazz(className, Seq(getFibonacciMethod))
+    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     compiledCode
@@ -80,7 +80,7 @@ class TestFibonacciCompilation {
       ByteCode.methodRef(3, 15),
       ByteCode.classRef(16),
       ByteCode.classRef(17),
-      "<init>",
+      ConstructorC.constructorName,
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
       "Code",
       "LineNumberTable",
@@ -98,10 +98,11 @@ class TestFibonacciCompilation {
     nativeClass
   }
 
+  val defaultPackage = Seq()
   @Test
   def compareCompiledVersusOptimizedNativeCode() {
     val className = "test"
-    val fibonacci = clazz(className, Seq(getFibonacciMethod))
+    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     val instructions = Seq(
@@ -129,7 +130,7 @@ class TestFibonacciCompilation {
   @Test
   def testCompiledCodeInterpretation() {
     val className = "test"
-    val fibonacci = clazz(className, Seq(getFibonacciMethod))
+    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     val console = new TestConsole

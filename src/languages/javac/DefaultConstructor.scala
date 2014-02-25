@@ -1,8 +1,8 @@
-package languages.java
+package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.java.base.{JavaBase, JavaMethodModel, JavaClassModel}
-import languages.java.base.JavaMethodModel.PublicVisibility
+import languages.javac.base.{JavaBase, JavaMethodModel, JavaClassModel}
+import languages.javac.base.JavaMethodModel.PublicVisibility
 
 object DefaultConstructor extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(ConstructorC)

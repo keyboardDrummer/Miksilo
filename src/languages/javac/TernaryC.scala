@@ -1,7 +1,7 @@
-package languages.java
+package languages.javac
 
 import transformation.{ProgramTransformation, TransformationState, MetaObject}
-import languages.java.base.JavaBase
+import languages.javac.base.JavaBase
 import JavaBase._
 import languages.bytecode.ByteCodeGoTo
 
