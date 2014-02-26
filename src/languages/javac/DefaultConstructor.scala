@@ -11,7 +11,7 @@ object DefaultConstructor extends ProgramTransformation {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      JavaClassModel.getMethods(clazz).append(ConstructorC.constructor(Seq(),Seq(), PublicVisibility))
+      JavaClassModel.getMethods(clazz).prepend(ConstructorC.constructor(Seq(),Seq(), PublicVisibility))
     }
   }
 }

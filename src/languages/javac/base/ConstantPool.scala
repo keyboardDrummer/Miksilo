@@ -8,10 +8,10 @@ class ConstantPool {
 
   def store(ref: Any) : Int = {
     reverseRouter.getOrElse[Int](ref, {
-      val index = constants.length
+      val index = constants.length + 1
       reverseRouter(ref) = index
       constants.append(ref)
-      index + 1
+      index
     })
   }
 

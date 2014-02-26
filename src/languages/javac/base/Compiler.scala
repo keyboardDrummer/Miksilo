@@ -9,7 +9,7 @@ case class MyPackage(content: mutable.Map[String, PackageContent] = mutable.Map(
 {
   def getPackage(parts: List[String]) : MyPackage = parts match {
     case Nil => this
-    case ::(head,tail) => content.getOrElse(head, new MyPackage()).asInstanceOf[MyPackage].getPackage(tail)
+    case ::(head,tail) => content.getOrElseUpdate(head, new MyPackage()).asInstanceOf[MyPackage].getPackage(tail)
   }
   def flattenContents() : mutable.Map[List[String],ClassInfo] = {
     content.flatMap(item => item._2 match {

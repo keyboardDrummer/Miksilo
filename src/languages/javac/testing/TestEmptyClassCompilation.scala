@@ -41,15 +41,7 @@ class TestEmptyClassCompilation {
     val expectedByteCode = getEmptyClassByteCode()
     val javaCode = getEmptyClass()
     val compiledCode = JavaCompiler.getCompiler.compile(javaCode)
-    val expectedConstantPoolSet = ByteCode.getConstantPool(expectedByteCode)
-    val compiledConstantPoolSet = ByteCode.getConstantPool(compiledCode)
-    Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
-    Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem =>
-    {
-      val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => MetaObject.deepEquality(compiledItem, expectedItem,
-        new ComparisonOptions(false, false, true)))
-      hasEquivalent
-    }))
+    TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   @Test
@@ -58,10 +50,6 @@ class TestEmptyClassCompilation {
     val javaCode = getEmptyClass()
     val compiledCode = JavaCompiler.getCompiler.compile(javaCode)
 
-    val expectedMethod = ByteCode.getMethods(expectedByteCode)(0)
-    val compiledMethod = ByteCode.getMethods(compiledCode)(0)
-    Assert.assertTrue(MetaObject.deepEquality(compiledMethod,expectedMethod,
-        new ComparisonOptions(false,false,true)))
-
+    TestUtils.testMethodEquivalence(expectedByteCode, compiledCode)
   }
 }
