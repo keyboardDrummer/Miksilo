@@ -30,13 +30,15 @@ object ByteCode extends ProgramTransformation {
     data.put(NameAndTypeName, nameIndex)
     data.put(NameAndTypeType, typeIndex)
   }
+  def getNameAndTypeName(nameAndType: MetaObject) = nameAndType(NameAndTypeName).asInstanceOf[Int]
+  def getNameAndTypeType(nameAndType: MetaObject) = nameAndType(NameAndTypeType).asInstanceOf[Int]
 
   object ClassRefKey
   object ClassRefName
   def classRef(classRefNameIndex: Int): MetaObject = new MetaObject(ClassRefKey) {
     data.put(ClassRefName, classRefNameIndex)
   }
-
+  def getClassRefName(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
 
   object MethodRefKey
   object MethodRefClassName
@@ -45,6 +47,8 @@ object ByteCode extends ProgramTransformation {
     data.put(MethodRefClassName, classNameIndex)
     data.put(MethodRefMethodName, methodNameAndTypeIndex)
   }
+  def getMethodRefClassRefIndex(methodRef: MetaObject) = methodRef(MethodRefClassName).asInstanceOf[Int]
+  def getMethodRefMethodNameIndex(methodRef: MetaObject) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
   object IntegerReturn
   def integerReturn: MetaObject = instruction(IntegerReturn)
@@ -138,15 +142,18 @@ object ByteCode extends ProgramTransformation {
 
   object ClassFileKey
   object ClassMethodsKey
-  object ClassNameKey
+  object ClassNameIndexKey
+  object ClassParentIndex
   object ClassConstantPool
-  def clazz(name: String, constantPool: Seq[Any], methods: Seq[MetaObject]) = new MetaObject(ClassFileKey) {
+  def clazz(name: Int, parent: Int, constantPool: Seq[Any], methods: Seq[MetaObject]) = new MetaObject(ClassFileKey) {
     data.put(ClassMethodsKey, methods)
-    data.put(ClassNameKey, name)
+    data.put(ClassNameIndexKey, name)
+    data.put(ClassParentIndex, parent)
     data.put(ClassConstantPool, constantPool)
   }
+  def getParentIndex(clazz: MetaObject) = clazz(ClassParentIndex).asInstanceOf[Int]
   def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[Seq[Any]]
-
+  def getClassNameIndex(clazz: MetaObject) = clazz(ClassNameIndexKey).asInstanceOf[Int]
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
   def transform(program: MetaObject, state: TransformationState): Unit = {}

@@ -16,7 +16,7 @@ object JavaClassModel {
   def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCode.ClassFileKey) {
     data.put(ByteCode.ClassMethodsKey, methods.toBuffer)
     data.put(ClassPackage, _package)
-    data.put(ByteCode.ClassNameKey, name)
+    data.put(ByteCode.ClassNameIndexKey, name)
     data.put(ClassImports, imports)
     mbParent match {
       case Some(parent) => data.put(ClassParent, parent)
@@ -24,7 +24,7 @@ object JavaClassModel {
     }
   }
   def getParent(clazz: MetaObject) : Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
-  def getClassName(clazz: MetaObject) = clazz(ByteCode.ClassNameKey).asInstanceOf[String]
+  def getClassName(clazz: MetaObject) = clazz(ByteCode.ClassNameIndexKey).asInstanceOf[String]
   def getMethods(clazz: MetaObject) = clazz(ByteCode.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
 }
 

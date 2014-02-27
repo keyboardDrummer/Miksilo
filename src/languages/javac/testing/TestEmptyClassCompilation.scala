@@ -26,7 +26,7 @@ class TestEmptyClassCompilation {
     val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 0, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute)
-    ByteCode.clazz(classname, constantPool, Seq(defaultConstructor))
+    ByteCode.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }
 
   val classPackage: Seq[String] = Seq("languages","java","testing")
