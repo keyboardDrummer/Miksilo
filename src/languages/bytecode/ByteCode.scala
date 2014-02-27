@@ -4,7 +4,23 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
+trait StackMap
+case class AppendFrame(offsetDelta: Int, localVerificationTypes: Seq[Any]) extends StackMap
+case class SameFrame(offsetDelta: Int) extends StackMap
 object ByteCode extends ProgramTransformation {
+  object IntegerStore
+  def integerStore(location: Int): MetaObject = instruction(IntegerStore,Seq(location))
+
+  object StackMapTableKey
+  object StackMapTableMaps
+  def stackMapTable(nameIndex: Int, attributeLength: Int, stackMaps: Seq[StackMap]) = new MetaObject(StackMapTableKey) {
+    data.put(AttributeNameKey, nameIndex)
+    data.put(AttributeLengthKey, attributeLength)
+    data.put(LineNumberTableId, stackMaps)
+  }
+
+  object StackMapTableId
+
   object LineNumberKey
   object LineNumberTableLines
   def lineNumberTable(nameIndex: Int, length: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberKey) {

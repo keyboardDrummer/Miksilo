@@ -6,9 +6,15 @@ import akka.util.Convert
 import java.nio.charset.Charset
 
 object PrintByteCode {
-  def print(byteCode: MetaObject) {
-
+  def print(byteCode: MetaObject) : String = {
+    formatHexLikeClassFile(valueOf(getBytes(byteCode))).toLowerCase
   }
+
+  def formatHexLikeClassFile(hex: String) : String = {
+    hex.grouped(4).grouped(8).map(g => g.mkString(" ")).mkString("\n")
+  }
+
+  def valueOf(buf: Iterable[Byte]): String = buf.map("%02X" format _).mkString
 
   def getBytes(byteCode: MetaObject) : Seq[Byte] = {
     val clazz = byteCode
