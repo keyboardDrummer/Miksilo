@@ -8,7 +8,7 @@ import akka.util.Convert
 class TestByteCodeGoTo {
 
   def testMain(instructions: Seq[MetaObject]) : MetaObject = {
-    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0,0,0,0,instructions,Seq(),Seq())))
+    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0,0,0,instructions,Seq(),Seq())))
     ByteCode.clazz(2, 3, Seq(), Seq(method))
   }
 
@@ -22,8 +22,8 @@ class TestByteCodeGoTo {
 
   def getIndexedJumpWhile: MetaObject = testMain(Seq(
     ByteCode.integerConstant(0),
-    ByteCode.addressStore(0),
-    ByteCode.addressLoad(0),
+    ByteCode.integerStore(0),
+    ByteCode.integerLoad(0),
     ByteCode.integerConstant(3),
     ByteCode.ifIntegerCompareGreater(13),
     ByteCode.integerIncrement(0, 1),
@@ -31,9 +31,9 @@ class TestByteCodeGoTo {
 
   def getLabelledJumpWhile: MetaObject = testMain(Seq(
     ByteCode.integerConstant(0),
-    ByteCode.addressStore(0),
+    ByteCode.integerStore(0),
     ByteCodeGoTo.label("start"),
-    ByteCode.addressLoad(0),
+    ByteCode.integerLoad(0),
     ByteCode.integerConstant(3),
     ByteCodeGoTo.ifIntegerCompareGreater("end"),
     ByteCode.integerIncrement(0, 1),

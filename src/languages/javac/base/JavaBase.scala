@@ -42,7 +42,7 @@ object JavaBase extends ProgramTransformation {
     val result = mutable.Map.empty[AnyRef, (MetaObject, InstructionCompiler) => Seq[MetaObject]]
     result.put(VariableKey, (variable, compiler) => {
       val variableAddress = compiler.variables.variables(getVariableName(variable))
-      Seq(ByteCode.addressLoad(variableAddress))
+      Seq(ByteCode.integerLoad(variableAddress))
     })
 
     result.put(CallKey, (call, compiler) => {
@@ -119,8 +119,7 @@ object JavaBase extends ProgramTransformation {
         val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
-        val length = 0
-        method(ByteCode.MethodAnnotations) = Seq(ByteCode.codeAttribute(codeIndex, length, getMaxStack(instructions), instructionCompiler.localCount,
+        method(ByteCode.MethodAnnotations) = Seq(ByteCode.codeAttribute(codeIndex, getMaxStack(instructions), instructionCompiler.localCount,
           instructions, exceptionTable, codeAttributes))
       }
 

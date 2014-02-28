@@ -23,8 +23,8 @@ class TestEmptyClassCompilation {
       new QualifiedClassName(Seq("languages","java","testing","EmptyClass")),
       new QualifiedClassName(Seq("java","lang","Object"))
     )
-    val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
-    val codeAttribute = Seq(ByteCode.codeAttribute(5, 0, 1, 1, instructions, Seq(), Seq()))
+    val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
+    val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute)
     ByteCode.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }

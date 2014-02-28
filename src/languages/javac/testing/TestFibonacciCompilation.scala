@@ -28,7 +28,7 @@ class TestFibonacciCompilation {
   }
 
   def getClassMethodInstructions(clazz: MetaObject) = {
-    ByteCode.getMethodAnnotations(ByteCode.getMethods(clazz)(1))(0)
+    ByteCode.getMethodAttributes(ByteCode.getMethods(clazz)(1))(0)
   }
 
   @Test
@@ -47,14 +47,14 @@ class TestFibonacciCompilation {
   }
 
   def getConstructorByteCode() : MetaObject = {
-    val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
-    val codeAttribute = Seq(ByteCode.codeAttribute(5, 0, 1, 1, instructions, Seq(), Seq()))
+    val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
+    val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     ByteCode.methodInfo(3,4, codeAttribute)
   }
 
   def getNativeUnoptimizedFibonacci(): MetaObject = {
     val instructions = Seq(
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(0),
       ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerConstant(1),
@@ -63,11 +63,11 @@ class TestFibonacciCompilation {
       ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(1),
       ByteCode.subtractInteger,
       ByteCode.invokeStatic(2),
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(2),
       ByteCode.subtractInteger,
       ByteCode.invokeStatic(2),
@@ -88,7 +88,7 @@ class TestFibonacciCompilation {
       ByteCode.nameAndType(8, 9),
       new QualifiedClassName(Seq("languages","bytecode","testing","OnlyFibonacci")),
       new QualifiedClassName(Seq("java","lang","Object")))
-    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode(), method))
     nativeClass
   }
@@ -100,23 +100,23 @@ class TestFibonacciCompilation {
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     val instructions = Seq(
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(0),
       ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(1),
       ByteCode.subtractInteger,
       ByteCode.invokeStatic(2),
-      ByteCode.addressLoad(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(2),
       ByteCode.subtractInteger,
       ByteCode.invokeStatic(2),
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     val nativeClass = ByteCode.clazz(0, 0, Seq(), Seq(getConstructorByteCode(), method))
     Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false, false)))
   }

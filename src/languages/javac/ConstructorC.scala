@@ -23,7 +23,7 @@ object ConstructorC extends ProgramTransformation {
       val qualifiedName = compiler.classCompiler.fullyQualify(className)
       val methodRefIndex = compiler.classCompiler.getMethodRefIndex(new MethodKey(qualifiedName, constructorName))
       val argumentInstructions = callArguments.flatMap(argument => JavaBase.statementToInstructions(argument, compiler))
-      Seq(ByteCode.addressLoad(0)) ++ argumentInstructions ++ Seq(ByteCode.invokeSpecial(methodRefIndex))
+      Seq(ByteCode.integerLoad(0)) ++ argumentInstructions ++ Seq(ByteCode.invokeSpecial(methodRefIndex))
     }
 
     JavaBase.getStatementToLines(state).put(SuperCall, transformSuperOrThisCall)

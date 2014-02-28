@@ -20,28 +20,29 @@ class TestPrintByteCode {
     val constantPool = Seq(ByteCode.methodRef(3, 12),
       ByteCode.classRef(13),
       ByteCode.classRef(14),
-      "<init",
-      "()V",
+      "<init>",
+      ByteCode.methodDescriptor(JavaTypes.VoidType,Seq()),
       ByteCode.CodeAttributeId,
       ByteCode.LineNumberTableId,
       "whilee",
       ByteCode.StackMapTableId,
       ByteCode.SourceFileId,
-      "While.java",
+      "Whilee.java",
       ByteCode.nameAndType(4, 5),
-      new QualifiedClassName(Seq("language", "bytecode", "testing", "Whilee")),
+      new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
       new QualifiedClassName(Seq("java", "lang", "Object")))
     val constructor: MetaObject = getConstructor
     val _while: MetaObject = getWhile
     val methods = Seq(constructor, _while)
-    ByteCode.clazz(1, 2, constantPool, methods)
+    val classAttributes = Seq(ByteCode.sourceFile(10,11))
+    ByteCode.clazz(2, 3, constantPool, methods, attributes = classAttributes)
   }
 
 
   def getConstructor: MetaObject = {
-    val lineNumberTable = ByteCode.lineNumberTable(7, -1, Seq(new LineNumberRef(3, 0)))
+    val lineNumberTable = ByteCode.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCode.methodInfo(4, 5, Seq(
-      ByteCode.codeAttribute(6, 0, 1, 1, Seq(
+      ByteCode.codeAttribute(6, 1, 1, Seq(
         ByteCode.addressLoad(0),
         ByteCode.invokeSpecial(1),
         ByteCode.voidReturn
@@ -50,22 +51,23 @@ class TestPrintByteCode {
   }
 
   def getWhile: MetaObject = {
-    val lineNumberTable = ByteCode.lineNumberTable(7, -1, Seq(
+    val lineNumberTable = ByteCode.lineNumberTable(7, Seq(
       new LineNumberRef(5, 0),
       new LineNumberRef(6, 2),
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCode.stackMapTable(9, -1, Seq(new AppendFrame(2, Seq(JavaTypes.IntegerType)), new SameFrame(10)))
-    val _while = ByteCode.methodInfo(8, 5, Seq(ByteCode.codeAttribute(6, -1, 2, 1, Seq(
+    val stackMapTable = ByteCode.stackMapTable(9, Seq(new AppendFrame(2, Seq(JavaTypes.IntegerType)), new SameFrame(10)))
+    val _while = ByteCode.methodInfo(8, 5, Seq(ByteCode.codeAttribute(6, 2, 1, Seq(
       ByteCode.integerConstant(0),
       ByteCode.integerStore(0),
+      ByteCode.integerLoad(0),
       ByteCode.integerConstant(3),
-      ByteCode.ifIntegerCompareGreater(13),
+      ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerIncrement(0, 1),
-      ByteCode.goTo(2),
+      ByteCode.goTo(-8),
       ByteCode.voidReturn
-    ), Seq(), Seq(lineNumberTable, stackMapTable))))
+    ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
     _while
   }
 }

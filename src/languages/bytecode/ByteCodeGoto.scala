@@ -31,7 +31,7 @@ object ByteCodeGoTo extends ProgramTransformation {
   def transform(program: MetaObject, state: TransformationState): Unit = {
 
     for(codeAnnotation <- ByteCode.getMethods(program)
-      .flatMap(methodInfo => ByteCode.getMethodAnnotations(methodInfo))
+      .flatMap(methodInfo => ByteCode.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == ByteCode.CodeKey) Some(annotation) else None))
     {
       val instructions = ByteCode.getCodeInstructions(codeAnnotation)
