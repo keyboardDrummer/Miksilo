@@ -96,6 +96,7 @@ object ByteCode extends ProgramTransformation {
   object MethodAccessFlags
   object PublicAccess extends MethodAccessFlag
   object StaticAccess extends MethodAccessFlag
+  object PrivateAccess extends MethodAccessFlag
   trait MethodAccessFlag
   def methodInfo(nameIndex: Int, descriptorIndex: Int, annotations: Seq[MetaObject], flags: Set[MethodAccessFlag] = Set()) =
     new MetaObject(MethodInfoKey)
@@ -120,7 +121,8 @@ object ByteCode extends ProgramTransformation {
   def integerLoad(location: Integer) = instruction(IntegerLoad,Seq(location))
   def getInstructionStackSizeModification(metaObject: MetaObject) : Integer = -1
 
-  def subtractInteger = instruction("subtractIntegers")
+  object SubtractInteger
+  def subtractInteger = instruction(SubtractInteger)
 
   object IntegerConstantKey
   object AddIntegersKey

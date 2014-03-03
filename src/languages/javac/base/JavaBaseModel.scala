@@ -13,10 +13,11 @@ object JavaClassModel {
   object ClassPackage
   object ClassImports
   object ClassParent
+  object ClassName
   def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCode.ClassFileKey) {
     data.put(ByteCode.ClassMethodsKey, methods.toBuffer)
     data.put(ClassPackage, _package)
-    data.put(ByteCode.ClassNameIndexKey, name)
+    data.put(ClassName, name)
     data.put(ClassImports, imports)
     mbParent match {
       case Some(parent) => data.put(ClassParent, parent)
@@ -24,7 +25,7 @@ object JavaClassModel {
     }
   }
   def getParent(clazz: MetaObject) : Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
-  def getClassName(clazz: MetaObject) = clazz(ByteCode.ClassNameIndexKey).asInstanceOf[String]
+  def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
   def getMethods(clazz: MetaObject) = clazz(ByteCode.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
 }
 
@@ -52,6 +53,8 @@ object JavaMethodModel {
       data.put(VisibilityKey, visibility)
     }
   }
+  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
+  def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
 
   object ParameterNameKey
 
@@ -136,6 +139,7 @@ object JavaTypes {
   object StringType
   object VoidType
   object IntegerType
+  object LongType
   object DoubleType
   def arrayType(elementType: Any) = {
     new MetaObject("arrayType") { data.put("elementType", elementType) }

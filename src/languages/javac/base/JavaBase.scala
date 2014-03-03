@@ -86,6 +86,20 @@ object JavaBase extends ProgramTransformation {
     maxStack
   }
 
+  def addMethodFlags(method: MetaObject) = {
+    var flags = Set[ByteCode.MethodAccessFlag]()
+    if (JavaMethodModel.getMethodStatic(method))
+      flags += ByteCode.StaticAccess
+
+    JavaMethodModel.getMethodVisibility(method) match
+    {
+      case JavaMethodModel.PublicVisibility => flags += ByteCode.PublicAccess
+      case JavaMethodModel.PrivateVisibility => flags += ByteCode.PrivateAccess
+    }
+
+    method(ByteCode.MethodAccessFlags) = flags
+  }
+
   def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
 
@@ -95,9 +109,16 @@ object JavaBase extends ProgramTransformation {
       val classCompiler = new ClassCompiler(clazz, state)
       val myPackage = classCompiler.compiler.getPackage(JavaClassModel.getPackage(clazz).toList)
       val classInfo = new ClassInfo()
+      clazz(ByteCode.ClassAttributes) = Seq()
       myPackage.content(className) = classInfo
 
-      classCompiler.getClassRef(qualifiedClassName) //TODO Just to store the classRef. I don't think this is really necessary but Javac also generates this classRef in the constantpool.
+      val classRef = classCompiler.getClassRef(qualifiedClassName)
+      clazz(ByteCode.ClassNameIndexKey) = classRef
+      val parentName = JavaClassModel.getParent(clazz).get
+      val parentRef = classCompiler.getClassRef(classCompiler.fullyQualify(parentName))
+      clazz(ByteCode.ClassParentIndex) = parentRef
+      clazz(ByteCode.ClassInterfaces) = Seq()
+      clazz(ByteCode.ClassFields) = Seq()
       clazz(ByteCode.ClassConstantPool) = classCompiler.constantPool.constants
       val methods = JavaClassModel.getMethods(clazz)
       for(method <- methods)
@@ -131,6 +152,7 @@ object JavaBase extends ProgramTransformation {
       }
 
       def convertMethod(method: MetaObject) {
+        addMethodFlags(method)
         val methodNameIndex: Int = classCompiler.getMethodNameIndex(JavaMethodModel.getMethodName(method))
         method(ByteCode.MethodNameIndex) = methodNameIndex
         method.data.remove(JavaMethodModel.MethodNameKey)
@@ -161,8 +183,7 @@ object JavaBase extends ProgramTransformation {
 
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
     val className = JavaClassModel.getClassName(clazz)
-    val qualifiedClassName = new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
-    qualifiedClassName
+    new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
   def dependencies: Set[ProgramTransformation] = Set(ByteCodeGoTo)

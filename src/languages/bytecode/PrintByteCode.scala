@@ -52,8 +52,10 @@ object PrintByteCode {
   def aaaaBytes = hexToBytes("aaaa")
 
   def getMethodByteCode(methodInfo: MetaObject) = {
-    val accessCodes = Map(ByteCode.PublicAccess -> "0001",
-      ByteCode.StaticAccess -> "0008").mapValues(s => hexToInt(s))
+    val accessCodes = Map(
+      ByteCode.PublicAccess -> "0001",
+      ByteCode.StaticAccess -> "0008",
+      ByteCode.PrivateAccess -> "0002").mapValues(s => hexToInt(s))
     shortToBytes(ByteCode.getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
       shortToBytes(ByteCode.getMethodNameIndex(methodInfo)) ++
       shortToBytes(ByteCode.getMethodDescriptorIndex(methodInfo)) ++
@@ -73,6 +75,7 @@ object PrintByteCode {
     val arguments = ByteCode.getInstructionArguments(instruction)
     val result = instruction.clazz match {
       case ByteCode.AddIntegersKey => hexToBytes("60")
+      case ByteCode.SubtractInteger => hexToBytes("64")
       case ByteCode.IntegerConstantKey =>
         byteToBytes(3 + ByteCode.getIntegerConstantValue(instruction))
       case ByteCode.AddressLoad =>
@@ -179,6 +182,9 @@ object PrintByteCode {
 
   def javaTypeToString(_type: Any): String = _type match {
     case JavaTypes.VoidType => "V"
+    case JavaTypes.IntegerType => "I"
+    case JavaTypes.DoubleType => "D"
+    case JavaTypes.LongType => "L"
   }
 
   def getConstantEntryByteCode(entry: Any): Seq[Byte] = {

@@ -29,12 +29,12 @@ object ConstructorC extends ProgramTransformation {
     JavaBase.getStatementToLines(state).put(SuperCall, transformSuperOrThisCall)
     JavaBase.getStatementToLines(state).put(ThisCall, transformSuperOrThisCall)
 
-    val className = JavaClassModel.getClassName(clazz)
     for(constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor))
     {
       constructor.clazz = ByteCode.MethodInfoKey
       constructor(JavaMethodModel.MethodNameKey) = constructorName
       constructor(JavaMethodModel.ReturnTypeKey) = JavaTypes.VoidType
+      constructor(StaticKey) = false
     }
   }
 
