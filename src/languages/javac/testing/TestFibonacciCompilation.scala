@@ -40,10 +40,15 @@ class TestFibonacciCompilation {
   }
 
   def getCompiledFibonacci: MetaObject = {
-    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
+    val fibonacci = getJavaFibonacci
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     compiledCode
+  }
+
+
+  def getJavaFibonacci: MetaObject = {
+    clazz(defaultPackage, className, Seq(getFibonacciMethod))
   }
 
   def getConstructorByteCode() : MetaObject = {
@@ -122,8 +127,16 @@ class TestFibonacciCompilation {
   }
 
   @Test
+  def compileAndPrintFibonacci() {
+    val fibonacci = getJavaFibonacci
+    val compiler = JavaCompiler.getCompiler
+    val byteCode = compiler.compile(fibonacci)
+    PrintByteCode.print(byteCode)
+  }
+
+  @Test
   def testCompiledCodeInterpretation() {
-    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
+    val fibonacci = getJavaFibonacci
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     val console = new TestConsole
