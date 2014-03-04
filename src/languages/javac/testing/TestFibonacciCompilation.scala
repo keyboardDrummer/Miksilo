@@ -59,7 +59,7 @@ class TestFibonacciCompilation {
   def getConstructorByteCode() : MetaObject = {
     val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
-    ByteCode.methodInfo(3,4, codeAttribute)
+    ByteCode.methodInfo(3,4, codeAttribute, Set(ByteCode.PublicAccess))
   }
 
   def getExpectedUnoptimizedFibonacci(): MetaObject = {
@@ -180,6 +180,21 @@ class TestFibonacciCompilation {
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     PrintByteCode.print(byteCode)
+  }
+
+  @Test
+  def runCompiledFibonacci() {
+    val fibonacci = getJavaFibonacciWithoutMain
+    val compiler = JavaCompiler.getCompiler
+    val byteCode = compiler.compile(fibonacci)
+    val bytes = PrintByteCode.print(byteCode)
+    val fileName = "test.class"
+    val file = File(fileName)
+    file.bufferedWriter().append(bytes)
+
+    val processBuilder = new ProcessBuilder("java",fileName)
+    val redirect = processBuilder.redirectOutput()
+    processBuilder.start()
   }
 
   def getMainMethod: MetaObject = {
