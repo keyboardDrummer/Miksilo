@@ -25,7 +25,7 @@ class TestEmptyClassCompilation {
     )
     val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
-    val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute)
+    val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute, Set(ByteCode.PublicAccess))
     ByteCode.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }
 
