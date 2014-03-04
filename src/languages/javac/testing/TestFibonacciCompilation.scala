@@ -156,7 +156,7 @@ class TestFibonacciCompilation {
 
   @Test
   def compileAndPrintFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithoutMain
+    val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     PrintByteCode.print(compiledCode)
