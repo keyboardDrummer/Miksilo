@@ -8,6 +8,12 @@ trait StackMap
 case class AppendFrame(offsetDelta: Int, localVerificationTypes: Seq[Any]) extends StackMap
 case class SameFrame(offsetDelta: Int) extends StackMap
 object ByteCode extends ProgramTransformation {
+  object InvokeVirtual
+  def invokeVirtual(methodRefIndex: Int) = instruction(InvokeVirtual, Seq(methodRefIndex))
+
+  object GetStatic
+  def getStatic(fieldRefIndex: Int): MetaObject = instruction(GetStatic, Seq(fieldRefIndex))
+
   object SourceFileAttribute
   object SourceFileFileNameIndex
   def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttribute) {

@@ -117,11 +117,10 @@ object JavaBaseModel {
 
   def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
 
-
   object SelectorKey
   object SelectorObject
   object SelectorMember
-  def selector(selectee: MetaObject, member: String) {
+  def selector(selectee: MetaObject, member: String) : MetaObject = {
     new MetaObject(SelectorKey) {
       data.put(SelectorObject, selectee)
       data.put(SelectorMember, member)

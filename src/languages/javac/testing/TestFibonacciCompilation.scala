@@ -13,6 +13,7 @@ import languages.javac.base.JavaMethodModel._
 import languages.javac._
 import transformation.ComparisonOptions
 import transformation.ComparisonOptions
+import scala.reflect.io.File
 
 class TestFibonacciCompilation {
   val className = "OnlyFibonacci"
@@ -20,7 +21,7 @@ class TestFibonacciCompilation {
   @Test
   def compareCompiledVersusNativeCodeFibonacciInstructionsOnly() {
     val compiledCode: MetaObject = getCompiledFibonacci
-    val nativeClass: MetaObject = getNativeUnoptimizedFibonacci()
+    val nativeClass: MetaObject = getExpectedUnoptimizedFibonacci()
     Assert.assertTrue(MetaObject.deepEquality(
       getClassMethodInstructions(compiledCode),
       getClassMethodInstructions(nativeClass),
@@ -34,21 +35,25 @@ class TestFibonacciCompilation {
   @Test
   def compareCompiledVersusNativeCode() {
     val compiledCode: MetaObject = getCompiledFibonacci
-    val nativeClass: MetaObject = getNativeUnoptimizedFibonacci()
+    val nativeClass: MetaObject = getExpectedUnoptimizedFibonacci()
     TestUtils.compareConstantPools(nativeClass, compiledCode)
     TestUtils.testMethodEquivalence(nativeClass, compiledCode)
   }
 
   def getCompiledFibonacci: MetaObject = {
-    val fibonacci = getJavaFibonacci
+    val fibonacci = getJavaFibonacciWithoutMain
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     compiledCode
   }
 
 
-  def getJavaFibonacci: MetaObject = {
+  def getJavaFibonacciWithoutMain: MetaObject = {
     clazz(defaultPackage, className, Seq(getFibonacciMethod))
+  }
+
+  def getJavaFibonacciWithMain: MetaObject = {
+    clazz(defaultPackage, className, Seq(getMainMethod, getFibonacciMethod))
   }
 
   def getConstructorByteCode() : MetaObject = {
@@ -57,7 +62,7 @@ class TestFibonacciCompilation {
     ByteCode.methodInfo(3,4, codeAttribute)
   }
 
-  def getNativeUnoptimizedFibonacci(): MetaObject = {
+  def getExpectedUnoptimizedFibonacci(): MetaObject = {
     val instructions = Seq(
       ByteCode.integerLoad(0),
       ByteCode.integerConstant(0),
@@ -104,6 +109,12 @@ class TestFibonacciCompilation {
     val fibonacci = clazz(defaultPackage, className, Seq(getConstructorByteCode(), getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
+    val method: MetaObject = getOptimizedFibonacciByteCode
+    val nativeClass = ByteCode.clazz(0, 0, Seq(), Seq(getConstructorByteCode(), method))
+    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false, false)))
+  }
+
+  def getOptimizedFibonacciByteCode: MetaObject = {
     val instructions = Seq(
       ByteCode.integerLoad(0),
       ByteCode.integerConstant(0),
@@ -121,22 +132,39 @@ class TestFibonacciCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    val nativeClass = ByteCode.clazz(0, 0, Seq(), Seq(getConstructorByteCode(), method))
-    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false, false)))
+    ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+  }
+
+  def getMainByteCode() = {
+    val instructions = Seq(ByteCode.getStatic(2),
+      ByteCode.integerConstant(5),
+      ByteCode.invokeStatic(3),
+      ByteCode.invokeVirtual(4),
+      ByteCode.voidReturn)
+    ByteCode.methodInfo(11,12,Seq(ByteCode.codeAttribute(9,2,1,instructions,Seq(),Seq())),
+      Set(ByteCode.PublicAccess,ByteCode.StaticAccess))
   }
 
   @Test
-  def compileAndPrintFibonacci() {
-    val fibonacci = getJavaFibonacci
+  def compileAndValidateFibonacciWithMain() {
+    val fibonacci = getJavaFibonacciWithoutMain
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
-    PrintByteCode.print(byteCode)
+    val compiledMainByteCode = ByteCode.getMethods(byteCode)
+    Assert.assertTrue(MetaObject.deepEquality(compiledMainByteCode,getMainByteCode(),new ComparisonOptions(false,true,true)))
+  }
+
+  @Test
+  def compileAndPrintFibonacciWithMain() {
+    val fibonacci = getJavaFibonacciWithoutMain
+    val compiler = JavaCompiler.getCompiler
+    val compiledCode = compiler.compile(fibonacci)
+    PrintByteCode.print(compiledCode)
   }
 
   @Test
   def testCompiledCodeInterpretation() {
-    val fibonacci = getJavaFibonacci
+    val fibonacci = getJavaFibonacciWithoutMain
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     val console = new TestConsole
@@ -146,10 +174,18 @@ class TestFibonacciCompilation {
     Assert.assertEquals("8", console.stdOut.toString())
   }
 
+  @Test
+  def compileAndPrintFibonacciWithoutMain() {
+    val fibonacci = getJavaFibonacciWithoutMain
+    val compiler = JavaCompiler.getCompiler
+    val byteCode = compiler.compile(fibonacci)
+    PrintByteCode.print(byteCode)
+  }
+
   def getMainMethod: MetaObject = {
     val parameters = Seq(parameter("args", arrayType(StringType)))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(call(variable("Console.printf"), Seq(StringLiteralC.literal("%i"), fibCall)))
+    val body = Seq(call(selector(selector(variable("System"),"out"),"print"), Seq(fibCall)))
     method("main", VoidType, parameters, body, static = true, PublicVisibility)
   }
 
