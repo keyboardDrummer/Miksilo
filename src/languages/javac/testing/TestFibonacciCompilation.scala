@@ -147,11 +147,13 @@ class TestFibonacciCompilation {
 
   @Test
   def compileAndValidateFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithoutMain
+    val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
-    val compiledMainByteCode = ByteCode.getMethods(byteCode)
-    Assert.assertTrue(MetaObject.deepEquality(compiledMainByteCode,getMainByteCode(),new ComparisonOptions(false,true,true)))
+    val compiledMainByteCode = ByteCode.getMethods(byteCode)(1)
+    val expectedMainByteCode = getMainByteCode()
+    Assert.assertTrue(MetaObject.deepEquality(compiledMainByteCode,expectedMainByteCode,
+      new ComparisonOptions(false,false,true)))
   }
 
   @Test
