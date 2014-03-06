@@ -59,7 +59,7 @@ class MetaObject(var clazz: AnyRef) {
     case anyRef: AnyRef => anyRef.getClass.getSimpleName
     case _ => clazz.toString
   }
-  override def toString: String = s"${classDebugRepresentation(clazz)}: ${data.map(kv => (classDebugRepresentation(kv._1),kv._2)).toString}"
+  override def toString: String = s"${classDebugRepresentation(clazz)}: ${data.map(kv => (classDebugRepresentation(kv._1),kv._2))}"
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[MetaObject]
 

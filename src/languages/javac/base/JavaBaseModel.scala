@@ -120,28 +120,38 @@ object JavaBaseModel {
   object SelectorKey
   object SelectorObject
   object SelectorMember
-  def selector(selectee: MetaObject, member: String) : MetaObject = {
+  def selector(_object: MetaObject, member: String) : MetaObject = {
     new MetaObject(SelectorKey) {
-      data.put(SelectorObject, selectee)
+      data.put(SelectorObject, _object)
       data.put(SelectorMember, member)
     }
   }
+  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 }
 
 object JavaTypes {
-  def objectType(className: String): Any = new MetaObject(ObjectType) {
-    data.put(ObjectTypeName,className)
+
+
+  def objectType(name: QualifiedClassName): Any = new MetaObject(ObjectType) {
+    data.put(ObjectTypeName, Right(name))
   }
+  def objectType(className: String): Any = new MetaObject(ObjectType) {
+    data.put(ObjectTypeName, Left(className))
+  }
+  def getObjectTypeName(objectType: MetaObject): Either[String,QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String,QualifiedClassName]]
 
   object ObjectTypeName
   object ObjectType
-  object StringType
   object VoidType
   object IntegerType
   object LongType
   object DoubleType
+  object ArrayType
+  object ArrayElementType
   def arrayType(elementType: Any) = {
-    new MetaObject("arrayType") { data.put("elementType", elementType) }
+    new MetaObject(ArrayType) { data.put(ArrayElementType, elementType) }
   }
+  def getArrayElementType(arrayType: MetaObject): Any = arrayType(ArrayElementType)
 
 }

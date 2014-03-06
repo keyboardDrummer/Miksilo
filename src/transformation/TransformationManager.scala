@@ -10,8 +10,7 @@ object TransformationManager {
   val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse, AddBlock,
     AddDoWhile, AddIfElse, AddForLoop, JavaMinus, DefaultConstructor, LessThanC,
     ByteCode, ByteCodeGoTo, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
-    ConstructorC, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
-
+    ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
 
   def buildCompiler(transformations: Seq[ProgramTransformation]) : Compiler = {
     new Compiler {

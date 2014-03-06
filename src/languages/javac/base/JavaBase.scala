@@ -5,72 +5,79 @@ import scala.collection.mutable
 import JavaBaseModel._
 import languages.javac.base.JavaMethodModel._
 import languages.bytecode.{ByteCodeGoTo, ByteCode}
-import languages.javac.base.JavaTypes.{DoubleType, IntegerType}
-import languages.javac.base.{MethodInfo, MethodKey, ClassCompiler}
-
-class VariablePool {
-  var offset = 0
-  val variables = mutable.Map[String,Integer]()
-
-  def add(variable: String, _type: Any) {
-    variables(variable) = offset
-    offset += JavaBase.getSize(_type)
-  }
-}
-
-
-case class InstructionCompiler(classCompiler: ClassCompiler) {
-  def transformationState = classCompiler.transformationState
-  val variables = new VariablePool()
-  var localCount = 0
-}
+import languages.javac.base.JavaTypes.{ObjectType, DoubleType, IntegerType}
+import languages.javac.base.MethodId
 
 
 object JavaBase extends ProgramTransformation {
 
-
   def getSize(_type: Any): Int = _type match {
     case IntegerType => 1
     case DoubleType => 1
-    case _ => throw new RuntimeException()
+    case meta: MetaObject => meta.clazz match  {
+      case JavaTypes.ArrayType => 1
+      case ObjectType => 1
+    }
   }
 
   def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, getInitialStatementToLines)
-    .asInstanceOf[mutable.Map[AnyRef, (MetaObject, InstructionCompiler) => Seq[MetaObject]]]
+    .asInstanceOf[mutable.Map[AnyRef, (MetaObject, MethodCompiler) => Seq[MetaObject]]]
 
   def getInitialStatementToLines = {
-    val result = mutable.Map.empty[AnyRef, (MetaObject, InstructionCompiler) => Seq[MetaObject]]
+    val result = mutable.Map.empty[AnyRef, (MetaObject, MethodCompiler) => Seq[MetaObject]]
     result.put(VariableKey, (variable, compiler) => {
-      val variableAddress = compiler.variables.variables(getVariableName(variable))
+      val variableAddress = compiler.variables.variables(getVariableName(variable)).offset
       Seq(ByteCode.integerLoad(variableAddress))
     })
 
-    result.put(CallKey, (call, compiler) => {
-      val callCallee = getCallCallee(call)
-      val methodKey : MethodKey = callCallee.clazz match {
-        case VariableKey =>
-          new MethodKey(getQualifiedClassName(compiler.classCompiler.currentClass), getVariableName(callCallee))
-        case SelectorKey => ???
-      }
-      val callArguments = getCallArguments(call)
-      val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
-      val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
-      argumentInstructions ++ Seq(ByteCode.invokeStatic(methodRefIndex))
-    })
-
-    result.put(Return, (_return,compiler) => {
-      val mbValue = getReturnValue(_return)
-      mbValue match {
-        case Some(value) =>
-          val returnValueInstructions = statementToInstructions(value, compiler)
-          returnValueInstructions ++ Seq(ByteCode.integerReturn)
-        case None => Seq(ByteCode.voidReturn)
-      }
-    })
+    result.put(CallKey, callToLines)
+    result.put(Return, returnToLines)
+    result.put(SelectorKey, selectorToLines)
     result
   }
 
-  def statementToInstructions(statement: MetaObject, instructionCompiler: InstructionCompiler)
+  def selectorToLines(selector: MetaObject, compiler: MethodCompiler) : Seq[MetaObject] = {
+    val obj = JavaBaseModel.getSelectorObject(selector)
+    val member = JavaBaseModel.getSelectorMember(selector)
+    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    val fieldInfo = classOrObjectReference.info.getField(member)
+    val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
+    if (classOrObjectReference.wasClass)
+      Seq(ByteCode.getStatic(fieldRef))
+    else
+      ???
+  }
+
+  def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
+    val mbValue = getReturnValue(_return)
+    mbValue match {
+      case Some(value) =>
+        val returnValueInstructions = statementToInstructions(value, compiler)
+        returnValueInstructions ++ Seq(ByteCode.integerReturn)
+      case None => Seq(ByteCode.voidReturn)
+    }
+  }
+
+  def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
+    val callCallee = getCallCallee(call)
+    val obj = JavaBaseModel.getSelectorObject(callCallee)
+    val member = JavaBaseModel.getSelectorMember(callCallee)
+    val kind = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+
+    val methodKey: MethodId = new MethodId(kind.info.getQualifiedName, member)
+    val methodInfo = compiler.classCompiler.compiler.find(methodKey)
+    val staticCall = methodInfo._static
+    val calleeInstructions = if (!staticCall) statementToInstructions(obj, compiler) else Seq[MetaObject]()
+    val callArguments = getCallArguments(call)
+    val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
+    val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
+    val invokeInstructions = Seq(if (staticCall)
+      ByteCode.invokeStatic(methodRefIndex) else
+      ByteCode.invokeVirtual(methodRefIndex))
+    calleeInstructions ++ argumentInstructions ++ invokeInstructions
+  }
+
+  def statementToInstructions(statement: MetaObject, instructionCompiler: MethodCompiler)
     : Seq[MetaObject] = {
     val statementToSSMLines = getStatementToLines(instructionCompiler.transformationState)
     statementToSSMLines(statement.clazz)(statement, instructionCompiler)
@@ -104,15 +111,11 @@ object JavaBase extends ProgramTransformation {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      val qualifiedClassName: QualifiedClassName = getQualifiedClassName(clazz)
-      val className = JavaClassModel.getClassName(clazz)
       val classCompiler = new ClassCompiler(clazz, state)
-      val myPackage = classCompiler.compiler.getPackage(JavaClassModel.getPackage(clazz).toList)
-      val classInfo = new ClassInfo()
+      val classInfo = classCompiler.currentClassInfo
       clazz(ByteCode.ClassAttributes) = Seq()
-      myPackage.content(className) = classInfo
 
-      val classRef = classCompiler.getClassRef(qualifiedClassName)
+      val classRef = classCompiler.getClassRef(classInfo)
       clazz(ByteCode.ClassNameIndexKey) = classRef
       val parentName = JavaClassModel.getParent(clazz).get
       val parentRef = classCompiler.getClassRef(classCompiler.fullyQualify(parentName))
@@ -130,11 +133,12 @@ object JavaBase extends ProgramTransformation {
       def bindMethod(method: MetaObject) = {
         val methodName: String = JavaMethodModel.getMethodName(method)
         val descriptor = getMethodDescriptor(method)
-        classInfo.content(methodName) = new MethodInfo(descriptor)
+        classInfo.content(methodName) = new MethodInfo(descriptor, JavaMethodModel.getMethodStatic(method))
       }
 
-      def addCodeAnnotation(method: MetaObject, parameters: Seq[MetaObject]) {
-        val instructionCompiler = getInstructionCompiler(parameters)
+      def addCodeAnnotation(method: MetaObject) {
+        val parameters = JavaMethodModel.getMethodParameters(method)
+        val instructionCompiler = getMethodCompiler(method, parameters)
         val statements = JavaMethodModel.getMethodBody(method)
         val instructions = statements.flatMap(statement => statementToInstructions(statement, instructionCompiler))
         val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
@@ -144,11 +148,12 @@ object JavaBase extends ProgramTransformation {
           instructions, exceptionTable, codeAttributes))
       }
 
-      def getInstructionCompiler(parameters: Seq[MetaObject]) = {
-        val methodState = new InstructionCompiler(classCompiler)
+      def getMethodCompiler(method: MetaObject,parameters: Seq[MetaObject]) = {
+        val methodCompiler = new MethodCompiler(classCompiler)
+        methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
         for (parameter <- parameters)
-          methodState.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
-        methodState
+          methodCompiler.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
+        methodCompiler
       }
 
       def convertMethod(method: MetaObject) {
@@ -158,8 +163,7 @@ object JavaBase extends ProgramTransformation {
         method.data.remove(JavaMethodModel.MethodNameKey)
         val methodDescriptorIndex = getMethodDescriptorIndex(method)
         method(ByteCode.MethodDescriptorIndex) = methodDescriptorIndex
-        val parameters = JavaMethodModel.getMethodParameters(method)
-        addCodeAnnotation(method, parameters)
+        addCodeAnnotation(method)
         method.data.remove(JavaMethodModel.ReturnTypeKey)
         method.data.remove(JavaMethodModel.MethodParametersKey)
       }

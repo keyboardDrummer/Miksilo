@@ -106,7 +106,7 @@ class TestFibonacciCompilation {
   val defaultPackage = Seq("languages","bytecode","testing")
   @Test
   def compareCompiledVersusOptimizedNativeCode() {
-    val fibonacci = clazz(defaultPackage, className, Seq(getConstructorByteCode(), getFibonacciMethod))
+    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethod))
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     val method: MetaObject = getOptimizedFibonacciByteCode
@@ -198,9 +198,9 @@ class TestFibonacciCompilation {
   }
 
   def getMainMethod: MetaObject = {
-    val parameters = Seq(parameter("args", arrayType(StringType)))
+    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java","lang","String"))))))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(call(selector(selector(variable("System"),"out"),"print"), Seq(fibCall)))
+    val body = Seq(call(selector(selector(selector(selector(variable("java"),"lang"),"System"),"out"),"print"), Seq(fibCall)))
     method("main", VoidType, parameters, body, static = true, PublicVisibility)
   }
 

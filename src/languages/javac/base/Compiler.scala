@@ -2,31 +2,65 @@ package languages.javac.base
 
 import scala.collection.mutable
 import languages.javac.JavaLang
-import languages.javac.base.MethodKey
+import languages.javac.base.MethodId
+import javaBytecode.MethodDescriptor
+import transformation.MetaObject
 
-trait PackageContent
-case class MyPackage(content: mutable.Map[String, PackageContent] = mutable.Map()) extends PackageContent
+class PackageContent(parent: Option[PackageInfo], name: String)
+case class PackageInfo(parent: Option[PackageInfo], name: String, content: mutable.Map[String, PackageContent] = mutable.Map())
+  extends PackageContent(parent,name)
 {
-  def getPackage(parts: List[String]) : MyPackage = parts match {
+  def getPackage(parts: List[String]) : PackageInfo = parts match {
     case Nil => this
-    case ::(head,tail) => content.getOrElseUpdate(head, new MyPackage()).asInstanceOf[MyPackage].getPackage(tail)
+    case ::(head,tail) => content.getOrElseUpdate(head, new PackageInfo(Some(this), head)).asInstanceOf[PackageInfo].getPackage(tail)
   }
+  def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.fold(Seq[String]())(info => info.getQualifiedName.parts ++ Seq(name)))
   def flattenContents() : mutable.Map[List[String],ClassInfo] = {
     content.flatMap(item => item._2 match {
       case classInfo: ClassInfo => Map(List(item._1) -> classInfo)
-      case newPackage: MyPackage => newPackage.flattenContents().map(
+      case newPackage: PackageInfo => newPackage.flattenContents().map(
         entry => (item._1 :: entry._1, entry._2))
     })
   }
+
+  def newClassInfo(className: String) = {
+    val result = new ClassInfo(this, className)
+    content(className) = result
+    result
+  }
+
+  def newPackageInfo(packageName: String) = {
+    val result = new PackageInfo(Some(this), packageName)
+    content(packageName) = result
+    result
+  }
 }
-case class ClassInfo(content: mutable.Map[String, MethodInfo] = mutable.Map()) extends PackageContent
+trait ClassMember
+
+case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[String, ClassMember] = mutable.Map()) extends PackageContent(Some(parent),name) {
+  def getMethod(name: String) = content(name).asInstanceOf[MethodInfo]
+  def getField(name: String) = content(name).asInstanceOf[FieldInfo]
+  def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.getQualifiedName.parts ++ Seq(name))
+
+  def newFieldInfo(name: String, _type: Any) = {
+    val result = new FieldInfo(this, name, _type)
+    content(name) = result
+    result
+  }
+
+  def newMethodInfo(name: String, descriptor: MetaObject, _static: Boolean) {
+    val result = new MethodInfo(descriptor, _static)
+    content(name) = result
+    result
+  }
+}
 
 class MyCompiler {
-  val env: MyPackage = JavaLang.standardLib
-  def getPackage(parts: List[String]) : MyPackage = env.getPackage(parts)
+  val env: PackageInfo = JavaLang.standardLib
+  def getPackage(parts: List[String]) : PackageInfo = env.getPackage(parts)
   def find(parts: Seq[String]) : PackageContent = parts.foldLeft[PackageContent](env)(
-    (pck: PackageContent,part: String) => pck.asInstanceOf[MyPackage].content(part))
+    (pck: PackageContent,part: String) => pck.asInstanceOf[PackageInfo].content(part))
 
-  def find(methodKey: MethodKey) : MethodInfo = find(methodKey.className.parts)
-    .asInstanceOf[ClassInfo].content(methodKey.methodName)
+  def find(methodKey: MethodId) : MethodInfo = find(methodKey.className.parts)
+    .asInstanceOf[ClassInfo].getMethod(methodKey.methodName)
 }

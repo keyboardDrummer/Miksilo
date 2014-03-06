@@ -11,6 +11,7 @@ import languages.bytecode.AppendFrame
 import languages.javac.base.QualifiedClassName
 import languages.bytecode.LineNumberRef
 import languages.bytecode.SameFrame
+import languages.javac.base.JavaTypes.{ObjectType, ArrayType}
 
 object PrintByteCode {
   def print(byteCode: MetaObject): String = {
@@ -74,6 +75,7 @@ object PrintByteCode {
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCode.getInstructionArguments(instruction)
     val result = instruction.clazz match {
+      case ByteCode.GetStatic => hexToBytes("b2") ++ shortToBytes(arguments(0))
       case ByteCode.AddIntegersKey => hexToBytes("60")
       case ByteCode.SubtractInteger => hexToBytes("64")
       case ByteCode.IntegerConstantKey =>
@@ -91,6 +93,7 @@ object PrintByteCode {
         else
           byteToBytes(hexToInt("1a") + location)
       case ByteCode.GoToKey => hexToBytes("a7") ++ shortToBytes(arguments(0))
+      case ByteCode.InvokeVirtual => hexToBytes("b6") ++ shortToBytes(arguments(0))
       case ByteCode.InvokeSpecial => hexToBytes("b7") ++ shortToBytes(arguments(0))
       case ByteCode.InvokeStaticKey => hexToBytes("b8") ++ shortToBytes(arguments(0))
       case ByteCode.VoidReturn => hexToBytes("b1")
@@ -184,7 +187,11 @@ object PrintByteCode {
     case JavaTypes.VoidType => "V"
     case JavaTypes.IntegerType => "I"
     case JavaTypes.DoubleType => "D"
-    case JavaTypes.LongType => "L"
+    case JavaTypes.LongType => "J"
+    case meta: MetaObject => meta.clazz match {
+      case ArrayType => s"[${javaTypeToString(JavaTypes.getArrayElementType(meta))}"
+      case ObjectType => s"L${JavaTypes.getObjectTypeName(meta).right.get.parts.mkString("/")}"
+    }
   }
 
   def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
@@ -195,6 +202,10 @@ object PrintByteCode {
             byteToBytes(10) ++
               shortToBytes(ByteCode.getMethodRefClassRefIndex(metaEntry)) ++
               shortToBytes(ByteCode.getMethodRefMethodNameIndex(metaEntry))
+          case ByteCode.FieldRef =>
+            byteToBytes(9) ++
+              shortToBytes(ByteCode.getFieldRefClassIndex(metaEntry)) ++
+              shortToBytes(ByteCode.getFieldRefNameIndex(metaEntry))
           case ByteCode.ClassRefKey =>
             byteToBytes(7) ++ shortToBytes(ByteCode.getClassRefName(metaEntry))
           case ByteCode.NameAndTypeKey =>
@@ -207,6 +218,7 @@ object PrintByteCode {
                 .map(javaTypeToString).mkString("")
             })"
             toUTF8ConstantEntry(parametersString + returnString)
+          case JavaTypes.ObjectType => toUTF8ConstantEntry(javaTypeToString(metaEntry))
         }
       case CodeAttributeId => toUTF8ConstantEntry("Code")
       case StackMapTableId => toUTF8ConstantEntry("StackMapTable")

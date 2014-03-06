@@ -158,7 +158,7 @@ object ByteCode extends ProgramTransformation {
   }
   def getMethodDescriptorReturnType(descriptor: MetaObject) = descriptor(MethodReturnType)
 
-  def getMethodDescriptorParameters(desciptor: MetaObject) = desciptor(MethodDescriptorParameters).asInstanceOf[Seq[Any]]
+  def getMethodDescriptorParameters(descriptor: MetaObject) = descriptor(MethodDescriptorParameters).asInstanceOf[Seq[Any]]
   object AttributeKey
   object CodeAttributeId
   object CodeKey
@@ -221,4 +221,14 @@ object ByteCode extends ProgramTransformation {
 
   object GoToKey
   object IfIntegerCompareGreater
+
+  object FieldRef
+  object FieldRefClassIndex
+  object FieldRefNameIndex
+  def fieldRef(classIndex: Int, nameIndex: Int) = new MetaObject(FieldRef) {
+    data.put(FieldRefClassIndex, classIndex)
+    data.put(FieldRefNameIndex, nameIndex)
+  }
+  def getFieldRefClassIndex(fieldRef: MetaObject) = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
+  def getFieldRefNameIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameIndex).asInstanceOf[Int]
 }
