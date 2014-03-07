@@ -30,11 +30,9 @@ class TestFibonacciWithMainCompilation {
     val writer = file.bufferedWriter()
     writer.append(bytes)
     writer.close()
-    System.out.append("hallo")
     val processBuilder = new ProcessBuilder("java",file.path)
     processBuilder.inheritIO()
     processBuilder.start()
-    System.out.append("hallo")
   }
 
   def getMainMethodJava: MetaObject = {

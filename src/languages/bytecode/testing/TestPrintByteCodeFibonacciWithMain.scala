@@ -3,13 +3,13 @@ package languages.bytecode.testing
 import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.MetaObject
-import languages.javac.testing.TestFibonacciCompilation
 import languages.javac.ConstructorC
-import languages.javac.base.{QualifiedClassName, JavaTypes}
-import com.sun.org.apache.bcel.internal.classfile.StackMapEntry
+import languages.javac.base.JavaTypes
+import scala.sys.process._
 import languages.javac.base.QualifiedClassName
 import languages.bytecode.SameFrame
 import languages.bytecode.LineNumberRef
+import scala.reflect.io.{Path, File, Directory}
 
 class TestPrintByteCodeFibonacciWithMain {
 
@@ -17,6 +17,21 @@ class TestPrintByteCodeFibonacciWithMain {
   def testPrintByteCode() = {
     val expectedHex = "cafe babe 0000 0033 0020 0a00 0600 1209\n0013 0014 0a00 0500 150a 0016 0017 0700\n1807 0019 0100 063c 696e 6974 3e01 0003\n2829 5601 0004 436f 6465 0100 0f4c 696e\n654e 756d 6265 7254 6162 6c65 0100 046d\n6169 6e01 0016 285b 4c6a 6176 612f 6c61\n6e67 2f53 7472 696e 673b 2956 0100 0966\n6962 6f6e 6163 6369 0100 0428 4929 4901\n000d 5374 6163 6b4d 6170 5461 626c 6501\n000a 536f 7572 6365 4669 6c65 0100 0e46\n6962 6f6e 6163 6369 2e6a 6176 610c 0007\n0008 0700 1a0c 001b 001c 0c00 0d00 0e07\n001d 0c00 1e00 1f01 0009 4669 626f 6e61\n6363 6901 0010 6a61 7661 2f6c 616e 672f\n4f62 6a65 6374 0100 106a 6176 612f 6c61\n6e67 2f53 7973 7465 6d01 0003 6f75 7401\n0015 4c6a 6176 612f 696f 2f50 7269 6e74\n5374 7265 616d 3b01 0013 6a61 7661 2f69\n6f2f 5072 696e 7453 7472 6561 6d01 0005\n7072 696e 7401 0004 2849 2956 0020 0005\n0006 0000 0000 0003 0000 0007 0008 0001\n0009 0000 001d 0001 0001 0000 0005 2ab7\n0001 b100 0000 0100 0a00 0000 0600 0100\n0000 0100 0900 0b00 0c00 0100 0900 0000\n2700 0200 0100 0000 0bb2 0002 08b8 0003\nb600 04b1 0000 0001 000a 0000 000a 0002\n0000 0004 000a 0005 0009 000d 000e 0001\n0009 0000 003a 0003 0001 0000 0017 1a05\na200 0704 a700 101a 0464 b800 031a 0564\nb800 0360 ac00 0000 0200 0a00 0000 0600\n0100 0000 0800 0f00 0000 0500 0209 4c01\n0001 0010 0000 0002 0011"
     Assert.assertEquals(expectedHex, PrintByteCode.print(getByteCode))
+  }
+
+  val className = "Fibonacci"
+  @Test
+  def runCompiledFibonacci() {
+    val bytes = PrintByteCode.getBytes(getByteCode).toArray
+    val tempDirectory = Directory.makeTemp()
+    val file = File.apply(tempDirectory / Path(className).addExtension("class"))
+    val writer = file.outputStream(false)
+    writer.write(bytes)
+    writer.close()
+
+    val process = Process.apply(s"java ${className}", tempDirectory.jfile)
+    val result : String = process.!!
+    Assert.assertEquals(8, Integer.parseInt(result.take(1)))
   }
 
   def getByteCode : MetaObject = {
