@@ -7,6 +7,7 @@ case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 trait StackMap
 case class AppendFrame(offsetDelta: Int, localVerificationTypes: Seq[Any]) extends StackMap
 case class SameFrame(offsetDelta: Int) extends StackMap
+case class SameLocals1StackItem(offsetDelta: Int, _type: Any) extends StackMap
 object ByteCode extends ProgramTransformation {
   object InvokeVirtual
   def invokeVirtual(methodRefIndex: Int) = instruction(InvokeVirtual, Seq(methodRefIndex))

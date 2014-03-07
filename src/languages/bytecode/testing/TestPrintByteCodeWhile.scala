@@ -8,7 +8,7 @@ import languages.bytecode.AppendFrame
 import languages.javac.base.QualifiedClassName
 import languages.bytecode.LineNumberRef
 
-class TestPrintByteCode {
+class TestPrintByteCodeWhile {
 
   @Test
   def testPrintByteCode() = {
@@ -37,7 +37,6 @@ class TestPrintByteCode {
     val classAttributes = Seq(ByteCode.sourceFile(10,11))
     ByteCode.clazz(2, 3, constantPool, methods, attributes = classAttributes)
   }
-
 
   def getConstructor: MetaObject = {
     val lineNumberTable = ByteCode.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
