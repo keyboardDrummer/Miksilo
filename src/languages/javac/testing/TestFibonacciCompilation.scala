@@ -120,7 +120,7 @@ class TestFibonacciCompilation {
     val compiler = JavaCompiler.getCompiler
     val byteCode = compiler.compile(fibonacci)
     val compiledMainByteCode = ByteCode.getMethods(byteCode)(1)
-    val expectedMainByteCode = getMainByteCode()
+    val expectedMainByteCode = getMainByteCode
     Assert.assertTrue(MetaObject.deepEquality(compiledMainByteCode,expectedMainByteCode,
       new ComparisonOptions(false,false,true)))
   }
