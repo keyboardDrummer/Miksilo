@@ -12,10 +12,11 @@ import languages.javac.base.JavaTypes._
 import languages.javac.base.JavaMethodModel._
 import languages.javac._
 import transformation.ComparisonOptions
-import scala.reflect.io.File
+import scala.reflect.io.{Path, Directory, File}
 
 class TestFibonacciCompilation {
   val className = "OnlyFibonacci"
+  val defaultPackage = Seq("languages", "bytecode", "testing")
 
   @Test
   def compareCompiledVersusNativeCodeFibonacciInstructionsOnly() {
@@ -35,8 +36,8 @@ class TestFibonacciCompilation {
   def compareCompiledVersusNativeCode() {
     val compiledCode: MetaObject = getCompiledFibonacci
     val nativeClass: MetaObject = getExpectedUnoptimizedFibonacciWithoutMainByteCode
-    TestUtils.compareConstantPools(nativeClass, compiledCode)
     TestUtils.testMethodEquivalence(nativeClass, compiledCode)
+    TestUtils.compareConstantPools(nativeClass, compiledCode)
   }
 
   def getCompiledFibonacci: MetaObject = {
@@ -46,22 +47,26 @@ class TestFibonacciCompilation {
     compiledCode
   }
 
-
   def getJavaFibonacciWithoutMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getFibonacciMethodByteCode))
+    clazz(defaultPackage, className, Seq(getFibonacciMethodJava))
   }
 
-  def getJavaFibonacciWithMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethod, getFibonacciMethodByteCode))
-  }
-
-  def getConstructorByteCode : MetaObject = {
+  def getConstructorByteCode: MetaObject = {
     val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
-    ByteCode.methodInfo(3,4, codeAttribute, Set(ByteCode.PublicAccess))
+    ByteCode.methodInfo(3, 4, codeAttribute, Set(ByteCode.PublicAccess))
   }
 
+  val methodName = "fibonacci"
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
+    val constantPool: Seq[Object] = getConstantPool
+    val method: MetaObject = getFibonacciMethodByteCode
+    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode, method))
+    nativeClass
+  }
+
+
+  def getFibonacciMethodByteCode: MetaObject = {
     val instructions = Seq(
       ByteCode.integerLoad(0),
       ByteCode.integerConstant(0),
@@ -83,7 +88,11 @@ class TestFibonacciCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val methodName = "fibonacci"
+    val codeAttribute = ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
+    ByteCode.methodInfo(0, 0, Seq(codeAttribute), Set(ByteCode.PrivateAccess, ByteCode.StaticAccess))
+  }
+
+  def getConstantPool: Seq[Object] = {
     val constantPool = Seq(ByteCode.methodRef(4, 11),
       ByteCode.methodRef(3, 12),
       ByteCode.classRef(13),
@@ -95,14 +104,10 @@ class TestFibonacciCompilation {
       ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
       ByteCode.nameAndType(5, 6),
       ByteCode.nameAndType(8, 9),
-      new QualifiedClassName(Seq("languages","bytecode","testing","OnlyFibonacci")),
-      new QualifiedClassName(Seq("java","lang","Object")))
-    val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode, method))
-    nativeClass
+      new QualifiedClassName(Seq("languages", "bytecode", "testing", "OnlyFibonacci")),
+      new QualifiedClassName(Seq("java", "lang", "Object")))
+    constantPool
   }
-
-  val defaultPackage = Seq("languages","bytecode","testing")
 
   def getMainByteCode = {
     val instructions = Seq(ByteCode.getStatic(2),
@@ -110,27 +115,8 @@ class TestFibonacciCompilation {
       ByteCode.invokeStatic(3),
       ByteCode.invokeVirtual(4),
       ByteCode.voidReturn)
-    ByteCode.methodInfo(11,12,Seq(ByteCode.codeAttribute(9,2,1,instructions,Seq(),Seq())),
-      Set(ByteCode.PublicAccess,ByteCode.StaticAccess))
-  }
-
-  @Test
-  def compileAndValidateFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
-    val compiledMainByteCode = ByteCode.getMethods(byteCode)(1)
-    val expectedMainByteCode = getMainByteCode
-    Assert.assertTrue(MetaObject.deepEquality(compiledMainByteCode,expectedMainByteCode,
-      new ComparisonOptions(false,false,true)))
-  }
-
-  @Test
-  def compileAndPrintFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.compile(fibonacci)
-    PrintByteCode.print(compiledCode)
+    ByteCode.methodInfo(11, 12, Seq(ByteCode.codeAttribute(9, 2, 1, instructions, Seq(), Seq())),
+      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
   }
 
   @Test
@@ -141,29 +127,7 @@ class TestFibonacciCompilation {
     PrintByteCode.print(byteCode)
   }
 
-  @Test
-  def runCompiledFibonacci() {
-    val fibonacci = getJavaFibonacciWithoutMain
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
-    val bytes = PrintByteCode.print(byteCode)
-    val fileName = "test.class"
-    val file = File(fileName)
-    file.bufferedWriter().append(bytes)
-
-    val processBuilder = new ProcessBuilder("java",fileName)
-    val redirect = processBuilder.redirectOutput()
-    processBuilder.start()
-  }
-
-  def getMainMethod: MetaObject = {
-    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java","lang","String"))))))
-    val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(call(selector(selector(selector(selector(variable("java"),"lang"),"System"),"out"),"print"), Seq(fibCall)))
-    method("main", VoidType, parameters, body, static = true, PublicVisibility)
-  }
-
-  def getFibonacciMethodByteCode: MetaObject = {
+  def getFibonacciMethodJava: MetaObject = {
     val parameters = Seq(parameter("i", IntegerType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))

@@ -8,10 +8,11 @@ object TestUtils {
 
 
   def testMethodEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
-    val expectedMethod = ByteCode.getMethods(expectedByteCode)(0)
-    val compiledMethod = ByteCode.getMethods(compiledCode)(0)
-    Assert.assertTrue(MetaObject.deepEquality(compiledMethod, expectedMethod,
-      new ComparisonOptions(false, false, true)))
+    for(methodPair <- ByteCode.getMethods(expectedByteCode).zip(ByteCode.getMethods(compiledCode)))
+    {
+      Assert.assertTrue(MetaObject.deepEquality(methodPair._1, methodPair._2,
+        new ComparisonOptions(false, true, false)))
+    }
   }
 
 
