@@ -37,7 +37,7 @@ class TestFibonacciWithMainCompilation {
     System.out.append("hallo")
   }
 
-  def getMainMethod: MetaObject = {
+  def getMainMethodJava: MetaObject = {
     val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java","lang","String"))))))
     val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(call(selector(selector(selector(selector(variable("java"),"lang"),"System"),"out"),"print"), Seq(fibCall)))
@@ -53,7 +53,7 @@ class TestFibonacciWithMainCompilation {
   }
 
   def getJavaFibonacciWithMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethod, other.getFibonacciMethodJava))
+    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
   }
 
   @Test
@@ -62,22 +62,36 @@ class TestFibonacciWithMainCompilation {
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacciJava)
     val expectedCode = getExpectedUnoptimizedFibonacciWithMainByteCode
-    TestUtils.compareConstantPools(expectedCode, compiledCode)
     TestUtils.testMethodEquivalence(expectedCode, compiledCode)
+    TestUtils.compareConstantPools(expectedCode, compiledCode)
   }
 
   val methodName = "fibonacci"
   def getExpectedUnoptimizedFibonacciWithMainByteCode: MetaObject = {
     val constantPool: Seq[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
-    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(other.getConstructorByteCode, method))
+    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(other.getConstructorByteCode, getMainByteCode, method))
     nativeClass
+  }
+
+  def getMainByteCode = {
+    val instructions = Seq(ByteCode.getStatic(2),
+      ByteCode.integerConstant(5),
+      ByteCode.invokeStatic(3),
+      ByteCode.invokeVirtual(4),
+      ByteCode.voidReturn)
+    ByteCode.methodInfo(11, 12, Seq(ByteCode.codeAttribute(9, 2, 1, instructions, Seq(), Seq())),
+      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
   }
 
   def getFibonacciMethodByteCode: MetaObject = {
     val instructions = Seq(
       ByteCode.integerLoad(0),
       ByteCode.integerConstant(2),
+      ByteCode.ifIntegerCompareGreater(3),
+      ByteCode.integerConstant(1),
+      ByteCode.goTo(16),
+      ByteCode.integerConstant(0),
       ByteCode.ifIntegerCompareGreater(7),
       ByteCode.integerConstant(1),
       ByteCode.goTo(16),
@@ -92,9 +106,7 @@ class TestFibonacciWithMainCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(8,0)))
-    val stackMapTable = ByteCode.stackMapTable(15, Seq(new SameFrame(9), new SameLocals1StackItem(12, JavaTypes.IntegerType)) )
-    val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
+    val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq())),
       Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
     method
   }
@@ -109,27 +121,23 @@ class TestFibonacciWithMainCompilation {
       ConstructorC.constructorName,
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
       ByteCode.CodeAttributeId,
-      ByteCode.LineNumberTableId,
       "main",
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java","lang","String")))))),
       methodName,
       ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
-      ByteCode.StackMapTableId,
-      ByteCode.SourceFileId,
-      "Fibonacci.java",
       ByteCode.nameAndType(7, 8),
       ByteCode.classRef(26),
       ByteCode.nameAndType(27, 28),
       ByteCode.nameAndType(13,14),
       ByteCode.classRef(29),
       ByteCode.nameAndType(30,31),
-      "Fibonacci",
+      new QualifiedClassName(defaultPackage ++ Seq(className)),
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
       JavaTypes.objectType(new QualifiedClassName(Seq("java","io","PrintStream"))),
-      "java/io/PrintStream",
+      new QualifiedClassName(Seq("java","io","PrintStream")),
       "print",
       ByteCode.methodDescriptor(JavaTypes.VoidType,Seq(JavaTypes.IntegerType))
     )

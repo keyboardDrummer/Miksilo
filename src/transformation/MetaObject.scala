@@ -13,6 +13,10 @@ object MetaObject {
         return true
 
       (first,second) match {
+        case (seq1: Set[_], seq2: Set[_]) =>
+          if (seq1.size != seq2.size)
+            return false
+          return true
         case (seq1: Seq[_], seq2: Seq[_]) => {
           if (seq1.length != seq2.length)
             return false

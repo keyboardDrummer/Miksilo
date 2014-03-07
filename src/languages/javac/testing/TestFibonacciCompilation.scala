@@ -109,16 +109,6 @@ class TestFibonacciCompilation {
     constantPool
   }
 
-  def getMainByteCode = {
-    val instructions = Seq(ByteCode.getStatic(2),
-      ByteCode.integerConstant(5),
-      ByteCode.invokeStatic(3),
-      ByteCode.invokeVirtual(4),
-      ByteCode.voidReturn)
-    ByteCode.methodInfo(11, 12, Seq(ByteCode.codeAttribute(9, 2, 1, instructions, Seq(), Seq())),
-      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
-  }
-
   @Test
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
