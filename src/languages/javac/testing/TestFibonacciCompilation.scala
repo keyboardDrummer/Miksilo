@@ -7,7 +7,7 @@ import languages.javac.base._
 import JavaBaseModel._
 import JavaClassModel._
 import util.TestConsole
-import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
+import javaBytecode.JavaByteCodeMachine
 import languages.javac.base.JavaTypes._
 import languages.javac.base.JavaMethodModel._
 import languages.javac._
@@ -131,18 +131,6 @@ class TestFibonacciCompilation {
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacci)
     PrintByteCode.print(compiledCode)
-  }
-
-  @Test
-  def testCompiledCodeInterpretation() {
-    val fibonacci = getJavaFibonacciWithoutMain
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
-    val console = new TestConsole
-    val machine = new JavaByteCodeMachine(console)
-    val typedByteCode = ByteCodeTypedUnTypedConversions.toTyped(byteCode)
-    machine.run(typedByteCode)
-    Assert.assertEquals("8", console.stdOut.toString())
   }
 
   @Test
