@@ -2,7 +2,7 @@ package languages.javac.testing
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
-import transformation.{ComparisonOptions, MetaObject}
+import transformation.MetaObject
 import languages.javac.base._
 import JavaBaseModel._
 import JavaClassModel._
@@ -11,7 +11,6 @@ import javaBytecode.{ByteCodeTypedUnTypedConversions, JavaByteCodeMachine}
 import languages.javac.base.JavaTypes._
 import languages.javac.base.JavaMethodModel._
 import languages.javac._
-import transformation.ComparisonOptions
 import transformation.ComparisonOptions
 import scala.reflect.io.File
 
@@ -56,7 +55,7 @@ class TestFibonacciCompilation {
     clazz(defaultPackage, className, Seq(getMainMethod, getFibonacciMethodByteCode))
   }
 
-  def getConstructorByteCode() : MetaObject = {
+  def getConstructorByteCode : MetaObject = {
     val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     ByteCode.methodInfo(3,4, codeAttribute, Set(ByteCode.PublicAccess))
@@ -99,43 +98,13 @@ class TestFibonacciCompilation {
       new QualifiedClassName(Seq("languages","bytecode","testing","OnlyFibonacci")),
       new QualifiedClassName(Seq("java","lang","Object")))
     val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode(), method))
+    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode, method))
     nativeClass
   }
 
   val defaultPackage = Seq("languages","bytecode","testing")
-  @Test
-  def compareCompiledVersusOptimizedNativeCode() {
-    val fibonacci = clazz(defaultPackage, className, Seq(getFibonacciMethodByteCode))
-    val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.compile(fibonacci)
-    val method: MetaObject = getOptimizedFibonacciByteCode
-    val nativeClass = ByteCode.clazz(0, 0, Seq(), Seq(getConstructorByteCode(), method))
-    Assert.assertTrue(MetaObject.deepEquality(compiledCode, nativeClass, new ComparisonOptions(false, false, false)))
-  }
 
-  def getOptimizedFibonacciByteCode: MetaObject = {
-    val instructions = Seq(
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(0),
-      ByteCode.ifIntegerCompareGreater(9),
-      ByteCode.integerConstant(1),
-      ByteCode.goTo(22),
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(1),
-      ByteCode.subtractInteger,
-      ByteCode.invokeStatic(2),
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(2),
-      ByteCode.subtractInteger,
-      ByteCode.invokeStatic(2),
-      ByteCode.addInteger,
-      ByteCode.integerReturn
-    )
-    ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-  }
-
-  def getMainByteCode() = {
+  def getMainByteCode = {
     val instructions = Seq(ByteCode.getStatic(2),
       ByteCode.integerConstant(5),
       ByteCode.invokeStatic(3),
