@@ -1,6 +1,6 @@
 package languages.javac.base
 
-import languages.bytecode.ByteCode
+import languages.bytecode.{ByteCodeGoTo, ByteCode}
 import languages.javac.base._
 import languages.javac.JavaLang
 import scala.collection.mutable
@@ -9,37 +9,51 @@ import languages.javac.base.QualifiedClassName
 import languages.javac.base.JavaImport
 import languages.javac.base.MethodId
 import scala.tools.scalap.scalax.util.StringUtil
+import languages.bytecode.ByteCode._
+import languages.javac.base.QualifiedClassName
+import scala.Some
+import languages.javac.base.JavaImport
+import languages.javac.base.FieldInfo
+import languages.javac.base.ClassInfo
+import languages.javac.base.MethodId
+import languages.javac.base.PackageInfo
+import languages.bytecode.ByteCodeGoTo.LabelKey
 
 object ClassCompiler {
 }
 
 
-case class FieldInfo(parent: ClassInfo, name: String, _type: Any) extends ClassMember
-{
+case class FieldInfo(parent: ClassInfo, name: String, _type: Any) extends ClassMember {
 }
+
 case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMember
+
 case class MethodId(className: QualifiedClassName, methodName: String)
-case class ClassCompiler(currentClass : MetaObject, transformationState: TransformationState) {
+
+case class ClassCompiler(currentClass: MetaObject, transformationState: TransformationState) {
 
 
-  val compiler  = new MyCompiler()
+  val compiler = new MyCompiler()
   val myPackage = compiler.getPackage(JavaClassModel.getPackage(currentClass).toList)
   val className = JavaClassModel.getClassName(currentClass)
   val currentClassInfo = myPackage.newClassInfo(className)
 
   val constantPool = new ConstantPool()
-  def fullyQualify(className: String) : QualifiedClassName = classNames(className)
+
+  def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   def findClass(objectType: MetaObject) = {
-    val qualifiedName = JavaTypes.getObjectTypeName(objectType) match
-    {
+    val qualifiedName = JavaTypes.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
     }
     compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
   }
+
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
+
   val classNames = getClassMapFromImports(JavaClassModel.getImports(currentClass))
+
   private def getClassMapFromImports(imports: Seq[JavaImport]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
       val finalPackage = compiler.find(_import._package).asInstanceOf[PackageInfo]
@@ -48,19 +62,31 @@ case class ClassCompiler(currentClass : MetaObject, transformationState: Transfo
           val qualifiedClassName = new QualifiedClassName(_import._package ++ Seq(importedClassName))
           Seq((importedClassName, qualifiedClassName)).toMap
         case _ => finalPackage.flattenContents().map(entry =>
-          (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)) )
+          (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
       }
       result
     }).toMap ++ Map(className -> JavaBase.getQualifiedClassName(currentClass))
   }
 
-  def getClassRef(info: ClassInfo) : Int = {
+  def getClassRef(info: ClassInfo): Int = {
     getClassRef(info.getQualifiedName)
   }
 
-  def getClassRef(nameParts: QualifiedClassName) : Int = {
+  def getClassRef(nameParts: QualifiedClassName): Int = {
     val nameIndex = constantPool.store(nameParts)
     constantPool.store(ByteCode.classRef(nameIndex))
+  }
+
+
+  def findMethod(methodRef: MetaObject): MethodInfo = {
+    val classIndex = ByteCode.getMethodRefClassRefIndex(methodRef)
+    val classRef = constantPool.getValue(classIndex).asInstanceOf[MetaObject]
+    val className = constantPool.getValue(ByteCode.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val nameAndTypeIndex = ByteCode.getMethodRefMethodNameIndex(methodRef)
+    val nameAndType = constantPool.getValue(nameAndTypeIndex).asInstanceOf[MetaObject]
+    val methodName = constantPool.getValue(ByteCode.getNameAndTypeName(nameAndType)).asInstanceOf[String]
+    val methodId = new MethodId(className, methodName)
+    compiler.find(methodId)
   }
 
   def getMethodNameAndTypeIndex(methodKey: MethodId): Int = {
@@ -70,7 +96,7 @@ case class ClassCompiler(currentClass : MetaObject, transformationState: Transfo
     constantPool.store(result)
   }
 
-  def getFieldNameAndTypeIndex(info: FieldInfo) : Int = {
+  def getFieldNameAndTypeIndex(info: FieldInfo): Int = {
     val fieldNameIndex = constantPool.storeUtf8(info.name)
     val typeIndex = constantPool.store(info._type)
     val result: MetaObject = ByteCode.nameAndType(fieldNameIndex, typeIndex)
@@ -87,7 +113,7 @@ case class ClassCompiler(currentClass : MetaObject, transformationState: Transfo
     constantPool.storeUtf8(methodName)
   }
 
-  def getFieldRefIndex(info: FieldInfo) : Int = {
+  def getFieldRefIndex(info: FieldInfo): Int = {
     val classRef = getClassRef(info.parent)
     val fieldNameAndTypeIndex = getFieldNameAndTypeIndex(info)
     constantPool.store(ByteCode.fieldRef(classRef, fieldNameAndTypeIndex))

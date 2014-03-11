@@ -3,14 +3,14 @@ package languages.javac
 import transformation.{TransformationState, MetaObject, ProgramTransformation, TransformationManager}
 import languages.javac.base.JavaBase
 import languages.javac.TernaryC
-import languages.bytecode.ByteCodeGoTo
+import languages.bytecode.{NoMaxStack, ByteCodeGoTo}
 
 object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC,
-      AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, ByteCodeGoTo)
+      AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, NoMaxStack, ByteCodeGoTo)
   }
 }
 

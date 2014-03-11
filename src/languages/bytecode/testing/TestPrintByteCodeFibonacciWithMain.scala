@@ -10,6 +10,7 @@ import languages.javac.base.QualifiedClassName
 import languages.bytecode.SameFrame
 import languages.bytecode.LineNumberRef
 import scala.reflect.io.{Path, File, Directory}
+import languages.javac.testing.TestUtils
 
 class TestPrintByteCodeFibonacciWithMain {
 
@@ -22,17 +23,13 @@ class TestPrintByteCodeFibonacciWithMain {
   val className = "Fibonacci"
   @Test
   def runCompiledFibonacci() {
-    val bytes = PrintByteCode.getBytes(getByteCode).toArray
-    val tempDirectory = Directory.makeTemp()
-    val file = File.apply(tempDirectory / Path(className).addExtension("class"))
-    val writer = file.outputStream(false)
-    writer.write(bytes)
-    writer.close()
-
-    val process = Process.apply(s"java ${className}", tempDirectory.jfile)
-    val result : String = process.!!
-    Assert.assertEquals(8, Integer.parseInt(result.take(1)))
+    val code = getByteCode
+    val expectedResult = 8
+    TestUtils.runByteCode(className, code, expectedResult)
   }
+
+
+
 
   def getByteCode : MetaObject = {
     val classAttributes = Seq(ByteCode.sourceFile(16,17))

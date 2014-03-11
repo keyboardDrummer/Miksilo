@@ -61,6 +61,6 @@ class MyCompiler {
   def find(parts: Seq[String]) : PackageContent = parts.foldLeft[PackageContent](env)(
     (pck: PackageContent,part: String) => pck.asInstanceOf[PackageInfo].content(part))
 
-  def find(methodKey: MethodId) : MethodInfo = find(methodKey.className.parts)
-    .asInstanceOf[ClassInfo].getMethod(methodKey.methodName)
+  def find(methodId: MethodId) : MethodInfo = find(methodId.className.parts)
+    .asInstanceOf[ClassInfo].getMethod(methodId.methodName)
 }

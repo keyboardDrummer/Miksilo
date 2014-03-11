@@ -9,6 +9,9 @@ case class AppendFrame(offsetDelta: Int, localVerificationTypes: Seq[Any]) exten
 case class SameFrame(offsetDelta: Int) extends StackMap
 case class SameLocals1StackItem(offsetDelta: Int, _type: Any) extends StackMap
 object ByteCode extends ProgramTransformation {
+  object IfZeroKey
+  def ifZero(target: Int) = instruction(IfZeroKey, Seq(target))
+
   object InvokeVirtual
   def invokeVirtual(methodRefIndex: Int) = instruction(InvokeVirtual, Seq(methodRefIndex))
 
@@ -126,7 +129,6 @@ object ByteCode extends ProgramTransformation {
 
   object IntegerLoad
   def integerLoad(location: Integer) = instruction(IntegerLoad,Seq(location))
-  def getInstructionStackSizeModification(metaObject: MetaObject) : Integer = -1
 
   object SubtractInteger
   def subtractInteger = instruction(SubtractInteger)
@@ -147,10 +149,11 @@ object ByteCode extends ProgramTransformation {
     instruction(InstructionArgumentsKey) = arguments
   }
 
+  def constantPoolGet(constantPool: Seq[Any], index: Int) = constantPool(index - 1)
+
   object MethodDescriptor
   object MethodDescriptorParameters
   object MethodReturnType
-  def ifNotEqual(target: Short) = new MetaObject("ifNotEquals")
   def methodDescriptor(returnDescriptor: Any, parameterDescriptors: Seq[Any]) = {
     new MetaObject(MethodDescriptor) {
       data.put(MethodDescriptorParameters, parameterDescriptors)

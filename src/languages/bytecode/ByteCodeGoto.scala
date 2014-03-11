@@ -4,11 +4,16 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import scala.collection.mutable
 
 object ByteCodeGoTo extends ProgramTransformation {
+  def ifZero(target: String) = instruction(ByteCode.IfZeroKey, Seq(target))
+
   def goTo(target: String) = instruction(ByteCode.GoToKey, Seq(target))
   def ifIntegerCompareGreater(target: String) = instruction(ByteCode.IfIntegerCompareGreater, Seq(target))
   def getGoToTarget(goTo: MetaObject) = getInstructionArguments(goTo)(0).asInstanceOf[String]
   def getIfIntegerCompareGreaterTarget(compare: MetaObject) =
     getInstructionArguments(compare)(0).asInstanceOf[String]
+
+  def getIfZeroTarget(ifZero: MetaObject) =
+    getInstructionArguments(ifZero)(0).asInstanceOf[String]
 
   object LabelKey
   object LabelNameKey
@@ -20,6 +25,7 @@ object ByteCodeGoTo extends ProgramTransformation {
   def instructionSize(instruction: MetaObject) = instruction.clazz match {
     case LabelKey => 0
     case IfIntegerCompareGreater => 3
+    case IfZeroKey => 3
     case GoToKey => 3
     case IntegerIncrementKey => 3
 
@@ -55,6 +61,8 @@ object ByteCodeGoTo extends ProgramTransformation {
           case GoToKey => setInstructionArguments(instruction, Seq(targetLocations(getGoToTarget(instruction))))
           case IfIntegerCompareGreater => setInstructionArguments(instruction, Seq(
             targetLocations(getIfIntegerCompareGreaterTarget(instruction))))
+          case IfZeroKey => setInstructionArguments(instruction, Seq(
+            targetLocations(getIfZeroTarget(instruction))))
           case _ =>
         }
         if (instruction.clazz != LabelKey)

@@ -32,7 +32,7 @@ object TernaryC extends ProgramTransformation {
       val falsePath = TernaryC.falseBranch(_ternary)
       val falseLabelName = state.getUniqueLabel("falseStart")
       val falseTarget = ByteCodeGoTo.label(falseLabelName)
-      val conditionalBranch = ByteCodeGoTo.ifIntegerCompareGreater(falseLabelName)
+      val conditionalBranch = ByteCodeGoTo.ifZero(falseLabelName)
       val endLabelName = state.getUniqueLabel("end")
       val end = ByteCodeGoTo.label(endLabelName)
       val goToEnd = ByteCodeGoTo.goTo(endLabelName)

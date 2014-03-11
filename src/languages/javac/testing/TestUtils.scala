@@ -1,8 +1,12 @@
 package languages.javac.testing
 
 import transformation.{ComparisonOptions, MetaObject}
-import languages.bytecode.ByteCode
+import languages.bytecode.{PrintByteCode, ByteCode}
 import org.junit.Assert
+import scala.reflect.io.{Path, File, Directory}
+import scala.sys.process.{ProcessIO, Process}
+import java.io._
+import transformation.ComparisonOptions
 
 object TestUtils {
 
@@ -15,6 +19,23 @@ object TestUtils {
     }
   }
 
+  def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
+    val bytes = PrintByteCode.getBytes(code).toArray
+    val tempDirectory = Directory.makeTemp()
+    val file = File.apply(tempDirectory / Path(className).addExtension("class"))
+    val writer = file.outputStream(false)
+    writer.write(bytes)
+    writer.close()
+
+    val processBuilder = Process.apply(s"java ${className}", tempDirectory.jfile)
+    var line: String = ""
+    val output = (writeOutput: InputStream) => line += new BufferedReader(new InputStreamReader(writeOutput)).readLine()
+    val processIO = new ProcessIO((writeInput: OutputStream) => { },
+      output, output)
+    val exitValue = processBuilder.run(processIO).exitValue()
+    Assert.assertEquals(0,exitValue)
+    Assert.assertEquals(expectedResult, Integer.parseInt(line.take(1)))
+  }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     val expectedConstantPoolSet = ByteCode.getConstantPool(expectedByteCode)

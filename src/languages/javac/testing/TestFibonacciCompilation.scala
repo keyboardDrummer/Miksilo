@@ -74,7 +74,7 @@ class TestFibonacciCompilation {
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
       ByteCode.integerConstant(0),
-      ByteCode.ifIntegerCompareGreater(9),
+      ByteCode.ifZero(9),
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
       ByteCode.integerLoad(0),

@@ -20,7 +20,7 @@ class VariablePool {
 
   def add(variable: String, _type: Any) {
     variables(variable) = new VariableInfo(offset, _type)
-    offset += JavaBase.getSize(_type)
+    offset += JavaBase.getTypeSize(_type)
   }
 }
 
@@ -34,7 +34,7 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
   def transformationState = classCompiler.transformationState
 
   val variables = new VariablePool()
-  var localCount = 0
+  def localCount = variables.variables.size
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
     expression.clazz match {

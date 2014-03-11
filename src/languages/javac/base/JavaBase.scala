@@ -4,20 +4,28 @@ import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import JavaBaseModel._
 import languages.javac.base.JavaMethodModel._
-import languages.bytecode.{ByteCodeGoTo, ByteCode}
-import languages.javac.base.JavaTypes.{ObjectType, DoubleType, IntegerType}
+import languages.bytecode.{NoMaxStack, ByteCodeGoTo, ByteCode}
+import languages.javac.base.JavaTypes.{VoidType, ObjectType, DoubleType, IntegerType}
 import languages.javac.base.MethodId
+import languages.bytecode.ByteCode._
+import languages.javac.base.MethodInfo
+import scala.Some
+import languages.javac.base.MethodId
+import languages.javac.base.ClassOrObjectReference
+import languages.javac.base.QualifiedClassName
+import languages.javac.base.MethodCompiler
 
 
 object JavaBase extends ProgramTransformation {
 
-  def getSize(_type: Any): Int = _type match {
+  def getTypeSize(_type: Any): Int = _type match {
     case IntegerType => 1
     case DoubleType => 1
     case meta: MetaObject => meta.clazz match  {
       case JavaTypes.ArrayType => 1
       case ObjectType => 1
     }
+    case VoidType => 0
   }
 
   def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, getInitialStatementToLines)
@@ -83,16 +91,6 @@ object JavaBase extends ProgramTransformation {
     statementToSSMLines(statement.clazz)(statement, instructionCompiler)
   }
 
-  def getMaxStack(instructions: Seq[MetaObject]): Integer = {
-    var maxStack = 0
-    var currentStack = 0
-    for(instruction <- instructions) {
-      currentStack += ByteCode.getInstructionStackSizeModification(instruction)
-      maxStack = Math.max(maxStack, currentStack)
-    }
-    maxStack
-  }
-
   def addMethodFlags(method: MetaObject) = {
     var flags = Set[ByteCode.MethodAccessFlag]()
     if (JavaMethodModel.getMethodStatic(method))
@@ -144,13 +142,20 @@ object JavaBase extends ProgramTransformation {
         val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
-        method(ByteCode.MethodAnnotations) = Seq(ByteCode.codeAttribute(codeIndex, getMaxStack(instructions), instructionCompiler.localCount,
-          instructions, exceptionTable, codeAttributes))
+        val codeAttribute = new MetaObject(ByteCode.CodeKey) {
+            data.put(AttributeNameKey, codeIndex)
+            data.put(CodeMaxLocalsKey, instructionCompiler.localCount)
+            data.put(CodeInstructionsKey, instructions)
+            data.put(CodeExceptionTableKey, exceptionTable)
+            data.put(CodeAttributesKey, codeAttributes)
+          }
+        method(ByteCode.MethodAnnotations) = Seq(codeAttribute)
       }
 
       def getMethodCompiler(method: MetaObject,parameters: Seq[MetaObject]) = {
         val methodCompiler = new MethodCompiler(classCompiler)
-        methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
+        if (!JavaMethodModel.getMethodStatic(method))
+          methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
         for (parameter <- parameters)
           methodCompiler.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
         methodCompiler
@@ -190,5 +195,5 @@ object JavaBase extends ProgramTransformation {
     new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(ByteCodeGoTo)
+  def dependencies: Set[ProgramTransformation] = Set(NoMaxStack)
 }
