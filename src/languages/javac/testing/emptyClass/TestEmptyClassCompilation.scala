@@ -1,19 +1,18 @@
-package languages.javac.testing
+package languages.javac.testing.emptyClass
 
-import languages.bytecode.{LineNumberRef, ByteCode}
-import languages.javac.base.{QualifiedClassName, JavaMethodModel, JavaClassModel, JavaTypes}
-import org.junit.{Assert, Test}
+import languages.bytecode.ByteCode
+import languages.javac.base.{QualifiedClassName, JavaClassModel, JavaTypes}
+import org.junit.Test
 import languages.javac.{ConstructorC, JavaCompiler}
-import java.util
-import transformation.{ComparisonOptions, MetaObject}
-import java.util.Comparator
-import scala.collection.mutable
+import transformation.MetaObject
+import scala.collection.mutable.ArrayBuffer
+import languages.javac.testing.TestUtils
 
 class TestEmptyClassCompilation {
   val classname: String = "EmptyClass"
 
   def getEmptyClassByteCode() = {
-    val constantPool = Seq(ByteCode.methodRef(3, 10),
+    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(3, 10),
       ByteCode.classRef(11),
       ByteCode.classRef(12),
       ConstructorC.constructorName,
@@ -23,7 +22,7 @@ class TestEmptyClassCompilation {
       new QualifiedClassName(Seq("languages","java","testing","EmptyClass")),
       new QualifiedClassName(Seq("java","lang","Object"))
     )
-    val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
+    val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCode.methodInfo(3,4, codeAttribute, Set(ByteCode.PublicAccess))
     ByteCode.clazz(2, 3, constantPool, Seq(defaultConstructor))
@@ -50,6 +49,6 @@ class TestEmptyClassCompilation {
     val javaCode = getEmptyClass()
     val compiledCode = JavaCompiler.getCompiler.compile(javaCode)
 
-    TestUtils.testMethodEquivalence(expectedByteCode, compiledCode)
+    TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }
 }

@@ -2,13 +2,39 @@ package languages.bytecode
 
 import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
+import scala.collection.mutable
+import languages.javac.base.JavaTypes.IntegerType
+import languages.bytecode.ByteCodeGoTo.LabelKey
+import languages.javac.base.JavaBase
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
-trait StackMap
-case class AppendFrame(offsetDelta: Int, localVerificationTypes: Seq[Any]) extends StackMap
-case class SameFrame(offsetDelta: Int) extends StackMap
-case class SameLocals1StackItem(offsetDelta: Int, _type: Any) extends StackMap
 object ByteCode extends ProgramTransformation {
+
+  object SameFrameKey
+  object OffsetDelta
+  def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
+    data.put(OffsetDelta, offset)
+  }
+  def getFrameOffset(frame: MetaObject) = frame(OffsetDelta).asInstanceOf[Int]
+  object SameLocals1StackItem
+  object SameLocals1StackItemType
+  def sameFrameLocals1StackItem(offsetDelta: Int, _type: Any) = new MetaObject(SameLocals1StackItem) {
+    data.put(OffsetDelta, offsetDelta)
+    data.put(SameLocals1StackItemType, _type)
+  }
+  def getSameLocals1StackItemType(sameLocals1StackItem: MetaObject) = sameLocals1StackItem(SameLocals1StackItemType)
+  object AppendFrame
+  object AppendFrameTypes
+  def appendFrame(offset: Int, newLocalTypes: Seq[Any]) = new MetaObject(AppendFrame) {
+    data.put(OffsetDelta, offset)
+    data.put(AppendFrameTypes, newLocalTypes)
+  }
+  object FullFrame
+  object FullFrameLocals
+  object FullFrameStack
+  def getAppendFrameTypes(appendFrame: MetaObject) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[Any]]
+  object ChopFrame
+  object ChopFrameCount
   object IfZeroKey
   def ifZero(target: Int) = instruction(IfZeroKey, Seq(target))
 
@@ -33,11 +59,11 @@ object ByteCode extends ProgramTransformation {
 
   object StackMapTableKey
   object StackMapTableMaps
-  def stackMapTable(nameIndex: Int, stackMaps: Seq[StackMap]) = new MetaObject(StackMapTableKey) {
+  def stackMapTable(nameIndex: Int, stackMaps: Seq[MetaObject]) = new MetaObject(StackMapTableKey) {
     data.put(AttributeNameKey, nameIndex)
     data.put(StackMapTableMaps, stackMaps)
   }
-  def getStackMapTableEntries(stackMapTable: MetaObject) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[StackMap]]
+  def getStackMapTableEntries(stackMapTable: MetaObject) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[MetaObject]]
 
   object StackMapTableId
 
@@ -201,7 +227,7 @@ object ByteCode extends ProgramTransformation {
   object ClassInterfaces
   object ClassFields
   object ClassAttributes
-  def clazz(name: Int, parent: Int, constantPool: Seq[Any], methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
+  def clazz(name: Int, parent: Int, constantPool: mutable.Buffer[Any], methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
              classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey) {
     data.put(ClassMethodsKey, methods)
     data.put(ClassNameIndexKey, name)
@@ -212,7 +238,7 @@ object ByteCode extends ProgramTransformation {
     data.put(ClassAttributes, attributes)
   }
   def getParentIndex(clazz: MetaObject) = clazz(ClassParentIndex).asInstanceOf[Int]
-  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[Seq[Any]]
+  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[mutable.Buffer[Any]]
   def getClassNameIndex(clazz: MetaObject) = clazz(ClassNameIndexKey).asInstanceOf[Int]
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
   def getClassInterfaces(clazz: MetaObject) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
@@ -228,11 +254,13 @@ object ByteCode extends ProgramTransformation {
 
   object FieldRef
   object FieldRefClassIndex
-  object FieldRefNameIndex
-  def fieldRef(classIndex: Int, nameIndex: Int) = new MetaObject(FieldRef) {
+  object FieldRefNameAndTypeIndex
+  def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new MetaObject(FieldRef) {
     data.put(FieldRefClassIndex, classIndex)
-    data.put(FieldRefNameIndex, nameIndex)
+    data.put(FieldRefNameAndTypeIndex, nameAndTypeIndex)
   }
   def getFieldRefClassIndex(fieldRef: MetaObject) = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
-  def getFieldRefNameIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameIndex).asInstanceOf[Int]
+  def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
+
+
 }

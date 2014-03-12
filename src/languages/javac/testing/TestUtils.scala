@@ -10,16 +10,24 @@ import transformation.ComparisonOptions
 
 object TestUtils {
 
-
-  def testMethodEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
+  def getMethodInstructions(method: MetaObject) =
+    ByteCode.getCodeInstructions(ByteCode.getMethodAttributes(method)(0))
+  def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for(methodPair <- ByteCode.getMethods(expectedByteCode).zip(ByteCode.getMethods(compiledCode)))
     {
-      Assert.assertTrue(MetaObject.deepEquality(methodPair._1, methodPair._2,
+      Assert.assertTrue(MetaObject.deepEquality(getMethodInstructions(methodPair._1),
+        getMethodInstructions(methodPair._2),
         new ComparisonOptions(false, true, false)))
     }
   }
 
   def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
+    val line = runByteCode(className, code)
+    Assert.assertEquals(expectedResult, Integer.parseInt(line.take(1)))
+  }
+
+
+  def runByteCode(className: String, code: MetaObject) = {
     val bytes = PrintByteCode.getBytes(code).toArray
     val tempDirectory = Directory.makeTemp()
     val file = File.apply(tempDirectory / Path(className).addExtension("class"))
@@ -30,11 +38,11 @@ object TestUtils {
     val processBuilder = Process.apply(s"java ${className}", tempDirectory.jfile)
     var line: String = ""
     val output = (writeOutput: InputStream) => line += new BufferedReader(new InputStreamReader(writeOutput)).readLine()
-    val processIO = new ProcessIO((writeInput: OutputStream) => { },
+    val processIO = new ProcessIO((writeInput: OutputStream) => {},
       output, output)
     val exitValue = processBuilder.run(processIO).exitValue()
-    Assert.assertEquals(0,exitValue)
-    Assert.assertEquals(expectedResult, Integer.parseInt(line.take(1)))
+    Assert.assertEquals(0, exitValue)
+    line
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {

@@ -7,10 +7,20 @@ import languages.javac.base.JavaBase
 import languages.javac._
 
 object TransformationManager {
-  val transformations = Seq[ProgramTransformation](AddWhile,AddStatementToSSM, AddIfElse, AddBlock,
-    AddDoWhile, AddIfElse, AddForLoop, JavaMinus, DefaultConstructor, LessThanC,
+  val ssmTransformations = Set(AddWhile,AddStatementToSSM, AddIfElse, AddBlock,
+    AddDoWhile, AddIfElse, AddForLoop)
+
+  val javaTransformations = Set[ProgramTransformation](JavaMinus, DefaultConstructor, LessThanC,
     ByteCode, ByteCodeGoTo, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
-    NoMaxStack, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
+    NoMaxStack, NoStackFrame, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport,
+    ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
+
+  val transformations = {
+
+    javaTransformations ++
+      ssmTransformations
+  }
+
 
   def buildCompiler(transformations: Seq[ProgramTransformation]) : Compiler = {
     new Compiler {

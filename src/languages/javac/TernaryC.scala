@@ -3,7 +3,7 @@ package languages.javac
 import transformation.{ProgramTransformation, TransformationState, MetaObject}
 import languages.javac.base.JavaBase
 import JavaBase._
-import languages.bytecode.ByteCodeGoTo
+import languages.bytecode.{NoStackFrame, ByteCodeGoTo}
 
 object TernaryC extends ProgramTransformation {
 
@@ -31,10 +31,10 @@ object TernaryC extends ProgramTransformation {
       val truePath = TernaryC.trueBranch(_ternary)
       val falsePath = TernaryC.falseBranch(_ternary)
       val falseLabelName = state.getUniqueLabel("falseStart")
-      val falseTarget = ByteCodeGoTo.label(falseLabelName)
+      val falseTarget = NoStackFrame.label(falseLabelName)
       val conditionalBranch = ByteCodeGoTo.ifZero(falseLabelName)
       val endLabelName = state.getUniqueLabel("end")
-      val end = ByteCodeGoTo.label(endLabelName)
+      val end = NoStackFrame.label(endLabelName)
       val goToEnd = ByteCodeGoTo.goTo(endLabelName)
       statementToInstructions(condition, compiler) ++
         Seq(conditionalBranch) ++

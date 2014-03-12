@@ -1,4 +1,4 @@
-package languages.javac.testing
+package languages.javac.testing.fibonacciWithoutMain
 
 import org.junit.{Assert, Test}
 import languages.bytecode._
@@ -6,13 +6,12 @@ import transformation.MetaObject
 import languages.javac.base._
 import JavaBaseModel._
 import JavaClassModel._
-import util.TestConsole
-import javaBytecode.JavaByteCodeMachine
 import languages.javac.base.JavaTypes._
 import languages.javac.base.JavaMethodModel._
 import languages.javac._
 import transformation.ComparisonOptions
-import scala.reflect.io.{Path, Directory, File}
+import scala.collection.mutable.ArrayBuffer
+import languages.javac.testing.TestUtils
 
 class TestFibonacciCompilation {
   val className = "OnlyFibonacci"
@@ -29,14 +28,14 @@ class TestFibonacciCompilation {
   }
 
   def getClassMethodInstructions(clazz: MetaObject) = {
-    ByteCode.getMethodAttributes(ByteCode.getMethods(clazz)(1))(0)
+    ByteCode.getCodeInstructions(ByteCode.getMethodAttributes(ByteCode.getMethods(clazz)(1))(0))
   }
 
   @Test
   def compareCompiledVersusNativeCode() {
     val compiledCode: MetaObject = getCompiledFibonacci
     val nativeClass: MetaObject = getExpectedUnoptimizedFibonacciWithoutMainByteCode
-    TestUtils.testMethodEquivalence(nativeClass, compiledCode)
+    TestUtils.testInstructionEquivalence(nativeClass, compiledCode)
     TestUtils.compareConstantPools(nativeClass, compiledCode)
   }
 
@@ -52,14 +51,14 @@ class TestFibonacciCompilation {
   }
 
   def getConstructorByteCode: MetaObject = {
-    val instructions = Seq(ByteCode.integerLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
+    val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     ByteCode.methodInfo(3, 4, codeAttribute, Set(ByteCode.PublicAccess))
   }
 
   val methodName = "fibonacci"
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
-    val constantPool: Seq[Object] = getConstantPool
+    val constantPool: ArrayBuffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
     val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode, method))
     nativeClass
@@ -69,7 +68,7 @@ class TestFibonacciCompilation {
   def getFibonacciMethodByteCode: MetaObject = {
     val instructions = Seq(
       ByteCode.integerLoad(0),
-      ByteCode.integerConstant(0),
+      ByteCode.integerConstant(2),
       ByteCode.ifIntegerCompareGreater(9),
       ByteCode.integerConstant(1),
       ByteCode.goTo(22),
@@ -88,12 +87,14 @@ class TestFibonacciCompilation {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val codeAttribute = ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
+    val stackMapTable = ByteCode.stackMapTable(14, Seq(ByteCode.sameFrame(9),
+      ByteCode.sameFrameLocals1StackItem(12, Seq(JavaTypes.IntegerType))))
+    val codeAttribute = ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))
     ByteCode.methodInfo(0, 0, Seq(codeAttribute), Set(ByteCode.PrivateAccess, ByteCode.StaticAccess))
   }
 
-  def getConstantPool: Seq[Object] = {
-    val constantPool = Seq(ByteCode.methodRef(4, 11),
+  def getConstantPool: ArrayBuffer[Any] = {
+    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(4, 11),
       ByteCode.methodRef(3, 12),
       ByteCode.classRef(13),
       ByteCode.classRef(14),
@@ -105,7 +106,8 @@ class TestFibonacciCompilation {
       ByteCode.nameAndType(5, 6),
       ByteCode.nameAndType(8, 9),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "OnlyFibonacci")),
-      new QualifiedClassName(Seq("java", "lang", "Object")))
+      new QualifiedClassName(Seq("java", "lang", "Object")),
+      ByteCode.StackMapTableId)
     constantPool
   }
 

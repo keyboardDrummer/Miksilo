@@ -47,10 +47,15 @@ object Program extends SimpleSwingApplication {
 
     val graphModelAdapter = new JGraphModelAdapter( graph )
 
-    //val jGraph = new JGraph(graphModelAdapter)
     val mxGraph = mxGraphFromGraphT(graph)
     val layout = new mxHierarchicalLayout(mxGraph)
+    layout.setIntraCellSpacing(layout.getIntraCellSpacing * 1.5)
+    layout.setParallelEdgeSpacing(layout.getParallelEdgeSpacing * 1.5)
+    layout.setInterRankCellSpacing(layout.getInterRankCellSpacing * 1.5)
+    layout.setFineTuning(true)
     layout.execute(mxGraph.getDefaultParent)
+    layout.setMoveParent(true)
+    layout.setResizeParent(true)
     val graphComponent = new mxGraphComponent(mxGraph)
     graphComponent.setConnectable(false)
     graphComponent.setEnabled(true)

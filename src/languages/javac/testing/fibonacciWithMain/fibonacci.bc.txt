@@ -1,18 +1,19 @@
-Classfile /d:/Dropbox/Projects/Code/modularCompiler/src/languages/javac/testing/Fibonacci.class
+Classfile /d:/Dropbox/Projects/Code/modularCompiler/src/languages/javac/testing/languages.javac.testing.fibonacciWithMain.Fibonacci.class
   Last modified Mar 4, 2014; size 506 bytes
   MD5 checksum 3895f8201abfff47c74bea25918a892a
-  Compiled from "Fibonacci.java"
-class Fibonacci
-  SourceFile: "Fibonacci.java"
+  Compiled from "languages.javac.testing.fibonacciWithMain.Fibonacci.java"
+class languages.javac.testing.fibonacciWithMain.Fibonacci
+  SourceFile: "languages.javac.testing.fibonacciWithMain.Fibonacci.java"
   minor version: 0
   major version: 51
-  flags: ACC_SUPER
+  flags: ACC_SUPER
+
 Constant pool:
    #1 = Methodref          #6.#18         //  java/lang/Object."<init>":()V
    #2 = Fieldref           #19.#20        //  java/lang/System.out:Ljava/io/PrintStream;
-   #3 = Methodref          #5.#21         //  Fibonacci.fibonacci:(I)I
+   #3 = Methodref          #5.#21         //  languages.javac.testing.fibonacciWithMain.Fibonacci.fibonacci:(I)I
    #4 = Methodref          #22.#23        //  java/io/PrintStream.print:(I)V
-   #5 = Class              #24            //  Fibonacci
+   #5 = Class              #24            //  languages.javac.testing.fibonacciWithMain.Fibonacci
    #6 = Class              #25            //  java/lang/Object
    #7 = Utf8               <init>
    #8 = Utf8               ()V
@@ -24,14 +25,14 @@ Constant pool:
   #14 = Utf8               (I)I
   #15 = Utf8               StackMapTable
   #16 = Utf8               SourceFile
-  #17 = Utf8               Fibonacci.java
+  #17 = Utf8               languages.javac.testing.fibonacciWithMain.Fibonacci.java
   #18 = NameAndType        #7:#8          //  "<init>":()V
   #19 = Class              #26            //  java/lang/System
   #20 = NameAndType        #27:#28        //  out:Ljava/io/PrintStream;
   #21 = NameAndType        #13:#14        //  fibonacci:(I)I
   #22 = Class              #29            //  java/io/PrintStream
   #23 = NameAndType        #30:#31        //  print:(I)V
-  #24 = Utf8               Fibonacci
+  #24 = Utf8               languages.javac.testing.fibonacciWithMain.Fibonacci
   #25 = Utf8               java/lang/Object
   #26 = Utf8               java/lang/System
   #27 = Utf8               out
@@ -40,8 +41,9 @@ Constant pool:
   #30 = Utf8               print
   #31 = Utf8               (I)V
 {
-  Fibonacci();
-    flags: 
+  languages.javac.testing.fibonacciWithMain.Fibonacci();
+    flags: 
+
     Code:
       stack=1, locals=1, args_size=1
          0: aload_0       
@@ -51,7 +53,8 @@ Constant pool:
         line 1: 0
 
   public static void main(java.lang.String[]);
-    flags: ACC_PUBLIC, ACC_STATIC
+    flags: ACC_PUBLIC, ACC_STATIC
+
     Code:
       stack=2, locals=1, args_size=1
          0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
@@ -64,7 +67,8 @@ Constant pool:
         line 5: 10
 
   public static int fibonacci(int);
-    flags: ACC_PUBLIC, ACC_STATIC
+    flags: ACC_PUBLIC, ACC_STATIC
+
     Code:
       stack=3, locals=1, args_size=1
          0: iload_0       

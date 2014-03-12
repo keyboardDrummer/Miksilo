@@ -3,10 +3,10 @@ package languages.bytecode.testing
 import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.MetaObject
-import languages.javac.base.{JavaTypes, QualifiedClassName}
-import languages.bytecode.AppendFrame
+import languages.javac.base.JavaTypes
 import languages.javac.base.QualifiedClassName
 import languages.bytecode.LineNumberRef
+import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeWhile {
 
@@ -17,7 +17,7 @@ class TestPrintByteCodeWhile {
   }
 
   def getByteCode: MetaObject = {
-    val constantPool = Seq(ByteCode.methodRef(3, 12),
+    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(3, 12),
       ByteCode.classRef(13),
       ByteCode.classRef(14),
       "<init>",
@@ -56,7 +56,8 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCode.stackMapTable(9, Seq(new AppendFrame(2, Seq(JavaTypes.IntegerType)), new SameFrame(10)))
+    val stackMapTable = ByteCode.stackMapTable(9, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.IntegerType)),
+      ByteCode.sameFrame(10)))
     val _while = ByteCode.methodInfo(8, 5, Seq(ByteCode.codeAttribute(6, 2, 1, Seq(
       ByteCode.integerConstant(0),
       ByteCode.integerStore(0),

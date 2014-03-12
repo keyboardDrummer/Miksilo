@@ -1,16 +1,11 @@
 package languages.bytecode
 
 import transformation.MetaObject
-import java.io.File
 import akka.util.Convert
-import java.nio.charset.{StandardCharsets, Charset}
 import languages.bytecode.ByteCode._
-import languages.javac.base.{JavaTypes, QualifiedClassName}
+import languages.javac.base.JavaTypes
 import java.math.BigInteger
-import languages.bytecode.AppendFrame
 import languages.javac.base.QualifiedClassName
-import languages.bytecode.LineNumberRef
-import languages.bytecode.SameFrame
 import languages.javac.base.JavaTypes.{ObjectType, ArrayType}
 
 object PrintByteCode {
@@ -138,18 +133,39 @@ object PrintByteCode {
       shortToBytes(ByteCode.getSourceFileFileNameIndex(sourceFile))
   }
 
-  def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes("01") //Int -> 01
+  def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes(info match
+  {
+    case JavaTypes.IntegerType => "01"
+    case JavaTypes.LongType => "02"
+  })
+
+  def getFrameByteCode(frame: MetaObject) : Seq[Byte] = {
+    val offset = ByteCode.getFrameOffset(frame)
+    frame.clazz match {
+      case ByteCode.SameFrameKey =>
+        if (offset > 63)
+          byteToBytes(251) ++ shortToBytes(offset)
+        else
+          byteToBytes(offset)
+      case ByteCode.AppendFrame =>
+        val localVerificationTypes = ByteCode.getAppendFrameTypes(frame)
+        byteToBytes(252 + localVerificationTypes.length - 1) ++
+          shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info))
+      case ByteCode.SameLocals1StackItem =>
+        val _type = ByteCode.getSameLocals1StackItemType(frame)
+        val code = 64 + offset
+        if (code > 127)
+          byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type)
+        else
+        {
+          byteToBytes(code) ++ getVerificationInfoBytes(_type)
+        }
+    }
+  }
 
   def getStackMapTableBytes(attribute: MetaObject) : Seq[Byte] = {
     val entries = ByteCode.getStackMapTableEntries(attribute)
-    shortToBytes(entries.length) ++
-      entries.flatMap(entry => entry match {
-        case same: SameFrame => byteToBytes(same.offsetDelta)
-        case append: AppendFrame => byteToBytes(251 + append.localVerificationTypes.length) ++
-          shortToBytes(append.offsetDelta) ++ append.localVerificationTypes.flatMap(info => getVerificationInfoBytes(info))
-        case sameLocals1Stack: SameLocals1StackItem =>
-          byteToBytes(64 + sameLocals1Stack.offsetDelta) ++ getVerificationInfoBytes(sameLocals1Stack._type)
-      })
+    shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
   def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
@@ -209,7 +225,7 @@ object PrintByteCode {
           case ByteCode.FieldRef =>
             byteToBytes(9) ++
               shortToBytes(ByteCode.getFieldRefClassIndex(metaEntry)) ++
-              shortToBytes(ByteCode.getFieldRefNameIndex(metaEntry))
+              shortToBytes(ByteCode.getFieldRefNameAndTypeIndex(metaEntry))
           case ByteCode.ClassRefKey =>
             byteToBytes(7) ++ shortToBytes(ByteCode.getClassRefName(metaEntry))
           case ByteCode.NameAndTypeKey =>

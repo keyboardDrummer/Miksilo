@@ -1,4 +1,4 @@
-package languages.javac.testing
+package languages.javac.testing.fibonacciWithMain
 
 import org.junit.{Assert, Test}
 import languages.javac.{LiteralC, ConstructorC, JavaCompiler}
@@ -6,13 +6,14 @@ import languages.bytecode._
 import languages.javac.base.JavaTypes
 import transformation.MetaObject
 import languages.javac.base.JavaClassModel._
-import scala.reflect.io.{Path, File, Directory}
+import scala.reflect.io.File
 import languages.javac.base.JavaMethodModel._
 import languages.javac.base.JavaTypes._
 import languages.javac.base.JavaBaseModel._
 import languages.javac.base.QualifiedClassName
-import languages.bytecode.LineNumberRef
-import languages.bytecode.SameFrame
+import scala.collection.mutable.ArrayBuffer
+import languages.javac.testing.TestUtils
+import languages.javac.testing.fibonacciWithoutMain.TestFibonacciCompilation
 
 class TestFibonacciWithMainCompilation {
   val className = "Fibonacci"
@@ -75,14 +76,14 @@ class TestFibonacciWithMainCompilation {
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.compile(fibonacciJava)
     val expectedCode = getExpectedUnoptimizedFibonacciWithMainByteCode
-    TestUtils.testMethodEquivalence(expectedCode, compiledCode)
+    TestUtils.testInstructionEquivalence(expectedCode, compiledCode)
     TestUtils.compareConstantPools(expectedCode, compiledCode)
   }
 
   val methodName = "fibonacci"
 
   def getExpectedUnoptimizedFibonacciWithMainByteCode: MetaObject = {
-    val constantPool: Seq[Any] = getConstantPool
+    val constantPool: ArrayBuffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
     val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(other.getConstructorByteCode, getMainByteCode, method))
     nativeClass
@@ -125,8 +126,8 @@ class TestFibonacciWithMainCompilation {
     method
   }
 
-  def getConstantPool: Seq[Any] = {
-    val constantPool = Seq(ByteCode.methodRef(6, 18),
+  def getConstantPool: ArrayBuffer[Any] = {
+    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(6, 18),
       ByteCode.fieldRef(19, 20),
       ByteCode.methodRef(5, 21),
       ByteCode.methodRef(22, 23),
@@ -140,6 +141,7 @@ class TestFibonacciWithMainCompilation {
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       methodName,
       ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
+      ByteCode.StackMapTableId,
       ByteCode.nameAndType(7, 8),
       ByteCode.classRef(26),
       ByteCode.nameAndType(27, 28),

@@ -5,12 +5,11 @@ import languages.bytecode._
 import transformation.MetaObject
 import languages.javac.ConstructorC
 import languages.javac.base.JavaTypes
-import scala.sys.process._
 import languages.javac.base.QualifiedClassName
-import languages.bytecode.SameFrame
 import languages.bytecode.LineNumberRef
-import scala.reflect.io.{Path, File, Directory}
 import languages.javac.testing.TestUtils
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeFibonacciWithMain {
 
@@ -38,7 +37,7 @@ class TestPrintByteCodeFibonacciWithMain {
 
   val fibonacciMethodName = "fibonacci"
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
-    val constantPool: Seq[Any] = getConstantPool
+    val constantPool: mutable.Buffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethod
     val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode(), getMainByteCode(), method))
     nativeClass
@@ -63,14 +62,15 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCode.integerReturn
     )
     val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(8,0)))
-    val stackMapTable = ByteCode.stackMapTable(15, Seq(new SameFrame(9), new SameLocals1StackItem(12, JavaTypes.IntegerType)) )
+    val stackMapTable = ByteCode.stackMapTable(15, Seq(ByteCode.sameFrame(9),
+      ByteCode.sameFrameLocals1StackItem(12, JavaTypes.IntegerType)) )
     val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
     method
   }
 
-  def getConstantPool: Seq[Any] = {
-    val constantPool = Seq(ByteCode.methodRef(6, 18),
+  def getConstantPool: mutable.Buffer[Any] = {
+    val constantPool = ArrayBuffer(ByteCode.methodRef(6, 18),
       ByteCode.fieldRef(19,20),
       ByteCode.methodRef(5, 21),
       ByteCode.methodRef(22,23),

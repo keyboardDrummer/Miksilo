@@ -1,4 +1,4 @@
-package languages.javac.testing;
+package languages.javac.testing.fibonacciWithoutMain;
 
 class OnlyFibonacci {
 	public static int fibonacci(int index) {

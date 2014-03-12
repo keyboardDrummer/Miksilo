@@ -2,9 +2,10 @@ package languages.javac.base
 
 import scala.collection.mutable
 
-class ConstantPool {
-  val constants: mutable.Buffer[Any] = mutable.Buffer()
+class ConstantPool(val constants: mutable.Buffer[Any] = mutable.Buffer()) {
   val reverseRouter = mutable.Map[Any,Int]()
+  for(indexedConstant <- constants.zipWithIndex)
+    reverseRouter(indexedConstant._1) = indexedConstant._2
 
   def getValue(index: Int) = constants(index - 1)
 

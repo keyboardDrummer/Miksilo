@@ -3,10 +3,12 @@ package graphing
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import TransformationVertex._
-import transformation.TransformationManager._
+import transformation.TransformationManager
+
 object TransformationGraph {
 
   def getGraph: DirectedGraph[TransformationVertex,DefaultEdge] = {
+    val transformations = TransformationManager.javaTransformations
     val result = new DefaultDirectedGraph[TransformationVertex,DefaultEdge](classOf[DefaultEdge])
     for(transformation <- transformations)
     {

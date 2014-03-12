@@ -2,7 +2,7 @@ package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.javac.base.JavaBase
-import languages.bytecode.{ByteCodeGoTo, ByteCode}
+import languages.bytecode.{NoStackFrame, ByteCodeGoTo, ByteCode}
 
 object LessThanC extends ProgramTransformation {
   object LessThanKey
@@ -24,9 +24,9 @@ object LessThanC extends ProgramTransformation {
         Seq(ByteCodeGoTo.ifIntegerCompareGreater(falseStartLabel),
           ByteCode.integerConstant(1),
           ByteCodeGoTo.goTo(endLabel),
-          ByteCodeGoTo.label(falseStartLabel),
+          NoStackFrame.label(falseStartLabel),
           ByteCode.integerConstant(0),
-          ByteCodeGoTo.label(endLabel))
+          NoStackFrame.label(endLabel))
     })
   }
 }

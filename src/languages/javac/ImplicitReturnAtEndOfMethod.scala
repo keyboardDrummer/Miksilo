@@ -14,7 +14,7 @@ object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
     for(method <- methods)
     {
       val instructions = JavaMethodModel.getMethodBody(method)
-      if (instructions.last.clazz != JavaMethodModel.Return)
+      if (instructions.isEmpty || instructions.last.clazz != JavaMethodModel.Return)
       {
         method(JavaMethodModel.MethodBodyKey) = instructions ++ Seq(JavaMethodModel._return())
       }
