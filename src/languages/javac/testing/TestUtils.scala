@@ -29,13 +29,15 @@ object TestUtils {
 
   def runByteCode(className: String, code: MetaObject) = {
     val bytes = PrintByteCode.getBytes(code).toArray
-    val tempDirectory = Directory.makeTemp()
-    val file = File.apply(tempDirectory / Path(className).addExtension("class"))
-    val writer = file.outputStream(append = false)
+    val currentDir = new File(new java.io.File("."))
+    val testDirectory = currentDir / Path("test")
+    testDirectory.createDirectory()
+    val byteCodeFile = File.apply(testDirectory / Path(className).addExtension("class"))
+    val writer = byteCodeFile.outputStream(append = false)
     writer.write(bytes)
     writer.close()
 
-    val processBuilder = Process.apply(s"java $className", tempDirectory.jfile)
+    val processBuilder = Process.apply(s"java $className", testDirectory.jfile)
     var line: String = ""
     val logger = ProcessLogger(
       (o: String) => line += o,
