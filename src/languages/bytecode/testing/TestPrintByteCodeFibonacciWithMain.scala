@@ -39,7 +39,7 @@ class TestPrintByteCodeFibonacciWithMain {
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
     val constantPool: mutable.Buffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethod
-    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode(), getMainByteCode(), method))
+    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
     nativeClass
   }
 
@@ -106,7 +106,7 @@ class TestPrintByteCodeFibonacciWithMain {
     constantPool
   }
 
-  def getConstructorByteCode() : MetaObject = {
+  def getConstructorByteCode : MetaObject = {
     val instructions = Seq(ByteCode.addressLoad(0),
       ByteCode.invokeSpecial(1), ByteCode.voidReturn)
     val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(1,0 )))
@@ -114,7 +114,7 @@ class TestPrintByteCodeFibonacciWithMain {
     ByteCode.methodInfo(7,8, codeAttribute, Set())
   }
 
-  def getMainByteCode() : MetaObject = {
+  def getMainByteCode : MetaObject = {
     val instructions = Seq(ByteCode.getStatic(2),
       ByteCode.integerConstant(5),
       ByteCode.invokeStatic(3),

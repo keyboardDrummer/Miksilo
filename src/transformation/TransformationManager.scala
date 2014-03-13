@@ -11,8 +11,8 @@ object TransformationManager {
     AddDoWhile, AddIfElse, AddForLoop)
 
   val javaTransformations = Set[ProgramTransformation](JavaMinus, DefaultConstructor, LessThanC,
-    ByteCode, ByteCodeGoTo, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
-    NoMaxStack, NoStackFrame, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport,
+    ByteCode, LabelledJumps, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
+    InferredMaxStack, InferredStackFrames, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport,
     ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
 
   val transformations = {

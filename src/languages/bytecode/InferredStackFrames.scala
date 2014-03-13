@@ -4,8 +4,8 @@ import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import languages.javac.base.ConstantPool
 
-object NoStackFrame extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(ByteCodeGoTo)
+object InferredStackFrames extends ProgramTransformation {
+  override def dependencies: Set[ProgramTransformation] = Set(LabelledJumps)
 
   def getStackMap(previousStack: Seq[Any], stack: Seq[Any], previousLocals: Seq[Any], locals: Seq[Any]) = {
     val sameLocalsPrefix = previousLocals.zip(locals).filter(p => p._1 == p._2)
@@ -39,8 +39,8 @@ object NoStackFrame extends ProgramTransformation {
 
   }
 
-  def label(name: String) = new MetaObject(ByteCodeGoTo.LabelKey) {
-    data.put(ByteCodeGoTo.LabelNameKey, name)
+  def label(name: String) = new MetaObject(LabelledJumps.LabelKey) {
+    data.put(LabelledJumps.LabelNameKey, name)
   }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
@@ -55,12 +55,12 @@ object NoStackFrame extends ProgramTransformation {
       var previousStack = Seq[Any]()
       val currentStacks = new StackAnalysis(constantPool, instructions).run(0, previousStack)
       var previousLocals = codeLocals
-      for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == ByteCodeGoTo.LabelKey)) {
+      for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledJumps.LabelKey)) {
         val index = indexedLabel._2
         val label = indexedLabel._1
         val stackSize = currentStacks(index)
         val locals = codeLocals
-        label(ByteCodeGoTo.LabelStackFrame) = getStackMap(previousStack, stackSize, previousLocals, locals)
+        label(LabelledJumps.LabelStackFrame) = getStackMap(previousStack, stackSize, previousLocals, locals)
         previousStack = stackSize
         previousLocals = locals
       }

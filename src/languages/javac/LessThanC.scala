@@ -2,7 +2,7 @@ package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.javac.base.JavaBase
-import languages.bytecode.{NoStackFrame, ByteCodeGoTo, ByteCode}
+import languages.bytecode.{InferredStackFrames, LabelledJumps, ByteCode}
 
 object LessThanC extends ProgramTransformation {
   object LessThanKey
@@ -21,12 +21,12 @@ object LessThanC extends ProgramTransformation {
       val falseStartLabel = state.getUniqueLabel("falseStart")
       val endLabel = state.getUniqueLabel("end")
       firstInstructions ++ secondInstructions ++
-        Seq(ByteCodeGoTo.ifIntegerCompareGreater(falseStartLabel),
+        Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
           ByteCode.integerConstant(1),
-          ByteCodeGoTo.goTo(endLabel),
-          NoStackFrame.label(falseStartLabel),
+          LabelledJumps.goTo(endLabel),
+          InferredStackFrames.label(falseStartLabel),
           ByteCode.integerConstant(0),
-          NoStackFrame.label(endLabel))
+          InferredStackFrames.label(endLabel))
     })
   }
 }

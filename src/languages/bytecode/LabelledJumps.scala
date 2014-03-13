@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import languages.javac.base.ConstantPool
 
-object ByteCodeGoTo extends ProgramTransformation {
+object LabelledJumps extends ProgramTransformation {
   def ifZero(target: String) = instruction(ByteCode.IfZeroKey, Seq(target))
 
   def goTo(target: String) = instruction(ByteCode.GoToKey, Seq(target))

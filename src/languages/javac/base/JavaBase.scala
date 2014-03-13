@@ -4,7 +4,7 @@ import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
 import JavaBaseModel._
 import languages.javac.base.JavaMethodModel._
-import languages.bytecode.{NoStackFrame, NoMaxStack, ByteCodeGoTo, ByteCode}
+import languages.bytecode.{InferredStackFrames, InferredMaxStack, LabelledJumps, ByteCode}
 import languages.javac.base.JavaTypes._
 import languages.javac.base.MethodId
 import languages.bytecode.ByteCode._
@@ -203,5 +203,5 @@ object JavaBase extends ProgramTransformation {
     new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(NoMaxStack, NoStackFrame)
+  def dependencies: Set[ProgramTransformation] = Set(InferredMaxStack, InferredStackFrames)
 }

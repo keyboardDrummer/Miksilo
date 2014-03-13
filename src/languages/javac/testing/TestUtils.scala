@@ -4,7 +4,7 @@ import transformation.{ComparisonOptions, MetaObject}
 import languages.bytecode.{PrintByteCode, ByteCode}
 import org.junit.Assert
 import scala.reflect.io.{Path, File, Directory}
-import scala.sys.process.{ProcessIO, Process}
+import scala.sys.process.{ProcessLogger, ProcessIO, Process}
 import java.io._
 import transformation.ComparisonOptions
 
@@ -31,15 +31,16 @@ object TestUtils {
     val bytes = PrintByteCode.getBytes(code).toArray
     val tempDirectory = Directory.makeTemp()
     val file = File.apply(tempDirectory / Path(className).addExtension("class"))
-    val writer = file.outputStream(false)
+    val writer = file.outputStream(append = false)
     writer.write(bytes)
     writer.close()
 
-    val processBuilder = Process.apply(s"java ${className}", tempDirectory.jfile)
+    val processBuilder = Process.apply(s"java $className", tempDirectory.jfile)
     var line: String = ""
-    val output = (writeOutput: InputStream) => line += new BufferedReader(new InputStreamReader(writeOutput)).readLine()
-    val processIO = new ProcessIO((writeInput: OutputStream) => {}, output, output)
-    val exitValue = processBuilder.run(processIO).exitValue()
+    val logger = ProcessLogger(
+      (o: String) => line += o,
+      (e: String) => line += e)
+    val exitValue = processBuilder ! logger
     Assert.assertEquals(0, exitValue)
     line
   }

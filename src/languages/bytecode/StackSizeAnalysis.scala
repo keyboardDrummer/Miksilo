@@ -3,7 +3,7 @@ package languages.bytecode
 import transformation.MetaObject
 import util.DataFlowAnalysis
 import languages.bytecode.ByteCode._
-import languages.bytecode.ByteCodeGoTo.LabelKey
+import languages.bytecode.LabelledJumps.LabelKey
 import languages.javac.base.JavaBase
 
 class StackSizeAnalysis(constantPool: Seq[Any], instructions: Seq[MetaObject])

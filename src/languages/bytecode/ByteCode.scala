@@ -4,7 +4,7 @@ import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 import scala.collection.mutable
 import languages.javac.base.JavaTypes.IntegerType
-import languages.bytecode.ByteCodeGoTo.LabelKey
+import languages.bytecode.LabelledJumps.LabelKey
 import languages.javac.base.JavaBase
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)

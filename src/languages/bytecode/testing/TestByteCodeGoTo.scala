@@ -1,7 +1,7 @@
 package languages.bytecode.testing
 
 import org.junit.{Assert, Test}
-import languages.bytecode.{PrintByteCode, ByteCode, ByteCodeGoTo}
+import languages.bytecode.{PrintByteCode, ByteCode, LabelledJumps}
 import transformation.{TransformationManager, MetaObject}
 import akka.util.Convert
 import scala.collection.mutable
@@ -18,7 +18,7 @@ class TestByteCodeGoTo {
   @Test
   def compareCompiledVersusNativeCode() {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = TransformationManager.buildCompiler(Seq(ByteCodeGoTo)).compile(labelledWhile)
+    val compiledWhile = TransformationManager.buildCompiler(Seq(LabelledJumps)).compile(labelledWhile)
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile,expectedCode)
   }
@@ -43,16 +43,16 @@ class TestByteCodeGoTo {
     val instructions = Seq(
       ByteCode.integerConstant(0),
     ByteCode.integerStore(0),
-    ByteCodeGoTo.label("start", new MetaObject(ByteCode.AppendFrame)
+    LabelledJumps.label("start", new MetaObject(ByteCode.AppendFrame)
     {
       data.put(ByteCode.AppendFrameTypes, Seq(JavaTypes.IntegerType))
     }),
     ByteCode.integerLoad(0),
     ByteCode.integerConstant(3),
-    ByteCodeGoTo.ifIntegerCompareGreater("end"),
+    LabelledJumps.ifIntegerCompareGreater("end"),
     ByteCode.integerIncrement(0, 1),
-    ByteCodeGoTo.goTo("start"),
-    ByteCodeGoTo.label("end", new MetaObject(ByteCode.SameFrameKey))
+    LabelledJumps.goTo("start"),
+    LabelledJumps.label("end", new MetaObject(ByteCode.SameFrameKey))
     )
 
     val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0,0,0,instructions,Seq(),Seq())))

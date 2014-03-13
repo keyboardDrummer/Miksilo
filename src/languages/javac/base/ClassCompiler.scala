@@ -1,6 +1,6 @@
 package languages.javac.base
 
-import languages.bytecode.{ByteCodeGoTo, ByteCode}
+import languages.bytecode.{LabelledJumps, ByteCode}
 import languages.javac.base._
 import languages.javac.JavaLang
 import scala.collection.mutable
@@ -17,7 +17,7 @@ import languages.javac.base.FieldInfo
 import languages.javac.base.ClassInfo
 import languages.javac.base.MethodId
 import languages.javac.base.PackageInfo
-import languages.bytecode.ByteCodeGoTo.LabelKey
+import languages.bytecode.LabelledJumps.LabelKey
 
 object ClassCompiler {
 }

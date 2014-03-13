@@ -20,7 +20,7 @@ class StackAnalysis(constantPool: ConstantPool, instructions: Seq[MetaObject])
       throw new RuntimeException()
 
     val stackTop = state.takeRight(inputTypes.length)
-    if (!inputTypes.equals(stackTop))
+    if (inputTypes != stackTop)
       throw new RuntimeException
 
     val remainingStack = state.dropRight(inputTypes.length)

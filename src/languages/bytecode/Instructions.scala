@@ -2,7 +2,7 @@ package languages.bytecode
 
 import transformation.MetaObject
 import languages.javac.base.JavaTypes.IntegerType
-import languages.bytecode.ByteCodeGoTo.LabelKey
+import languages.bytecode.LabelledJumps.LabelKey
 import languages.javac.base.{ConstantPool, QualifiedClassName, JavaTypes, JavaBase}
 import ByteCode._
 
