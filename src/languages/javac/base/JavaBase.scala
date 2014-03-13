@@ -185,15 +185,10 @@ object JavaBase extends ProgramTransformation {
       def getMethodDescriptor(method: MetaObject) : MetaObject = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
-        ByteCode.methodDescriptor(javaTypeToByteCodeType(returnType)
-          , parameters.map(p => javaTypeToByteCodeType(JavaMethodModel.getParameterType(p))))
+        ByteCode.methodDescriptor(returnType
+          , parameters.map(p => JavaMethodModel.getParameterType(p)))
       }
 
-    }
-
-    def javaTypeToByteCodeType(_type: Any) = _type match {
-      case BooleanType => IntegerType
-      case _ => _type
     }
   }
 

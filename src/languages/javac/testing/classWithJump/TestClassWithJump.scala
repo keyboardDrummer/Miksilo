@@ -46,6 +46,6 @@ class TestClassWithJump {
   }
 
   def getJava: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava, getTestMethod))
+    clazz(defaultPackage, className, Seq(getTestMethod, getMainMethodJava))
   }
 }

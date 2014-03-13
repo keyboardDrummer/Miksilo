@@ -66,8 +66,8 @@ object Instructions {
   }
 
   def getMethodStackModification(descriptor: MetaObject): (Seq[Any],Seq[Any]) = {
-    val ins = ByteCode.getMethodDescriptorParameters(descriptor)
-    val outs = Seq(ByteCode.getMethodDescriptorReturnType(descriptor))
+    val ins = ByteCode.getMethodDescriptorParameters(descriptor).map(JavaTypes.javaTypeToByteCodeType)
+    val outs = Seq(JavaTypes.javaTypeToByteCodeType(ByteCode.getMethodDescriptorReturnType(descriptor)))
     (ins,outs)
   }
 }

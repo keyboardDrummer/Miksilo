@@ -1,11 +1,10 @@
 package languages.javac.testing
 
-import transformation.{ComparisonOptions, MetaObject}
+import transformation.MetaObject
 import languages.bytecode.{PrintByteCode, ByteCode}
 import org.junit.Assert
-import scala.reflect.io.{Path, File, Directory}
-import scala.sys.process.{ProcessLogger, ProcessIO, Process}
-import java.io._
+import scala.reflect.io.{Path, File}
+import scala.sys.process.{ProcessLogger, Process}
 import transformation.ComparisonOptions
 
 object TestUtils {

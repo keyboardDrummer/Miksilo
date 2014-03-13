@@ -133,6 +133,10 @@ object JavaBaseModel {
 object JavaTypes {
   object BooleanType
 
+  def javaTypeToByteCodeType(_type: Any) = _type match {
+    case BooleanType => IntegerType
+    case _ => _type
+  }
 
   def objectType(name: QualifiedClassName): Any = new MetaObject(ObjectType) {
     data.put(ObjectTypeName, Right(name))

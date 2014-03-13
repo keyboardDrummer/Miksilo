@@ -208,6 +208,7 @@ object PrintByteCode {
     case JavaTypes.IntegerType => "I"
     case JavaTypes.DoubleType => "D"
     case JavaTypes.LongType => "J"
+    case JavaTypes.BooleanType => "Z"
     case meta: MetaObject => meta.clazz match {
       case ArrayType => s"[${javaTypeToString(JavaTypes.getArrayElementType(meta))}"
       case ObjectType => s"L${JavaTypes.getObjectTypeName(meta).right.get.parts.mkString("/")};"
