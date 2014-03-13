@@ -1,0 +1,83 @@
+Classfile /d:/Dropbox/Projects/Code/modularCompiler/src/languages/javac/testing/classWithJump/ClassWithJump.class
+  Last modified 13-mrt-2014; size 496 bytes
+  MD5 checksum cd85432853586583b6f61fc584e840b4
+  Compiled from "ClassWithJump.java"
+public class ClassWithJump
+  SourceFile: "ClassWithJump.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #6.#18         //  java/lang/Object."<init>":()V
+   #2 = Fieldref           #19.#20        //  java/lang/System.out:Ljava/io/PrintStream;
+   #3 = Methodref          #5.#21         //  ClassWithJump.test:(Z)I
+   #4 = Methodref          #22.#23        //  java/io/PrintStream.print:(I)V
+   #5 = Class              #24            //  ClassWithJump
+   #6 = Class              #25            //  java/lang/Object
+   #7 = Utf8               <init>
+   #8 = Utf8               ()V
+   #9 = Utf8               Code
+  #10 = Utf8               LineNumberTable
+  #11 = Utf8               main
+  #12 = Utf8               ([Ljava/lang/String;)V
+  #13 = Utf8               test
+  #14 = Utf8               (Z)I
+  #15 = Utf8               StackMapTable
+  #16 = Utf8               SourceFile
+  #17 = Utf8               ClassWithJump.java
+  #18 = NameAndType        #7:#8          //  "<init>":()V
+  #19 = Class              #26            //  java/lang/System
+  #20 = NameAndType        #27:#28        //  out:Ljava/io/PrintStream;
+  #21 = NameAndType        #13:#14        //  test:(Z)I
+  #22 = Class              #29            //  java/io/PrintStream
+  #23 = NameAndType        #30:#31        //  print:(I)V
+  #24 = Utf8               ClassWithJump
+  #25 = Utf8               java/lang/Object
+  #26 = Utf8               java/lang/System
+  #27 = Utf8               out
+  #28 = Utf8               Ljava/io/PrintStream;
+  #29 = Utf8               java/io/PrintStream
+  #30 = Utf8               print
+  #31 = Utf8               (I)V
+{
+  public ClassWithJump();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 2: 0
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: iconst_1      
+         4: invokestatic  #3                  // Method test:(Z)I
+         7: invokevirtual #4                  // Method java/io/PrintStream.print:(I)V
+        10: return        
+      LineNumberTable:
+        line 5: 0
+        line 6: 10
+
+  static int test(boolean);
+    flags: ACC_STATIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: iload_0       
+         1: ifeq          8
+         4: iconst_3      
+         5: goto          9
+         8: iconst_4      
+         9: ireturn       
+      LineNumberTable:
+        line 10: 0
+      StackMapTable: number_of_entries = 2
+           frame_type = 8 /* same */
+           frame_type = 64 /* same_locals_1_stack_item */
+          stack = [ int ]
+
+}

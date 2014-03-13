@@ -131,6 +131,7 @@ object JavaBaseModel {
 }
 
 object JavaTypes {
+  object BooleanType
 
 
   def objectType(name: QualifiedClassName): Any = new MetaObject(ObjectType) {

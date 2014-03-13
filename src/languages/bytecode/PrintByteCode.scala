@@ -70,7 +70,6 @@ object PrintByteCode {
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCode.getInstructionArguments(instruction)
     val result = instruction.clazz match {
-      case ByteCode.IfZeroKey => hexToBytes("99")
       case ByteCode.GetStatic => hexToBytes("b2") ++ shortToBytes(arguments(0))
       case ByteCode.AddIntegersKey => hexToBytes("60")
       case ByteCode.SubtractInteger => hexToBytes("64")
@@ -101,6 +100,7 @@ object PrintByteCode {
         else
           byteToBytes(hexToInt("3b") + location)
       case ByteCode.IfIntegerCompareGreater => hexToBytes("a2") ++ shortToBytes(arguments(0))
+      case ByteCode.IfZeroKey => hexToBytes("99") ++ shortToBytes(arguments(0))
       case ByteCode.IntegerIncrementKey => hexToBytes("84") ++
         byteToBytes(arguments(0)) ++
         byteToBytes(arguments(1))

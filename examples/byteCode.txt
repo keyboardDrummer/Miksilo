@@ -1,4 +1,4 @@
-Classfile /d:/Dropbox/Projects/Code/modularCompiler/examples/Fibonacci.class
+Classfile /d:/Dropbox/Projects/Code/modularCompiler/examples/languages.javac.testing.fibonacciWithMain.Fibonacci.class
   Last modified 5-feb-2014; size 645 bytes
   MD5 checksum 894c5f58d277a237338f57eab6f98570
   Compiled from "fibonacci.java"
@@ -6,7 +6,8 @@ class Fiboacci
   SourceFile: "fibonacci.java"
   minor version: 0
   major version: 51
-  flags: ACC_SUPER
+  flags: ACC_SUPER
+
 Constant pool:
    #1 = Methodref          #4.#20         //  java/lang/Object."<init>":()V
    #2 = Methodref          #21.#22        //  java/lang/System.console:()Ljava/io/Console;
@@ -49,7 +50,8 @@ Constant pool:
   #39 = Utf8               (Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/Console;
 {
   Fiboacci();
-    flags: 
+    flags: 
+
     Code:
       stack=1, locals=1, args_size=1
          0: aload_0       
@@ -59,7 +61,8 @@ Constant pool:
         line 1: 0
 
   public static void main(java.lang.String[]);
-    flags: ACC_PUBLIC, ACC_STATIC
+    flags: ACC_PUBLIC, ACC_STATIC
+
     Code:
       stack=6, locals=1, args_size=1
          0: invokestatic  #2                  // Method java/lang/System.console:()Ljava/io/Console;
@@ -80,7 +83,8 @@ Constant pool:
         line 5: 23
 
   public static int fibonacci(int);
-    flags: ACC_PUBLIC, ACC_STATIC
+    flags: ACC_PUBLIC, ACC_STATIC
+
     Code:
       stack=3, locals=1, args_size=1
          0: iload_0       

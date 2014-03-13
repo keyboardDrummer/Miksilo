@@ -5,9 +5,15 @@ import scala.collection.mutable
 import JavaBaseModel._
 import languages.javac.base.JavaMethodModel._
 import languages.bytecode.{NoStackFrame, NoMaxStack, ByteCodeGoTo, ByteCode}
-import languages.javac.base.JavaTypes.{VoidType, ObjectType, DoubleType, IntegerType}
+import languages.javac.base.JavaTypes._
 import languages.javac.base.MethodId
 import languages.bytecode.ByteCode._
+import languages.javac.base.MethodInfo
+import scala.Some
+import languages.javac.base.MethodId
+import languages.javac.base.ClassOrObjectReference
+import languages.javac.base.QualifiedClassName
+import languages.javac.base.MethodCompiler
 import languages.javac.base.MethodInfo
 import scala.Some
 import languages.javac.base.MethodId
@@ -18,8 +24,10 @@ import languages.javac.base.MethodCompiler
 
 object JavaBase extends ProgramTransformation {
 
+
   def getTypeSize(_type: Any): Int = _type match {
     case IntegerType => 1
+    case BooleanType => 1
     case DoubleType => 1
     case meta: MetaObject => meta.clazz match  {
       case JavaTypes.ArrayType => 1
@@ -182,11 +190,11 @@ object JavaBase extends ProgramTransformation {
       }
 
     }
-    def javaTypeToByteCodeType(_type: Any) : Any = {
-      _type
+
+    def javaTypeToByteCodeType(_type: Any) = _type match {
+      case BooleanType => IntegerType
+      case _ => _type
     }
-
-
   }
 
 
