@@ -1,68 +1,108 @@
 package grammar
 
-trait ParseResult
-case class ParseSuccess(results: Seq[Any], remainingStream: Stream[Any]) extends ParseResult
-object ParseFailure extends ParseResult
+import scala.util.parsing.combinator.Parsers
 
-trait Grammar {
-  val parent = this
-  def parse(input: Stream[Any]) : ParseResult
-  def printer : Grammar
+
+trait GrammarWriter {
+
+
+  def identifier = Identifier
+
+  def number = Number
+
+  def success = Success
+
+  def failure = FailureG
+
+  def produce(value: Any) = new Produce(value)
+
+  def keyword(word: String) = new Keyword(word)
+
+  implicit def stringToGrammar(value: String): Grammar = keyword(value)
+
 }
 
-case class Many(inner: Grammar) extends Grammar {
-  lazy val grammar = Choice(Many(inner),Produce(Seq()))
-
-  override def parse(input: Stream[Any]): ParseResult = grammar.parse(input)
-
-  override def printer: Grammar = grammar.printer
+case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product with scala.Serializable {
 }
 
-case class Some(inner: Grammar) extends Grammar {
-  lazy val grammar = Sequence(inner, Many(inner))
+trait Grammar extends Parsers {
 
-  override def parse(input: Stream[Any]): ParseResult = grammar.parse(input)
+  def mustConsume: Boolean
 
-  override def printer: Grammar = grammar.printer
-}
+  def ~(other: Grammar) = new Sequence(this, other)
 
-case class Sequence(first: Grammar, second: Grammar) extends Grammar {
-  override def parse(input: Stream[Any]): ParseResult =
-    first.parse(input) match {
-      case ParseSuccess(firstResult,firstRest) => second.parse(firstRest) match {
-          case ParseSuccess(secondResult,secondRest) => ParseSuccess(firstResult ++ secondResult, secondRest)
-          case ParseFailure => ParseFailure
+  def ~>(right: Grammar) = (this ~ right) ^^ {
+    case seqr(l, r) => r
+  }
+
+  def <~(right: Grammar) = (this ~ right) ^^ { case seqr(l,r) => l }
+
+
+  def |(other: Grammar) = new Choice(this, other)
+
+  def * = new Many(this)
+
+  def named(name: String) = new Labelled(name, this)
+
+  def manySeparated(seperator: Grammar): Grammar = someSeparated(seperator) | new Produce(Seq.empty[Any])
+
+  def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
+
+  def someSeparated(seperator: Grammar): Grammar = this ~ (seperator ~> this *) ^^ {
+    case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
+  }
+
+  def findGrammar(name: String): Grammar = {
+    var closed = Set.empty[Grammar]
+    def findGrammar(grammar: Grammar): Set[Grammar] = {
+      if (closed.contains(grammar))
+        return Set.empty
+
+      this match {
+        case labelled: Labelled => if (labelled.name == name)
+          Set(labelled)
+        else findGrammar(labelled.inner)
+        case sequence: Sequence => findGrammar(sequence.first) ++ findGrammar(sequence.second)
+        case choice: Choice => findGrammar(choice.left) ++ findGrammar(choice.right)
       }
-      case ParseFailure => ParseFailure
     }
-
-  override def printer: Grammar = Sequence(first.printer,second.printer)
-}
-
-case class Produce(result: Seq[Any]) extends Grammar {
-  override def parse(input: Stream[Any]): ParseResult = ParseSuccess(result,input)
-
-  override def printer: Grammar = Consume(result)
-}
-
-case class Consume(value: Seq[Any]) extends Grammar{
-  override def parse(input: Stream[Any]): ParseResult = {
-    val (prefix,rest) = input.splitAt(value.length)
-    if (prefix != value)
-      return ParseFailure
-    ParseSuccess(Seq(), rest)
+    findGrammar(this).head
   }
-
-  override def printer: Grammar = Produce(value)
 }
 
-case class Choice(left: Grammar, right: Grammar) extends Grammar{
-  override def parse(input: Stream[Any]): ParseResult = {
-    left.parse(input) match {
-      case success: ParseSuccess => success
-      case ParseFailure => right.parse(input)
-    }
-  }
+class Many(var inner: Grammar) extends Grammar {
+  if (!inner.mustConsume)
+    throw new RuntimeException("cannot build non-terminating grammars")
 
-  override def printer: Grammar = Choice(left.printer,right.printer)
+  override def mustConsume: Boolean = false
+}
+
+class Sequence(var first: Grammar, var second: Grammar) extends Grammar {
+
+  override def mustConsume: Boolean = first.mustConsume || second.mustConsume
+}
+
+class Produce(var result: Any) extends Grammar {
+
+  override def mustConsume: Boolean = false
+}
+
+class Keyword(var value: String) extends Grammar {
+  if (value.length == 0)
+    throw new RuntimeException("value must have non-zero length")
+
+  override def mustConsume: Boolean = true
+}
+
+class Choice(var left: Grammar, var right: Grammar) extends Grammar {
+
+  override def mustConsume: Boolean = left.mustConsume && right.mustConsume
+}
+
+class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any => Any) extends Grammar {
+  override def mustConsume: Boolean = inner.mustConsume
+}
+
+class Labelled(val name: String, val inner: Grammar) extends Grammar {
+  override def mustConsume: Boolean = inner.mustConsume
 }

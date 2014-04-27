@@ -7,18 +7,22 @@ abstract class DataFlowAnalysis[Node, State] {
   def updateState(state: State, node: Node) : State
   def combineState(first: State, second: State) : State
 
+  val states = mutable.Map[Node,State]()
+  val nodeQueue = mutable.Queue[Node]()
   def run(rootNode: Node, rootState: State) : Map[Node,State] = {
-    val states = mutable.Map(rootNode -> rootState)
-    val nodeQueue = mutable.Queue(rootNode)
-    
-    while(nodeQueue.nonEmpty)
-    {
+    states.put(rootNode, rootState)
+    nodeQueue.enqueue(rootNode)
+    run()
+    states.toMap
+  }
+
+  def run() {
+    while (nodeQueue.nonEmpty) {
       val node = nodeQueue.dequeue()
       val ingoingState = states(node)
       val outgoingState = updateState(ingoingState, node)
       val outgoingNodes = getOutgoingNodes(node)
-      for(outgoingNode <- outgoingNodes)
-      {
+      for (outgoingNode <- outgoingNodes) {
         val newState = states.get(outgoingNode).fold(outgoingState)(existingState => {
           combineState(existingState, outgoingState)
         })
@@ -26,7 +30,5 @@ abstract class DataFlowAnalysis[Node, State] {
         nodeQueue.enqueue(outgoingNode)
       }
     }
-
-    states.toMap
   }
 }
