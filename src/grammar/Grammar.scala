@@ -48,7 +48,7 @@ trait Grammar extends Parsers {
 
   def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
 
-  def someSeparated(seperator: Grammar): Grammar = this ~ (seperator ~> this *) ^^ {
+  def someSeparated(seperator: Grammar): Grammar = this ~ ((seperator ~> this)*) ^^ {
     case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
@@ -92,6 +92,10 @@ class Keyword(var value: String) extends Grammar {
     throw new RuntimeException("value must have non-zero length")
 
   override def mustConsume: Boolean = true
+}
+
+class Lazy(inner: => Grammar) extends Grammar {
+  override def mustConsume: Boolean = inner.mustConsume
 }
 
 class Choice(var left: Grammar, var right: Grammar) extends Grammar {

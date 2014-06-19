@@ -5,8 +5,8 @@ import languages.bytecode.{PrintByteCode, ByteCode, LabelledJumps}
 import transformation.{TransformationManager, MetaObject}
 import akka.util.Convert
 import scala.collection.mutable
-import languages.javac.base.JavaTypes
 import languages.javac.testing.TestUtils
+import languages.javac.base.model.JavaTypes
 
 class TestByteCodeGoTo {
 

@@ -1,12 +1,12 @@
 package languages.javac.testing.emptyClass
 
 import languages.bytecode.ByteCode
-import languages.javac.base.{QualifiedClassName, JavaClassModel, JavaTypes}
 import org.junit.Test
 import languages.javac.{ConstructorC, JavaCompiler}
 import transformation.MetaObject
 import scala.collection.mutable.ArrayBuffer
 import languages.javac.testing.TestUtils
+import languages.javac.base.model.{JavaTypes, JavaClassModel, QualifiedClassName}
 
 class TestEmptyClassCompilation {
   val classname: String = "EmptyClass"

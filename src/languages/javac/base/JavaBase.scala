@@ -2,29 +2,30 @@ package languages.javac.base
 
 import transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
 import scala.collection.mutable
+import languages.javac.base.model._
 import JavaBaseModel._
-import languages.javac.base.JavaMethodModel._
+import scala.Some
+import languages.javac.base.model.QualifiedClassName
+import JavaMethodModel._
 import languages.bytecode.{InferredStackFrames, InferredMaxStack, LabelledJumps, ByteCode}
-import languages.javac.base.JavaTypes._
+import JavaTypes._
 import languages.javac.base.MethodId
 import languages.bytecode.ByteCode._
 import languages.javac.base.MethodInfo
 import scala.Some
 import languages.javac.base.MethodId
 import languages.javac.base.ClassOrObjectReference
-import languages.javac.base.QualifiedClassName
 import languages.javac.base.MethodCompiler
 import languages.javac.base.MethodInfo
 import scala.Some
 import languages.javac.base.MethodId
 import languages.javac.base.ClassOrObjectReference
-import languages.javac.base.QualifiedClassName
 import languages.javac.base.MethodCompiler
 import grammar.{seqr, Grammar}
 import scala.util.parsing.combinator.Parsers
 
 
-object JavaBase extends ProgramTransformation with GrammarTransformation {
+object JavaBase extends ProgramTransformation {
 
 
   def getTypeSize(_type: Any): Int = _type match {
@@ -203,27 +204,4 @@ object JavaBase extends ProgramTransformation with GrammarTransformation {
   def dependencies: Set[ProgramTransformation] = Set(InferredMaxStack, InferredStackFrames)
 
 
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
-    = delimiters ++= Seq("{","}",";")
-
-  override def transformReserved(reserved: mutable.HashSet[String]): Unit = reserved ++= Seq("class", "package")
-
-  override def transformGrammar(grammar: Grammar): Grammar = {
-    lazy val statement: Grammar = success.named("statement")
-    lazy val block : Grammar = "{" ~> (statement*) <~ "}"
-    lazy val classMember : Grammar = failure
-    // lazy val _import = "import" ~> identifier.someSeparated(".") <~ ";"
-    lazy val importsP : Grammar = produce(Seq.empty[JavaImport]) //succes_import*
-    lazy val packageP = keyword("package") ~> identifier.someSeparated(".") <~ ";"
-    lazy val _classContent = "class" ~> identifier ~ ("{" ~> (classMember*) <~ "}")
-    lazy val clazz = packageP ~ importsP ~ _classContent ^^
-      { case (_package seqr _imports) seqr (name seqr members)  =>
-        val methods = members
-        JavaClassModel.clazz(_package.asInstanceOf[Seq[String]],
-          name.asInstanceOf[String],
-          methods.asInstanceOf[Seq[MetaObject]],
-          _imports.asInstanceOf[List[JavaImport]], None)
-      }
-    clazz
-  }
 }

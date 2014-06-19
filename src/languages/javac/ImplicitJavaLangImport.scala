@@ -1,7 +1,8 @@
 package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.javac.base.{JavaImport, JavaClassModel, JavaBase}
+import languages.javac.base.JavaBase
+import languages.javac.base.model.{JavaClassModel, JavaImport}
 
 object ImplicitJavaLangImport extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)

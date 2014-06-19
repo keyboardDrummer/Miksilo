@@ -5,12 +5,15 @@ import org.junit.Test
 import transformation.MetaObject
 import languages.javac.testing.TestUtils
 import languages.javac.{LiteralC, TernaryC, JavaCompiler}
-import languages.javac.base.JavaMethodModel._
-import languages.javac.base.JavaTypes._
+import languages.javac.base.model._
+import languages.javac.base.model.QualifiedClassName
+import scala.Some
+import JavaMethodModel._
+import languages.javac.base.model.{JavaTypes, JavaBaseModel, JavaClassModel, QualifiedClassName}
+import JavaTypes._
 import languages.javac.base._
-import languages.javac.base.JavaClassModel._
-import languages.javac.base.JavaBaseModel._
-import languages.javac.base.QualifiedClassName
+import JavaClassModel._
+import JavaBaseModel._
 import scala.Some
 
 class TestClassWithJump {

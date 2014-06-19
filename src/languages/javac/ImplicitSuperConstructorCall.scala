@@ -1,7 +1,7 @@
 package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.javac.base.{JavaMethodModel, JavaClassModel}
+import languages.javac.base.model.{JavaMethodModel, JavaClassModel}
 
 object ImplicitSuperConstructorCall extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(ConstructorC)

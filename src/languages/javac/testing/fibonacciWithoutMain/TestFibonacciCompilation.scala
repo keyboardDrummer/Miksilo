@@ -4,10 +4,15 @@ import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.MetaObject
 import languages.javac.base._
+import languages.javac.base.model._
+import languages.javac.base.model.QualifiedClassName
+import scala.Some
+import transformation.ComparisonOptions
 import JavaBaseModel._
+import languages.javac.base.model.{JavaClassModel, QualifiedClassName, JavaTypes}
 import JavaClassModel._
-import languages.javac.base.JavaTypes._
-import languages.javac.base.JavaMethodModel._
+import JavaTypes._
+import JavaMethodModel._
 import languages.javac._
 import transformation.ComparisonOptions
 import scala.collection.mutable.ArrayBuffer

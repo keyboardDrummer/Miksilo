@@ -5,19 +5,16 @@ import languages.javac.base._
 import languages.javac.JavaLang
 import scala.collection.mutable
 import transformation.{TransformationState, MetaObject}
-import languages.javac.base.QualifiedClassName
-import languages.javac.base.JavaImport
 import languages.javac.base.MethodId
 import scala.tools.scalap.scalax.util.StringUtil
 import languages.bytecode.ByteCode._
-import languages.javac.base.QualifiedClassName
 import scala.Some
-import languages.javac.base.JavaImport
 import languages.javac.base.FieldInfo
 import languages.javac.base.ClassInfo
 import languages.javac.base.MethodId
 import languages.javac.base.PackageInfo
 import languages.bytecode.LabelledJumps.LabelKey
+import languages.javac.base.model.{JavaTypes, JavaClassModel, JavaImport, QualifiedClassName}
 
 object ClassCompiler {
 }

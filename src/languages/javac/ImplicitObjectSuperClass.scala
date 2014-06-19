@@ -1,7 +1,8 @@
 package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.javac.base.{QualifiedClassName, JavaClassModel, JavaBase}
+import languages.javac.base.JavaBase
+import languages.javac.base.model.{JavaClassModel, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends ProgramTransformation {
   val objectName = "Object"

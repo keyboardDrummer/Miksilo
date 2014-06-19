@@ -3,7 +3,8 @@ package languages.bytecode
 import transformation.{TransformationState, ProgramTransformation, MetaObject}
 import javaBytecode.ConstantPoolInfo
 import scala.collection.mutable
-import languages.javac.base.JavaTypes.IntegerType
+import languages.javac.base.model.JavaTypes
+import JavaTypes.IntegerType
 import languages.bytecode.LabelledJumps.LabelKey
 import languages.javac.base.JavaBase
 

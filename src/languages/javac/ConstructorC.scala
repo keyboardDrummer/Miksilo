@@ -2,10 +2,12 @@ package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.javac.base._
-import languages.javac.base.JavaMethodModel._
+import languages.javac.base.model.{JavaMethodModel, JavaTypes, JavaClassModel, JavaBaseModel}
+import JavaMethodModel._
 import languages.bytecode.ByteCode
 import languages.javac.base.MethodCompiler
-import languages.javac.base.JavaBaseModel._
+import languages.javac.base.model.{JavaTypes, JavaClassModel, JavaBaseModel}
+import JavaBaseModel._
 import languages.javac.base.MethodCompiler
 import languages.javac.base.MethodId
 

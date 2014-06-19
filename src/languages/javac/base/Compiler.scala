@@ -5,6 +5,7 @@ import languages.javac.JavaLang
 import languages.javac.base.MethodId
 import javaBytecode.MethodDescriptor
 import transformation.MetaObject
+import languages.javac.base.model.QualifiedClassName
 
 class PackageContent(parent: Option[PackageInfo], name: String)
 case class PackageInfo(parent: Option[PackageInfo], name: String, content: mutable.Map[String, PackageContent] = mutable.Map())

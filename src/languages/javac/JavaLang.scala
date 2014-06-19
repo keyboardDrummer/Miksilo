@@ -5,6 +5,7 @@ import languages.javac.base._
 import scala.collection.mutable
 import languages.javac.base.PackageInfo
 import languages.javac.base.MethodInfo
+import languages.javac.base.model.{JavaTypes, QualifiedClassName}
 
 object JavaLang {
   val javaPackageName: String = "java"

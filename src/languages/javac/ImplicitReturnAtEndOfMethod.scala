@@ -2,8 +2,9 @@ package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
 import languages.bytecode.ByteCode
-import languages.javac.base.{JavaMethodModel, JavaClassModel, JavaBase}
+import languages.javac.base.JavaBase
 import javaInterpreter.JavaClass
+import languages.javac.base.model.{JavaMethodModel, JavaClassModel}
 
 object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)

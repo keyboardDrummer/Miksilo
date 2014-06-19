@@ -4,12 +4,11 @@ import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.MetaObject
 import languages.javac.ConstructorC
-import languages.javac.base.JavaTypes
-import languages.javac.base.QualifiedClassName
 import languages.bytecode.LineNumberRef
 import languages.javac.testing.TestUtils
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import languages.javac.base.model.{JavaTypes, QualifiedClassName}
 
 class TestPrintByteCodeFibonacciWithMain {
 

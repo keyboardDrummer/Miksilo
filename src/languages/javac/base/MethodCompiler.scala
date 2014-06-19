@@ -2,7 +2,8 @@ package languages.javac.base
 
 import scala.collection.mutable
 import transformation.MetaObject
-import languages.javac.base.JavaBaseModel._
+import languages.javac.base.model.JavaBaseModel
+import JavaBaseModel._
 import languages.javac.base.ClassInfo
 import languages.javac.base.ClassOrObjectReference
 import languages.javac.base.PackageInfo

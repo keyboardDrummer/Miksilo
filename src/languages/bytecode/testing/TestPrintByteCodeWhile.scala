@@ -3,10 +3,9 @@ package languages.bytecode.testing
 import org.junit.{Assert, Test}
 import languages.bytecode._
 import transformation.MetaObject
-import languages.javac.base.JavaTypes
-import languages.javac.base.QualifiedClassName
 import languages.bytecode.LineNumberRef
 import scala.collection.mutable.ArrayBuffer
+import languages.javac.base.model.{JavaTypes, QualifiedClassName}
 
 class TestPrintByteCodeWhile {
 

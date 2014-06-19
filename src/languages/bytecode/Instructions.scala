@@ -1,9 +1,10 @@
 package languages.bytecode
 
 import transformation.MetaObject
-import languages.javac.base.JavaTypes.IntegerType
+import languages.javac.base.model.{QualifiedClassName, JavaTypes}
+import JavaTypes.IntegerType
 import languages.bytecode.LabelledJumps.LabelKey
-import languages.javac.base.{ConstantPool, QualifiedClassName, JavaTypes, JavaBase}
+import languages.javac.base.{ConstantPool, JavaBase}
 import ByteCode._
 
 object Instructions {

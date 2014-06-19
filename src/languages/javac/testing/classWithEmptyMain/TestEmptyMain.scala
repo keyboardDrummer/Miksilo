@@ -3,13 +3,13 @@ package languages.javac.testing.classWithEmptyMain
 import org.junit.{Assert, Test}
 import languages.javac.{LiteralC, ConstructorC, JavaCompiler}
 import languages.bytecode._
-import languages.javac.base.JavaTypes
 import transformation.{TransformationState, ProgramTransformation, TransformationManager, MetaObject}
-import languages.javac.base.JavaClassModel._
-import languages.javac.base.JavaMethodModel._
-import languages.javac.base.JavaTypes._
-import languages.javac.base.JavaBaseModel._
-import languages.javac.base.QualifiedClassName
+import languages.javac.base.model._
+import JavaClassModel._
+import languages.javac.base.model.QualifiedClassName
+import JavaMethodModel._
+import JavaTypes._
+import JavaBaseModel._
 import scala.collection.mutable.ArrayBuffer
 import languages.javac.testing.TestUtils
 import languages.javac.testing.fibonacciWithoutMain.TestFibonacciCompilation

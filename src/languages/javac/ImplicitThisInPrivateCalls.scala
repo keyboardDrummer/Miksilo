@@ -1,7 +1,8 @@
 package languages.javac
 
 import transformation.{TransformationState, MetaObject, ProgramTransformation}
-import languages.javac.base.{JavaBaseModel, JavaBase}
+import languages.javac.base.JavaBase
+import languages.javac.base.model.JavaBaseModel
 
 object ImplicitThisInPrivateCalls extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)

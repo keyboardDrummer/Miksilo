@@ -3,10 +3,10 @@ package languages.bytecode
 import transformation.MetaObject
 import akka.util.Convert
 import languages.bytecode.ByteCode._
-import languages.javac.base.JavaTypes
 import java.math.BigInteger
-import languages.javac.base.QualifiedClassName
-import languages.javac.base.JavaTypes.{ObjectType, ArrayType}
+import languages.javac.base.model.{JavaTypes, QualifiedClassName}
+import JavaTypes.{ObjectType, ArrayType}
+import languages.javac.base.model.{JavaTypes, QualifiedClassName}
 
 object PrintByteCode {
   def print(byteCode: MetaObject): String = {
