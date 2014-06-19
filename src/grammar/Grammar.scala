@@ -27,8 +27,6 @@ case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product wi
 
 trait Grammar extends Parsers {
 
-  def mustConsume: Boolean
-
   def ~(other: Grammar) = new Sequence(this, other)
 
   def ~>(right: Grammar) = (this ~ right) ^^ {
@@ -71,42 +69,31 @@ trait Grammar extends Parsers {
 }
 
 class Many(var inner: Grammar) extends Grammar {
-  if (!inner.mustConsume)
-    throw new RuntimeException("cannot build non-terminating grammars")
-
-  override def mustConsume: Boolean = false
 }
 
 class Sequence(var first: Grammar, var second: Grammar) extends Grammar {
 
-  override def mustConsume: Boolean = first.mustConsume || second.mustConsume
 }
 
 class Produce(var result: Any) extends Grammar {
 
-  override def mustConsume: Boolean = false
 }
 
 class Keyword(var value: String) extends Grammar {
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def mustConsume: Boolean = true
 }
 
 class Lazy(inner: => Grammar) extends Grammar {
-  override def mustConsume: Boolean = inner.mustConsume
 }
 
 class Choice(var left: Grammar, var right: Grammar) extends Grammar {
 
-  override def mustConsume: Boolean = left.mustConsume && right.mustConsume
 }
 
 class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any => Any) extends Grammar {
-  override def mustConsume: Boolean = inner.mustConsume
 }
 
 class Labelled(val name: String, val inner: Grammar) extends Grammar {
-  override def mustConsume: Boolean = inner.mustConsume
 }
