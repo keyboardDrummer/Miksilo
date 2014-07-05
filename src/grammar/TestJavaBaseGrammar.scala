@@ -1,11 +1,14 @@
 package grammar
 
 import org.junit.{Assert, Test}
-import transformation.{MetaObject, TransformationManager}
+import transformation._
 import languages.javac.base._
 import scala.reflect.io.{Path, File}
-import scala.util.parsing.input.StreamReader
-import languages.javac.base.model.{JavaClassModel, JavaImport}
+import languages.javac.base.model.{JavaTypes, JavaClassModel}
+import scala.util.parsing.combinator.PackratParsers
+import scala.util.parsing.combinator.syntactical.StandardTokenParsers
+import scala.collection.mutable
+import languages.javac.base.model.JavaImport
 
 class TestJavaBaseGrammar {
 
@@ -20,7 +23,6 @@ class TestJavaBaseGrammar {
 
   @Test
   def testFibonacci {
-    val currentDir = Path(".")
     val inputFile = Path("src") / "languages" / "javac" / "testing" / "fibonacciWithMain" / "Fibonacci.java"
 
     val input = File(inputFile).slurp()
@@ -32,4 +34,63 @@ class TestJavaBaseGrammar {
     val expectation = JavaClassModel.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
+
+  object Ratpacker extends StandardTokenParsers with PackratParsers
+  {
+    lazy val parseTypeInner : PackratParser[TestType] =
+      parseTypeInner <~ "[" <~ "]" ^^ (inner => new ArrayType(inner)) | "String" ^^ (_ => StringType)
+    val parseType : PackratParser[TestType] = parseTypeInner
+
+    lexical.reserved += "String"
+    lexical.delimiters += "["
+    lexical.delimiters += "]"
+
+    def testPackrat() {
+
+      Assert.assertEquals(new ArrayType(StringType),
+        parseType(new PackratReader(new lexical.Scanner("String[]"))).get)
+    }
+  }
+
+  @Test
+  def testPackrat() {
+    Ratpacker.testPackrat()
+  }
+
+  object TestGrammar extends GrammarTransformation
+  {
+    override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("[","]")
+
+    override def transformGrammar(grammar: Grammar): Grammar = {
+
+      lazy val parseString = "String" ^^ (_ => JavaTypes.StringType)
+      lazy val parseType2 : Grammar = new Lazy(parseType2) <~ "[" <~ "]" ^^
+        ( _type => JavaTypes.arrayType(_type)) | parseString
+      val identity : Any => Any = x => x
+      lazy val parseType : Grammar = parseString ~ (("[" ~> "]" ^^ (_ => (s: Any) => JavaTypes.arrayType(s))) | produce(identity)) ^^
+        { case s seqr f => f.asInstanceOf[Any => Any](s) }
+
+      // { case _type seqr _ => JavaTypes.arrayType(_type)} | parseString
+      parseType2
+    }
+
+    override def transformReserved(reserved: mutable.HashSet[String]): Unit = reserved += "String"
+
+    override def transform(program: MetaObject, state: TransformationState): Unit = ???
+
+    override def dependencies: Set[ProgramTransformation] = ???
+  }
+
+  @Test
+  def testGrammar() {
+
+    val input = "String[]"
+    val parser = TransformationManager.buildParser(Seq(TestGrammar))
+    val result = parser(input).get
+    Assert.assertEquals(JavaTypes.arrayType(JavaTypes.StringType), result)
+  }
+
+  trait TestType
+  object StringType extends TestType
+  case class ArrayType(inner: TestType) extends TestType
 }
