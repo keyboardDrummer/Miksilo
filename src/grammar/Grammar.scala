@@ -10,7 +10,7 @@ trait GrammarWriter {
 
   def number = Number
 
-  def success = Success
+  def success = SuccessG
 
   def failure = FailureG
 
@@ -86,6 +86,7 @@ class Keyword(var value: String) extends Grammar {
 }
 
 class Lazy(inner: => Grammar) extends Grammar {
+  def getInner = inner
 }
 
 class Choice(var left: Grammar, var right: Grammar) extends Grammar {

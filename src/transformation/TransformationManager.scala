@@ -4,7 +4,7 @@ import languages.ssm._
 import languages.bytecode._
 import languages.javac.base.JavaBase
 import languages.javac._
-import grammar.{GrammarWriter, ToPackrat, Grammar, Success}
+import grammar.ToPackrat
 import grammar.Grammar
 import grammar.FailureG
 

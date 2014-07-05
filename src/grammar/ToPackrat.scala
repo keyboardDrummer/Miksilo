@@ -12,8 +12,10 @@ trait ToPackrat extends StandardTokenParsers with PackratParsers {
     case many: Many => convert(many.inner).*
     case originalKeyword: Keyword => keyword(originalKeyword.value)
     case Identifier => ident
+    case SuccessG => success[Any](null)
     case labelled: Labelled => convert(labelled.inner)
     case map: MapGrammar => convert(map.inner) ^^ map.forward
+    case layz: Lazy => convert(layz.getInner)
     case produce: Produce => success(produce.result)
     case FailureG => failure("fail")
   }
