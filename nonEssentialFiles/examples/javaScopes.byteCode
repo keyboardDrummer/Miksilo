@@ -1,0 +1,120 @@
+Classfile /D:/Dropbox/Projects/Code/modularCompiler/examples/JavaScopes.class
+  Last modified 13-feb-2014; size 629 bytes
+  MD5 checksum a2c12f711fa78e5eae2dcd4beca9f5c0
+  Compiled from "javaScopes.java"
+class JavaScopes
+  SourceFile: "javaScopes.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_SUPER
+Constant pool:
+   #1 = Methodref          #4.#16         //  java/lang/Object."<init>":()V
+   #2 = Methodref          #17.#18        //  java/lang/System.console:()Ljava/io/Console;
+   #3 = String             #19            //  %i
+   #4 = Class              #20            //  java/lang/Object
+   #5 = Methodref          #21.#22        //  java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+   #6 = Methodref          #23.#24        //  java/io/Console.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/Console;
+   #7 = Class              #25            //  JavaScopes
+   #8 = Utf8               <init>
+   #9 = Utf8               ()V
+  #10 = Utf8               Code
+  #11 = Utf8               LineNumberTable
+  #12 = Utf8               javaScopes
+  #13 = Utf8               StackMapTable
+  #14 = Utf8               SourceFile
+  #15 = Utf8               javaScopes.java
+  #16 = NameAndType        #8:#9          //  "<init>":()V
+  #17 = Class              #26            //  java/lang/System
+  #18 = NameAndType        #27:#28        //  console:()Ljava/io/Console;
+  #19 = Utf8               %i
+  #20 = Utf8               java/lang/Object
+  #21 = Class              #29            //  java/lang/Integer
+  #22 = NameAndType        #30:#31        //  valueOf:(I)Ljava/lang/Integer;
+  #23 = Class              #32            //  java/io/Console
+  #24 = NameAndType        #33:#34        //  printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/Console;
+  #25 = Utf8               JavaScopes
+  #26 = Utf8               java/lang/System
+  #27 = Utf8               console
+  #28 = Utf8               ()Ljava/io/Console;
+  #29 = Utf8               java/lang/Integer
+  #30 = Utf8               valueOf
+  #31 = Utf8               (I)Ljava/lang/Integer;
+  #32 = Utf8               java/io/Console
+  #33 = Utf8               printf
+  #34 = Utf8               (Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/Console;
+{
+  JavaScopes();
+    flags: 
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 1: 0
+
+  public static void javaScopes();
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=6, locals=3, args_size=0
+         0: iconst_0      
+         1: istore_0      
+         2: iconst_3      
+         3: istore_1      
+         4: iload_1       
+         5: iconst_4      
+         6: if_icmpge     22
+         9: bipush        10
+        11: istore_2      
+        12: iinc          1, 1
+        15: iload_0       
+        16: iload_2       
+        17: iadd          
+        18: istore_0      
+        19: goto          4
+        22: iload_1       
+        23: bipush        6
+        25: if_icmpge     41
+        28: bipush        15
+        30: istore_2      
+        31: iinc          1, 1
+        34: iload_0       
+        35: iload_2       
+        36: iadd          
+        37: istore_0      
+        38: goto          22
+        41: invokestatic  #2                  // Method java/lang/System.console:()Ljava/io/Console;
+        44: ldc           #3                  // String %i
+        46: iconst_1      
+        47: anewarray     #4                  // class java/lang/Object
+        50: dup           
+        51: iconst_0      
+        52: iload_0       
+        53: invokestatic  #5                  // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        56: aastore       
+        57: invokevirtual #6                  // Method java/io/Console.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/Console;
+        60: pop           
+        61: return        
+      LineNumberTable:
+        line 3: 0
+        line 4: 2
+        line 5: 4
+        line 7: 9
+        line 8: 12
+        line 9: 15
+        line 10: 19
+        line 12: 22
+        line 13: 28
+        line 14: 31
+        line 15: 34
+        line 16: 38
+        line 18: 41
+        line 19: 61
+      StackMapTable: number_of_entries = 3
+           frame_type = 253 /* append */
+             offset_delta = 4
+        locals = [ int, int ]
+           frame_type = 17 /* same */
+           frame_type = 18 /* same */
+
+}

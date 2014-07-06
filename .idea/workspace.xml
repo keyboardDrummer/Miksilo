@@ -1,35 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="89a959f4-8a64-46a4-9f49-61afea01692f" name="Default" comment="Fixed ToPackrat.convert method and fixed some tests.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/testResources/emptyClass/EmptyClass.java" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\bytecode\Whilee.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithEmptyMain\EmptyMain.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithJump\ClassWithJump.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\emptyClass\EmptyClass.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithoutMain\OnlyFibonacci.bc.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithoutMain\OnlyFibonacci.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/transformations/javac/TestUtils.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/TestUtils.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" afterPath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\bytecode\WhileByteCode.txt" afterPath="$PROJECT_DIR$/testResources/WhileByteCode.txt" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\BooleanOperations.java" afterPath="$PROJECT_DIR$/testResources/BooleanOperations.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\CallWithSubClass.java" afterPath="$PROJECT_DIR$/testResources/CallWithSubClass.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\ConstructorsTest.java" afterPath="$PROJECT_DIR$/testResources/ConstructorsTest.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\EmptyMethod.java" afterPath="$PROJECT_DIR$/testResources/EmptyMethod.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithEmptyMain\EmptyMain.java" afterPath="$PROJECT_DIR$/src/test/core/grammar/EmptyMain.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithEmptyMain\TestEmptyMain.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/EmptyMain.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithJump\ClassWithJump.java" afterPath="$PROJECT_DIR$/testResources/classWithJump/ClassWithJump.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithJump\TestClassWithJump.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/ClassWithJump.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\classWithJump\bytecode.txt" afterPath="$PROJECT_DIR$/testResources/classWithJump/bytecode.txt" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\emptyClass\EmptyClass.by.txt" afterPath="$PROJECT_DIR$/testResources/emptyClass/EmptyClass.by.txt" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\emptyClass\TestEmptyClassCompilation.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/EmptyClassCompilation.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithMain\Fibonacci.java" afterPath="$PROJECT_DIR$/testResources/fibonacciWithMain/Fibonacci.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithMain\TestFibonacciWithMainCompilation.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/FibonacciWithMain.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithMain\fibonacci.bc.txt" afterPath="$PROJECT_DIR$/testResources/fibonacciWithMain/fibonacci.bc.txt" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\test\transformations\javac\fibonacciWithoutMain\TestFibonacciCompilation.scala" afterPath="$PROJECT_DIR$/src/test/transformations/javac/FibonacciWthoutMain.scala" />
-    </list>
+    <list default="true" id="89a959f4-8a64-46a4-9f49-61afea01692f" name="Default" comment="Fixed ToPackrat.convert method and fixed some tests." />
     <ignored path="modularCompiler.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -340,8 +312,8 @@
       <file leaf-file-name="TestUtils.scala" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/TestUtils.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.71090907" vertical-offset="187" max-vertical-offset="1020">
-              <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+            <state vertical-scroll-proportion="0.6181818" vertical-offset="187" max-vertical-offset="1020">
+              <caret line="35" column="18" selection-start-line="34" selection-start-column="23" selection-end-line="35" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -515,92 +487,6 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="testResources" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testResources" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="fibonacciWithoutMain" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testResources" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="fibonacciWithMain" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testResources" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="emptyClass" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="testResources" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="classWithJump" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="modularCompiler" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -668,6 +554,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1255,7 +1155,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1275,8 +1175,8 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.45829427" sideWeight="0.7516046" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.45829427" sideWeight="0.7516046" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="91" y="91" width="1418" height="670" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SBT Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
@@ -1799,8 +1699,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/TestUtils.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.71090907" vertical-offset="187" max-vertical-offset="1020">
-          <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+        <state vertical-scroll-proportion="0.6181818" vertical-offset="187" max-vertical-offset="1020">
+          <caret line="35" column="18" selection-start-line="34" selection-start-column="23" selection-end-line="35" selection-end-column="18" />
           <folding />
         </state>
       </provider>
