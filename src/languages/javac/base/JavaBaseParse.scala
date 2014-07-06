@@ -8,6 +8,7 @@ import JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibilit
 import JavaTypes.VoidType
 import languages.javac.base.model.JavaImport
 import grammar.seqr
+import languages.javac.LiteralC
 
 object JavaBaseParse extends GrammarTransformation {
 
@@ -16,23 +17,21 @@ object JavaBaseParse extends GrammarTransformation {
   override def transform(program: MetaObject, state: TransformationState): Unit = {}
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
-  = delimiters ++= Seq("{", "}", ";", ".")
+  = delimiters ++= Seq("(",")", "{", "}", ";", ".","[","]","[]")
 
   override def transformReserved(reserved: mutable.HashSet[String]): Unit =
-    reserved ++= Seq("class", "package", "public", "static")
+    reserved ++= Seq("void", "class", "package", "public", "static", "String")
 
   override def transformGrammar(grammar: Grammar): Grammar = {
-    lazy val call = expression ~ "(" ~ expression.manySeparated(",") ~ ")"
-    lazy val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
-    lazy val selection = expression ~ "." ~ identifier ^^
-      { case left seqr right => JavaBaseModel.selector(left.asInstanceOf[MetaObject], right.asInstanceOf[String])}
-    lazy val expression : Grammar = new Lazy(call | variable | selection)
-    lazy val statement: Grammar = expression
+    val expression: Grammar = getExpressionGrammar
+    lazy val statement: Grammar = expression <~ ";"
     lazy val block: Grammar = "{" ~> (statement *) <~ "}"
     lazy val parseReturnType = "void" ^^ (_ => VoidType)
-    //lazy val parseType = "String[]" ^^ (_ => JavaTypes.arrayType(JavaTypes.StringType))
-    lazy val parseType : Grammar = "String" ^^ (_ => JavaTypes.StringType) |
-      (new Lazy(parseType) ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type)})
+
+    lazy val parseStringType = "String" ^^ (_ => JavaTypes.StringType)
+    lazy val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type) }
+    lazy val parseType : Grammar = new Lazy(parseArrayType | parseStringType)
+
     lazy val parseParameter = parseType ~ identifier ^^
       {case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String],_type)}
     lazy val parseParameters = "(" ~ parseParameter.someSeparated(",") ~ ")"
@@ -49,7 +48,7 @@ object JavaBaseParse extends GrammarTransformation {
     // lazy val _import = "import" ~> identifier.someSeparated(".") <~ ";"
     lazy val importsP: Grammar = produce(Seq.empty[JavaImport]) //success_import*
     lazy val packageP = keyword("package") ~> identifier.someSeparated(".") <~ ";"
-    lazy val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
+    lazy val _classContent = "class" ~> identifier ~ ("{" ~> (classMember) <~ "}")
     lazy val clazz = packageP ~ importsP ~ _classContent ^^ {
       case (_package seqr _imports) seqr (name seqr members) =>
         val methods = members
@@ -58,6 +57,18 @@ object JavaBaseParse extends GrammarTransformation {
           methods.asInstanceOf[Seq[MetaObject]],
           _imports.asInstanceOf[List[JavaImport]], None)
     }
-    clazz
+    expression
+  }
+
+  def getExpressionGrammar: Grammar = {
+    lazy val pNumber = number ^^ (number => LiteralC.literal(number.asInstanceOf[AnyVal]))
+    lazy val call = expression ~ ("(" ~> expression.manySeparated(",") <~ ")") ^^
+      { case callee seqr arguments => JavaBaseModel.call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]]) }
+    lazy val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
+
+    lazy val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => JavaBaseModel.selector(left.asInstanceOf[MetaObject], right.asInstanceOf[String])}
+
+    lazy val expression: Grammar = new Lazy(call | selection | variable | pNumber)
+    expression
   }
 }

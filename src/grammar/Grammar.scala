@@ -8,7 +8,7 @@ trait GrammarWriter {
 
   def identifier = Identifier
 
-  def number = Number
+  def number = NumberG
 
   def success = SuccessG
 

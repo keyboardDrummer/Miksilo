@@ -1,7 +1,7 @@
 package grammar
 
 
-object Number extends Grammar {
+object NumberG extends Grammar {
 
 }
 

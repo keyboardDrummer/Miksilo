@@ -21,6 +21,22 @@ class TestJavaBaseGrammar {
     Assert.assertEquals(expectation, result)
   }
 
+
+  @Test
+  def testExpression {
+
+    val input = "System.out.print(fibonacci(5))"
+    val parser = TransformationManager.buildParser(Seq(JavaBaseParse))
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    val remainingInput = parseResult.next
+    val result = parseResult.get
+    val expectation = JavaClassModel.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
+    Assert.assertEquals(expectation, result)
+  }
+
   @Test
   def testFibonacci {
     val inputFile = Path("src") / "languages" / "javac" / "testing" / "fibonacciWithMain" / "Fibonacci.java"
@@ -35,7 +51,7 @@ class TestJavaBaseGrammar {
     Assert.assertEquals(expectation, result)
   }
 
-  object Ratpacker extends StandardTokenParsers with PackratParsers
+  object RatPacker extends StandardTokenParsers with PackratParsers
   {
     lazy val parseTypeInner : PackratParser[TestType] =
       parseTypeInner <~ "[" <~ "]" ^^ (inner => new ArrayType(inner)) | "String" ^^ (_ => StringType)
@@ -54,7 +70,7 @@ class TestJavaBaseGrammar {
 
   @Test
   def testPackrat() {
-    Ratpacker.testPackrat()
+    RatPacker.testPackrat()
   }
 
   object TestGrammar extends GrammarTransformation
