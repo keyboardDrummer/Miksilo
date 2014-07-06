@@ -1,12 +1,23 @@
 package core.grammar
 
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
-import core.transformation.GrammarTransformation
+import core.transformation._
+import scala.collection.mutable
 
-object TestGrammarUtils extends ToPackrat {
+class TestGrammarUtils {
 
-  def buildParser(transformations: Seq[GrammarTransformation]): String => ParseResult[Any] = {
-    val packratParser = convert(grammar)
-    input => packratParser(new PackratReader(new lexical.Scanner(input)))
+  val manager: TransformationManager = new TransformationManager()
+
+  def buildParser(transformations: Seq[GrammarTransformation], selector: Grammar => Grammar): String => manager.ParseResult[Any] = {
+
+    object SelectorTransformation extends GrammarTransformation {
+      override def transformGrammar(grammar: Grammar): Grammar = selector(grammar)
+      override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = {}
+      override def transformReserved(reserved: mutable.HashSet[String]): Unit = {}
+      override def transform(program: MetaObject, state: TransformationState): Unit = {}
+      override def dependencies: Set[ProgramTransformation] = Set.empty
+    }
+
+    manager.buildParser(transformations ++ Seq(SelectorTransformation))
   }
 }

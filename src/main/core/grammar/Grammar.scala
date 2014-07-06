@@ -40,7 +40,7 @@ trait Grammar extends Parsers {
 
   def * = new Many(this)
 
-  def named(name: String) = new Labelled(name, this)
+  def named(name: AnyRef) = new Labelled(name, this)
 
   def manySeparated(seperator: Grammar): Grammar = someSeparated(seperator) | new Produce(Seq.empty[Any])
 
@@ -50,18 +50,25 @@ trait Grammar extends Parsers {
     case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
-  def findGrammar(name: String): Grammar = {
+  def findGrammar(name: AnyRef): Grammar = {
     var closed = Set.empty[Grammar]
     def findGrammar(grammar: Grammar): Set[Grammar] = {
       if (closed.contains(grammar))
         return Set.empty
 
-      this match {
-        case labelled: Labelled => if (labelled.name == name)
-          Set(labelled)
+      closed += grammar
+
+      grammar match {
+        case labelled: Labelled =>
+          if (labelled.name.equals(name))
+            Set(labelled)
         else findGrammar(labelled.inner)
         case sequence: Sequence => findGrammar(sequence.first) ++ findGrammar(sequence.second)
         case choice: Choice => findGrammar(choice.left) ++ findGrammar(choice.right)
+        case map: MapGrammar => findGrammar(map.inner)
+        case many: Many => findGrammar(many.inner)
+        case lazyG: Lazy => findGrammar(lazyG.getInner)
+        case _ => Set.empty
       }
     }
     findGrammar(this).head
@@ -96,5 +103,5 @@ class Choice(var left: Grammar, var right: Grammar) extends Grammar {
 class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any => Any) extends Grammar {
 }
 
-class Labelled(val name: String, val inner: Grammar) extends Grammar {
+class Labelled(val name: AnyRef, val inner: Grammar) extends Grammar {
 }

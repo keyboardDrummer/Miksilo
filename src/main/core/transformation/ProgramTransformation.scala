@@ -1,8 +1,7 @@
 package core.transformation
 
-import core.grammar.{GrammarWriter, Grammar}
-import scala.util.parsing.combinator.Parsers
-import java.util
+import core.grammar.{Grammar, GrammarWriter}
+
 import scala.collection.mutable
 
 trait GrammarTransformation extends ProgramTransformation with GrammarWriter

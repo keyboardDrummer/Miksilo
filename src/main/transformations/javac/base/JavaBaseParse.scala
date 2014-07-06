@@ -1,14 +1,13 @@
 package transformations.javac.base
 
-import scala.collection.mutable
-import core.grammar.{Lazy, Sequence, seqr, Grammar}
-import core.transformation.{ProgramTransformation, TransformationState, GrammarTransformation, MetaObject}
-import transformations.javac.base.model._
-import JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibility, PublicVisibility}
-import JavaTypes.VoidType
-import transformations.javac.base.model.JavaImport
-import core.grammar.seqr
+import core.grammar.{Grammar, Lazy, seqr}
+import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
 import transformations.javac.LiteralC
+import transformations.javac.base.model.JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibility, PublicVisibility}
+import transformations.javac.base.model.JavaTypes.VoidType
+import transformations.javac.base.model._
+
+import scala.collection.mutable
 
 object JavaBaseParse extends GrammarTransformation {
 
@@ -48,7 +47,7 @@ object JavaBaseParse extends GrammarTransformation {
     // lazy val _import = "import" ~> identifier.someSeparated(".") <~ ";"
     lazy val importsP: Grammar = produce(Seq.empty[JavaImport]) //success_import*
     lazy val packageP = keyword("package") ~> identifier.someSeparated(".") <~ ";"
-    lazy val _classContent = "class" ~> identifier ~ ("{" ~> (classMember) <~ "}")
+    lazy val _classContent = "class" ~> identifier ~ ("{" ~> (classMember*) <~ "}")
     lazy val clazz = packageP ~ importsP ~ _classContent ^^ {
       case (_package seqr _imports) seqr (name seqr members) =>
         val methods = members
@@ -57,7 +56,7 @@ object JavaBaseParse extends GrammarTransformation {
           methods.asInstanceOf[Seq[MetaObject]],
           _imports.asInstanceOf[List[JavaImport]], None)
     }
-    expression
+    clazz
   }
 
   def getExpressionGrammar: Grammar = {
@@ -69,6 +68,8 @@ object JavaBaseParse extends GrammarTransformation {
     lazy val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => JavaBaseModel.selector(left.asInstanceOf[MetaObject], right.asInstanceOf[String])}
 
     lazy val expression: Grammar = new Lazy(call | selection | variable | pNumber)
-    expression
+    expression.named(ExpressionGrammar)
   }
+
+  object ExpressionGrammar
 }
