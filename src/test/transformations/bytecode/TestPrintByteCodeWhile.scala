@@ -55,7 +55,7 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCode.stackMapTable(9, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.IntegerType)),
+    val stackMapTable = ByteCode.stackMapTable(9, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.IntType)),
       ByteCode.sameFrame(10)))
     val _while = ByteCode.methodInfo(8, 5, Seq(ByteCode.codeAttribute(6, 2, 1, Seq(
       ByteCode.integerConstant(0),

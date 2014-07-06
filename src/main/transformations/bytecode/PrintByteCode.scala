@@ -1,11 +1,11 @@
 package transformations.bytecode
 
-import core.transformation.MetaObject
-import akka.util.Convert
-import transformations.bytecode.ByteCode._
 import java.math.BigInteger
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
-import JavaTypes.{ObjectType, ArrayType}
+
+import akka.util.Convert
+import core.transformation.MetaObject
+import transformations.bytecode.ByteCode._
+import transformations.javac.base.model.JavaTypes.{ArrayType, ObjectType}
 import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
 object PrintByteCode {
@@ -135,7 +135,7 @@ object PrintByteCode {
 
   def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes(info match
   {
-    case JavaTypes.IntegerType => "01"
+    case JavaTypes.IntType => "01"
     case JavaTypes.LongType => "02"
   })
 
@@ -205,7 +205,7 @@ object PrintByteCode {
 
   def javaTypeToString(_type: Any): String = _type match {
     case JavaTypes.VoidType => "V"
-    case JavaTypes.IntegerType => "I"
+    case JavaTypes.IntType => "I"
     case JavaTypes.DoubleType => "D"
     case JavaTypes.LongType => "J"
     case JavaTypes.BooleanType => "Z"

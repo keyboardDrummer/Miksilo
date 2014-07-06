@@ -6,7 +6,7 @@ object JavaTypes {
    object BooleanType
 
    def javaTypeToByteCodeType(_type: Any) = _type match {
-     case BooleanType => IntegerType
+     case BooleanType => IntType
      case _ => _type
    }
 
@@ -18,11 +18,12 @@ object JavaTypes {
    }
    def getObjectTypeName(objectType: MetaObject): Either[String,QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String,QualifiedClassName]]
 
-   object StringType
+   val stringType = objectType("String")
+
    object ObjectTypeName
    object ObjectType
    object VoidType
-   object IntegerType
+   object IntType
    object LongType
    object DoubleType
    object ArrayType

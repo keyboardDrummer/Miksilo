@@ -29,7 +29,7 @@ object JavaBase extends ProgramTransformation {
 
 
   def getTypeSize(_type: Any): Int = _type match {
-    case IntegerType => 1
+    case IntType => 1
     case BooleanType => 1
     case DoubleType => 1
     case meta: MetaObject => meta.clazz match  {

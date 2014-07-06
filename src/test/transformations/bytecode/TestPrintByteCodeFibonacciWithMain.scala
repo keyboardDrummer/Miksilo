@@ -61,7 +61,7 @@ class TestPrintByteCodeFibonacciWithMain {
     )
     val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(8,0)))
     val stackMapTable = ByteCode.stackMapTable(15, Seq(ByteCode.sameFrame(9),
-      ByteCode.sameFrameLocals1StackItem(12, JavaTypes.IntegerType)) )
+      ByteCode.sameFrameLocals1StackItem(12, JavaTypes.IntType)) )
     val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
     method
@@ -82,7 +82,7 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java","lang","String")))))),
       fibonacciMethodName,
-      ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
+      ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
       ByteCode.StackMapTableId,
       ByteCode.SourceFileId,
       "Fibonacci.java",
@@ -99,7 +99,7 @@ class TestPrintByteCodeFibonacciWithMain {
       JavaTypes.objectType(new QualifiedClassName(Seq("java","io","PrintStream"))),
       "java/io/PrintStream",
       "print",
-      ByteCode.methodDescriptor(JavaTypes.VoidType,Seq(JavaTypes.IntegerType))
+      ByteCode.methodDescriptor(JavaTypes.VoidType,Seq(JavaTypes.IntType))
       )
     constantPool
   }

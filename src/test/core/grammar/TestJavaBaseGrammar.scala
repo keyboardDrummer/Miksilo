@@ -25,7 +25,7 @@ class TestJavaBaseGrammar {
   }
 
   @Test
-  def testExpression() {
+  def testMainExpression() {
 
     val input = "System.out.print(fibonacci(5))"
     val parser = new TestGrammarUtils().buildParser(Seq(JavaBaseParse), grammar => grammar.findGrammar(JavaBaseParse.ExpressionGrammar))
@@ -42,7 +42,23 @@ class TestJavaBaseGrammar {
   }
 
   @Test
-  def testFibonacciMethod() {
+  def testFibonacciExpression() {
+    val input = "index < 2 ? 1 : fibonacci(index-1) + fibonacci(index-2)"
+    val parser = new TestGrammarUtils().buildParser(Seq(JavaBaseParse), grammar => grammar.findGrammar(JavaBaseParse.ExpressionGrammar))
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    val result = parseResult.get
+    Assert.assertTrue(parseResult.next.atEnd)
+
+    val expectation = JavaBaseModel.call(JavaBaseModel.selector(JavaBaseModel.selector(JavaBaseModel.variable("System"),"out"),"print"),
+      Seq(JavaBaseModel.call(JavaBaseModel.variable("fibonacci"),Seq(LiteralC.literal(5)))))
+    Assert.assertEquals(expectation, result)
+  }
+
+  @Test
+  def testFibonacciMainMethod() {
     val input = "public static void main(String[] args) { System.out.print(fibonacci(5)); }"
     val parser = new TestGrammarUtils().buildParser(Seq(JavaBaseParse), grammar => grammar.findGrammar(JavaBaseParse.MethodGrammar))
     val parseResult = parser(input)
@@ -52,7 +68,24 @@ class TestJavaBaseGrammar {
     Assert.assertTrue(parseResult.next.atEnd)
 
     val result = parseResult.get
-    val expectation = JavaMethodModel.method("main",JavaTypes.VoidType,Seq(JavaMethodModel.parameter("args",JavaTypes.arrayType(JavaTypes.StringType))),
+    val expectation = JavaMethodModel.method("main",JavaTypes.VoidType,Seq(JavaMethodModel.parameter("args",JavaTypes.arrayType(JavaTypes.stringType))),
+      Seq(JavaBaseModel.call(JavaBaseModel.selector(JavaBaseModel.selector(JavaBaseModel.variable("System"),"out"),"print"),
+        Seq(JavaBaseModel.call(JavaBaseModel.variable("fibonacci"),Seq(LiteralC.literal(5)))))),true,JavaMethodModel.PublicVisibility)
+    Assert.assertEquals(expectation, result)
+  }
+
+  @Test
+  def testFibonacciMethod() {
+    val input = "public static int fibonacci(int index) { return index < 2 ? 1 : fibonacci(index-1) + fibonacci(index-2); }"
+    val parser = new TestGrammarUtils().buildParser(Seq(JavaBaseParse), grammar => grammar.findGrammar(JavaBaseParse.MethodGrammar))
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    Assert.assertTrue(parseResult.next.atEnd)
+
+    val result = parseResult.get
+    val expectation = JavaMethodModel.method("main",JavaTypes.VoidType,Seq(JavaMethodModel.parameter("args",JavaTypes.arrayType(JavaTypes.stringType))),
       Seq(JavaBaseModel.call(JavaBaseModel.selector(JavaBaseModel.selector(JavaBaseModel.variable("System"),"out"),"print"),
         Seq(JavaBaseModel.call(JavaBaseModel.variable("fibonacci"),Seq(LiteralC.literal(5)))))),true,JavaMethodModel.PublicVisibility)
     Assert.assertEquals(expectation, result)

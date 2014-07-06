@@ -4,7 +4,7 @@ import core.transformation.{TransformationState, ProgramTransformation, MetaObje
 import typed.languages.javaBytecode.ConstantPoolInfo
 import scala.collection.mutable
 import transformations.javac.base.model.JavaTypes
-import JavaTypes.IntegerType
+import JavaTypes.IntType
 import transformations.bytecode.LabelledJumps.LabelKey
 import transformations.javac.base.JavaBase
 

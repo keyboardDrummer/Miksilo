@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.transformation.MetaObject
 import transformations.javac.base.model.{QualifiedClassName, JavaTypes}
-import JavaTypes.IntegerType
+import JavaTypes.IntType
 import transformations.bytecode.LabelledJumps.LabelKey
 import transformations.javac.base.{ConstantPool, JavaBase}
 import ByteCode._
@@ -17,15 +17,15 @@ object Instructions {
 
   def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) : (Seq[Any],Seq[Any]) =
     instruction.clazz match {
-    case ByteCode.IfIntegerCompareGreater => (Seq(IntegerType,IntegerType),Seq())
-    case ByteCode.IfZeroKey => (Seq(IntegerType),Seq())
-    case AddIntegersKey => binary(IntegerType)
-    case SubtractInteger => binary(IntegerType)
+    case ByteCode.IfIntegerCompareGreater => (Seq(IntType,IntType),Seq())
+    case ByteCode.IfZeroKey => (Seq(IntType),Seq())
+    case AddIntegersKey => binary(IntType)
+    case SubtractInteger => binary(IntType)
     case LabelKey => (Seq(),Seq())
-    case IntegerLoad => (Seq(),Seq(IntegerType))
-    case IntegerConstantKey => (Seq(),Seq(IntegerType))
-    case AddressLoad => (Seq(),Seq(IntegerType))
-    case IntegerReturn => (Seq(IntegerType),Seq())
+    case IntegerLoad => (Seq(),Seq(IntType))
+    case IntegerConstantKey => (Seq(),Seq(IntType))
+    case AddressLoad => (Seq(),Seq(IntType))
+    case IntegerReturn => (Seq(IntType),Seq())
     case GetStatic => (Seq(),Seq(getGetStaticReturnType(constantPool, instruction)))
     case GoToKey => (Seq(),Seq())
     case InvokeSpecial => getInvokeStackModification(constantPool, instruction)

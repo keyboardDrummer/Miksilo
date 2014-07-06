@@ -1,15 +1,12 @@
 package transformations.javac
 
-import org.junit.Test
 import core.transformation.MetaObject
-import transformations.javac.{FibonacciWthoutMain, JavaCompiler}
+import org.junit.Test
+import transformations.javac.base.model.JavaBaseModel._
+import transformations.javac.base.model.JavaClassModel._
+import transformations.javac.base.model.JavaMethodModel._
+import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
-import JavaMethodModel._
-import transformations.javac.base.model.{JavaTypes, JavaBaseModel, JavaClassModel, QualifiedClassName}
-import JavaTypes._
-import JavaClassModel._
-import JavaBaseModel._
-import scala.Some
 
 class ClassWithJump {
 
@@ -40,7 +37,7 @@ class ClassWithJump {
   def getTestMethod = {
     val parameters = Seq(parameter("b", JavaTypes.BooleanType))
     val body = Seq(_return(Some(TernaryC.ternary(JavaBaseModel.variable("b"), LiteralC.literal(3), LiteralC.literal(4)))))
-    method("test", IntegerType, parameters, body, static = true, PrivateVisibility)
+    method("test", IntType, parameters, body, static = true, PrivateVisibility)
   }
 
   def getJava: MetaObject = {

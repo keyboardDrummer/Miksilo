@@ -19,17 +19,19 @@ object JavaBaseParse extends GrammarTransformation {
   = delimiters ++= Seq("(",")", "{", "}", ";", ".","[","]","[]")
 
   override def transformReserved(reserved: mutable.HashSet[String]): Unit =
-    reserved ++= Seq("void", "class", "package", "public", "static", "String")
+    reserved ++= Seq("void", "class", "package", "public", "static", "int", "return")
 
   override def transformGrammar(grammar: Grammar): Grammar = {
     val expression: Grammar = getExpressionGrammar
-    lazy val statement: Grammar = expression <~ ";"
+    lazy val parseReturnValue = "return" ~> expression <~ ";" ^^ (expr => JavaMethodModel._return(Some(expr.asInstanceOf[MetaObject])))
+    lazy val statement: Grammar = expression <~ ";" | parseReturnValue
     lazy val block: Grammar = "{" ~> (statement *) <~ "}"
-    lazy val parseReturnType = "void" ^^ (_ => VoidType)
+    lazy val parseReturnType = "void" ^^ (_ => VoidType) | parseType
 
-    lazy val parseStringType = "String" ^^ (_ => JavaTypes.StringType)
+    lazy val parseObjectType = identifier ^^ (s => JavaTypes.objectType(s.asInstanceOf[String]))
+    lazy val parseIntType = "int" ^^ (_ => JavaTypes.IntType)
     lazy val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type) }
-    lazy val parseType : Grammar = new Lazy(parseArrayType | parseStringType)
+    lazy val parseType : Grammar = new Lazy(parseArrayType | parseObjectType | parseIntType)
 
     lazy val parseParameter = parseType ~ identifier ^^
       {case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String],_type)}

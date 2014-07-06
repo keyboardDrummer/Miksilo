@@ -1,16 +1,14 @@
 package transformations.javac
 
+import core.transformation.{ComparisonOptions, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode._
-import core.transformation.MetaObject
+import transformations.javac.base.model.JavaBaseModel._
+import transformations.javac.base.model.JavaClassModel._
+import transformations.javac.base.model.JavaMethodModel._
+import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
-import scala.Some
-import JavaBaseModel._
-import transformations.javac.base.model.{JavaClassModel, QualifiedClassName, JavaTypes}
-import JavaClassModel._
-import JavaTypes._
-import JavaMethodModel._
-import core.transformation.ComparisonOptions
+
 import scala.collection.mutable.ArrayBuffer
 
 class FibonacciWthoutMain {
@@ -88,7 +86,7 @@ class FibonacciWthoutMain {
       ByteCode.integerReturn
     )
     val stackMapTable = ByteCode.stackMapTable(14, Seq(ByteCode.sameFrame(9),
-      ByteCode.sameFrameLocals1StackItem(12, Seq(JavaTypes.IntegerType))))
+      ByteCode.sameFrameLocals1StackItem(12, Seq(JavaTypes.IntType))))
     val codeAttribute = ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))
     ByteCode.methodInfo(0, 0, Seq(codeAttribute), Set(ByteCode.PrivateAccess, ByteCode.StaticAccess))
   }
@@ -102,7 +100,7 @@ class FibonacciWthoutMain {
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
       ByteCode.CodeAttributeId,
       methodName,
-      ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
+      ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
       ByteCode.nameAndType(5, 6),
       ByteCode.nameAndType(8, 9),
       new QualifiedClassName(Seq("transformations", "bytecode", "testing", "OnlyFibonacci")),
@@ -120,12 +118,12 @@ class FibonacciWthoutMain {
   }
 
   def getFibonacciMethodJava: MetaObject = {
-    val parameters = Seq(parameter("i", IntegerType))
+    val parameters = Seq(parameter("i", IntType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
     val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
     val body = Seq(JavaMethodModel._return(Some(returnValue)))
-    method("fibonacci", IntegerType, parameters, body, static = true)
+    method("fibonacci", IntType, parameters, body, static = true)
   }
 }

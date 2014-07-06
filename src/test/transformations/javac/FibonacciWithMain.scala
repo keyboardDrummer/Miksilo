@@ -137,7 +137,7 @@ class FibonacciWithMain {
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       methodName,
-      ByteCode.methodDescriptor(JavaTypes.IntegerType, Seq(JavaTypes.IntegerType)),
+      ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
       ByteCode.StackMapTableId,
       ByteCode.nameAndType(7, 8),
       ByteCode.classRef(26),
@@ -152,7 +152,7 @@ class FibonacciWithMain {
       JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       new QualifiedClassName(Seq("java", "io", "PrintStream")),
       "print",
-      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(JavaTypes.IntegerType))
+      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(JavaTypes.IntType))
     )
     constantPool
   }
