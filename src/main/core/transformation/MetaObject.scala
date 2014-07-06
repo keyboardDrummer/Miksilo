@@ -69,8 +69,9 @@ class MetaObject(var clazz: AnyRef) {
 
   override def equals(other: Any): Boolean = other match {
     case that: MetaObject =>
+      val dataEquals: Boolean = data == that.data
       (that canEqual this) &&
-        data == that.data &&
+        dataEquals &&
         clazz == that.clazz
     case _ => false
   }

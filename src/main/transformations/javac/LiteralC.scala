@@ -6,16 +6,16 @@ import transformations.bytecode.ByteCode
 
 object LiteralC extends ProgramTransformation {
   def literal(value: AnyVal) = {
-    new MetaObject(clazz) {
-      data.put(valueKey, value)
+    new MetaObject(LiteralKey) {
+      data.put(ValueKey, value)
     }
   }
 
-  def getValue(literal: MetaObject) = { literal(valueKey) }
-  val clazz = "literal"
-  val valueKey = "value"
+  def getValue(literal: MetaObject) = { literal(ValueKey) }
+  object LiteralKey
+  object ValueKey
   def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(clazz,(literal : MetaObject, compiler) => {
+    JavaBase.getStatementToLines(state).put(LiteralKey,(literal : MetaObject, compiler) => {
       val value = getValue(literal)
       Seq(value match {
         case i:Integer => ByteCode.integerConstant(i)

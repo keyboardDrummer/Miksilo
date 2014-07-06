@@ -60,7 +60,7 @@ object JavaBaseParse extends GrammarTransformation {
   }
 
   def getExpressionGrammar: Grammar = {
-    lazy val pNumber = number ^^ (number => LiteralC.literal(number.asInstanceOf[AnyVal]))
+    lazy val pNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
     lazy val call = expression ~ ("(" ~> expression.manySeparated(",") <~ ")") ^^
       { case callee seqr arguments => JavaBaseModel.call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]]) }
     lazy val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
