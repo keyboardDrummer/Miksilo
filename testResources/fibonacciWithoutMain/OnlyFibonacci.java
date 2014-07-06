@@ -1,4 +1,4 @@
-package transformations.javac.fibonacciWithoutMain;
+package fibonacciWithoutMain;
 
 class OnlyFibonacci {
 	public static int fibonacci(int index) {

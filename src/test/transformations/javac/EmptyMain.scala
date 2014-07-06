@@ -1,22 +1,19 @@
-package transformations.javac.classWithEmptyMain
+package transformations.javac
 
 import org.junit.{Assert, Test}
-import transformations.javac.{TestUtils, LiteralC, ConstructorC, JavaCompiler}
+import transformations.javac.{FibonacciWthoutMain, LiteralC}
 import transformations.bytecode._
-import core.transformation.{TransformationState, ProgramTransformation, TransformationManager, MetaObject}
+import core.transformation.{ProgramTransformation, TransformationManager, MetaObject}
 import transformations.javac.base.model._
 import JavaClassModel._
 import transformations.javac.base.model.QualifiedClassName
 import JavaMethodModel._
 import JavaTypes._
-import JavaBaseModel._
-import scala.collection.mutable.ArrayBuffer
-import transformations.javac.fibonacciWithoutMain.TestFibonacciCompilation
 
-class TestEmptyMain {
+class EmptyMain {
   val className = "EmptyMain"
   val defaultPackage = Seq()
-  val other = new TestFibonacciCompilation()
+  val other = new FibonacciWthoutMain()
 
   @Test
   def runCompiledCode() {

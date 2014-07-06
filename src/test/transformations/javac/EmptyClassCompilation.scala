@@ -1,13 +1,13 @@
-package transformations.javac.emptyClass
+package transformations.javac
 
 import transformations.bytecode.ByteCode
 import org.junit.Test
-import transformations.javac.{TestUtils, ConstructorC, JavaCompiler}
+import transformations.javac.ConstructorC
 import core.transformation.MetaObject
 import scala.collection.mutable.ArrayBuffer
 import transformations.javac.base.model.{JavaTypes, JavaClassModel, QualifiedClassName}
 
-class TestEmptyClassCompilation {
+class EmptyClassCompilation {
   val classname: String = "EmptyClass"
 
   def getEmptyClassByteCode() = {

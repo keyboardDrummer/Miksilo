@@ -28,7 +28,7 @@ object TestUtils {
   def runByteCode(className: String, code: MetaObject) = {
     val bytes = PrintByteCode.getBytes(code).toArray
     val currentDir = new File(new java.io.File("."))
-    val testDirectory = currentDir / Path("test")
+    val testDirectory = currentDir / Path("testOutput")
     testDirectory.createDirectory()
     val byteCodeFile = File.apply(testDirectory / Path(className).addExtension("class"))
     val writer = byteCodeFile.outputStream(append = false)

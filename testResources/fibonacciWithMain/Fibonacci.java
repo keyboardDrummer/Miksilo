@@ -1,4 +1,4 @@
-package transformations.javac.fibonacciWithMain;
+package fibonacciWithMain;
 
 class Fibonacci {
     public static void main(String[] args)

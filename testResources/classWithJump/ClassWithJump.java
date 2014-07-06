@@ -1,3 +1,4 @@
+package classWithJump;
 
 public class ClassWithJump {
   public static void main(String[] args)

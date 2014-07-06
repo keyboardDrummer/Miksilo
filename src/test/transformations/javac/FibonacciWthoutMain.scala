@@ -1,23 +1,19 @@
-package transformations.javac.fibonacciWithoutMain
+package transformations.javac
 
 import org.junit.{Assert, Test}
 import transformations.bytecode._
 import core.transformation.MetaObject
-import transformations.javac.base._
 import transformations.javac.base.model._
-import transformations.javac.base.model.QualifiedClassName
 import scala.Some
-import core.transformation.ComparisonOptions
 import JavaBaseModel._
 import transformations.javac.base.model.{JavaClassModel, QualifiedClassName, JavaTypes}
 import JavaClassModel._
 import JavaTypes._
 import JavaMethodModel._
-import transformations.javac._
 import core.transformation.ComparisonOptions
 import scala.collection.mutable.ArrayBuffer
 
-class TestFibonacciCompilation {
+class FibonacciWthoutMain {
   val className = "OnlyFibonacci"
   val defaultPackage = Seq("transformations", "bytecode", "testing")
 

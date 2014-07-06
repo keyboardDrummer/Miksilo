@@ -1,25 +1,21 @@
-package transformations.javac.classWithJump
+package transformations.javac
 
-import transformations.javac.fibonacciWithoutMain.TestFibonacciCompilation
 import org.junit.Test
 import core.transformation.MetaObject
-import transformations.javac.{TestUtils, LiteralC, TernaryC, JavaCompiler}
+import transformations.javac.{FibonacciWthoutMain, JavaCompiler}
 import transformations.javac.base.model._
-import transformations.javac.base.model.QualifiedClassName
-import scala.Some
 import JavaMethodModel._
 import transformations.javac.base.model.{JavaTypes, JavaBaseModel, JavaClassModel, QualifiedClassName}
 import JavaTypes._
-import transformations.javac.base._
 import JavaClassModel._
 import JavaBaseModel._
 import scala.Some
 
-class TestClassWithJump {
+class ClassWithJump {
 
   val className = "ClassWithJump"
   val defaultPackage = Seq()
-  val other = new TestFibonacciCompilation()
+  val other = new FibonacciWthoutMain()
 
   @Test
   def runCompiledCode() {
