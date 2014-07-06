@@ -1,139 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="89a959f4-8a64-46a4-9f49-61afea01692f" name="Default" comment="">
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\TestJavaBaseGrammar.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestByteCodeGoTo.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestPrintByteCodeFibonacciWithMain.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestPrintByteCodeWhile.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\WhileByteCode.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\Whilee.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\Whilee.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\BooleanOperations.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\BooleanOperations.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\CallWithSubClass.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\CallWithSubClass.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\ConstructorsTest.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\ConstructorsTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyClass.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyMethod.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyMethod.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\Fibonacci.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\OnlyFibonacci.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\TestUtils.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\Whilee.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\EmptyMain.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\EmptyMain.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\TestEmptyMain.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\ClassWithJump.class" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\ClassWithJump.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\TestClassWithJump.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\bytecode.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\EmptyClass.by.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\EmptyClass.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\TestEmptyClassCompilation.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\Fibonacci.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\TestFibonacciWithMainCompilation.scala" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\fibonacci.bc.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\OnlyFibonacci.bc.txt" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\OnlyFibonacci.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\TestFibonacciCompilation.scala" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" afterPath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" />
+    <list default="true" id="89a959f4-8a64-46a4-9f49-61afea01692f" name="Default" comment="Fixed ToPackrat.convert method and fixed some tests.">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\application\Program.scala" afterPath="$PROJECT_DIR$/src/main/application/Program.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\application\myGraph.scala" afterPath="$PROJECT_DIR$/src/main/application/myGraph.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Arithmatic.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Arithmatic.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CMachine.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CProgram.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CProgram.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CTests.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CTests.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Call.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Call.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Continue.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Continue.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Expression.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Expression.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\ForLoop.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/ForLoop.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Function.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Function.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Goto.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Goto.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Literal.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Literal.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Memory.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Memory.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Statement.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Statement.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Type.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Type.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\VariableDeclaration.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/VariableDeclaration.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\While.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/While.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\printf.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/printf.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\Grammar.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/Grammar.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\GrammarExtensions.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/GrammarExtensions.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\StringGrammars.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/StringGrammars.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\ToPackrat.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/ToPackrat.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\graphing\TransformationGraph.scala" afterPath="$PROJECT_DIR$/src/main/application/graphing/TransformationGraph.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\graphing\TransformationVertex.scala" afterPath="$PROJECT_DIR$/src/main/application/graphing/TransformationVertex.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\ClassFile.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/ClassFile.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\ConstantPoolInfo.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/ConstantPoolInfo.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\CreatingNewObject.class" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/CreatingNewObject.class" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\CreatingNewObject.java" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/CreatingNewObject.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\FieldType.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/FieldType.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\Instruction.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/Instruction.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\JavaBytecodeMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/JavaBytecodeMachine.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\MethodDescriptor.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/MethodDescriptor.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\FibonacciExample.java" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/FibonacciExample.java" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaClass.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaClass.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaExamples.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaExamples.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaExpression.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaExpression.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaMethod.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaMethod.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaStatement.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaStatement.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaType.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaType.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\ByteCode.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/ByteCode.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InferredMaxStack.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InferredMaxStack.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InferredStackFrames.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InferredStackFrames.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InstructionFlowAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InstructionFlowAnalysis.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\Instructions.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/Instructions.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\LabelledJumps.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/LabelledJumps.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\PrintByteCode.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/PrintByteCode.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\StackAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/StackAnalysis.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\StackSizeAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/StackSizeAnalysis.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\AdditionC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/AdditionC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ConstructorC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ConstructorC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\DefaultConstructor.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/DefaultConstructor.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitJavaLangImport.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitJavaLangImport.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitObjectSuperClass.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitObjectSuperClass.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitReturnAtEndOfMethod.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitReturnAtEndOfMethod.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitSuperConstructorCall.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitSuperConstructorCall.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitThisInPrivateCalls.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitThisInPrivateCalls.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\JavaCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/JavaCompiler.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\JavaLang.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/JavaLang.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\LessThanC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/LessThanC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\LiteralC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/LiteralC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\StringLiteralC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/StringLiteralC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\SubtractionC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/SubtractionC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\TernaryC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/TernaryC.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\ClassCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/ClassCompiler.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\Compiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/Compiler.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\ConstantPool.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/ConstantPool.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\JavaBase.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/JavaBase.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\JavaBaseParse.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/JavaBaseParse.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\MethodCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/MethodCompiler.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaBaseModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaBaseModel.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaClassModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaClassModel.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaImport.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaImport.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaMethodModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaMethodModel.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaTypes.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaTypes.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\QualifiedClassName.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/QualifiedClassName.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddBlock.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddBlock.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddDoWhile.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddDoWhile.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddForLoop.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddForLoop.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddIfElse.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddIfElse.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddStatementToSSM.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddStatementToSSM.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddWhile.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddWhile.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\SSM.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/SSM.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\ssm\SSMMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/ssm/SSMMachine.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\ssm\SSMProgram.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/ssm/SSMProgram.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\Compiler.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/Compiler.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\MetaObject.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/MetaObject.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\ProgramTransformation.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/ProgramTransformation.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\TransformationManager.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/TransformationManager.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\TransformationState.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/TransformationState.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\DataFlowAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/util/DataFlowAnalysis.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\StackedMap.scala" afterPath="$PROJECT_DIR$/src/main/util/StackedMap.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\TestConsole.scala" afterPath="$PROJECT_DIR$/src/main/util/TestConsole.scala" />
-      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\TypedToMetaProgramConverter.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/TypedToMetaProgramConverter.scala" />
     </list>
     <ignored path="modularCompiler.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -424,11 +293,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestByteCodeGoTo.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="TestByteCodeGoTo.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestByteCodeGoTo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.36811024" vertical-offset="0" max-vertical-offset="1037">
-              <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1037">
+              <caret line="27" column="32" selection-start-line="27" selection-start-column="32" selection-end-line="27" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ClassWithJump.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/classWithJump/ClassWithJump.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.15338346" vertical-offset="0" max-vertical-offset="665">
+              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -439,16 +318,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2108">
               <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ConstructorsTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/ConstructorsTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -677,6 +546,40 @@
               <option name="myItemId" value="transformations" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javac" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="transformations" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javac" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="classWithJump" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -764,6 +667,22 @@
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="304" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="304" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="304" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="978" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="304" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="303" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="304" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="979" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -1321,7 +1240,7 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44611058" sideWeight="0.7471117" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41237113" sideWeight="0.24839538" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329235" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3289597" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.48078725" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="SBT" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -1329,7 +1248,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2755389" sideWeight="0.7516046" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="91" y="91" width="1418" height="670" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1469,13 +1388,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/base/ConstantPool.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-          <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaBaseModel.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="123" max-vertical-offset="918">
@@ -1870,8 +1782,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestByteCodeGoTo.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36811024" vertical-offset="0" max-vertical-offset="1037">
-          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1037">
+          <caret line="27" column="32" selection-start-line="27" selection-start-column="32" selection-end-line="27" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/classWithJump/ClassWithJump.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.15338346" vertical-offset="0" max-vertical-offset="665">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
       </provider>

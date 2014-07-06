@@ -1,0 +1,62 @@
+Classfile /D:/Dropbox/Projects/Code/modularCompiler/src/languages/bytecode/testing/Whilee.class
+  Last modified 17-feb-2014; size 314 bytes
+  MD5 checksum 873ec522540f0fd69d842d64202edc02
+  Compiled from "while.java"
+class languages.bytecode.testing.Whilee
+  SourceFile: "while.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_SUPER
+
+Constant pool:
+   #1 = Methodref          #3.#12         //  java/lang/Object."<init>":()V
+   #2 = Class              #13            //  languages/bytecode/testing/Whilee
+   #3 = Class              #14            //  java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               whilee
+   #9 = Utf8               StackMapTable
+  #10 = Utf8               SourceFile
+  #11 = Utf8               while.java
+  #12 = NameAndType        #4:#5          //  "<init>":()V
+  #13 = Utf8               languages/bytecode/testing/Whilee
+  #14 = Utf8               java/lang/Object
+{
+  languages.bytecode.testing.Whilee();
+    flags: 
+
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 3: 0
+
+  public static void whilee();
+    flags: ACC_PUBLIC, ACC_STATIC
+
+    Code:
+      stack=2, locals=1, args_size=0
+         0: iconst_0      
+         1: istore_0      
+         2: iload_0       
+         3: iconst_3      
+         4: if_icmpge     13
+         7: iinc          0, 1
+        10: goto          2
+        13: return        
+      LineNumberTable:
+        line 5: 0
+        line 6: 2
+        line 8: 7
+        line 10: 13
+      StackMapTable: number_of_entries = 2
+           frame_type = 252 /* append */
+             offset_delta = 2
+        locals = [ int ]
+           frame_type = 10 /* same */
+
+}

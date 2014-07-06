@@ -1,0 +1,68 @@
+Classfile /D:/Dropbox/Projects/Code/modularCompiler/src/languages/bytecode/testing/OnlyFibonacci.class
+  Last modified 18-feb-2014; size 344 bytes
+  MD5 checksum ab8d499021ab89c88249c565fed08858
+  Compiled from "OnlyFibonacci.java"
+class languages.java.testing.OnlyFibonacci
+  SourceFile: "OnlyFibonacci.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_SUPER
+
+Constant pool:
+   #1 = Methodref          #4.#14         //  java/lang/Object."<init>":()V
+   #2 = Methodref          #3.#15         //  languages/bytecode/testing/OnlyFibonacci.fibonacci:(I)I
+   #3 = Class              #16            //  languages/bytecode/testing/OnlyFibonacci
+   #4 = Class              #17            //  java/lang/Object
+   #5 = Utf8               <init>
+   #6 = Utf8               ()V
+   #7 = Utf8               Code
+   #8 = Utf8               LineNumberTable
+   #9 = Utf8               fibonacci
+  #10 = Utf8               (I)I
+  #11 = Utf8               StackMapTable
+  #12 = Utf8               SourceFile
+  #13 = Utf8               OnlyFibonacci.java
+  #14 = NameAndType        #5:#6          //  "<init>":()V
+  #15 = NameAndType        #9:#10         //  fibonacci:(I)I
+  #16 = Utf8               languages/bytecode/testing/OnlyFibonacci
+  #17 = Utf8               java/lang/Object
+{
+  languages.java.testing.OnlyFibonacci();
+    flags: 
+
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 3: 0
+
+  public static int fibonacci(int);
+    flags: ACC_PUBLIC, ACC_STATIC
+
+    Code:
+      stack=3, locals=1, args_size=1
+         0: iload_0       
+         1: iconst_2      
+         2: if_icmpge     9
+         5: iconst_1      
+         6: goto          22
+         9: iload_0
+        10: iconst_1      
+        11: isub          
+        12: invokestatic  #2                  // Method fibonacci:(I)I
+        15: iload_0       
+        16: iconst_2      
+        17: isub          
+        18: invokestatic  #2                  // Method fibonacci:(I)I
+        21: iadd          
+        22: ireturn       
+      LineNumberTable:
+        line 5: 0
+      StackMapTable: number_of_entries = 2
+           frame_type = 9 /* same */
+           frame_type = 76 /* same_locals_1_stack_item */
+          stack = [ int ]
+
+}
