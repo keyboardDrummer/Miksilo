@@ -33,15 +33,18 @@ object JavaBaseParse extends GrammarTransformation {
 
     lazy val parseParameter = parseType ~ identifier ^^
       {case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String],_type)}
-    lazy val parseParameters = "(" ~ parseParameter.someSeparated(",") ~ ")"
+    lazy val parseParameters = "(" ~> parseParameter.someSeparated(",") <~ ")"
     lazy val parseStatic = "static" ^^ (_ => true) | produce(false)
     lazy val visibilityModifier =
       "public" ^^ (_ => PublicVisibility) |
       "protected" ^^ (_ => ProtectedVisibility) |
       "private" ^^ (_ => PrivateVisibility) |
       produce(DefaultVisibility)
-    lazy val classMethod : Grammar = visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
-      parseParameters ~ block
+    lazy val classMethod : Grammar = (visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
+      parseParameters ~ block ^^ { case visibility seqr static seqr returnType seqr name seqr parameters seqr body =>
+        JavaMethodModel.method(name.asInstanceOf[String],returnType,parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
+          static.asInstanceOf[Boolean], visibility.asInstanceOf[JavaMethodModel.Visibility])
+    }).named(MethodGrammar)
 
     lazy val classMember: Grammar = classMethod
     // lazy val _import = "import" ~> identifier.someSeparated(".") <~ ";"
@@ -71,5 +74,6 @@ object JavaBaseParse extends GrammarTransformation {
     expression.named(ExpressionGrammar)
   }
 
+  object MethodGrammar
   object ExpressionGrammar
 }
