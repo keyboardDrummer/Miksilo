@@ -50,4 +50,5 @@ pip-log.txt
 ## IntelliJ
 #############
 
+.idea/workspace.xml
 out/

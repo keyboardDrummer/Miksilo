@@ -13,20 +13,19 @@ import transformations.javac.base.model.JavaImport
 class TestJavaBaseGrammar {
 
   @Test
-  def testBasicClass {
+  def testBasicClass() {
     val input = "package bla; class Help {}"
-    val parser = TransformationManager.buildParser(Seq(JavaBaseParse))
+    val parser = new TransformationManager().buildParser(Seq(JavaBaseParse))
     val result = parser(input).get
     val expectation = JavaClassModel.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
 
-
   @Test
-  def testExpression {
+  def testExpression() {
 
     val input = "System.out.print(fibonacci(5))"
-    val parser = TransformationManager.buildParser(Seq(JavaBaseParse))
+    val parser = new TransformationManager().buildParser(Seq(JavaBaseParse))
     val parseResult = parser(input)
     if (parseResult.isEmpty)
       Assert.fail(parseResult.toString)
@@ -38,11 +37,11 @@ class TestJavaBaseGrammar {
   }
 
   @Test
-  def testFibonacci {
+  def testFibonacci() {
     val inputFile = Path("src") / "transformations" / "javac" / "testing" / "fibonacciWithMain" / "Fibonacci.java"
 
     val input = File(inputFile).slurp()
-    val parser = TransformationManager.buildParser(Seq(JavaBaseParse))
+    val parser = new TransformationManager().buildParser(Seq(JavaBaseParse))
     val parseResult = parser(input)
     if (parseResult.isEmpty)
       Assert.fail(parseResult.toString)
@@ -99,9 +98,8 @@ class TestJavaBaseGrammar {
 
   @Test
   def testGrammar() {
-
     val input = "String[]"
-    val parser = TransformationManager.buildParser(Seq(TestGrammar))
+    val parser = new TransformationManager().buildParser(Seq(TestGrammar))
     val result = parser(input).get
     Assert.assertEquals(JavaTypes.arrayType(JavaTypes.StringType), result)
   }
