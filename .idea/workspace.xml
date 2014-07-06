@@ -2,38 +2,138 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="89a959f4-8a64-46a4-9f49-61afea01692f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_typesafe_akka_akka_actor_2_10_2_1_3.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_typesafe_config_1_0_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__jgraph_jgraph_5_13_0_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jgrapht_jgrapht_jdk1_5_0_7_3.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_scala_lang_scala_library_2_10_4.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_scala_lang_scala_reflect_2_10_4.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_scala_lang_scala_swing_2_10_4.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_scalatest_scalatest_2_10_2_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_tinyjee_jgraphx_jgraphx_2_3_0_5.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/RemyW.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/Remy_Willems.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/highlighting.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/sbt.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scala_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grammar/Grammar.scala" afterPath="$PROJECT_DIR$/src/grammar/Grammar.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/languages/javac/base/JavaBaseParse.scala" afterPath="$PROJECT_DIR$/src/languages/javac/base/JavaBaseParse.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grammar/StringGrammars.scala" afterPath="$PROJECT_DIR$/src/grammar/StringGrammars.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grammar/TestJavaBaseGrammar.scala" afterPath="$PROJECT_DIR$/src/grammar/TestJavaBaseGrammar.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/grammar/ToPackrat.scala" afterPath="$PROJECT_DIR$/src/grammar/ToPackrat.scala" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\TestJavaBaseGrammar.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestByteCodeGoTo.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestPrintByteCodeFibonacciWithMain.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\TestPrintByteCodeWhile.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\WhileByteCode.txt" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\Whilee.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\testing\Whilee.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\BooleanOperations.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\BooleanOperations.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\CallWithSubClass.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\CallWithSubClass.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\ConstructorsTest.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\ConstructorsTest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyClass.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyMethod.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\EmptyMethod.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\Fibonacci.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\OnlyFibonacci.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\TestUtils.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\Whilee.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\EmptyMain.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\EmptyMain.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithEmptyMain\TestEmptyMain.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\ClassWithJump.class" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\ClassWithJump.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\TestClassWithJump.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\classWithJump\bytecode.txt" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\EmptyClass.by.txt" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\EmptyClass.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass\TestEmptyClassCompilation.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\Fibonacci.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\TestFibonacciWithMainCompilation.scala" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain\fibonacci.bc.txt" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\OnlyFibonacci.bc.txt" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\OnlyFibonacci.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain\TestFibonacciCompilation.scala" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" afterPath="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\application\Program.scala" afterPath="$PROJECT_DIR$/src/main/application/Program.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\application\myGraph.scala" afterPath="$PROJECT_DIR$/src/main/application/myGraph.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Arithmatic.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Arithmatic.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CMachine.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CProgram.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CProgram.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\CTests.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/CTests.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Call.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Call.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Continue.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Continue.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Expression.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Expression.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\ForLoop.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/ForLoop.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Function.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Function.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Goto.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Goto.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Literal.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Literal.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Memory.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Memory.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Statement.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Statement.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\Type.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/Type.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\VariableDeclaration.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/VariableDeclaration.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\While.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/While.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\cLanguage\printf.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/cLanguage/printf.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\Grammar.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/Grammar.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\GrammarExtensions.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/GrammarExtensions.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\StringGrammars.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/StringGrammars.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\grammar\ToPackrat.scala" afterPath="$PROJECT_DIR$/src/main/core/grammar/ToPackrat.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\graphing\TransformationGraph.scala" afterPath="$PROJECT_DIR$/src/main/application/graphing/TransformationGraph.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\graphing\TransformationVertex.scala" afterPath="$PROJECT_DIR$/src/main/application/graphing/TransformationVertex.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\ClassFile.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/ClassFile.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\ConstantPoolInfo.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/ConstantPoolInfo.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\CreatingNewObject.class" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/CreatingNewObject.class" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\CreatingNewObject.java" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/CreatingNewObject.java" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\FieldType.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/FieldType.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\Instruction.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/Instruction.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\JavaBytecodeMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/JavaBytecodeMachine.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaBytecode\MethodDescriptor.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaBytecode/MethodDescriptor.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\FibonacciExample.java" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/FibonacciExample.java" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaClass.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaClass.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaExamples.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaExamples.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaExpression.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaExpression.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaMethod.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaMethod.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaStatement.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaStatement.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\javaInterpreter\JavaType.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaType.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\ByteCode.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/ByteCode.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InferredMaxStack.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InferredMaxStack.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InferredStackFrames.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InferredStackFrames.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\InstructionFlowAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/InstructionFlowAnalysis.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\Instructions.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/Instructions.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\LabelledJumps.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/LabelledJumps.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\PrintByteCode.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/PrintByteCode.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\StackAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/StackAnalysis.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\bytecode\StackSizeAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/transformations/bytecode/StackSizeAnalysis.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\AdditionC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/AdditionC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ConstructorC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ConstructorC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\DefaultConstructor.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/DefaultConstructor.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitJavaLangImport.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitJavaLangImport.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitObjectSuperClass.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitObjectSuperClass.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitReturnAtEndOfMethod.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitReturnAtEndOfMethod.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitSuperConstructorCall.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitSuperConstructorCall.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\ImplicitThisInPrivateCalls.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/ImplicitThisInPrivateCalls.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\JavaCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/JavaCompiler.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\JavaLang.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/JavaLang.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\LessThanC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/LessThanC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\LiteralC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/LiteralC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\StringLiteralC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/StringLiteralC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\SubtractionC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/SubtractionC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\TernaryC.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/TernaryC.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\ClassCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/ClassCompiler.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\Compiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/Compiler.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\ConstantPool.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/ConstantPool.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\JavaBase.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/JavaBase.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\JavaBaseParse.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/JavaBaseParse.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\MethodCompiler.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/MethodCompiler.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaBaseModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaBaseModel.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaClassModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaClassModel.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaImport.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaImport.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaMethodModel.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaMethodModel.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\JavaTypes.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaTypes.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\base\model\QualifiedClassName.scala" afterPath="$PROJECT_DIR$/src/main/transformations/javac/base/model/QualifiedClassName.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddBlock.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddBlock.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddDoWhile.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddDoWhile.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddForLoop.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddForLoop.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddIfElse.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddIfElse.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddStatementToSSM.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddStatementToSSM.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\AddWhile.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/AddWhile.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\languages\ssm\SSM.scala" afterPath="$PROJECT_DIR$/src/main/transformations/ssm/SSM.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\ssm\SSMMachine.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/ssm/SSMMachine.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\ssm\SSMProgram.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/ssm/SSMProgram.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\Compiler.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/Compiler.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\MetaObject.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/MetaObject.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\ProgramTransformation.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/ProgramTransformation.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\TransformationManager.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/TransformationManager.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\transformation\TransformationState.scala" afterPath="$PROJECT_DIR$/src/main/core/transformation/TransformationState.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\DataFlowAnalysis.scala" afterPath="$PROJECT_DIR$/src/main/util/DataFlowAnalysis.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\StackedMap.scala" afterPath="$PROJECT_DIR$/src/main/util/StackedMap.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\TestConsole.scala" afterPath="$PROJECT_DIR$/src/main/util/TestConsole.scala" />
+      <change type="MOVED" beforePath="D:\Dropbox\Projects\Code\modularCompiler\src\util\TypedToMetaProgramConverter.scala" afterPath="$PROJECT_DIR$/src/main/typed/languages/TypedToMetaProgramConverter.scala" />
     </list>
     <ignored path="modularCompiler.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -282,101 +382,103 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="modules.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/modules.xml">
+      <file leaf-file-name="TestJavaBaseGrammar.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/core/grammar/TestJavaBaseGrammar.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
-              <caret line="4" column="71" selection-start-line="4" selection-start-column="71" selection-end-line="4" selection-end-column="71" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="1853">
+              <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
+      <file leaf-file-name="Whilee.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/Whilee.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
-              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
+              <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Maven__org_jgrapht_jgrapht_jdk1_5_0_7_3.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/libraries/Maven__org_jgrapht_jgrapht_jdk1_5_0_7_3.xml">
+      <file leaf-file-name="WhileByteCode.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/WhileByteCode.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="306">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1156">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="highlighting.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/highlighting.xml">
+      <file leaf-file-name="TestFibonacciCompilation.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/fibonacciWithoutMain/TestFibonacciCompilation.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="238">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2397">
+              <caret line="28" column="47" selection-start-line="28" selection-start-column="47" selection-end-line="28" selection-end-column="47" />
+              <folding>
+                <element signature="e#52#83#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestByteCodeGoTo.scala" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestByteCodeGoTo.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.36811024" vertical-offset="0" max-vertical-offset="1037">
+              <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="encodings.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/encodings.xml">
+      <file leaf-file-name="TestPrintByteCodeFibonacciWithMain.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestPrintByteCodeFibonacciWithMain.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2108">
+              <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="modularCompiler.iml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/modularCompiler.iml">
+      <file leaf-file-name="ConstructorsTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/ConstructorsTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612">
-              <caret line="27" column="14" selection-start-line="27" selection-start-column="14" selection-end-line="27" selection-end-column="14" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="modularcompiler.iml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/modules/modularcompiler.iml">
+      <file leaf-file-name="EmptyMethod.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/EmptyMethod.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="663">
-              <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="221">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".name" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.idea/.name">
+      <file leaf-file-name="CallWithSubClass.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/CallWithSubClass.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1016">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
+              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="compiler.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/compiler.xml">
+      <file leaf-file-name="BooleanOperations.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/BooleanOperations.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="595">
-              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="uiDesigner.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/uiDesigner.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2227">
-              <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -400,13 +502,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/languages/javac/LiteralC.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/StackAnalysis.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/ByteCodeGoTo.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/LabelledJumps.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/NoStackFrame.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/InferredStackFrames.scala" />
-        <option value="$PROJECT_DIR$/src/languages/bytecode/NoMaxStack.scala" />
         <option value="$PROJECT_DIR$/src/languages/bytecode/InferredMaxStack.scala" />
         <option value="$PROJECT_DIR$/src/languages/bytecode/testing/TestPrintByteCodeFibonacciWithMain.scala" />
         <option value="$PROJECT_DIR$/src/languages/javac/testing/TestUtils.scala" />
@@ -451,6 +546,13 @@
         <option value="$PROJECT_DIR$/src/grammar/TestJavaBaseGrammar.scala" />
         <option value="$PROJECT_DIR$/.idea/modules.xml" />
         <option value="$PROJECT_DIR$/.idea/modules/modularcompiler.iml" />
+        <option value="$PROJECT_DIR$/src/application/graphing/TransformationGraph.scala" />
+        <option value="$PROJECT_DIR$/src/typed/languages/javaInterpreter/JavaMethod.scala" />
+        <option value="$PROJECT_DIR$/src/typed/languages/ssm/SSMProgram.scala" />
+        <option value="$PROJECT_DIR$/src/typed/languages/TypedToMetaProgramConverter.scala" />
+        <option value="$PROJECT_DIR$/src/typed/languages/cLanguage/Continue.scala" />
+        <option value="$PROJECT_DIR$/test/transformations/javac/TestUtils.scala" />
+        <option value="$PROJECT_DIR$/test/transformations/javac/fibonacciWithoutMain/TestFibonacciCompilation.scala" />
       </list>
     </option>
   </component>
@@ -550,7 +652,7 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value=".idea" />
+              <option name="myItemId" value="utilities" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -564,11 +666,73 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value=".idea" />
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="modules" />
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="transformations" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="transformations" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bytecode" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modularCompiler" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -611,24 +775,26 @@
       <recent name="D:\Dropbox\Projects\Code\modularCompiler\.idea\libraries" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="core.grammar" />
+      <recent name="transformations.javac" />
       <recent name="languages.java" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Dropbox\Projects\Code\modularCompiler\src" />
+      <recent name="D:\Dropbox\Projects\Code\modularCompiler\test\transformations\bytecode" />
+      <recent name="D:\Dropbox\Projects\Code\modularCompiler\src\main" />
       <recent name="D:\Dropbox\Projects\Code\modularCompiler\modularCompilerSbt\project\src" />
       <recent name="D:\Dropbox\Projects\Code\modularCompiler\modularCompilerSbt\project" />
-      <recent name="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\emptyClass" />
-      <recent name="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithoutMain" />
-      <recent name="D:\Dropbox\Projects\Code\modularCompiler\src\languages\javac\testing\fibonacciWithMain" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.TestJavaBaseGrammar.testExpression">
+  <component name="RunManager" selected="JUnit.All in modularcompiler">
     <configuration default="false" name="TestJavaBaseGrammar.testFibonacci" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="modularcompiler" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="grammar" />
-      <option name="MAIN_CLASS_NAME" value="grammar.TestJavaBaseGrammar" />
+      <option name="PACKAGE_NAME" value="core.grammar" />
+      <option name="MAIN_CLASS_NAME" value="core.grammar.TestJavaBaseGrammar" />
       <option name="METHOD_NAME" value="testFibonacci" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -650,8 +816,8 @@
       <module name="modularcompiler" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="grammar" />
-      <option name="MAIN_CLASS_NAME" value="grammar.TestJavaBaseGrammar" />
+      <option name="PACKAGE_NAME" value="core.grammar" />
+      <option name="MAIN_CLASS_NAME" value="core.grammar.TestJavaBaseGrammar" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -679,8 +845,8 @@
       <module name="modularcompiler" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="grammar" />
-      <option name="MAIN_CLASS_NAME" value="grammar.TestJavaBaseGrammar" />
+      <option name="PACKAGE_NAME" value="core.grammar" />
+      <option name="MAIN_CLASS_NAME" value="core.grammar.TestJavaBaseGrammar" />
       <option name="METHOD_NAME" value="testPackrat" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -708,8 +874,8 @@
       <module name="modularcompiler" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="grammar" />
-      <option name="MAIN_CLASS_NAME" value="grammar.TestJavaBaseGrammar" />
+      <option name="PACKAGE_NAME" value="core.grammar" />
+      <option name="MAIN_CLASS_NAME" value="core.grammar.TestJavaBaseGrammar" />
       <option name="METHOD_NAME" value="testGrammar" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -729,6 +895,29 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="All in modularcompiler" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="modularcompiler" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -919,8 +1108,8 @@
       <module name="modularcompiler" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="grammar" />
-      <option name="MAIN_CLASS_NAME" value="grammar.TestJavaBaseGrammar" />
+      <option name="PACKAGE_NAME" value="core.grammar" />
+      <option name="MAIN_CLASS_NAME" value="core.grammar.TestJavaBaseGrammar" />
       <option name="METHOD_NAME" value="testExpression" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -943,19 +1132,21 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="5">
+    <list size="6">
       <item index="0" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testExpression" />
       <item index="1" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testFibonacci" />
       <item index="2" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar" />
       <item index="3" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testPackrat" />
       <item index="4" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testGrammar" />
+      <item index="5" class="java.lang.String" itemvalue="JUnit.All in modularcompiler" />
     </list>
     <recent_temporary>
-      <list size="4">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testFibonacci" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testGrammar" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testPackrat" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar" />
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="JUnit.All in modularcompiler" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testFibonacci" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testGrammar" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar.testPackrat" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.TestJavaBaseGrammar" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -1119,7 +1310,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32825485" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1138,7 +1329,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2921875" sideWeight="0.6712463" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2755389" sideWeight="0.7516046" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="91" y="91" width="1418" height="670" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1278,185 +1469,39 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0/src.zip!/java/nio/ByteBuffer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="15970" max-vertical-offset="34765">
-          <caret line="991" column="24" selection-start-line="991" selection-start-column="24" selection-end-line="991" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1026">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3043">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar!/scala/Some.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.68" vertical-offset="0" max-vertical-offset="187">
-          <caret line="1" column="17" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/Program.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1207">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/bytecode/PrintByteCode.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1530" max-vertical-offset="4896">
-          <caret line="17" column="3" selection-start-line="17" selection-start-column="3" selection-end-line="17" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/ssm/AddWhile.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="986">
-          <caret line="10" column="47" selection-start-line="10" selection-start-column="47" selection-end-line="10" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/ssm/AddForLoop.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="721" max-vertical-offset="1224">
-          <caret line="62" column="4" selection-start-line="62" selection-start-column="4" selection-end-line="62" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/ClassCompiler.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1401" max-vertical-offset="1904">
-          <caret line="14" column="50" selection-start-line="14" selection-start-column="50" selection-end-line="14" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar!/scala/util/parsing/combinator/Parsers.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.2" vertical-offset="687" max-vertical-offset="2159">
-          <caret line="51" column="23" selection-start-line="51" selection-start-column="23" selection-end-line="51" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/grammar/GrammarExtensions.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="204">
-          <caret line="6" column="1" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/ssm/AddIfElse.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="276" max-vertical-offset="1292">
-          <caret line="58" column="34" selection-start-line="58" selection-start-column="34" selection-end-line="58" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4-sources.jar!/scala/collection/mutable/MapLike.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2829" max-vertical-offset="4165">
-          <caret line="185" column="6" selection-start-line="185" selection-start-column="6" selection-end-line="185" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/transformation/TransformationManager.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="258" max-vertical-offset="901">
-          <caret line="33" column="54" selection-start-line="33" selection-start-column="54" selection-end-line="33" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4-sources.jar!/scala/util/parsing/combinator/syntactical/StandardTokenParsers.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
-          <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/testing/fibonacciWithMain/Fibonacci.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="204">
-          <caret line="5" column="38" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4-sources.jar!/scala/package.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="525" max-vertical-offset="2346">
-          <caret line="51" column="6" selection-start-line="51" selection-start-column="6" selection-end-line="51" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/model/JavaTypes.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="157" max-vertical-offset="697">
-          <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/model/JavaMethodModel.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1258">
-          <caret line="5" column="7" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/model/JavaClassModel.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="527">
-          <caret line="6" column="7" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/ConstantPool.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/base/ConstantPool.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
           <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/testing/fibonacciWithoutMain/TestFibonacciCompilation.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1602" max-vertical-offset="2142">
-          <caret line="126" column="6" selection-start-line="126" selection-start-column="6" selection-end-line="126" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/model/JavaBaseModel.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/base/model/JavaBaseModel.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="123" max-vertical-offset="918">
           <caret line="38" column="23" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="23" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/LiteralC.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/LiteralC.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="544">
           <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/languages/javac/base/JavaBaseParse.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/transformations/javac/base/JavaBaseParse.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="774" max-vertical-offset="1360">
           <caret line="66" column="90" selection-start-line="66" selection-start-column="90" selection-end-line="66" selection-end-column="90" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/grammar/Grammar.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/core/grammar/Grammar.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1785">
           <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1483,7 +1528,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/grammar/StringGrammars.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/core/grammar/StringGrammars.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="238">
           <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
@@ -1499,7 +1544,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/grammar/ToPackrat.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/core/grammar/ToPackrat.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="663">
           <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
@@ -1523,7 +1568,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/javaInterpreter/FibonacciExample.java">
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/FibonacciExample.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.06544755" vertical-offset="0" max-vertical-offset="1039">
           <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
@@ -1531,21 +1576,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cLanguage/CTests.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/cLanguage/CTests.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1326">
           <caret line="12" column="68" selection-start-line="12" selection-start-column="68" selection-end-line="12" selection-end-column="68" />
           <folding>
-            <element signature="e#19#50#0" expanded="true" />
+            <element signature="e#35#66#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/grammar/TestJavaBaseGrammar.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1853">
-          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1657,6 +1694,184 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1016">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/application/graphing/TransformationGraph.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="459">
+          <caret line="7" column="7" selection-start-line="7" selection-start-column="7" selection-end-line="7" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaExamples.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="374">
+          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/javaInterpreter/JavaMethod.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="221">
+          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/ssm/SSMMachine.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="646">
+          <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/ssm/SSMProgram.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1632">
+          <caret line="5" column="15" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/util/DataFlowAnalysis.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="680">
+          <caret line="4" column="15" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/util/StackedMap.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="459">
+          <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/TypedToMetaProgramConverter.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="697">
+          <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/util/TestConsole.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="187">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/typed/languages/cLanguage/Continue.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="238">
+          <caret line="7" column="21" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/TestUtils.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1020">
+          <caret line="8" column="7" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/ConstructorsTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/EmptyMethod.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="221">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/CallWithSubClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/BooleanOperations.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/core/grammar/TestJavaBaseGrammar.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1853">
+          <caret line="24" column="7" selection-start-line="24" selection-start-column="7" selection-end-line="24" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/Whilee.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestPrintByteCodeFibonacciWithMain.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2108">
+          <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/WhileByteCode.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1156">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities/jd-gui.cfg">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1016">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/javac/fibonacciWithoutMain/TestFibonacciCompilation.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2397">
+          <caret line="28" column="47" selection-start-line="28" selection-start-column="47" selection-end-line="28" selection-end-column="47" />
+          <folding>
+            <element signature="e#52#83#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/transformations/bytecode/TestByteCodeGoTo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.36811024" vertical-offset="0" max-vertical-offset="1037">
+          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
           <folding />
         </state>
       </provider>
