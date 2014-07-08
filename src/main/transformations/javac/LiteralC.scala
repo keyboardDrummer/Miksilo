@@ -1,9 +1,9 @@
 package transformations.javac
 
-import core.grammar.{Grammar, Labelled}
+import core.grammar.Grammar
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode
-import transformations.javac.base.{JavaBase, JavaBaseParse}
+import transformations.javac.base.JavaBase
 
 object LiteralC extends GrammarTransformation {
   def literal(value: AnyVal) = {
@@ -28,9 +28,9 @@ object LiteralC extends GrammarTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
 
   override def transformGrammar(grammar: Grammar): Grammar = {
-    lazy val pNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
-    expressionGrammar.inner = expressionGrammar.inner | pNumber
+    val parseNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
+    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar)
+    expressionGrammar.inner = expressionGrammar.inner | parseNumber
     grammar
   }
 }

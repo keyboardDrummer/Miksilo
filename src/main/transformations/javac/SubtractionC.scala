@@ -1,9 +1,10 @@
 package transformations.javac
 
-import core.transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.{JavaBaseParse, JavaBase}
+import core.grammar.{Grammar, seqr}
+import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode
-import core.grammar.{seqr, Labelled, Grammar}
+import transformations.javac.base.JavaBase
+
 import scala.collection.mutable
 
 object SubtractionC extends GrammarTransformation {
@@ -30,16 +31,16 @@ object SubtractionC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
-
+  override def dependencies: Set[ProgramTransformation] = Set(JavaBase, AddAdditivePrecedence)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "-"
 
   override def transformGrammar(grammar: Grammar): Grammar = {
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
-    lazy val pSubtraction : Grammar = (expressionGrammar <~ "-") ~ expressionGrammar ^^
-      { case left seqr right => subtraction(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject]) }
-    expressionGrammar.inner = pSubtraction | expressionGrammar.inner
+    val additiveGrammar = grammar.findGrammar(AddAdditivePrecedence.AdditiveExpressionGrammar)
+    val parseSubtraction : Grammar = (additiveGrammar <~ "-") ~ additiveGrammar ^^ { case left seqr right => subtraction(left, right) }
+    additiveGrammar.inner = additiveGrammar.inner | parseSubtraction
     grammar
   }
+
+  def subtraction(first: Any, second: Any) : MetaObject  = subtraction(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 }

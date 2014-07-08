@@ -1,18 +1,18 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation, TransformationManager}
+import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
+import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaBase
-import transformations.javac.TernaryC
-import transformations.bytecode.{InferredStackFrames, InferredMaxStack, LabelledJumps}
 
 object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, TernaryC, LessThanC,
-      AdditionC, LiteralC, SubtractionC, JavaBase, InferredStackFrames, InferredMaxStack, LabelledJumps)
-  }}
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, TernaryC, LessThanC, AddRelationalPrecedence,
+      AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC, JavaBase, InferredStackFrames, InferredMaxStack, LabelledJumps)
+  }
+}
 
 object JavaMinus extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] =

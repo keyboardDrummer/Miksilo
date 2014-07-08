@@ -1,10 +1,11 @@
 package transformations.javac
 
-import core.transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
+import core.grammar.{Grammar, seqr}
+import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode
+import transformations.javac.base.JavaBase
+
 import scala.collection.mutable
-import core.grammar.{seqr, Labelled, Grammar}
 
 object AdditionC extends GrammarTransformation {
   val clazz: String = "Addition"
@@ -30,15 +31,16 @@ object AdditionC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(JavaBase, AddAdditivePrecedence)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "+"
 
   override def transformGrammar(grammar: Grammar): Grammar = {
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
-    lazy val pAddition : Grammar = (expressionGrammar <~ "+") ~ expressionGrammar ^^
-      { case left seqr right => addition(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject]) }
-    expressionGrammar.inner = pAddition | expressionGrammar.inner
+    val additiveGrammar = grammar.findGrammar(AddAdditivePrecedence.AdditiveExpressionGrammar)
+    val parseAddition : Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left seqr right => addition(left, right) }
+    additiveGrammar.inner = additiveGrammar.inner | parseAddition
     grammar
   }
+
+  private def addition(first: Any, second: Any) : MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 }

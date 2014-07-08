@@ -1,20 +1,22 @@
 package transformations.javac
 
-import core.transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.{JavaBaseParse, JavaBase}
-import transformations.bytecode.{InferredStackFrames, LabelledJumps, ByteCode}
-import core.grammar.{Labelled, Grammar, seqr}
+import core.grammar.{Grammar, seqr}
+import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import transformations.bytecode.{ByteCode, InferredStackFrames, LabelledJumps}
+import transformations.javac.base.JavaBase
+
 import scala.collection.mutable
 
 object LessThanC extends GrammarTransformation {
   object LessThanKey
   object LessThanFirst
   object LessThanSecond
+
   def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first,second))
   def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
   def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(JavaBase, AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaBase.getStatementToLines(state).put(LessThanKey,(subtraction : MetaObject, compiler) => {
@@ -32,14 +34,15 @@ object LessThanC extends GrammarTransformation {
     })
   }
 
-
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
 
   override def transformGrammar(grammar: Grammar): Grammar = {
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
-    lazy val pLessThan : Grammar = (expressionGrammar <~ "<") ~ expressionGrammar ^^
-      { case left seqr right => lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject]) }
-    expressionGrammar.inner = pLessThan | expressionGrammar.inner
+    val relationalGrammar = grammar.findGrammar(AddRelationalPrecedence.RelationalExpressionGrammar)
+    val parseLessThan : Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left seqr right => lessThan(left, right) }
+    relationalGrammar.inner = relationalGrammar.inner | parseLessThan
+
     grammar
   }
+
+  private def lessThan(left: Any, right: Any) : MetaObject  = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
 }

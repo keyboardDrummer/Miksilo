@@ -16,7 +16,7 @@ class TransformationManager extends ToPackrat {
       transformation.transformReserved(lexical.reserved)
       grammar = transformation.transformGrammar(grammar)
     }
-    val packratParser = convert(grammar)
+    val packratParser = phrase(convert(grammar))
     input => packratParser(new PackratReader(new lexical.Scanner(input)))
   }
 }

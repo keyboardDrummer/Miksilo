@@ -1,7 +1,7 @@
 package transformations.javac.base
 
-import core.grammar.{Grammar, Lazy, seqr}
-import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import core.grammar.{Labelled, Grammar, Lazy, seqr}
+import core.transformation.{GrammarTransformation, MetaObject}
 import transformations.javac.base.model.JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibility, PublicVisibility}
 import transformations.javac.base.model.JavaTypes.VoidType
 import transformations.javac.base.model._
@@ -60,17 +60,23 @@ trait JavaBaseParse extends GrammarTransformation {
   }
 
   def getExpressionGrammar: Grammar = {
-    lazy val call = expression ~ ("(" ~> expression.manySeparated(",") <~ ")") ^^
-      { case callee seqr arguments => JavaBaseModel.call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]]) }
-    lazy val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
+    val expression = new Labelled(ExpressionGrammar)
+    val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
+    val parseCall = expression ~ callArguments ^^ { case callee seqr arguments => call(callee, arguments) }
+    val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
 
-    lazy val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => JavaBaseModel.selector(left.asInstanceOf[MetaObject], right.asInstanceOf[String])}
+    val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => selector(left, right) }
 
-    lazy val pParens = "(" ~> expression <~ ")"
-    lazy val expression: Grammar = new Lazy(call | selection | variable | pParens).named(ExpressionGrammar)
+    val parseParenthesis = "(" ~> expression <~ ")"
+    expression.inner = new Labelled(ExpressionBaseGrammar, parseCall | selection | variable | parseParenthesis)
     expression
   }
 
+  def call(callee: Any, arguments: Any) = JavaBaseModel.call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
+
+  def selector(_object: Any, member: Any) : MetaObject = JavaBaseModel.selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
+
   object MethodGrammar
   object ExpressionGrammar
+  object ExpressionBaseGrammar
 }
