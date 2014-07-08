@@ -16,7 +16,7 @@ object LessThanC extends GrammarTransformation {
   def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
   def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase, AddRelationalPrecedence)
+  override def dependencies: Set[ProgramTransformation] = Set(AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaBase.getStatementToLines(state).put(LessThanKey,(subtraction : MetaObject, compiler) => {
