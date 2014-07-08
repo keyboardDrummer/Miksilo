@@ -12,8 +12,6 @@ class TestGrammarUtils {
 
     object SelectorTransformation extends GrammarTransformation {
       override def transformGrammar(grammar: Grammar): Grammar = selector(grammar)
-      override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = {}
-      override def transformReserved(reserved: mutable.HashSet[String]): Unit = {}
       override def transform(program: MetaObject, state: TransformationState): Unit = {}
       override def dependencies: Set[ProgramTransformation] = Set.empty
     }

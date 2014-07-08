@@ -1,11 +1,13 @@
 package transformations.javac
 
-import core.transformation.{ProgramTransformation, TransformationState, MetaObject}
-import transformations.javac.base.JavaBase
+import core.transformation.{GrammarTransformation, ProgramTransformation, TransformationState, MetaObject}
+import transformations.javac.base.{JavaBaseParse, JavaBase}
 import JavaBase._
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
+import core.grammar.{seqr, Labelled, Grammar}
+import scala.collection.mutable
 
-object TernaryC extends ProgramTransformation {
+object TernaryC extends GrammarTransformation {
 
   object FalseKey
   object TrueKey
@@ -25,7 +27,7 @@ object TernaryC extends ProgramTransformation {
     metaObject(ConditionKey).asInstanceOf[MetaObject]
   }
 
-  def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaBase.getStatementToLines(state).put(TernaryKey,(_ternary : MetaObject, compiler) => {
       val condition = TernaryC.getCondition(_ternary)
       val truePath = TernaryC.trueBranch(_ternary)
@@ -45,5 +47,16 @@ object TernaryC extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+
+
+  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?",":")
+
+  override def transformGrammar(grammar: Grammar): Grammar = {
+    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
+    lazy val pTernary : Grammar = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^
+      { case cond seqr truth seqr falsy => ternary(cond.asInstanceOf[MetaObject], truth.asInstanceOf[MetaObject], falsy.asInstanceOf[MetaObject]) }
+    expressionGrammar.inner = pTernary | expressionGrammar.inner
+    grammar
+  }
 }

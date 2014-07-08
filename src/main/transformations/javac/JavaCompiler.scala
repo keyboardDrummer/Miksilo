@@ -9,10 +9,10 @@ object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
-    Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC,
-      AdditionC, LiteralC, SubtractionC, TernaryC, JavaBase, InferredStackFrames, InferredMaxStack, LabelledJumps)
-  }
-}
+    Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, TernaryC, LessThanC,
+      AdditionC, LiteralC, SubtractionC, JavaBase, InferredStackFrames, InferredMaxStack, LabelledJumps)
+  }}
 
 object JavaMinus extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] =

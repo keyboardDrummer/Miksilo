@@ -2,18 +2,13 @@ package transformations.javac.base
 
 import core.grammar.{Grammar, Lazy, seqr}
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
-import transformations.javac.LiteralC
 import transformations.javac.base.model.JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibility, PublicVisibility}
 import transformations.javac.base.model.JavaTypes.VoidType
 import transformations.javac.base.model._
 
 import scala.collection.mutable
 
-object JavaBaseParse extends GrammarTransformation {
-
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
-
-  override def transform(program: MetaObject, state: TransformationState): Unit = {}
+trait JavaBaseParse extends GrammarTransformation {
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
   = delimiters ++= Seq("(",")", "{", "}", ";", ".","[","]","[]")
@@ -65,15 +60,15 @@ object JavaBaseParse extends GrammarTransformation {
   }
 
   def getExpressionGrammar: Grammar = {
-    lazy val pNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
     lazy val call = expression ~ ("(" ~> expression.manySeparated(",") <~ ")") ^^
       { case callee seqr arguments => JavaBaseModel.call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]]) }
     lazy val variable = identifier ^^ (name => JavaBaseModel.variable(name.asInstanceOf[String]))
 
     lazy val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => JavaBaseModel.selector(left.asInstanceOf[MetaObject], right.asInstanceOf[String])}
 
-    lazy val expression: Grammar = new Lazy(call | selection | variable | pNumber)
-    expression.named(ExpressionGrammar)
+    lazy val pParens = "(" ~> expression <~ ")"
+    lazy val expression: Grammar = new Lazy(call | selection | variable | pParens).named(ExpressionGrammar)
+    expression
   }
 
   object MethodGrammar

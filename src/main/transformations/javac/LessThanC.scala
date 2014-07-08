@@ -1,10 +1,12 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
+import core.transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
+import transformations.javac.base.{JavaBaseParse, JavaBase}
 import transformations.bytecode.{InferredStackFrames, LabelledJumps, ByteCode}
+import core.grammar.{Labelled, Grammar, seqr}
+import scala.collection.mutable
 
-object LessThanC extends ProgramTransformation {
+object LessThanC extends GrammarTransformation {
   object LessThanKey
   object LessThanFirst
   object LessThanSecond
@@ -28,5 +30,16 @@ object LessThanC extends ProgramTransformation {
           ByteCode.integerConstant(0),
           InferredStackFrames.label(endLabel))
     })
+  }
+
+
+  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
+
+  override def transformGrammar(grammar: Grammar): Grammar = {
+    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
+    lazy val pLessThan : Grammar = (expressionGrammar <~ "<") ~ expressionGrammar ^^
+      { case left seqr right => lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject]) }
+    expressionGrammar.inner = pLessThan | expressionGrammar.inner
+    grammar
   }
 }

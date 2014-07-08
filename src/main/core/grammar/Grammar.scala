@@ -103,5 +103,5 @@ class Choice(var left: Grammar, var right: Grammar) extends Grammar {
 class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any => Any) extends Grammar {
 }
 
-class Labelled(val name: AnyRef, val inner: Grammar) extends Grammar {
+class Labelled(val name: AnyRef, var inner: Grammar) extends Grammar {
 }

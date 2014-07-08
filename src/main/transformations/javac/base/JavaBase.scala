@@ -25,7 +25,7 @@ import core.grammar.{seqr, Grammar}
 import scala.util.parsing.combinator.Parsers
 
 
-object JavaBase extends ProgramTransformation {
+object JavaBase extends ProgramTransformation with JavaBaseParse {
 
 
   def getTypeSize(_type: Any): Int = _type match {
@@ -116,7 +116,7 @@ object JavaBase extends ProgramTransformation {
     method(ByteCode.MethodAccessFlags) = flags
   }
 
-  def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
@@ -201,7 +201,7 @@ object JavaBase extends ProgramTransformation {
     new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(InferredMaxStack, InferredStackFrames)
+  override def dependencies: Set[ProgramTransformation] = Set(InferredMaxStack, InferredStackFrames)
 
 
 }

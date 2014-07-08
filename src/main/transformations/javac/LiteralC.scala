@@ -1,10 +1,11 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
+import core.grammar.{Grammar, Labelled}
+import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode
+import transformations.javac.base.{JavaBase, JavaBaseParse}
 
-object LiteralC extends ProgramTransformation {
+object LiteralC extends GrammarTransformation {
   def literal(value: AnyVal) = {
     new MetaObject(LiteralKey) {
       data.put(ValueKey, value)
@@ -14,7 +15,7 @@ object LiteralC extends ProgramTransformation {
   def getValue(literal: MetaObject) = { literal(ValueKey) }
   object LiteralKey
   object ValueKey
-  def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaBase.getStatementToLines(state).put(LiteralKey,(literal : MetaObject, compiler) => {
       val value = getValue(literal)
       Seq(value match {
@@ -24,5 +25,12 @@ object LiteralC extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+
+  override def transformGrammar(grammar: Grammar): Grammar = {
+    lazy val pNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
+    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar).asInstanceOf[Labelled]
+    expressionGrammar.inner = expressionGrammar.inner | pNumber
+    grammar
+  }
 }
