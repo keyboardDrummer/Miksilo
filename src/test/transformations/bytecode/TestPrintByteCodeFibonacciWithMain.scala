@@ -25,9 +25,6 @@ class TestPrintByteCodeFibonacciWithMain {
     TestUtils.runByteCode(className, code, expectedResult)
   }
 
-
-
-
   def getByteCode : MetaObject = {
     val classAttributes = Seq(ByteCode.sourceFile(16,17))
     ByteCode.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode,getMainByteCode,getFibonacciMethod), attributes = classAttributes)

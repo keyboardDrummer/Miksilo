@@ -1,32 +1,17 @@
 package transformations.javac.base
 
-import core.transformation.{GrammarTransformation, TransformationState, MetaObject, ProgramTransformation}
-import scala.collection.mutable
-import transformations.javac.base.model._
-import JavaBaseModel._
-import scala.Some
-import transformations.javac.base.model.QualifiedClassName
-import JavaMethodModel._
-import transformations.bytecode.{InferredStackFrames, InferredMaxStack, LabelledJumps, ByteCode}
-import JavaTypes._
-import transformations.javac.base.MethodId
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode._
-import transformations.javac.base.MethodInfo
-import scala.Some
-import transformations.javac.base.MethodId
-import transformations.javac.base.ClassOrObjectReference
-import transformations.javac.base.MethodCompiler
-import transformations.javac.base.MethodInfo
-import scala.Some
-import transformations.javac.base.MethodId
-import transformations.javac.base.ClassOrObjectReference
-import transformations.javac.base.MethodCompiler
-import core.grammar.{seqr, Grammar}
-import scala.util.parsing.combinator.Parsers
+import transformations.bytecode.{ByteCode, InferredMaxStack, InferredStackFrames}
+import transformations.javac.base.model.JavaBaseModel._
+import transformations.javac.base.model.JavaMethodModel._
+import transformations.javac.base.model.JavaTypes._
+import transformations.javac.base.model._
+
+import scala.collection.mutable
 
 
 object JavaBase extends ProgramTransformation with JavaBaseParse {
-
 
   def getTypeSize(_type: Any): Int = _type match {
     case IntType => 1
@@ -79,14 +64,14 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
 
   def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)
-    val obj = JavaBaseModel.getSelectorObject(callCallee)
+    val objectExpression = JavaBaseModel.getSelectorObject(callCallee)
     val member = JavaBaseModel.getSelectorMember(callCallee)
-    val kind = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val methodKey: MethodId = new MethodId(kind.info.getQualifiedName, member)
     val methodInfo = compiler.classCompiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
-    val calleeInstructions = if (!staticCall) statementToInstructions(obj, compiler) else Seq[MetaObject]()
+    val calleeInstructions = if (!staticCall) statementToInstructions(objectExpression, compiler) else Seq[MetaObject]()
     val callArguments = getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
     val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
@@ -96,8 +81,7 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
-  def statementToInstructions(statement: MetaObject, instructionCompiler: MethodCompiler)
-    : Seq[MetaObject] = {
+  def statementToInstructions(statement: MetaObject, instructionCompiler: MethodCompiler) : Seq[MetaObject] = {
     val statementToSSMLines = getStatementToLines(instructionCompiler.transformationState)
     statementToSSMLines(statement.clazz)(statement, instructionCompiler)
   }
@@ -191,7 +175,6 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
         ByteCode.methodDescriptor(returnType
           , parameters.map(p => JavaMethodModel.getParameterType(p)))
       }
-
     }
   }
 

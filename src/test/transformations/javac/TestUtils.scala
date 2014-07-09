@@ -24,7 +24,6 @@ object TestUtils {
     Assert.assertEquals(expectedResult, Integer.parseInt(line))
   }
 
-
   def runByteCode(className: String, code: MetaObject) = {
     val bytes = PrintByteCode.getBytes(code).toArray
     val currentDir = new File(new java.io.File("."))

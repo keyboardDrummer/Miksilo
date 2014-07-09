@@ -28,7 +28,7 @@ class TestPrintByteCodeWhile {
       ByteCode.SourceFileId,
       "Whilee.java",
       ByteCode.nameAndType(4, 5),
-      new QualifiedClassName(Seq("transformations", "bytecode", "testing", "Whilee")),
+      new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
       new QualifiedClassName(Seq("java", "lang", "Object")))
     val constructor: MetaObject = getConstructor
     val _while: MetaObject = getWhile
