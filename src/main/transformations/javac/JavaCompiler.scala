@@ -3,6 +3,7 @@ package transformations.javac
 import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
 import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaBase
+import transformations.javac.expressions._
 
 object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)

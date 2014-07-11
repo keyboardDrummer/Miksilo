@@ -8,6 +8,7 @@ import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
+import transformations.javac.expressions._
 
 import scala.collection.mutable.ArrayBuffer
 

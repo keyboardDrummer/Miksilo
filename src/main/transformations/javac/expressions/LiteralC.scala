@@ -1,4 +1,4 @@
-package transformations.javac
+package transformations.javac.expressions
 
 import core.grammar.Grammar
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
@@ -12,15 +12,20 @@ object LiteralC extends GrammarTransformation {
     }
   }
 
-  def getValue(literal: MetaObject) = { literal(ValueKey) }
+  def getValue(literal: MetaObject) = {
+    literal(ValueKey)
+  }
+
   object LiteralKey
+
   object ValueKey
+
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(LiteralKey,(literal : MetaObject, compiler) => {
+    JavaBase.getStatementToLines(state).put(LiteralKey, (literal: MetaObject, compiler) => {
       val value = getValue(literal)
       Seq(value match {
-        case i:Integer => ByteCode.integerConstant(i)
-        case b:Boolean => ByteCode.integerConstant(if (b) 1 else 0)
+        case i: Integer => ByteCode.integerConstant(i)
+        case b: Boolean => ByteCode.integerConstant(if (b) 1 else 0)
       })
     })
   }

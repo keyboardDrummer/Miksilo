@@ -1,4 +1,4 @@
-package transformations.javac
+package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
@@ -24,7 +24,7 @@ object AdditionC extends GrammarTransformation {
   def getSecond(addition: MetaObject) = addition(secondKey).asInstanceOf[MetaObject]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(clazz,(addition : MetaObject, compiler) => {
+    JavaBase.getStatementToLines(state).put(clazz, (addition: MetaObject, compiler) => {
       val firstInstructions = JavaBase.statementToInstructions(getFirst(addition), compiler)
       val secondInstructions = JavaBase.statementToInstructions(getSecond(addition), compiler)
       firstInstructions ++ secondInstructions ++ Seq(ByteCode.addInteger)
@@ -37,10 +37,10 @@ object AdditionC extends GrammarTransformation {
 
   override def transformGrammar(grammar: Grammar): Grammar = {
     val additiveGrammar = grammar.findGrammar(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseAddition : Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left seqr right => addition(left, right) }
+    val parseAddition: Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left seqr right => addition(left, right)}
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
     grammar
   }
 
-  private def addition(first: Any, second: Any) : MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
+  private def addition(first: Any, second: Any): MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 }

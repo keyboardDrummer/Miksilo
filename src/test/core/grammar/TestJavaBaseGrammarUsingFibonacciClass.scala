@@ -4,7 +4,8 @@ import core.transformation._
 import org.junit.{Assert, Test}
 import transformations.javac._
 import transformations.javac.base._
-import transformations.javac.base.model.{JavaImport, _}
+import transformations.javac.base.model._
+import transformations.javac.expressions._
 
 import scala.reflect.io.{File, Path}
 

@@ -4,6 +4,7 @@ import core.grammar.{FailureG, Grammar, ToPackrat}
 import transformations.bytecode._
 import transformations.javac._
 import transformations.javac.base.JavaBase
+import transformations.javac.expressions._
 import transformations.ssm._
 
 class TransformationManager extends ToPackrat {

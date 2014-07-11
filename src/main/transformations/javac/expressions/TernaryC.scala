@@ -1,4 +1,4 @@
-package transformations.javac
+package transformations.javac.expressions
 
 import core.grammar.{Grammar, Labelled, seqr}
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
@@ -11,8 +11,11 @@ import scala.collection.mutable
 object TernaryC extends GrammarTransformation {
 
   object FalseKey
+
   object TrueKey
+
   object ConditionKey
+
   def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey) {
     data.put(FalseKey, falseBranch)
     data.put(TrueKey, trueBranch)
@@ -24,12 +27,13 @@ object TernaryC extends GrammarTransformation {
   def trueBranch(metaObject: MetaObject) = metaObject(TrueKey).asInstanceOf[MetaObject]
 
   object TernaryKey
+
   def getCondition(metaObject: MetaObject) = {
     metaObject(ConditionKey).asInstanceOf[MetaObject]
   }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(TernaryKey,(_ternary : MetaObject, compiler) => {
+    JavaBase.getStatementToLines(state).put(TernaryKey, (_ternary: MetaObject, compiler) => {
       val condition = TernaryC.getCondition(_ternary)
       val truePath = TernaryC.trueBranch(_ternary)
       val falsePath = TernaryC.falseBranch(_ternary)
@@ -50,13 +54,13 @@ object TernaryC extends GrammarTransformation {
 
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
 
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?",":")
+  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?", ":")
 
   object TernaryExpressionGrammar
+
   override def transformGrammar(grammar: Grammar): Grammar = {
     val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar)
-    val parseTernary : Grammar = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^
-      { case cond seqr onTrue seqr onFalse => ternary(cond.asInstanceOf[MetaObject], onTrue.asInstanceOf[MetaObject], onFalse.asInstanceOf[MetaObject]) }
+    val parseTernary: Grammar = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^ { case cond seqr onTrue seqr onFalse => ternary(cond.asInstanceOf[MetaObject], onTrue.asInstanceOf[MetaObject], onFalse.asInstanceOf[MetaObject])}
 
     val ternaryGrammar = new Labelled(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
 

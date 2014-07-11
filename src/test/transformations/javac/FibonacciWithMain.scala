@@ -7,7 +7,8 @@ import transformations.javac.base.model.JavaBaseModel._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
-import transformations.javac.base.model.{QualifiedClassName, _}
+import transformations.javac.base.model._
+import transformations.javac.expressions.LiteralC
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.io.Path

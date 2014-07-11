@@ -1,4 +1,4 @@
-package transformations.javac
+package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
 import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
@@ -8,18 +8,23 @@ import transformations.javac.base.JavaBase
 import scala.collection.mutable
 
 object LessThanC extends GrammarTransformation {
+
   object LessThanKey
+
   object LessThanFirst
+
   object LessThanSecond
 
-  def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first,second))
+  def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first, second))
+
   def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
+
   def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
   override def dependencies: Set[ProgramTransformation] = Set(AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(LessThanKey,(subtraction : MetaObject, compiler) => {
+    JavaBase.getStatementToLines(state).put(LessThanKey, (subtraction: MetaObject, compiler) => {
       val firstInstructions = JavaBase.statementToInstructions(getFirst(subtraction), compiler)
       val secondInstructions = JavaBase.statementToInstructions(getSecond(subtraction), compiler)
       val falseStartLabel = state.getUniqueLabel("falseStart")
@@ -38,11 +43,11 @@ object LessThanC extends GrammarTransformation {
 
   override def transformGrammar(grammar: Grammar): Grammar = {
     val relationalGrammar = grammar.findGrammar(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan : Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left seqr right => lessThan(left, right) }
+    val parseLessThan: Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left seqr right => lessThan(left, right)}
     relationalGrammar.inner = relationalGrammar.inner | parseLessThan
 
     grammar
   }
 
-  private def lessThan(left: Any, right: Any) : MetaObject  = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
+  private def lessThan(left: Any, right: Any): MetaObject = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
 }
