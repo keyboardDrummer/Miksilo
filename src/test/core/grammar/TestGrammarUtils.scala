@@ -1,8 +1,6 @@
 package core.grammar
 
-import scala.util.parsing.combinator.syntactical.StandardTokenParsers
 import core.transformation._
-import scala.collection.mutable
 
 class TestGrammarUtils {
 
@@ -12,7 +10,9 @@ class TestGrammarUtils {
 
     object SelectorTransformation extends GrammarTransformation {
       override def transformGrammar(grammar: Grammar): Grammar = selector(grammar)
+
       override def transform(program: MetaObject, state: TransformationState): Unit = {}
+
       override def dependencies: Set[ProgramTransformation] = Set.empty
     }
 

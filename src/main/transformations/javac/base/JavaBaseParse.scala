@@ -1,6 +1,6 @@
 package transformations.javac.base
 
-import core.grammar.{Labelled, Grammar, Lazy, seqr}
+import core.grammar.{Grammar, Labelled, Lazy, seqr}
 import core.transformation.{GrammarTransformation, MetaObject}
 import transformations.javac.base.model.JavaMethodModel.{DefaultVisibility, PrivateVisibility, ProtectedVisibility, PublicVisibility}
 import transformations.javac.base.model.JavaTypes.VoidType
@@ -23,7 +23,14 @@ trait JavaBaseParse extends GrammarTransformation {
     lazy val block: Grammar = "{" ~> (statement *) <~ "}"
     lazy val parseReturnType = "void" ^^ (_ => VoidType) | parseType
 
-    lazy val parseObjectType = identifier ^^ (s => JavaTypes.objectType(s.asInstanceOf[String]))
+    lazy val parseObjectType = identifier.someSeparated(".") ^^ { case ids: Seq[Any] => {
+      val stringIds = ids.collect({ case v: String => v})
+      if (ids.size > 1)
+        JavaTypes.objectType(new QualifiedClassName(stringIds))
+      else
+        JavaTypes.objectType(stringIds(0))
+    }
+    }
     lazy val parseIntType = "int" ^^ (_ => JavaTypes.IntType)
     lazy val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type) }
     lazy val parseType : Grammar = new Lazy(parseArrayType | parseObjectType | parseIntType)

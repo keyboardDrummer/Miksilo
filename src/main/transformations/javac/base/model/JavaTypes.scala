@@ -18,7 +18,7 @@ object JavaTypes {
    }
    def getObjectTypeName(objectType: MetaObject): Either[String,QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String,QualifiedClassName]]
 
-   val stringType = objectType("String")
+  val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
 
    object ObjectTypeName
    object ObjectType

@@ -1,13 +1,12 @@
-package transformations.bytecode.testing
+package transformations.bytecode
 
-import org.junit.{Assert, Test}
-import transformations.bytecode._
 import core.transformation.MetaObject
-import transformations.javac.{TestUtils, ConstructorC}
-import transformations.bytecode.LineNumberRef
+import org.junit.{Assert, Test}
+import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.{ConstructorC, TestUtils}
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
 class TestPrintByteCodeFibonacciWithMain {
 
@@ -18,6 +17,7 @@ class TestPrintByteCodeFibonacciWithMain {
   }
 
   val className = "Fibonacci"
+
   @Test
   def runCompiledFibonacci() {
     val code = getByteCode
@@ -25,12 +25,13 @@ class TestPrintByteCodeFibonacciWithMain {
     TestUtils.runByteCode(className, code, expectedResult)
   }
 
-  def getByteCode : MetaObject = {
-    val classAttributes = Seq(ByteCode.sourceFile(16,17))
-    ByteCode.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode,getMainByteCode,getFibonacciMethod), attributes = classAttributes)
+  def getByteCode: MetaObject = {
+    val classAttributes = Seq(ByteCode.sourceFile(16, 17))
+    ByteCode.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
   }
 
   val fibonacciMethodName = "fibonacci"
+
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
     val constantPool: mutable.Buffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethod
@@ -56,9 +57,9 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCode.addInteger,
       ByteCode.integerReturn
     )
-    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(8,0)))
+    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = ByteCode.stackMapTable(15, Seq(ByteCode.sameFrame(9),
-      ByteCode.sameFrameLocals1StackItem(12, JavaTypes.IntType)) )
+      ByteCode.sameFrameLocals1StackItem(12, JavaTypes.IntType)))
     val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
     method
@@ -66,9 +67,9 @@ class TestPrintByteCodeFibonacciWithMain {
 
   def getConstantPool: mutable.Buffer[Any] = {
     val constantPool = ArrayBuffer(ByteCode.methodRef(6, 18),
-      ByteCode.fieldRef(19,20),
+      ByteCode.fieldRef(19, 20),
       ByteCode.methodRef(5, 21),
-      ByteCode.methodRef(22,23),
+      ByteCode.methodRef(22, 23),
       ByteCode.classRef(24),
       ByteCode.classRef(25),
       ConstructorC.constructorName,
@@ -77,7 +78,7 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCode.LineNumberTableId,
       "main",
       ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(
-        JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java","lang","String")))))),
+        JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
       ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
       ByteCode.StackMapTableId,
@@ -86,37 +87,37 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCode.nameAndType(7, 8),
       ByteCode.classRef(26),
       ByteCode.nameAndType(27, 28),
-      ByteCode.nameAndType(13,14),
+      ByteCode.nameAndType(13, 14),
       ByteCode.classRef(29),
-      ByteCode.nameAndType(30,31),
+      ByteCode.nameAndType(30, 31),
       "Fibonacci",
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      JavaTypes.objectType(new QualifiedClassName(Seq("java","io","PrintStream"))),
+      JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       "java/io/PrintStream",
       "print",
-      ByteCode.methodDescriptor(JavaTypes.VoidType,Seq(JavaTypes.IntType))
-      )
+      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(JavaTypes.IntType))
+    )
     constantPool
   }
 
-  def getConstructorByteCode : MetaObject = {
+  def getConstructorByteCode: MetaObject = {
     val instructions = Seq(ByteCode.addressLoad(0),
       ByteCode.invokeSpecial(1), ByteCode.voidReturn)
-    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(1,0 )))
+    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
     val codeAttribute = Seq(ByteCode.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
-    ByteCode.methodInfo(7,8, codeAttribute, Set())
+    ByteCode.methodInfo(7, 8, codeAttribute, Set())
   }
 
-  def getMainByteCode : MetaObject = {
+  def getMainByteCode: MetaObject = {
     val instructions = Seq(ByteCode.getStatic(2),
       ByteCode.integerConstant(5),
       ByteCode.invokeStatic(3),
       ByteCode.invokeVirtual(4),
       ByteCode.voidReturn)
-    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(4,0 ), new LineNumberRef(5,10)))
-    ByteCode.methodInfo(11,12,Seq(ByteCode.codeAttribute(9,2,1,instructions,Seq(),Seq(lineNumberTable))),
-      Set(ByteCode.PublicAccess,ByteCode.StaticAccess))
+    val lineNumberTable = ByteCode.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
+    ByteCode.methodInfo(11, 12, Seq(ByteCode.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
+      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
   }
 }

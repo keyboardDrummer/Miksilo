@@ -40,7 +40,7 @@ class FibonacciWthoutMain {
   def getCompiledFibonacci: MetaObject = {
     val fibonacci = getJavaFibonacciWithoutMain
     val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.compile(fibonacci)
+    val compiledCode = compiler.transform(fibonacci)
     compiledCode
   }
 
@@ -55,6 +55,7 @@ class FibonacciWthoutMain {
   }
 
   val methodName = "fibonacci"
+
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
     val constantPool: ArrayBuffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
@@ -113,7 +114,7 @@ class FibonacciWthoutMain {
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
     val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
+    val byteCode = compiler.transform(fibonacci)
     PrintByteCode.print(byteCode)
   }
 

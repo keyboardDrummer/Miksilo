@@ -4,10 +4,9 @@ import core.transformation._
 import org.junit.{Assert, Test}
 import transformations.javac._
 import transformations.javac.base._
-import transformations.javac.base.model._
+import transformations.javac.base.model.{JavaImport, _}
 
 import scala.reflect.io.{File, Path}
-import transformations.javac.base.model.JavaImport
 
 class TestJavaBaseGrammarUsingFibonacciClass {
 
@@ -94,7 +93,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
 
   @Test
   def testFibonacciMainMethod() {
-    val input = "public static void main(String[] args) { System.out.print(fibonacci(5)); }"
+    val input = "public static void main(java.lang.String[] args) { System.out.print(fibonacci(5)); }"
     val result = getMethodGrammarResult(input)
 
     val expectation = getMainMethod

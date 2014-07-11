@@ -1,10 +1,11 @@
 package transformations.javac
 
 import core.transformation.{ComparisonOptions, MetaObject}
-import transformations.bytecode.{PrintByteCode, ByteCode}
 import org.junit.Assert
-import scala.reflect.io.{Path, File}
-import scala.sys.process.{ProcessLogger, Process}
+import transformations.bytecode.{ByteCode, PrintByteCode}
+
+import scala.reflect.io.{Directory, File, Path}
+import scala.sys.process.{Process, ProcessLogger}
 
 object TestUtils {
 
@@ -34,7 +35,22 @@ object TestUtils {
     writer.write(bytes)
     writer.close()
 
-    val processBuilder = Process.apply(s"java $className", testDirectory.jfile)
+    runJavaClass(className, testDirectory)
+  }
+
+  def compile(className: String, inputDirectory: Path): String = {
+    val relativeFilePath = inputDirectory / (className + ".java")
+    val currentDir = new File(new java.io.File("."))
+    val testOutput = Directory(currentDir / Path("testOutput"))
+    val testResources = currentDir / Path("testResources")
+    val input: File = File(testResources / relativeFilePath)
+    JavaCompiler.getCompiler.compile(input, testOutput)
+    val output = TestUtils.runJavaClass(className, testOutput)
+    output
+  }
+
+  def runJavaClass(className: String, directory: Path): String = {
+    val processBuilder = Process.apply(s"java $className", directory.jfile)
     var line: String = ""
     val logger = ProcessLogger(
       (o: String) => line += o,

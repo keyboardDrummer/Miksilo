@@ -1,14 +1,11 @@
 package transformations.javac
 
-import org.junit.{Assert, Test}
-import transformations.javac.{FibonacciWthoutMain, LiteralC}
-import transformations.bytecode._
-import core.transformation.{ProgramTransformation, TransformationManager, MetaObject}
-import transformations.javac.base.model._
-import JavaClassModel._
-import transformations.javac.base.model.QualifiedClassName
-import JavaMethodModel._
-import JavaTypes._
+import core.transformation.MetaObject
+import org.junit.Test
+import transformations.javac.base.model.JavaClassModel._
+import transformations.javac.base.model.JavaMethodModel._
+import transformations.javac.base.model.JavaTypes._
+import transformations.javac.base.model.{QualifiedClassName, _}
 
 class EmptyMain {
   val className = "EmptyMain"
@@ -25,7 +22,7 @@ class EmptyMain {
   def getByteCode: MetaObject = {
     val java = getJava
     val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(java)
+    val byteCode = compiler.transform(java)
     byteCode
   }
 

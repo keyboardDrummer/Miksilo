@@ -28,8 +28,7 @@ object PrintByteCode {
     val constantPool = ByteCode.getConstantPool(clazz)
     val constantPoolSizePlusOne = shortToBytes(constantPool.length + 1)
     result ++= constantPoolSizePlusOne
-    for (constantPoolEntry <- constantPool)
-    {
+    for (constantPoolEntry <- constantPool) {
       result ++= getConstantEntryByteCode(constantPoolEntry)
     }
     result ++= getAccessFlagsByteCode(clazz)
@@ -120,7 +119,7 @@ object PrintByteCode {
       })
   }
 
-  def prefixWithIntLength(_bytes: () => Seq[Byte]) : Seq[Byte] = {
+  def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
     hexToBytes("cafebabe")
     val counterBefore = debugCounter
     val bytes = _bytes()
@@ -130,16 +129,15 @@ object PrintByteCode {
   }
 
   def getSourceFileBytes(sourceFile: MetaObject) = {
-      shortToBytes(ByteCode.getSourceFileFileNameIndex(sourceFile))
+    shortToBytes(ByteCode.getSourceFileFileNameIndex(sourceFile))
   }
 
-  def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes(info match
-  {
+  def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes(info match {
     case JavaTypes.IntType => "01"
     case JavaTypes.LongType => "02"
   })
 
-  def getFrameByteCode(frame: MetaObject) : Seq[Byte] = {
+  def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
     val offset = ByteCode.getFrameOffset(frame)
     frame.clazz match {
       case ByteCode.SameFrameKey =>
@@ -156,14 +154,13 @@ object PrintByteCode {
         val code = 64 + offset
         if (code > 127)
           byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type)
-        else
-        {
+        else {
           byteToBytes(code) ++ getVerificationInfoBytes(_type)
         }
     }
   }
 
-  def getStackMapTableBytes(attribute: MetaObject) : Seq[Byte] = {
+  def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
     val entries = ByteCode.getStackMapTableEntries(attribute)
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
@@ -177,11 +174,11 @@ object PrintByteCode {
   def getCodeAttributeBytes(attribute: MetaObject): Seq[Byte] = {
     val exceptionTable = ByteCode.getCodeExceptionTable(attribute)
     shortToBytes(ByteCode.getCodeMaxStack(attribute)) ++
-        shortToBytes(ByteCode.getCodeMaxLocals(attribute)) ++
-        prefixWithIntLength(() => ByteCode.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
-        shortToBytes(exceptionTable.length) ++
-        exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-        getAttributesByteCode(ByteCode.getCodeAttributes(attribute))
+      shortToBytes(ByteCode.getCodeMaxLocals(attribute)) ++
+      prefixWithIntLength(() => ByteCode.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+      shortToBytes(exceptionTable.length) ++
+      exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
+      getAttributesByteCode(ByteCode.getCodeAttributes(attribute))
   }
 
   def getLineNumberTableEntryByteCode(entry: LineNumberRef) =
@@ -250,7 +247,7 @@ object PrintByteCode {
     }
   }
 
-  def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray().takeRight(hex.length/2))
+  def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2))
 
   def toUTF8ConstantEntry(utf8: String): Seq[Byte] = {
     val bytes = utf8.toString.getBytes("UTF-8")
@@ -274,6 +271,7 @@ object PrintByteCode {
   }
 
   var debugCounter: Int = 0
+
   def debugBytes(bytes: Seq[Byte]) = {
     val diff = bytes.length
     debugCounter = debugCounter + diff

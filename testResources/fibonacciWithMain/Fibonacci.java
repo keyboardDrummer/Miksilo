@@ -1,7 +1,7 @@
 package fibonacciWithMain;
 
 class Fibonacci {
-    public static void main(String[] args)
+    public static void main(java.lang.String[] args)
     {
         System.out.print(fibonacci(5));
     }

@@ -1,11 +1,10 @@
-package transformations.bytecode.testing
+package transformations.bytecode
 
-import org.junit.{Assert, Test}
-import transformations.bytecode._
 import core.transformation.MetaObject
-import transformations.bytecode.LineNumberRef
-import scala.collection.mutable.ArrayBuffer
+import org.junit.{Assert, Test}
 import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+
+import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeWhile {
 
@@ -20,7 +19,7 @@ class TestPrintByteCodeWhile {
       ByteCode.classRef(13),
       ByteCode.classRef(14),
       "<init>",
-      ByteCode.methodDescriptor(JavaTypes.VoidType,Seq()),
+      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
       ByteCode.CodeAttributeId,
       ByteCode.LineNumberTableId,
       "whilee",
@@ -33,7 +32,7 @@ class TestPrintByteCodeWhile {
     val constructor: MetaObject = getConstructor
     val _while: MetaObject = getWhile
     val methods = Seq(constructor, _while)
-    val classAttributes = Seq(ByteCode.sourceFile(10,11))
+    val classAttributes = Seq(ByteCode.sourceFile(10, 11))
     ByteCode.clazz(2, 3, constantPool, methods, attributes = classAttributes)
   }
 

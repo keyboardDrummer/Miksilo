@@ -1,16 +1,14 @@
 package core.transformation
 
-import transformations.ssm._
+import core.grammar.{FailureG, Grammar, ToPackrat}
 import transformations.bytecode._
-import transformations.javac.base.JavaBase
 import transformations.javac._
-import core.grammar.ToPackrat
-import core.grammar.Grammar
-import core.grammar.FailureG
+import transformations.javac.base.JavaBase
+import transformations.ssm._
 
 class TransformationManager extends ToPackrat {
   def buildParser(transformations: Seq[GrammarTransformation]): String => ParseResult[Any] = {
-    var grammar: Grammar = FailureG.named("program")
+    var grammar: Grammar = FailureG.named("program") //TODO clean this. Probably can do that with Grammar sets.
     for (transformation <- transformations) {
       transformation.transformDelimiters(lexical.delimiters)
       transformation.transformReserved(lexical.reserved)
@@ -36,12 +34,21 @@ object TransformationManager {
   }
 
   def buildCompiler(transformations: Seq[ProgramTransformation]): Compiler = {
+    val manager = new TransformationManager()
+    val parser = manager.buildParser(transformations.collect({ case t: GrammarTransformation => t}).reverse)
     new Compiler {
-      def compile(program: MetaObject) = {
+      def transform(program: MetaObject) = {
         val state = new TransformationState
         for (transformation <- transformations)
           transformation.transform(program, state)
         program
+      }
+
+      override def parse(input: String): MetaObject = {
+        val parseResult = parser(input)
+        if (!parseResult.successful)
+          throw new RuntimeException(parseResult.toString)
+        parseResult.get.asInstanceOf[MetaObject]
       }
     }
   }

@@ -1,29 +1,38 @@
 package transformations.javac
 
-import org.junit.{Assert, Test}
-import transformations.javac.{FibonacciWthoutMain, TestUtils}
-import transformations.bytecode._
 import core.transformation.MetaObject
-import transformations.javac.base.model._
-import JavaClassModel._
-import transformations.javac.base.model.QualifiedClassName
-import JavaMethodModel._
-import JavaTypes._
-import JavaBaseModel._
+import org.junit.{Assert, Test}
+import transformations.bytecode._
+import transformations.javac.base.model.JavaBaseModel._
+import transformations.javac.base.model.JavaClassModel._
+import transformations.javac.base.model.JavaMethodModel._
+import transformations.javac.base.model.JavaTypes._
+import transformations.javac.base.model.{QualifiedClassName, _}
+
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.io.Path
 
 class FibonacciWithMain {
-  val className = "Fibonacci"
   val defaultPackage = Seq()
+  val className = "Fibonacci"
   val other = new FibonacciWthoutMain()
+
+  val expectedOutput: Int = 8
+
+  @Test
+  def testFullPipeline() {
+    val inputDirectory = Path("fibonacciWithMain")
+    val output: String = TestUtils.compile(className, inputDirectory)
+    Assert.assertEquals(expectedOutput, Integer.parseInt(output))
+  }
 
   @Test
   def runCompiledFibonacci() {
     val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
+    val byteCode = compiler.transform(fibonacci)
 
-    val expectedResult = 8
+    val expectedResult = expectedOutput
     TestUtils.runByteCode(className, byteCode, expectedResult)
   }
 
@@ -38,7 +47,7 @@ class FibonacciWithMain {
   def testStackSizeLocalsArgs() {
     val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.compile(fibonacci)
+    val byteCode = compiler.transform(fibonacci)
     val methods = ByteCode.getMethods(byteCode)
     val constructor = methods(0)
     val main = methods(1)
@@ -53,13 +62,14 @@ class FibonacciWithMain {
   }
 
   def getMethodLocals(method: MetaObject) = ByteCode.getCodeMaxLocals(ByteCode.getMethodAttributes(method)(0))
+
   def getMethodMaxStack(method: MetaObject) = ByteCode.getCodeMaxStack(ByteCode.getMethodAttributes(method)(0))
 
   @Test
   def compileAndPrintFibonacciWithMain() {
     val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.compile(fibonacci)
+    val compiledCode = compiler.transform(fibonacci)
     PrintByteCode.print(compiledCode)
   }
 
@@ -71,7 +81,7 @@ class FibonacciWithMain {
   def compileAndValidateFibonacciWithMain() {
     val fibonacciJava = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.compile(fibonacciJava)
+    val compiledCode = compiler.transform(fibonacciJava)
     val expectedCode = getExpectedUnoptimizedFibonacciWithMainByteCode
     TestUtils.testInstructionEquivalence(expectedCode, compiledCode)
     TestUtils.compareConstantPools(expectedCode, compiledCode)
@@ -139,7 +149,7 @@ class FibonacciWithMain {
       methodName,
       ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
       ByteCode.StackMapTableId,
-      ByteCode.nameAndType(7, 8),
+      ByteCode.nameAndType(7, expectedOutput),
       ByteCode.classRef(26),
       ByteCode.nameAndType(27, 28),
       ByteCode.nameAndType(13, 14),
