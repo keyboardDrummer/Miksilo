@@ -1,15 +1,18 @@
 package core.grammar
 
+import core.transformation.TransformationManager.ProgramGrammar
 import core.transformation._
 
 class TestGrammarUtils {
 
   val manager: TransformationManager = new TransformationManager()
 
-  def buildParser(transformations: Seq[GrammarTransformation], selector: Grammar => Grammar): String => manager.ParseResult[Any] = {
+  def buildParser(transformations: Seq[GrammarTransformation], key: Any): String => manager.ParseResult[Any] = {
 
     object SelectorTransformation extends GrammarTransformation {
-      override def transformGrammar(grammar: Grammar): Grammar = selector(grammar)
+      override def transformGrammars(grammars: GrammarCatalogue) {
+        grammars.find(ProgramGrammar).inner = grammars.find(key).inner
+      }
 
       override def transform(program: MetaObject, state: TransformationState): Unit = {}
 

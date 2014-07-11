@@ -29,22 +29,20 @@ trait Grammar extends Parsers {
 
   def ~(other: Grammar) = new Sequence(this, other)
 
-  def ~>(right: Grammar) = new IgnoreLeft(this,right)
+  def ~>(right: Grammar) = new IgnoreLeft(this, right)
 
-  def <~(right: Grammar) = new IgnoreRight(this,right)
+  def <~(right: Grammar) = new IgnoreRight(this, right)
 
 
   def |(other: Grammar) = new Choice(this, other)
 
   def * = new Many(this)
 
-  def named(name: AnyRef) = new Labelled(name, this)
-
   def manySeparated(separator: Grammar): Grammar = someSeparated(separator) | new Produce(Seq.empty[Any])
 
   def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
 
-  def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this)*) ^^ {
+  def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this) *) ^^ {
     case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
@@ -60,12 +58,11 @@ trait Grammar extends Parsers {
         case labelled: Labelled =>
           if (labelled.name.equals(name))
             Set(labelled)
-        else findGrammar(labelled.inner)
+          else findGrammar(labelled.inner)
         case sequence: Sequence => findGrammar(sequence.first) ++ findGrammar(sequence.second)
         case choice: Choice => findGrammar(choice.left) ++ findGrammar(choice.right)
         case map: MapGrammar => findGrammar(map.inner)
         case many: Many => findGrammar(many.inner)
-        case lazyG: Lazy => findGrammar(lazyG.getInner)
         case _ => Set.empty
       }
     }
@@ -78,14 +75,12 @@ class Many(var inner: Grammar) extends Grammar {
 }
 
 class IgnoreLeft(first: Grammar, second: Grammar)
-  extends MapGrammar(new Sequence(first,second), {  case seqr(l, r) => r }, s => s)
-{
+  extends MapGrammar(new Sequence(first, second), { case seqr(l, r) => r}, s => s) {
   override def toString: String = s"$first ~> $second"
 }
 
 class IgnoreRight(first: Grammar, second: Grammar)
-  extends MapGrammar(new Sequence(first,second), {  case seqr(l, r) => l }, s => s)
-{
+  extends MapGrammar(new Sequence(first, second), { case seqr(l, r) => l}, s => s) {
   override def toString: String = s"$first <~ $second"
 }
 
@@ -105,11 +100,6 @@ class Keyword(var value: String) extends Grammar {
   override def toString: String = value
 }
 
-class Lazy(inner: => Grammar) extends Grammar {
-  def getInner = inner
-
-  override def toString: String = inner.toString
-}
 
 class Choice(var left: Grammar, var right: Grammar) extends Grammar {
   override def toString: String = s"$left | $right"

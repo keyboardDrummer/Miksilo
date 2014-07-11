@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
-import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation._
 import transformations.bytecode.{ByteCode, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaBase
 
@@ -41,12 +41,10 @@ object LessThanC extends GrammarTransformation {
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
 
-  override def transformGrammar(grammar: Grammar): Grammar = {
-    val relationalGrammar = grammar.findGrammar(AddRelationalPrecedence.RelationalExpressionGrammar)
+  override def transformGrammars(grammars: GrammarCatalogue) {
+    val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan: Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left seqr right => lessThan(left, right)}
     relationalGrammar.inner = relationalGrammar.inner | parseLessThan
-
-    grammar
   }
 
   private def lessThan(left: Any, right: Any): MetaObject = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])

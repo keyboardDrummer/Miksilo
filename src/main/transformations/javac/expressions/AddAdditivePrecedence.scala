@@ -1,7 +1,6 @@
 package transformations.javac.expressions
 
-import core.grammar.{Grammar, Labelled}
-import core.transformation.{GrammarTransformation, ProgramTransformation}
+import core.transformation.{GrammarCatalogue, GrammarTransformation, ProgramTransformation}
 import transformations.javac.base.JavaBase
 
 object AddAdditivePrecedence extends GrammarTransformation {
@@ -10,10 +9,10 @@ object AddAdditivePrecedence extends GrammarTransformation {
 
   object AdditiveExpressionGrammar
 
-  override def transformGrammar(grammar: Grammar): Grammar = {
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar)
-    val additiveGrammar = new Labelled(AdditiveExpressionGrammar, expressionGrammar.inner)
+
+  override def transformGrammars(grammars: GrammarCatalogue) = {
+    val expressionGrammar = grammars.find(AddExpression.ExpressionGrammar)
+    val additiveGrammar = grammars.create(AdditiveExpressionGrammar, expressionGrammar.inner)
     expressionGrammar.inner = additiveGrammar
-    grammar
   }
 }

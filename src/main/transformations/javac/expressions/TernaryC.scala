@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
-import core.grammar.{Grammar, Labelled, seqr}
-import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import core.grammar.{Grammar, seqr}
+import core.transformation._
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaBase
 import transformations.javac.base.JavaBase._
@@ -58,14 +58,10 @@ object TernaryC extends GrammarTransformation {
 
   object TernaryExpressionGrammar
 
-  override def transformGrammar(grammar: Grammar): Grammar = {
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar)
+  override def transformGrammars(grammars: GrammarCatalogue) {
+    val expressionGrammar = grammars.find(AddExpression.ExpressionGrammar)
     val parseTernary: Grammar = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^ { case cond seqr onTrue seqr onFalse => ternary(cond.asInstanceOf[MetaObject], onTrue.asInstanceOf[MetaObject], onFalse.asInstanceOf[MetaObject])}
-
-    val ternaryGrammar = new Labelled(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
-
+    val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar
-
-    grammar
   }
 }

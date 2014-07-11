@@ -1,7 +1,6 @@
 package transformations.javac.expressions
 
-import core.grammar.Grammar
-import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation._
 import transformations.bytecode.ByteCode
 import transformations.javac.base.JavaBase
 
@@ -32,10 +31,11 @@ object LiteralC extends GrammarTransformation {
 
   override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
 
-  override def transformGrammar(grammar: Grammar): Grammar = {
+
+  override def transformGrammars(grammars: GrammarCatalogue) = {
     val parseNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
-    val expressionGrammar = grammar.findGrammar(JavaBase.ExpressionGrammar)
+    val expressionGrammar = grammars.find(AddExpression.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
-    grammar
+    grammars
   }
 }

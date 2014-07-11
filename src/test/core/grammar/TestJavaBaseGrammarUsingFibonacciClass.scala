@@ -1,5 +1,6 @@
 package core.grammar
 
+import core.transformation.TransformationManager.ProgramGrammar
 import core.transformation._
 import org.junit.{Assert, Test}
 import transformations.javac._
@@ -122,8 +123,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val methodSelector: (Grammar) => Labelled = grammar => grammar.findGrammar(JavaBase.MethodGrammar)
-    val result = getGrammarResult(input, methodSelector)
+    val result = getGrammarResult(input, JavaBase.MethodGrammar)
     result
   }
 
@@ -139,12 +139,12 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val grammarTransformer: (Grammar) => Grammar = grammar => grammar.findGrammar(JavaBase.ExpressionGrammar)
-    val result: Any = getGrammarResult(input, grammarTransformer)
+    val grammarTransformer: (Grammar) => Grammar = grammar => grammar.findGrammar(AddExpression.ExpressionGrammar)
+    val result: Any = getGrammarResult(input, AddExpression.ExpressionGrammar)
     result
   }
 
-  def getGrammarResult(input: String, grammarTransformer: (Grammar) => Grammar = x => x): Any = {
+  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
     val parser = new TestGrammarUtils().buildParser(grammarSequence, grammarTransformer)
     val parseResult = parser(input)
     if (parseResult.isEmpty)

@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
-import core.transformation.{GrammarTransformation, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation._
 import transformations.bytecode.ByteCode
 import transformations.javac.base.JavaBase
 
@@ -35,11 +35,10 @@ object AdditionC extends GrammarTransformation {
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "+"
 
-  override def transformGrammar(grammar: Grammar): Grammar = {
-    val additiveGrammar = grammar.findGrammar(AddAdditivePrecedence.AdditiveExpressionGrammar)
+  override def transformGrammars(grammars: GrammarCatalogue) {
+    val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val parseAddition: Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left seqr right => addition(left, right)}
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
-    grammar
   }
 
   private def addition(first: Any, second: Any): MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])

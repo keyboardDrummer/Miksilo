@@ -1,8 +1,8 @@
 package core.grammar
 
+import scala.collection.mutable
 import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
-import scala.collection.mutable
 
 class ToPackrat extends StandardTokenParsers with PackratParsers {
   def convert(grammar: Grammar): PackratParser[Any] = {
@@ -21,9 +21,9 @@ class ToPackrat extends StandardTokenParsers with PackratParsers {
         case SuccessG => success[Any](null)
         case labelled: Labelled => helper(labelled.inner)
         case map: MapGrammar => helper(map.inner) ^^ map.forward
-        case layz: Lazy => helper(layz.getInner)
         case produce: Produce => success(produce.result)
         case FailureG => failure("fail")
+        case null => throw new RuntimeException("cannot convert empty grammar")
       })
     }
 

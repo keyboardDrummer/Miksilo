@@ -1,6 +1,7 @@
 package core.transformation
 
-import core.grammar.{FailureG, Grammar, ToPackrat}
+import core.grammar.{FailureG, ToPackrat}
+import core.transformation.TransformationManager.ProgramGrammar
 import transformations.bytecode._
 import transformations.javac._
 import transformations.javac.base.JavaBase
@@ -9,18 +10,22 @@ import transformations.ssm._
 
 class TransformationManager extends ToPackrat {
   def buildParser(transformations: Seq[GrammarTransformation]): String => ParseResult[Any] = {
-    var grammar: Grammar = FailureG.named("program") //TODO clean this. Probably can do that with Grammar sets.
+    var grammars: GrammarCatalogue = new GrammarCatalogue()
+    grammars.create(ProgramGrammar, FailureG)
     for (transformation <- transformations) {
       transformation.transformDelimiters(lexical.delimiters)
       transformation.transformReserved(lexical.reserved)
-      grammar = transformation.transformGrammar(grammar)
+      transformation.transformGrammars(grammars)
     }
-    val packratParser = phrase(convert(grammar))
+    val packratParser = phrase(convert(grammars.find(ProgramGrammar)))
     input => packratParser(new PackratReader(new lexical.Scanner(input)))
   }
 }
 
 object TransformationManager {
+
+  object ProgramGrammar
+
   val ssmTransformations = Set(AddWhile, AddStatementToSSM, AddIfElse, AddBlock,
     AddDoWhile, AddIfElse, AddForLoop)
 
