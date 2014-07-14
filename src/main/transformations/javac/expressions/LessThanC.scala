@@ -3,7 +3,6 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.{ByteCode, InferredStackFrames, LabelledJumps}
-import transformations.javac.base.JavaBase
 
 import scala.collection.mutable
 
@@ -24,9 +23,10 @@ object LessThanC extends GrammarTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(LessThanKey, (subtraction: MetaObject, compiler) => {
-      val firstInstructions = JavaBase.statementToInstructions(getFirst(subtraction), compiler)
-      val secondInstructions = JavaBase.statementToInstructions(getSecond(subtraction), compiler)
+    ExpressionC.getExpressionToLines(state).put(LessThanKey, subtraction => {
+      val toInstructions = ExpressionC.getToInstructions(state)
+      val firstInstructions = toInstructions(getFirst(subtraction))
+      val secondInstructions = toInstructions(getSecond(subtraction))
       val falseStartLabel = state.getUniqueLabel("falseStart")
       val endLabel = state.getUniqueLabel("end")
       firstInstructions ++ secondInstructions ++

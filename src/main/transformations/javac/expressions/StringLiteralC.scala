@@ -1,7 +1,6 @@
 package transformations.javac.expressions
 
 import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
-import transformations.javac.base.JavaBase
 
 object StringLiteralC extends ProgramTransformation {
 
@@ -17,5 +16,5 @@ object StringLiteralC extends ProgramTransformation {
 
   def transform(program: MetaObject, state: TransformationState): Unit = ???
 
-  def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
 }

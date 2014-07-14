@@ -3,8 +3,6 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
-import transformations.javac.base.JavaBase
-import transformations.javac.base.JavaBase._
 
 import scala.collection.mutable
 
@@ -33,7 +31,7 @@ object TernaryC extends GrammarTransformation {
   }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(TernaryKey, (_ternary: MetaObject, compiler) => {
+    ExpressionC.getExpressionToLines(state).put(TernaryKey, _ternary => {
       val condition = TernaryC.getCondition(_ternary)
       val truePath = TernaryC.trueBranch(_ternary)
       val falsePath = TernaryC.falseBranch(_ternary)
@@ -43,23 +41,24 @@ object TernaryC extends GrammarTransformation {
       val endLabelName = state.getUniqueLabel("end")
       val end = InferredStackFrames.label(endLabelName)
       val goToEnd = LabelledJumps.goTo(endLabelName)
-      statementToInstructions(condition, compiler) ++
+      val toInstructions = ExpressionC.getToInstructions(state)
+      toInstructions(condition) ++
         Seq(conditionalBranch) ++
-        statementToInstructions(truePath, compiler) ++
+        toInstructions(truePath) ++
         Seq(goToEnd, falseTarget) ++
-        statementToInstructions(falsePath, compiler) ++
+        toInstructions(falsePath) ++
         Seq(end)
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?", ":")
 
   object TernaryExpressionGrammar
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    val expressionGrammar = grammars.find(AddExpression.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val parseTernary: Grammar = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^ { case cond seqr onTrue seqr onFalse => ternary(cond.asInstanceOf[MetaObject], onTrue.asInstanceOf[MetaObject], onFalse.asInstanceOf[MetaObject])}
     val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar

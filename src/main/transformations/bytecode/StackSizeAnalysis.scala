@@ -1,10 +1,9 @@
 package transformations.bytecode
 
 import core.transformation.MetaObject
-import util.DataFlowAnalysis
 import transformations.bytecode.ByteCode._
 import transformations.bytecode.LabelledJumps.LabelKey
-import transformations.javac.base.JavaBase
+import transformations.javac.base.JavaMethodC
 
 class StackSizeAnalysis(constantPool: Seq[Any], instructions: Seq[MetaObject])
   extends InstructionFlowAnalysis[Int](instructions) {
@@ -52,9 +51,9 @@ class StackSizeAnalysis(constantPool: Seq[Any], instructions: Seq[MetaObject])
   }
 
   def getMethodStackModification(descriptor: MetaObject): Integer = {
-    var result = JavaBase.getTypeSize(ByteCode.getMethodDescriptorReturnType(descriptor))
+    var result = JavaMethodC.getTypeSize(ByteCode.getMethodDescriptorReturnType(descriptor))
     for (parameter <- ByteCode.getMethodDescriptorParameters(descriptor))
-      result -= JavaBase.getTypeSize(parameter)
+      result -= JavaMethodC.getTypeSize(parameter)
     result
   }
 }

@@ -1,11 +1,11 @@
 package transformations.bytecode
 
 import core.transformation.MetaObject
-import transformations.javac.base.model.{QualifiedClassName, JavaTypes}
-import JavaTypes.IntType
+import transformations.bytecode.ByteCode._
 import transformations.bytecode.LabelledJumps.LabelKey
-import transformations.javac.base.{ConstantPool, JavaBase}
-import ByteCode._
+import transformations.javac.base.ConstantPool
+import transformations.javac.base.model.JavaTypes.IntType
+import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
 object Instructions {
 

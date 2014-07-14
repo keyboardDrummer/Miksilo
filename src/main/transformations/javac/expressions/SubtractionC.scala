@@ -3,7 +3,6 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.ByteCode
-import transformations.javac.base.JavaBase
 
 import scala.collection.mutable
 
@@ -24,9 +23,10 @@ object SubtractionC extends GrammarTransformation {
   def getSecond(subtraction: MetaObject) = subtraction(secondKey).asInstanceOf[MetaObject]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(clazz, (subtraction: MetaObject, compiler) => {
-      val firstInstructions = JavaBase.statementToInstructions(getFirst(subtraction), compiler)
-      val secondInstructions = JavaBase.statementToInstructions(getSecond(subtraction), compiler)
+    ExpressionC.getExpressionToLines(state).put(clazz, subtraction => {
+      val toInstructions = ExpressionC.getToInstructions(state)
+      val firstInstructions = toInstructions(getFirst(subtraction))
+      val secondInstructions = toInstructions(getSecond(subtraction))
       firstInstructions ++ secondInstructions ++ Seq(ByteCode.subtractInteger)
     })
   }

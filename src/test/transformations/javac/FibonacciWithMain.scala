@@ -3,12 +3,12 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode._
-import transformations.javac.base.model.JavaBaseModel._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
 import transformations.javac.expressions.LiteralC
+import transformations.javac.methods.{CallC, SelectorC, VariableC}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.io.Path
@@ -39,8 +39,9 @@ class FibonacciWithMain {
 
   def getMainMethodJava: MetaObject = {
     val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
-    val fibCall = call(variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(call(selector(selector(selector(selector(variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
+    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
+    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
+      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
     method("main", VoidType, parameters, body, static = true, PublicVisibility)
   }
 

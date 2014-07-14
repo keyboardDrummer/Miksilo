@@ -2,7 +2,6 @@ package transformations.javac.expressions
 
 import core.transformation._
 import transformations.bytecode.ByteCode
-import transformations.javac.base.JavaBase
 
 object LiteralC extends GrammarTransformation {
   def literal(value: AnyVal) = {
@@ -20,7 +19,7 @@ object LiteralC extends GrammarTransformation {
   object ValueKey
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(LiteralKey, (literal: MetaObject, compiler) => {
+    ExpressionC.getExpressionToLines(state).put(LiteralKey, literal => {
       val value = getValue(literal)
       Seq(value match {
         case i: Integer => ByteCode.integerConstant(i)
@@ -29,12 +28,12 @@ object LiteralC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
 
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
     val parseNumber = number ^^ (number => LiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
-    val expressionGrammar = grammars.find(AddExpression.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
     grammars
   }

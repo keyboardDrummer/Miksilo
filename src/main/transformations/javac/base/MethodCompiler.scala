@@ -1,17 +1,9 @@
 package transformations.javac.base
 
-import scala.collection.mutable
 import core.transformation.MetaObject
-import transformations.javac.base.model.JavaBaseModel
-import JavaBaseModel._
-import transformations.javac.base.ClassInfo
-import transformations.javac.base.ClassOrObjectReference
-import transformations.javac.base.PackageInfo
-import transformations.javac.base.PackageReference
-import transformations.javac.base.ClassInfo
-import transformations.javac.base.ClassOrObjectReference
-import transformations.javac.base.PackageInfo
-import transformations.javac.base.PackageReference
+import transformations.javac.methods.{CallC, SelectorC, VariableC}
+
+import scala.collection.mutable
 
 case class VariableInfo(offset: Integer, _type: Any)
 
@@ -21,7 +13,7 @@ class VariablePool {
 
   def add(variable: String, _type: Any) {
     variables(variable) = new VariableInfo(offset, _type)
-    offset += JavaBase.getTypeSize(_type)
+    offset += JavaMethodC.getTypeSize(_type)
   }
 }
 
@@ -39,9 +31,9 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
     expression.clazz match {
-      case SelectorKey =>
-        val obj = JavaBaseModel.getSelectorObject(expression)
-        val member = JavaBaseModel.getSelectorMember(expression)
+      case SelectorC.SelectorKey =>
+        val obj = SelectorC.getSelectorObject(expression)
+        val member = SelectorC.getSelectorMember(expression)
         getReferenceKind(obj) match {
           case PackageReference(info) => info.content(member) match {
             case result: PackageInfo => new PackageReference(result)
@@ -52,8 +44,8 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
             val fieldClassType = classCompiler.findClass(field._type.asInstanceOf[MetaObject])
             new ClassOrObjectReference(fieldClassType, false)
         }
-      case VariableKey =>
-        val name = getVariableName(expression)
+      case VariableC.VariableKey =>
+        val name = VariableC.getVariableName(expression)
         val isClass = classCompiler.classNames.contains(name)
         if (isClass)
           new ClassOrObjectReference(classCompiler.findClass(name), true)
@@ -66,7 +58,7 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
             new ClassOrObjectReference(classInfo, false)
           }
         }
-      case CallKey => ???
+      case CallC.CallKey => ???
 
     }
   }

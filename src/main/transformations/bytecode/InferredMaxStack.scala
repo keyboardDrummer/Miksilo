@@ -1,12 +1,6 @@
 package transformations.bytecode
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
-import scala.collection.mutable
-import transformations.bytecode.ByteCode._
-import transformations.bytecode.LabelledJumps.LabelKey
-import typed.languages.javaBytecode.MethodInfo
-import util.DataFlowAnalysis
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
 
 object InferredMaxStack extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(LabelledJumps)
@@ -22,7 +16,7 @@ object InferredMaxStack extends ProgramTransformation {
 
   def getMaxStack(constantPool: Seq[Any], code: MetaObject): Integer = {
     val instructions = ByteCode.getCodeInstructions(code)
-    val currentStacks = new StackSizeAnalysis(constantPool,instructions).run(0,0)
+    val currentStacks = new StackSizeAnalysis(constantPool, instructions).run(0, 0)
     val maxStack = currentStacks.values.max
     maxStack
   }

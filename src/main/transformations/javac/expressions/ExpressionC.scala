@@ -1,17 +1,24 @@
 package transformations.javac.expressions
 
 import core.grammar.FailureG
-import core.transformation.{GrammarCatalogue, GrammarTransformation, MetaObject, TransformationState}
+import core.transformation._
+import transformations.bytecode.LabelledJumps
 
 import scala.collection.mutable
 
-object AddExpression extends GrammarTransformation {
+object ExpressionC extends GrammarTransformation {
 
   object ExpressionGrammar
 
+  override def dependencies: Set[ProgramTransformation] = Set(LabelledJumps)
+
   class ExpressionTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
 
-  def getExpressionToLines(state: TransformationState) =
+  def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
+    expression => getExpressionToLines(state)(expression.clazz)(expression)
+  }
+
+  def getExpressionToLines(state: TransformationState): ExpressionTransformations =
     state.data.getOrElseUpdate(this, new ExpressionTransformations()).asInstanceOf[ExpressionTransformations]
 
   override def transformGrammars(grammars: GrammarCatalogue) {

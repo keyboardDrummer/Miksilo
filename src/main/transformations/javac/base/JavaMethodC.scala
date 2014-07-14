@@ -1,17 +1,19 @@
 package transformations.javac.base
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import core.grammar.{Grammar, Labelled, seqr}
+import core.transformation.TransformationManager.ProgramGrammar
+import core.transformation._
 import transformations.bytecode.ByteCode._
 import transformations.bytecode.{ByteCode, InferredMaxStack, InferredStackFrames}
-import transformations.javac.base.model.JavaBaseModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
+import transformations.javac.statements.{BlockC, StatementC}
 
 import scala.collection.mutable
 
 
-object JavaBase extends ProgramTransformation with JavaBaseParse {
+object JavaMethodC extends GrammarTransformation {
 
   def getTypeSize(_type: Any): Int = _type match {
     case IntType => 1
@@ -22,68 +24,6 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
       case ObjectType => 1
     }
     case VoidType => 0
-  }
-
-  def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, getInitialStatementToLines)
-    .asInstanceOf[mutable.Map[AnyRef, (MetaObject, MethodCompiler) => Seq[MetaObject]]]
-
-  def getInitialStatementToLines = {
-    val result = mutable.Map.empty[AnyRef, (MetaObject, MethodCompiler) => Seq[MetaObject]]
-    result.put(VariableKey, (variable, compiler) => {
-      val variableAddress = compiler.variables.variables(getVariableName(variable)).offset
-      Seq(ByteCode.integerLoad(variableAddress))
-    })
-
-    result.put(CallKey, callToLines)
-    result.put(Return, returnToLines)
-    result.put(SelectorKey, selectorToLines)
-    result
-  }
-
-  def selectorToLines(selector: MetaObject, compiler: MethodCompiler) : Seq[MetaObject] = {
-    val obj = JavaBaseModel.getSelectorObject(selector)
-    val member = JavaBaseModel.getSelectorMember(selector)
-    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
-    val fieldInfo = classOrObjectReference.info.getField(member)
-    val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
-    if (classOrObjectReference.wasClass)
-      Seq(ByteCode.getStatic(fieldRef))
-    else
-      ???
-  }
-
-  def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
-    val mbValue = getReturnValue(_return)
-    mbValue match {
-      case Some(value) =>
-        val returnValueInstructions = statementToInstructions(value, compiler)
-        returnValueInstructions ++ Seq(ByteCode.integerReturn)
-      case None => Seq(ByteCode.voidReturn)
-    }
-  }
-
-  def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
-    val callCallee = getCallCallee(call)
-    val objectExpression = JavaBaseModel.getSelectorObject(callCallee)
-    val member = JavaBaseModel.getSelectorMember(callCallee)
-    val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
-
-    val methodKey: MethodId = new MethodId(kind.info.getQualifiedName, member)
-    val methodInfo = compiler.classCompiler.compiler.find(methodKey)
-    val staticCall = methodInfo._static
-    val calleeInstructions = if (!staticCall) statementToInstructions(objectExpression, compiler) else Seq[MetaObject]()
-    val callArguments = getCallArguments(call)
-    val argumentInstructions = callArguments.flatMap(argument => statementToInstructions(argument, compiler))
-    val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
-    val invokeInstructions = Seq(if (staticCall)
-      ByteCode.invokeStatic(methodRefIndex) else
-      ByteCode.invokeVirtual(methodRefIndex))
-    calleeInstructions ++ argumentInstructions ++ invokeInstructions
-  }
-
-  def statementToInstructions(statement: MetaObject, instructionCompiler: MethodCompiler) : Seq[MetaObject] = {
-    val statementToSSMLines = getStatementToLines(instructionCompiler.transformationState)
-    statementToSSMLines(statement.clazz)(statement, instructionCompiler)
   }
 
   def addMethodFlags(method: MetaObject) = {
@@ -99,6 +39,8 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
 
     method(ByteCode.MethodAccessFlags) = flags
   }
+
+  def getMethodCompiler(state: TransformationState) = state.data(this).asInstanceOf[MethodCompiler]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
@@ -131,15 +73,16 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
 
       def addCodeAnnotation(method: MetaObject) {
         val parameters = JavaMethodModel.getMethodParameters(method)
-        val instructionCompiler = getMethodCompiler(method, parameters)
+        setMethodCompiler(method, parameters)
         val statements = JavaMethodModel.getMethodBody(method)
-        val instructions = statements.flatMap(statement => statementToInstructions(statement, instructionCompiler))
+        val statementToInstructions = StatementC.getToInstructions(state)
+        val instructions = statements.flatMap(statement => statementToInstructions(statement))
         val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
         val codeAttribute = new MetaObject(ByteCode.CodeKey) {
             data.put(AttributeNameKey, codeIndex)
-            data.put(CodeMaxLocalsKey, instructionCompiler.localCount)
+          data.put(CodeMaxLocalsKey, getMethodCompiler(state).localCount)
             data.put(CodeInstructionsKey, instructions)
             data.put(CodeExceptionTableKey, exceptionTable)
             data.put(CodeAttributesKey, codeAttributes)
@@ -147,13 +90,13 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
         method(ByteCode.MethodAnnotations) = Seq(codeAttribute)
       }
 
-      def getMethodCompiler(method: MetaObject,parameters: Seq[MetaObject]) = {
+      def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
         val methodCompiler = new MethodCompiler(classCompiler)
         if (!JavaMethodModel.getMethodStatic(method))
           methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
         for (parameter <- parameters)
           methodCompiler.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
-        methodCompiler
+        state.data(this) = methodCompiler
       }
 
       def convertMethod(method: MetaObject) {
@@ -184,7 +127,72 @@ object JavaBase extends ProgramTransformation with JavaBaseParse {
     new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(InferredMaxStack, InferredStackFrames)
+  override def dependencies: Set[ProgramTransformation] = Set(StatementC, InferredMaxStack, InferredStackFrames)
 
+
+  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
+  = delimiters ++= Seq("(", ")", "{", "}", "[", "]", "[]")
+
+  override def transformReserved(reserved: mutable.HashSet[String]): Unit =
+    reserved ++= Seq("void", "class", "package", "public", "static", "int")
+
+  override def transformGrammars(grammars: GrammarCatalogue) {
+    val block = grammars.find(BlockC.BlockGrammar)
+
+    val parseType: Labelled = createParseType(grammars)
+    val parseReturnType = "void" ^^ (_ => VoidType) | parseType
+
+    val parseParameter = parseType ~ identifier ^^ { case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String], _type)}
+    val parseParameters = "(" ~> parseParameter.someSeparated(",") <~ ")"
+    val parseStatic = "static" ^^ (_ => true) | produce(false)
+    val visibilityModifier =
+      "public" ^^ (_ => PublicVisibility) |
+        "protected" ^^ (_ => ProtectedVisibility) |
+        "private" ^^ (_ => PrivateVisibility) |
+        produce(DefaultVisibility)
+    val classMethod = grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
+      parseParameters ~ block ^^ { case visibility seqr static seqr returnType seqr name seqr parameters seqr body =>
+      JavaMethodModel.method(name.asInstanceOf[String], returnType, parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
+        static.asInstanceOf[Boolean], visibility.asInstanceOf[Visibility])
+    })
+
+    val classMember: Grammar = classMethod
+    // val _import = "import" ~> identifier.someSeparated(".") <~ ";"
+    val importsP: Grammar = produce(Seq.empty[JavaImport]) //success_import*
+    val packageP = keyword("package") ~> identifier.someSeparated(".") <~ ";"
+    val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
+    val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^ {
+      case (_package seqr _imports) seqr (name seqr members) =>
+        val methods = members
+        JavaClassModel.clazz(_package.asInstanceOf[Seq[String]],
+          name.asInstanceOf[String],
+          methods.asInstanceOf[Seq[MetaObject]],
+          _imports.asInstanceOf[List[JavaImport]], None)
+    })
+    grammars.find(ProgramGrammar).inner = classGrammar
+  }
+
+  def createParseType(grammars: GrammarCatalogue): Labelled = {
+    val parseType = grammars.create(TypeGrammar)
+
+    val parseObjectType = identifier.someSeparated(".") ^^ { case ids: Seq[Any] => {
+      val stringIds = ids.collect({ case v: String => v})
+      if (ids.size > 1)
+        JavaTypes.objectType(new QualifiedClassName(stringIds))
+      else
+        JavaTypes.objectType(stringIds(0))
+    }
+    }
+    val parseIntType = "int" ^^ (_ => JavaTypes.IntType)
+    val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type)}
+    parseType.inner = parseArrayType | parseObjectType | parseIntType
+    parseType
+  }
+
+  object TypeGrammar
+
+  object ClassGrammar
+
+  object MethodGrammar
 
 }

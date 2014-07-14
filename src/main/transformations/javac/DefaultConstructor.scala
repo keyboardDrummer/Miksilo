@@ -1,10 +1,8 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
-import transformations.javac.base.model.{JavaMethodModel, JavaClassModel}
-import JavaMethodModel.PublicVisibility
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
 import transformations.javac.base.model.JavaClassModel
+import transformations.javac.base.model.JavaMethodModel.PublicVisibility
 
 object DefaultConstructor extends ProgramTransformation {
   override def dependencies: Set[ProgramTransformation] = Set(ConstructorC)
@@ -13,7 +11,7 @@ object DefaultConstructor extends ProgramTransformation {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      JavaClassModel.getMethods(clazz).prepend(ConstructorC.constructor(Seq(),Seq(), PublicVisibility))
+      JavaClassModel.getMethods(clazz).prepend(ConstructorC.constructor(Seq(), Seq(), PublicVisibility))
     }
   }
 }

@@ -4,7 +4,7 @@ import core.grammar.{FailureG, ToPackrat}
 import core.transformation.TransformationManager.ProgramGrammar
 import transformations.bytecode._
 import transformations.javac._
-import transformations.javac.base.JavaBase
+import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
 import transformations.ssm._
 
@@ -30,7 +30,7 @@ object TransformationManager {
     AddDoWhile, AddIfElse, AddForLoop)
 
   val javaTransformations = Set[ProgramTransformation](JavaMinus, DefaultConstructor, LessThanC,
-    ByteCode, LabelledJumps, JavaBase, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
+    ByteCode, LabelledJumps, JavaMethodC, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
     InferredMaxStack, InferredStackFrames, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport,
     ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
 

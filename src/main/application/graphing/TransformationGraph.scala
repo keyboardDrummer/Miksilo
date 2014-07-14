@@ -4,14 +4,15 @@ import application.graphing.TransformationVertex._
 import core.transformation.{ProgramTransformation, TransformationManager}
 import org.jgrapht.DirectedGraph
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
+import transformations.javac.JavaCompiler
 
 import scala.collection.mutable
 
 object TransformationGraph {
 
-  def getGraph: DirectedGraph[TransformationVertex,DefaultEdge] = {
-    val transformations = TransformationManager.javaTransformations
-    val result = new DefaultDirectedGraph[TransformationVertex,DefaultEdge](classOf[DefaultEdge])
+  def getGraph: DirectedGraph[TransformationVertex, DefaultEdge] = {
+    val transformations = TransformationManager.javaTransformations ++ JavaCompiler.javaCompilerTransformations.toSet
+    val result = new DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge])
 
     depthFirstTraversal[ProgramTransformation](transformations, transformation => transformation.dependencies,
       transformation => result.addVertex(new TransformationVertex(transformation)),
@@ -52,8 +53,7 @@ object TransformationGraph {
       }
     }
 
-    while(remainingNodes.nonEmpty)
-    {
+    while (remainingNodes.nonEmpty) {
       val node = remainingNodes.pop()
       if (!leftNodes.contains(node)) {
         processNode(node)

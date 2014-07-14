@@ -3,12 +3,14 @@ package transformations.javac
 import core.transformation.{ComparisonOptions, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode._
-import transformations.javac.base.model.JavaBaseModel._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
 import transformations.javac.expressions._
+import transformations.javac.methods.CallC._
+import transformations.javac.methods.ReturnC
+import transformations.javac.methods.VariableC._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -125,7 +127,7 @@ class FibonacciWthoutMain {
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
     val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
-    val body = Seq(JavaMethodModel._return(Some(returnValue)))
+    val body = Seq(ReturnC._return(Some(returnValue)))
     method("fibonacci", IntType, parameters, body, static = true)
   }
 }

@@ -3,30 +3,31 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.ByteCode
-import transformations.javac.base.JavaBase
 
 import scala.collection.mutable
 
 object AdditionC extends GrammarTransformation {
-  val clazz: String = "Addition"
 
-  val firstKey: String = "first"
+  object Clazz
 
-  val secondKey: String = "second"
+  object FirstKey
 
-  def addition(first: MetaObject, second: MetaObject) = new MetaObject(clazz) {
-    data.put(firstKey, first)
-    data.put(secondKey, second)
+  object SecondKey
+
+  def addition(first: MetaObject, second: MetaObject) = new MetaObject(Clazz) {
+    data.put(FirstKey, first)
+    data.put(SecondKey, second)
   }
 
-  def getFirst(addition: MetaObject) = addition(firstKey).asInstanceOf[MetaObject]
+  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
 
-  def getSecond(addition: MetaObject) = addition(secondKey).asInstanceOf[MetaObject]
+  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(clazz, (addition: MetaObject, compiler) => {
-      val firstInstructions = JavaBase.statementToInstructions(getFirst(addition), compiler)
-      val secondInstructions = JavaBase.statementToInstructions(getSecond(addition), compiler)
+    ExpressionC.getExpressionToLines(state).put(Clazz, (addition: MetaObject) => {
+      val toInstructions = ExpressionC.getToInstructions(state)
+      val firstInstructions = toInstructions(getFirst(addition))
+      val secondInstructions = toInstructions(getSecond(addition))
       firstInstructions ++ secondInstructions ++ Seq(ByteCode.addInteger)
     })
   }

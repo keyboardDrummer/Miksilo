@@ -1,9 +1,8 @@
 package transformations.javac.base
 
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCode
-import core.transformation.{TransformationState, MetaObject}
-import scala.Some
-import transformations.javac.base.model.{JavaTypes, JavaClassModel, JavaImport, QualifiedClassName}
+import transformations.javac.base.model.{JavaClassModel, JavaImport, JavaTypes, QualifiedClassName}
 
 object ClassCompiler {
 }
@@ -51,7 +50,7 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
           (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
       }
       result
-    }).toMap ++ Map(className -> JavaBase.getQualifiedClassName(currentClass))
+    }).toMap ++ Map(className -> JavaMethodC.getQualifiedClassName(currentClass))
   }
 
   def getClassRef(info: ClassInfo): Int = {

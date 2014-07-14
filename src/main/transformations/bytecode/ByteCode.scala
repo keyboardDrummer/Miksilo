@@ -1,12 +1,8 @@
 package transformations.bytecode
 
-import core.transformation.{TransformationState, ProgramTransformation, MetaObject}
-import typed.languages.javaBytecode.ConstantPoolInfo
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+
 import scala.collection.mutable
-import transformations.javac.base.model.JavaTypes
-import JavaTypes.IntType
-import transformations.bytecode.LabelledJumps.LabelKey
-import transformations.javac.base.JavaBase
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 object ByteCode extends ProgramTransformation {

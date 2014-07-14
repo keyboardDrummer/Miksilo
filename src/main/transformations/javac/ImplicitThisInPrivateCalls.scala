@@ -1,26 +1,27 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
-import transformations.javac.base.model.JavaBaseModel
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import transformations.javac.base.JavaMethodC
+import transformations.javac.expressions.ExpressionC
+import transformations.javac.methods.{CallC, SelectorC, VariableC}
 
 object ImplicitThisInPrivateCalls extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(CallC, VariableC)
 
   val thisName: String = "this"
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    JavaBase.getStatementToLines(state).put(JavaBaseModel.CallKey,(call : MetaObject, compiler) => {
-      val callCallee = JavaBaseModel.getCallCallee(call)
-      if (callCallee.clazz == JavaBaseModel.VariableKey)
-      {
-        val memberName = JavaBaseModel.getVariableName(callCallee)
+    ExpressionC.getExpressionToLines(state).put(CallC.CallKey, (call: MetaObject) => {
+      val callCallee = CallC.getCallCallee(call)
+      val compiler = JavaMethodC.getMethodCompiler(state)
+      if (callCallee.clazz == VariableC.VariableKey) {
+        val memberName = VariableC.getVariableName(callCallee)
         val currentClass = compiler.classCompiler.currentClassInfo
         val methodInfo = currentClass.getMethod(memberName)
-        val selectee = JavaBaseModel.variable(if (methodInfo._static) currentClass.name else thisName)
-        call(JavaBaseModel.CallCallee) = JavaBaseModel.selector(selectee, memberName)
+        val selectee = VariableC.variable(if (methodInfo._static) currentClass.name else thisName)
+        call(CallC.CallCallee) = SelectorC.selector(selectee, memberName)
       }
-      JavaBase.callToLines(call, compiler)
+      CallC.callToLines(call, compiler)
     })
   }
 }

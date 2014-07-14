@@ -1,11 +1,11 @@
 package transformations.javac
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import transformations.javac.base.JavaBase
+import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import transformations.javac.base.JavaMethodC
 import transformations.javac.base.model.{JavaClassModel, JavaImport}
 
 object ImplicitJavaLangImport extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(JavaBase)
+  override def dependencies: Set[ProgramTransformation] = Set(JavaMethodC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program

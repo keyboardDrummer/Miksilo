@@ -1,8 +1,8 @@
 package core.transformation
 
 import org.junit.{Assert, Test}
-import transformations.javac.base.model.JavaBaseModel
 import transformations.javac.expressions.LiteralC
+import transformations.javac.methods.{CallC, SelectorC, VariableC}
 
 class TestMetaObject {
 
@@ -25,10 +25,10 @@ class TestMetaObject {
 
   @Test
   def testEqualsOnJavaModel() {
-    val first = JavaBaseModel.call(JavaBaseModel.selector(JavaBaseModel.selector(JavaBaseModel.variable("System"), "out"), "print"),
-      List(JavaBaseModel.call(JavaBaseModel.variable("fibonacci"), List(LiteralC.literal(5)))))
-    val second = JavaBaseModel.call(JavaBaseModel.selector(JavaBaseModel.selector(JavaBaseModel.variable("System"), "out"), "print"),
-      List(JavaBaseModel.call(JavaBaseModel.variable("fibonacci"), List(LiteralC.literal(5)))))
+    val first = CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
+      List(CallC.call(VariableC.variable("fibonacci"), List(LiteralC.literal(5)))))
+    val second = CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
+      List(CallC.call(VariableC.variable("fibonacci"), List(LiteralC.literal(5)))))
     Assert.assertEquals(first, second)
   }
 
