@@ -9,7 +9,7 @@ object StatementC extends GrammarTransformation {
 
   object StatementGrammar
 
-  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionC)
 
   class StatementTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
 

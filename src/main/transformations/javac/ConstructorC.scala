@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
 import transformations.bytecode.ByteCode
 import transformations.javac.base._
 import transformations.javac.base.model.JavaMethodModel._
@@ -11,7 +11,7 @@ import transformations.javac.statements.StatementC
 object ConstructorC extends ProgramTransformation {
   val constructorName: String = "<init>"
 
-  override def dependencies: Set[ProgramTransformation] = Set(CallC)
+  override def dependencies: Set[Contract] = Set(CallC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     def transformSuperOrThisCall(call: MetaObject): Seq[MetaObject] = {

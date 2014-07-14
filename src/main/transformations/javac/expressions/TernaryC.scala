@@ -51,7 +51,7 @@ object TernaryC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionC)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?", ":")
 

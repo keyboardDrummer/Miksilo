@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 object SelectorC extends GrammarTransformation {
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC)
 
   object SelectorKey
 

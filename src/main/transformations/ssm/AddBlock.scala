@@ -1,7 +1,7 @@
 package transformations.ssm
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import AddStatementToSSM._
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import transformations.ssm.AddStatementToSSM._
 
 object AddBlock extends ProgramTransformation {
   val block = "block"
@@ -14,10 +14,11 @@ object AddBlock extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+  def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
-  def createBlock(statements: MetaObject*) =
-  {
-    new MetaObject(block) { data.put(AddBlock.statements,statements) }
+  def createBlock(statements: MetaObject*) = {
+    new MetaObject(block) {
+      data.put(AddBlock.statements, statements)
+    }
   }
 }

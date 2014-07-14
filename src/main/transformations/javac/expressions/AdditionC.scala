@@ -32,7 +32,7 @@ object AdditionC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(AddAdditivePrecedence)
+  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "+"
 

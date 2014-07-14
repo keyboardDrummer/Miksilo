@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
+import core.transformation._
 import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
@@ -18,21 +18,13 @@ object JavaCompiler {
   }
 }
 
-object JavaExpression extends ProgramTransformation {
+object JavaExpression extends Contract {
 
-  override def dependencies: Set[ProgramTransformation] =
+  override def dependencies: Set[Contract] =
     Set(LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC)
-
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
-
-  }
 }
 
-object JavaMinus extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] =
+object JavaMinus extends Contract {
+  override def dependencies: Set[Contract] =
     Set(JavaExpression, ImplicitThisInPrivateCalls, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, DefaultConstructor)
-
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
-
-  }
 }

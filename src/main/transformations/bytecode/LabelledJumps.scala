@@ -1,10 +1,11 @@
 package transformations.bytecode
 
-import ByteCode._
-import core.transformation.{TransformationState, ProgramTransformation, MetaObject}
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import transformations.bytecode.ByteCode._
+import transformations.javac.base.ConstantPool
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import transformations.javac.base.ConstantPool
 
 object LabelledJumps extends ProgramTransformation {
   def ifZero(target: String) = instruction(ByteCode.IfZeroKey, Seq(target))
@@ -57,7 +58,7 @@ object LabelledJumps extends ProgramTransformation {
   }
 
   def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[MetaObject])
-    : Seq[MetaObject] = {
+  : Seq[MetaObject] = {
     val frameLocations = instructions.filter(i => i.clazz == LabelKey).map(i => (labelLocations(getLabelName(i)), getLabelStackFrame(i)))
     var adjustedZero = 0
     var stackFrames = ArrayBuffer[MetaObject]()
@@ -134,5 +135,5 @@ object LabelledJumps extends ProgramTransformation {
     targetLocations.toMap
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(ByteCode)
+  def dependencies: Set[Contract] = Set(ByteCode)
 }

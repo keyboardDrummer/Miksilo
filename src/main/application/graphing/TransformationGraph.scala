@@ -1,28 +1,21 @@
 package application.graphing
 
-import application.graphing.TransformationVertex._
-import core.transformation.{ProgramTransformation, TransformationManager}
-import org.jgrapht.DirectedGraph
+import core.transformation.{Contract, TransformationManager}
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import transformations.javac.JavaCompiler
 
 import scala.collection.mutable
 
-object TransformationGraph {
+class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
 
-  def getGraph: DirectedGraph[TransformationVertex, DefaultEdge] = {
-    val transformations = TransformationManager.javaTransformations ++ JavaCompiler.javaCompilerTransformations.toSet
-    val result = new DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge])
+  val transformations: Set[Contract] = TransformationManager.javaTransformations ++ JavaCompiler.javaCompilerTransformations.toSet
 
-    depthFirstTraversal[ProgramTransformation](transformations, transformation => transformation.dependencies,
-      transformation => result.addVertex(new TransformationVertex(transformation)),
-      transformation => {
-        for (outgoing <- transformation.dependencies)
-          result.addEdge(outgoing, transformation)
-      })
-
-    result
-  }
+  depthFirstTraversal[Contract](transformations, transformation => transformation.dependencies,
+    transformation => addVertex(new TransformationVertex(transformation)),
+    transformation => {
+      for (outgoing <- transformation.dependencies)
+        addEdge(outgoing, transformation)
+    })
 
   def depthFirstTraversal[T](nodes: Set[T], getOutgoing: T => Set[T], enter: T => Unit, leave: T => Unit) {
     val remainingNodes = mutable.Stack[T]()
@@ -60,5 +53,4 @@ object TransformationGraph {
       }
     }
   }
-
 }

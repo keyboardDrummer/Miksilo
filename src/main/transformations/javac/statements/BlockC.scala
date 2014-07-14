@@ -5,7 +5,7 @@ import core.transformation._
 object BlockC extends GrammarTransformation {
 
 
-  override def dependencies: Set[ProgramTransformation] = Set(StatementC)
+  override def dependencies: Set[Contract] = Set(StatementC)
 
   object BlockGrammar
 

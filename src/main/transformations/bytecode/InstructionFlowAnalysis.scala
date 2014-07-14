@@ -1,7 +1,7 @@
 package transformations.bytecode
 
-import util.DataFlowAnalysis
 import core.transformation.MetaObject
+import util.DataFlowAnalysis
 
 abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject]) extends DataFlowAnalysis[Int, State] {
 

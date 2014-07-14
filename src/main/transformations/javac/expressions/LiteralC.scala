@@ -28,7 +28,7 @@ object LiteralC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionC)
 
 
   override def transformGrammars(grammars: GrammarCatalogue) = {

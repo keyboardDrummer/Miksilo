@@ -32,7 +32,7 @@ object CallC extends GrammarTransformation {
     //    })
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(SelectorC)
+  override def dependencies: Set[Contract] = Set(SelectorC)
 
   def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)

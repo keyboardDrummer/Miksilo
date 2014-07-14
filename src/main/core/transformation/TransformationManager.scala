@@ -29,8 +29,8 @@ object TransformationManager {
   val ssmTransformations = Set(AddWhile, AddStatementToSSM, AddIfElse, AddBlock,
     AddDoWhile, AddIfElse, AddForLoop)
 
-  val javaTransformations = Set[ProgramTransformation](JavaMinus, DefaultConstructor, LessThanC,
-    ByteCode, LabelledJumps, JavaMethodC, TernaryC, SubtractionC, LiteralC, StringLiteralC, AdditionC,
+  val javaTransformations = Set[Contract](JavaMinus, DefaultConstructor, LessThanC,
+    ByteCode, LabelledJumps, JavaMethodC, TernaryC, SubtractionC, LiteralC, AdditionC,
     InferredMaxStack, InferredStackFrames, ImplicitThisInPrivateCalls, ConstructorC, ImplicitJavaLangImport,
     ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod)
 

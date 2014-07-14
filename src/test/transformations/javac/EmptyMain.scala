@@ -5,7 +5,7 @@ import org.junit.Test
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
-import transformations.javac.base.model.{QualifiedClassName, _}
+import transformations.javac.base.model._
 
 class EmptyMain {
   val className = "EmptyMain"

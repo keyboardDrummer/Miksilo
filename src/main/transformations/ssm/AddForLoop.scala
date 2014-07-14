@@ -1,6 +1,6 @@
 package transformations.ssm
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
+import core.transformation._
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit._
 import transformations.ssm.AddBlock._
@@ -32,7 +32,7 @@ object AddForLoop extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+  def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createForLoop(initializer: MetaObject, condition: MetaObject, increment: MetaObject, body: MetaObject) = new MetaObject(forLoop) {
     data.put(AddForLoop.initialisation, initializer)

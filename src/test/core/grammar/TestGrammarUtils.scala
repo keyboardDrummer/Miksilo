@@ -16,7 +16,7 @@ class TestGrammarUtils {
 
       override def transform(program: MetaObject, state: TransformationState): Unit = {}
 
-      override def dependencies: Set[ProgramTransformation] = Set.empty
+      override def dependencies: Set[Contract] = Set.empty
     }
 
     manager.buildParser(transformations ++ Seq(SelectorTransformation))

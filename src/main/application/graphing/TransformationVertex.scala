@@ -1,13 +1,12 @@
 package application.graphing
 
-import core.transformation.ProgramTransformation
+import core.transformation.Contract
 
 object TransformationVertex
 {
-  implicit def fromTransformation(transformation: ProgramTransformation) = new TransformationVertex(transformation)
+  implicit def fromTransformation(transformation: Contract) = new TransformationVertex(transformation)
 }
 
-case class TransformationVertex(transformation: ProgramTransformation)
-{
-  override def toString: String = transformation.getClass.getSimpleName.dropRight(1)
+case class TransformationVertex(transformation: Contract) {
+  override def toString: String = transformation.name
 }

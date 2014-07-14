@@ -1,10 +1,10 @@
 package transformations.javac.expressions
 
-import core.transformation.{GrammarCatalogue, GrammarTransformation, ProgramTransformation}
+import core.transformation.{Contract, GrammarCatalogue, GrammarTransformation}
 
 object AddAdditivePrecedence extends GrammarTransformation {
 
-  override def dependencies: Set[ProgramTransformation] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionC)
 
   object AdditiveExpressionGrammar
 

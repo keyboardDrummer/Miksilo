@@ -1,11 +1,10 @@
 package transformations.bytecode
 
-import core.transformation.{TransformationState, MetaObject, ProgramTransformation}
-import scala.collection.mutable
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
 import transformations.javac.base.ConstantPool
 
 object InferredStackFrames extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(LabelledJumps)
+  override def dependencies: Set[Contract] = Set(LabelledJumps)
 
   def getStackMap(previousStack: Seq[Any], stack: Seq[Any], previousLocals: Seq[Any], locals: Seq[Any]) = {
     val sameLocalsPrefix = previousLocals.zip(locals).filter(p => p._1 == p._2)

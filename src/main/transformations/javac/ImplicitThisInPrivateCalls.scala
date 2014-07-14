@@ -1,12 +1,12 @@
 package transformations.javac
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
 
 object ImplicitThisInPrivateCalls extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(CallC, VariableC)
+  override def dependencies: Set[Contract] = Set(CallC, VariableC)
 
   val thisName: String = "this"
 

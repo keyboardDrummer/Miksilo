@@ -7,8 +7,7 @@ import transformations.javac.expressions.ExpressionC
 
 object VariableC extends GrammarTransformation {
 
-
-  override def dependencies: Set[ProgramTransformation] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC)
 
   object VariableKey
 

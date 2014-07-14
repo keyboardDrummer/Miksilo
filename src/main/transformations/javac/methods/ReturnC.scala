@@ -11,7 +11,7 @@ import scala.collection.mutable
 object ReturnC extends GrammarTransformation {
 
 
-  override def dependencies: Set[ProgramTransformation] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC)
 
   object Return
 

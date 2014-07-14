@@ -20,7 +20,7 @@ object LessThanC extends GrammarTransformation {
 
   def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
-  override def dependencies: Set[ProgramTransformation] = Set(AddRelationalPrecedence)
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(LessThanKey, subtraction => {

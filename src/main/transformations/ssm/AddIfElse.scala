@@ -1,6 +1,6 @@
 package transformations.ssm
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
+import core.transformation._
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit._
 import transformations.ssm
@@ -31,7 +31,7 @@ object AddIfElse extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+  def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createIfElse(condition: MetaObject, _then: MetaObject, _else: MetaObject) = new MetaObject(_if) {
     data.put(AddIfElse.condition, condition)

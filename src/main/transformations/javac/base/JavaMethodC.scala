@@ -19,7 +19,7 @@ object JavaMethodC extends GrammarTransformation {
     case IntType => 1
     case BooleanType => 1
     case DoubleType => 1
-    case meta: MetaObject => meta.clazz match  {
+    case meta: MetaObject => meta.clazz match {
       case JavaTypes.ArrayType => 1
       case ObjectType => 1
     }
@@ -31,8 +31,7 @@ object JavaMethodC extends GrammarTransformation {
     if (JavaMethodModel.getMethodStatic(method))
       flags += ByteCode.StaticAccess
 
-    JavaMethodModel.getMethodVisibility(method) match
-    {
+    JavaMethodModel.getMethodVisibility(method) match {
       case JavaMethodModel.PublicVisibility => flags += ByteCode.PublicAccess
       case JavaMethodModel.PrivateVisibility => flags += ByteCode.PrivateAccess
     }
@@ -59,10 +58,10 @@ object JavaMethodC extends GrammarTransformation {
       clazz(ByteCode.ClassFields) = Seq()
       clazz(ByteCode.ClassConstantPool) = classCompiler.constantPool.constants
       val methods = JavaClassModel.getMethods(clazz)
-      for(method <- methods)
+      for (method <- methods)
         bindMethod(method)
-      
-      for(method <- methods)
+
+      for (method <- methods)
         convertMethod(method)
 
       def bindMethod(method: MetaObject) = {
@@ -81,12 +80,12 @@ object JavaMethodC extends GrammarTransformation {
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
         val codeAttribute = new MetaObject(ByteCode.CodeKey) {
-            data.put(AttributeNameKey, codeIndex)
+          data.put(AttributeNameKey, codeIndex)
           data.put(CodeMaxLocalsKey, getMethodCompiler(state).localCount)
-            data.put(CodeInstructionsKey, instructions)
-            data.put(CodeExceptionTableKey, exceptionTable)
-            data.put(CodeAttributesKey, codeAttributes)
-          }
+          data.put(CodeInstructionsKey, instructions)
+          data.put(CodeExceptionTableKey, exceptionTable)
+          data.put(CodeAttributesKey, codeAttributes)
+        }
         method(ByteCode.MethodAnnotations) = Seq(codeAttribute)
       }
 
@@ -111,8 +110,8 @@ object JavaMethodC extends GrammarTransformation {
         method.data.remove(JavaMethodModel.MethodParametersKey)
       }
 
-      def getMethodDescriptorIndex(method: MetaObject) : Int = classCompiler.constantPool.store(getMethodDescriptor(method))
-      def getMethodDescriptor(method: MetaObject) : MetaObject = {
+      def getMethodDescriptorIndex(method: MetaObject): Int = classCompiler.constantPool.store(getMethodDescriptor(method))
+      def getMethodDescriptor(method: MetaObject): MetaObject = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
         ByteCode.methodDescriptor(returnType
@@ -127,8 +126,7 @@ object JavaMethodC extends GrammarTransformation {
     new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
   }
 
-  override def dependencies: Set[ProgramTransformation] = Set(StatementC, InferredMaxStack, InferredStackFrames)
-
+  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
   = delimiters ++= Seq("(", ")", "{", "}", "[", "]", "[]")

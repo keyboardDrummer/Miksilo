@@ -1,6 +1,6 @@
 package transformations.ssm
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationManager, TransformationState}
+import core.transformation._
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit._
 import transformations.ssm
@@ -28,11 +28,12 @@ object AddWhile extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[ProgramTransformation] = Set(AddStatementToSSM)
+  def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createWhile(condition: MetaObject, body: MetaObject) = {
     new MetaObject(_while) {
-      data.put(AddWhile.condition, condition); data.put(AddWhile.body, body)
+      data.put(AddWhile.condition, condition);
+      data.put(AddWhile.body, body)
     }
   }
 }

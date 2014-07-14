@@ -1,8 +1,9 @@
 package transformations.ssm
 
-import core.transformation.{MetaObject, TransformationState, ProgramTransformation}
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import transformations.ssm.SSM._
+
 import scala.collection.mutable
-import SSM._
 
 object AddStatementToSSM extends ProgramTransformation {
 
@@ -25,5 +26,5 @@ object AddStatementToSSM extends ProgramTransformation {
     program.data.put(lines, convertStatement(program))
   }
 
-  def dependencies: Set[ProgramTransformation] = Set.empty
+  def dependencies: Set[Contract] = Set.empty
 }

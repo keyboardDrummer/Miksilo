@@ -1,9 +1,9 @@
 package transformations.bytecode
 
-import core.transformation.{MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
 
 object InferredMaxStack extends ProgramTransformation {
-  override def dependencies: Set[ProgramTransformation] = Set(LabelledJumps)
+  override def dependencies: Set[Contract] = Set(LabelledJumps)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
