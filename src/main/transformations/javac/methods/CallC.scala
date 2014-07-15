@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.ByteCode
-import transformations.javac.base.{ClassOrObjectReference, MethodCompiler, MethodId}
+import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
 
 object CallC extends GrammarTransformation {
@@ -26,10 +26,10 @@ object CallC extends GrammarTransformation {
   def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    //    ExpressionC.getExpressionToLines(state) += (CallKey, (call: MetaObject) => {
-    //      val methodCompiler = JavaMethodC.getMethodCompiler(state)
-    //      callToLines(call, methodCompiler)
-    //    })
+    ExpressionC.getExpressionToLines(state).putIfEmpty(CallKey, (call: MetaObject) => {
+      val methodCompiler = JavaMethodC.getMethodCompiler(state)
+      callToLines(call, methodCompiler)
+    })
   }
 
   override def dependencies: Set[Contract] = Set(SelectorC)

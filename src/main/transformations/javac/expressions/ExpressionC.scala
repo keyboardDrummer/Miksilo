@@ -12,7 +12,12 @@ object ExpressionC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(LabelledJumps)
 
-  class ExpressionTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
+  class ExpressionTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]] {
+    def putIfEmpty(key: AnyRef, value: MetaObject => Seq[MetaObject]) = {
+      if (!this.contains(key))
+        put(key, value)
+    }
+  }
 
   def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
     expression => getExpressionToLines(state)(expression.clazz)(expression)
