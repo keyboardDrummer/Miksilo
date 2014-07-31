@@ -9,9 +9,6 @@ import scala.sys.process.{Process, ProcessLogger}
 
 object TestUtils {
 
-  def getMethodInstructions(method: MetaObject) =
-    ByteCode.getCodeInstructions(ByteCode.getMethodAttributes(method)(0))
-
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCode.getMethods(expectedByteCode).zip(ByteCode.getMethods(compiledCode))) {
       Assert.assertTrue(MetaObject.deepEquality(getMethodInstructions(methodPair._1),
@@ -19,6 +16,9 @@ object TestUtils {
         new ComparisonOptions(false, true, false)))
     }
   }
+
+  def getMethodInstructions(method: MetaObject) =
+    ByteCode.getCodeInstructions(ByteCode.getMethodAttributes(method)(0))
 
   def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
     val line = runByteCode(className, code)
@@ -38,17 +38,6 @@ object TestUtils {
     runJavaClass(className, testDirectory)
   }
 
-  def compile(className: String, inputDirectory: Path): String = {
-    val relativeFilePath = inputDirectory / (className + ".java")
-    val currentDir = new File(new java.io.File("."))
-    val testOutput = Directory(currentDir / Path("testOutput"))
-    val testResources = currentDir / Path("testResources")
-    val input: File = File(testResources / relativeFilePath)
-    JavaCompiler.getCompiler.compile(input, testOutput)
-    val output = TestUtils.runJavaClass(className, testOutput)
-    output
-  }
-
   def runJavaClass(className: String, directory: Path): String = {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
     var line: String = ""
@@ -58,6 +47,16 @@ object TestUtils {
     val exitValue = processBuilder ! logger
     Assert.assertEquals(0, exitValue)
     line
+  }
+
+  def compileAndRun(className: String, inputDirectory: Path): String = {
+    val relativeFilePath = inputDirectory / (className + ".java")
+    val currentDir = new File(new java.io.File("."))
+    val testOutput = Directory(currentDir / Path("testOutput"))
+    val testResources = currentDir / Path("testResources")
+    val input: File = File(testResources / relativeFilePath)
+    JavaCompiler.getCompiler.compile(input, testOutput)
+    TestUtils.runJavaClass(className, testOutput)
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {

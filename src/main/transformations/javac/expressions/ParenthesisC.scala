@@ -1,7 +1,6 @@
-package transformations.javac.methods
+package transformations.javac.expressions
 
 import core.transformation.{Contract, GrammarCatalogue, GrammarTransformation}
-import transformations.javac.expressions.ExpressionC
 
 object ParenthesisC extends GrammarTransformation {
 

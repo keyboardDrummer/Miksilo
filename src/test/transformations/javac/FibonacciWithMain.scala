@@ -19,11 +19,12 @@ class FibonacciWithMain {
   val other = new FibonacciWthoutMain()
 
   val expectedOutput: Int = 8
+  val methodName = "fibonacci"
 
   @Test
   def testFullPipeline() {
     val inputDirectory = Path("fibonacciWithMain")
-    val output: String = TestUtils.compile(className, inputDirectory)
+    val output: String = TestUtils.compileAndRun(className, inputDirectory)
     Assert.assertEquals(expectedOutput, Integer.parseInt(output))
   }
 
@@ -35,14 +36,6 @@ class FibonacciWithMain {
 
     val expectedResult = expectedOutput
     TestUtils.runByteCode(className, byteCode, expectedResult)
-  }
-
-  def getMainMethodJava: MetaObject = {
-    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
-    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
-      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
-    method("main", VoidType, parameters, body, static = true, PublicVisibility)
   }
 
   @Test
@@ -67,16 +60,24 @@ class FibonacciWithMain {
 
   def getMethodMaxStack(method: MetaObject) = ByteCode.getCodeMaxStack(ByteCode.getMethodAttributes(method)(0))
 
+  def getJavaFibonacciWithMain: MetaObject = {
+    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
+  }
+
+  def getMainMethodJava: MetaObject = {
+    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
+    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
+      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
+    method("main", VoidType, parameters, body, static = true, PublicVisibility)
+  }
+
   @Test
   def compileAndPrintFibonacciWithMain() {
     val fibonacci = getJavaFibonacciWithMain
     val compiler = JavaCompiler.getCompiler
     val compiledCode = compiler.transform(fibonacci)
     PrintByteCode.print(compiledCode)
-  }
-
-  def getJavaFibonacciWithMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
   }
 
   @Test
@@ -88,8 +89,6 @@ class FibonacciWithMain {
     TestUtils.testInstructionEquivalence(expectedCode, compiledCode)
     TestUtils.compareConstantPools(expectedCode, compiledCode)
   }
-
-  val methodName = "fibonacci"
 
   def getExpectedUnoptimizedFibonacciWithMainByteCode: MetaObject = {
     val constantPool: ArrayBuffer[Any] = getConstantPool

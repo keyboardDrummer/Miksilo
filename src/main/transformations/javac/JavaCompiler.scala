@@ -12,8 +12,8 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, TernaryC, LessThanC, AddRelationalPrecedence,
-      AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC, CallC, ParenthesisC, ReturnC, SelectorC, VariableC,
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, AddRelationalPrecedence,
+      AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC, TernaryC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC,
       JavaMethodC, BlockC, StatementC, ExpressionC, InferredStackFrames, InferredMaxStack, LabelledJumps)
   }
 }
