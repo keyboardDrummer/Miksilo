@@ -26,20 +26,7 @@ object JavaMethodC extends GrammarTransformation {
     case VoidType => 0
   }
 
-  def addMethodFlags(method: MetaObject) = {
-    var flags = Set[ByteCode.MethodAccessFlag]()
-    if (JavaMethodModel.getMethodStatic(method))
-      flags += ByteCode.StaticAccess
-
-    JavaMethodModel.getMethodVisibility(method) match {
-      case JavaMethodModel.PublicVisibility => flags += ByteCode.PublicAccess
-      case JavaMethodModel.PrivateVisibility => flags += ByteCode.PrivateAccess
-    }
-
-    method(ByteCode.MethodAccessFlags) = flags
-  }
-
-  def getMethodCompiler(state: TransformationState) = state.data(this).asInstanceOf[MethodCompiler]
+  def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
@@ -81,7 +68,7 @@ object JavaMethodC extends GrammarTransformation {
         val codeAttributes = Seq[MetaObject]()
         val codeAttribute = new MetaObject(ByteCode.CodeKey) {
           data.put(AttributeNameKey, codeIndex)
-          data.put(CodeMaxLocalsKey, getMethodCompiler(state).localCount)
+          data.put(CodeMaxLocalsKey, getMethodCompiler(state).variables.localCount)
           data.put(CodeInstructionsKey, instructions)
           data.put(CodeExceptionTableKey, exceptionTable)
           data.put(CodeAttributesKey, codeAttributes)
@@ -95,7 +82,7 @@ object JavaMethodC extends GrammarTransformation {
           methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
         for (parameter <- parameters)
           methodCompiler.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
-        state.data(this) = methodCompiler
+        getState(state).methodCompiler = methodCompiler
       }
 
       def convertMethod(method: MetaObject) {
@@ -120,6 +107,24 @@ object JavaMethodC extends GrammarTransformation {
     }
   }
 
+  def addMethodFlags(method: MetaObject) = {
+    var flags = Set[ByteCode.MethodAccessFlag]()
+    if (JavaMethodModel.getMethodStatic(method))
+      flags += ByteCode.StaticAccess
+
+    JavaMethodModel.getMethodVisibility(method) match {
+      case JavaMethodModel.PublicVisibility => flags += ByteCode.PublicAccess
+      case JavaMethodModel.PrivateVisibility => flags += ByteCode.PrivateAccess
+    }
+
+    method(ByteCode.MethodAccessFlags) = flags
+  }
+
+  def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
+
+  def getState(state: TransformationState): State = {
+    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  }
 
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
     val className = JavaClassModel.getClassName(clazz)
@@ -185,6 +190,13 @@ object JavaMethodC extends GrammarTransformation {
     val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type)}
     parseType.inner = parseArrayType | parseObjectType | parseIntType
     parseType
+  }
+
+  class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
+
+  class State() {
+    val referenceKindRegistry = new GetReferenceKindRegistry()
+    var methodCompiler: MethodCompiler = null
   }
 
   object TypeGrammar

@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.grammar.seqr
 import core.transformation._
 import transformations.bytecode.ByteCode
-import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler}
+import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
 import scala.collection.mutable
@@ -12,28 +12,30 @@ object SelectorC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(JavaMethodC)
 
-  object SelectorKey
-
-  object SelectorObject
-
-  object SelectorMember
-
-  def selector(_object: MetaObject, member: String): MetaObject = {
-    new MetaObject(SelectorKey) {
-      data.put(SelectorObject, _object)
-      data.put(SelectorMember, member)
-    }
-  }
-
-  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
-
-  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
-
   override def transform(program: MetaObject, state: TransformationState): Unit = {
+    JavaMethodC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
+      val methodCompiler = JavaMethodC.getMethodCompiler(state)
+      getReferenceKind(selector, methodCompiler)
+    })
     ExpressionC.getExpressionToLines(state).put(SelectorKey, (selector: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       selectorToLines(selector, methodCompiler)
     })
+  }
+
+  def getReferenceKind(selector: MetaObject, methodCompiler: MethodCompiler): ReferenceKind = {
+    val obj = SelectorC.getSelectorObject(selector)
+    val member = SelectorC.getSelectorMember(selector)
+    methodCompiler.getReferenceKind(obj) match {
+      case PackageReference(info) => info.content(member) match {
+        case result: PackageInfo => new PackageReference(result)
+        case result: ClassInfo => new ClassOrObjectReference(result, true)
+      }
+      case ClassOrObjectReference(info, _) =>
+        val field = info.getField(member)
+        val fieldClassType = methodCompiler.classCompiler.findClass(field._type.asInstanceOf[MetaObject])
+        new ClassOrObjectReference(fieldClassType, false)
+    }
   }
 
   def selectorToLines(selector: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
@@ -48,6 +50,10 @@ object SelectorC extends GrammarTransformation {
       ???
   }
 
+  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+
+  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
+
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
   = delimiters ++= Seq(".")
 
@@ -58,5 +64,18 @@ object SelectorC extends GrammarTransformation {
   }
 
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
+
+  def selector(_object: MetaObject, member: String): MetaObject = {
+    new MetaObject(SelectorKey) {
+      data.put(SelectorObject, _object)
+      data.put(SelectorMember, member)
+    }
+  }
+
+  object SelectorKey
+
+  object SelectorObject
+
+  object SelectorMember
 
 }
