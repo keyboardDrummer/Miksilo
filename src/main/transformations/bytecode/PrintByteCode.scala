@@ -5,10 +5,13 @@ import java.math.BigInteger
 import akka.util.Convert
 import core.transformation.MetaObject
 import transformations.bytecode.ByteCode._
-import transformations.javac.base.model.JavaTypes.{ArrayType, ObjectType}
+import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, ObjectTypeKey}
 import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
 object PrintByteCode {
+  val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
+  var debugCounter: Int = 0
+
   def print(byteCode: MetaObject): String = {
     formatHexLikeClassFile(valueOf(getBytes(byteCode))).toLowerCase
   }
@@ -63,7 +66,6 @@ object PrintByteCode {
 
   def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
 
-
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
@@ -103,6 +105,13 @@ object PrintByteCode {
       case ByteCode.IntegerIncrementKey => hexToBytes("84") ++
         byteToBytes(arguments(0)) ++
         byteToBytes(arguments(1))
+      case PushNull => hexToBytes("01")
+      case AddressStore =>
+        val location = arguments(0)
+        if (location > 3)
+          hexToBytes("3a") ++ byteToBytes(location)
+        else
+          byteToBytes(hexToInt("4b") + location)
     }
     result
   }
@@ -132,9 +141,9 @@ object PrintByteCode {
     shortToBytes(ByteCode.getSourceFileFileNameIndex(sourceFile))
   }
 
-  def getVerificationInfoBytes(info: Any): Seq[Byte] = hexToBytes(info match {
-    case JavaTypes.IntType => "01"
-    case JavaTypes.LongType => "02"
+  def getVerificationInfoBytes(_type: MetaObject): Seq[Byte] = hexToBytes(_type.clazz match {
+    case JavaTypes.IntTypeKey => "01"
+    case JavaTypes.LongTypeKey => "02"
   })
 
   def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
@@ -194,22 +203,18 @@ object PrintByteCode {
     shortToBytes(fields.length) ++ fields.map(field => ???)
   }
 
-  val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
-
   def getAccessFlagsByteCode(clazz: MetaObject): Seq[Byte] = {
     shortToBytes(accessFlags("super"))
   }
 
-  def javaTypeToString(_type: Any): String = _type match {
-    case JavaTypes.VoidType => "V"
-    case JavaTypes.IntType => "I"
-    case JavaTypes.DoubleType => "D"
-    case JavaTypes.LongType => "J"
-    case JavaTypes.BooleanType => "Z"
-    case meta: MetaObject => meta.clazz match {
-      case ArrayType => s"[${javaTypeToString(JavaTypes.getArrayElementType(meta))}"
-      case ObjectType => s"L${JavaTypes.getObjectTypeName(meta).right.get.parts.mkString("/")};"
-    }
+  def javaTypeToString(_type: MetaObject): String = _type.clazz match {
+    case JavaTypes.VoidTypeKey => "V"
+    case JavaTypes.IntTypeKey => "I"
+    case JavaTypes.DoubleTypeKey => "D"
+    case JavaTypes.LongTypeKey => "J"
+    case JavaTypes.BooleanTypeKey => "Z"
+    case ArrayTypeKey => s"[${javaTypeToString(JavaTypes.getArrayElementType(_type))}"
+    case ObjectTypeKey => s"L${JavaTypes.getObjectTypeName(_type).right.get.parts.mkString("/")};"
   }
 
   def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
@@ -232,11 +237,10 @@ object PrintByteCode {
           case ByteCode.MethodDescriptor =>
             val returnString = javaTypeToString(ByteCode.getMethodDescriptorReturnType(metaEntry))
             val parametersString = s"(${
-              ByteCode.getMethodDescriptorParameters(metaEntry)
-                .map(javaTypeToString).mkString("")
+              ByteCode.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
             })"
             toUTF8ConstantEntry(parametersString + returnString)
-          case JavaTypes.ObjectType => toUTF8ConstantEntry(javaTypeToString(metaEntry))
+          case JavaTypes.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
         }
       case CodeAttributeId => toUTF8ConstantEntry("Code")
       case StackMapTableId => toUTF8ConstantEntry("StackMapTable")
@@ -269,8 +273,6 @@ object PrintByteCode {
   def intToBytes(int: Int): Seq[Byte] = {
     debugBytes(Convert.intToBytes(int))
   }
-
-  var debugCounter: Int = 0
 
   def debugBytes(bytes: Seq[Byte]) = {
     val diff = bytes.length

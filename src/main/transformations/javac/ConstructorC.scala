@@ -33,15 +33,10 @@ object ConstructorC extends ProgramTransformation {
     for (constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor)) {
       constructor.clazz = ByteCode.MethodInfoKey
       constructor(JavaMethodModel.MethodNameKey) = constructorName
-      constructor(JavaMethodModel.ReturnTypeKey) = JavaTypes.VoidType
+      constructor(JavaMethodModel.ReturnTypeKey) = JavaTypes.voidType
       constructor(StaticKey) = false
     }
   }
-
-
-  object SuperCall
-
-  object ThisCall
 
   def superCall(arguments: Seq[MetaObject] = Seq()) = new MetaObject(SuperCall) {
     data.put(CallC.CallArguments, arguments)
@@ -51,11 +46,16 @@ object ConstructorC extends ProgramTransformation {
     data.put(CallC.CallArguments, arguments)
   }
 
-  object Constructor
-
   def constructor(_parameters: Seq[MetaObject], _body: Seq[MetaObject], visibility: Visibility = PublicVisibility) = new MetaObject(Constructor) {
     data.put(MethodParametersKey, _parameters)
     data.put(MethodBodyKey, _body)
     data.put(VisibilityKey, visibility)
   }
+
+  object SuperCall
+
+  object ThisCall
+
+  object Constructor
+
 }

@@ -1,6 +1,6 @@
 package transformations.javac.base
 
-import core.grammar.{Grammar, Labelled, seqr}
+import core.grammar._
 import core.transformation.TransformationManager.ProgramGrammar
 import core.transformation._
 import transformations.bytecode.ByteCode._
@@ -9,21 +9,21 @@ import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
 import transformations.javac.statements.{BlockC, StatementC}
+import transformations.javac.types.TypeC
 
 import scala.collection.mutable
 
 
 object JavaMethodC extends GrammarTransformation {
 
-  def getTypeSize(_type: Any): Int = _type match {
-    case IntType => 1
-    case BooleanType => 1
-    case DoubleType => 1
-    case meta: MetaObject => meta.clazz match {
-      case JavaTypes.ArrayType => 1
-      case ObjectType => 1
-    }
-    case VoidType => 0
+  def getTypeSize(_type: MetaObject): Int = _type.clazz match {
+    case IntTypeKey => 1
+    case BooleanTypeKey => 1
+    case DoubleTypeKey => 1
+    case ArrayTypeKey => 1
+    case ObjectTypeKey => 1
+    case ArrayTypeKey => 1
+    case VoidTypeKey => 0
   }
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
@@ -101,8 +101,7 @@ object JavaMethodC extends GrammarTransformation {
       def getMethodDescriptor(method: MetaObject): MetaObject = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
-        ByteCode.methodDescriptor(returnType
-          , parameters.map(p => JavaMethodModel.getParameterType(p)))
+        ByteCode.methodDescriptor(returnType, parameters.map(p => JavaMethodModel.getParameterType(p)))
       }
     }
   }
@@ -142,10 +141,12 @@ object JavaMethodC extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)
 
-    val parseType: Labelled = createParseType(grammars)
-    val parseReturnType = "void" ^^ (_ => VoidType) | parseType
+    val parseType = grammars.find(TypeC.TypeGrammar)
+    val parseReturnType = "void" ^^ (_ => JavaTypes.voidType) | parseType
 
-    val parseParameter = parseType ~ identifier ^^ { case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String], _type)}
+    val parseParameter = parseType ~ identifier ^^ {
+      case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String], _type)
+    }
     val parseParameters = "(" ~> parseParameter.someSeparated(",") <~ ")"
     val parseStatic = "static" ^^ (_ => true) | produce(false)
     val visibilityModifier =
@@ -154,9 +155,10 @@ object JavaMethodC extends GrammarTransformation {
         "private" ^^ (_ => PrivateVisibility) |
         produce(DefaultVisibility)
     val classMethod = grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
-      parseParameters ~ block ^^ { case visibility seqr static seqr returnType seqr name seqr parameters seqr body =>
-      JavaMethodModel.method(name.asInstanceOf[String], returnType, parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
-        static.asInstanceOf[Boolean], visibility.asInstanceOf[Visibility])
+      parseParameters ~ block ^^ {
+      case visibility seqr static seqr returnType seqr name seqr parameters seqr body =>
+        JavaMethodModel.method(name.asInstanceOf[String], returnType, parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
+          static.asInstanceOf[Boolean], visibility.asInstanceOf[Visibility])
     })
 
     val classMember: Grammar = classMethod
@@ -175,22 +177,6 @@ object JavaMethodC extends GrammarTransformation {
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
-  def createParseType(grammars: GrammarCatalogue): Labelled = {
-    val parseType = grammars.create(TypeGrammar)
-
-    val parseObjectType = identifier.someSeparated(".") ^^ { case ids: Seq[Any] => {
-      val stringIds = ids.collect({ case v: String => v})
-      if (ids.size > 1)
-        JavaTypes.objectType(new QualifiedClassName(stringIds))
-      else
-        JavaTypes.objectType(stringIds(0))
-    }
-    }
-    val parseIntType = "int" ^^ (_ => JavaTypes.IntType)
-    val parseArrayType = parseType ~ "[]" ^^ { case _type seqr _ => JavaTypes.arrayType(_type)}
-    parseType.inner = parseArrayType | parseObjectType | parseIntType
-    parseType
-  }
 
   class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
 

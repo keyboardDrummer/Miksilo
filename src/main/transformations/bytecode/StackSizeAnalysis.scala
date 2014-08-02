@@ -40,6 +40,9 @@ class StackSizeAnalysis(constantPool: Seq[Any], instructions: Seq[MetaObject])
       case IfIntegerCompareGreater => -2
       case IfZeroKey => -1
       case VoidReturn => 0
+      case PushNull => 1
+      case AddressStore => -1
+      case IntegerStore => -1
     }
 
   def getInvokeStackModification(constantPool: Seq[Any], instruction: MetaObject): Integer = {

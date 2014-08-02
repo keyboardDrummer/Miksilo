@@ -5,6 +5,7 @@ import transformations.bytecode.ByteCode
 import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
+
 object VariableC extends GrammarTransformation {
 
   val variableNameKey = "name"
@@ -18,12 +19,17 @@ object VariableC extends GrammarTransformation {
     })
     ExpressionC.getExpressionToLines(state).put(VariableKey, (variable: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
-      val variableAddress = methodCompiler.variables(getVariableName(variable)).offset
+      val name: String = getVariableName(variable)
+      val variableAddress = methodCompiler.variables(name).offset
       Seq(ByteCode.integerLoad(variableAddress))
+    })
+    ExpressionC.getGetTypeRegistry(state).put(VariableKey, (variable: MetaObject) => {
+      val methodCompiler = JavaMethodC.getMethodCompiler(state)
+      getType(variable, methodCompiler)
     })
   }
 
-  def getReferenceKind(variable: MetaObject, methodCompiler: MethodCompiler): ReferenceKind with Product with Serializable = {
+  def getReferenceKind(variable: MetaObject, methodCompiler: MethodCompiler): ReferenceKind = {
     val classCompiler = methodCompiler.classCompiler
 
     val name = VariableC.getVariableName(variable)
@@ -35,13 +41,16 @@ object VariableC extends GrammarTransformation {
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageInfo])
       else {
-        val classInfo = classCompiler.findClass(methodCompiler.variables(name)._type.asInstanceOf[MetaObject])
-        new ClassOrObjectReference(classInfo, false)
+        methodCompiler.getReferenceKindFromExpressionType(variable)
       }
     }
   }
 
   def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
+
+  def getType(variable: MetaObject, methodCompiler: MethodCompiler) = {
+    methodCompiler.variables(VariableC.getVariableName(variable))._type
+  }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)

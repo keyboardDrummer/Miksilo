@@ -8,8 +8,6 @@ object JavaMethodModel {
 
   def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
 
-  object MethodBodyKey
-
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
     new MetaObject(ByteCode.MethodInfoKey) {
@@ -26,13 +24,38 @@ object JavaMethodModel {
 
   def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
 
+  def parameter(name: String, _type: Any) = {
+    new MetaObject("JavaParameter") {
+      data.put(ParameterNameKey, name)
+      data.put(ParameterTypeKey, _type)
+    }
+  }
+
+  def getMethodName(method: MetaObject) = {
+    method(MethodNameKey).asInstanceOf[String]
+  }
+
+  def getMethodParameters(metaObject: MetaObject) = {
+    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
+  }
+
+  def getMethodReturnType(metaObject: MetaObject) = {
+    metaObject(ReturnTypeKey).asInstanceOf[MetaObject]
+  }
+
+  def getParameterType(metaObject: MetaObject) = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
+
+  def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
+
+  class Visibility
+
+  object MethodBodyKey
+
   object ParameterNameKey
 
   object StaticKey
 
   object VisibilityKey
-
-  class Visibility
 
   object PublicVisibility extends Visibility
 
@@ -42,34 +65,11 @@ object JavaMethodModel {
 
   object DefaultVisibility extends Visibility
 
-  def parameter(name: String, _type: Any) = {
-    new MetaObject("JavaParameter") {
-      data.put(ParameterNameKey, name)
-      data.put(ParameterTypeKey, _type)
-    }
-  }
-
   object ReturnTypeKey
 
   object MethodNameKey
 
-  def getMethodName(method: MetaObject) = {
-    method(MethodNameKey).asInstanceOf[String]
-  }
-
   object MethodParametersKey
-
-  def getMethodParameters(metaObject: MetaObject) = {
-    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
-  }
-
-  def getMethodReturnType(metaObject: MetaObject) = {
-    metaObject(ReturnTypeKey)
-  }
-
-  def getParameterType(metaObject: MetaObject): Any = metaObject(ParameterTypeKey)
-
-  def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
 
   object ParameterTypeKey
 

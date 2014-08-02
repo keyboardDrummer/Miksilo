@@ -8,25 +8,13 @@ import scala.collection.mutable
 
 object LessThanC extends GrammarTransformation {
 
-  object LessThanKey
-
-  object LessThanFirst
-
-  object LessThanSecond
-
-  def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first, second))
-
-  def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
-
-  def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
-
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(LessThanKey, subtraction => {
+    ExpressionC.getExpressionToLines(state).put(LessThanKey, lessThan => {
       val toInstructions = ExpressionC.getToInstructions(state)
-      val firstInstructions = toInstructions(getFirst(subtraction))
-      val secondInstructions = toInstructions(getSecond(subtraction))
+      val firstInstructions = toInstructions(getFirst(lessThan))
+      val secondInstructions = toInstructions(getSecond(lessThan))
       val falseStartLabel = state.getUniqueLabel("falseStart")
       val endLabel = state.getUniqueLabel("end")
       firstInstructions ++ secondInstructions ++
@@ -39,6 +27,10 @@ object LessThanC extends GrammarTransformation {
     })
   }
 
+  def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
+
+  def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
+
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
 
   override def transformGrammars(grammars: GrammarCatalogue) {
@@ -48,4 +40,13 @@ object LessThanC extends GrammarTransformation {
   }
 
   private def lessThan(left: Any, right: Any): MetaObject = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
+
+  def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first, second))
+
+  object LessThanKey
+
+  object LessThanFirst
+
+  object LessThanSecond
+
 }

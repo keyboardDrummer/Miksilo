@@ -45,7 +45,7 @@ object TestUtils {
       (o: String) => line += o,
       (e: String) => line += e)
     val exitValue = processBuilder ! logger
-    Assert.assertEquals(0, exitValue)
+    Assert.assertEquals(line, 0, exitValue)
     line
   }
 
@@ -55,8 +55,9 @@ object TestUtils {
     val testOutput = Directory(currentDir / Path("testOutput"))
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
-    JavaCompiler.getCompiler.compile(input, testOutput)
-    TestUtils.runJavaClass(className, testOutput)
+    JavaCompiler.getCompiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
+    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
+    TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {

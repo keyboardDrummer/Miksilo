@@ -1,10 +1,15 @@
 package transformations.javac.base
 
-import core.transformation.MetaObject
+import core.transformation.{BadInputException, MetaObject}
+import transformations.javac.expressions.ExpressionC
 
 import scala.collection.mutable
 
-case class VariableInfo(offset: Integer, _type: Any)
+case class VariableDoesNotExist(name: String) extends BadInputException {
+  override def toString = s"variable $name does not exist."
+}
+
+case class VariableInfo(offset: Integer, _type: MetaObject)
 
 class VariablePool {
   private val variables = mutable.Map[String, VariableInfo]()
@@ -12,9 +17,13 @@ class VariablePool {
 
   def localCount = variables.size
 
-  def apply(name: String) = variables(name)
+  def get(name: String) = variables.get(name)
 
-  def add(variable: String, _type: Any) {
+  def apply(name: String) = variables.getOrElse(name, throw new VariableDoesNotExist(name))
+
+  def contains(name: String) = variables.contains(name)
+
+  def add(variable: String, _type: MetaObject) {
     variables(variable) = new VariableInfo(offset, _type)
     offset += JavaMethodC.getTypeSize(_type)
   }
@@ -25,10 +34,14 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
     val getReferenceKindOption = JavaMethodC.getReferenceKindRegistry(transformationState).get(expression.clazz)
-    getReferenceKindOption.fold({
-      val _type: Any = null
-      ???
+    getReferenceKindOption.fold[ReferenceKind]({
+      getReferenceKindFromExpressionType(expression)
     })(implementation => implementation(expression))
+  }
+
+  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
+    val classInfo: ClassInfo = classCompiler.findClass(ExpressionC.getType(transformationState)(expression).asInstanceOf[MetaObject])
+    new ClassOrObjectReference(classInfo, false)
   }
 
   def transformationState = classCompiler.transformationState

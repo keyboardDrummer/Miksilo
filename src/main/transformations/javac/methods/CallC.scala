@@ -5,25 +5,9 @@ import core.transformation._
 import transformations.bytecode.ByteCode
 import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
+import util.HashMapExtensions._
 
 object CallC extends GrammarTransformation {
-
-  object CallKey
-
-  object CallCallee
-
-  object CallArguments
-
-  def call(callee: MetaObject, arguments: Seq[MetaObject] = Seq()) = {
-    new MetaObject(CallKey) {
-      data.put(CallCallee, callee)
-      data.put(CallArguments, arguments)
-    }
-  }
-
-  def getCallCallee(call: MetaObject) = call(CallCallee).asInstanceOf[MetaObject]
-
-  def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).putIfEmpty(CallKey, (call: MetaObject) => {
@@ -31,8 +15,6 @@ object CallC extends GrammarTransformation {
       callToLines(call, methodCompiler)
     })
   }
-
-  override def dependencies: Set[Contract] = Set(SelectorC)
 
   def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)
@@ -57,6 +39,12 @@ object CallC extends GrammarTransformation {
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
+  def getCallCallee(call: MetaObject) = call(CallCallee).asInstanceOf[MetaObject]
+
+  def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
+
+  override def dependencies: Set[Contract] = Set(SelectorC)
+
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
@@ -65,5 +53,18 @@ object CallC extends GrammarTransformation {
   }
 
   def call(callee: Any, arguments: Any): MetaObject = call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
+
+  def call(callee: MetaObject, arguments: Seq[MetaObject] = Seq()) = {
+    new MetaObject(CallKey) {
+      data.put(CallCallee, callee)
+      data.put(CallArguments, arguments)
+    }
+  }
+
+  object CallKey
+
+  object CallCallee
+
+  object CallArguments
 
 }

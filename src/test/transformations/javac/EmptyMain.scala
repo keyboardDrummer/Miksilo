@@ -26,13 +26,13 @@ class EmptyMain {
     byteCode
   }
 
+  def getJava: MetaObject = {
+    clazz(defaultPackage, className, Seq(getMainMethodJava))
+  }
+
   def getMainMethodJava: MetaObject = {
     val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
-    method("main", VoidType, parameters, body, static = true, PublicVisibility)
-  }
-
-  def getJava: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava))
+    method("main", JavaTypes.voidType, parameters, body, static = true, PublicVisibility)
   }
 }

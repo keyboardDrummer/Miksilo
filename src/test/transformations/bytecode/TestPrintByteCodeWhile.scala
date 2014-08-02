@@ -19,7 +19,7 @@ class TestPrintByteCodeWhile {
       ByteCode.classRef(13),
       ByteCode.classRef(14),
       "<init>",
-      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
+      ByteCode.methodDescriptor(JavaTypes.voidType, Seq()),
       ByteCode.CodeAttributeId,
       ByteCode.LineNumberTableId,
       "whilee",
@@ -54,7 +54,7 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCode.stackMapTable(9, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.IntType)),
+    val stackMapTable = ByteCode.stackMapTable(9, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.intType)),
       ByteCode.sameFrame(10)))
     val _while = ByteCode.methodInfo(8, 5, Seq(ByteCode.codeAttribute(6, 2, 1, Seq(
       ByteCode.integerConstant(0),

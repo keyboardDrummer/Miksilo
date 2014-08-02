@@ -14,47 +14,24 @@ object LabelledJumps extends ProgramTransformation {
 
   def ifIntegerCompareGreater(target: String) = instruction(ByteCode.IfIntegerCompareGreater, Seq(target))
 
-  def getGoToTarget(goTo: MetaObject) = getInstructionArguments(goTo)(0).asInstanceOf[String]
-
-  def getIfIntegerCompareGreaterTarget(compare: MetaObject) =
-    getInstructionArguments(compare)(0).asInstanceOf[String]
-
-  def getIfZeroTarget(ifZero: MetaObject) =
-    getInstructionArguments(ifZero)(0).asInstanceOf[String]
-
-  object LabelKey
-
-  object LabelNameKey
-
-  object LabelStackFrame
-
   def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey) {
     data.put(LabelNameKey, name)
     data.put(LabelStackFrame, stackFrame)
   }
 
-  def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
+  def transform(program: MetaObject, state: TransformationState): Unit = {
+    val clazz = program
+    val constantPool = new ConstantPool(ByteCode.getConstantPool(clazz))
+    for (codeAnnotation <- ByteCode.getMethods(clazz)
+      .flatMap(methodInfo => ByteCode.getMethodAttributes(methodInfo))
+      .flatMap(annotation => if (annotation.clazz == ByteCode.CodeKey) Some(annotation) else None)) {
+      val instructions = ByteCode.getCodeInstructions(codeAnnotation)
+      val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
+      codeAnnotation(ByteCode.CodeAttributesKey) = ByteCode.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
 
-  def getLabelStackFrame(label: MetaObject) = label(LabelStackFrame).asInstanceOf[MetaObject]
-
-  def instructionSize(instruction: MetaObject) = instruction.clazz match {
-    case LabelKey => 0
-    case ByteCode.VoidReturn => 1
-    case ByteCode.AddressLoad => 1
-    case ByteCode.IntegerReturn => 1
-    case ByteCode.IntegerConstantKey => 1
-    case ByteCode.SubtractInteger => 1
-    case ByteCode.AddIntegersKey => 1
-    case ByteCode.IntegerLoad => 1
-    case ByteCode.IntegerStore => 2
-    case IntegerIncrementKey => 3
-    case ByteCode.InvokeStaticKey => 3
-    case ByteCode.InvokeVirtual => 3
-    case ByteCode.InvokeSpecial => 3
-    case IfIntegerCompareGreater => 3
-    case ByteCode.GetStatic => 3
-    case IfZeroKey => 3
-    case GoToKey => 3
+      val newInstructions: Seq[MetaObject] = getNewInstructions(instructions, targetLocations)
+      codeAnnotation(ByteCode.CodeInstructionsKey) = newInstructions
+    }
   }
 
   def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[MetaObject])
@@ -80,21 +57,9 @@ object LabelledJumps extends ProgramTransformation {
       Seq[MetaObject]()
   }
 
-  def transform(program: MetaObject, state: TransformationState): Unit = {
-    val clazz = program
-    val constantPool = new ConstantPool(ByteCode.getConstantPool(clazz))
-    for (codeAnnotation <- ByteCode.getMethods(clazz)
-      .flatMap(methodInfo => ByteCode.getMethodAttributes(methodInfo))
-      .flatMap(annotation => if (annotation.clazz == ByteCode.CodeKey) Some(annotation) else None)) {
-      val instructions = ByteCode.getCodeInstructions(codeAnnotation)
-      val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
-      codeAnnotation(ByteCode.CodeAttributesKey) = ByteCode.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
+  def getLabelStackFrame(label: MetaObject) = label(LabelStackFrame).asInstanceOf[MetaObject]
 
-      val newInstructions: Seq[MetaObject] = getNewInstructions(instructions, targetLocations)
-      codeAnnotation(ByteCode.CodeInstructionsKey) = newInstructions
-    }
-  }
-
+  def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
 
   def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
     var newInstructions = mutable.ArrayBuffer[MetaObject]()
@@ -121,6 +86,36 @@ object LabelledJumps extends ProgramTransformation {
     newInstructions
   }
 
+  def getGoToTarget(goTo: MetaObject) = getInstructionArguments(goTo)(0).asInstanceOf[String]
+
+  def getIfIntegerCompareGreaterTarget(compare: MetaObject) =
+    getInstructionArguments(compare)(0).asInstanceOf[String]
+
+  def getIfZeroTarget(ifZero: MetaObject) =
+    getInstructionArguments(ifZero)(0).asInstanceOf[String]
+
+  def instructionSize(instruction: MetaObject) = instruction.clazz match {
+    case LabelKey => 0
+    case ByteCode.VoidReturn => 1
+    case ByteCode.AddressLoad => 1
+    case ByteCode.IntegerReturn => 1
+    case ByteCode.IntegerConstantKey => 1
+    case ByteCode.SubtractInteger => 1
+    case ByteCode.AddIntegersKey => 1
+    case ByteCode.IntegerLoad => 1
+    case ByteCode.IntegerStore => 2
+    case IntegerIncrementKey => 3
+    case ByteCode.InvokeStaticKey => 3
+    case ByteCode.InvokeVirtual => 3
+    case ByteCode.InvokeSpecial => 3
+    case IfIntegerCompareGreater => 3
+    case ByteCode.GetStatic => 3
+    case IfZeroKey => 3
+    case GoToKey => 3
+    case PushNull => 1
+    case AddressStore => 2
+  }
+
   def determineTargetLocations(instructions: Seq[MetaObject]): Map[String, Int] = {
     val targetLocations = mutable.Map[String, Int]()
     var location = 0
@@ -136,4 +131,12 @@ object LabelledJumps extends ProgramTransformation {
   }
 
   def dependencies: Set[Contract] = Set(ByteCode)
+
+
+  object LabelKey
+
+  object LabelNameKey
+
+  object LabelStackFrame
+
 }

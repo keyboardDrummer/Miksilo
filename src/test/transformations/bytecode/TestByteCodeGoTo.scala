@@ -32,7 +32,7 @@ class TestByteCodeGoTo {
       ByteCode.integerIncrement(0, 1),
       ByteCode.goTo(-8))
 
-    val stackMapTable = ByteCode.stackMapTable(1, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.IntType)),
+    val stackMapTable = ByteCode.stackMapTable(1, Seq(ByteCode.appendFrame(2, Seq(JavaTypes.intType)),
       ByteCode.sameFrame(10)))
     val method = ByteCode.methodInfo(0, 0, Seq(ByteCode.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
     ByteCode.clazz(2, 3, mutable.Buffer[Any](ByteCode.StackMapTableId), Seq(method))
@@ -43,7 +43,7 @@ class TestByteCodeGoTo {
       ByteCode.integerConstant(0),
       ByteCode.integerStore(0),
       LabelledJumps.label("start", new MetaObject(ByteCode.AppendFrame) {
-        data.put(ByteCode.AppendFrameTypes, Seq(JavaTypes.IntType))
+        data.put(ByteCode.AppendFrameTypes, Seq(JavaTypes.intType))
       }),
       ByteCode.integerLoad(0),
       ByteCode.integerConstant(3),

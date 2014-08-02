@@ -1,42 +1,11 @@
 package transformations.bytecode
 
 import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import transformations.bytecode.ByteCode.{FullFrameLocals, FullFrameStack}
 import transformations.javac.base.ConstantPool
 
 object InferredStackFrames extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(LabelledJumps)
-
-  def getStackMap(previousStack: Seq[Any], stack: Seq[Any], previousLocals: Seq[Any], locals: Seq[Any]) = {
-    val sameLocalsPrefix = previousLocals.zip(locals).filter(p => p._1 == p._2)
-    val removedLocals = previousLocals.drop(sameLocalsPrefix.length)
-    val addedLocals = locals.drop(sameLocalsPrefix.length)
-    val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
-    if (unchangedLocals && stack.isEmpty) {
-      new MetaObject(ByteCode.SameFrameKey)
-    }
-    else if (unchangedLocals && stack.size == 1) {
-      new MetaObject(ByteCode.SameLocals1StackItem) {
-        data.put(ByteCode.SameLocals1StackItemType, stack(0))
-      }
-    }
-    else if (stack.isEmpty && addedLocals.isEmpty) {
-      new MetaObject(ByteCode.ChopFrame) {
-        data.put(ByteCode.ChopFrameCount, removedLocals.length)
-      }
-    }
-    else if (stack.isEmpty && removedLocals.isEmpty) {
-      new MetaObject(ByteCode.AppendFrame) {
-        data.put(ByteCode.AppendFrameTypes, addedLocals)
-      }
-    }
-    else {
-      new MetaObject(ByteCode.FullFrame) {
-        data.put(ByteCode.FullFrameLocals, locals)
-        data.put(ByteCode.FullFrameStack, stack)
-      }
-    }
-
-  }
 
   def label(name: String) = new MetaObject(LabelledJumps.LabelKey) {
     data.put(LabelledJumps.LabelNameKey, name)
@@ -64,6 +33,35 @@ object InferredStackFrames extends ProgramTransformation {
         previousLocals = locals
       }
     }
+  }
+
+  def getStackMap(previousStack: Seq[Any], stack: Seq[Any], previousLocals: Seq[Any], locals: Seq[Any]) = {
+    val sameLocalsPrefix = previousLocals.zip(locals).filter(p => p._1 == p._2)
+    val removedLocals = previousLocals.drop(sameLocalsPrefix.length)
+    val addedLocals = locals.drop(sameLocalsPrefix.length)
+    val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
+    if (unchangedLocals && stack.isEmpty) {
+      new MetaObject(ByteCode.SameFrameKey)
+    }
+    else if (unchangedLocals && stack.size == 1) {
+      new MetaObject(ByteCode.SameLocals1StackItem) {
+        data.put(ByteCode.SameLocals1StackItemType, stack(0))
+      }
+    }
+    else if (stack.isEmpty && addedLocals.isEmpty) {
+      new MetaObject(ByteCode.ChopFrame) {
+        data.put(ByteCode.ChopFrameCount, removedLocals.length)
+      }
+    }
+    else if (stack.isEmpty && removedLocals.isEmpty) {
+      new MetaObject(ByteCode.AppendFrame) {
+        data.put(ByteCode.AppendFrameTypes, addedLocals)
+      }
+    }
+    else {
+      new MetaObject(ByteCode.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+    }
+
   }
 
 

@@ -5,16 +5,17 @@ import transformations.bytecode.{InferredMaxStack, InferredStackFrames, Labelled
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
 import transformations.javac.methods._
-import transformations.javac.statements.{BlockC, StatementC}
+import transformations.javac.statements.{AssignmentC, BlockC, DeclarationC, StatementC}
+import transformations.javac.types.{ObjectTypeC, TypeC}
 
 object JavaCompiler {
   def getCompiler = TransformationManager.buildCompiler(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[ProgramTransformation] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, AddRelationalPrecedence,
-      AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC, TernaryC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC,
-      JavaMethodC, BlockC, StatementC, ExpressionC, InferredStackFrames, InferredMaxStack, LabelledJumps)
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC, AddEqualityPrecedence, AddRelationalPrecedence,
+      AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC, AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC,
+      NullC, DeclarationC, JavaMethodC, BlockC, StatementC, ExpressionC, ObjectTypeC, TypeC, InferredStackFrames, InferredMaxStack, LabelledJumps)
   }
 }
 

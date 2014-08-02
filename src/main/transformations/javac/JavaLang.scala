@@ -13,14 +13,14 @@ object JavaLang {
   val langPackage = javaPackage.newPackageInfo(langPackageName)
   val objectClass = langPackage.newClassInfo(ImplicitObjectSuperClass.objectName)
   objectClass.content(ConstructorC.constructorName) =
-    new MethodInfo(ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()), false)
+    new MethodInfo(ByteCode.methodDescriptor(JavaTypes.voidType, Seq()), false)
 
   val systemClass = langPackage.newClassInfo("System")
   systemClass.newFieldInfo("out", JavaTypes.objectType(new QualifiedClassName(Seq(javaPackageName, ioPackageName, "PrintStream"))))
 
   val javaIO = javaPackage.newPackageInfo(ioPackageName)
   val printStreamClass = javaIO.newClassInfo("PrintStream")
-  printStreamClass.newMethodInfo("print", ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(JavaTypes.IntType)), _static = false)
+  printStreamClass.newMethodInfo("print", ByteCode.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType)), _static = false)
 
   val stringClass = langPackage.newClassInfo("String")
 }

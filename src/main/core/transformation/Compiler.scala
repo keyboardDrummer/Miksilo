@@ -3,6 +3,7 @@ package core.transformation
 import java.io.OutputStream
 
 import transformations.bytecode.PrintByteCode
+import util.FileNameUtils
 
 import scala.reflect.io.{Directory, File, Path}
 
@@ -14,7 +15,7 @@ trait Compiler {
   def compile(input: File, outputDirectory: Directory) {
     val inputStream = File(input).slurp()
     outputDirectory.createDirectory()
-    val byteCodeFile = File.apply(outputDirectory / Path(input.name).addExtension("class"))
+    val byteCodeFile = File.apply(outputDirectory / Path(FileNameUtils.removeExtension(input.name)).addExtension("class"))
     val writer = byteCodeFile.outputStream(append = false)
     compile(inputStream, writer)
     writer.close()

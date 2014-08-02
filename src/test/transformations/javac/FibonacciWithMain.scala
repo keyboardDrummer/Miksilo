@@ -60,6 +60,14 @@ class FibonacciWithMain {
 
   def getMethodMaxStack(method: MetaObject) = ByteCode.getCodeMaxStack(ByteCode.getMethodAttributes(method)(0))
 
+  @Test
+  def compileAndPrintFibonacciWithMain() {
+    val fibonacci = getJavaFibonacciWithMain
+    val compiler = JavaCompiler.getCompiler
+    val compiledCode = compiler.transform(fibonacci)
+    PrintByteCode.print(compiledCode)
+  }
+
   def getJavaFibonacciWithMain: MetaObject = {
     clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
   }
@@ -69,15 +77,7 @@ class FibonacciWithMain {
     val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
       VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
-    method("main", VoidType, parameters, body, static = true, PublicVisibility)
-  }
-
-  @Test
-  def compileAndPrintFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.transform(fibonacci)
-    PrintByteCode.print(compiledCode)
+    method("main", JavaTypes.voidType, parameters, body, static = true, PublicVisibility)
   }
 
   @Test
@@ -142,13 +142,13 @@ class FibonacciWithMain {
       ByteCode.classRef(24),
       ByteCode.classRef(25),
       ConstructorC.constructorName,
-      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq()),
+      ByteCode.methodDescriptor(JavaTypes.voidType, Seq()),
       ByteCode.CodeAttributeId,
       "main",
-      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(
+      ByteCode.methodDescriptor(JavaTypes.voidType, Seq(
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       methodName,
-      ByteCode.methodDescriptor(JavaTypes.IntType, Seq(JavaTypes.IntType)),
+      ByteCode.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
       ByteCode.StackMapTableId,
       ByteCode.nameAndType(7, expectedOutput),
       ByteCode.classRef(26),
@@ -163,7 +163,7 @@ class FibonacciWithMain {
       JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       new QualifiedClassName(Seq("java", "io", "PrintStream")),
       "print",
-      ByteCode.methodDescriptor(JavaTypes.VoidType, Seq(JavaTypes.IntType))
+      ByteCode.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType))
     )
     constantPool
   }
