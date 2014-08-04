@@ -1,6 +1,7 @@
 package transformations.bytecode
 
 import core.transformation.MetaObject
+import transformations.bytecode.instructions._
 import util.DataFlowAnalysis
 
 abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject]) extends DataFlowAnalysis[Int, State] {
@@ -11,15 +12,15 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject]) ext
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)
     instruction.clazz match {
-      case ByteCode.GoToKey => Set(labels(LabelledJumps.getGoToTarget(instruction)))
-      case ByteCode.IfZeroKey =>
+      case GotoC.GoToKey => Set(labels(LabelledJumps.getGoToTarget(instruction)))
+      case IfZeroC.IfZeroKey =>
         val target = LabelledJumps.getIfIntegerCompareGreaterTarget(instruction)
         Set(instructionIndex + 1, labels(target))
-      case ByteCode.IfIntegerCompareGreater =>
+      case IfIntegerCompareGreaterC.IfIntegerCompareGreaterKey =>
         val target = LabelledJumps.getIfIntegerCompareGreaterTarget(instruction)
         Set(instructionIndex + 1, labels(target))
-      case ByteCode.VoidReturn => Set()
-      case ByteCode.IntegerReturn => Set()
+      case VoidReturnC.VoidReturn => Set()
+      case IntegerReturnC.IntegerReturn => Set()
       case _ => Set(instructionIndex + 1)
     }
   }

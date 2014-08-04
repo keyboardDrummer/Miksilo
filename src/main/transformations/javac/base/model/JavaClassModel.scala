@@ -1,7 +1,7 @@
 package transformations.javac.base.model
 
 import core.transformation.MetaObject
-import transformations.bytecode.ByteCode
+import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 
@@ -10,16 +10,8 @@ object JavaClassModel {
 
   def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
 
-  object ClassPackage
-
-  object ClassImports
-
-  object ClassParent
-
-  object ClassName
-
-  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCode.ClassFileKey) {
-    data.put(ByteCode.ClassMethodsKey, methods.toBuffer)
+  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCodeSkeleton.ClassFileKey) {
+    data.put(ByteCodeSkeleton.ClassMethodsKey, methods.toBuffer)
     data.put(ClassPackage, _package)
     data.put(ClassName, name)
     data.put(ClassImports, imports)
@@ -33,5 +25,14 @@ object JavaClassModel {
 
   def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
 
-  def getMethods(clazz: MetaObject) = clazz(ByteCode.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+
+  object ClassPackage
+
+  object ClassImports
+
+  object ClassParent
+
+  object ClassName
+
 }

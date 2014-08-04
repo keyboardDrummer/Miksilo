@@ -31,7 +31,7 @@ object AddIfElse extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[Contract] = Set(AddStatementToSSM)
+  override def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createIfElse(condition: MetaObject, _then: MetaObject, _else: MetaObject) = new MetaObject(_if) {
     data.put(AddIfElse.condition, condition)
@@ -47,7 +47,7 @@ class TestIfElse {
     val _then = loadConstant(5)
     val _else = loadConstant(9)
     val _if = AddIfElse.createIfElse(condition, _then, _else)
-    val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
+    val compiler = new Transformer(Seq(AddIfElse, AddStatementToSSM))
     compiler.transform(_if)
     val typedSSM = SSM.toTyped(_if)
     val machine = new SSMMachine(typedSSM)
@@ -61,7 +61,7 @@ class TestIfElse {
     val _then = loadConstant(5)
     val _else = loadConstant(9)
     val _if = AddIfElse.createIfElse(condition, _then, _else)
-    val compiler = TransformationManager.buildCompiler(Seq(AddIfElse, AddStatementToSSM))
+    val compiler = new Transformer(Seq(AddIfElse, AddStatementToSSM))
     compiler.transform(_if)
     val typedSSM = ssm.SSM.toTyped(_if)
     val machine = new SSMMachine(typedSSM)

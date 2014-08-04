@@ -1,25 +1,24 @@
 package transformations.bytecode
 
 import core.transformation.MetaObject
-import transformations.javac.base.ConstantPool
 
 case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
   override def toString = s"StackDoesNotFitInstructionInput: instruction= $instruction; inputTypes= $inputTypes; stack= $stack"
 }
 
-class StackAnalysis(constantPool: ConstantPool, instructions: Seq[MetaObject])
-  extends InstructionFlowAnalysis[Seq[Any]](instructions) {
+class StackAnalysis(instructions: Seq[MetaObject], getInputTypes: MetaObject => Seq[MetaObject], getOutputTypes: MetaObject => Seq[MetaObject])
+  extends InstructionFlowAnalysis[Seq[MetaObject]](instructions) {
 
-  override def combineState(first: Seq[Any], second: Seq[Any]): Seq[Any] = {
+  override def combineState(first: Seq[MetaObject], second: Seq[MetaObject]): Seq[MetaObject] = {
     if (first == second)
       return first
 
     throw new RuntimeException()
   }
 
-  override def updateState(state: Seq[Any], instructionIndex: Int): Seq[Any] = {
+  override def updateState(state: Seq[MetaObject], instructionIndex: Int): Seq[MetaObject] = {
     val instruction = instructions(instructionIndex)
-    val inputTypes = Instructions.getInstructionInputTypes(constantPool, instruction)
+    val inputTypes = getInputTypes(instruction)
     if (inputTypes.length > state.length)
       throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
 
@@ -28,7 +27,7 @@ class StackAnalysis(constantPool: ConstantPool, instructions: Seq[MetaObject])
       throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
 
     val remainingStack = state.dropRight(inputTypes.length)
-    val newStack = remainingStack ++ Instructions.getInstructionOutputTypes(constantPool, instruction)
+    val newStack = remainingStack ++ getOutputTypes(instruction)
     newStack
   }
 

@@ -1,8 +1,8 @@
 package transformations.javac
 
-import core.transformation.{ComparisonOptions, MetaObject}
+import core.transformation._
 import org.junit.Assert
-import transformations.bytecode.{ByteCode, PrintByteCode}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
@@ -10,7 +10,7 @@ import scala.sys.process.{Process, ProcessLogger}
 object TestUtils {
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
-    for (methodPair <- ByteCode.getMethods(expectedByteCode).zip(ByteCode.getMethods(compiledCode))) {
+    for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
       Assert.assertTrue(MetaObject.deepEquality(getMethodInstructions(methodPair._1),
         getMethodInstructions(methodPair._2),
         new ComparisonOptions(false, true, false)))
@@ -18,7 +18,11 @@ object TestUtils {
   }
 
   def getMethodInstructions(method: MetaObject) =
-    ByteCode.getCodeInstructions(ByteCode.getMethodAttributes(method)(0))
+    ByteCodeSkeleton.getCodeInstructions(ByteCodeSkeleton.getMethodAttributes(method)(0))
+
+  def printByteCode(byteCode: MetaObject): String = {
+    PrintByteCode.printBytes(getBytes(byteCode))
+  }
 
   def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
     val line = runByteCode(className, code)
@@ -26,7 +30,7 @@ object TestUtils {
   }
 
   def runByteCode(className: String, code: MetaObject) = {
-    val bytes = PrintByteCode.getBytes(code).toArray
+    val bytes = getBytes(code).toArray
     val currentDir = new File(new java.io.File("."))
     val testDirectory = currentDir / Path("testOutput")
     testDirectory.createDirectory()
@@ -36,6 +40,13 @@ object TestUtils {
     writer.close()
 
     runJavaClass(className, testDirectory)
+  }
+
+  def getBytes(byteCode: MetaObject): Seq[Byte] = {
+    var output: Seq[Byte] = null
+    val transformations: Seq[Injector] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
+    new Transformer(transformations).transform(byteCode)
+    output
   }
 
   def runJavaClass(className: String, directory: Path): String = {
@@ -61,8 +72,8 @@ object TestUtils {
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {
-    val expectedConstantPoolSet = ByteCode.getConstantPool(expectedByteCode)
-    val compiledConstantPoolSet = ByteCode.getConstantPool(compiledCode)
+    val expectedConstantPoolSet = ByteCodeSkeleton.getConstantPool(expectedByteCode)
+    val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode)
     Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
     Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem => {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => MetaObject.deepEquality(compiledItem, expectedItem,
@@ -70,4 +81,11 @@ object TestUtils {
       hasEquivalent
     }))
   }
+
+  class GetBytes(write: Seq[Byte] => Unit) extends ProgramTransformation {
+    override def transform(program: MetaObject, state: TransformationState): Unit = {
+      write(PrintByteCode.getBytes(program, state))
+    }
+  }
+
 }

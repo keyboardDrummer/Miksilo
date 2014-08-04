@@ -3,6 +3,7 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode._
+import transformations.bytecode.instructions._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.JavaTypes._
@@ -31,8 +32,7 @@ class FibonacciWithMain {
   @Test
   def runCompiledFibonacci() {
     val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.transform(fibonacci)
+    val byteCode = JavaCompiler.getTransformer.transform(fibonacci)
 
     val expectedResult = expectedOutput
     TestUtils.runByteCode(className, byteCode, expectedResult)
@@ -41,9 +41,8 @@ class FibonacciWithMain {
   @Test
   def testStackSizeLocalsArgs() {
     val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.transform(fibonacci)
-    val methods = ByteCode.getMethods(byteCode)
+    val byteCode = JavaCompiler.getTransformer.transform(fibonacci)
+    val methods = ByteCodeSkeleton.getMethods(byteCode)
     val constructor = methods(0)
     val main = methods(1)
     val fibonacciMethod = methods(2)
@@ -56,17 +55,9 @@ class FibonacciWithMain {
 
   }
 
-  def getMethodLocals(method: MetaObject) = ByteCode.getCodeMaxLocals(ByteCode.getMethodAttributes(method)(0))
+  def getMethodLocals(method: MetaObject) = ByteCodeSkeleton.getCodeMaxLocals(ByteCodeSkeleton.getMethodAttributes(method)(0))
 
-  def getMethodMaxStack(method: MetaObject) = ByteCode.getCodeMaxStack(ByteCode.getMethodAttributes(method)(0))
-
-  @Test
-  def compileAndPrintFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.transform(fibonacci)
-    PrintByteCode.print(compiledCode)
-  }
+  def getMethodMaxStack(method: MetaObject) = ByteCodeSkeleton.getCodeMaxStack(ByteCodeSkeleton.getMethodAttributes(method)(0))
 
   def getJavaFibonacciWithMain: MetaObject = {
     clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
@@ -81,10 +72,16 @@ class FibonacciWithMain {
   }
 
   @Test
+  def compileAndPrintFibonacciWithMain() {
+    val fibonacci = getJavaFibonacciWithMain
+    val compiledCode = JavaCompiler.getTransformer.transform(fibonacci)
+    TestUtils.printByteCode(compiledCode)
+  }
+
+  @Test
   def compileAndValidateFibonacciWithMain() {
     val fibonacciJava = getJavaFibonacciWithMain
-    val compiler = JavaCompiler.getCompiler
-    val compiledCode = compiler.transform(fibonacciJava)
+    val compiledCode = JavaCompiler.getTransformer.transform(fibonacciJava)
     val expectedCode = getExpectedUnoptimizedFibonacciWithMainByteCode
     TestUtils.testInstructionEquivalence(expectedCode, compiledCode)
     TestUtils.compareConstantPools(expectedCode, compiledCode)
@@ -93,69 +90,69 @@ class FibonacciWithMain {
   def getExpectedUnoptimizedFibonacciWithMainByteCode: MetaObject = {
     val constantPool: ArrayBuffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
-    val nativeClass = ByteCode.clazz(3, 4, constantPool, Seq(other.getConstructorByteCode, getMainByteCode, method))
+    val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(other.getConstructorByteCode, getMainByteCode, method))
     nativeClass
   }
 
   def getMainByteCode = {
-    val instructions = Seq(ByteCode.getStatic(2),
-      ByteCode.integerConstant(5),
-      ByteCode.invokeStatic(3),
-      ByteCode.invokeVirtual(4),
-      ByteCode.voidReturn)
-    ByteCode.methodInfo(11, 12, Seq(ByteCode.codeAttribute(9, 2, 1, instructions, Seq(), Seq())),
-      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
+    val instructions = Seq(GetStaticC.getStatic(2),
+      IntegerConstantC.integerConstant(5),
+      InvokeStaticC.invokeStatic(3),
+      InvokeVirtualC.invokeVirtual(4),
+      VoidReturnC.voidReturn)
+    ByteCodeSkeleton.methodInfo(11, 12, Seq(ByteCodeSkeleton.codeAttribute(9, 2, 1, instructions, Seq(), Seq())),
+      Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
   }
 
   def getFibonacciMethodByteCode: MetaObject = {
     val instructions = Seq(
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(2),
-      ByteCode.ifIntegerCompareGreater(3),
-      ByteCode.integerConstant(1),
-      ByteCode.goTo(16),
-      ByteCode.integerConstant(0),
-      ByteCode.ifZero(7),
-      ByteCode.integerConstant(1),
-      ByteCode.goTo(16),
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(1),
-      ByteCode.subtractInteger,
-      ByteCode.invokeStatic(3),
-      ByteCode.integerLoad(0),
-      ByteCode.integerConstant(2),
-      ByteCode.subtractInteger,
-      ByteCode.invokeStatic(3),
-      ByteCode.addInteger,
-      ByteCode.integerReturn
+      LoadIntegerC.integerLoad(0),
+      IntegerConstantC.integerConstant(2),
+      IfIntegerCompareGreaterC.ifIntegerCompareGreater(3),
+      IntegerConstantC.integerConstant(1),
+      GotoC.goTo(16),
+      IntegerConstantC.integerConstant(0),
+      IfZeroC.ifZero(7),
+      IntegerConstantC.integerConstant(1),
+      GotoC.goTo(16),
+      LoadIntegerC.integerLoad(0),
+      IntegerConstantC.integerConstant(1),
+      SubtractIntegerC.subtractInteger,
+      InvokeStaticC.invokeStatic(3),
+      LoadIntegerC.integerLoad(0),
+      IntegerConstantC.integerConstant(2),
+      SubtractIntegerC.subtractInteger,
+      InvokeStaticC.invokeStatic(3),
+      AddIntegersC.addInteger,
+      IntegerReturnC.integerReturn
     )
-    val method = ByteCode.methodInfo(13, 14, Seq(ByteCode.codeAttribute(9, 3, 1, instructions, Seq(), Seq())),
-      Set(ByteCode.PublicAccess, ByteCode.StaticAccess))
+    val method = ByteCodeSkeleton.methodInfo(13, 14, Seq(ByteCodeSkeleton.codeAttribute(9, 3, 1, instructions, Seq(), Seq())),
+      Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
     method
   }
 
   def getConstantPool: ArrayBuffer[Any] = {
-    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(6, 18),
-      ByteCode.fieldRef(19, 20),
-      ByteCode.methodRef(5, 21),
-      ByteCode.methodRef(22, 23),
-      ByteCode.classRef(24),
-      ByteCode.classRef(25),
+    val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(6, 18),
+      ByteCodeSkeleton.fieldRef(19, 20),
+      ByteCodeSkeleton.methodRef(5, 21),
+      ByteCodeSkeleton.methodRef(22, 23),
+      ByteCodeSkeleton.classRef(24),
+      ByteCodeSkeleton.classRef(25),
       ConstructorC.constructorName,
-      ByteCode.methodDescriptor(JavaTypes.voidType, Seq()),
-      ByteCode.CodeAttributeId,
+      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.CodeAttributeId,
       "main",
-      ByteCode.methodDescriptor(JavaTypes.voidType, Seq(
+      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(
         JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       methodName,
-      ByteCode.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
-      ByteCode.StackMapTableId,
-      ByteCode.nameAndType(7, expectedOutput),
-      ByteCode.classRef(26),
-      ByteCode.nameAndType(27, 28),
-      ByteCode.nameAndType(13, 14),
-      ByteCode.classRef(29),
-      ByteCode.nameAndType(30, 31),
+      ByteCodeSkeleton.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
+      ByteCodeSkeleton.StackMapTableId,
+      ByteCodeSkeleton.nameAndType(7, expectedOutput),
+      ByteCodeSkeleton.classRef(26),
+      ByteCodeSkeleton.nameAndType(27, 28),
+      ByteCodeSkeleton.nameAndType(13, 14),
+      ByteCodeSkeleton.classRef(29),
+      ByteCodeSkeleton.nameAndType(30, 31),
       new QualifiedClassName(defaultPackage ++ Seq(className)),
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
@@ -163,7 +160,7 @@ class FibonacciWithMain {
       JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       new QualifiedClassName(Seq("java", "io", "PrintStream")),
       "print",
-      ByteCode.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType))
+      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType))
     )
     constantPool
   }

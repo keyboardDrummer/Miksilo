@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
-import transformations.bytecode.ByteCode
+import transformations.bytecode.instructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
 import util.HashMapExtensions._
@@ -33,9 +33,9 @@ object CallC extends GrammarTransformation {
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
     val invokeInstructions = Seq(if (staticCall)
-      ByteCode.invokeStatic(methodRefIndex)
+      InvokeStaticC.invokeStatic(methodRefIndex)
     else
-      ByteCode.invokeVirtual(methodRefIndex))
+      InvokeVirtualC.invokeVirtual(methodRefIndex))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
@@ -43,7 +43,7 @@ object CallC extends GrammarTransformation {
 
   def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
 
-  override def dependencies: Set[Contract] = Set(SelectorC)
+  override def dependencies: Set[Contract] = Set(SelectorC, InvokeStaticC, InvokeVirtualC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)

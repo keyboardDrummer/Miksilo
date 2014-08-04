@@ -1,6 +1,7 @@
 package transformations.javac.base
 
 import core.transformation.{BadInputException, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.expressions.ExpressionC
 
 import scala.collection.mutable
@@ -25,7 +26,7 @@ class VariablePool {
 
   def add(variable: String, _type: MetaObject) {
     variables(variable) = new VariableInfo(offset, _type)
-    offset += JavaMethodC.getTypeSize(_type)
+    offset += ByteCodeSkeleton.getTypeSize(_type)
   }
 }
 

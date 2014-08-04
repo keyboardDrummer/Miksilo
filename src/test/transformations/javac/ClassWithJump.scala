@@ -23,8 +23,7 @@ class ClassWithJump {
 
   def getByteCode: MetaObject = {
     val java = getJava
-    val compiler = JavaCompiler.getCompiler
-    val byteCode = compiler.transform(java)
+    val byteCode = JavaCompiler.getTransformer.transform(java)
     byteCode
   }
 

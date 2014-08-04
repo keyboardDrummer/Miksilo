@@ -2,13 +2,14 @@ package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
-import transformations.bytecode.{ByteCode, InferredStackFrames, LabelledJumps}
+import transformations.bytecode.instructions.IntegerConstantC
+import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
 
 import scala.collection.mutable
 
 object LessThanC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence)
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(LessThanKey, lessThan => {
@@ -19,17 +20,17 @@ object LessThanC extends GrammarTransformation {
       val endLabel = state.getUniqueLabel("end")
       firstInstructions ++ secondInstructions ++
         Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
-          ByteCode.integerConstant(1),
+          IntegerConstantC.integerConstant(1),
           LabelledJumps.goTo(endLabel),
           InferredStackFrames.label(falseStartLabel),
-          ByteCode.integerConstant(0),
+          IntegerConstantC.integerConstant(0),
           InferredStackFrames.label(endLabel))
     })
   }
 
-  def getFirst(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
+  def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
 
-  def getSecond(lessThan: MetaObject) = ByteCode.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
+  def getSecond(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
 
@@ -41,7 +42,7 @@ object LessThanC extends GrammarTransformation {
 
   private def lessThan(left: Any, right: Any): MetaObject = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
 
-  def lessThan(first: MetaObject, second: MetaObject) = ByteCode.instruction(LessThanKey, Seq(first, second))
+  def lessThan(first: MetaObject, second: MetaObject) = ByteCodeSkeleton.instruction(LessThanKey, Seq(first, second))
 
   object LessThanKey
 

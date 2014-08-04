@@ -1,6 +1,6 @@
 package application.graphing
 
-import core.transformation.{Contract, TransformationManager}
+import core.transformation.Contract
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import transformations.javac.JavaCompiler
 
@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
 
-  val transformations: Set[Contract] = TransformationManager.javaTransformations ++ JavaCompiler.javaCompilerTransformations.toSet
+  val transformations: Set[Contract] = JavaCompiler.javaCompilerTransformations.toSet
 
   depthFirstTraversal[Contract](transformations, transformation => transformation.dependencies,
     transformation => addVertex(new TransformationVertex(transformation)),

@@ -20,5 +20,5 @@ object AddDoWhile extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[Contract] = Set(AddStatementToSSM)
+  override def dependencies: Set[Contract] = Set(AddStatementToSSM)
 }

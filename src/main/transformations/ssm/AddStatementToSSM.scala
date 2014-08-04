@@ -7,9 +7,6 @@ import scala.collection.mutable
 
 object AddStatementToSSM extends ProgramTransformation {
 
-  def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, mutable.Map.empty)
-    .asInstanceOf[mutable.Map[AnyRef, MetaObject => Seq[MetaObject]]]
-
   def convertStatement(statement: MetaObject, state: TransformationState) = {
     val statementToSSMLines = getStatementToLines(state)
     statementToSSMLines(statement.clazz)(statement)
@@ -26,5 +23,8 @@ object AddStatementToSSM extends ProgramTransformation {
     program.data.put(lines, convertStatement(program))
   }
 
-  def dependencies: Set[Contract] = Set.empty
+  def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, mutable.Map.empty)
+    .asInstanceOf[mutable.Map[AnyRef, MetaObject => Seq[MetaObject]]]
+
+  override def dependencies: Set[Contract] = Set.empty
 }

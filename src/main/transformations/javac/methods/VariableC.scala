@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.transformation._
-import transformations.bytecode.ByteCode
+import transformations.bytecode.instructions.LoadIntegerC
 import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
@@ -10,7 +10,7 @@ object VariableC extends GrammarTransformation {
 
   val variableNameKey = "name"
 
-  override def dependencies: Set[Contract] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC, LoadIntegerC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaMethodC.getReferenceKindRegistry(state).put(VariableKey, variable => {
@@ -21,7 +21,7 @@ object VariableC extends GrammarTransformation {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       val name: String = getVariableName(variable)
       val variableAddress = methodCompiler.variables(name).offset
-      Seq(ByteCode.integerLoad(variableAddress))
+      Seq(LoadIntegerC.integerLoad(variableAddress))
     })
     ExpressionC.getGetTypeRegistry(state).put(VariableKey, (variable: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)

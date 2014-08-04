@@ -2,7 +2,8 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.bytecode.ByteCode
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC, VoidReturnC}
 import transformations.javac.base.model.{JavaClassModel, JavaTypes, QualifiedClassName}
 
 import scala.collection.mutable.ArrayBuffer
@@ -13,40 +14,39 @@ class EmptyClassCompilation {
 
   @Test
   def testEquivalentConstantPool() {
-    val expectedByteCode = getEmptyClassByteCode()
-    val javaCode = getEmptyClass()
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val expectedByteCode = getEmptyClassByteCode
+    val javaCode: MetaObject = getEmptyClass
+    val compiledCode = JavaCompiler.getTransformer.transform(javaCode)
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   @Test
   def testEquivalentMethod() {
-    val expectedByteCode = getEmptyClassByteCode()
-    val javaCode = getEmptyClass()
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val expectedByteCode = getEmptyClassByteCode
+    val javaCode = getEmptyClass
+    val compiledCode = JavaCompiler.getTransformer.transform(javaCode)
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }
 
-  def getEmptyClassByteCode() = {
-    val constantPool = ArrayBuffer[Any](ByteCode.methodRef(3, 10),
-      ByteCode.classRef(11),
-      ByteCode.classRef(12),
+  def getEmptyClassByteCode = {
+    val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(3, 10),
+      ByteCodeSkeleton.classRef(11),
+      ByteCodeSkeleton.classRef(12),
       ConstructorC.constructorName,
-      ByteCode.methodDescriptor(JavaTypes.voidType, Seq()),
-      ByteCode.CodeAttributeId,
-      ByteCode.nameAndType(4, 5),
+      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.CodeAttributeId,
+      ByteCodeSkeleton.nameAndType(4, 5),
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
       new QualifiedClassName(Seq("java", "lang", "Object"))
     )
-    val instructions = Seq(ByteCode.addressLoad(0), ByteCode.invokeSpecial(1), ByteCode.voidReturn)
-    val codeAttribute = Seq(ByteCode.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
-    val defaultConstructor = ByteCode.methodInfo(3, 4, codeAttribute, Set(ByteCode.PublicAccess))
-    ByteCode.clazz(2, 3, constantPool, Seq(defaultConstructor))
+    val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnC.voidReturn)
+    val codeAttribute = Seq(ByteCodeSkeleton.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
+    val defaultConstructor = ByteCodeSkeleton.methodInfo(3, 4, codeAttribute, Set(ByteCodeSkeleton.PublicAccess))
+    ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }
 
-  def getEmptyClass() = {
+  def getEmptyClass: MetaObject = {
     JavaClassModel.clazz(classPackage, className, methods = Seq[MetaObject]())
-
   }
 }

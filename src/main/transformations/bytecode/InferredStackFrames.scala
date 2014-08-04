@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
-import transformations.bytecode.ByteCode.{FullFrameLocals, FullFrameStack}
+import transformations.bytecode.ByteCodeSkeleton.{FullFrameLocals, FullFrameStack}
 import transformations.javac.base.ConstantPool
 
 object InferredStackFrames extends ProgramTransformation {
@@ -12,16 +12,20 @@ object InferredStackFrames extends ProgramTransformation {
   }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
+    val signatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
     val clazz = program
-    val constantPool = new ConstantPool(ByteCode.getConstantPool(clazz))
-    for (method <- ByteCode.getMethods(clazz)) {
-      val methodDescriptor = constantPool.getValue(ByteCode.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
-      val inputs = ByteCode.getMethodDescriptorParameters(methodDescriptor)
-      val code = ByteCode.getMethodAttributes(method).find(a => a.clazz == ByteCode.CodeKey).get
-      val instructions = ByteCode.getCodeInstructions(code)
+    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    for (method <- ByteCodeSkeleton.getMethods(clazz)) {
+      val methodDescriptor = constantPool.getValue(ByteCodeSkeleton.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
+      val inputs = ByteCodeSkeleton.getMethodDescriptorParameters(methodDescriptor)
+      val code = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == ByteCodeSkeleton.CodeKey).get
+      val instructions = ByteCodeSkeleton.getCodeInstructions(code)
       val codeLocals = inputs
-      var previousStack = Seq[Any]()
-      val currentStacks = new StackAnalysis(constantPool, instructions).run(0, previousStack)
+      var previousStack = Seq[MetaObject]()
+      val stackAnalysis: StackAnalysis = new StackAnalysis(instructions,
+        instruction => signatureRegistry(instruction.clazz)(constantPool, instruction)._1,
+        instruction => signatureRegistry(instruction.clazz)(constantPool, instruction)._2)
+      val currentStacks = stackAnalysis.run(0, previousStack)
       var previousLocals = codeLocals
       for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledJumps.LabelKey)) {
         val index = indexedLabel._2
@@ -41,25 +45,25 @@ object InferredStackFrames extends ProgramTransformation {
     val addedLocals = locals.drop(sameLocalsPrefix.length)
     val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
     if (unchangedLocals && stack.isEmpty) {
-      new MetaObject(ByteCode.SameFrameKey)
+      new MetaObject(ByteCodeSkeleton.SameFrameKey)
     }
     else if (unchangedLocals && stack.size == 1) {
-      new MetaObject(ByteCode.SameLocals1StackItem) {
-        data.put(ByteCode.SameLocals1StackItemType, stack(0))
+      new MetaObject(ByteCodeSkeleton.SameLocals1StackItem) {
+        data.put(ByteCodeSkeleton.SameLocals1StackItemType, stack(0))
       }
     }
     else if (stack.isEmpty && addedLocals.isEmpty) {
-      new MetaObject(ByteCode.ChopFrame) {
-        data.put(ByteCode.ChopFrameCount, removedLocals.length)
+      new MetaObject(ByteCodeSkeleton.ChopFrame) {
+        data.put(ByteCodeSkeleton.ChopFrameCount, removedLocals.length)
       }
     }
     else if (stack.isEmpty && removedLocals.isEmpty) {
-      new MetaObject(ByteCode.AppendFrame) {
-        data.put(ByteCode.AppendFrameTypes, addedLocals)
+      new MetaObject(ByteCodeSkeleton.AppendFrame) {
+        data.put(ByteCodeSkeleton.AppendFrameTypes, addedLocals)
       }
     }
     else {
-      new MetaObject(ByteCode.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+      new MetaObject(ByteCodeSkeleton.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
     }
 
   }

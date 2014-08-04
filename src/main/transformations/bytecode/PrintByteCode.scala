@@ -3,130 +3,20 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import akka.util.Convert
-import core.transformation.MetaObject
-import transformations.bytecode.ByteCode._
+import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, ObjectTypeKey}
 import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
-object PrintByteCode {
+import scala.collection.mutable
+
+object PrintByteCode extends ProgramTransformation {
   val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 
-  def print(byteCode: MetaObject): String = {
-    formatHexLikeClassFile(valueOf(getBytes(byteCode))).toLowerCase
-  }
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
-  def formatHexLikeClassFile(hex: String): String = {
-    hex.grouped(4).grouped(8).map(g => g.mkString(" ")).mkString("\n")
-  }
-
-  def valueOf(buf: Iterable[Byte]): String = buf.map("%02X" format _).mkString
-
-  def getBytes(byteCode: MetaObject): Seq[Byte] = {
-    val clazz = byteCode
-    var result = List[Byte]()
-
-    result ++= intToBytes(0xCAFEBABE)
-    result ++= intToBytes(0x00000033)
-    val constantPool = ByteCode.getConstantPool(clazz)
-    val constantPoolSizePlusOne = shortToBytes(constantPool.length + 1)
-    result ++= constantPoolSizePlusOne
-    for (constantPoolEntry <- constantPool) {
-      result ++= getConstantEntryByteCode(constantPoolEntry)
-    }
-    result ++= getAccessFlagsByteCode(clazz)
-    result ++= shortToBytes(ByteCode.getClassNameIndex(clazz))
-    result ++= shortToBytes(ByteCode.getParentIndex(clazz))
-    result ++= getInterfacesByteCode(clazz)
-    result ++= getFieldsByteCode(clazz)
-    result ++= getMethodsByteCode(clazz)
-    result ++= getAttributesByteCode(ByteCode.getClassAttributes(clazz))
-    result
-  }
-
-  def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
-    val methods = ByteCode.getMethods(clazz)
-    shortToBytes(methods.length) ++ methods.flatMap(method => getMethodByteCode(method))
-  }
-
-  def getMethodByteCode(methodInfo: MetaObject) = {
-    val accessCodes = Map(
-      ByteCode.PublicAccess -> "0001",
-      ByteCode.StaticAccess -> "0008",
-      ByteCode.PrivateAccess -> "0002").mapValues(s => hexToInt(s))
-    shortToBytes(ByteCode.getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
-      shortToBytes(ByteCode.getMethodNameIndex(methodInfo)) ++
-      shortToBytes(ByteCode.getMethodDescriptorIndex(methodInfo)) ++
-      getAttributesByteCode(ByteCode.getMethodAttributes(methodInfo))
-  }
-
-  def getAttributesByteCode(attributes: Seq[MetaObject]) = {
-    shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))
-  }
-
-  def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
-
-  def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
-
-  def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCode.getInstructionArguments(instruction)
-    val result = instruction.clazz match {
-      case ByteCode.GetStatic => hexToBytes("b2") ++ shortToBytes(arguments(0))
-      case ByteCode.AddIntegersKey => hexToBytes("60")
-      case ByteCode.SubtractInteger => hexToBytes("64")
-      case ByteCode.IntegerConstantKey =>
-        byteToBytes(3 + ByteCode.getIntegerConstantValue(instruction))
-      case ByteCode.AddressLoad =>
-        val location = arguments(0)
-        if (location > 3)
-          hexToBytes("19") ++ byteToBytes(location)
-        else
-          byteToBytes(hexToInt("2a") + location)
-      case ByteCode.IntegerLoad =>
-        val location = arguments(0)
-        if (location > 3)
-          hexToBytes("15") ++ byteToBytes(location)
-        else
-          byteToBytes(hexToInt("1a") + location)
-      case ByteCode.GoToKey => hexToBytes("a7") ++ shortToBytes(arguments(0))
-      case ByteCode.InvokeVirtual => hexToBytes("b6") ++ shortToBytes(arguments(0))
-      case ByteCode.InvokeSpecial => hexToBytes("b7") ++ shortToBytes(arguments(0))
-      case ByteCode.InvokeStaticKey => hexToBytes("b8") ++ shortToBytes(arguments(0))
-      case ByteCode.VoidReturn => hexToBytes("b1")
-      case ByteCode.IntegerReturn => hexToBytes("ac")
-      case ByteCode.IntegerStore =>
-        val location = arguments(0)
-        if (location > 3)
-          hexToBytes("36") ++ byteToBytes(location)
-        else
-          byteToBytes(hexToInt("3b") + location)
-      case ByteCode.IfIntegerCompareGreater => hexToBytes("a2") ++ shortToBytes(arguments(0))
-      case ByteCode.IfZeroKey => hexToBytes("99") ++ shortToBytes(arguments(0))
-      case ByteCode.IntegerIncrementKey => hexToBytes("84") ++
-        byteToBytes(arguments(0)) ++
-        byteToBytes(arguments(1))
-      case PushNull => hexToBytes("01")
-      case AddressStore =>
-        val location = arguments(0)
-        if (location > 3)
-          hexToBytes("3a") ++ byteToBytes(location)
-        else
-          byteToBytes(hexToInt("4b") + location)
-    }
-    result
-  }
-
-  def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
-    shortToBytes(ByteCode.getAttributeNameIndex(attribute)) ++
-      prefixWithIntLength(() => attribute.clazz match {
-        case ByteCode.CodeKey =>
-          getCodeAttributeBytes(attribute)
-        case ByteCode.LineNumberTableKey =>
-          getLineNumberTableBytes(attribute)
-        case ByteCode.StackMapTableKey => getStackMapTableBytes(attribute)
-        case ByteCode.SourceFileAttribute => getSourceFileBytes(attribute)
-      })
-  }
+  def getBytesRegistry(state: TransformationState) = getState(state).getBytesRegistry
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
     hexToBytes("cafebabe")
@@ -138,7 +28,7 @@ object PrintByteCode {
   }
 
   def getSourceFileBytes(sourceFile: MetaObject) = {
-    shortToBytes(ByteCode.getSourceFileFileNameIndex(sourceFile))
+    shortToBytes(ByteCodeSkeleton.getSourceFileFileNameIndex(sourceFile))
   }
 
   def getVerificationInfoBytes(_type: MetaObject): Seq[Byte] = hexToBytes(_type.clazz match {
@@ -147,19 +37,19 @@ object PrintByteCode {
   })
 
   def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
-    val offset = ByteCode.getFrameOffset(frame)
+    val offset = ByteCodeSkeleton.getFrameOffset(frame)
     frame.clazz match {
-      case ByteCode.SameFrameKey =>
+      case ByteCodeSkeleton.SameFrameKey =>
         if (offset > 63)
           byteToBytes(251) ++ shortToBytes(offset)
         else
           byteToBytes(offset)
-      case ByteCode.AppendFrame =>
-        val localVerificationTypes = ByteCode.getAppendFrameTypes(frame)
+      case ByteCodeSkeleton.AppendFrame =>
+        val localVerificationTypes = ByteCodeSkeleton.getAppendFrameTypes(frame)
         byteToBytes(252 + localVerificationTypes.length - 1) ++
           shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info))
-      case ByteCode.SameLocals1StackItem =>
-        val _type = ByteCode.getSameLocals1StackItemType(frame)
+      case ByteCodeSkeleton.SameLocals1StackItem =>
+        val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
         val code = 64 + offset
         if (code > 127)
           byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type)
@@ -170,36 +60,26 @@ object PrintByteCode {
   }
 
   def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
-    val entries = ByteCode.getStackMapTableEntries(attribute)
+    val entries = ByteCodeSkeleton.getStackMapTableEntries(attribute)
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
   def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
-    val entries = ByteCode.getLineNumberTableEntries(attribute)
+    val entries = ByteCodeSkeleton.getLineNumberTableEntries(attribute)
     shortToBytes(entries.length) ++
       entries.flatMap(getLineNumberTableEntryByteCode)
-  }
-
-  def getCodeAttributeBytes(attribute: MetaObject): Seq[Byte] = {
-    val exceptionTable = ByteCode.getCodeExceptionTable(attribute)
-    shortToBytes(ByteCode.getCodeMaxStack(attribute)) ++
-      shortToBytes(ByteCode.getCodeMaxLocals(attribute)) ++
-      prefixWithIntLength(() => ByteCode.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
-      shortToBytes(exceptionTable.length) ++
-      exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-      getAttributesByteCode(ByteCode.getCodeAttributes(attribute))
   }
 
   def getLineNumberTableEntryByteCode(entry: LineNumberRef) =
     shortToBytes(entry.startProgramCounter) ++ shortToBytes(entry.lineNumber)
 
   def getInterfacesByteCode(clazz: MetaObject): Seq[Byte] = {
-    val interfaces = ByteCode.getClassInterfaces(clazz)
+    val interfaces = ByteCodeSkeleton.getClassInterfaces(clazz)
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
   def getFieldsByteCode(clazz: MetaObject) = {
-    val fields = ByteCode.getClassFields(clazz)
+    val fields = ByteCodeSkeleton.getClassFields(clazz)
     shortToBytes(fields.length) ++ fields.map(field => ???)
   }
 
@@ -221,23 +101,23 @@ object PrintByteCode {
     entry match {
       case metaEntry: MetaObject =>
         metaEntry.clazz match {
-          case ByteCode.MethodRefKey =>
+          case ByteCodeSkeleton.MethodRefKey =>
             byteToBytes(10) ++
-              shortToBytes(ByteCode.getMethodRefClassRefIndex(metaEntry)) ++
-              shortToBytes(ByteCode.getMethodRefMethodNameIndex(metaEntry))
-          case ByteCode.FieldRef =>
+              shortToBytes(ByteCodeSkeleton.getMethodRefClassRefIndex(metaEntry)) ++
+              shortToBytes(ByteCodeSkeleton.getMethodRefMethodNameIndex(metaEntry))
+          case ByteCodeSkeleton.FieldRef =>
             byteToBytes(9) ++
-              shortToBytes(ByteCode.getFieldRefClassIndex(metaEntry)) ++
-              shortToBytes(ByteCode.getFieldRefNameAndTypeIndex(metaEntry))
-          case ByteCode.ClassRefKey =>
-            byteToBytes(7) ++ shortToBytes(ByteCode.getClassRefName(metaEntry))
-          case ByteCode.NameAndTypeKey =>
-            byteToBytes(12) ++ shortToBytes(ByteCode.getNameAndTypeName(metaEntry)) ++
-              shortToBytes(ByteCode.getNameAndTypeType(metaEntry))
-          case ByteCode.MethodDescriptor =>
-            val returnString = javaTypeToString(ByteCode.getMethodDescriptorReturnType(metaEntry))
+              shortToBytes(ByteCodeSkeleton.getFieldRefClassIndex(metaEntry)) ++
+              shortToBytes(ByteCodeSkeleton.getFieldRefNameAndTypeIndex(metaEntry))
+          case ByteCodeSkeleton.ClassRefKey =>
+            byteToBytes(7) ++ shortToBytes(ByteCodeSkeleton.getClassRefName(metaEntry))
+          case ByteCodeSkeleton.NameAndTypeKey =>
+            byteToBytes(12) ++ shortToBytes(ByteCodeSkeleton.getNameAndTypeName(metaEntry)) ++
+              shortToBytes(ByteCodeSkeleton.getNameAndTypeType(metaEntry))
+          case ByteCodeSkeleton.MethodDescriptor =>
+            val returnString = javaTypeToString(ByteCodeSkeleton.getMethodDescriptorReturnType(metaEntry))
             val parametersString = s"(${
-              ByteCode.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
+              ByteCodeSkeleton.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
             })"
             toUTF8ConstantEntry(parametersString + returnString)
           case JavaTypes.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
@@ -258,16 +138,16 @@ object PrintByteCode {
     byteToBytes(1) ++ shortToBytes(bytes.length) ++ debugBytes(bytes)
   }
 
+  def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
+
+  def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
+
   def byteToBytes(value: Int): Seq[Byte] = {
     debugBytes(Convert.intToBytes(value).drop(3))
   }
 
   def shortToBytes(short: Int): Seq[Byte] = {
     debugBytes(Convert.intToBytes(short).takeRight(2))
-  }
-
-  def shortToBytes(short: Short): Seq[Byte] = {
-    ???
   }
 
   def intToBytes(int: Int): Seq[Byte] = {
@@ -279,4 +159,100 @@ object PrintByteCode {
     debugCounter = debugCounter + diff
     bytes
   }
+
+  def printBytes(bytes: Seq[Byte]): String = {
+    formatHexLikeClassFile(valueOf(bytes)).toLowerCase
+  }
+
+  def formatHexLikeClassFile(hex: String): String = {
+    hex.grouped(4).grouped(8).map(g => g.mkString(" ")).mkString("\n")
+  }
+
+  def valueOf(buf: Iterable[Byte]): String = buf.map("%02X" format _).mkString
+
+  def getBytes(byteCode: MetaObject, state: TransformationState): Seq[Byte] = {
+
+    def getBytes(byteCode: MetaObject): Seq[Byte] = {
+      val clazz = byteCode
+      var result = List[Byte]()
+
+      result ++= intToBytes(0xCAFEBABE)
+      result ++= intToBytes(0x00000033)
+      val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
+      val constantPoolSizePlusOne = shortToBytes(constantPool.length + 1)
+      result ++= constantPoolSizePlusOne
+      for (constantPoolEntry <- constantPool) {
+        result ++= getConstantEntryByteCode(constantPoolEntry)
+      }
+      result ++= getAccessFlagsByteCode(clazz)
+      result ++= shortToBytes(ByteCodeSkeleton.getClassNameIndex(clazz))
+      result ++= shortToBytes(ByteCodeSkeleton.getParentIndex(clazz))
+      result ++= getInterfacesByteCode(clazz)
+      result ++= getFieldsByteCode(clazz)
+      result ++= getMethodsByteCode(clazz)
+      result ++= getAttributesByteCode(ByteCodeSkeleton.getClassAttributes(clazz))
+      result
+    }
+
+    def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
+      val methods = ByteCodeSkeleton.getMethods(clazz)
+      shortToBytes(methods.length) ++ methods.flatMap(method => getMethodByteCode(method))
+    }
+
+    def getMethodByteCode(methodInfo: MetaObject) = {
+      val accessCodes = Map(
+        ByteCodeSkeleton.PublicAccess -> "0001",
+        ByteCodeSkeleton.StaticAccess -> "0008",
+        ByteCodeSkeleton.PrivateAccess -> "0002").mapValues(s => hexToInt(s))
+      shortToBytes(ByteCodeSkeleton.getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
+        shortToBytes(ByteCodeSkeleton.getMethodNameIndex(methodInfo)) ++
+        shortToBytes(ByteCodeSkeleton.getMethodDescriptorIndex(methodInfo)) ++
+        getAttributesByteCode(ByteCodeSkeleton.getMethodAttributes(methodInfo))
+    }
+
+    def getAttributesByteCode(attributes: Seq[MetaObject]) = {
+      shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))
+    }
+
+
+    def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
+      shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
+        prefixWithIntLength(() => attribute.clazz match {
+          case ByteCodeSkeleton.CodeKey =>
+            getCodeAttributeBytes(attribute)
+          case ByteCodeSkeleton.LineNumberTableKey =>
+            getLineNumberTableBytes(attribute)
+          case ByteCodeSkeleton.StackMapTableKey => getStackMapTableBytes(attribute)
+          case ByteCodeSkeleton.SourceFileAttribute => getSourceFileBytes(attribute)
+        })
+    }
+
+    def getCodeAttributeBytes(attribute: MetaObject): Seq[Byte] = {
+      val exceptionTable = ByteCodeSkeleton.getCodeExceptionTable(attribute)
+      shortToBytes(ByteCodeSkeleton.getCodeMaxStack(attribute)) ++
+        shortToBytes(ByteCodeSkeleton.getCodeMaxLocals(attribute)) ++
+        prefixWithIntLength(() => ByteCodeSkeleton.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+        shortToBytes(exceptionTable.length) ++
+        exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
+        getAttributesByteCode(ByteCodeSkeleton.getCodeAttributes(attribute))
+    }
+
+    def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+      getBytesRegistry(state)(instruction.clazz)(instruction)
+    }
+
+    getBytes(byteCode)
+  }
+
+  override def transform(program: MetaObject, state: TransformationState): Unit = {
+
+
+  }
+
+  override def dependencies: Set[Contract] = Set.empty
+
+  class State {
+    var getBytesRegistry = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
+  }
+
 }

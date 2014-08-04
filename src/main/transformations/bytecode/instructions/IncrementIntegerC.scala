@@ -1,0 +1,29 @@
+package transformations.bytecode.instructions
+
+import core.transformation.MetaObject
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.PrintByteCode._
+import transformations.javac.base.ConstantPool
+
+object IncrementIntegerC extends InstructionC {
+
+  override val key: Any = IntegerIncrementKey
+
+  def integerIncrement(location: Int, amount: Int) = ByteCodeSkeleton.instruction(IntegerIncrementKey, Seq(location, amount))
+
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = 0
+
+  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    hexToBytes("84") ++
+      byteToBytes(arguments(0)) ++
+      byteToBytes(arguments(1))
+  }
+
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq.empty, Seq.empty)
+
+  override def getInstructionSize: Int = 3
+
+  object IntegerIncrementKey
+
+}

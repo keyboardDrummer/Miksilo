@@ -1,12 +1,10 @@
 package transformations.javac.base
 
 import core.grammar._
-import core.transformation.TransformationManager.ProgramGrammar
 import core.transformation._
-import transformations.bytecode.ByteCode._
-import transformations.bytecode.{ByteCode, InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.{ByteCodeSkeleton, InferredMaxStack, InferredStackFrames}
 import transformations.javac.base.model.JavaMethodModel._
-import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.javac.types.TypeC
@@ -16,16 +14,6 @@ import scala.collection.mutable
 
 object JavaMethodC extends GrammarTransformation {
 
-  def getTypeSize(_type: MetaObject): Int = _type.clazz match {
-    case IntTypeKey => 1
-    case BooleanTypeKey => 1
-    case DoubleTypeKey => 1
-    case ArrayTypeKey => 1
-    case ObjectTypeKey => 1
-    case ArrayTypeKey => 1
-    case VoidTypeKey => 0
-  }
-
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
@@ -34,16 +22,16 @@ object JavaMethodC extends GrammarTransformation {
     def transformClass(clazz: MetaObject) {
       val classCompiler = new ClassCompiler(clazz, state)
       val classInfo = classCompiler.currentClassInfo
-      clazz(ByteCode.ClassAttributes) = Seq()
+      clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
 
       val classRef = classCompiler.getClassRef(classInfo)
-      clazz(ByteCode.ClassNameIndexKey) = classRef
+      clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
       val parentName = JavaClassModel.getParent(clazz).get
       val parentRef = classCompiler.getClassRef(classCompiler.fullyQualify(parentName))
-      clazz(ByteCode.ClassParentIndex) = parentRef
-      clazz(ByteCode.ClassInterfaces) = Seq()
-      clazz(ByteCode.ClassFields) = Seq()
-      clazz(ByteCode.ClassConstantPool) = classCompiler.constantPool.constants
+      clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
+      clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
+      clazz(ByteCodeSkeleton.ClassFields) = Seq()
+      clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool.constants
       val methods = JavaClassModel.getMethods(clazz)
       for (method <- methods)
         bindMethod(method)
@@ -63,17 +51,17 @@ object JavaMethodC extends GrammarTransformation {
         val statements = JavaMethodModel.getMethodBody(method)
         val statementToInstructions = StatementC.getToInstructions(state)
         val instructions = statements.flatMap(statement => statementToInstructions(statement))
-        val codeIndex = classCompiler.constantPool.store(ByteCode.CodeAttributeId)
+        val codeIndex = classCompiler.constantPool.store(ByteCodeSkeleton.CodeAttributeId)
         val exceptionTable = Seq[MetaObject]()
         val codeAttributes = Seq[MetaObject]()
-        val codeAttribute = new MetaObject(ByteCode.CodeKey) {
+        val codeAttribute = new MetaObject(ByteCodeSkeleton.CodeKey) {
           data.put(AttributeNameKey, codeIndex)
           data.put(CodeMaxLocalsKey, getMethodCompiler(state).variables.localCount)
           data.put(CodeInstructionsKey, instructions)
           data.put(CodeExceptionTableKey, exceptionTable)
           data.put(CodeAttributesKey, codeAttributes)
         }
-        method(ByteCode.MethodAnnotations) = Seq(codeAttribute)
+        method(ByteCodeSkeleton.MethodAnnotations) = Seq(codeAttribute)
       }
 
       def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
@@ -88,10 +76,10 @@ object JavaMethodC extends GrammarTransformation {
       def convertMethod(method: MetaObject) {
         addMethodFlags(method)
         val methodNameIndex: Int = classCompiler.getMethodNameIndex(JavaMethodModel.getMethodName(method))
-        method(ByteCode.MethodNameIndex) = methodNameIndex
+        method(ByteCodeSkeleton.MethodNameIndex) = methodNameIndex
         method.data.remove(JavaMethodModel.MethodNameKey)
         val methodDescriptorIndex = getMethodDescriptorIndex(method)
-        method(ByteCode.MethodDescriptorIndex) = methodDescriptorIndex
+        method(ByteCodeSkeleton.MethodDescriptorIndex) = methodDescriptorIndex
         addCodeAnnotation(method)
         method.data.remove(JavaMethodModel.ReturnTypeKey)
         method.data.remove(JavaMethodModel.MethodParametersKey)
@@ -101,22 +89,22 @@ object JavaMethodC extends GrammarTransformation {
       def getMethodDescriptor(method: MetaObject): MetaObject = {
         val returnType = JavaMethodModel.getMethodReturnType(method)
         val parameters = JavaMethodModel.getMethodParameters(method)
-        ByteCode.methodDescriptor(returnType, parameters.map(p => JavaMethodModel.getParameterType(p)))
+        ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => JavaMethodModel.getParameterType(p)))
       }
     }
   }
 
   def addMethodFlags(method: MetaObject) = {
-    var flags = Set[ByteCode.MethodAccessFlag]()
+    var flags = Set[ByteCodeSkeleton.MethodAccessFlag]()
     if (JavaMethodModel.getMethodStatic(method))
-      flags += ByteCode.StaticAccess
+      flags += ByteCodeSkeleton.StaticAccess
 
     JavaMethodModel.getMethodVisibility(method) match {
-      case JavaMethodModel.PublicVisibility => flags += ByteCode.PublicAccess
-      case JavaMethodModel.PrivateVisibility => flags += ByteCode.PrivateAccess
+      case JavaMethodModel.PublicVisibility => flags += ByteCodeSkeleton.PublicAccess
+      case JavaMethodModel.PrivateVisibility => flags += ByteCodeSkeleton.PrivateAccess
     }
 
-    method(ByteCode.MethodAccessFlags) = flags
+    method(ByteCodeSkeleton.MethodAccessFlags) = flags
   }
 
   def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler

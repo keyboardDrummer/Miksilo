@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
-import transformations.bytecode.ByteCode
+import transformations.bytecode.instructions.{StoreAddressC, StoreIntegerC}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, IntTypeKey, ObjectTypeKey}
 import transformations.javac.expressions.ExpressionC
@@ -18,9 +18,9 @@ object AssignmentC extends GrammarTransformation {
       val target = getAssignmentTarget(assignment)
       val variable = methodCompiler.variables(target)
       valueInstructions ++ Seq(variable._type.clazz match {
-        case IntTypeKey => ByteCode.integerStore(variable.offset)
-        case ObjectTypeKey => ByteCode.addressStore(variable.offset)
-        case ArrayTypeKey => ByteCode.addressStore(variable.offset)
+        case IntTypeKey => StoreIntegerC.integerStore(variable.offset)
+        case ObjectTypeKey => StoreAddressC.addressStore(variable.offset)
+        case ArrayTypeKey => StoreAddressC.addressStore(variable.offset)
       })
     })
   }
@@ -32,7 +32,7 @@ object AssignmentC extends GrammarTransformation {
   /** TODO: separate variableC in a expression and package variable. Make variable, assignment and declaration both dependent on some VariablePoolC.
     * Variable and assignment should further depend on expression.
     */
-  override def dependencies: Set[Contract] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC, StoreAddressC, StoreIntegerC)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "="
 

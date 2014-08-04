@@ -1,7 +1,8 @@
 package transformations.javac
 
 import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
-import transformations.bytecode.ByteCode
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.base._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.{JavaClassModel, JavaMethodModel, JavaTypes}
@@ -11,7 +12,7 @@ import transformations.javac.statements.StatementC
 object ConstructorC extends ProgramTransformation {
   val constructorName: String = "<init>"
 
-  override def dependencies: Set[Contract] = Set(CallC)
+  override def dependencies: Set[Contract] = Set(CallC, InvokeSpecialC, LoadAddressC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     def transformSuperOrThisCall(call: MetaObject): Seq[MetaObject] = {
@@ -24,14 +25,14 @@ object ConstructorC extends ProgramTransformation {
       val qualifiedName = compiler.classCompiler.fullyQualify(className)
       val methodRefIndex = compiler.classCompiler.getMethodRefIndex(new MethodId(qualifiedName, constructorName))
       val argumentInstructions = callArguments.flatMap(argument => StatementC.getToInstructions(state)(argument))
-      Seq(ByteCode.addressLoad(0)) ++ argumentInstructions ++ Seq(ByteCode.invokeSpecial(methodRefIndex))
+      Seq(LoadAddressC.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialC.invokeSpecial(methodRefIndex))
     }
 
     StatementC.getStatementToLines(state).put(SuperCall, transformSuperOrThisCall)
     StatementC.getStatementToLines(state).put(ThisCall, transformSuperOrThisCall)
 
     for (constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor)) {
-      constructor.clazz = ByteCode.MethodInfoKey
+      constructor.clazz = ByteCodeSkeleton.MethodInfoKey
       constructor(JavaMethodModel.MethodNameKey) = constructorName
       constructor(JavaMethodModel.ReturnTypeKey) = JavaTypes.voidType
       constructor(StaticKey) = false

@@ -32,7 +32,7 @@ object AddForLoop extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[Contract] = Set(AddStatementToSSM)
+  override def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createForLoop(initializer: MetaObject, condition: MetaObject, increment: MetaObject, body: MetaObject) = new MetaObject(forLoop) {
     data.put(AddForLoop.initialisation, initializer)
@@ -52,7 +52,7 @@ class TestForLoop {
     val increment = createBlock(loadFreeRegister(loopVariableIndex), loadConstant(1), addition, storeFreeRegister(loopVariableIndex))
     val body = createBlock(loadFreeRegister(accumulatorIndex), loadConstant(2), addition, storeFreeRegister(accumulatorIndex))
     val forLoop = AddForLoop.createForLoop(initializer, condition, increment, body)
-    val compiler = TransformationManager.buildCompiler(Seq(AddForLoop, AddBlock, AddStatementToSSM))
+    val compiler = new Transformer(Seq(AddForLoop, AddBlock, AddStatementToSSM))
     compiler.transform(forLoop)
     val typedSSM = SSM.toTyped(forLoop)
     val machine = new SSMMachine(typedSSM)

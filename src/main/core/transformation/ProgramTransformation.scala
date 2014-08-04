@@ -20,8 +20,6 @@ trait GrammarTransformation extends ProgramTransformation with GrammarWriter {
 
   def transform(program: MetaObject, state: TransformationState) = {}
 
-  def dependencies: Set[Contract] = Set.empty
-
   def transformGrammars(grammars: GrammarCatalogue)
 
   def transformReserved(reserved: mutable.HashSet[String]) = {}
@@ -29,8 +27,10 @@ trait GrammarTransformation extends ProgramTransformation with GrammarWriter {
   def transformDelimiters(delimiters: mutable.HashSet[String]) = {}
 }
 
+trait Injector extends Contract {
+  def inject(state: TransformationState) = {}
+}
 
-trait ProgramTransformation extends Contract {
+trait ProgramTransformation extends Injector {
   def transform(program: MetaObject, state: TransformationState)
-
 }

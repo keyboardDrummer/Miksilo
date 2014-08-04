@@ -28,11 +28,11 @@ object AddWhile extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[Contract] = Set(AddStatementToSSM)
+  override def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createWhile(condition: MetaObject, body: MetaObject) = {
     new MetaObject(_while) {
-      data.put(AddWhile.condition, condition);
+      data.put(AddWhile.condition, condition)
       data.put(AddWhile.body, body)
     }
   }
@@ -44,7 +44,7 @@ class TestWhile {
     val condition = createBlock(loadFreeRegister(0), loadConstant(3), notEquals)
     val body = createBlock(loadFreeRegister(0), loadConstant(1), addition, storeFreeRegister(0))
     val _while = AddWhile.createWhile(condition, body)
-    val compiler = TransformationManager.buildCompiler(Seq(AddWhile, AddBlock, AddStatementToSSM))
+    val compiler = new Transformer(Seq(AddWhile, AddBlock, AddStatementToSSM))
     compiler.transform(_while)
     val typedSSM = ssm.SSM.toTyped(_while)
     val machine = new SSMMachine(typedSSM)

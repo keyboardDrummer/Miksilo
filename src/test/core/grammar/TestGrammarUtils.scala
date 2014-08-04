@@ -1,11 +1,10 @@
 package core.grammar
 
-import core.transformation.TransformationManager.ProgramGrammar
 import core.transformation._
 
 class TestGrammarUtils {
 
-  val manager: TransformationManager = new TransformationManager()
+  val manager: TransformationsToPackrat = new TransformationsToPackrat()
 
   def buildParser(transformations: Seq[GrammarTransformation], key: Any): String => manager.ParseResult[Any] = {
 

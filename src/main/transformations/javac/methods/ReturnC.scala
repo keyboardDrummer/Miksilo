@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.transformation._
-import transformations.bytecode.ByteCode
+import transformations.bytecode.instructions.{IntegerReturnC, VoidReturnC}
 import transformations.javac.base.{JavaMethodC, MethodCompiler}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.StatementC
@@ -11,17 +11,7 @@ import scala.collection.mutable
 object ReturnC extends GrammarTransformation {
 
 
-  override def dependencies: Set[Contract] = Set(JavaMethodC)
-
-  object Return
-
-  object ReturnValue
-
-  def _return(value: Option[MetaObject] = None): MetaObject = new MetaObject(Return) {
-    data.put(ReturnValue, value)
-  }
-
-  def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[Option[MetaObject]]
+  override def dependencies: Set[Contract] = Set(JavaMethodC, VoidReturnC, IntegerReturnC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(Return, (_return: MetaObject) => {
@@ -35,10 +25,12 @@ object ReturnC extends GrammarTransformation {
     mbValue match {
       case Some(value) =>
         val returnValueInstructions = ExpressionC.getToInstructions(compiler.transformationState)(value)
-        returnValueInstructions ++ Seq(ByteCode.integerReturn)
-      case None => Seq(ByteCode.voidReturn)
+        returnValueInstructions ++ Seq(IntegerReturnC.integerReturn)
+      case None => Seq(VoidReturnC.voidReturn)
     }
   }
+
+  def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[Option[MetaObject]]
 
   override def transformReserved(reserved: mutable.HashSet[String]): Unit =
     reserved ++= Seq("return")
@@ -50,4 +42,13 @@ object ReturnC extends GrammarTransformation {
     val returnExpression = "return" ~> expression <~ ";" ^^ (expr => _return(Some(expr.asInstanceOf[MetaObject])))
     statement.inner = statement.inner | returnExpression
   }
+
+  def _return(value: Option[MetaObject] = None): MetaObject = new MetaObject(Return) {
+    data.put(ReturnValue, value)
+  }
+
+  object Return
+
+  object ReturnValue
+
 }

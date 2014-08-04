@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
-import core.transformation.{GrammarCatalogue, GrammarTransformation, MetaObject, TransformationState}
-import transformations.bytecode.ByteCode
+import core.transformation._
+import transformations.bytecode.instructions.PushNullC
 
 import scala.collection.mutable
 
@@ -19,9 +19,12 @@ object NullC extends GrammarTransformation {
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(NullKey, _null => {
-      Seq(ByteCode.pushNull)
+      Seq(PushNullC.pushNull)
     })
   }
+
+
+  override def dependencies: Set[Contract] = Set(ExpressionC, PushNullC)
 
   object NullKey
 

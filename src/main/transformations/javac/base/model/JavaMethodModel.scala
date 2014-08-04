@@ -1,7 +1,7 @@
 package transformations.javac.base.model
 
 import core.transformation.MetaObject
-import transformations.bytecode.ByteCode
+import transformations.bytecode.ByteCodeSkeleton
 
 object JavaMethodModel {
 
@@ -10,7 +10,7 @@ object JavaMethodModel {
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
-    new MetaObject(ByteCode.MethodInfoKey) {
+    new MetaObject(ByteCodeSkeleton.MethodInfoKey) {
       data.put(MethodNameKey, name)
       data.put(ReturnTypeKey, _returnType)
       data.put(MethodParametersKey, _parameters)

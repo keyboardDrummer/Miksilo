@@ -1,7 +1,7 @@
 package core.transformation
 
 trait Contract {
-  def dependencies: Set[Contract]
+  def dependencies: Set[Contract] = Set.empty
 
   def name = {
     var result = getClass.getSimpleName.dropRight(1)

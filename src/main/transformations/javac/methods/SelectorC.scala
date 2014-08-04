@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.grammar.seqr
 import core.transformation._
-import transformations.bytecode.ByteCode
+import transformations.bytecode.instructions.GetStaticC
 import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
@@ -10,7 +10,7 @@ import scala.collection.mutable
 
 object SelectorC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(JavaMethodC)
+  override def dependencies: Set[Contract] = Set(JavaMethodC, GetStaticC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     JavaMethodC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
@@ -45,7 +45,7 @@ object SelectorC extends GrammarTransformation {
     val fieldInfo = classOrObjectReference.info.getField(member)
     val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
     if (classOrObjectReference.wasClass)
-      Seq(ByteCode.getStatic(fieldRef))
+      Seq(GetStaticC.getStatic(fieldRef))
     else
       ???
   }

@@ -14,7 +14,7 @@ object AddBlock extends ProgramTransformation {
     })
   }
 
-  def dependencies: Set[Contract] = Set(AddStatementToSSM)
+  override def dependencies: Set[Contract] = Set(AddStatementToSSM)
 
   def createBlock(statements: MetaObject*) = {
     new MetaObject(block) {

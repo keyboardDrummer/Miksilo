@@ -8,28 +8,6 @@ import scala.collection.mutable
 
 object TernaryC extends GrammarTransformation {
 
-  object FalseKey
-
-  object TrueKey
-
-  object ConditionKey
-
-  def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey) {
-    data.put(FalseKey, falseBranch)
-    data.put(TrueKey, trueBranch)
-    data.put(ConditionKey, condition)
-  }
-
-  def falseBranch(metaObject: MetaObject) = metaObject(FalseKey).asInstanceOf[MetaObject]
-
-  def trueBranch(metaObject: MetaObject) = metaObject(TrueKey).asInstanceOf[MetaObject]
-
-  object TernaryKey
-
-  def getCondition(metaObject: MetaObject) = {
-    metaObject(ConditionKey).asInstanceOf[MetaObject]
-  }
-
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(TernaryKey, _ternary => {
       val condition = TernaryC.getCondition(_ternary)
@@ -51,11 +29,17 @@ object TernaryC extends GrammarTransformation {
     })
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionC)
+  def falseBranch(metaObject: MetaObject) = metaObject(FalseKey).asInstanceOf[MetaObject]
+
+  def trueBranch(metaObject: MetaObject) = metaObject(TrueKey).asInstanceOf[MetaObject]
+
+  def getCondition(metaObject: MetaObject) = {
+    metaObject(ConditionKey).asInstanceOf[MetaObject]
+  }
+
+  override def dependencies: Set[Contract] = Set(ExpressionC, LabelledJumps)
 
   override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?", ":")
-
-  object TernaryExpressionGrammar
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
@@ -63,4 +47,21 @@ object TernaryC extends GrammarTransformation {
     val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar
   }
+
+  def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey) {
+    data.put(FalseKey, falseBranch)
+    data.put(TrueKey, trueBranch)
+    data.put(ConditionKey, condition)
+  }
+
+  object FalseKey
+
+  object TrueKey
+
+  object ConditionKey
+
+  object TernaryKey
+
+  object TernaryExpressionGrammar
+
 }
