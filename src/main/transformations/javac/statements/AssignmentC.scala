@@ -7,10 +7,8 @@ import transformations.javac.base.JavaMethodC
 import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, IntTypeKey, ObjectTypeKey}
 import transformations.javac.expressions.ExpressionC
 
-import scala.collection.mutable
-
 object AssignmentC extends GrammarTransformation {
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(AssignmentKey, assignment => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       val value = getAssignmentValue(assignment)
@@ -33,8 +31,6 @@ object AssignmentC extends GrammarTransformation {
     * Variable and assignment should further depend on expression.
     */
   override def dependencies: Set[Contract] = Set(JavaMethodC, StoreAddressC, StoreIntegerC)
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "="
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)

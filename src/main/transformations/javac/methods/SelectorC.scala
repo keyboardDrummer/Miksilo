@@ -6,13 +6,11 @@ import transformations.bytecode.instructions.GetStaticC
 import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
-import scala.collection.mutable
-
 object SelectorC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(JavaMethodC, GetStaticC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     JavaMethodC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       getReferenceKind(selector, methodCompiler)
@@ -53,9 +51,6 @@ object SelectorC extends GrammarTransformation {
   def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
 
   def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
-  = delimiters ++= Seq(".")
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)

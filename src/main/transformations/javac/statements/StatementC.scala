@@ -23,9 +23,6 @@ object StatementC extends GrammarTransformation {
   def getStatementToLines(state: TransformationState): StatementTransformations =
     state.data.getOrElseUpdate(this, new StatementTransformations()).asInstanceOf[StatementTransformations]
 
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
-  = delimiters ++= Seq(";")
-
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val expressionStatement = expression <~ ";"

@@ -16,6 +16,7 @@ class ToPackrat extends StandardTokenParsers with PackratParsers {
         case choice: Choice => helper(choice.left) ||| helper(choice.right)
         case NumberG => numericLit
         case many: Many => helper(many.inner).*
+        case originalDelimiter: Delimiter => keyword(originalDelimiter.value)
         case originalKeyword: Keyword => keyword(originalKeyword.value)
         case Identifier => ident
         case SuccessG => success[Any](null)

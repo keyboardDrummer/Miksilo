@@ -4,7 +4,7 @@ import core.transformation._
 import transformations.bytecode.instructions.IntegerConstantC
 
 object LiteralC extends GrammarTransformation {
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(LiteralKey, literal => {
       val value = getValue(literal)
       Seq(value match {

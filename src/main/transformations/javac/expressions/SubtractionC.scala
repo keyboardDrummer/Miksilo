@@ -4,8 +4,6 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.instructions.SubtractIntegerC
 
-import scala.collection.mutable
-
 object SubtractionC extends GrammarTransformation {
   val clazz: String = "Subtraction"
 
@@ -13,7 +11,7 @@ object SubtractionC extends GrammarTransformation {
 
   val secondKey: String = "second"
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(clazz, subtraction => {
       val toInstructions = ExpressionC.getToInstructions(state)
       val firstInstructions = toInstructions(getFirst(subtraction))
@@ -27,8 +25,6 @@ object SubtractionC extends GrammarTransformation {
   def getSecond(subtraction: MetaObject) = subtraction(secondKey).asInstanceOf[MetaObject]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerC)
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "-"
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)

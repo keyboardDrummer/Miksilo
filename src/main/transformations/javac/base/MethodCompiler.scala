@@ -1,6 +1,7 @@
 package transformations.javac.base
 
-import core.transformation.{BadInputException, MetaObject}
+import core.exceptions.BadInputException
+import core.transformation.MetaObject
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.expressions.ExpressionC
 

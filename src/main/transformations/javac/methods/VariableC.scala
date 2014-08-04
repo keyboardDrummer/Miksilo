@@ -12,7 +12,7 @@ object VariableC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(JavaMethodC, LoadIntegerC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     JavaMethodC.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       getReferenceKind(variable, methodCompiler)

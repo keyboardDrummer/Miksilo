@@ -1,5 +1,6 @@
 package transformations.javac.expressions
 
+import core.exceptions.CompilerException
 import core.grammar.FailureG
 import core.transformation._
 import transformations.bytecode.SimpleByteCode

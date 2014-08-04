@@ -1,8 +1,6 @@
 package core.transformation
 
-import core.grammar.{Grammar, GrammarWriter, Labelled}
-
-import scala.collection.mutable
+import core.grammar._
 
 class GrammarCatalogue {
   var grammars: Map[Any, Labelled] = Map.empty
@@ -14,17 +12,37 @@ class GrammarCatalogue {
     grammars += key -> result
     result
   }
+
+  def getGrammars: Set[Grammar] = {
+
+    var closed = Set.empty[Grammar]
+    def inner(grammar: Grammar): Unit = {
+
+      if (closed.contains(grammar))
+        return
+
+      closed += grammar
+      grammar match {
+        case labelled: Labelled => inner(labelled.inner)
+        case sequence: Sequence =>
+          inner(sequence.first)
+          inner(sequence.second)
+        case choice: Choice =>
+          inner(choice.left)
+          inner(choice.right)
+        case map: MapGrammar => inner(map.inner)
+        case many: Many => inner(many.inner)
+        case _ => Set.empty
+      }
+    }
+
+    grammars.values.foreach(labelled => inner(labelled))
+    closed
+  }
 }
 
-trait GrammarTransformation extends ProgramTransformation with GrammarWriter {
-
-  def transform(program: MetaObject, state: TransformationState) = {}
-
+trait GrammarTransformation extends Injector with GrammarWriter {
   def transformGrammars(grammars: GrammarCatalogue)
-
-  def transformReserved(reserved: mutable.HashSet[String]) = {}
-
-  def transformDelimiters(delimiters: mutable.HashSet[String]) = {}
 }
 
 trait Injector extends Contract {

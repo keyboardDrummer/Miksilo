@@ -4,11 +4,9 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
 
-import scala.collection.mutable
-
 object TernaryC extends GrammarTransformation {
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(TernaryKey, _ternary => {
       val condition = TernaryC.getCondition(_ternary)
       val truePath = TernaryC.trueBranch(_ternary)
@@ -38,8 +36,6 @@ object TernaryC extends GrammarTransformation {
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionC, LabelledJumps)
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters ++= Seq("?", ":")
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)

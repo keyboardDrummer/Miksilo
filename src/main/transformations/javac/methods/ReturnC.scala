@@ -6,14 +6,12 @@ import transformations.javac.base.{JavaMethodC, MethodCompiler}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.StatementC
 
-import scala.collection.mutable
-
 object ReturnC extends GrammarTransformation {
 
 
   override def dependencies: Set[Contract] = Set(JavaMethodC, VoidReturnC, IntegerReturnC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(Return, (_return: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       returnToLines(_return, methodCompiler)
@@ -31,9 +29,6 @@ object ReturnC extends GrammarTransformation {
   }
 
   def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[Option[MetaObject]]
-
-  override def transformReserved(reserved: mutable.HashSet[String]): Unit =
-    reserved ++= Seq("return")
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)

@@ -2,14 +2,11 @@ package core.transformation
 
 import java.io.OutputStream
 
+import core.exceptions.TransformationDependencyViolation
 import core.grammar.ParseException
 import util.FileNameUtils
 
 import scala.reflect.io.{Directory, File, Path}
-
-case class TransformationDependencyViolation(dependency: Contract, dependent: Contract) extends CompilerException {
-  override def toString = s"dependency '${dependency.name}' from '${dependent.name}' is not satisfied"
-}
 
 class CompilerFromTransformations(val transformations: Seq[Injector]) extends Compiler {
 

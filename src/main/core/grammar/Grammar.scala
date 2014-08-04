@@ -18,8 +18,10 @@ trait GrammarWriter {
 
   def keyword(word: String) = new Keyword(word)
 
-  implicit def stringToGrammar(value: String): Grammar = keyword(value)
-
+  implicit def stringToGrammar(value: String): Grammar =
+    if (value.forall(c => Character.isLetterOrDigit(c)))
+      new Keyword(value)
+    else new Delimiter(value)
 }
 
 case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product with scala.Serializable {
@@ -27,47 +29,23 @@ case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product wi
 
 trait Grammar extends Parsers {
 
-  def ~(other: Grammar) = new Sequence(this, other)
-
-  def ~>(right: Grammar) = new IgnoreLeft(this, right)
-
   def <~(right: Grammar) = new IgnoreRight(this, right)
-
-
-  def |(other: Grammar) = new Choice(this, other)
-
-  def * = new Many(this)
 
   def manySeparated(separator: Grammar): Grammar = someSeparated(separator) | new Produce(Seq.empty[Any])
 
-  def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
+  def |(other: Grammar) = new Choice(this, other)
 
   def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this) *) ^^ {
     case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
-  def findGrammar(name: AnyRef): Labelled = {
-    var closed = Set.empty[Grammar]
-    def findGrammar(grammar: Grammar): Set[Labelled] = {
-      if (closed.contains(grammar))
-        return Set.empty
+  def ~(other: Grammar) = new Sequence(this, other)
 
-      closed += grammar
+  def ~>(right: Grammar) = new IgnoreLeft(this, right)
 
-      grammar match {
-        case labelled: Labelled =>
-          if (labelled.name.equals(name))
-            Set(labelled)
-          else findGrammar(labelled.inner)
-        case sequence: Sequence => findGrammar(sequence.first) ++ findGrammar(sequence.second)
-        case choice: Choice => findGrammar(choice.left) ++ findGrammar(choice.right)
-        case map: MapGrammar => findGrammar(map.inner)
-        case many: Many => findGrammar(many.inner)
-        case _ => Set.empty
-      }
-    }
-    findGrammar(this).head
-  }
+  def * = new Many(this)
+
+  def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
 }
 
 class Many(var inner: Grammar) extends Grammar {
@@ -91,6 +69,13 @@ class Sequence(var first: Grammar, var second: Grammar) extends Grammar {
 
 class Produce(var result: Any) extends Grammar {
 
+}
+
+class Delimiter(var value: String) extends Grammar {
+  if (value.length == 0)
+    throw new RuntimeException("value must have non-zero length")
+
+  override def toString: String = value
 }
 
 class Keyword(var value: String) extends Grammar {

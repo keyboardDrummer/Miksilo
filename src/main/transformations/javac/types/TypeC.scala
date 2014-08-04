@@ -7,8 +7,6 @@ import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 import scala.collection.mutable
 
 object TypeC extends GrammarTransformation {
-  override def transform(program: MetaObject, state: TransformationState): Unit = {}
-
   override def dependencies: Set[Contract] = Set.empty
 
   def isAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject): Boolean = {

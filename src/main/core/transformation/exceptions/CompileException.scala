@@ -1,3 +1,3 @@
-package core
+package core.exceptions
 
 class CompileException extends RuntimeException

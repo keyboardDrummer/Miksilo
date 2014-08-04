@@ -1,6 +1,6 @@
 package core.transformation
 
-import core.grammar.{FailureG, ToPackrat}
+import core.grammar._
 
 object ProgramGrammar
 
@@ -9,10 +9,11 @@ class TransformationsToPackrat extends ToPackrat {
     val grammars: GrammarCatalogue = new GrammarCatalogue()
     grammars.create(ProgramGrammar, FailureG)
     for (transformation <- transformations) {
-      transformation.transformDelimiters(lexical.delimiters)
-      transformation.transformReserved(lexical.reserved)
       transformation.transformGrammars(grammars)
     }
+    val allGrammars: Set[Grammar] = grammars.getGrammars
+    lexical.delimiters ++= allGrammars.collect({ case delimiter: Delimiter => delimiter.value})
+    lexical.reserved ++= allGrammars.collect({ case keyword: Keyword => keyword.value})
     val packratParser = phrase(convert(grammars.find(ProgramGrammar)))
     input => packratParser(new PackratReader(new lexical.Scanner(input)))
   }

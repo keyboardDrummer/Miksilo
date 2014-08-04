@@ -12,7 +12,7 @@ import transformations.javac.types.TypeC
 import scala.collection.mutable
 
 
-object JavaMethodC extends GrammarTransformation {
+object JavaMethodC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 
@@ -119,12 +119,6 @@ object JavaMethodC extends GrammarTransformation {
   }
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit
-  = delimiters ++= Seq("(", ")", "{", "}", "[", "]", "[]")
-
-  override def transformReserved(reserved: mutable.HashSet[String]): Unit =
-    reserved ++= Seq("void", "class", "package", "public", "static", "int")
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)

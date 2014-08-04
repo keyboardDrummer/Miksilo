@@ -5,13 +5,11 @@ import core.transformation._
 import transformations.bytecode.instructions.IntegerConstantC
 import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
 
-import scala.collection.mutable
-
 object LessThanC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(LessThanKey, lessThan => {
       val toInstructions = ExpressionC.getToInstructions(state)
       val firstInstructions = toInstructions(getFirst(lessThan))
@@ -31,8 +29,6 @@ object LessThanC extends GrammarTransformation {
   def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
 
   def getSecond(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
-
-  override def transformDelimiters(delimiters: mutable.HashSet[String]): Unit = delimiters += "<"
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)

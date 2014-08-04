@@ -13,8 +13,6 @@ class TestGrammarUtils {
         grammars.find(ProgramGrammar).inner = grammars.find(key).inner
       }
 
-      override def transform(program: MetaObject, state: TransformationState): Unit = {}
-
       override def dependencies: Set[Contract] = Set.empty
     }
 

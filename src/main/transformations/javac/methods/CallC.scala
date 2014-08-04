@@ -5,12 +5,11 @@ import core.transformation._
 import transformations.bytecode.instructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
-import util.HashMapExtensions._
 
 object CallC extends GrammarTransformation {
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).putIfEmpty(CallKey, (call: MetaObject) => {
+  override def inject(state: TransformationState): Unit = {
+    ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       callToLines(call, methodCompiler)
     })

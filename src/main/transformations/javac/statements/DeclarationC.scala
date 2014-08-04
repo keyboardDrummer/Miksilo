@@ -1,5 +1,6 @@
 package transformations.javac.statements
 
+import core.exceptions.BadInputException
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import transformations.javac.base.{JavaMethodC, VariablePool}
@@ -9,7 +10,7 @@ case class VariableAlreadyDefined(variable: String) extends BadInputException
 
 object DeclarationC extends GrammarTransformation {
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(DeclarationKey, declaration => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       val variables: VariablePool = methodCompiler.variables
