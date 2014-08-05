@@ -1,6 +1,7 @@
 package transformations.bytecode
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledJumps.LabelKey
 import transformations.javac.base.ConstantPool
 

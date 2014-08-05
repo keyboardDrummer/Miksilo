@@ -1,6 +1,8 @@
 package core.grammar
 
 import core.transformation._
+import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.transformation.sillyCodePieces.GrammarTransformation
 
 class TestGrammarUtils {
 

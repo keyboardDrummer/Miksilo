@@ -1,6 +1,7 @@
 package transformations.javac
 
 import core.transformation._
+import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode.instructions._
 import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaMethodC

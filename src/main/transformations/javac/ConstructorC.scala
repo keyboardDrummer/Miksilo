@@ -1,6 +1,7 @@
 package transformations.javac
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.base._

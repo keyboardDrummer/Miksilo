@@ -1,8 +1,9 @@
 package core.transformation
 
 import core.grammar._
+import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.transformation.sillyCodePieces.GrammarTransformation
 
-object ProgramGrammar
 
 class TransformationsToPackrat extends ToPackrat {
   def buildParser(transformations: Seq[GrammarTransformation]): String => ParseResult[Any] = {

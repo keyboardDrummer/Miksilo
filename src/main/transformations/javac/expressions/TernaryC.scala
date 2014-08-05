@@ -2,6 +2,8 @@ package transformations.javac.expressions
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
 
 object TernaryC extends GrammarTransformation {

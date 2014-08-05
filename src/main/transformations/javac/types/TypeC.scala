@@ -2,6 +2,8 @@ package transformations.javac.types
 
 import core.grammar.seqr
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
 
 import scala.collection.mutable

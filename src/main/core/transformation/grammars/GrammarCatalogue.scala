@@ -1,4 +1,4 @@
-package core.transformation
+package core.transformation.grammars
 
 import core.grammar._
 
@@ -39,16 +39,4 @@ class GrammarCatalogue {
     grammars.values.foreach(labelled => inner(labelled))
     closed
   }
-}
-
-trait GrammarTransformation extends Injector with GrammarWriter {
-  def transformGrammars(grammars: GrammarCatalogue)
-}
-
-trait Injector extends Contract {
-  def inject(state: TransformationState) = {}
-}
-
-trait ProgramTransformation extends Injector {
-  def transform(program: MetaObject, state: TransformationState)
 }

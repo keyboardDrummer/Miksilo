@@ -2,6 +2,8 @@ package transformations.javac.methods
 
 import core.grammar.seqr
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.GetStaticC
 import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC

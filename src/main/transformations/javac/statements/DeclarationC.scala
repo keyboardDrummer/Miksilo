@@ -3,6 +3,8 @@ package transformations.javac.statements
 import core.exceptions.BadInputException
 import core.grammar.{Grammar, seqr}
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.base.{JavaMethodC, VariablePool}
 import transformations.javac.types.TypeC
 

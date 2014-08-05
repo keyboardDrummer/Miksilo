@@ -2,6 +2,8 @@ package transformations.javac.expressions
 
 import core.grammar._
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 
 object EqualityC extends GrammarTransformation {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence)

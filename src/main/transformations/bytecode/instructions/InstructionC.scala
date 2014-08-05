@@ -1,6 +1,7 @@
 package transformations.bytecode.instructions
 
 import core.transformation._
+import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode._
 import transformations.javac.base.ConstantPool
 

@@ -1,6 +1,7 @@
 package transformations.javac
 
 import core.transformation._
+import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
 import org.junit.Assert
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
@@ -24,6 +25,13 @@ object TestUtils {
     PrintByteCode.printBytes(getBytes(byteCode))
   }
 
+  def getBytes(byteCode: MetaObject): Seq[Byte] = {
+    var output: Seq[Byte] = null
+    val transformations: Seq[Injector] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
+    new Transformer(transformations).transform(byteCode)
+    output
+  }
+
   def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
     val line = runByteCode(className, code)
     Assert.assertEquals(expectedResult, Integer.parseInt(line))
@@ -42,11 +50,15 @@ object TestUtils {
     runJavaClass(className, testDirectory)
   }
 
-  def getBytes(byteCode: MetaObject): Seq[Byte] = {
-    var output: Seq[Byte] = null
-    val transformations: Seq[Injector] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
-    new Transformer(transformations).transform(byteCode)
-    output
+  def compileAndRun(className: String, inputDirectory: Path): String = {
+    val relativeFilePath = inputDirectory / (className + ".java")
+    val currentDir = new File(new java.io.File("."))
+    val testOutput = Directory(currentDir / Path("testOutput"))
+    val testResources = currentDir / Path("testResources")
+    val input: File = File(testResources / relativeFilePath)
+    JavaCompiler.getCompiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
+    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
+    TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
   def runJavaClass(className: String, directory: Path): String = {
@@ -58,17 +70,6 @@ object TestUtils {
     val exitValue = processBuilder ! logger
     Assert.assertEquals(line, 0, exitValue)
     line
-  }
-
-  def compileAndRun(className: String, inputDirectory: Path): String = {
-    val relativeFilePath = inputDirectory / (className + ".java")
-    val currentDir = new File(new java.io.File("."))
-    val testOutput = Directory(currentDir / Path("testOutput"))
-    val testResources = currentDir / Path("testResources")
-    val input: File = File(testResources / relativeFilePath)
-    JavaCompiler.getCompiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
-    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
-    TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {

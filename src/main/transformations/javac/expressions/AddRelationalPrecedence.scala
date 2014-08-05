@@ -1,6 +1,8 @@
 package transformations.javac.expressions
 
-import core.transformation.{Contract, GrammarCatalogue, GrammarTransformation}
+import core.transformation.Contract
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 
 object AddRelationalPrecedence extends GrammarTransformation {
 

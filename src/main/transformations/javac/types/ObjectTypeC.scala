@@ -1,6 +1,7 @@
 package transformations.javac.types
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 
 object ObjectTypeC extends ProgramTransformation {
   override def transform(program: MetaObject, state: TransformationState): Unit = {

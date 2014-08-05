@@ -1,8 +1,9 @@
 package core.transformation
 
 import core.exceptions.TransformationDependencyViolation
-import core.modularProgram.{PieceCombiner, PieceOfCode}
-import util.FileNameUtils
+import core.modularProgram.PieceCombiner
+import core.transformation.grammars.ReadUsingGrammarTransformation
+import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
 
 import scala.reflect.io.{Directory, File}
 
@@ -11,11 +12,14 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
   validateDependencies(transformations)
 
   def compile(input: File, outputDirectory: Directory) {
-    val readFilePiece = new ReadUsingGrammarTransformation(input)
-    val fileName = FileNameUtils.removeExtension(input.name)
-    val printByteCodePiece = new PrintByteCodeToOutputDirectory(fileName, outputDirectory)
-    val pieces = Seq(readFilePiece) ++ transformations.map(i => new FromInjector(i)) ++ Seq(printByteCodePiece)
-    PieceCombiner.combineAndExecute(new TransformationState(), pieces.reverse)
+    val readFilePiece = ReadUsingGrammarTransformation
+    val printByteCodePiece = PrintByteCodeToOutputDirectory
+    val pieces = Seq(readFilePiece) ++ transformations ++ Seq(printByteCodePiece)
+    val state = new TransformationState()
+    state.data(PrintByteCodeToOutputDirectory.InputFile) = input
+    state.data(PrintByteCodeToOutputDirectory.OutputDirectory) = outputDirectory
+    state.data(ReadUsingGrammarTransformation.InputFile) = input
+    PieceCombiner.combineAndExecute(state, pieces.reverse)
   }
 
   def validateDependencies(transformations: Seq[Injector]) = {
@@ -28,22 +32,4 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
       available += transformation
     }
   }
-
-  class FromInjector(injector: Injector) extends PieceOfCode[TransformationState] {
-    override def enter(state: TransformationState): Unit = {
-      injector.inject(state)
-      injector match {
-        case grammarTransformation: GrammarTransformation => grammarTransformation.transformGrammars(state.grammarCatalogue)
-        case _ =>
-      }
-    }
-
-    override def leave(state: TransformationState): Unit = {
-      injector match {
-        case programTransformation: ProgramTransformation => programTransformation.transform(state.program, state)
-        case _ =>
-      }
-    }
-  }
-
 }

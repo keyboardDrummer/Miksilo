@@ -1,6 +1,7 @@
 package transformations.ssm
 
 import core.transformation._
+import core.transformation.sillyCodePieces.ProgramTransformation
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit._
 import transformations.ssm.AddBlock._

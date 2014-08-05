@@ -1,6 +1,7 @@
 package transformations.javac
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.base.model.{JavaClassModel, JavaImport}
 

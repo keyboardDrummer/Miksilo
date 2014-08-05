@@ -1,6 +1,7 @@
 package transformations.ssm
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.ssm.SSM._
 
 import scala.collection.mutable
@@ -12,6 +13,9 @@ object AddStatementToSSM extends ProgramTransformation {
     statementToSSMLines(statement.clazz)(statement)
   }
 
+  def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, mutable.Map.empty)
+    .asInstanceOf[mutable.Map[AnyRef, MetaObject => Seq[MetaObject]]]
+
   def transform(program: MetaObject, state: TransformationState) = {
     val statementToSSMLines = getStatementToLines(state)
     def convertStatement(statement: MetaObject) = {
@@ -22,9 +26,6 @@ object AddStatementToSSM extends ProgramTransformation {
     })
     program.data.put(lines, convertStatement(program))
   }
-
-  def getStatementToLines(state: TransformationState) = state.data.getOrElseUpdate(this, mutable.Map.empty)
-    .asInstanceOf[mutable.Map[AnyRef, MetaObject => Seq[MetaObject]]]
 
   override def dependencies: Set[Contract] = Set.empty
 }

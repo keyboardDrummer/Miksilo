@@ -1,6 +1,7 @@
 package transformations.bytecode
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.instructions.GotoC.GoToKey
 import transformations.bytecode.instructions.IfIntegerCompareGreaterC.IfIntegerCompareGreaterKey
@@ -120,7 +121,7 @@ object LabelledJumps extends ProgramTransformation {
   def getIfZeroTarget(ifZero: MetaObject) =
     getInstructionArguments(ifZero)(0).asInstanceOf[String]
 
-  override def dependencies: Set[Contract] = Set(ByteCode)
+  override def dependencies: Set[Contract] = Set(IfIntegerCompareGreaterC, GotoC, IfZeroC)
 
   object LabelKey
 

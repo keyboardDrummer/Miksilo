@@ -1,6 +1,7 @@
 package transformations.ssm
 
-import core.transformation.{Contract, MetaObject, ProgramTransformation, TransformationState}
+import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.ssm.SSM._
 
 object AddDoWhile extends ProgramTransformation {

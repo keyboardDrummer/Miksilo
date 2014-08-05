@@ -1,12 +1,13 @@
 package core.transformation
 
+import core.modularProgram.PieceCombiner
+import core.transformation.sillyCodePieces.Injector
+
 class Transformer(val injectors: Seq[Injector]) {
   def transform(program: MetaObject) = {
     val state = new TransformationState
-    for (transformation <- injectors.reverse)
-      transformation.inject(state)
-
-    injectors.collect({ case transformation: ProgramTransformation => transformation.transform(program, state)})
+    state.program = program
+    PieceCombiner.combineAndExecute(state, injectors.reverse)
     program
   }
 }

@@ -3,14 +3,16 @@ package application
 import java.util
 
 import application.graphing.{TransformationGraph, TransformationVertex}
+import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.transformation.{Contract, GrammarTransformation, ProgramTransformation}
+import core.transformation.Contract
+import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import org.jgrapht.traverse.TopologicalOrderIterator
 
-import scala.collection.convert.Wrappers.JSetWrapper
-import scala.collection.mutable
+import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class GraphView(origin: TransformationGraph) extends mxGraph {
 
@@ -25,12 +27,13 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     setResetEdgesOnMove(true)
 
     setStyleSheet()
-
-    val vertexMap = mutable.Map[TransformationVertex, AnyRef]()
+    var vertexMap: Map[TransformationVertex, mxCell] = Map.empty[TransformationVertex, mxCell]
     val parent = getDefaultParent
-    for (vertex <- new JSetWrapper(origin.vertexSet)) {
-      val cell: mxCell = getVertex(parent, vertex)
-      vertexMap.put(vertex, cell)
+
+    val topologicalOrdering = Lists.reverse(Lists.newArrayList(new TopologicalOrderIterator(origin)))
+    for (vertex <- JListWrapper(topologicalOrdering)) {
+      val cell: mxCell = getVertex(parent, vertex, vertexMap)
+      vertexMap += (vertex -> cell)
     }
     for (edge <- new JSetWrapper(origin.edgeSet())) {
       val source = vertexMap(origin.getEdgeSource(edge))
@@ -71,17 +74,10 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     insertEdge(parent, null, "", source, target)
   }
 
-  def getCellWidthBasedOnDependencies(vertex: TransformationVertex) = {
-    val incoming = vertex.transformation.dependencies.size
-    val outgoing = origin.outgoingEdgesOf(vertex).size
-    val maximum = Math.max(incoming, outgoing)
-    maximum * 50
-  }
-
-  def getVertex(parent: AnyRef, vertex: TransformationVertex): mxCell = {
+  def getVertex(parent: AnyRef, vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]): mxCell = {
     val vertexLabel = vertex.toString
     val height: Double = 30
-    val width = Math.max(getCellWidthBasedOnLabel(vertexLabel), getCellWidthBasedOnDependencies(vertex))
+    val width = Math.max(getCellWidthBasedOnLabel(vertexLabel), getCellWidthBasedOnDependencies(vertex, vertexMap))
     val cell = insertVertex(parent, null, "", 20, 20, width, height).asInstanceOf[mxCell]
     cell.setValue(vertexLabel)
     vertex.transformation match {
@@ -96,6 +92,18 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     }
 
     cell
+  }
+
+  def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
+    val incoming = vertex.transformation.dependencies.size
+    var outgoingWidth = 0.0
+    val outgoingEdgesOf = origin.outgoingEdgesOf(vertex)
+    for (outgoing <- JSetWrapper(outgoingEdgesOf)) {
+      val outgoingCell = vertexMap(origin.getEdgeTarget(outgoing))
+      outgoingWidth += outgoingCell.getGeometry.getWidth
+    }
+    val maximum = Math.max(incoming * 50, outgoingWidth / (outgoingEdgesOf.size() + 1))
+    Math.min(1000, maximum)
   }
 
   def getCellWidthBasedOnLabel(vertexLabel: String): Int = {

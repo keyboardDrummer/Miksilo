@@ -2,6 +2,8 @@ package transformations.javac.base
 
 import core.grammar._
 import core.transformation._
+import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.{ByteCodeSkeleton, InferredMaxStack, InferredStackFrames}
 import transformations.javac.base.model.JavaMethodModel._

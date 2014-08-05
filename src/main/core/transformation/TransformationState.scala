@@ -1,12 +1,13 @@
 package core.transformation
 
 import core.grammar.FailureG
+import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.collection.mutable
 import scala.util.Random
 
-class TransformationState {
-  val data: mutable.Map[Contract, Any] = mutable.Map.empty
+class TransformationState() {
+  val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
   var program: MetaObject = null
 

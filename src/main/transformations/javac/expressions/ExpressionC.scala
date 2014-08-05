@@ -3,7 +3,8 @@ package transformations.javac.expressions
 import core.exceptions.CompilerException
 import core.grammar.FailureG
 import core.transformation._
-import transformations.bytecode.SimpleByteCode
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.types.TypeC
 
 import scala.collection.mutable
@@ -14,7 +15,7 @@ case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
 
 object ExpressionC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(SimpleByteCode, TypeC)
+  override def dependencies: Set[Contract] = Set(TypeC)
 
   def getType(state: TransformationState): MetaObject => Any = expression => getGetTypeRegistry(state)(expression.clazz)(expression)
 

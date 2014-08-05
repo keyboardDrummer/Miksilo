@@ -2,6 +2,8 @@ package transformations.javac.methods
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC

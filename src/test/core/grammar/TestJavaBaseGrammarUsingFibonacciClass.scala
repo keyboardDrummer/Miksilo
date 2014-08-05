@@ -1,6 +1,8 @@
 package core.grammar
 
 import core.transformation._
+import core.transformation.grammars.ProgramGrammar
+import core.transformation.sillyCodePieces.GrammarTransformation
 import org.junit.{Assert, Test}
 import transformations.javac._
 import transformations.javac.base._
@@ -53,6 +55,22 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
+  def getExpressionGrammarResult(input: String): Any = {
+    val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
+    result
+  }
+
+  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
+    val parser = new TestGrammarUtils().buildParser(grammarSequence, grammarTransformer)
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    val result = parseResult.get
+    Assert.assertTrue(result.toString, parseResult.next.atEnd)
+    result
+  }
+
   @Test
   def testLessThan() {
     val input = "index < 2"
@@ -85,22 +103,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
-  def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
-    result
-  }
-
-  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val parser = new TestGrammarUtils().buildParser(grammarSequence, grammarTransformer)
-    val parseResult = parser(input)
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
-
-    val result = parseResult.get
-    Assert.assertTrue(result.toString, parseResult.next.atEnd)
-    result
-  }
-
   @Test
   def testFibonacciMainMethod() {
     val input = "public static void main(java.lang.String[] args) { System.out.print(fibonacci(5)); }"
@@ -130,17 +132,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
-  @Test
-  def testFibonacci() {
-    val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
-
-    val input = File(inputFile).slurp()
-
-    val result = getGrammarResult(input)
-    val expectation = JavaClassModel.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
-    Assert.assertEquals(expectation, result)
-  }
-
   def getFibonacciMethod: MetaObject = {
     JavaMethodModel.method("fibonacci", JavaTypes.intType, Seq(JavaMethodModel.parameter("index", JavaTypes.intType)),
       Seq(ReturnC._return(Some(getFibonacciExpression))), static = true, JavaMethodModel.PublicVisibility)
@@ -152,5 +143,16 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), LiteralC.literal(2))))
     val expectation = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
     expectation
+  }
+
+  @Test
+  def testFibonacci() {
+    val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
+
+    val input = File(inputFile).slurp()
+
+    val result = getGrammarResult(input)
+    val expectation = JavaClassModel.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
+    Assert.assertEquals(expectation, result)
   }
 }
