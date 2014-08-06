@@ -17,6 +17,11 @@ object ByteCodeSkeleton extends Contract {
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
 
+  def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
+    ByteCodeSkeleton.getMethods(clazz)
+      .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
+      .flatMap(annotation => if (annotation.clazz == ByteCodeSkeleton.CodeKey) Some(annotation) else None)
+  }
 
   def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
     data.put(OffsetDelta, offset)

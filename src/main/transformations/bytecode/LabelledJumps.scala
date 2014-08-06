@@ -61,9 +61,13 @@ object LabelledJumps extends ProgramTransformation {
 
     val clazz = program
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
-    for (codeAnnotation <- ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
-      .flatMap(annotation => if (annotation.clazz == ByteCodeSkeleton.CodeKey) Some(annotation) else None)) {
+    val codeAnnotations: Seq[MetaObject] = getCodeAnnotations(clazz)
+
+    for (codeAnnotation <- codeAnnotations) {
+      processCodeAnnotation(codeAnnotation)
+    }
+
+    def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
       val instructions = ByteCodeSkeleton.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(ByteCodeSkeleton.CodeAttributesKey) = ByteCodeSkeleton.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)

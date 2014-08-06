@@ -3,30 +3,21 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.instructions.IntegerConstantC
-import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.instructions.{IntegerConstantC, LessThanInstructionC}
 import transformations.javac.types.{BooleanTypeC, IntTypeC, TypeC}
 
 object LessThanC extends ExpressionInstance {
 
   val key = LessThanKey
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC)
-
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC, LessThanInstructionC)
 
   override def toByteCode(lessThan: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val toInstructions = ExpressionC.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
-    val falseStartLabel = state.getUniqueLabel("falseStart")
-    val endLabel = state.getUniqueLabel("end")
-    firstInstructions ++ secondInstructions ++
-      Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
-        IntegerConstantC.integerConstant(1),
-        LabelledJumps.goTo(endLabel),
-        InferredStackFrames.label(falseStartLabel),
-        IntegerConstantC.integerConstant(0),
-        InferredStackFrames.label(endLabel))
+    firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
   }
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {

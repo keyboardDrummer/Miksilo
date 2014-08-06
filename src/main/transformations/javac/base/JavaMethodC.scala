@@ -29,7 +29,7 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
       val classRef = classCompiler.getClassRef(classInfo)
       clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
       val parentName = JavaClassModel.getParent(clazz).get
-      val parentRef = classCompiler.getClassRef(classCompiler.fullyQualify(parentName))
+      val parentRef = classCompiler.constantPool.getClassRef(classCompiler.fullyQualify(parentName))
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassFields) = Seq()

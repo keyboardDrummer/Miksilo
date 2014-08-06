@@ -18,7 +18,7 @@ object JavaCompiler {
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
       AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, BlockC,
-      StatementC, ExpressionC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++
+      StatementC, ExpressionC) ++ Seq(LessThanInstructionC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++
       byteCodeTransformations
   }
 

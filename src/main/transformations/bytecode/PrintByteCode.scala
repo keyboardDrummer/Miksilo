@@ -97,8 +97,8 @@ object PrintByteCode extends ProgramTransformation {
 
   def getBytes(byteCode: MetaObject, state: TransformationState): Seq[Byte] = {
 
+    val clazz = byteCode
     def getBytes(byteCode: MetaObject): Seq[Byte] = {
-      val clazz = byteCode
       var result = List[Byte]()
 
       result ++= intToBytes(0xCAFEBABE)
@@ -164,14 +164,14 @@ object PrintByteCode extends ProgramTransformation {
         case ByteCodeSkeleton.AppendFrame =>
           val localVerificationTypes = ByteCodeSkeleton.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
-            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(info, state))
+            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(clazz, info, state))
         case ByteCodeSkeleton.SameLocals1StackItem =>
           val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code > 127)
-            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(_type, state)
+            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
           else {
-            byteToBytes(code) ++ TypeC.getVerificationInfoBytes(_type, state)
+            byteToBytes(code) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
           }
       }
     }

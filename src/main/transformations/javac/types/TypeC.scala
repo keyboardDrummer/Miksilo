@@ -4,8 +4,9 @@ import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.javac.base.JavaMethodC
+import transformations.javac.base.ConstantPool
 import transformations.javac.types.BooleanTypeC.BooleanTypeKey
 
 import scala.collection.mutable
@@ -19,13 +20,14 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
 object TypeC extends GrammarTransformation {
-  def getVerificationInfoBytes(_type: MetaObject, state: TransformationState): Seq[Byte] = {
-    val classCompiler = JavaMethodC.getClassCompiler(state)
+  def getVerificationInfoBytes(clazz: MetaObject, _type: MetaObject, state: TransformationState): Seq[Byte] = {
+
+    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
     val stackType: MetaObject = toStackType(_type)
     stackType.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
       case LongTypeC.LongTypeKey => hexToBytes("02")
-      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(classCompiler.getClassRef(classCompiler.findClass(stackType)))
+      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(constantPool.getClassRef(ObjectTypeC.getObjectTypeName(stackType).right.get))
     }
   }
 
