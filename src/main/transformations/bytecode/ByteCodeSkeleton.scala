@@ -2,7 +2,6 @@ package transformations.bytecode
 
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.JavaTypes._
 
 import scala.collection.mutable
 
@@ -18,15 +17,6 @@ object ByteCodeSkeleton extends Contract {
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
 
-  def getTypeSize(_type: MetaObject): Int = _type.clazz match {
-    case IntTypeKey => 1
-    case BooleanTypeKey => 1
-    case DoubleTypeKey => 1
-    case ArrayTypeKey => 1
-    case ObjectTypeKey => 1
-    case ArrayTypeKey => 1
-    case VoidTypeKey => 0
-  }
 
   def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
     data.put(OffsetDelta, offset)

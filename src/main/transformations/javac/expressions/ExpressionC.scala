@@ -17,7 +17,8 @@ object ExpressionC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(TypeC)
 
-  def getType(state: TransformationState): MetaObject => Any = expression => getGetTypeRegistry(state)(expression.clazz)(expression)
+  def getType(state: TransformationState): MetaObject => MetaObject =
+    expression => getGetTypeRegistry(state)(expression.clazz)(expression)
 
   def getGetTypeRegistry(state: TransformationState) = getState(state).getTypeRegistry
 
@@ -40,7 +41,7 @@ object ExpressionC extends GrammarTransformation {
 
   class ToInstructionsRegistry extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
 
-  class GetTypeRegistry extends mutable.HashMap[AnyRef, MetaObject => Any]
+  class GetTypeRegistry extends mutable.HashMap[AnyRef, MetaObject => MetaObject]
 
   class State {
     val transformations = new ToInstructionsRegistry()

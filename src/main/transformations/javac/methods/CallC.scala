@@ -4,6 +4,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.instructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.base.{ClassOrObjectReference, JavaMethodC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
@@ -11,19 +12,32 @@ import transformations.javac.expressions.ExpressionC
 object CallC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
+    ExpressionC.getGetTypeRegistry(state).put(CallKey, (call: MetaObject) => {
+      val compiler = JavaMethodC.getMethodCompiler(state)
+      val methodKey = getMethodKey(call, compiler)
+      val methodInfo = compiler.classCompiler.compiler.find(methodKey)
+      val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
+      returnType
+    })
     ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       callToLines(call, methodCompiler)
     })
   }
 
+  def getMethodKey(call: MetaObject, compiler: MethodCompiler) = {
+    val callCallee = getCallCallee(call)
+    val objectExpression = SelectorC.getSelectorObject(callCallee)
+    val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
+
+    val member = SelectorC.getSelectorMember(callCallee)
+    new MethodId(kind.info.getQualifiedName, member)
+  }
+
   def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
-    val member = SelectorC.getSelectorMember(callCallee)
-    val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
-
-    val methodKey: MethodId = new MethodId(kind.info.getQualifiedName, member)
+    val methodKey: MethodId = getMethodKey(call, compiler)
     val methodInfo = compiler.classCompiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
     val expressionToInstruction = ExpressionC.getToInstructions(compiler.transformationState)

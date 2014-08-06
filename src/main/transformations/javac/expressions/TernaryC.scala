@@ -5,10 +5,22 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.{InferredStackFrames, LabelledJumps}
+import transformations.javac.types.{BooleanTypeC, TypeC}
 
 object TernaryC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
+    val getType = ExpressionC.getType(state)
+    ExpressionC.getGetTypeRegistry(state).put(TernaryKey, _ternary => {
+      val condition = TernaryC.getCondition(_ternary)
+      val truePath = TernaryC.trueBranch(_ternary)
+      val falsePath = TernaryC.falseBranch(_ternary)
+      TypeC.checkAssignableTo(state)(BooleanTypeC.booleanType, getType(condition))
+
+      val trueType = getType(truePath)
+      val falseType = getType(falsePath)
+      TypeC.union(state)(trueType, falseType)
+    })
     ExpressionC.getExpressionToLines(state).put(TernaryKey, _ternary => {
       val condition = TernaryC.getCondition(_ternary)
       val truePath = TernaryC.trueBranch(_ternary)

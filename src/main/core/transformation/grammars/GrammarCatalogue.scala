@@ -7,7 +7,7 @@ class GrammarCatalogue {
 
   def find(key: Any): Labelled = grammars(key)
 
-  def create(key: AnyRef, inner: Grammar = null): Labelled = {
+  def create(key: AnyRef, inner: Grammar = FailureG): Labelled = {
     val result = new Labelled(key, inner)
     grammars += key -> result
     result

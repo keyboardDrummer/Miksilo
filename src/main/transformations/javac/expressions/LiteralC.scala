@@ -2,19 +2,12 @@ package transformations.javac.expressions
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.IntegerConstantC
+import transformations.javac.types.{BooleanTypeC, IntTypeC}
 
-object LiteralC extends GrammarTransformation {
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(LiteralKey, literal => {
-      val value = getValue(literal)
-      Seq(value match {
-        case i: Integer => IntegerConstantC.integerConstant(i)
-        case b: Boolean => IntegerConstantC.integerConstant(if (b) 1 else 0)
-      })
-    })
-  }
+object LiteralC extends ExpressionInstance {
+  //TODO split into boolean and integer
+  val key = LiteralKey
 
   def getValue(literal: MetaObject) = {
     literal(ValueKey)
@@ -40,4 +33,17 @@ object LiteralC extends GrammarTransformation {
 
   object ValueKey
 
+  override def toByteCode(literal: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val value = getValue(literal)
+    Seq(value match {
+      case i: Integer => IntegerConstantC.integerConstant(i)
+      case b: Boolean => IntegerConstantC.integerConstant(if (b) 1 else 0)
+    })
+  }
+
+  override def getType(expression: MetaObject, state: TransformationState): MetaObject =
+    getValue(expression) match {
+      case i: Integer => IntTypeC.intType
+      case b: Boolean => BooleanTypeC.booleanType
+    }
 }

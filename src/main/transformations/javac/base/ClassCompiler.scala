@@ -2,13 +2,14 @@ package transformations.javac.base
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.base.model.{JavaClassModel, JavaImport, JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.{JavaClassModel, JavaImport, QualifiedClassName}
+import transformations.javac.types.ObjectTypeC
 
 object ClassCompiler {
 }
 
 
-case class FieldInfo(parent: ClassInfo, name: String, _type: Any) extends ClassMember {
+case class FieldInfo(parent: ClassInfo, name: String, _type: MetaObject) extends ClassMember {
 }
 
 case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMember
@@ -26,8 +27,8 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
   val constantPool = new ConstantPool()
   val classNames = getClassMapFromImports(JavaClassModel.getImports(currentClass))
 
-  def findClass(objectType: MetaObject) = {
-    val qualifiedName = JavaTypes.getObjectTypeName(objectType) match {
+  def findClass(objectType: MetaObject): ClassInfo = {
+    val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
     }

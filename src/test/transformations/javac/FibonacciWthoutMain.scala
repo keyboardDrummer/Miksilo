@@ -11,6 +11,7 @@ import transformations.javac.expressions._
 import transformations.javac.methods.CallC._
 import transformations.javac.methods.ReturnC
 import transformations.javac.methods.VariableC._
+import transformations.javac.types.{IntTypeC, VoidTypeC}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -75,7 +76,7 @@ class FibonacciWthoutMain {
       IntegerReturnC.integerReturn
     )
     val stackMapTable = ByteCodeSkeleton.stackMapTable(14, Seq(ByteCodeSkeleton.sameFrame(9),
-      ByteCodeSkeleton.sameFrameLocals1StackItem(12, JavaTypes.intType)))
+      ByteCodeSkeleton.sameFrameLocals1StackItem(12, IntTypeC.intType)))
     val codeAttribute = ByteCodeSkeleton.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))
     ByteCodeSkeleton.methodInfo(0, 0, Seq(codeAttribute), Set(ByteCodeSkeleton.PrivateAccess, ByteCodeSkeleton.StaticAccess))
   }
@@ -86,10 +87,10 @@ class FibonacciWthoutMain {
       ByteCodeSkeleton.classRef(13),
       ByteCodeSkeleton.classRef(14),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
       ByteCodeSkeleton.CodeAttributeId,
       methodName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
+      ByteCodeSkeleton.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
       ByteCodeSkeleton.nameAndType(5, 6),
       ByteCodeSkeleton.nameAndType(8, 9),
       new QualifiedClassName(Seq("transformations", "bytecode", "testing", "OnlyFibonacci")),
@@ -118,12 +119,12 @@ class FibonacciWthoutMain {
   }
 
   def getFibonacciMethodJava: MetaObject = {
-    val parameters = Seq(parameter("i", JavaTypes.intType))
+    val parameters = Seq(parameter("i", IntTypeC.intType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
     val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
     val body = Seq(ReturnC._return(Some(returnValue)))
-    method("fibonacci", JavaTypes.intType, parameters, body, static = true)
+    method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }
 }

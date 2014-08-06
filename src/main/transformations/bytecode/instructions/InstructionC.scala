@@ -9,7 +9,7 @@ trait InstructionC extends Injector {
 
   override def inject(state: TransformationState): Unit = {
     ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, getInstructionInAndOutputs)
-    ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(key, getInstructionStackSizeModification)
+    ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(key, (c, i) => getInstructionStackSizeModification(c, i, state))
     PrintByteCode.getBytesRegistry(state).put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
   }
@@ -24,7 +24,7 @@ trait InstructionC extends Injector {
 
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte]
 
-  def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int
+  def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int
 
   protected def binary(_type: MetaObject) = (Seq(_type, _type), Seq(_type))
 }

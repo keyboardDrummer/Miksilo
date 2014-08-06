@@ -1,8 +1,9 @@
 package transformations.javac
 
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.base.{MethodInfo, PackageInfo}
+import transformations.javac.types.{IntTypeC, ObjectTypeC, VoidTypeC}
 
 object JavaLang {
   val javaPackageName: String = "java"
@@ -13,14 +14,14 @@ object JavaLang {
   val langPackage = javaPackage.newPackageInfo(langPackageName)
   val objectClass = langPackage.newClassInfo(ImplicitObjectSuperClass.objectName)
   objectClass.content(ConstructorC.constructorName) =
-    new MethodInfo(ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()), false)
+    new MethodInfo(ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()), false)
 
   val systemClass = langPackage.newClassInfo("System")
-  systemClass.newFieldInfo("out", JavaTypes.objectType(new QualifiedClassName(Seq(javaPackageName, ioPackageName, "PrintStream"))))
+  systemClass.newFieldInfo("out", ObjectTypeC.objectType(new QualifiedClassName(Seq(javaPackageName, ioPackageName, "PrintStream"))))
 
   val javaIO = javaPackage.newPackageInfo(ioPackageName)
   val printStreamClass = javaIO.newClassInfo("PrintStream")
-  printStreamClass.newMethodInfo("print", ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType)), _static = false)
+  printStreamClass.newMethodInfo("print", ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType)), _static = false)
 
   val stringClass = langPackage.newClassInfo("String")
 }

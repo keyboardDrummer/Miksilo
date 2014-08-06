@@ -6,9 +6,10 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.base._
 import transformations.javac.base.model.JavaMethodModel._
-import transformations.javac.base.model.{JavaClassModel, JavaMethodModel, JavaTypes}
+import transformations.javac.base.model.{JavaClassModel, JavaMethodModel}
 import transformations.javac.methods.CallC
 import transformations.javac.statements.StatementC
+import transformations.javac.types.VoidTypeC
 
 object ConstructorC extends ProgramTransformation {
   val constructorName: String = "<init>"
@@ -35,7 +36,7 @@ object ConstructorC extends ProgramTransformation {
     for (constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor)) {
       constructor.clazz = ByteCodeSkeleton.MethodInfoKey
       constructor(JavaMethodModel.MethodNameKey) = constructorName
-      constructor(JavaMethodModel.ReturnTypeKey) = JavaTypes.voidType
+      constructor(JavaMethodModel.ReturnTypeKey) = VoidTypeC.voidType
       constructor(StaticKey) = false
     }
   }

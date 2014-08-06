@@ -47,7 +47,7 @@ case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[Str
 
   def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.getQualifiedName.parts ++ Seq(name))
 
-  def newFieldInfo(name: String, _type: Any) = {
+  def newFieldInfo(name: String, _type: MetaObject) = {
     val result = new FieldInfo(this, name, _type)
     content(name) = result
     result

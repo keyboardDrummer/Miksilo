@@ -2,21 +2,16 @@ package core.grammar
 
 import core.transformation._
 import core.transformation.grammars.ProgramGrammar
-import core.transformation.sillyCodePieces.GrammarTransformation
 import org.junit.{Assert, Test}
-import transformations.javac._
 import transformations.javac.base._
 import transformations.javac.base.model._
 import transformations.javac.expressions._
 import transformations.javac.methods.{CallC, ReturnC, SelectorC, VariableC}
+import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.{File, Path}
 
 class TestJavaBaseGrammarUsingFibonacciClass {
-
-  val grammarSequence: Seq[GrammarTransformation] =
-    JavaCompiler.javaCompilerTransformations.reverse.collect({ case x: GrammarTransformation => x})
-
 
   @Test
   def testBasicClass() {
@@ -61,7 +56,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val parser = new TestGrammarUtils().buildParser(grammarSequence, grammarTransformer)
+    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
     val parseResult = parser(input)
     if (parseResult.isEmpty)
       Assert.fail(parseResult.toString)
@@ -118,7 +113,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMainMethod: MetaObject = {
-    JavaMethodModel.method("main", JavaTypes.voidType, Seq(JavaMethodModel.parameter("args", JavaTypes.arrayType(JavaTypes.stringType))),
+    JavaMethodModel.method("main", VoidTypeC.voidType, Seq(JavaMethodModel.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
       Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
         Seq(CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))))), true, JavaMethodModel.PublicVisibility)
   }
@@ -133,7 +128,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getFibonacciMethod: MetaObject = {
-    JavaMethodModel.method("fibonacci", JavaTypes.intType, Seq(JavaMethodModel.parameter("index", JavaTypes.intType)),
+    JavaMethodModel.method("fibonacci", IntTypeC.intType, Seq(JavaMethodModel.parameter("index", IntTypeC.intType)),
       Seq(ReturnC._return(Some(getFibonacciExpression))), static = true, JavaMethodModel.PublicVisibility)
   }
 

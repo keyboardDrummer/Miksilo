@@ -1,6 +1,6 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.base.ConstantPool
 
@@ -10,7 +10,7 @@ object GotoC extends InstructionC {
 
   def goTo(target: Int): MetaObject = ByteCodeSkeleton.instruction(GoToKey, Seq(target))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = 0
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 0
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)

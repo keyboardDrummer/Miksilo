@@ -6,8 +6,10 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.{StoreAddressC, StoreIntegerC}
 import transformations.javac.base.JavaMethodC
-import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, IntTypeKey, ObjectTypeKey}
 import transformations.javac.expressions.ExpressionC
+import transformations.javac.types.ArrayTypeC.ArrayTypeKey
+import transformations.javac.types.IntTypeC.IntTypeKey
+import transformations.javac.types.ObjectTypeC.ObjectTypeKey
 
 object AssignmentC extends GrammarTransformation {
   override def inject(state: TransformationState): Unit = {
@@ -41,7 +43,6 @@ object AssignmentC extends GrammarTransformation {
   }
 
   object AssignmentKey
-
 
   object AssignmentTarget
 

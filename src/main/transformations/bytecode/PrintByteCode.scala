@@ -6,8 +6,8 @@ import akka.util.Convert
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.javac.base.model.JavaTypes.{ArrayTypeKey, ObjectTypeKey}
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.types.{ObjectTypeC, TypeC}
 
 import scala.collection.mutable
 
@@ -30,39 +30,6 @@ object PrintByteCode extends ProgramTransformation {
 
   def getSourceFileBytes(sourceFile: MetaObject) = {
     shortToBytes(ByteCodeSkeleton.getSourceFileFileNameIndex(sourceFile))
-  }
-
-  def getVerificationInfoBytes(_type: MetaObject): Seq[Byte] = hexToBytes(_type.clazz match {
-    case JavaTypes.IntTypeKey => "01"
-    case JavaTypes.LongTypeKey => "02"
-  })
-
-  def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
-    val offset = ByteCodeSkeleton.getFrameOffset(frame)
-    frame.clazz match {
-      case ByteCodeSkeleton.SameFrameKey =>
-        if (offset > 63)
-          byteToBytes(251) ++ shortToBytes(offset)
-        else
-          byteToBytes(offset)
-      case ByteCodeSkeleton.AppendFrame =>
-        val localVerificationTypes = ByteCodeSkeleton.getAppendFrameTypes(frame)
-        byteToBytes(252 + localVerificationTypes.length - 1) ++
-          shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info))
-      case ByteCodeSkeleton.SameLocals1StackItem =>
-        val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
-        val code = 64 + offset
-        if (code > 127)
-          byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type)
-        else {
-          byteToBytes(code) ++ getVerificationInfoBytes(_type)
-        }
-    }
-  }
-
-  def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
-    val entries = ByteCodeSkeleton.getStackMapTableEntries(attribute)
-    shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
   def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
@@ -88,49 +55,6 @@ object PrintByteCode extends ProgramTransformation {
     shortToBytes(accessFlags("super"))
   }
 
-  def javaTypeToString(_type: MetaObject): String = _type.clazz match {
-    case JavaTypes.VoidTypeKey => "V"
-    case JavaTypes.IntTypeKey => "I"
-    case JavaTypes.DoubleTypeKey => "D"
-    case JavaTypes.LongTypeKey => "J"
-    case JavaTypes.BooleanTypeKey => "Z"
-    case ArrayTypeKey => s"[${javaTypeToString(JavaTypes.getArrayElementType(_type))}"
-    case ObjectTypeKey => s"L${JavaTypes.getObjectTypeName(_type).right.get.parts.mkString("/")};"
-  }
-
-  def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
-    entry match {
-      case metaEntry: MetaObject =>
-        metaEntry.clazz match {
-          case ByteCodeSkeleton.MethodRefKey =>
-            byteToBytes(10) ++
-              shortToBytes(ByteCodeSkeleton.getMethodRefClassRefIndex(metaEntry)) ++
-              shortToBytes(ByteCodeSkeleton.getMethodRefMethodNameIndex(metaEntry))
-          case ByteCodeSkeleton.FieldRef =>
-            byteToBytes(9) ++
-              shortToBytes(ByteCodeSkeleton.getFieldRefClassIndex(metaEntry)) ++
-              shortToBytes(ByteCodeSkeleton.getFieldRefNameAndTypeIndex(metaEntry))
-          case ByteCodeSkeleton.ClassRefKey =>
-            byteToBytes(7) ++ shortToBytes(ByteCodeSkeleton.getClassRefName(metaEntry))
-          case ByteCodeSkeleton.NameAndTypeKey =>
-            byteToBytes(12) ++ shortToBytes(ByteCodeSkeleton.getNameAndTypeName(metaEntry)) ++
-              shortToBytes(ByteCodeSkeleton.getNameAndTypeType(metaEntry))
-          case ByteCodeSkeleton.MethodDescriptor =>
-            val returnString = javaTypeToString(ByteCodeSkeleton.getMethodDescriptorReturnType(metaEntry))
-            val parametersString = s"(${
-              ByteCodeSkeleton.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
-            })"
-            toUTF8ConstantEntry(parametersString + returnString)
-          case JavaTypes.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
-        }
-      case CodeAttributeId => toUTF8ConstantEntry("Code")
-      case StackMapTableId => toUTF8ConstantEntry("StackMapTable")
-      case LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
-      case SourceFileId => toUTF8ConstantEntry("SourceFile")
-      case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
-      case utf8: String => toUTF8ConstantEntry(utf8)
-    }
-  }
 
   def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2))
 
@@ -194,6 +118,70 @@ object PrintByteCode extends ProgramTransformation {
       result ++= getAttributesByteCode(ByteCodeSkeleton.getClassAttributes(clazz))
       result
     }
+
+    def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
+      entry match {
+        case metaEntry: MetaObject =>
+          metaEntry.clazz match {
+            case ByteCodeSkeleton.MethodRefKey =>
+              byteToBytes(10) ++
+                shortToBytes(ByteCodeSkeleton.getMethodRefClassRefIndex(metaEntry)) ++
+                shortToBytes(ByteCodeSkeleton.getMethodRefMethodNameIndex(metaEntry))
+            case ByteCodeSkeleton.FieldRef =>
+              byteToBytes(9) ++
+                shortToBytes(ByteCodeSkeleton.getFieldRefClassIndex(metaEntry)) ++
+                shortToBytes(ByteCodeSkeleton.getFieldRefNameAndTypeIndex(metaEntry))
+            case ByteCodeSkeleton.ClassRefKey =>
+              byteToBytes(7) ++ shortToBytes(ByteCodeSkeleton.getClassRefName(metaEntry))
+            case ByteCodeSkeleton.NameAndTypeKey =>
+              byteToBytes(12) ++ shortToBytes(ByteCodeSkeleton.getNameAndTypeName(metaEntry)) ++
+                shortToBytes(ByteCodeSkeleton.getNameAndTypeType(metaEntry))
+            case ByteCodeSkeleton.MethodDescriptor =>
+              val returnString = javaTypeToString(ByteCodeSkeleton.getMethodDescriptorReturnType(metaEntry))
+              val parametersString = s"(${
+                ByteCodeSkeleton.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
+              })"
+              toUTF8ConstantEntry(parametersString + returnString)
+            case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
+          }
+        case CodeAttributeId => toUTF8ConstantEntry("Code")
+        case StackMapTableId => toUTF8ConstantEntry("StackMapTable")
+        case LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
+        case SourceFileId => toUTF8ConstantEntry("SourceFile")
+        case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
+        case utf8: String => toUTF8ConstantEntry(utf8)
+      }
+    }
+
+    def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
+      val offset = ByteCodeSkeleton.getFrameOffset(frame)
+      frame.clazz match {
+        case ByteCodeSkeleton.SameFrameKey =>
+          if (offset > 63)
+            byteToBytes(251) ++ shortToBytes(offset)
+          else
+            byteToBytes(offset)
+        case ByteCodeSkeleton.AppendFrame =>
+          val localVerificationTypes = ByteCodeSkeleton.getAppendFrameTypes(frame)
+          byteToBytes(252 + localVerificationTypes.length - 1) ++
+            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(info, state))
+        case ByteCodeSkeleton.SameLocals1StackItem =>
+          val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
+          val code = 64 + offset
+          if (code > 127)
+            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(_type, state)
+          else {
+            byteToBytes(code) ++ TypeC.getVerificationInfoBytes(_type, state)
+          }
+      }
+    }
+
+    def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
+      val entries = ByteCodeSkeleton.getStackMapTableEntries(attribute)
+      shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
+    }
+
+    def javaTypeToString(_type: MetaObject): String = TypeC.getByteCodeString(state)(_type)
 
     def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
       val methods = ByteCodeSkeleton.getMethods(clazz)

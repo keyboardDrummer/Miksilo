@@ -3,12 +3,11 @@ package transformations.javac.methods
 import core.grammar.seqr
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.GetStaticC
 import transformations.javac.base._
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
-object SelectorC extends GrammarTransformation {
+object SelectorC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaMethodC, GetStaticC)
 
@@ -17,10 +16,7 @@ object SelectorC extends GrammarTransformation {
       val methodCompiler = JavaMethodC.getMethodCompiler(state)
       getReferenceKind(selector, methodCompiler)
     })
-    ExpressionC.getExpressionToLines(state).put(SelectorKey, (selector: MetaObject) => {
-      val methodCompiler = JavaMethodC.getMethodCompiler(state)
-      selectorToLines(selector, methodCompiler)
-    })
+    super.inject(state)
   }
 
   def getReferenceKind(selector: MetaObject, methodCompiler: MethodCompiler): ReferenceKind = {
@@ -36,18 +32,6 @@ object SelectorC extends GrammarTransformation {
         val fieldClassType = methodCompiler.classCompiler.findClass(field._type.asInstanceOf[MetaObject])
         new ClassOrObjectReference(fieldClassType, false)
     }
-  }
-
-  def selectorToLines(selector: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
-    val obj = getSelectorObject(selector)
-    val member = getSelectorMember(selector)
-    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
-    val fieldInfo = classOrObjectReference.info.getField(member)
-    val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
-    if (classOrObjectReference.wasClass)
-      Seq(GetStaticC.getStatic(fieldRef))
-    else
-      ???
   }
 
   def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
@@ -75,4 +59,27 @@ object SelectorC extends GrammarTransformation {
 
   object SelectorMember
 
+  override val key: AnyRef = SelectorKey
+
+  override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
+    val compiler = JavaMethodC.getMethodCompiler(state)
+    val obj = getSelectorObject(selector)
+    val member = getSelectorMember(selector)
+    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    val fieldInfo = classOrObjectReference.info.getField(member)
+    fieldInfo._type
+  }
+
+  override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val compiler = JavaMethodC.getMethodCompiler(state)
+    val obj = getSelectorObject(selector)
+    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    val member = getSelectorMember(selector)
+    val fieldInfo = classOrObjectReference.info.getField(member)
+    val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
+    if (classOrObjectReference.wasClass)
+      Seq(GetStaticC.getStatic(fieldRef))
+    else
+      ???
+  }
 }

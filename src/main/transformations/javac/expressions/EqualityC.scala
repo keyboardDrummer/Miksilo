@@ -9,7 +9,7 @@ object EqualityC extends GrammarTransformation {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence)
 
   override def inject(state: TransformationState): Unit = {
-    ExpressionC.getGetTypeRegistry(state).put(EqualityC, equality => {
+    ExpressionC.getExpressionToLines(state).put(EqualityC, equality => {
       val first = getFirst(equality)
       val second = getSecond(equality)
       val toInstructions = ExpressionC.getToInstructions(state)

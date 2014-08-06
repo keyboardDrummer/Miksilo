@@ -1,11 +1,11 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.JavaTypes
+import transformations.javac.types.IntTypeC
 
 object IfIntegerCompareGreaterC extends InstructionC {
 
@@ -13,7 +13,7 @@ object IfIntegerCompareGreaterC extends InstructionC {
 
   def ifIntegerCompareGreater(target: Int): MetaObject = instruction(IfIntegerCompareGreaterKey, Seq(target))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = -2
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = -2
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
@@ -21,7 +21,7 @@ object IfIntegerCompareGreaterC extends InstructionC {
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) =
-    (Seq(JavaTypes.intType, JavaTypes.intType), Seq())
+    (Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   override def getInstructionSize: Int = 3
 

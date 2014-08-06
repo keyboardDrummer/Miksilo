@@ -1,6 +1,6 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
@@ -12,7 +12,7 @@ object GetStaticC extends InstructionC {
 
   def getStatic(fieldRefIndex: Int): MetaObject = instruction(GetStaticKey, Seq(fieldRefIndex))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = 1
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)

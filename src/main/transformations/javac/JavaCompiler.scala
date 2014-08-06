@@ -8,7 +8,7 @@ import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
 import transformations.javac.methods._
 import transformations.javac.statements.{AssignmentC, BlockC, DeclarationC, StatementC}
-import transformations.javac.types.{ObjectTypeC, TypeC}
+import transformations.javac.types._
 
 object JavaCompiler {
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
@@ -18,11 +18,13 @@ object JavaCompiler {
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
       AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, BlockC,
-      StatementC, ExpressionC, ObjectTypeC, TypeC, InferredStackFrames, InferredMaxStack, LabelledJumps) ++
+      StatementC, ExpressionC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++
       byteCodeTransformations
   }
 
-  def byteCodeTransformations = Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareGreaterC,
+  val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
+
+  def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareGreaterC,
     IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
     LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
 

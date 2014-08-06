@@ -1,10 +1,11 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.types.ObjectTypeC
 
 object InvokeVirtualC extends InvokeC {
 
@@ -12,8 +13,8 @@ object InvokeVirtualC extends InvokeC {
 
   def invokeVirtual(methodRefIndex: Int) = ByteCodeSkeleton.instruction(InvokeVirtual, Seq(methodRefIndex))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int =
-    super.getInstructionStackSizeModification(constantPool, instruction) + 1
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int =
+    super.getInstructionStackSizeModification(constantPool, instruction, state) + 1
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
@@ -27,7 +28,7 @@ object InvokeVirtualC extends InvokeC {
     val nameAndType = constantPool.getValue(ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val classRef = constantPool.getValue(ByteCodeSkeleton.getMethodRefClassRefIndex(methodRef)).asInstanceOf[MetaObject]
     val className = constantPool.getValue(ByteCodeSkeleton.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
-    val classType = JavaTypes.objectType(className)
+    val classType = ObjectTypeC.objectType(className)
     val descriptor = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
     val (ins, outs) = getMethodStackModification(descriptor)
     (Seq(classType) ++ ins, outs)

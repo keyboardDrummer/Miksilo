@@ -1,10 +1,10 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.JavaTypes
+import transformations.javac.types.IntTypeC
 
 object LoadIntegerC extends InstructionC {
 
@@ -12,7 +12,7 @@ object LoadIntegerC extends InstructionC {
 
   def integerLoad(location: Integer) = ByteCodeSkeleton.instruction(IntegerLoad, Seq(location))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = 1
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
@@ -23,7 +23,7 @@ object LoadIntegerC extends InstructionC {
       byteToBytes(hexToInt("1a") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(JavaTypes.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize: Int = 1
 

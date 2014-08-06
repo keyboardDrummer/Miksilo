@@ -5,21 +5,25 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.AddIntegersC
+import transformations.javac.types.{IntTypeC, TypeC}
 
-object AdditionC extends GrammarTransformation {
+object AdditionC extends GrammarTransformation with ExpressionInstance {
 
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(Clazz, (addition: MetaObject) => {
-      val toInstructions = ExpressionC.getToInstructions(state)
-      val firstInstructions = toInstructions(getFirst(addition))
-      val secondInstructions = toInstructions(getSecond(addition))
-      firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
-    })
+  override def toByteCode(addition: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val toInstructions = ExpressionC.getToInstructions(state)
+    val firstInstructions = toInstructions(getFirst(addition))
+    val secondInstructions = toInstructions(getSecond(addition))
+    firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
-
-  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
+  override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
+    val getType = ExpressionC.getType(state)
+    val firstType = getType(getFirst(expression))
+    val secondType = getType(getSecond(expression))
+    TypeC.checkAssignableTo(state)(IntTypeC.intType, firstType)
+    TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    IntTypeC.intType
+  }
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersC)
 
@@ -31,15 +35,21 @@ object AdditionC extends GrammarTransformation {
 
   private def addition(first: Any, second: Any): MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 
-  def addition(first: MetaObject, second: MetaObject) = new MetaObject(Clazz) {
+  def addition(first: MetaObject, second: MetaObject) = new MetaObject(AdditionClazz) {
     data.put(FirstKey, first)
     data.put(SecondKey, second)
   }
 
-  object Clazz
+  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
+
+  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
+
+  object AdditionClazz
 
   object FirstKey
 
   object SecondKey
+
+  val key = AdditionClazz
 
 }

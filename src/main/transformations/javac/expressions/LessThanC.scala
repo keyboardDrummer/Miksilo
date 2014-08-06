@@ -3,29 +3,39 @@ package transformations.javac.expressions
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.instructions.IntegerConstantC
 import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
+import transformations.javac.types.{BooleanTypeC, IntTypeC, TypeC}
 
-object LessThanC extends GrammarTransformation {
+object LessThanC extends ExpressionInstance {
+
+  val key = LessThanKey
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC)
 
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(LessThanKey, lessThan => {
-      val toInstructions = ExpressionC.getToInstructions(state)
-      val firstInstructions = toInstructions(getFirst(lessThan))
-      val secondInstructions = toInstructions(getSecond(lessThan))
-      val falseStartLabel = state.getUniqueLabel("falseStart")
-      val endLabel = state.getUniqueLabel("end")
-      firstInstructions ++ secondInstructions ++
-        Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
-          IntegerConstantC.integerConstant(1),
-          LabelledJumps.goTo(endLabel),
-          InferredStackFrames.label(falseStartLabel),
-          IntegerConstantC.integerConstant(0),
-          InferredStackFrames.label(endLabel))
-    })
+
+  override def toByteCode(lessThan: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val toInstructions = ExpressionC.getToInstructions(state)
+    val firstInstructions = toInstructions(getFirst(lessThan))
+    val secondInstructions = toInstructions(getSecond(lessThan))
+    val falseStartLabel = state.getUniqueLabel("falseStart")
+    val endLabel = state.getUniqueLabel("end")
+    firstInstructions ++ secondInstructions ++
+      Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
+        IntegerConstantC.integerConstant(1),
+        LabelledJumps.goTo(endLabel),
+        InferredStackFrames.label(falseStartLabel),
+        IntegerConstantC.integerConstant(0),
+        InferredStackFrames.label(endLabel))
+  }
+
+  override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
+    val getType = ExpressionC.getType(state)
+    val firstType = getType(getFirst(expression))
+    val secondType = getType(getSecond(expression))
+    TypeC.checkAssignableTo(state)(IntTypeC.intType, firstType)
+    TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    BooleanTypeC.booleanType
   }
 
   def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]

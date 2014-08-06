@@ -4,7 +4,8 @@ import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.instructions._
 import transformations.javac.TestUtils
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.types.{IntTypeC, VoidTypeC}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -21,7 +22,7 @@ class TestPrintByteCodeWhile {
       ByteCodeSkeleton.classRef(13),
       ByteCodeSkeleton.classRef(14),
       "<init>",
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
       ByteCodeSkeleton.CodeAttributeId,
       ByteCodeSkeleton.LineNumberTableId,
       "whilee",
@@ -56,7 +57,7 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCodeSkeleton.stackMapTable(9, Seq(ByteCodeSkeleton.appendFrame(2, Seq(JavaTypes.intType)),
+    val stackMapTable = ByteCodeSkeleton.stackMapTable(9, Seq(ByteCodeSkeleton.appendFrame(2, Seq(IntTypeC.intType)),
       ByteCodeSkeleton.sameFrame(10)))
     val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(ByteCodeSkeleton.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),

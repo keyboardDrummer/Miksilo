@@ -4,8 +4,8 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
-import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
+import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 class EmptyMain {
   val className = "EmptyMain"
@@ -30,8 +30,8 @@ class EmptyMain {
   }
 
   def getMainMethodJava: MetaObject = {
-    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
-    method("main", JavaTypes.voidType, parameters, body, static = true, PublicVisibility)
+    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }
 }

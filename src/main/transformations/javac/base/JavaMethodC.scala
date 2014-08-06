@@ -9,7 +9,7 @@ import transformations.bytecode.{ByteCodeSkeleton, InferredMaxStack, InferredSta
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
 import transformations.javac.statements.{BlockC, StatementC}
-import transformations.javac.types.TypeC
+import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 
 import scala.collection.mutable
 
@@ -69,7 +69,7 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
       def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
         val methodCompiler = new MethodCompiler(classCompiler)
         if (!JavaMethodModel.getMethodStatic(method))
-          methodCompiler.variables.add("this", JavaTypes.objectType(classCompiler.currentClassInfo.name))
+          methodCompiler.variables.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))
         for (parameter <- parameters)
           methodCompiler.variables.add(JavaMethodModel.getParameterName(parameter), JavaMethodModel.getParameterType(parameter))
         getState(state).methodCompiler = methodCompiler
@@ -109,6 +109,8 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
     method(ByteCodeSkeleton.MethodAccessFlags) = flags
   }
 
+  def getClassCompiler(state: TransformationState) = getState(state).methodCompiler.classCompiler
+
   def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
 
   def getState(state: TransformationState): State = {
@@ -126,7 +128,7 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseReturnType = "void" ^^ (_ => JavaTypes.voidType) | parseType
+    val parseReturnType = "void" ^^ (_ => VoidTypeC.voidType) | parseType
 
     val parseParameter = parseType ~ identifier ^^ {
       case _type seqr _name => JavaMethodModel.parameter(_name.asInstanceOf[String], _type)
@@ -168,8 +170,6 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
     val referenceKindRegistry = new GetReferenceKindRegistry()
     var methodCompiler: MethodCompiler = null
   }
-
-  object TypeGrammar
 
   object ClassGrammar
 

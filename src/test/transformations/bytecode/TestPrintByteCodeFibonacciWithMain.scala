@@ -3,7 +3,8 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.instructions._
-import transformations.javac.base.model.{JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.{ConstructorC, TestUtils}
 
 import scala.collection.mutable
@@ -45,7 +46,7 @@ class TestPrintByteCodeFibonacciWithMain {
     )
     val lineNumberTable = ByteCodeSkeleton.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = ByteCodeSkeleton.stackMapTable(15, Seq(ByteCodeSkeleton.sameFrame(9),
-      ByteCodeSkeleton.sameFrameLocals1StackItem(12, JavaTypes.intType)))
+      ByteCodeSkeleton.sameFrameLocals1StackItem(12, IntTypeC.intType)))
     val method = ByteCodeSkeleton.methodInfo(13, 14, Seq(ByteCodeSkeleton.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
     method
@@ -59,14 +60,14 @@ class TestPrintByteCodeFibonacciWithMain {
       ByteCodeSkeleton.classRef(24),
       ByteCodeSkeleton.classRef(25),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
       ByteCodeSkeleton.CodeAttributeId,
       ByteCodeSkeleton.LineNumberTableId,
       "main",
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(
-        JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(
+        ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
+      ByteCodeSkeleton.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
       ByteCodeSkeleton.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Fibonacci.java",
@@ -80,10 +81,10 @@ class TestPrintByteCodeFibonacciWithMain {
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
+      ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       "java/io/PrintStream",
       "print",
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType))
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
     constantPool
   }

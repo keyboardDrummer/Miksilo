@@ -6,10 +6,10 @@ import transformations.bytecode._
 import transformations.bytecode.instructions._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
-import transformations.javac.base.model.JavaTypes._
 import transformations.javac.base.model._
 import transformations.javac.expressions.LiteralC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
+import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.io.Path
@@ -64,11 +64,11 @@ class FibonacciWithMain {
   }
 
   def getMainMethodJava: MetaObject = {
-    val parameters = Seq(parameter("args", arrayType(objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
     val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
       VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
-    method("main", JavaTypes.voidType, parameters, body, static = true, PublicVisibility)
+    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }
 
   @Test
@@ -139,13 +139,13 @@ class FibonacciWithMain {
       ByteCodeSkeleton.classRef(24),
       ByteCodeSkeleton.classRef(25),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
       ByteCodeSkeleton.CodeAttributeId,
       "main",
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(
-        JavaTypes.arrayType(JavaTypes.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(
+        ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       methodName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.intType, Seq(JavaTypes.intType)),
+      ByteCodeSkeleton.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
       ByteCodeSkeleton.StackMapTableId,
       ByteCodeSkeleton.nameAndType(7, expectedOutput),
       ByteCodeSkeleton.classRef(26),
@@ -157,10 +157,10 @@ class FibonacciWithMain {
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      JavaTypes.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
+      ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       new QualifiedClassName(Seq("java", "io", "PrintStream")),
       "print",
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq(JavaTypes.intType))
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
     constantPool
   }

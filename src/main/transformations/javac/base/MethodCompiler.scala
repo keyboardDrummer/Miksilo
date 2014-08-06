@@ -1,9 +1,9 @@
 package transformations.javac.base
 
 import core.exceptions.BadInputException
-import core.transformation.MetaObject
-import transformations.bytecode.ByteCodeSkeleton
+import core.transformation.{MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
+import transformations.javac.types.TypeC
 
 import scala.collection.mutable
 
@@ -13,7 +13,7 @@ case class VariableDoesNotExist(name: String) extends BadInputException {
 
 case class VariableInfo(offset: Integer, _type: MetaObject)
 
-class VariablePool {
+class VariablePool(state: TransformationState) {
   private val variables = mutable.Map[String, VariableInfo]()
   var offset = 0
 
@@ -27,12 +27,12 @@ class VariablePool {
 
   def add(variable: String, _type: MetaObject) {
     variables(variable) = new VariableInfo(offset, _type)
-    offset += ByteCodeSkeleton.getTypeSize(_type)
+    offset += TypeC.getTypeSize(_type, state)
   }
 }
 
 case class MethodCompiler(classCompiler: ClassCompiler) {
-  val variables = new VariablePool()
+  val variables = new VariablePool(classCompiler.transformationState)
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
     val getReferenceKindOption = JavaMethodC.getReferenceKindRegistry(transformationState).get(expression.clazz)

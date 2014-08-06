@@ -4,7 +4,8 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC, VoidReturnC}
-import transformations.javac.base.model.{JavaClassModel, JavaTypes, QualifiedClassName}
+import transformations.javac.base.model.{JavaClassModel, QualifiedClassName}
+import transformations.javac.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -34,7 +35,7 @@ class EmptyClassCompilation {
       ByteCodeSkeleton.classRef(11),
       ByteCodeSkeleton.classRef(12),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(JavaTypes.voidType, Seq()),
+      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
       ByteCodeSkeleton.CodeAttributeId,
       ByteCodeSkeleton.nameAndType(4, 5),
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),

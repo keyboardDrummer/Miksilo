@@ -1,26 +1,27 @@
 package transformations.bytecode.instructions
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.JavaTypes
+import transformations.javac.types.TypeC
 
 abstract class InvokeC extends InstructionC {
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = getInvokeStackSizeModification(constantPool, instruction)
+  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = {
+    def getMethodStackSizeModification(descriptor: MetaObject): Int = {
+      var result = TypeC.getTypeSize(ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor), state)
+      for (parameter <- ByteCodeSkeleton.getMethodDescriptorParameters(descriptor))
+        result -= TypeC.getTypeSize(parameter, state)
+      result
+    }
 
-  def getInvokeStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = {
-    val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
-    val methodRef = ByteCodeSkeleton.constantPoolGet(constantPool, location).asInstanceOf[MetaObject]
-    val nameAndType = ByteCodeSkeleton.constantPoolGet(constantPool, ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
-    val descriptor = ByteCodeSkeleton.constantPoolGet(constantPool, ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
-    getMethodStackSizeModification(descriptor)
-  }
-
-  def getMethodStackSizeModification(descriptor: MetaObject): Int = {
-    var result = ByteCodeSkeleton.getTypeSize(ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor))
-    for (parameter <- ByteCodeSkeleton.getMethodDescriptorParameters(descriptor))
-      result -= ByteCodeSkeleton.getTypeSize(parameter)
-    result
+    def getInvokeStackSizeModification(constantPool: ConstantPool, instruction: MetaObject): Int = {
+      val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
+      val methodRef = ByteCodeSkeleton.constantPoolGet(constantPool, location).asInstanceOf[MetaObject]
+      val nameAndType = ByteCodeSkeleton.constantPoolGet(constantPool, ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
+      val descriptor = ByteCodeSkeleton.constantPoolGet(constantPool, ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
+      getMethodStackSizeModification(descriptor)
+    }
+    getInvokeStackSizeModification(constantPool, instruction)
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) =
@@ -39,8 +40,8 @@ abstract class InvokeC extends InstructionC {
   }
 
   def getMethodStackModification(descriptor: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = {
-    val ins = ByteCodeSkeleton.getMethodDescriptorParameters(descriptor).map(JavaTypes.javaTypeToByteCodeType)
-    val outs = Seq(JavaTypes.javaTypeToByteCodeType(ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor)))
+    val ins = ByteCodeSkeleton.getMethodDescriptorParameters(descriptor).map(TypeC.toStackType)
+    val outs = Seq(TypeC.toStackType(ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor)))
     (ins, outs)
   }
 
