@@ -4,7 +4,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.instructions.SubtractIntegerC
+import transformations.bytecode.coreInstructions.SubtractIntegerC
 
 object SubtractionC extends GrammarTransformation {
   val clazz: String = "Subtraction"

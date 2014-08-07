@@ -3,7 +3,7 @@ package transformations.javac
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.instructions.{InvokeSpecialC, LoadAddressC}
+import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.base._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model.{JavaClassModel, JavaMethodModel}

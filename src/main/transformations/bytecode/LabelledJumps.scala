@@ -3,8 +3,8 @@ package transformations.bytecode
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.instructions.GotoC
-import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions.GotoC
+import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.javac.base.ConstantPool
 
 import scala.collection.mutable
@@ -44,7 +44,7 @@ object LabelledJumps extends ProgramTransformation {
       for (instruction <- instructions) {
 
         if (jumpRegistry(instruction.clazz).hasJumpInFirstArgument) {
-          setInstructionArguments(instruction, Seq(targetLocations(getInstructionArguments(instruction)(0).asInstanceOf[String]) - location))
+          setInstructionArguments(instruction, Seq(targetLocations(getJumpInstructionLabel(instruction)) - location))
         }
 
         if (instruction.clazz != LabelKey)
@@ -86,6 +86,10 @@ object LabelledJumps extends ProgramTransformation {
       }
       targetLocations.toMap
     }
+  }
+
+  def getJumpInstructionLabel(instruction: MetaObject): String = {
+    getInstructionArguments(instruction)(0).asInstanceOf[String]
   }
 
   def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[MetaObject]): Seq[MetaObject] = {

@@ -4,8 +4,8 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.coreInstructions.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
-import transformations.bytecode.instructions.IntegerConstantC
 import transformations.javac.types.{BooleanTypeC, IntTypeC, TypeC}
 
 object LessThanC extends ExpressionInstance {

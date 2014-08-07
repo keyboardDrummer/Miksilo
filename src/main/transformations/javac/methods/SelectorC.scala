@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.grammar.seqr
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.instructions.GetStaticC
+import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.javac.base._
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 

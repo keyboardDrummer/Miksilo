@@ -3,7 +3,7 @@ package transformations.javac.expressions
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.instructions.PushNullC
+import transformations.bytecode.coreInstructions.PushNullC
 
 object NullC extends GrammarTransformation {
 

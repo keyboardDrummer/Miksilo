@@ -11,6 +11,15 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
 
   validateDependencies(transformations)
 
+  def parseAndTransform(input: File): MetaObject = {
+    val readFilePiece = ReadUsingGrammarTransformation
+    val pieces = Seq(readFilePiece) ++ transformations
+    val state = new TransformationState()
+    state.data(ReadUsingGrammarTransformation.InputFile) = input
+    PieceCombiner.combineAndExecute(state, pieces.reverse)
+    state.program
+  }
+
   def compile(input: File, outputDirectory: Directory) {
     val readFilePiece = ReadUsingGrammarTransformation
     val printByteCodePiece = PrintByteCodeToOutputDirectory

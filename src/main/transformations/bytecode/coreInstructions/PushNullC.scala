@@ -1,4 +1,4 @@
-package transformations.bytecode.instructions
+package transformations.bytecode.coreInstructions
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}

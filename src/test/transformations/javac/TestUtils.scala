@@ -50,6 +50,15 @@ object TestUtils {
     runJavaClass(className, testDirectory)
   }
 
+  def parseAndTransform(className: String, inputDirectory: Path, compiler: CompilerFromTransformations): MetaObject = {
+    val relativeFilePath = inputDirectory / (className + ".java")
+    val currentDir = new File(new java.io.File("."))
+    val testOutput = Directory(currentDir / Path("testOutput"))
+    val testResources = currentDir / Path("testResources")
+    val input: File = File(testResources / relativeFilePath)
+    compiler.parseAndTransform(input)
+  }
+
   def compileAndRun(className: String, inputDirectory: Path): String = {
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))

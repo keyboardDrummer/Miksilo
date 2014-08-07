@@ -2,8 +2,8 @@ package transformations.bytecode
 
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
-import transformations.bytecode.instructions._
-import transformations.bytecode.instructions.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions._
+import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.{ConstructorC, TestUtils}

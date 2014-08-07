@@ -3,8 +3,8 @@ package transformations.bytecode.extraBooleanInstructions
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.instructions.IntegerConstantC
-import transformations.bytecode.instructions.integerCompare.IfIntegerCompareLessC
+import transformations.bytecode.coreInstructions.IntegerConstantC
+import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareLessC
 import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
 
 import scala.collection.mutable

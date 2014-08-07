@@ -12,7 +12,7 @@ import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.Path
 
-class FibonacciWithMain {
+class TestFibonacciWithMain {
   val defaultPackage = Seq()
   val className = "Fibonacci"
   val other = new FibonacciWithoutMain()

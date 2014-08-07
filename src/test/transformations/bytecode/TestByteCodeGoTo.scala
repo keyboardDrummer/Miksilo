@@ -2,8 +2,8 @@ package transformations.bytecode
 
 import core.transformation.{MetaObject, Transformer}
 import org.junit.Test
-import transformations.bytecode.instructions._
-import transformations.bytecode.instructions.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions._
+import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.types.IntTypeC
 import transformations.javac.{JavaCompiler, TestUtils}
 

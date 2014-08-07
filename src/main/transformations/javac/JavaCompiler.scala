@@ -2,9 +2,9 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
-import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
-import transformations.bytecode.instructions._
-import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions._
+import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
@@ -22,9 +22,12 @@ object JavaCompiler {
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
       AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, BlockC,
-      StatementC, ExpressionC) ++ Seq(LessThanInstructionC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++
-      byteCodeTransformations
+      StatementC, ExpressionC) ++ allByteCodeTransformations
   }
+
+  def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
+
+  def simpleByteCodeTransformations = Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++ byteCodeTransformations
 
   def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
     IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,

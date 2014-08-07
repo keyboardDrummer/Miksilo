@@ -1,4 +1,4 @@
-package transformations.bytecode.instructions
+package transformations.bytecode.coreInstructions
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector

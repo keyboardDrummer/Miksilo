@@ -4,7 +4,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.instructions.AddIntegersC
+import transformations.bytecode.coreInstructions.AddIntegersC
 import transformations.javac.types.{IntTypeC, TypeC}
 
 object AdditionC extends GrammarTransformation with ExpressionInstance {
