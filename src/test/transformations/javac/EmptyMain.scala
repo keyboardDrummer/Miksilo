@@ -10,7 +10,7 @@ import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 class EmptyMain {
   val className = "EmptyMain"
   val defaultPackage = Seq()
-  val other = new FibonacciWthoutMain()
+  val other = new FibonacciWithoutMain()
 
   @Test
   def runCompiledCode() {

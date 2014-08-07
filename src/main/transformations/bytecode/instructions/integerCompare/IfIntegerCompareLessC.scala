@@ -18,7 +18,7 @@ object IfIntegerCompareLessC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
-    hexToBytes("a4") ++ shortToBytes(arguments(0))
+    hexToBytes("a1") ++ shortToBytes(arguments(0))
   }
 
   override def getJumpBehavior: JumpBehavior = new JumpBehavior(true, true)

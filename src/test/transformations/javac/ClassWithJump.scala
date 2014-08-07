@@ -13,7 +13,7 @@ class ClassWithJump {
 
   val className = "ClassWithJump"
   val defaultPackage = Seq()
-  val other = new FibonacciWthoutMain()
+  val other = new FibonacciWithoutMain()
 
   @Test
   def runCompiledCode() {
