@@ -2,7 +2,9 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
+import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
@@ -11,6 +13,8 @@ import transformations.javac.statements.{AssignmentC, BlockC, DeclarationC, Stat
 import transformations.javac.types._
 
 object JavaCompiler {
+  val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
+
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[Injector] = {
@@ -22,9 +26,7 @@ object JavaCompiler {
       byteCodeTransformations
   }
 
-  val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
-
-  def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareGreaterC,
+  def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
     IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
     LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
 

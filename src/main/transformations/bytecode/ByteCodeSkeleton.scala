@@ -11,9 +11,9 @@ object ByteCodeSkeleton extends Contract {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
-  def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
-
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+
+  def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
 
@@ -22,6 +22,10 @@ object ByteCodeSkeleton extends Contract {
       .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == ByteCodeSkeleton.CodeKey) Some(annotation) else None)
   }
+
+  def getMethodAttributes(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
+
+  def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
   def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
     data.put(OffsetDelta, offset)
@@ -102,8 +106,6 @@ object ByteCodeSkeleton extends Contract {
 
   def getMethodAccessFlags(method: MetaObject) = method(MethodAccessFlags).asInstanceOf[Set[MethodAccessFlag]]
 
-  def getMethodAttributes(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
-
   def getMethodNameIndex(methodInfo: MetaObject) = methodInfo(MethodNameIndex).asInstanceOf[Int]
 
   def getMethodDescriptorIndex(methodInfo: MetaObject) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
@@ -172,8 +174,6 @@ object ByteCodeSkeleton extends Contract {
 
   def getClassNameIndex(clazz: MetaObject) = clazz(ClassNameIndexKey).asInstanceOf[Int]
 
-  def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
-
   def getClassInterfaces(clazz: MetaObject) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
 
   def getClassFields(clazz: MetaObject) = clazz(ClassFields).asInstanceOf[Seq[MetaObject]]
@@ -193,10 +193,13 @@ object ByteCodeSkeleton extends Contract {
 
   trait MethodAccessFlag
 
+  case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
+
   class State {
-    var getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
-    var getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => (Seq[MetaObject], Seq[MetaObject])]
-    var getInstructionSizeRegistry = new mutable.HashMap[Any, Int]
+    val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
+    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => (Seq[MetaObject], Seq[MetaObject])]
+    val getInstructionSizeRegistry = new mutable.HashMap[Any, Int]
+    val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
   }
 
 

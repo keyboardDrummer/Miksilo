@@ -7,7 +7,7 @@ import transformations.javac.types.IntTypeC
 
 object PushNullC extends InstructionC {
 
-  override val key: Any = PushNullKey
+  override val key: AnyRef = PushNullKey
   val pushNull = ByteCodeSkeleton.instruction(PushNullC)
 
   override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1

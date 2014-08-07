@@ -3,10 +3,8 @@ package transformations.bytecode
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.instructions.GotoC.GoToKey
-import transformations.bytecode.instructions.IfIntegerCompareGreaterC.IfIntegerCompareGreaterKey
-import transformations.bytecode.instructions.IfZeroC.IfZeroKey
-import transformations.bytecode.instructions.{GotoC, IfIntegerCompareGreaterC, IfZeroC}
+import transformations.bytecode.instructions.GotoC
+import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.javac.base.ConstantPool
 
 import scala.collection.mutable
@@ -17,7 +15,9 @@ object LabelledJumps extends ProgramTransformation {
 
   def goTo(target: String) = instruction(GotoC.GoToKey, Seq(target))
 
-  def ifIntegerCompareGreater(target: String) = instruction(IfIntegerCompareGreaterC.IfIntegerCompareGreaterKey, Seq(target))
+  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualC.IfIntegerCompareGreaterKey, Seq(target))
+
+  def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessC.key, Seq(target))
 
   def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey) {
     data.put(LabelNameKey, name)
@@ -28,10 +28,12 @@ object LabelledJumps extends ProgramTransformation {
     ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(LabelKey, (pool, label) => (Seq.empty, Seq.empty))
     ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(LabelKey, (pool, label) => 0)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(LabelKey, 0)
+    ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(LabelKey, new JumpBehavior(true, false))
   }
 
   def transform(program: MetaObject, state: TransformationState): Unit = {
 
+    val jumpRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
     def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)
 
     def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
@@ -41,15 +43,10 @@ object LabelledJumps extends ProgramTransformation {
       var location = 0
       for (instruction <- instructions) {
 
-        instruction.clazz match {
-          case GoToKey => setInstructionArguments(instruction, Seq(
-            targetLocations(getGoToTarget(instruction)) - location))
-          case IfIntegerCompareGreaterKey => setInstructionArguments(instruction, Seq(
-            targetLocations(getIfIntegerCompareGreaterTarget(instruction)) - location))
-          case IfZeroKey => setInstructionArguments(instruction, Seq(
-            targetLocations(getIfZeroTarget(instruction)) - location))
-          case _ =>
+        if (jumpRegistry(instruction.clazz).hasJumpInFirstArgument) {
+          setInstructionArguments(instruction, Seq(targetLocations(getInstructionArguments(instruction)(0).asInstanceOf[String]) - location))
         }
+
         if (instruction.clazz != LabelKey)
           newInstructions += instruction
 
@@ -117,15 +114,7 @@ object LabelledJumps extends ProgramTransformation {
 
   def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
 
-  def getGoToTarget(goTo: MetaObject) = getInstructionArguments(goTo)(0).asInstanceOf[String]
-
-  def getIfIntegerCompareGreaterTarget(compare: MetaObject) =
-    getInstructionArguments(compare)(0).asInstanceOf[String]
-
-  def getIfZeroTarget(ifZero: MetaObject) =
-    getInstructionArguments(ifZero)(0).asInstanceOf[String]
-
-  override def dependencies: Set[Contract] = Set(IfIntegerCompareGreaterC, GotoC, IfZeroC)
+  override def dependencies: Set[Contract] = Set(IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
   object LabelKey
 

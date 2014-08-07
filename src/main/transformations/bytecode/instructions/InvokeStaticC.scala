@@ -7,7 +7,7 @@ import transformations.bytecode.PrintByteCode._
 
 object InvokeStaticC extends InvokeC {
 
-  override val key: Any = InvokeStaticKey
+  override val key: AnyRef = InvokeStaticKey
 
   def invokeStatic(constantIndex: Int): MetaObject = instruction(InvokeStaticKey, Seq(constantIndex))
 

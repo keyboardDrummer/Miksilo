@@ -7,7 +7,7 @@ import transformations.javac.types.IntTypeC
 
 object LoadAddressC extends InstructionC {
 
-  override val key: Any = AddressLoad
+  override val key: AnyRef = AddressLoad
 
   def addressLoad(location: Int): MetaObject = ByteCodeSkeleton.instruction(AddressLoad, Seq(location))
 

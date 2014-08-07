@@ -15,7 +15,7 @@ object InferredMaxStack extends ProgramTransformation {
     def getMaxStack(code: MetaObject): Integer = {
       val instructions = ByteCodeSkeleton.getCodeInstructions(code)
       val registry = ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state)
-      val currentStacks = new StackSizeAnalysis(instructions, instruction => registry(instruction.clazz)(constantPool, instruction)).run(0, 0)
+      val currentStacks = new StackSizeAnalysis(instructions, instruction => registry(instruction.clazz)(constantPool, instruction), state).run(0, 0)
       val maxStack = currentStacks.values.max
       maxStack
     }

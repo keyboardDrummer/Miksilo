@@ -25,7 +25,8 @@ object InferredStackFrames extends ProgramTransformation {
       var previousStack = Seq[MetaObject]()
       val stackAnalysis: StackAnalysis = new StackAnalysis(instructions,
         instruction => signatureRegistry(instruction.clazz)(constantPool, instruction)._1,
-        instruction => signatureRegistry(instruction.clazz)(constantPool, instruction)._2)
+        instruction => signatureRegistry(instruction.clazz)(constantPool, instruction)._2,
+        state)
       val currentStacks = stackAnalysis.run(0, previousStack)
       var previousLocals = codeLocals
       for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledJumps.LabelKey)) {

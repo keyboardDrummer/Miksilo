@@ -9,7 +9,7 @@ import transformations.javac.types.IntTypeC
 
 object IntegerConstantC extends InstructionC {
 
-  override val key: Any = IntegerConstantKey
+  override val key: AnyRef = IntegerConstantKey
 
   def integerConstant(value: Int) = instruction(IntegerConstantKey, Seq(value))
 

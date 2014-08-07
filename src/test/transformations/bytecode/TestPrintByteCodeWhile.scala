@@ -3,6 +3,7 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.TestUtils
 import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.types.{IntTypeC, VoidTypeC}
@@ -64,7 +65,7 @@ class TestPrintByteCodeWhile {
       StoreIntegerC.integerStore(0),
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(3),
-      IfIntegerCompareGreaterC.ifIntegerCompareGreater(9),
+      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8),
       VoidReturnC.voidReturn

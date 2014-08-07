@@ -1,19 +1,19 @@
-package transformations.bytecode.instructions
+package transformations.bytecode.extraBooleanInstructions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.instructions.IntegerConstantC
+import transformations.bytecode.instructions.integerCompare.IfIntegerCompareLessC
 import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
 
 import scala.collection.mutable
 
 object LessThanInstructionC extends ProgramTransformation {
 
-  object LessThanInstructionKey
-
   def lessThanInstruction = instruction(LessThanInstructionKey)
 
-  override def dependencies: Set[Contract] = Set(LabelledJumps, IfIntegerCompareGreaterC)
+  override def dependencies: Set[Contract] = Set(LabelledJumps, IfIntegerCompareLessC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
@@ -40,11 +40,11 @@ object LessThanInstructionC extends ProgramTransformation {
           case LessThanInstructionKey =>
             val falseStartLabel = state.getUniqueLabel("falseStart")
             val endLabel = state.getUniqueLabel("end")
-            Seq(LabelledJumps.ifIntegerCompareGreater(falseStartLabel),
-              IntegerConstantC.integerConstant(1),
+            Seq(LabelledJumps.ifIntegerCompareLess(falseStartLabel),
+              IntegerConstantC.integerConstant(0),
               LabelledJumps.goTo(endLabel),
               InferredStackFrames.label(falseStartLabel),
-              IntegerConstantC.integerConstant(0),
+              IntegerConstantC.integerConstant(1),
               InferredStackFrames.label(endLabel))
           case _ => Seq(instruction)
         }
@@ -55,4 +55,7 @@ object LessThanInstructionC extends ProgramTransformation {
 
     }
   }
+
+  object LessThanInstructionKey
+
 }

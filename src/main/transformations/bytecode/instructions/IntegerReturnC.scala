@@ -1,15 +1,18 @@
 package transformations.bytecode.instructions
 
 import core.transformation.{MetaObject, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.base.ConstantPool
 import transformations.javac.types.IntTypeC
 
 object IntegerReturnC extends InstructionC {
 
-  override val key: Any = IntegerReturn
+  override val key: AnyRef = IntegerReturn
 
   def integerReturn: MetaObject = ByteCodeSkeleton.instruction(IntegerReturn)
+
+  override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
   override def getInstructionSize: Int = 1
 

@@ -7,7 +7,7 @@ import transformations.javac.base.ConstantPool
 import transformations.javac.types.IntTypeC
 
 object AddIntegersC extends InstructionC {
-  override val key: Any = AddIntegersKey
+  override val key: AnyRef = AddIntegersKey
 
   def addInteger = instruction(AddIntegersKey)
 

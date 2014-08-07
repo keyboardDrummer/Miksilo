@@ -3,6 +3,7 @@ package transformations.bytecode
 import core.transformation.{MetaObject, Transformer}
 import org.junit.Test
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.types.IntTypeC
 import transformations.javac.{JavaCompiler, TestUtils}
 
@@ -29,7 +30,7 @@ class TestByteCodeGoTo {
       StoreIntegerC.integerStore(0),
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(3),
-      IfIntegerCompareGreaterC.ifIntegerCompareGreater(9),
+      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8))
 
@@ -48,7 +49,7 @@ class TestByteCodeGoTo {
       }),
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(3),
-      LabelledJumps.ifIntegerCompareGreater("end"),
+      LabelledJumps.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
       LabelledJumps.goTo("start"),
       LabelledJumps.label("end", new MetaObject(ByteCodeSkeleton.SameFrameKey))

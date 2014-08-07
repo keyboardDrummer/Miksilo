@@ -8,7 +8,7 @@ import transformations.javac.types.IntTypeC
 
 object LoadIntegerC extends InstructionC {
 
-  override val key: Any = IntegerLoad
+  override val key: AnyRef = IntegerLoad
 
   def integerLoad(location: Integer) = ByteCodeSkeleton.instruction(IntegerLoad, Seq(location))
 

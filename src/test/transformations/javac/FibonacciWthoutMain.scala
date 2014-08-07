@@ -4,6 +4,7 @@ import core.transformation.{ComparisonOptions, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode._
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfZeroC}
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
@@ -40,6 +41,20 @@ class FibonacciWthoutMain {
     compiledCode
   }
 
+  def getJavaFibonacciWithoutMain: MetaObject = {
+    clazz(defaultPackage, className, Seq(getFibonacciMethodJava))
+  }
+
+  def getFibonacciMethodJava: MetaObject = {
+    val parameters = Seq(parameter("i", IntTypeC.intType))
+    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
+    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
+    val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
+    val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
+    val body = Seq(ReturnC._return(Some(returnValue)))
+    method("fibonacci", IntTypeC.intType, parameters, body, static = true)
+  }
+
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
     val constantPool: ArrayBuffer[Any] = getConstantPool
     val method: MetaObject = getFibonacciMethodByteCode
@@ -57,7 +72,7 @@ class FibonacciWthoutMain {
     val instructions = Seq(
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(2),
-      IfIntegerCompareGreaterC.ifIntegerCompareGreater(9),
+      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IntegerConstantC.integerConstant(1),
       GotoC.goTo(22),
       IntegerConstantC.integerConstant(0),
@@ -112,19 +127,5 @@ class FibonacciWthoutMain {
     val fibonacci = getJavaFibonacciWithoutMain
     val byteCode = JavaCompiler.getTransformer.transform(fibonacci)
     TestUtils.printByteCode(byteCode)
-  }
-
-  def getJavaFibonacciWithoutMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getFibonacciMethodJava))
-  }
-
-  def getFibonacciMethodJava: MetaObject = {
-    val parameters = Seq(parameter("i", IntTypeC.intType))
-    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
-    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
-    val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
-    val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
-    val body = Seq(ReturnC._return(Some(returnValue)))
-    method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }
 }

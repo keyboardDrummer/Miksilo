@@ -1,13 +1,14 @@
 package transformations.bytecode
 
-import core.transformation.MetaObject
+import core.transformation.{MetaObject, TransformationState}
 
 case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
   override def toString = s"StackDoesNotFitInstructionInput: instruction= $instruction; inputTypes= $inputTypes; stack= $stack"
 }
 
-class StackAnalysis(instructions: Seq[MetaObject], getInputTypes: MetaObject => Seq[MetaObject], getOutputTypes: MetaObject => Seq[MetaObject])
-  extends InstructionFlowAnalysis[Seq[MetaObject]](instructions) {
+class StackAnalysis(instructions: Seq[MetaObject], getInputTypes: MetaObject => Seq[MetaObject], getOutputTypes: MetaObject => Seq[MetaObject],
+                    state: TransformationState)
+  extends InstructionFlowAnalysis[Seq[MetaObject]](instructions, state) {
 
   override def combineState(first: Seq[MetaObject], second: Seq[MetaObject]): Seq[MetaObject] = {
     if (first == second)

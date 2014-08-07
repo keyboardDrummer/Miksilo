@@ -1,12 +1,13 @@
 package transformations.bytecode.instructions
 
 import core.transformation.{MetaObject, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.base.ConstantPool
 
 object GotoC extends InstructionC {
 
-  override val key: Any = GoToKey
+  override val key: AnyRef = GoToKey
 
   def goTo(target: Int): MetaObject = ByteCodeSkeleton.instruction(GoToKey, Seq(target))
 
@@ -16,6 +17,8 @@ object GotoC extends InstructionC {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
     PrintByteCode.hexToBytes("a7") ++ PrintByteCode.shortToBytes(arguments(0))
   }
+
+  override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, true)
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq())
 

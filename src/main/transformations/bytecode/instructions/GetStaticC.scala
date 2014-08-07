@@ -8,7 +8,7 @@ import transformations.javac.base.ConstantPool
 
 object GetStaticC extends InstructionC {
 
-  override val key: Any = GetStaticKey
+  override val key: AnyRef = GetStaticKey
 
   def getStatic(fieldRefIndex: Int): MetaObject = instruction(GetStaticKey, Seq(fieldRefIndex))
 

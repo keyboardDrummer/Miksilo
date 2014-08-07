@@ -7,7 +7,7 @@ import transformations.javac.base.ConstantPool
 import transformations.javac.types.IntTypeC
 
 object StoreAddressC extends InstructionC {
-  override val key: Any = AddressStore
+  override val key: AnyRef = AddressStore
 
   def addressStore(location: Int): MetaObject = instruction(AddressStore, Seq(location))
 

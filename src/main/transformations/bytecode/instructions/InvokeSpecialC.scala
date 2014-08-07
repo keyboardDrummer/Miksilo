@@ -6,7 +6,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
 object InvokeSpecialC extends InvokeC {
-  override val key: Any = InvokeSpecialKey
+  override val key: AnyRef = InvokeSpecialKey
 
   def invokeSpecial(location: Int): MetaObject = instruction(InvokeSpecialKey, Seq(location))
 

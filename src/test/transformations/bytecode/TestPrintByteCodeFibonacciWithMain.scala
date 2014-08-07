@@ -3,6 +3,7 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.{ConstructorC, TestUtils}
@@ -30,7 +31,7 @@ class TestPrintByteCodeFibonacciWithMain {
     val instructions = Seq(
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(2),
-      IfIntegerCompareGreaterC.ifIntegerCompareGreater(7),
+      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(7),
       IntegerConstantC.integerConstant(1),
       GotoC.goTo(16),
       LoadIntegerC.integerLoad(0),

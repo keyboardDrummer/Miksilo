@@ -8,7 +8,7 @@ import transformations.javac.types.IntTypeC
 
 object StoreIntegerC extends InstructionC {
 
-  override val key: Any = IntegerStore
+  override val key: AnyRef = IntegerStore
 
   def integerStore(location: Int) = instruction(IntegerStore, Seq(location))
 

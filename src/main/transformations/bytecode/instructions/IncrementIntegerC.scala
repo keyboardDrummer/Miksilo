@@ -7,7 +7,7 @@ import transformations.javac.base.ConstantPool
 
 object IncrementIntegerC extends InstructionC {
 
-  override val key: Any = IntegerIncrementKey
+  override val key: AnyRef = IntegerIncrementKey
 
   def integerIncrement(location: Int, amount: Int) = ByteCodeSkeleton.instruction(IntegerIncrementKey, Seq(location, amount))
 

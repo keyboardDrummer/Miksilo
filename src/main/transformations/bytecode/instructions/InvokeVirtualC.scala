@@ -9,7 +9,7 @@ import transformations.javac.types.ObjectTypeC
 
 object InvokeVirtualC extends InvokeC {
 
-  override val key: Any = InvokeVirtual
+  override val key: AnyRef = InvokeVirtual
 
   def invokeVirtual(methodRefIndex: Int) = ByteCodeSkeleton.instruction(InvokeVirtual, Seq(methodRefIndex))
 

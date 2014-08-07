@@ -4,6 +4,7 @@ import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode._
 import transformations.bytecode.instructions._
+import transformations.bytecode.instructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfZeroC}
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
@@ -59,6 +60,13 @@ class FibonacciWithMain {
 
   def getMethodMaxStack(method: MetaObject) = ByteCodeSkeleton.getCodeMaxStack(ByteCodeSkeleton.getMethodAttributes(method)(0))
 
+  @Test
+  def compileAndPrintFibonacciWithMain() {
+    val fibonacci = getJavaFibonacciWithMain
+    val compiledCode = JavaCompiler.getTransformer.transform(fibonacci)
+    TestUtils.printByteCode(compiledCode)
+  }
+
   def getJavaFibonacciWithMain: MetaObject = {
     clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
   }
@@ -69,13 +77,6 @@ class FibonacciWithMain {
     val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
       VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
     method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
-  }
-
-  @Test
-  def compileAndPrintFibonacciWithMain() {
-    val fibonacci = getJavaFibonacciWithMain
-    val compiledCode = JavaCompiler.getTransformer.transform(fibonacci)
-    TestUtils.printByteCode(compiledCode)
   }
 
   @Test
@@ -108,7 +109,7 @@ class FibonacciWithMain {
     val instructions = Seq(
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(2),
-      IfIntegerCompareGreaterC.ifIntegerCompareGreater(3),
+      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(3),
       IntegerConstantC.integerConstant(1),
       GotoC.goTo(16),
       IntegerConstantC.integerConstant(0),
