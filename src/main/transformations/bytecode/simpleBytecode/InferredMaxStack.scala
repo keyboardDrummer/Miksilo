@@ -1,8 +1,9 @@
-package transformations.bytecode
+package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledJumps.LabelKey
+import transformations.bytecode.{ByteCodeSkeleton, LabelledJumps}
 import transformations.javac.base.ConstantPool
 
 object InferredMaxStack extends ProgramTransformation {

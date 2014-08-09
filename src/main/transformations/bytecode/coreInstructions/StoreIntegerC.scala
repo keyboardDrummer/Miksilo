@@ -29,4 +29,6 @@ object StoreIntegerC extends InstructionC {
 
   object IntegerStore
 
+  override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
+    Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 }

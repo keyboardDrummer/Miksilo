@@ -1,4 +1,4 @@
-package transformations.bytecode
+package transformations.bytecode.simpleBytecode
 
 import core.transformation.Contract
 

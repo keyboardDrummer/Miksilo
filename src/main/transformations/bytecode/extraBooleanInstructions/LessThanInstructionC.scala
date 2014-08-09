@@ -5,7 +5,8 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.IntegerConstantC
 import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareLessC
-import transformations.bytecode.{ByteCodeSkeleton, InferredStackFrames, LabelledJumps}
+import transformations.bytecode.simpleBytecode.InferredStackFrames
+import transformations.bytecode.{ByteCodeSkeleton, LabelledJumps}
 
 import scala.collection.mutable
 

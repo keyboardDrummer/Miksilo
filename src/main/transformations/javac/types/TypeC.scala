@@ -21,7 +21,6 @@ class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) e
 
 object TypeC extends GrammarTransformation {
   def getVerificationInfoBytes(clazz: MetaObject, _type: MetaObject, state: TransformationState): Seq[Byte] = {
-
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
     val stackType: MetaObject = toStackType(_type)
     stackType.clazz match {

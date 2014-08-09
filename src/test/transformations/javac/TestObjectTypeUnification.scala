@@ -12,4 +12,10 @@ class TestObjectTypeUnification {
     val output: String = TestUtils.compileAndRun("ObjectTypeUnification", inputDirectory)
     Assert.assertEquals("Object", output)
   }
+
+  @Test
+  def compareWithJavaC() {
+    val inputDirectory = Path("remy")
+    TestUtils.compareWithJavacAfterRunning("ObjectTypeUnification", inputDirectory)
+  }
 }

@@ -14,11 +14,14 @@ trait InstructionC extends Injector {
     PrintByteCode.getBytesRegistry(state).put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
     ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, getJumpBehavior)
+    ByteCodeSkeleton.getState(state).localUpdates.put(key, getVariableUpdates)
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   val key: AnyRef
+
+  def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] = Map.empty
 
   def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject])
 

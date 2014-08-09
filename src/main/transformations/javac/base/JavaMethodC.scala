@@ -4,8 +4,9 @@ import core.grammar._
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.{ByteCodeSkeleton, InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
 import transformations.javac.statements.{BlockC, StatementC}
@@ -150,7 +151,7 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
     val classMember: Grammar = classMethod
     // val _import = "import" ~> identifier.someSeparated(".") <~ ";"
     val importsP: Grammar = produce(Seq.empty[JavaImport]) //success_import*
-    val packageP = keyword("package") ~> identifier.someSeparated(".") <~ ";"
+    val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
     val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^ {
       case (_package seqr _imports) seqr (name seqr members) =>

@@ -2,14 +2,15 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
+import transformations.bytecode.LabelledJumps
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
-import transformations.bytecode.{InferredMaxStack, InferredStackFrames, LabelledJumps}
+import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
 import transformations.javac.methods._
-import transformations.javac.statements.{AssignmentC, BlockC, DeclarationC, StatementC}
+import transformations.javac.statements._
 import transformations.javac.types._
 
 object JavaCompiler {
@@ -21,7 +22,7 @@ object JavaCompiler {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
-      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, BlockC,
+      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 

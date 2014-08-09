@@ -3,8 +3,8 @@ package transformations.bytecode
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.coreInstructions.GotoC
 import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
 import transformations.javac.base.ConstantPool
 
 import scala.collection.mutable
@@ -25,10 +25,17 @@ object LabelledJumps extends ProgramTransformation {
   }
 
   override def inject(state: TransformationState): Unit = {
-    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(LabelKey, (pool, label) => (Seq.empty, Seq.empty))
-    ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(LabelKey, (pool, label) => 0)
-    ByteCodeSkeleton.getInstructionSizeRegistry(state).put(LabelKey, 0)
-    ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(LabelKey, new JumpBehavior(true, false))
+    LabelC.inject(state)
+  }
+
+  object LabelC extends InstructionC {
+    override val key: AnyRef = LabelKey
+
+    override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
+
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
+
+    override def getInstructionSize: Int = 0
   }
 
   def transform(program: MetaObject, state: TransformationState): Unit = {

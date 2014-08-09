@@ -70,6 +70,64 @@ object TestUtils {
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
+  def compareWithJavacAfterRunning(className: String, inputDirectory: Path) {
+    val relativeFilePath = inputDirectory / (className + ".java")
+    val currentDir = new File(new java.io.File("."))
+    val rootOutput = currentDir / Path("testOutput")
+    val actualOutputDirectory = rootOutput / "actual"
+    val testResources = currentDir / Path("testResources")
+    val input: File = File(testResources / relativeFilePath)
+    JavaCompiler.getCompiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
+    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
+
+    val expectedOutputDirectory = rootOutput / "expected"
+    val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
+    Assert.assertEquals("", javaCompilerOutput)
+
+    val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)
+    try {
+      val actualOutput = TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
+      Assert.assertEquals(expectedOutput, actualOutput)
+    }
+    catch {
+      case e: AssertionError =>
+        val relativeClassPath = inputDirectory / (className + ".class")
+        val actualByteCode = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
+        val expectedByteCode = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
+
+        val originalMessage = e.getMessage
+        val errorMessage: String = s"Output comparison failed with message: \n$originalMessage \n\n" +
+          s"javac byteCode was: \n\n$expectedByteCode \n\n" +
+          s"Actual byteCode was: \n$actualByteCode"
+        (rootOutput / "outputLog.txt").createFile().writeAll(errorMessage)
+        throw new AssertionError(errorMessage)
+    }
+
+  }
+
+  def runJavaP(input: File): String = {
+    val processBuilder = Process.apply(s"javap -v $input")
+    var line: String = ""
+    val logger = ProcessLogger(
+      (o: String) => line += o + "\n",
+      (e: String) => line += e + "\n")
+    val exitValue = processBuilder ! logger
+    Assert.assertEquals(line, 0, exitValue)
+    line
+  }
+
+  def runJavaC(directory: Path, input: File, output: Path): String = {
+    val processBuilder = Process.apply(s"javac -d $output $input", directory.jfile)
+    var line: String = ""
+    val logger = ProcessLogger(
+      (o: String) => line += o,
+      (e: String) => line += e)
+    val exitValue = processBuilder ! logger
+    Assert.assertEquals(line, 0, exitValue)
+    line
+  }
+
+
   def runJavaClass(className: String, directory: Path): String = {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
     var line: String = ""

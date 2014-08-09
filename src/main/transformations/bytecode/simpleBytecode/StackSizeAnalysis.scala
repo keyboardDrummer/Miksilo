@@ -1,13 +1,13 @@
-package transformations.bytecode
+package transformations.bytecode.simpleBytecode
 
 import core.transformation.{MetaObject, TransformationState}
 
 class StackSizeAnalysis(instructions: Seq[MetaObject], getInstructionStackSizeModification: MetaObject => Int, state: TransformationState)
   extends InstructionFlowAnalysis[Int](instructions, state) {
 
-  override def combineState(first: Int, second: Int): Int = {
+  override def combineState(first: Int, second: Int): Option[Int] = {
     if (first == second)
-      return first
+      return None
 
     throw new RuntimeException()
   }
