@@ -1,6 +1,7 @@
 package application
 
-import application.graphing.TransformationGraph
+import application.graphing.GraphView
+import application.graphing.model.TransformationGraph
 import com.mxgraph.swing.mxGraphComponent
 
 import scala.swing._

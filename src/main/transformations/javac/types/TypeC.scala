@@ -38,7 +38,6 @@ object TypeC extends GrammarTransformation {
 
   def getTypeSize(_type: MetaObject, state: TransformationState): Int = getState(state).stackSize(_type.clazz)
 
-
   def getByteCodeString(state: TransformationState): MetaObject => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
 

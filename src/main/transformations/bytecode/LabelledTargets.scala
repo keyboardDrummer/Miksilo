@@ -125,7 +125,7 @@ object LabelledTargets extends ProgramTransformation {
 
   def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
 
-  override def dependencies: Set[Contract] = Set(IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
   object LabelKey
 

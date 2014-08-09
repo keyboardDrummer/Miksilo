@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integerCompare.IfZeroC.IfZeroKey
@@ -11,6 +11,8 @@ import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import scala.collection.mutable
 
 object OptimizeBooleanInstructionsC extends ProgramTransformation {
+
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 

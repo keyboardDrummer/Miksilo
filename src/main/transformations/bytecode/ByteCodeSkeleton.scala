@@ -1,13 +1,15 @@
 package transformations.bytecode
 
+import core.transformation.sillyCodePieces.Injector
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.base.ConstantPool
+import transformations.javac.types._
 
 import scala.collection.mutable
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 
-object ByteCodeSkeleton extends Contract {
+object ByteCodeSkeleton extends Injector {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
@@ -189,7 +191,7 @@ object ByteCodeSkeleton extends Contract {
 
   def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  override def dependencies: Set[Contract] = Set.empty
+  override def dependencies: Set[Contract] = Set(ObjectTypeC, IntTypeC, DoubleTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC)
 
   trait MethodAccessFlag
 
@@ -202,7 +204,6 @@ object ByteCodeSkeleton extends Contract {
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
   }
-
 
   object SameFrameKey
 

@@ -1,9 +1,8 @@
-package application.graphing
+package application.graphing.model
 
 import core.transformation.Contract
 
-object TransformationVertex
-{
+object TransformationVertex {
   implicit def fromTransformation(transformation: Contract) = new TransformationVertex(transformation)
 }
 

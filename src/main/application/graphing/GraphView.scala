@@ -1,15 +1,15 @@
-package application
+package application.graphing
 
 import java.util
 
-import application.graphing.{TransformationGraph, TransformationVertex}
+import application.graphing.model.simplifications.Simplification
+import application.graphing.model.{TransformationGraph, TransformationVertex}
 import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.transformation.Contract
-import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import core.transformation.sillyCodePieces.GrammarTransformation
 import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
@@ -49,14 +49,17 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
 
   def setStyleSheet() {
     val stylesheet: mxStylesheet = getStylesheet
-    val contractStyle = new util.Hashtable[String, Object]()
-    contractStyle.put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF")
+    val simplification = new util.Hashtable[String, Object]()
+    simplification.put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF")
+
+    val simplificationStyle = new util.Hashtable[String, Object]()
+    simplificationStyle.put(mxConstants.STYLE_FILLCOLOR, "#ABC123")
 
     val grammarStyle = new util.Hashtable[String, Object]()
     grammarStyle.put(mxConstants.STYLE_FILLCOLOR, "#44E35C")
 
-    stylesheet.putCellStyle("CONTRACT", contractStyle)
     stylesheet.putCellStyle("GRAMMAR", grammarStyle)
+    stylesheet.putCellStyle("SIMPLIFICATION", simplification)
   }
 
   def setLayout() {
@@ -81,13 +84,12 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     val cell = insertVertex(parent, null, "", 20, 20, width, height).asInstanceOf[mxCell]
     cell.setValue(vertexLabel)
     vertex.transformation match {
+      case _: Simplification =>
+        cell.setStyle("SIMPLIFICATION")
+
       case _: GrammarTransformation =>
         cell.setStyle("GRAMMAR")
 
-      case _: ProgramTransformation =>
-
-      case _: Contract =>
-        cell.setStyle("CONTRACT")
       case _ =>
     }
 
@@ -96,15 +98,23 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
 
   def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
     val incoming = vertex.transformation.dependencies.size
-    var outgoingWidth = 0.0
-    val outgoingEdgesOf = origin.outgoingEdgesOf(vertex)
-    for (outgoing <- JSetWrapper(outgoingEdgesOf)) {
-      val outgoingCell = vertexMap(origin.getEdgeTarget(outgoing))
-      outgoingWidth += outgoingCell.getGeometry.getWidth
-    }
-    val maximum = Math.max(incoming * 50, outgoingWidth / (outgoingEdgesOf.size() + 1))
-    Math.min(1000, maximum)
+    val outgoingEdgesOf = origin.outDegreeOf(vertex)
+    val maximum = Math.max(incoming, outgoingEdgesOf)
+    Math.min(1000, maximum * 50)
   }
+
+  //
+  //  def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
+  //    val incoming = vertex.transformation.dependencies.size
+  //    var outgoingWidth = 0.0
+  //    val outgoingEdgesOf = origin.outgoingEdgesOf(vertex)
+  //    for (outgoing <- JSetWrapper(outgoingEdgesOf)) {
+  //      val outgoingCell = vertexMap(origin.getEdgeTarget(outgoing))
+  //      outgoingWidth += outgoingCell.getGeometry.getWidth
+  //    }
+  //    val maximum = Math.max(incoming * 50, outgoingWidth / (outgoingEdgesOf.size() + 1))
+  //    Math.min(1000, maximum)
+  //  }
 
   def getCellWidthBasedOnLabel(vertexLabel: String): Int = {
     vertexLabel.length * 5 + 20

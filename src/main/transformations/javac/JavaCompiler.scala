@@ -2,11 +2,11 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
-import transformations.bytecode.LabelledTargets
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.base.JavaMethodC
 import transformations.javac.expressions._
 import transformations.javac.methods._
@@ -30,20 +30,16 @@ object JavaCompiler {
 
   def simpleByteCodeTransformations = Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations
 
-  def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
-    IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
-    LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
+  def byteCodeTransformations = typeTransformations ++ byteCodeInstructions ++ Seq(ByteCodeSkeleton)
+
+  def byteCodeInstructions: Seq[InstructionC] = {
+    Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
+      IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+      LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
+  }
 
   def getTransformer = new Transformer(javaCompilerTransformations)
 }
 
-object JavaExpression extends Contract {
 
-  override def dependencies: Set[Contract] =
-    Set(LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC)
-}
 
-object JavaMinus extends Contract {
-  override def dependencies: Set[Contract] =
-    Set(JavaExpression, ImplicitThisInPrivateCalls, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, DefaultConstructor)
-}
