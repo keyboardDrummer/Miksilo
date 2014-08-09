@@ -31,7 +31,13 @@ abstract class InvokeC extends InstructionC {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val descriptor = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
-    getMethodStackModification(descriptor)
+    getMethodStackModification(descriptor, constantPool)
+  }
+
+  def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool): (Seq[MetaObject], Seq[MetaObject]) = {
+    val ins = ByteCodeSkeleton.getMethodDescriptorParameters(descriptor).map(_type => TypeC.toStackType(constantPool, _type))
+    val outs = Seq(TypeC.toStackType(constantPool, ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor)))
+    (ins, outs)
   }
 
   def getInvokeTargetMethodRef(instruction: MetaObject, constantPool: ConstantPool) = {
@@ -39,11 +45,5 @@ abstract class InvokeC extends InstructionC {
     constantPool.getValue(location).asInstanceOf[MetaObject]
   }
 
-  def getMethodStackModification(descriptor: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = {
-    val ins = ByteCodeSkeleton.getMethodDescriptorParameters(descriptor).map(TypeC.toStackType)
-    val outs = Seq(TypeC.toStackType(ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor)))
-    (ins, outs)
-  }
-
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(instruction: MetaObject): Int = 3
 }

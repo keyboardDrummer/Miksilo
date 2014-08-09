@@ -14,7 +14,7 @@ object IntegerReturnC extends InstructionC {
 
   override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
-  override def getInstructionSize: Int = 1
+  override def getInstructionSize(instruction: MetaObject): Int = 1
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(IntTypeC.intType), Seq())
 

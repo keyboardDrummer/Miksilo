@@ -198,7 +198,7 @@ object ByteCodeSkeleton extends Contract {
   class State {
     val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
     val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => (Seq[MetaObject], Seq[MetaObject])]
-    val getInstructionSizeRegistry = new mutable.HashMap[Any, Int]
+    val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
   }

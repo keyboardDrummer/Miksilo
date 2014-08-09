@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
-import transformations.bytecode.LabelledJumps
+import transformations.bytecode.LabelledTargets
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
@@ -28,7 +28,7 @@ object JavaCompiler {
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
 
-  def simpleByteCodeTransformations = Seq(InferredStackFrames, InferredMaxStack, LabelledJumps) ++ byteCodeTransformations
+  def simpleByteCodeTransformations = Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations
 
   def byteCodeTransformations = typeTransformations ++ Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
     IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,

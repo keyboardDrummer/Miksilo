@@ -4,10 +4,10 @@ import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.base.ConstantPool
 import transformations.javac.types.BooleanTypeC.BooleanTypeKey
+import transformations.javac.types.ObjectTypeC.ObjectTypeName
 
 import scala.collection.mutable
 
@@ -21,18 +21,19 @@ class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) e
 
 object TypeC extends GrammarTransformation {
   def getVerificationInfoBytes(clazz: MetaObject, _type: MetaObject, state: TransformationState): Seq[Byte] = {
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
-    val stackType: MetaObject = toStackType(_type)
-    stackType.clazz match {
+    _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
       case LongTypeC.LongTypeKey => hexToBytes("02")
-      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(constantPool.getClassRef(ObjectTypeC.getObjectTypeName(stackType).right.get))
+      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeName).asInstanceOf[Int])
     }
   }
 
-  def toStackType(_type: MetaObject) = _type.clazz match {
-    case BooleanTypeKey => IntTypeC.intType
-    case _ => _type
+  def toStackType(constantPool: ConstantPool, _type: MetaObject) = {
+    _type.clazz match {
+      case BooleanTypeKey => IntTypeC.intType
+      case ObjectTypeC.ObjectTypeKey => ObjectTypeC.stackObjectType(constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+      case _ => _type
+    }
   }
 
   def getTypeSize(_type: MetaObject, state: TransformationState): Int = getState(state).stackSize(_type.clazz)

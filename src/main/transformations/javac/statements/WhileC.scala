@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.grammar.seqr
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.LabelledJumps
+import transformations.bytecode.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionC
 
@@ -30,9 +30,9 @@ object WhileC extends StatementInstance {
     val endLabel = state.getUniqueLabel("end")
     Seq(InferredStackFrames.label(startLabel)) ++
       conditionInstructions ++
-      Seq(LabelledJumps.ifZero(endLabel)) ++
+      Seq(LabelledTargets.ifZero(endLabel)) ++
       bodyInstructions ++
-      Seq(LabelledJumps.goTo(startLabel), InferredStackFrames.label(endLabel))
+      Seq(LabelledTargets.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
 
 

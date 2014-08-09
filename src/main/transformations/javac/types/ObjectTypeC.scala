@@ -17,6 +17,8 @@ object ObjectTypeC extends TypeInstance {
 
   object ObjectTypeKey
 
+  def stackObjectType(constantPoolClassRef: Int) = new MetaObject(ObjectTypeKey, ObjectTypeName -> constantPoolClassRef)
+
   def objectType(name: QualifiedClassName) = new MetaObject(ObjectTypeKey) {
     data.put(ObjectTypeName, Right(name))
   }

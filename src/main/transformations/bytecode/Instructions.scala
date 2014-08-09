@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.transformation.MetaObject
-import transformations.bytecode.LabelledJumps.LabelKey
+import transformations.bytecode.LabelledTargets.LabelKey
 import transformations.javac.base.ConstantPool
 
 object Instructions {

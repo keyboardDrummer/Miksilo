@@ -19,7 +19,7 @@ class TestByteCodeGoTo {
   @Test
   def compareCompiledVersusNativeCode() {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = new Transformer(Seq(LabelledJumps) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
+    val compiledWhile = new Transformer(Seq(LabelledTargets) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }
@@ -44,15 +44,15 @@ class TestByteCodeGoTo {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledJumps.label("start", new MetaObject(ByteCodeSkeleton.AppendFrame) {
+      LabelledTargets.label("start", new MetaObject(ByteCodeSkeleton.AppendFrame) {
         data.put(ByteCodeSkeleton.AppendFrameTypes, Seq(IntTypeC.intType))
       }),
       LoadIntegerC.integerLoad(0),
       IntegerConstantC.integerConstant(3),
-      LabelledJumps.ifIntegerCompareGreaterEquals("end"),
+      LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
-      LabelledJumps.goTo("start"),
-      LabelledJumps.label("end", new MetaObject(ByteCodeSkeleton.SameFrameKey))
+      LabelledTargets.goTo("start"),
+      LabelledTargets.label("end", new MetaObject(ByteCodeSkeleton.SameFrameKey))
     )
 
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(ByteCodeSkeleton.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

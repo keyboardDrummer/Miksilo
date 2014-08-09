@@ -2,12 +2,12 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.LabelledJumps.LabelKey
-import transformations.bytecode.{ByteCodeSkeleton, LabelledJumps}
+import transformations.bytecode.LabelledTargets.LabelKey
+import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.base.ConstantPool
 
 object InferredMaxStack extends ProgramTransformation {
-  override def dependencies: Set[Contract] = Set(LabelledJumps)
+  override def dependencies: Set[Contract] = Set(LabelledTargets)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program

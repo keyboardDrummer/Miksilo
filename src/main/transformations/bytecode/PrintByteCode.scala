@@ -168,10 +168,10 @@ object PrintByteCode extends ProgramTransformation {
         case ByteCodeSkeleton.SameLocals1StackItem =>
           val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
           val code = 64 + offset
-          if (code > 127)
-            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
-          else {
+          if (code <= 127) {
             byteToBytes(code) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
+          } else {
+            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
           }
       }
     }

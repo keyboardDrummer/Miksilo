@@ -24,8 +24,6 @@ object StoreAddressC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(IntTypeC.intType), Seq())
 
-  override def getInstructionSize: Int = 2
-
   object AddressStore
 
   override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =

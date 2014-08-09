@@ -4,7 +4,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.LabelledJumps
+import transformations.bytecode.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.types.{BooleanTypeC, TypeC}
 
@@ -28,10 +28,10 @@ object TernaryC extends GrammarTransformation {
       val falsePath = TernaryC.falseBranch(_ternary)
       val falseLabelName = state.getUniqueLabel("falseStart")
       val falseTarget = InferredStackFrames.label(falseLabelName)
-      val conditionalBranch = LabelledJumps.ifZero(falseLabelName)
+      val conditionalBranch = LabelledTargets.ifZero(falseLabelName)
       val endLabelName = state.getUniqueLabel("end")
       val end = InferredStackFrames.label(endLabelName)
-      val goToEnd = LabelledJumps.goTo(endLabelName)
+      val goToEnd = LabelledTargets.goTo(endLabelName)
       val toInstructions = ExpressionC.getToInstructions(state)
       toInstructions(condition) ++
         Seq(conditionalBranch) ++
@@ -50,7 +50,7 @@ object TernaryC extends GrammarTransformation {
     metaObject(ConditionKey).asInstanceOf[MetaObject]
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionC, LabelledJumps)
+  override def dependencies: Set[Contract] = Set(ExpressionC, LabelledTargets)
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)

@@ -22,7 +22,7 @@ object IncrementIntegerC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq.empty, Seq.empty)
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(instruction: MetaObject): Int = 3
 
   object IntegerIncrementKey
 

@@ -25,7 +25,7 @@ trait InstructionC extends Injector {
 
   def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject])
 
-  def getInstructionSize: Int
+  def getInstructionSize(instruction: MetaObject): Int = getInstructionByteCode(instruction).size
 
   def getJumpBehavior: JumpBehavior = new JumpBehavior(true, false)
 

@@ -22,7 +22,7 @@ object IntegerConstantC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject)
   = (Seq(), Seq(IntTypeC.intType))
 
-  override def getInstructionSize: Int = 1
+  override def getInstructionSize(instruction: MetaObject): Int = 1
 
   object IntegerConstantKey
 

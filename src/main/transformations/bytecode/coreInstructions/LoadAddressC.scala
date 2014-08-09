@@ -24,8 +24,6 @@ object LoadAddressC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(IntTypeC.intType))
 
-  override def getInstructionSize: Int = 1
-
   object AddressLoad
 
 }

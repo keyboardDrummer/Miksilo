@@ -22,7 +22,7 @@ object GotoC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq())
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(instruction: MetaObject): Int = 3
 
   object GoToKey
 

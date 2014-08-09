@@ -10,7 +10,7 @@ class TestObjectTypeUnification {
   def testFullPipeline() {
     val inputDirectory = Path("remy")
     val output: String = TestUtils.compileAndRun("ObjectTypeUnification", inputDirectory)
-    Assert.assertEquals("Object", output)
+    Assert.assertEquals("3", output)
   }
 
   @Test

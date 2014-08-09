@@ -30,7 +30,7 @@ object InvokeVirtualC extends InvokeC {
     val className = constantPool.getValue(ByteCodeSkeleton.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
     val descriptor = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
-    val (ins, outs) = getMethodStackModification(descriptor)
+    val (ins, outs) = getMethodStackModification(descriptor, constantPool)
     (Seq(classType) ++ ins, outs)
   }
 

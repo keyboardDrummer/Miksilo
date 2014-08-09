@@ -2,14 +2,14 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.{ByteCodeSkeleton, LabelledJumps}
+import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import util.DataFlowAnalysis
 
 abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject], state: TransformationState)
   extends DataFlowAnalysis[Int, State] {
 
-  val labels = instructions.zipWithIndex.filter(i => i._1.clazz == LabelledJumps.LabelKey)
-    .map(p => (LabelledJumps.getLabelName(p._1), p._2)).toMap
+  val labels = instructions.zipWithIndex.filter(i => i._1.clazz == LabelledTargets.LabelKey)
+    .map(p => (LabelledTargets.getLabelName(p._1), p._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)

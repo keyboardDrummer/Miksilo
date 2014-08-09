@@ -10,7 +10,7 @@ import transformations.javac.base.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledJumps extends ProgramTransformation {
+object LabelledTargets extends ProgramTransformation {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
 
   def goTo(target: String) = instruction(GotoC.GoToKey, Seq(target))
@@ -35,13 +35,13 @@ object LabelledJumps extends ProgramTransformation {
 
     override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
 
-    override def getInstructionSize: Int = 0
+    override def getInstructionSize(instruction: MetaObject): Int = 0
   }
 
   def transform(program: MetaObject, state: TransformationState): Unit = {
 
     val jumpRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
-    def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)
+    def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)(instruction)
 
     def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
       var newInstructions = mutable.ArrayBuffer[MetaObject]()

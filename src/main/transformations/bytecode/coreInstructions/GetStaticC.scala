@@ -29,7 +29,7 @@ object GetStaticC extends InstructionC {
     fieldType
   }
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(instruction: MetaObject): Int = 3
 
   object GetStaticKey
 

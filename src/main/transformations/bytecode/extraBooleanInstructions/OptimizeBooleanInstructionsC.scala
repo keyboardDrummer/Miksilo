@@ -6,7 +6,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integerCompare.IfZeroC.IfZeroKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
-import transformations.bytecode.{ByteCodeSkeleton, LabelledJumps}
+import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 
 import scala.collection.mutable
 
@@ -40,12 +40,12 @@ object OptimizeBooleanInstructionsC extends ProgramTransformation {
         first.clazz match {
           case LessThanInstructionKey => second.clazz match {
             case IfZeroKey =>
-              val target = LabelledJumps.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledJumps.ifIntegerCompareGreaterEquals(target)
+              val target = LabelledTargets.getJumpInstructionLabel(second)
+              instructionToAdd = LabelledTargets.ifIntegerCompareGreaterEquals(target)
               i += 1
             case IfNotZeroKey =>
-              val target = LabelledJumps.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledJumps.ifIntegerCompareLess(target)
+              val target = LabelledTargets.getJumpInstructionLabel(second)
+              instructionToAdd = LabelledTargets.ifIntegerCompareLess(target)
               i += 1
             case _ =>
           }
