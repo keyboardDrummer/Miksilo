@@ -15,9 +15,13 @@ import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 import scala.collection.mutable
 
 
-object JavaMethodC extends GrammarTransformation with ProgramTransformation {
+object JavaMethodAndClassC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
+
+  def getState(state: TransformationState): State = {
+    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
@@ -110,13 +114,9 @@ object JavaMethodC extends GrammarTransformation with ProgramTransformation {
     method(ByteCodeSkeleton.MethodAccessFlags) = flags
   }
 
-  def getClassCompiler(state: TransformationState) = getState(state).methodCompiler.classCompiler
-
   def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
 
-  def getState(state: TransformationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
+  def getClassCompiler(state: TransformationState) = getState(state).methodCompiler.classCompiler
 
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
     val className = JavaClassModel.getClassName(clazz)

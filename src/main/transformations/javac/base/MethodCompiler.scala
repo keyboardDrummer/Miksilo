@@ -35,7 +35,7 @@ case class MethodCompiler(classCompiler: ClassCompiler) {
   val variables = new VariablePool(classCompiler.transformationState)
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = JavaMethodC.getReferenceKindRegistry(transformationState).get(expression.clazz)
+    val getReferenceKindOption = JavaMethodAndClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(expression)
     })(implementation => implementation(expression))

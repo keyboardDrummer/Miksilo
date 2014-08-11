@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompar
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.javac.base.JavaMethodC
+import transformations.javac.base.JavaMethodAndClassC
 import transformations.javac.expressions._
 import transformations.javac.methods._
 import transformations.javac.statements._
@@ -22,7 +22,7 @@ object JavaCompiler {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
-      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodC, WhileC, BlockC,
+      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodAndClassC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 

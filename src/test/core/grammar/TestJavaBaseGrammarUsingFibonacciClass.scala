@@ -31,6 +31,22 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
+  def getExpressionGrammarResult(input: String): Any = {
+    val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
+    result
+  }
+
+  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
+    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    val result = parseResult.get
+    Assert.assertTrue(result.toString, parseResult.next.atEnd)
+    result
+  }
+
   @Test
   def testFibonacciExpression() {
     val input = "index < 2 ? 1 : fibonacci(index-1) + fibonacci(index-2)"
@@ -48,22 +64,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val expectation: MetaObject = TernaryC.ternary(LessThanC.lessThan(LiteralC.literal(1), LiteralC.literal(2)),
       LiteralC.literal(3), LiteralC.literal(4))
     Assert.assertEquals(expectation, result)
-  }
-
-  def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
-    result
-  }
-
-  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
-    val parseResult = parser(input)
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
-
-    val result = parseResult.get
-    Assert.assertTrue(result.toString, parseResult.next.atEnd)
-    result
   }
 
   @Test
@@ -108,14 +108,8 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = getGrammarResult(input, JavaMethodC.MethodGrammar)
+    val result = getGrammarResult(input, JavaMethodAndClassC.MethodGrammar)
     result
-  }
-
-  def getMainMethod: MetaObject = {
-    JavaMethodModel.method("main", VoidTypeC.voidType, Seq(JavaMethodModel.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
-      Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))))), true, JavaMethodModel.PublicVisibility)
   }
 
   @Test
@@ -125,6 +119,23 @@ class TestJavaBaseGrammarUsingFibonacciClass {
 
     val expectation = getFibonacciMethod
     Assert.assertEquals(expectation, result)
+  }
+
+  @Test
+  def testFibonacci() {
+    val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
+
+    val input = File(inputFile).slurp()
+
+    val result = getGrammarResult(input)
+    val expectation = JavaClassModel.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
+    Assert.assertEquals(expectation, result)
+  }
+
+  def getMainMethod: MetaObject = {
+    JavaMethodModel.method("main", VoidTypeC.voidType, Seq(JavaMethodModel.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
+      Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
+        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))))), true, JavaMethodModel.PublicVisibility)
   }
 
   def getFibonacciMethod: MetaObject = {
@@ -138,16 +149,5 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), LiteralC.literal(2))))
     val expectation = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
     expectation
-  }
-
-  @Test
-  def testFibonacci() {
-    val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
-
-    val input = File(inputFile).slurp()
-
-    val result = getGrammarResult(input)
-    val expectation = JavaClassModel.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
-    Assert.assertEquals(expectation, result)
   }
 }

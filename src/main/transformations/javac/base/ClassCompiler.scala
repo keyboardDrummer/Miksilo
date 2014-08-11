@@ -95,6 +95,6 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
           (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
       }
       result
-    }).toMap ++ Map(className -> JavaMethodC.getQualifiedClassName(currentClass))
+    }).toMap ++ Map(className -> JavaMethodAndClassC.getQualifiedClassName(currentClass))
   }
 }

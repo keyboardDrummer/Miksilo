@@ -9,11 +9,13 @@ import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
 object SelectorC extends ExpressionInstance {
 
-  override def dependencies: Set[Contract] = Set(JavaMethodC, GetStaticC)
+  override val key: AnyRef = SelectorKey
+
+  override def dependencies: Set[Contract] = Set(JavaMethodAndClassC, GetStaticC)
 
   override def inject(state: TransformationState): Unit = {
-    JavaMethodC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val methodCompiler = JavaMethodC.getMethodCompiler(state)
+    JavaMethodAndClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
+      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
       getReferenceKind(selector, methodCompiler)
     })
     super.inject(state)
@@ -34,10 +36,6 @@ object SelectorC extends ExpressionInstance {
     }
   }
 
-  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
-
-  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
-
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => selector(left, right)}
@@ -53,16 +51,8 @@ object SelectorC extends ExpressionInstance {
     }
   }
 
-  object SelectorKey
-
-  object SelectorObject
-
-  object SelectorMember
-
-  override val key: AnyRef = SelectorKey
-
   override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
-    val compiler = JavaMethodC.getMethodCompiler(state)
+    val compiler = JavaMethodAndClassC.getMethodCompiler(state)
     val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
@@ -71,7 +61,7 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val compiler = JavaMethodC.getMethodCompiler(state)
+    val compiler = JavaMethodAndClassC.getMethodCompiler(state)
     val obj = getSelectorObject(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
     val member = getSelectorMember(selector)
@@ -82,4 +72,15 @@ object SelectorC extends ExpressionInstance {
     else
       ???
   }
+
+  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+
+  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
+
+  object SelectorKey
+
+  object SelectorObject
+
+  object SelectorMember
+
 }
