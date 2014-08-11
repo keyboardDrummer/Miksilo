@@ -3,6 +3,7 @@ package application.graphing.model
 import application.graphing.model.simplifications._
 import com.google.common.collect.Lists
 import core.transformation.Contract
+import org.jgrapht.alg.StrongConnectivityInspector
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import org.jgrapht.traverse.TopologicalOrderIterator
 import transformations.javac.JavaCompiler
@@ -12,8 +13,8 @@ import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
 
-  val simplifications = Set(ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
-    JavaExpression, JavaStatement, JavaC, JavaMethod, JavaClass, JavaSimpleStatement)
+  val simplifications = Seq(ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
+    , JavaSimpleStatement) // JavaExpression, JavaStatement, JavaC, JavaMethod, JavaClass, )
   buildInitialGraph()
   addSimplifications()
 
@@ -41,43 +42,46 @@ class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, Def
   def addSimplifications() {
     for (simplification <- simplifications) {
       addVertex(simplification)
-      for (incoming <- simplification.dependants) {
+
+      var dependants = simplification.dependants
+      for (dependency <- simplification.dependencies) {
+        addVertex(dependency)
+        for (derivedDependant <- getOutgoingNodes(dependency)) {
+          dependants += derivedDependant.transformation
+        }
+        addEdge(dependency, simplification)
+      }
+      for (incoming <- dependants) {
         addVertex(incoming)
         addEdge(simplification, incoming)
       }
-
-      for (dependency <- simplification.dependencies) {
-        addVertex(dependency)
-        //        val derivedDependants: Set[TransformationVertex] = getIncomingNodes(dependency)
-        //        for(derivedDependant <- derivedDependants)
-        //        {
-        //          //removeEdge(derivedDependant, dependency)
-        //          addEdge(simplification, derivedDependant)
-        //        }
-        addEdge(dependency, simplification)
-      }
-
     }
   }
 
-  def getIncomingNodes(dependency: Contract): Set[TransformationVertex] = {
-    JSetWrapper(incomingEdgesOf(dependency)).map(edge => getEdgeSource(edge)).toSet
+  def getOutgoingNodes(vertex: TransformationVertex): Set[TransformationVertex] = {
+    new JSetWrapper(this.outgoingEdgesOf(vertex)).map(outgoingEdge => getEdgeTarget(outgoingEdge)).toSet
   }
 
   def optimizeDependencies() {
-    var deepDependencies = Map.empty[TransformationVertex, Map[Contract, Int]]
     val topologicalOrdering = Lists.newArrayList(new TopologicalOrderIterator(this))
 
-    if (topologicalOrdering.size() < vertexSet().size())
-      throw new RuntimeException
+    if (topologicalOrdering.size() < vertexSet().size()) {
+      val detector = new StrongConnectivityInspector(this)
+      val cycles = JListWrapper(detector.stronglyConnectedSets()).map(s => JSetWrapper(s)).filter(s => s.size > 1)
+      if (cycles.nonEmpty) {
+        throw new RuntimeException(s"you have cycles: $cycles")
+      }
 
+      throw new RuntimeException("topological ordering missed some nodes. ")
+    }
+
+    var deepDependencies = Map.empty[TransformationVertex, Map[TransformationVertex, Int]]
     for (vertex <- JListWrapper[TransformationVertex](topologicalOrdering)) {
-      deepDependencies += vertex -> Map[Contract, Int](vertex.transformation -> 1)
+      deepDependencies += vertex -> Map[TransformationVertex, Int](vertex -> 1)
 
-      for (outgoingEdge <- new JSetWrapper(this.incomingEdgesOf(vertex))) {
-        val outgoingNode = getEdgeSource(outgoingEdge)
+      for (outgoingNode <- getIncomingNodes(vertex)) {
         for (dependencyEntry <- deepDependencies(outgoingNode)) {
-          val dependency: Contract = dependencyEntry._1
+          val dependency = dependencyEntry._1
           deepDependencies = alterNestedMap(deepDependencies, vertex, dependency, 0, (v: Int) => v + dependencyEntry._2)
         }
       }
@@ -85,7 +89,7 @@ class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, Def
 
     for (vertex <- getVertices) {
 
-      for (directDependency <- vertex.transformation.dependencies) {
+      for (directDependency <- getIncomingNodes(vertex)) {
         if (deepDependencies(vertex).getOrElse(directDependency, 0) > 1) {
           removeEdge(directDependency, vertex)
         }
@@ -93,6 +97,9 @@ class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, Def
     }
   }
 
+  def getIncomingNodes(dependency: TransformationVertex): Set[TransformationVertex] = {
+    JSetWrapper(incomingEdgesOf(dependency)).map(edge => getEdgeSource(edge)).toSet
+  }
 
   def alterNestedMap[K, K2, V](map: Map[K, Map[K2, V]], key: K, key2: K2, default: V, alter: V => V): Map[K, Map[K2, V]] = {
     alterMap(map, key, Map.empty[K2, V], (m: Map[K2, V]) => alterMap(m, key2, default, alter))
