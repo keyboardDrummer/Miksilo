@@ -7,7 +7,7 @@ import transformations.javac.statements.StatementC
 object JavaSimpleExpression extends TransformationGroup {
 
   override def dependencies: Set[Contract] =
-    Set(LessThanC, AdditionC, LiteralC, SubtractionC, TernaryC, ParenthesisC, NullC, EqualityC)
+    Set(LessThanC, AdditionC, BooleanLiteralC, NumberLiteralC, SubtractionC, TernaryC, ParenthesisC, NullC, EqualityC)
 
   override def dependants: Set[Contract] = Set(StatementC)
 }

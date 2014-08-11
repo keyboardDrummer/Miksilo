@@ -5,7 +5,7 @@ import org.junit.Test
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
-import transformations.javac.expressions.{LiteralC, TernaryC}
+import transformations.javac.expressions.{BooleanLiteralC, NumberLiteralC, TernaryC}
 import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC}
 import transformations.javac.types._
 
@@ -33,7 +33,7 @@ class ClassWithJump {
 
   def getMainMethodJava: MetaObject = {
     val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
-    val fibCall = CallC.call(VariableC.variable("test"), Seq(LiteralC.literal(true)))
+    val fibCall = CallC.call(VariableC.variable("test"), Seq(BooleanLiteralC.literal(true)))
     val body = Seq[MetaObject](CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
       VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
     method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
@@ -41,7 +41,7 @@ class ClassWithJump {
 
   def getTestMethod = {
     val parameters = Seq(parameter("b", BooleanTypeC.booleanType))
-    val body = Seq(ReturnExpressionC._return(TernaryC.ternary(VariableC.variable("b"), LiteralC.literal(3), LiteralC.literal(4))))
+    val body = Seq(ReturnExpressionC._return(TernaryC.ternary(VariableC.variable("b"), NumberLiteralC.literal(3), NumberLiteralC.literal(4))))
     method("test", IntTypeC.intType, parameters, body, static = true, PrivateVisibility)
   }
 }

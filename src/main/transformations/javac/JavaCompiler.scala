@@ -23,7 +23,7 @@ object JavaCompiler {
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
-      AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
+      AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, BooleanLiteralC, NumberLiteralC,
       AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, MethodAndClassC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }

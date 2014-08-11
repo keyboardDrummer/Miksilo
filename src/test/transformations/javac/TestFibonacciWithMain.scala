@@ -6,7 +6,7 @@ import transformations.bytecode._
 import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
-import transformations.javac.expressions.LiteralC
+import transformations.javac.expressions.NumberLiteralC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
 import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
@@ -36,18 +36,6 @@ class TestFibonacciWithMain {
     TestUtils.runByteCode(className, byteCode, expectedResult)
   }
 
-  def getJavaFibonacciWithMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
-  }
-
-  def getMainMethodJava: MetaObject = {
-    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
-    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(LiteralC.literal(5)))
-    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
-      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
-    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
-  }
-
   @Test
   def testStackSizeLocalsArgs() {
     val fibonacci = getJavaFibonacciWithMain
@@ -74,6 +62,18 @@ class TestFibonacciWithMain {
     val fibonacci = getJavaFibonacciWithMain
     val compiledCode = JavaCompiler.getTransformer.transform(fibonacci)
     TestUtils.printByteCode(compiledCode)
+  }
+
+  def getJavaFibonacciWithMain: MetaObject = {
+    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
+  }
+
+  def getMainMethodJava: MetaObject = {
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))
+    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
+      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
+    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }
 
 }

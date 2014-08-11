@@ -28,10 +28,10 @@ class FibonacciWithoutMain {
 
   def getFibonacciMethodJava: MetaObject = {
     val parameters = Seq(parameter("i", IntTypeC.intType))
-    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(1))))
-    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
-    val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
-    val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
+    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), NumberLiteralC.literal(1))))
+    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), NumberLiteralC.literal(2))))
+    val condition = LessThanC.lessThan(variable("i"), NumberLiteralC.literal(2))
+    val returnValue = TernaryC.ternary(condition, NumberLiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
     val body = Seq(ReturnExpressionC._return(returnValue))
     method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }
