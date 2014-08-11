@@ -3,6 +3,7 @@ package transformations.javac.base
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.base.model.{JavaClassModel, JavaImport, QualifiedClassName}
+import transformations.javac.expressions.ExpressionC
 import transformations.javac.types.ObjectTypeC
 
 object ClassCompiler {
@@ -96,5 +97,17 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
       }
       result
     }).toMap ++ Map(className -> MethodAndClassC.getQualifiedClassName(currentClass))
+  }
+
+  def getReferenceKind(expression: MetaObject): ReferenceKind = {
+    val getReferenceKindOption = MethodAndClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
+    getReferenceKindOption.fold[ReferenceKind]({
+      getReferenceKindFromExpressionType(expression)
+    })(implementation => implementation(expression))
+  }
+
+  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
+    val classInfo: ClassInfo = findClass(ExpressionC.getType(transformationState)(expression))
+    new ClassOrObjectReference(classInfo, false)
   }
 }

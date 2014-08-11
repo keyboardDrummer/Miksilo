@@ -18,14 +18,14 @@ object ConstructorC extends ProgramTransformation {
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     def transformSuperOrThisCall(call: MetaObject): Seq[MetaObject] = {
-      val compiler = MethodAndClassC.getMethodCompiler(state)
+      val compiler = MethodAndClassC.getClassCompiler(state)
       val callArguments = CallC.getCallArguments(call)
       val className = call.clazz match {
         case SuperCall => JavaClassModel.getParent(clazz).get
         case ThisCall => JavaClassModel.getClassName(clazz)
       }
-      val qualifiedName = compiler.classCompiler.fullyQualify(className)
-      val methodRefIndex = compiler.classCompiler.getMethodRefIndex(new MethodId(qualifiedName, constructorName))
+      val qualifiedName = compiler.fullyQualify(className)
+      val methodRefIndex = compiler.getMethodRefIndex(new MethodId(qualifiedName, constructorName))
       val argumentInstructions = callArguments.flatMap(argument => StatementC.getToInstructions(state)(argument))
       Seq(LoadAddressC.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialC.invokeSpecial(methodRefIndex))
     }

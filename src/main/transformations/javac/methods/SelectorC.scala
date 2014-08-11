@@ -15,23 +15,23 @@ object SelectorC extends ExpressionInstance {
 
   override def inject(state: TransformationState): Unit = {
     MethodAndClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
-      getReferenceKind(selector, methodCompiler)
+      val compiler = MethodAndClassC.getClassCompiler(state)
+      getReferenceKind(selector, compiler)
     })
     super.inject(state)
   }
 
-  def getReferenceKind(selector: MetaObject, methodCompiler: MethodCompiler): ReferenceKind = {
+  def getReferenceKind(selector: MetaObject, compiler: ClassCompiler): ReferenceKind = {
     val obj = SelectorC.getSelectorObject(selector)
     val member = SelectorC.getSelectorMember(selector)
-    methodCompiler.getReferenceKind(obj) match {
+    compiler.getReferenceKind(obj) match {
       case PackageReference(info) => info.content(member) match {
         case result: PackageInfo => new PackageReference(result)
         case result: ClassInfo => new ClassOrObjectReference(result, true)
       }
       case ClassOrObjectReference(info, _) =>
         val field = info.getField(member)
-        val fieldClassType = methodCompiler.classCompiler.findClass(field._type.asInstanceOf[MetaObject])
+        val fieldClassType = compiler.findClass(field._type.asInstanceOf[MetaObject])
         new ClassOrObjectReference(fieldClassType, false)
     }
   }
@@ -52,7 +52,7 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
-    val compiler = MethodAndClassC.getMethodCompiler(state)
+    val compiler = MethodAndClassC.getClassCompiler(state)
     val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
@@ -61,12 +61,12 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val compiler = MethodAndClassC.getMethodCompiler(state)
+    val compiler = MethodAndClassC.getClassCompiler(state)
     val obj = getSelectorObject(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
     val member = getSelectorMember(selector)
     val fieldInfo = classOrObjectReference.info.getField(member)
-    val fieldRef = compiler.classCompiler.getFieldRefIndex(fieldInfo)
+    val fieldRef = compiler.getFieldRefIndex(fieldInfo)
     if (classOrObjectReference.wasClass)
       Seq(GetStaticC.getStatic(fieldRef))
     else

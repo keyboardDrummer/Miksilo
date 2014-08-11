@@ -2,7 +2,6 @@ package transformations.javac.base
 
 import core.exceptions.BadInputException
 import core.transformation.{MetaObject, TransformationState}
-import transformations.javac.expressions.ExpressionC
 import transformations.javac.types.TypeC
 
 import scala.collection.mutable
@@ -33,18 +32,6 @@ class VariablePool(state: TransformationState) {
 
 case class MethodCompiler(classCompiler: ClassCompiler) {
   val variables = new VariablePool(classCompiler.transformationState)
-
-  def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = MethodAndClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
-    getReferenceKindOption.fold[ReferenceKind]({
-      getReferenceKindFromExpressionType(expression)
-    })(implementation => implementation(expression))
-  }
-
-  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
-    val classInfo: ClassInfo = classCompiler.findClass(ExpressionC.getType(transformationState)(expression).asInstanceOf[MetaObject])
-    new ClassOrObjectReference(classInfo, false)
-  }
 
   def transformationState = classCompiler.transformationState
 }

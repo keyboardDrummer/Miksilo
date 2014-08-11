@@ -16,8 +16,8 @@ object VariableC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     MethodAndClassC.getReferenceKindRegistry(state).put(VariableKey, variable => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
-      getReferenceKind(variable, methodCompiler)
+      val compiler = MethodAndClassC.getClassCompiler(state)
+      getReferenceKind(variable, compiler)
     })
     ExpressionC.getExpressionToLines(state).put(VariableKey, (variable: MetaObject) => {
       val methodCompiler = MethodAndClassC.getMethodCompiler(state)
@@ -31,8 +31,7 @@ object VariableC extends GrammarTransformation {
     })
   }
 
-  def getReferenceKind(variable: MetaObject, methodCompiler: MethodCompiler): ReferenceKind = {
-    val classCompiler = methodCompiler.classCompiler
+  def getReferenceKind(variable: MetaObject, classCompiler: ClassCompiler): ReferenceKind = {
 
     val name = VariableC.getVariableName(variable)
     val isClass = classCompiler.classNames.contains(name)
@@ -43,7 +42,7 @@ object VariableC extends GrammarTransformation {
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageInfo])
       else {
-        methodCompiler.getReferenceKindFromExpressionType(variable)
+        classCompiler.getReferenceKindFromExpressionType(variable)
       }
     }
   }

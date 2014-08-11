@@ -6,30 +6,30 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
-import transformations.javac.base.{ClassOrObjectReference, MethodAndClassC, MethodCompiler, MethodId}
+import transformations.javac.base._
 import transformations.javac.expressions.ExpressionC
 
 object CallC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     ExpressionC.getGetTypeRegistry(state).put(CallKey, (call: MetaObject) => {
-      val compiler = MethodAndClassC.getMethodCompiler(state)
+      val compiler = MethodAndClassC.getClassCompiler(state)
       val methodKey = getMethodKey(call, compiler)
-      val methodInfo = compiler.classCompiler.compiler.find(methodKey)
+      val methodInfo = compiler.compiler.find(methodKey)
       val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
       returnType
     })
     ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
-      callToLines(call, methodCompiler)
+      val compiler = MethodAndClassC.getClassCompiler(state)
+      callToLines(call, compiler)
     })
   }
 
-  def callToLines(call: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
+  def callToLines(call: MetaObject, compiler: ClassCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
     val methodKey: MethodId = getMethodKey(call, compiler)
-    val methodInfo = compiler.classCompiler.compiler.find(methodKey)
+    val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
     val expressionToInstruction = ExpressionC.getToInstructions(compiler.transformationState)
     val calleeInstructions =
@@ -37,7 +37,7 @@ object CallC extends GrammarTransformation {
       else Seq[MetaObject]()
     val callArguments = getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val methodRefIndex = compiler.classCompiler.getMethodRefIndex(methodKey)
+    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
     val invokeInstructions = Seq(if (staticCall)
       InvokeStaticC.invokeStatic(methodRefIndex)
     else
@@ -45,7 +45,7 @@ object CallC extends GrammarTransformation {
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
-  def getMethodKey(call: MetaObject, compiler: MethodCompiler) = {
+  def getMethodKey(call: MetaObject, compiler: ClassCompiler) = {
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
     val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
