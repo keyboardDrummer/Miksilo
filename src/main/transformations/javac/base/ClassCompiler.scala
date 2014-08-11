@@ -21,12 +21,12 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
 
 
   val compiler = new MyCompiler()
-  val myPackage = compiler.getPackage(MethodAndClassC.getPackage(currentClass).toList)
-  val className = MethodAndClassC.getClassName(currentClass)
+  val myPackage = compiler.getPackage(ClassC.getPackage(currentClass).toList)
+  val className = ClassC.getClassName(currentClass)
   val currentClassInfo = myPackage.newClassInfo(className)
 
   val constantPool = new ConstantPool()
-  val classNames = getClassMapFromImports(MethodAndClassC.getImports(currentClass))
+  val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
 
   def findClass(objectType: MetaObject): ClassInfo = {
     val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
@@ -96,11 +96,11 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
           (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
       }
       result
-    }).toMap ++ Map(className -> MethodAndClassC.getQualifiedClassName(currentClass))
+    }).toMap ++ Map(className -> ClassC.getQualifiedClassName(currentClass))
   }
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = MethodAndClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
+    val getReferenceKindOption = ClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(expression)
     })(implementation => implementation(expression))

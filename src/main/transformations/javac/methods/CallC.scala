@@ -13,14 +13,14 @@ object CallC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     ExpressionC.getGetTypeRegistry(state).put(CallKey, (call: MetaObject) => {
-      val compiler = MethodAndClassC.getClassCompiler(state)
+      val compiler = ClassC.getClassCompiler(state)
       val methodKey = getMethodKey(call, compiler)
       val methodInfo = compiler.compiler.find(methodKey)
       val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
       returnType
     })
     ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
-      val compiler = MethodAndClassC.getClassCompiler(state)
+      val compiler = ClassC.getClassCompiler(state)
       callToLines(call, compiler)
     })
   }

@@ -12,7 +12,7 @@ import transformations.javac.statements.BlockC
 import scala.collection.mutable
 
 
-object MethodAndClassC extends GrammarTransformation with ProgramTransformation {
+object ClassC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 
@@ -48,16 +48,15 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
         bindMethod(method)
 
       for (method <- methods)
-        MethodPart.convertMethod(method, classCompiler, state)
+        MethodC.convertMethod(method, classCompiler, state)
 
       def bindMethod(method: MetaObject) = {
-        val methodName: String = MethodPart.getMethodName(method)
-        val descriptor = MethodPart.getMethodDescriptor(method)
-        classInfo.content(methodName) = new MethodInfo(descriptor, MethodPart.getMethodStatic(method))
+        val methodName: String = MethodC.getMethodName(method)
+        val descriptor = MethodC.getMethodDescriptor(method)
+        classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
       }
     }
   }
-
 
   def getClassCompiler(state: TransformationState) = getState(state).classCompiler
 
@@ -66,11 +65,10 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
     new QualifiedClassName(getPackage(clazz) ++ Seq(className))
   }
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
+  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, MethodC)
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    MethodPart.transformGrammars(grammars)
-    val classMethod = grammars.find(MethodPart.MethodGrammar)
+    val classMethod = grammars.find(MethodC.MethodGrammar)
 
     val classMember: Grammar = classMethod
     // val _import = "import" ~> identifier.someSeparated(".") <~ ";"

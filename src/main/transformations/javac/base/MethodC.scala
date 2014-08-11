@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 
-object MethodPart extends GrammarTransformation {
+object MethodC extends GrammarTransformation {
 
   class State() {
     var methodCompiler: MethodCompiler = null
@@ -26,6 +26,7 @@ object MethodPart extends GrammarTransformation {
   }
 
   def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
+    //TODO don't depend on classCompiler and don't get called directly from ClassC.
 
     def getMethodDescriptorIndex(method: MetaObject): Int = classCompiler.constantPool.store(getMethodDescriptor(method))
 
@@ -74,8 +75,8 @@ object MethodPart extends GrammarTransformation {
       flags += ByteCodeSkeleton.StaticAccess
 
     getMethodVisibility(method) match {
-      case MethodPart.PublicVisibility => flags += ByteCodeSkeleton.PublicAccess
-      case MethodPart.PrivateVisibility => flags += ByteCodeSkeleton.PrivateAccess
+      case MethodC.PublicVisibility => flags += ByteCodeSkeleton.PublicAccess
+      case MethodC.PrivateVisibility => flags += ByteCodeSkeleton.PrivateAccess
     }
 
     method(ByteCodeSkeleton.MethodAccessFlags) = flags

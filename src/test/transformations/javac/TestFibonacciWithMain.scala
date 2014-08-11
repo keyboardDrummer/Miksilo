@@ -3,8 +3,8 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode._
-import transformations.javac.base.MethodAndClassC._
-import transformations.javac.base.MethodPart._
+import transformations.javac.base.ClassC._
+import transformations.javac.base.MethodC._
 import transformations.javac.base.model._
 import transformations.javac.expressions.NumberLiteralC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}

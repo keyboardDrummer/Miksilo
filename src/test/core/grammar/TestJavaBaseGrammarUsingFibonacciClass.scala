@@ -17,7 +17,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testBasicClass() {
     val input = "package bla; class Help {}"
     val result = getGrammarResult(input)
-    val expectation = MethodAndClassC.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
+    val expectation = ClassC.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
 
@@ -108,9 +108,9 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMainMethod: MetaObject = {
-    MethodPart.method("main", VoidTypeC.voidType, Seq(MethodPart.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
+    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
       Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodPart.PublicVisibility)
+        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodC.PublicVisibility)
   }
 
   @Test
@@ -123,13 +123,13 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = getGrammarResult(input, MethodPart.MethodGrammar)
+    val result = getGrammarResult(input, MethodC.MethodGrammar)
     result
   }
 
   def getFibonacciMethod: MetaObject = {
-    MethodPart.method("fibonacci", IntTypeC.intType, Seq(MethodPart.parameter("index", IntTypeC.intType)),
-      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodPart.PublicVisibility)
+    MethodC.method("fibonacci", IntTypeC.intType, Seq(MethodC.parameter("index", IntTypeC.intType)),
+      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodC.PublicVisibility)
   }
 
   def getFibonacciExpression: MetaObject = {
@@ -147,7 +147,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = File(inputFile).slurp()
 
     val result = getGrammarResult(input)
-    val expectation = MethodAndClassC.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
+    val expectation = ClassC.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
 }

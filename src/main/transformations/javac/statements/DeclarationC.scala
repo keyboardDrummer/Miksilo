@@ -5,7 +5,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.javac.base.{MethodPart, VariablePool}
+import transformations.javac.base.{MethodC, VariablePool}
 import transformations.javac.types.TypeC
 
 case class VariableAlreadyDefined(variable: String) extends BadInputException
@@ -14,7 +14,7 @@ object DeclarationC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(DeclarationKey, declaration => {
-      val methodCompiler = MethodPart.getMethodCompiler(state)
+      val methodCompiler = MethodC.getMethodCompiler(state)
       val variables: VariablePool = methodCompiler.variables
       val name: String = getDeclarationName(declaration)
 

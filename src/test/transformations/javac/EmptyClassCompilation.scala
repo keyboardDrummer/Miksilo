@@ -4,7 +4,7 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnInstructionC}
-import transformations.javac.base.MethodAndClassC
+import transformations.javac.base.ClassC
 import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.types.VoidTypeC
 
@@ -49,6 +49,6 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClass: MetaObject = {
-    MethodAndClassC.clazz(classPackage, className, methods = Seq[MetaObject]())
+    ClassC.clazz(classPackage, className, methods = Seq[MetaObject]())
   }
 }

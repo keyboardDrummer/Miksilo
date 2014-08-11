@@ -2,15 +2,15 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.{MethodAndClassC, MethodPart}
+import transformations.javac.base.{ClassC, MethodC}
 
 object ImplicitSuperConstructorCall extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
 
-    for (constructor <- MethodAndClassC.getMethods(clazz).filter(method => method.clazz == ConstructorC.Constructor)) {
-      val statements = MethodPart.getMethodBody(constructor)
+    for (constructor <- ClassC.getMethods(clazz).filter(method => method.clazz == ConstructorC.Constructor)) {
+      val statements = MethodC.getMethodBody(constructor)
       var addSuperCall = false
       if (statements.isEmpty)
         addSuperCall = true
@@ -22,7 +22,7 @@ object ImplicitSuperConstructorCall extends ProgramTransformation {
       }
 
       if (addSuperCall)
-        constructor(MethodPart.MethodBodyKey) = Seq(ConstructorC.superCall()) ++ statements
+        constructor(MethodC.MethodBodyKey) = Seq(ConstructorC.superCall()) ++ statements
     }
   }
 }

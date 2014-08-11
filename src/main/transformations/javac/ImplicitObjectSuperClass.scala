@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.MethodAndClassC
+import transformations.javac.base.ClassC
 import transformations.javac.base.model.QualifiedClassName
 
 object ImplicitObjectSuperClass extends ProgramTransformation {
@@ -10,11 +10,11 @@ object ImplicitObjectSuperClass extends ProgramTransformation {
   val packageName = Seq("java", "lang")
   val qualifiedObjectName = new QualifiedClassName(packageName ++ Seq(objectName))
 
-  override def dependencies: Set[Contract] = Set(MethodAndClassC)
+  override def dependencies: Set[Contract] = Set(ClassC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
-    if (MethodAndClassC.getParent(program).isEmpty) {
-      program(MethodAndClassC.ClassParent) = objectName
+    if (ClassC.getParent(program).isEmpty) {
+      program(ClassC.ClassParent) = objectName
     }
   }
 }
