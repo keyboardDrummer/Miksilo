@@ -4,7 +4,7 @@ import core.transformation.Contract
 import transformations.bytecode.LabelledTargets
 import transformations.javac.JavaCompiler
 
-object ByteCode extends Simplification {
+object ByteCode extends TransformationGroup {
   override def dependants: Set[Contract] = Set(LabelledTargets)
 
   override def dependencies: Set[Contract] = JavaCompiler.byteCodeInstructions.toSet

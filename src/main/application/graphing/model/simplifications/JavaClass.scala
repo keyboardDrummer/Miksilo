@@ -3,7 +3,7 @@ package application.graphing.model.simplifications
 import core.transformation.Contract
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass}
 
-object JavaClass extends Simplification {
+object JavaClass extends TransformationGroup {
 
   override def dependencies: Set[Contract] = Set(JavaMethod, ImplicitObjectSuperClass, ImplicitJavaLangImport)
 

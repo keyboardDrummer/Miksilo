@@ -5,7 +5,7 @@ import transformations.javac.ImplicitThisInPrivateCalls
 import transformations.javac.methods.{CallC, VariableC}
 import transformations.javac.statements.AssignmentC
 
-object JavaExpression extends Simplification {
+object JavaExpression extends TransformationGroup {
 
   override def dependencies: Set[Contract] =
     Set(JavaSimpleExpression, AssignmentC, CallC, VariableC, ImplicitThisInPrivateCalls)

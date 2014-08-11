@@ -2,7 +2,7 @@ package application.graphing
 
 import java.util
 
-import application.graphing.model.simplifications.Simplification
+import application.graphing.model.simplifications.TransformationGroup
 import application.graphing.model.{TransformationGraph, TransformationVertex}
 import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
@@ -84,7 +84,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     val cell = insertVertex(parent, null, "", 20, 20, width, height).asInstanceOf[mxCell]
     cell.setValue(vertexLabel)
     vertex.transformation match {
-      case _: Simplification =>
+      case _: TransformationGroup =>
         cell.setStyle("SIMPLIFICATION")
 
       case _: GrammarTransformation =>

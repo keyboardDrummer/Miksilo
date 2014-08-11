@@ -4,7 +4,7 @@ import core.transformation.Contract
 import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
 import transformations.javac.expressions.ExpressionC
 
-object OptimizedByteCode extends Simplification {
+object OptimizedByteCode extends TransformationGroup {
   override def dependants: Set[Contract] = Set(ExpressionC)
 
   override def dependencies: Set[Contract] = Set(OptimizeBooleanInstructionsC)

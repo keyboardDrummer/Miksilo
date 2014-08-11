@@ -4,7 +4,7 @@ import core.transformation.Contract
 import transformations.javac.base.JavaMethodC
 import transformations.javac.statements.{BlockC, DeclarationC, StatementC, WhileC}
 
-object JavaSimpleStatement extends Simplification {
+object JavaSimpleStatement extends TransformationGroup {
 
   override def dependencies: Set[Contract] = Set(WhileC, StatementC, BlockC, DeclarationC)
 
