@@ -6,7 +6,7 @@ import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.base.ConstantPool
 import transformations.javac.types.IntTypeC
 
-object IntegerReturnC extends InstructionC {
+object IntegerReturnInstructionC extends InstructionC {
 
   override val key: AnyRef = IntegerReturn
 

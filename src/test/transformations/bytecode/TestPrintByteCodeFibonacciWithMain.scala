@@ -43,7 +43,7 @@ class TestPrintByteCodeFibonacciWithMain {
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),
       AddIntegersC.addInteger,
-      IntegerReturnC.integerReturn
+      IntegerReturnInstructionC.integerReturn
     )
     val lineNumberTable = ByteCodeSkeleton.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = ByteCodeSkeleton.stackMapTable(15, Seq(ByteCodeSkeleton.sameFrame(9),
@@ -92,7 +92,7 @@ class TestPrintByteCodeFibonacciWithMain {
 
   def getConstructorByteCode: MetaObject = {
     val instructions = Seq(LoadAddressC.addressLoad(0),
-      InvokeSpecialC.invokeSpecial(1), VoidReturnC.voidReturn)
+      InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val lineNumberTable = ByteCodeSkeleton.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
     val codeAttribute = Seq(ByteCodeSkeleton.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
     ByteCodeSkeleton.methodInfo(7, 8, codeAttribute, Set())
@@ -103,7 +103,7 @@ class TestPrintByteCodeFibonacciWithMain {
       IntegerConstantC.integerConstant(5),
       InvokeStaticC.invokeStatic(3),
       InvokeVirtualC.invokeVirtual(4),
-      VoidReturnC.voidReturn)
+      VoidReturnInstructionC.voidReturn)
     val lineNumberTable = ByteCodeSkeleton.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
     ByteCodeSkeleton.methodInfo(11, 12, Seq(ByteCodeSkeleton.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
       Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))

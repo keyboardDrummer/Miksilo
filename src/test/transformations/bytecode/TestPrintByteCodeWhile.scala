@@ -46,7 +46,7 @@ class TestPrintByteCodeWhile {
       ByteCodeSkeleton.codeAttribute(6, 1, 1, Seq(
         LoadAddressC.addressLoad(0),
         InvokeSpecialC.invokeSpecial(1),
-        VoidReturnC.voidReturn
+        VoidReturnInstructionC.voidReturn
       ), Seq(), Seq(lineNumberTable))))
     constructor
   }
@@ -68,7 +68,7 @@ class TestPrintByteCodeWhile {
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8),
-      VoidReturnC.voidReturn
+      VoidReturnInstructionC.voidReturn
     ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
     _while
   }

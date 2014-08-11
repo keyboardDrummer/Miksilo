@@ -3,7 +3,7 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnC}
+import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnInstructionC}
 import transformations.javac.base.model.{JavaClassModel, QualifiedClassName}
 import transformations.javac.types.VoidTypeC
 
@@ -41,7 +41,7 @@ class EmptyClassCompilation {
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
       new QualifiedClassName(Seq("java", "lang", "Object"))
     )
-    val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnC.voidReturn)
+    val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(ByteCodeSkeleton.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCodeSkeleton.methodInfo(3, 4, codeAttribute, Set(ByteCodeSkeleton.PublicAccess))
     ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))

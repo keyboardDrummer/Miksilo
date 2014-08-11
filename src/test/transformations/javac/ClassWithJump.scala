@@ -6,7 +6,7 @@ import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.base.model._
 import transformations.javac.expressions.{LiteralC, TernaryC}
-import transformations.javac.methods.{CallC, ReturnC, SelectorC, VariableC}
+import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC}
 import transformations.javac.types._
 
 class ClassWithJump {
@@ -41,7 +41,7 @@ class ClassWithJump {
 
   def getTestMethod = {
     val parameters = Seq(parameter("b", BooleanTypeC.booleanType))
-    val body = Seq(ReturnC._return(Some(TernaryC.ternary(VariableC.variable("b"), LiteralC.literal(3), LiteralC.literal(4)))))
+    val body = Seq(ReturnExpressionC._return(TernaryC.ternary(VariableC.variable("b"), LiteralC.literal(3), LiteralC.literal(4))))
     method("test", IntTypeC.intType, parameters, body, static = true, PrivateVisibility)
   }
 }

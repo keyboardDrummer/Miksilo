@@ -5,7 +5,7 @@ import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.base.ConstantPool
 
-object VoidReturnC extends InstructionC {
+object VoidReturnInstructionC extends InstructionC {
 
   override val key: AnyRef = VoidReturn
 

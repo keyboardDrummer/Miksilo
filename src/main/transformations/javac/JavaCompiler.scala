@@ -24,7 +24,7 @@ object JavaCompiler {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
-      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, MethodAndClassC, WhileC, BlockC,
+      AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, MethodAndClassC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 
@@ -36,8 +36,8 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
-      IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
-      LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
+      IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+      LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
 }
 

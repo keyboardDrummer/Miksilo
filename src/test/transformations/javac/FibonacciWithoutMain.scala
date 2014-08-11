@@ -6,7 +6,7 @@ import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.expressions._
 import transformations.javac.methods.CallC._
-import transformations.javac.methods.ReturnC
+import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
 import transformations.javac.types.IntTypeC
 
@@ -32,7 +32,7 @@ class FibonacciWithoutMain {
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), LiteralC.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), LiteralC.literal(2))
     val returnValue = TernaryC.ternary(condition, LiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
-    val body = Seq(ReturnC._return(Some(returnValue)))
+    val body = Seq(ReturnExpressionC._return(returnValue))
     method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }
 }
