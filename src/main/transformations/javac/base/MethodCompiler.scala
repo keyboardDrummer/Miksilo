@@ -30,8 +30,6 @@ class VariablePool(state: TransformationState) {
   }
 }
 
-case class MethodCompiler(classCompiler: ClassCompiler) {
-  val variables = new VariablePool(classCompiler.transformationState)
-
-  def transformationState = classCompiler.transformationState
+case class MethodCompiler(transformationState: TransformationState) {
+  val variables = new VariablePool(transformationState)
 }
