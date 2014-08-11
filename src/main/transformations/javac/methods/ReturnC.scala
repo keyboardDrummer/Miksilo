@@ -4,18 +4,18 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.{IntegerReturnC, VoidReturnC}
-import transformations.javac.base.{JavaMethodAndClassC, MethodCompiler}
+import transformations.javac.base.{MethodAndClassC, MethodCompiler}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.StatementC
 
 object ReturnC extends GrammarTransformation {
 
 
-  override def dependencies: Set[Contract] = Set(JavaMethodAndClassC, VoidReturnC, IntegerReturnC)
+  override def dependencies: Set[Contract] = Set(MethodAndClassC, VoidReturnC, IntegerReturnC)
 
   override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(Return, (_return: MetaObject) => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       returnToLines(_return, methodCompiler)
     })
   }

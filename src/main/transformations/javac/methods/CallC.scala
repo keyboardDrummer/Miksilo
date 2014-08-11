@@ -6,21 +6,21 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
-import transformations.javac.base.{ClassOrObjectReference, JavaMethodAndClassC, MethodCompiler, MethodId}
+import transformations.javac.base.{ClassOrObjectReference, MethodAndClassC, MethodCompiler, MethodId}
 import transformations.javac.expressions.ExpressionC
 
 object CallC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     ExpressionC.getGetTypeRegistry(state).put(CallKey, (call: MetaObject) => {
-      val compiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val compiler = MethodAndClassC.getMethodCompiler(state)
       val methodKey = getMethodKey(call, compiler)
       val methodInfo = compiler.classCompiler.compiler.find(methodKey)
       val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
       returnType
     })
     ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       callToLines(call, methodCompiler)
     })
   }

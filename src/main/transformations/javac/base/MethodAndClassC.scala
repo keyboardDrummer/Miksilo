@@ -15,7 +15,7 @@ import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 import scala.collection.mutable
 
 
-object JavaMethodAndClassC extends GrammarTransformation with ProgramTransformation {
+object MethodAndClassC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 

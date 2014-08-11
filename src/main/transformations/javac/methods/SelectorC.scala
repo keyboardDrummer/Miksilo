@@ -11,11 +11,11 @@ object SelectorC extends ExpressionInstance {
 
   override val key: AnyRef = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(JavaMethodAndClassC, GetStaticC)
+  override def dependencies: Set[Contract] = Set(MethodAndClassC, GetStaticC)
 
   override def inject(state: TransformationState): Unit = {
-    JavaMethodAndClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+    MethodAndClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       getReferenceKind(selector, methodCompiler)
     })
     super.inject(state)
@@ -52,7 +52,7 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
-    val compiler = JavaMethodAndClassC.getMethodCompiler(state)
+    val compiler = MethodAndClassC.getMethodCompiler(state)
     val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
@@ -61,7 +61,7 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val compiler = JavaMethodAndClassC.getMethodCompiler(state)
+    val compiler = MethodAndClassC.getMethodCompiler(state)
     val obj = getSelectorObject(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
     val member = getSelectorMember(selector)

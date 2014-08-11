@@ -5,7 +5,7 @@ import transformations.javac._
 
 object JavaC extends TransformationGroup {
   override def dependencies: Set[Contract] =
-    Set(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, DefaultConstructor)
+    Set(ImplicitSuperConstructorCall, DefaultConstructor, ImplicitObjectSuperClass)
 
   override def dependants: Set[Contract] = Set.empty
 }

@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompar
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.javac.base.JavaMethodAndClassC
+import transformations.javac.base.MethodAndClassC
 import transformations.javac.expressions._
 import transformations.javac.methods._
 import transformations.javac.statements._
@@ -18,11 +18,13 @@ object JavaCompiler {
 
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
 
+  def getTransformer = new Transformer(javaCompilerTransformations)
+
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, LiteralC,
-      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, JavaMethodAndClassC, WhileC, BlockC,
+      AssignmentC, CallC, ReturnC, SelectorC, VariableC, ParenthesisC, NullC, DeclarationC, MethodAndClassC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 
@@ -37,8 +39,6 @@ object JavaCompiler {
       IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnC)
   }
-
-  def getTransformer = new Transformer(javaCompilerTransformations)
 }
 
 

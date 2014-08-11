@@ -35,9 +35,9 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
     compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
   }
 
-  def fullyQualify(className: String): QualifiedClassName = classNames(className)
-
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
+
+  def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   def findMethod(methodRef: MetaObject): MethodInfo = {
     val classIndex = ByteCodeSkeleton.getMethodRefClassRefIndex(methodRef)
@@ -95,6 +95,6 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
           (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
       }
       result
-    }).toMap ++ Map(className -> JavaMethodAndClassC.getQualifiedClassName(currentClass))
+    }).toMap ++ Map(className -> MethodAndClassC.getQualifiedClassName(currentClass))
   }
 }

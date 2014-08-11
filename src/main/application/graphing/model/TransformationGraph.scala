@@ -14,7 +14,7 @@ import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
 
   val simplifications = Seq(ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
-    , JavaSimpleStatement) // JavaExpression, JavaStatement, JavaC, JavaMethod, JavaClass, )
+    , JavaSimpleStatement, JavaMethod, JavaC)
   buildInitialGraph()
   addSimplifications()
 

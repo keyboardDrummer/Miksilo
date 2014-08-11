@@ -18,7 +18,7 @@ object ConstructorC extends ProgramTransformation {
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     def transformSuperOrThisCall(call: MetaObject): Seq[MetaObject] = {
-      val compiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val compiler = MethodAndClassC.getMethodCompiler(state)
       val callArguments = CallC.getCallArguments(call)
       val className = call.clazz match {
         case SuperCall => JavaClassModel.getParent(clazz).get

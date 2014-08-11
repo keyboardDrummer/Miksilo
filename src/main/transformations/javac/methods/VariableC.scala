@@ -12,21 +12,21 @@ object VariableC extends GrammarTransformation {
 
   val variableNameKey = "name"
 
-  override def dependencies: Set[Contract] = Set(JavaMethodAndClassC, LoadIntegerC)
+  override def dependencies: Set[Contract] = Set(MethodAndClassC, LoadIntegerC)
 
   override def inject(state: TransformationState): Unit = {
-    JavaMethodAndClassC.getReferenceKindRegistry(state).put(VariableKey, variable => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+    MethodAndClassC.getReferenceKindRegistry(state).put(VariableKey, variable => {
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       getReferenceKind(variable, methodCompiler)
     })
     ExpressionC.getExpressionToLines(state).put(VariableKey, (variable: MetaObject) => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       val name: String = getVariableName(variable)
       val variableAddress = methodCompiler.variables(name).offset
       Seq(LoadIntegerC.integerLoad(variableAddress))
     })
     ExpressionC.getGetTypeRegistry(state).put(VariableKey, (variable: MetaObject) => {
-      val methodCompiler = JavaMethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
       getType(variable, methodCompiler)
     })
   }
@@ -48,11 +48,11 @@ object VariableC extends GrammarTransformation {
     }
   }
 
-  def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
-
   def getType(variable: MetaObject, methodCompiler: MethodCompiler) = {
     methodCompiler.variables(VariableC.getVariableName(variable))._type
   }
+
+  def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
