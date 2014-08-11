@@ -6,7 +6,6 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.base.MethodPart._
 import transformations.javac.base._
-import transformations.javac.base.model.JavaClassModel
 import transformations.javac.methods.CallC
 import transformations.javac.statements.StatementC
 import transformations.javac.types.VoidTypeC
@@ -21,8 +20,8 @@ object ConstructorC extends ProgramTransformation {
       val compiler = MethodAndClassC.getClassCompiler(state)
       val callArguments = CallC.getCallArguments(call)
       val className = call.clazz match {
-        case SuperCall => JavaClassModel.getParent(clazz).get
-        case ThisCall => JavaClassModel.getClassName(clazz)
+        case SuperCall => MethodAndClassC.getParent(clazz).get
+        case ThisCall => MethodAndClassC.getClassName(clazz)
       }
       val qualifiedName = compiler.fullyQualify(className)
       val methodRefIndex = compiler.getMethodRefIndex(new MethodId(qualifiedName, constructorName))
@@ -33,7 +32,7 @@ object ConstructorC extends ProgramTransformation {
     StatementC.getStatementToLines(state).put(SuperCall, transformSuperOrThisCall)
     StatementC.getStatementToLines(state).put(ThisCall, transformSuperOrThisCall)
 
-    for (constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor)) {
+    for (constructor <- MethodAndClassC.getMethods(clazz).filter(method => method.clazz == Constructor)) {
       constructor.clazz = ByteCodeSkeleton.MethodInfoKey
       constructor(MethodPart.MethodNameKey) = constructorName
       constructor(MethodPart.ReturnTypeKey) = VoidTypeC.voidType

@@ -11,7 +11,6 @@ import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 
 object MethodPart extends GrammarTransformation {
 
-
   class State() {
     var methodCompiler: MethodCompiler = null
   }

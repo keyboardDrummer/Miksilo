@@ -2,9 +2,8 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.javac.base.MethodPart
+import transformations.javac.base.MethodAndClassC._
 import transformations.javac.base.MethodPart._
-import transformations.javac.base.model.JavaClassModel._
 import transformations.javac.base.model._
 import transformations.javac.expressions.{BooleanLiteralC, NumberLiteralC, TernaryC}
 import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC}

@@ -2,9 +2,8 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.MethodPart
+import transformations.javac.base.MethodAndClassC
 import transformations.javac.base.MethodPart.PublicVisibility
-import transformations.javac.base.model.JavaClassModel
 
 object DefaultConstructor extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ConstructorC)
@@ -13,7 +12,7 @@ object DefaultConstructor extends ProgramTransformation {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      JavaClassModel.getMethods(clazz).prepend(ConstructorC.constructor(Seq(), Seq(), PublicVisibility))
+      MethodAndClassC.getMethods(clazz).prepend(ConstructorC.constructor(Seq(), Seq(), PublicVisibility))
     }
   }
 }

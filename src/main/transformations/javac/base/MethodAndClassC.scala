@@ -37,13 +37,13 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
 
       val classRef = classCompiler.getClassRef(classInfo)
       clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
-      val parentName = JavaClassModel.getParent(clazz).get
+      val parentName = getParent(clazz).get
       val parentRef = classCompiler.constantPool.getClassRef(classCompiler.fullyQualify(parentName))
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassFields) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool.constants
-      val methods = JavaClassModel.getMethods(clazz)
+      val methods = getMethods(clazz)
       for (method <- methods)
         bindMethod(method)
 
@@ -62,8 +62,8 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
   def getClassCompiler(state: TransformationState) = getState(state).classCompiler
 
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
-    val className = JavaClassModel.getClassName(clazz)
-    new QualifiedClassName(JavaClassModel.getPackage(clazz) ++ Seq(className))
+    val className = getClassName(clazz)
+    new QualifiedClassName(getPackage(clazz) ++ Seq(className))
   }
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
@@ -80,7 +80,7 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
     val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^ {
       case (_package seqr _imports) seqr (name seqr members) =>
         val methods = members
-        JavaClassModel.clazz(_package.asInstanceOf[Seq[String]],
+        clazz(_package.asInstanceOf[Seq[String]],
           name.asInstanceOf[String],
           methods.asInstanceOf[Seq[MetaObject]],
           _imports.asInstanceOf[List[JavaImport]], None)
@@ -91,5 +91,35 @@ object MethodAndClassC extends GrammarTransformation with ProgramTransformation 
   class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
 
   object ClassGrammar
+
+
+  def getPackage(clazz: MetaObject): Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
+
+  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
+
+  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCodeSkeleton.ClassFileKey) {
+    data.put(ByteCodeSkeleton.ClassMethodsKey, methods.toBuffer)
+    data.put(ClassPackage, _package)
+    data.put(ClassName, name)
+    data.put(ClassImports, imports)
+    mbParent match {
+      case Some(parent) => data.put(ClassParent, parent)
+      case _ =>
+    }
+  }
+
+  def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
+
+  def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
+
+  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+
+  object ClassPackage
+
+  object ClassImports
+
+  object ClassParent
+
+  object ClassName
 
 }

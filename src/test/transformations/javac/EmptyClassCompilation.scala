@@ -4,7 +4,8 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnInstructionC}
-import transformations.javac.base.model.{JavaClassModel, QualifiedClassName}
+import transformations.javac.base.MethodAndClassC
+import transformations.javac.base.model.QualifiedClassName
 import transformations.javac.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer
@@ -48,6 +49,6 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClass: MetaObject = {
-    JavaClassModel.clazz(classPackage, className, methods = Seq[MetaObject]())
+    MethodAndClassC.clazz(classPackage, className, methods = Seq[MetaObject]())
   }
 }
