@@ -12,7 +12,7 @@ import transformations.javac.statements.BlockC
 import scala.collection.mutable
 
 
-object MethodAndClassC extends MethodPart with GrammarTransformation with ProgramTransformation {
+object MethodAndClassC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 
@@ -48,12 +48,12 @@ object MethodAndClassC extends MethodPart with GrammarTransformation with Progra
         bindMethod(method)
 
       for (method <- methods)
-        convertMethod(method, classCompiler, state)
+        MethodPart.convertMethod(method, classCompiler, state)
 
       def bindMethod(method: MetaObject) = {
-        val methodName: String = JavaMethodModel.getMethodName(method)
-        val descriptor = getMethodDescriptor(method)
-        classInfo.content(methodName) = new MethodInfo(descriptor, JavaMethodModel.getMethodStatic(method))
+        val methodName: String = MethodPart.getMethodName(method)
+        val descriptor = MethodPart.getMethodDescriptor(method)
+        classInfo.content(methodName) = new MethodInfo(descriptor, MethodPart.getMethodStatic(method))
       }
     }
   }
@@ -69,8 +69,8 @@ object MethodAndClassC extends MethodPart with GrammarTransformation with Progra
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    super.transformGrammars(grammars)
-    val classMethod = grammars.find(this.MethodGrammar)
+    MethodPart.transformGrammars(grammars)
+    val classMethod = grammars.find(MethodPart.MethodGrammar)
 
     val classMember: Grammar = classMethod
     // val _import = "import" ~> identifier.someSeparated(".") <~ ";"

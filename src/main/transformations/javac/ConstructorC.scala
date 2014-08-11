@@ -4,9 +4,9 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
+import transformations.javac.base.MethodPart._
 import transformations.javac.base._
-import transformations.javac.base.model.JavaMethodModel._
-import transformations.javac.base.model.{JavaClassModel, JavaMethodModel}
+import transformations.javac.base.model.JavaClassModel
 import transformations.javac.methods.CallC
 import transformations.javac.statements.StatementC
 import transformations.javac.types.VoidTypeC
@@ -35,8 +35,8 @@ object ConstructorC extends ProgramTransformation {
 
     for (constructor <- JavaClassModel.getMethods(clazz).filter(method => method.clazz == Constructor)) {
       constructor.clazz = ByteCodeSkeleton.MethodInfoKey
-      constructor(JavaMethodModel.MethodNameKey) = constructorName
-      constructor(JavaMethodModel.ReturnTypeKey) = VoidTypeC.voidType
+      constructor(MethodPart.MethodNameKey) = constructorName
+      constructor(MethodPart.ReturnTypeKey) = VoidTypeC.voidType
       constructor(StaticKey) = false
     }
   }

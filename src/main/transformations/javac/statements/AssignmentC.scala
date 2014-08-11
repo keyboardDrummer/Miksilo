@@ -5,7 +5,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.{StoreAddressC, StoreIntegerC}
-import transformations.javac.base.MethodAndClassC
+import transformations.javac.base.{MethodAndClassC, MethodPart}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.types.ArrayTypeC.ArrayTypeKey
 import transformations.javac.types.IntTypeC.IntTypeKey
@@ -14,7 +14,7 @@ import transformations.javac.types.ObjectTypeC.ObjectTypeKey
 object AssignmentC extends GrammarTransformation {
   override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(AssignmentKey, assignment => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodPart.getMethodCompiler(state)
       val value = getAssignmentValue(assignment)
       val valueInstructions = ExpressionC.getToInstructions(state)(value)
       val target = getAssignmentTarget(assignment)

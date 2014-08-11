@@ -108,9 +108,9 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMainMethod: MetaObject = {
-    JavaMethodModel.method("main", VoidTypeC.voidType, Seq(JavaMethodModel.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
+    MethodPart.method("main", VoidTypeC.voidType, Seq(MethodPart.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
       Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, JavaMethodModel.PublicVisibility)
+        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodPart.PublicVisibility)
   }
 
   @Test
@@ -123,13 +123,13 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = getGrammarResult(input, MethodAndClassC.MethodGrammar)
+    val result = getGrammarResult(input, MethodPart.MethodGrammar)
     result
   }
 
   def getFibonacciMethod: MetaObject = {
-    JavaMethodModel.method("fibonacci", IntTypeC.intType, Seq(JavaMethodModel.parameter("index", IntTypeC.intType)),
-      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, JavaMethodModel.PublicVisibility)
+    MethodPart.method("fibonacci", IntTypeC.intType, Seq(MethodPart.parameter("index", IntTypeC.intType)),
+      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodPart.PublicVisibility)
   }
 
   def getFibonacciExpression: MetaObject = {

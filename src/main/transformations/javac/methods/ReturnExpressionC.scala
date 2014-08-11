@@ -4,7 +4,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.IntegerReturnInstructionC
-import transformations.javac.base.{MethodAndClassC, MethodCompiler}
+import transformations.javac.base.{MethodAndClassC, MethodCompiler, MethodPart}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.StatementC
 
@@ -14,7 +14,7 @@ object ReturnExpressionC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(ReturnInteger, (_return: MetaObject) => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodPart.getMethodCompiler(state)
       returnToLines(_return, methodCompiler)
     })
   }

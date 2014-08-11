@@ -1,9 +1,9 @@
-package transformations.javac
+package transformations.javac.methods
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.model.{JavaClassModel, JavaMethodModel}
-import transformations.javac.methods.{ReturnExpressionC, ReturnVoidC}
+import transformations.javac.base.MethodPart
+import transformations.javac.base.model.JavaClassModel
 
 object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ReturnVoidC)
@@ -12,9 +12,9 @@ object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
     val clazz = program
     val methods = JavaClassModel.getMethods(clazz)
     for (method <- methods) {
-      val instructions = JavaMethodModel.getMethodBody(method)
+      val instructions = MethodPart.getMethodBody(method)
       if (instructions.isEmpty || instructions.last.clazz != ReturnExpressionC.ReturnInteger) {
-        method(JavaMethodModel.MethodBodyKey) = instructions ++ Seq(ReturnVoidC._return())
+        method(MethodPart.MethodBodyKey) = instructions ++ Seq(ReturnVoidC._return())
       }
     }
   }

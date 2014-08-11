@@ -2,8 +2,9 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
+import transformations.javac.base.MethodPart
+import transformations.javac.base.MethodPart._
 import transformations.javac.base.model.JavaClassModel._
-import transformations.javac.base.model.JavaMethodModel._
 import transformations.javac.expressions._
 import transformations.javac.methods.CallC._
 import transformations.javac.methods.ReturnExpressionC

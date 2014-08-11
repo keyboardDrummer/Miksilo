@@ -20,13 +20,13 @@ object VariableC extends GrammarTransformation {
       getReferenceKind(variable, compiler)
     })
     ExpressionC.getExpressionToLines(state).put(VariableKey, (variable: MetaObject) => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodPart.getMethodCompiler(state)
       val name: String = getVariableName(variable)
       val variableAddress = methodCompiler.variables(name).offset
       Seq(LoadIntegerC.integerLoad(variableAddress))
     })
     ExpressionC.getGetTypeRegistry(state).put(VariableKey, (variable: MetaObject) => {
-      val methodCompiler = MethodAndClassC.getMethodCompiler(state)
+      val methodCompiler = MethodPart.getMethodCompiler(state)
       getType(variable, methodCompiler)
     })
   }
