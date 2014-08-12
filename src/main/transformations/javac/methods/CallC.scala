@@ -61,10 +61,11 @@ object CallC extends GrammarTransformation {
   override def dependencies: Set[Contract] = Set(SelectorC, InvokeStaticC, InvokeVirtualC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
     val parseCall = expression ~ callArguments ^^ { case callee seqr arguments => call(callee, arguments)}
-    expression.inner = expression.inner | parseCall
+    core.inner = core.inner | parseCall
   }
 
   def call(callee: Any, arguments: Any): MetaObject = call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])

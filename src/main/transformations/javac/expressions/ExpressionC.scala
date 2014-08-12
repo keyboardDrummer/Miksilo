@@ -9,11 +9,11 @@ import transformations.types.TypeC
 
 import scala.collection.mutable
 
-case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
-  override def toString = s"missing transformation for ${clazz.getClass.getSimpleName}"
-}
-
 object ExpressionC extends GrammarTransformation {
+
+  case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
+    override def toString = s"missing transformation for ${clazz.getClass.getSimpleName}"
+  }
 
   override def dependencies: Set[Contract] = Set(TypeC)
 
@@ -36,7 +36,8 @@ object ExpressionC extends GrammarTransformation {
   def getExpressionToLines(state: TransformationState): ToInstructionsRegistry = getState(state).transformations
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    grammars.create(ExpressionGrammar, FailureG)
+    val core = grammars.create(CoreGrammar, FailureG)
+    grammars.create(ExpressionGrammar, core)
   }
 
   class ToInstructionsRegistry extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
@@ -48,6 +49,7 @@ object ExpressionC extends GrammarTransformation {
     val getTypeRegistry = new GetTypeRegistry
   }
 
+  object CoreGrammar
   object ExpressionGrammar
 
 }

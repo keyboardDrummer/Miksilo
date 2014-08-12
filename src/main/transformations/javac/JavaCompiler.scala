@@ -11,7 +11,7 @@ import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPa
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
-import transformations.javac.expressions.postfix.{PostFixPrecedenceC, PostfixPlusPlusC}
+import transformations.javac.expressions.postfix.{PostfixPlusPlusC}
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.AssignmentC
@@ -25,14 +25,16 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
-      AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-      PostfixPlusPlusC, PostFixPrecedenceC, BooleanLiteralC, NumberLiteralC,
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC,
       DeclarationWithInitializerC, AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
       SelectorC, ClassOrPackageReference, VariableC,
-      ParenthesisC, NullC, DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
-      StatementC, ExpressionC) ++ allByteCodeTransformations
+      DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
+      StatementC) ++ javaSimpleExpression
   }
+
+  def javaSimpleExpression = Seq(TernaryC, EqualityC,
+    AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
+    PostfixPlusPlusC,  BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
 

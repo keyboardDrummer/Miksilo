@@ -31,9 +31,9 @@ object VariableC extends GrammarTransformation {
   def getVariableName(variable: MetaObject) = variable(VariableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
+    val core = grammars.find(ExpressionC.CoreGrammar)
     val variableGrammar = identifier ^^ (name => variable(name.asInstanceOf[String]))
-    expression.inner = expression.inner | variableGrammar
+    core.inner = core.inner | variableGrammar
   }
 
   def variable(name: String) = new MetaObject(VariableKey, VariableNameKey -> name)

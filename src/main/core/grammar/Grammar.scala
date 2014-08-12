@@ -96,4 +96,8 @@ class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any 
 
 class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
   override def toString: String = name.getClass.getSimpleName
+
+  def orToInner(addition: Grammar) {
+    inner = inner | addition
+  }
 }

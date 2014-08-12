@@ -13,11 +13,6 @@ object SelectorC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, GetStaticC)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => selector(left, right)}
-    expression.inner = expression.inner | selection
-  }
 
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
 
@@ -52,6 +47,13 @@ object SelectorC extends ExpressionInstance {
       Seq(GetStaticC.getStatic(fieldRef))
     else
       ???
+  }
+
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val core = grammars.find(ExpressionC.CoreGrammar)
+    val expression = grammars.find(ExpressionC.ExpressionGrammar)
+    val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => selector(left, right)}
+    core.inner = core.inner | selection
   }
 
   object SelectorKey

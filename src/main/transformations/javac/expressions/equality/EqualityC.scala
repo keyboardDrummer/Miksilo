@@ -23,9 +23,8 @@ object EqualityC extends GrammarTransformation {
   def getSecond(equality: MetaObject) = equality(SecondKey).asInstanceOf[MetaObject]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
-    val parseEquality = (expressionGrammar <~ "==") ~ expressionGrammar ^^ { case left seqr right => equality(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])}
+    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ { case left seqr right => equality(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])}
     equalityGrammar.inner = equalityGrammar.inner | equalityGrammar
   }
 
