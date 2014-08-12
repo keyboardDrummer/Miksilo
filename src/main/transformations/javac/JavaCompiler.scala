@@ -14,6 +14,7 @@ import transformations.javac.expressions.equality.{AddEqualityPrecedence, Equali
 import transformations.javac.expressions.postfix.{PostFixPrecedenceC, PostfixPlusPlusC}
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
+import transformations.javac.methods.assignment.AssignmentC
 import transformations.javac.statements._
 import transformations.types._
 

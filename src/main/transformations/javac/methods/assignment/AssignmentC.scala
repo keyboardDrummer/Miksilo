@@ -1,4 +1,4 @@
-package transformations.javac.statements
+package transformations.javac.methods.assignment
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._

@@ -5,6 +5,7 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
+import transformations.javac.methods.assignment.AssignmentC
 import transformations.javac.statements.DeclarationC.{DeclarationName, DeclarationType}
 import transformations.types.TypeC
 
