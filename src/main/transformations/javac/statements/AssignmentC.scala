@@ -31,16 +31,15 @@ object AssignmentC extends GrammarTransformation {
 
   def getAssignmentValue(assignment: MetaObject) = assignment(AssignmentValue).asInstanceOf[MetaObject]
 
-  /** TODO: separate variableC in a expression and package variable. Make variable, assignment and declaration both dependent on some VariablePoolC.
-    * Variable and assignment should further depend on expression.
-    */
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val assignmentGrammar: Grammar = (identifier <~ "=") ~ expressionGrammar ^^ { case target seqr value => new MetaObject(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)}
+    val assignmentGrammar: Grammar = (identifier <~ "=") ~ expressionGrammar ^^ { case target seqr value => assignment(target.asInstanceOf[String], value.asInstanceOf[MetaObject])}
     expressionGrammar.inner = expressionGrammar.inner | assignmentGrammar
   }
+
+  def assignment(target: String, value: MetaObject) = new MetaObject(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
   object AssignmentKey
 

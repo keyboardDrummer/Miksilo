@@ -6,7 +6,7 @@ import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.expressions.{BooleanLiteralC, NumberLiteralC, TernaryC}
 import transformations.javac.methods.MethodC._
-import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC, _}
+import transformations.javac.methods._
 import transformations.javac.types._
 
 class ClassWithJump {

@@ -7,7 +7,7 @@ import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.expressions.NumberLiteralC
 import transformations.javac.methods.MethodC._
-import transformations.javac.methods.{CallC, MethodC, SelectorC, VariableC}
+import transformations.javac.methods.{CallC, SelectorC, VariableC}
 import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.Path
@@ -36,18 +36,6 @@ class TestFibonacciWithMain {
     TestUtils.runByteCode(className, byteCode, expectedResult)
   }
 
-  def getJavaFibonacciWithMain: MetaObject = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
-  }
-
-  def getMainMethodJava: MetaObject = {
-    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
-    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))
-    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
-      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
-    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
-  }
-
   @Test
   def testStackSizeLocalsArgs() {
     val fibonacci = getJavaFibonacciWithMain
@@ -63,6 +51,18 @@ class TestFibonacciWithMain {
     Assert.assertEquals(1, getMethodLocals(main))
     Assert.assertEquals(1, getMethodLocals(fibonacciMethod))
 
+  }
+
+  def getJavaFibonacciWithMain: MetaObject = {
+    clazz(defaultPackage, className, Seq(getMainMethodJava, other.getFibonacciMethodJava))
+  }
+
+  def getMainMethodJava: MetaObject = {
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val fibCall = CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))
+    val body = Seq(CallC.call(SelectorC.selector(SelectorC.selector(SelectorC.selector(SelectorC.selector(
+      VariableC.variable("java"), "lang"), "System"), "out"), "print"), Seq(fibCall)))
+    method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }
 
   def getMethodLocals(method: MetaObject) = ByteCodeSkeleton.getCodeMaxLocals(ByteCodeSkeleton.getMethodAttributes(method)(0))

@@ -18,11 +18,14 @@ object JavaCompiler {
 
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
 
+  def getTransformer = new Transformer(javaCompilerTransformations)
+
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
       AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, BooleanLiteralC, NumberLiteralC,
-      AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector, SelectorC, ClassOrPackageReference, VariableC, ParenthesisC, NullC, DeclarationC, ClassC, MethodC, WhileC, BlockC,
+      DeclarationWithInitializerC, AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector, SelectorC, ClassOrPackageReference, VariableC,
+      ParenthesisC, NullC, DeclarationC, ClassC, MethodC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 
@@ -37,8 +40,6 @@ object JavaCompiler {
       IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
-
-  def getTransformer = new Transformer(javaCompilerTransformations)
 }
 
 

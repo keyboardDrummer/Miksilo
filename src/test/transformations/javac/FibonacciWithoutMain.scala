@@ -6,7 +6,7 @@ import transformations.javac.classes.ClassC._
 import transformations.javac.expressions._
 import transformations.javac.methods.CallC._
 import transformations.javac.methods.MethodC._
-import transformations.javac.methods.{MethodC, ReturnExpressionC}
+import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
 import transformations.javac.types.IntTypeC
 

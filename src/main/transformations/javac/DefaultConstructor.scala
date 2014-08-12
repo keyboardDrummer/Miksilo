@@ -3,7 +3,6 @@ package transformations.javac
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ClassC
-import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC.PublicVisibility
 
 object DefaultConstructor extends ProgramTransformation {

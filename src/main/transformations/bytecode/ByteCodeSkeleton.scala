@@ -13,11 +13,11 @@ object ByteCodeSkeleton extends Injector {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+
   def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
-
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
     ByteCodeSkeleton.getMethods(clazz)

@@ -8,7 +8,6 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.methods.{MethodC, VariablePool}
 import transformations.javac.types.TypeC
 
-case class VariableAlreadyDefined(variable: String) extends BadInputException
 
 object DeclarationC extends GrammarTransformation {
 
@@ -35,9 +34,15 @@ object DeclarationC extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    val parseDeclaration: Grammar = typeGrammar ~ identifier <~ ";" ^^ { case _type seqr name => new MetaObject(DeclarationKey, DeclarationName -> name, DeclarationType -> _type)}
+    val parseDeclaration: Grammar = typeGrammar ~ identifier <~ ";" ^^ { case _type seqr name => declaration(name.asInstanceOf[String], _type.asInstanceOf[MetaObject])}
     statement.inner = statement.inner | parseDeclaration
   }
+
+  def declaration(name: String, _type: MetaObject): MetaObject = {
+    new MetaObject(DeclarationKey, DeclarationName -> name, DeclarationType -> _type)
+  }
+
+  case class VariableAlreadyDefined(variable: String) extends BadInputException
 
   object DeclarationKey
 
