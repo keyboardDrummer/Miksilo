@@ -9,7 +9,7 @@ class TestAssignment {
 
   @Test
   def testFullPipeline() {
-    val inputDirectory = Path("remy")
+    val inputDirectory = Path("")
     val output: String = TestUtils.compileAndRun("Assignment", inputDirectory)
     Assert.assertEquals("1", output)
   }

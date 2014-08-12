@@ -1,5 +1,3 @@
-package fibonacciWithMain;
-
 class Fibonacci {
     public static void main(java.lang.String[] args)
     {

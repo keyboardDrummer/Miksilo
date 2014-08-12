@@ -124,12 +124,12 @@ class TestJavaBaseGrammarUsingFibonacciClass {
 
   @Test
   def testFibonacci() {
-    val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
+    val inputFile = Path("testResources") / "Fibonacci.java"
 
     val input = File(inputFile).slurp()
 
     val result = getGrammarResult(input)
-    val expectation = ClassC.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
+    val expectation = ClassC.clazz(Seq(), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
 

@@ -22,7 +22,7 @@ class TestFibonacciWithMain {
 
   @Test
   def testFullPipeline() {
-    val inputDirectory = Path("fibonacciWithMain")
+    val inputDirectory = Path("")
     val output: String = TestUtils.compileAndRun(className, inputDirectory)
     Assert.assertEquals(expectedOutput, Integer.parseInt(output))
   }

@@ -1,5 +1,3 @@
-package remy;
-
 class ObjectTypeUnification {
   public static void main(java.lang.String[] args) {
   	int x;
