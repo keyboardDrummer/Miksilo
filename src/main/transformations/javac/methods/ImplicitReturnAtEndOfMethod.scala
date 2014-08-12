@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.{ClassC, MethodC}
+import transformations.javac.classes.ClassC
 
 object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ReturnVoidC)

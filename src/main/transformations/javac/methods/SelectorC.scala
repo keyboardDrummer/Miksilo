@@ -4,7 +4,7 @@ import core.grammar.seqr
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
-import transformations.javac.base._
+import transformations.javac.classes._
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
 object SelectorC extends ExpressionInstance {
@@ -35,6 +35,10 @@ object SelectorC extends ExpressionInstance {
         new ClassOrObjectReference(fieldClassType, false)
     }
   }
+
+  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+
+  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
@@ -72,10 +76,6 @@ object SelectorC extends ExpressionInstance {
     else
       ???
   }
-
-  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
-
-  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
   object SelectorKey
 

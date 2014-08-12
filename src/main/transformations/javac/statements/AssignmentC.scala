@@ -5,8 +5,8 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.{StoreAddressC, StoreIntegerC}
-import transformations.javac.base.MethodC
 import transformations.javac.expressions.ExpressionC
+import transformations.javac.methods.MethodC
 import transformations.javac.types.ArrayTypeC.ArrayTypeKey
 import transformations.javac.types.IntTypeC.IntTypeKey
 import transformations.javac.types.ObjectTypeC.ObjectTypeKey

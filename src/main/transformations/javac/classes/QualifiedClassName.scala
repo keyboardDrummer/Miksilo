@@ -1,3 +1,3 @@
-package transformations.javac.base.model
+package transformations.javac.classes
 
 case class QualifiedClassName(parts: Seq[String])

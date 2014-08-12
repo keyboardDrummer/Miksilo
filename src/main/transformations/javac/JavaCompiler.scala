@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompar
 import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.javac.base.{ClassC, MethodC}
+import transformations.javac.classes.ClassC
 import transformations.javac.expressions._
 import transformations.javac.methods._
 import transformations.javac.statements._
@@ -17,8 +17,6 @@ object JavaCompiler {
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
-
-  def getTransformer = new Transformer(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
@@ -39,6 +37,8 @@ object JavaCompiler {
       IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
+
+  def getTransformer = new Transformer(javaCompilerTransformations)
 }
 
 

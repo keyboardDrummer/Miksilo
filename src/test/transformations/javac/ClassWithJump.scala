@@ -2,11 +2,11 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.javac.base.ClassC._
-import transformations.javac.base.MethodC._
-import transformations.javac.base.model._
+import transformations.javac.classes.ClassC._
+import transformations.javac.classes.QualifiedClassName
 import transformations.javac.expressions.{BooleanLiteralC, NumberLiteralC, TernaryC}
-import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC}
+import transformations.javac.methods.MethodC._
+import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC, _}
 import transformations.javac.types._
 
 class ClassWithJump {

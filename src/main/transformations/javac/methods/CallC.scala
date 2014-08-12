@@ -6,7 +6,7 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
-import transformations.javac.base._
+import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionC
 
 object CallC extends GrammarTransformation {

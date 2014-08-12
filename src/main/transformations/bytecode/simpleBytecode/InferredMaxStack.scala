@@ -4,7 +4,7 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledTargets.LabelKey
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 
 object InferredMaxStack extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(LabelledTargets)

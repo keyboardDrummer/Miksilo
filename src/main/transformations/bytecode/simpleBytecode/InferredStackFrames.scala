@@ -4,17 +4,17 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 import transformations.javac.types.TypeC
 
 object InferredStackFrames extends ProgramTransformation {
+  val initialStack = Seq[MetaObject]()
+
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
   def label(name: String) = new MetaObject(LabelledTargets.LabelKey) {
     data.put(LabelledTargets.LabelNameKey, name)
   }
-
-  val initialStack = Seq[MetaObject]()
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program

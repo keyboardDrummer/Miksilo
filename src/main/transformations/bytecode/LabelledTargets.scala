@@ -5,7 +5,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -26,16 +26,6 @@ object LabelledTargets extends ProgramTransformation {
 
   override def inject(state: TransformationState): Unit = {
     LabelC.inject(state)
-  }
-
-  object LabelC extends InstructionC {
-    override val key: AnyRef = LabelKey
-
-    override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
-
-    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
-
-    override def getInstructionSize(instruction: MetaObject): Int = 0
   }
 
   def transform(program: MetaObject, state: TransformationState): Unit = {
@@ -126,6 +116,16 @@ object LabelledTargets extends ProgramTransformation {
   def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
+
+  object LabelC extends InstructionC {
+    override val key: AnyRef = LabelKey
+
+    override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
+
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
+
+    override def getInstructionSize(instruction: MetaObject): Int = 0
+  }
 
   object LabelKey
 

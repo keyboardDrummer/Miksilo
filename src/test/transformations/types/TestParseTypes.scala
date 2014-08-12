@@ -2,7 +2,7 @@ package transformations.types
 
 import core.grammar.TestGrammarUtils
 import org.junit.{Assert, Test}
-import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.classes.QualifiedClassName
 import transformations.javac.types._
 
 class TestParseTypes {

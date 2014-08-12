@@ -4,9 +4,9 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
-import transformations.javac.base.MethodC._
-import transformations.javac.base._
-import transformations.javac.methods.CallC
+import transformations.javac.classes._
+import transformations.javac.methods.{CallC, MethodC}
+import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementC
 import transformations.javac.types.VoidTypeC
 

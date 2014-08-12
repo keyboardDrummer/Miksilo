@@ -1,4 +1,4 @@
-package transformations.javac.base
+package transformations.javac.methods
 
 import core.exceptions.BadInputException
 import core.transformation.{MetaObject, TransformationState}

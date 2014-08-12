@@ -1,4 +1,4 @@
-package transformations.javac.base
+package transformations.javac.classes
 
 
 trait ReferenceKind

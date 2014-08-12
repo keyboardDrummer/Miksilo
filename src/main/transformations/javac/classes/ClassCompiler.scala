@@ -1,8 +1,7 @@
-package transformations.javac.base
+package transformations.javac.classes
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.base.model.{JavaImport, QualifiedClassName}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.types.ObjectTypeC
 
@@ -28,17 +27,7 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
   val constantPool = new ConstantPool()
   val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
 
-  def findClass(objectType: MetaObject): ClassInfo = {
-    val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
-      case Right(qualified) => qualified
-      case Left(name) => fullyQualify(className)
-    }
-    compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
-  }
-
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
-
-  def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   def findMethod(methodRef: MetaObject): MethodInfo = {
     val classIndex = ByteCodeSkeleton.getMethodRefClassRefIndex(methodRef)
@@ -85,6 +74,28 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
     constantPool.store(result)
   }
 
+  def getReferenceKind(expression: MetaObject): ReferenceKind = {
+    val getReferenceKindOption = ClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
+    getReferenceKindOption.fold[ReferenceKind]({
+      getReferenceKindFromExpressionType(expression)
+    })(implementation => implementation(expression))
+  }
+
+  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
+    val classInfo: ClassInfo = findClass(ExpressionC.getType(transformationState)(expression))
+    new ClassOrObjectReference(classInfo, false)
+  }
+
+  def findClass(objectType: MetaObject): ClassInfo = {
+    val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
+      case Right(qualified) => qualified
+      case Left(name) => fullyQualify(className)
+    }
+    compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
+  }
+
+  def fullyQualify(className: String): QualifiedClassName = classNames(className)
+
   private def getClassMapFromImports(imports: Seq[JavaImport]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
       val finalPackage = compiler.find(_import._package).asInstanceOf[PackageInfo]
@@ -97,17 +108,5 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
       }
       result
     }).toMap ++ Map(className -> ClassC.getQualifiedClassName(currentClass))
-  }
-
-  def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = ClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
-    getReferenceKindOption.fold[ReferenceKind]({
-      getReferenceKindFromExpressionType(expression)
-    })(implementation => implementation(expression))
-  }
-
-  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
-    val classInfo: ClassInfo = findClass(ExpressionC.getType(transformationState)(expression))
-    new ClassOrObjectReference(classInfo, false)
   }
 }

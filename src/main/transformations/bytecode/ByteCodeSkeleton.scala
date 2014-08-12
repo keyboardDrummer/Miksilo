@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.transformation.sillyCodePieces.Injector
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 import transformations.javac.types._
 
 import scala.collection.mutable
@@ -13,11 +13,11 @@ object ByteCodeSkeleton extends Injector {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-
   def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
+
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
     ByteCodeSkeleton.getMethods(clazz)

@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.transformation.Contract
-import transformations.javac.base.MethodC
+import transformations.javac.methods.MethodC
 import transformations.javac.statements.{DeclarationC, WhileC}
 
 object JavaSimpleStatement extends TransformationGroup {

@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.ClassC
+import transformations.javac.classes.ClassC
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
 

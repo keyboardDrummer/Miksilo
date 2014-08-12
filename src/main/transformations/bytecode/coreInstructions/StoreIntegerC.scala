@@ -3,7 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 import transformations.javac.types.IntTypeC
 
 object StoreIntegerC extends InstructionC {
@@ -25,8 +25,9 @@ object StoreIntegerC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(IntTypeC.intType), Seq())
 
-  object IntegerStore
-
   override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
     Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)
+
+  object IntegerStore
+
 }

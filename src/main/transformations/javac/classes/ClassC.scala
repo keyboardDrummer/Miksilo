@@ -1,4 +1,4 @@
-package transformations.javac.base
+package transformations.javac.classes
 
 import core.grammar._
 import core.transformation._
@@ -6,7 +6,7 @@ import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.javac.base.model._
+import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
 
 import scala.collection.mutable
@@ -15,15 +15,6 @@ import scala.collection.mutable
 object ClassC extends GrammarTransformation with ProgramTransformation {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
-
-  def getState(state: TransformationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
-
-  class State() {
-    val referenceKindRegistry = new GetReferenceKindRegistry()
-    var classCompiler: ClassCompiler = null
-  }
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
@@ -58,12 +49,24 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     }
   }
 
+  def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
+
+  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+
   def getClassCompiler(state: TransformationState) = getState(state).classCompiler
+
+  def getState(state: TransformationState): State = {
+    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  }
 
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
     val className = getClassName(clazz)
     new QualifiedClassName(getPackage(clazz) ++ Seq(className))
   }
+
+  def getPackage(clazz: MetaObject): Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
+
+  def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, MethodC)
 
@@ -86,15 +89,6 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
-  class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
-
-  object ClassGrammar
-
-
-  def getPackage(clazz: MetaObject): Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
-
-  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
-
   def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCodeSkeleton.ClassFileKey) {
     data.put(ByteCodeSkeleton.ClassMethodsKey, methods.toBuffer)
     data.put(ClassPackage, _package)
@@ -106,11 +100,16 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     }
   }
 
-  def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
+  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
 
-  def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
+  class State() {
+    val referenceKindRegistry = new GetReferenceKindRegistry()
+    var classCompiler: ClassCompiler = null
+  }
 
-  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+  class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
+
+  object ClassGrammar
 
   object ClassPackage
 

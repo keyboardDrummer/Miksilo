@@ -5,7 +5,7 @@ import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.javac.base.{MethodC, VariablePool}
+import transformations.javac.methods.{MethodC, VariablePool}
 import transformations.javac.types.TypeC
 
 case class VariableAlreadyDefined(variable: String) extends BadInputException

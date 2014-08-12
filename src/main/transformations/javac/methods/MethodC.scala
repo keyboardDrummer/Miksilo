@@ -1,4 +1,4 @@
-package transformations.javac.base
+package transformations.javac.methods
 
 import core.grammar.seqr
 import core.transformation.grammars.GrammarCatalogue
@@ -7,6 +7,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 
@@ -87,9 +88,9 @@ object MethodC extends GrammarTransformation {
     method(ByteCodeSkeleton.MethodAccessFlags) = flags
   }
 
-  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
-
   def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
+
+  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
 
   def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
 

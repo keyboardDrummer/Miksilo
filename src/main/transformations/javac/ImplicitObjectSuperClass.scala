@@ -2,8 +2,7 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.ClassC
-import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.classes.{ClassC, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends ProgramTransformation {
   val objectName = "Object"

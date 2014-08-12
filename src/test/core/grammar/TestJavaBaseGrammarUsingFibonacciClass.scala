@@ -3,10 +3,9 @@ package core.grammar
 import core.transformation._
 import core.transformation.grammars.ProgramGrammar
 import org.junit.{Assert, Test}
-import transformations.javac.base._
-import transformations.javac.base.model._
+import transformations.javac.classes._
 import transformations.javac.expressions._
-import transformations.javac.methods.{CallC, ReturnExpressionC, SelectorC, VariableC}
+import transformations.javac.methods._
 import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.{File, Path}
@@ -19,17 +18,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val result = getGrammarResult(input)
     val expectation = ClassC.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
-  }
-
-  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
-    val parseResult = parser(input)
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
-
-    val result = parseResult.get
-    Assert.assertTrue(result.toString, parseResult.next.atEnd)
-    result
   }
 
   @Test
@@ -54,6 +42,25 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def getExpressionGrammarResult(input: String): Any = {
     val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
     result
+  }
+
+  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
+    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
+    val parseResult = parser(input)
+    if (parseResult.isEmpty)
+      Assert.fail(parseResult.toString)
+
+    val result = parseResult.get
+    Assert.assertTrue(result.toString, parseResult.next.atEnd)
+    result
+  }
+
+  def getFibonacciExpression: MetaObject = {
+    val condition = LessThanC.lessThan(VariableC.variable("index"), NumberLiteralC.literal(2))
+    val firstCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(1))))
+    val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(2))))
+    val expectation = TernaryC.ternary(condition, NumberLiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
+    expectation
   }
 
   @Test
@@ -107,10 +114,9 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
-  def getMainMethod: MetaObject = {
-    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
-      Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodC.PublicVisibility)
+  def getMethodGrammarResult(input: String): Any = {
+    val result = getGrammarResult(input, MethodC.MethodGrammar)
+    result
   }
 
   @Test
@@ -122,24 +128,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     Assert.assertEquals(expectation, result)
   }
 
-  def getMethodGrammarResult(input: String): Any = {
-    val result = getGrammarResult(input, MethodC.MethodGrammar)
-    result
-  }
-
-  def getFibonacciMethod: MetaObject = {
-    MethodC.method("fibonacci", IntTypeC.intType, Seq(MethodC.parameter("index", IntTypeC.intType)),
-      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodC.PublicVisibility)
-  }
-
-  def getFibonacciExpression: MetaObject = {
-    val condition = LessThanC.lessThan(VariableC.variable("index"), NumberLiteralC.literal(2))
-    val firstCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(1))))
-    val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(2))))
-    val expectation = TernaryC.ternary(condition, NumberLiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
-    expectation
-  }
-
   @Test
   def testFibonacci() {
     val inputFile = Path("testResources") / "fibonacciWithMain" / "Fibonacci.java"
@@ -149,5 +137,16 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val result = getGrammarResult(input)
     val expectation = ClassC.clazz(Seq("fibonacciWithMain"), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
+  }
+
+  def getMainMethod: MetaObject = {
+    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
+      Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
+        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodC.PublicVisibility)
+  }
+
+  def getFibonacciMethod: MetaObject = {
+    MethodC.method("fibonacci", IntTypeC.intType, Seq(MethodC.parameter("index", IntTypeC.intType)),
+      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodC.PublicVisibility)
   }
 }

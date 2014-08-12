@@ -3,8 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.javac.base.ConstantPool
-import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.javac.types.ObjectTypeC
 
 object InvokeVirtualC extends InvokeC {

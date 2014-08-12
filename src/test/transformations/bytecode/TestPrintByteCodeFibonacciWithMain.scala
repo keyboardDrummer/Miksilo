@@ -4,7 +4,7 @@ import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.classes.QualifiedClassName
 import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.{ConstructorC, TestUtils}
 
@@ -25,6 +25,20 @@ class TestPrintByteCodeFibonacciWithMain {
   def getByteCode: MetaObject = {
     val classAttributes = Seq(ByteCodeSkeleton.sourceFile(16, 17))
     ByteCodeSkeleton.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
+  }
+
+  @Test
+  def runCompiledFibonacci() {
+    val code = getByteCode
+    val expectedResult = 8
+    TestUtils.runByteCode(className, code, expectedResult)
+  }
+
+  def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
+    val constantPool: mutable.Buffer[Any] = getConstantPool
+    val method: MetaObject = getFibonacciMethod
+    val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
+    nativeClass
   }
 
   def getFibonacciMethod: MetaObject = {
@@ -107,19 +121,5 @@ class TestPrintByteCodeFibonacciWithMain {
     val lineNumberTable = ByteCodeSkeleton.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
     ByteCodeSkeleton.methodInfo(11, 12, Seq(ByteCodeSkeleton.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
       Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
-  }
-
-  @Test
-  def runCompiledFibonacci() {
-    val code = getByteCode
-    val expectedResult = 8
-    TestUtils.runByteCode(className, code, expectedResult)
-  }
-
-  def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
-    val constantPool: mutable.Buffer[Any] = getConstantPool
-    val method: MetaObject = getFibonacciMethod
-    val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
-    nativeClass
   }
 }

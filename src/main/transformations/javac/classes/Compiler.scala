@@ -1,8 +1,7 @@
-package transformations.javac.base
+package transformations.javac.classes
 
 import core.transformation.MetaObject
 import transformations.javac.JavaLang
-import transformations.javac.base.model.QualifiedClassName
 
 import scala.collection.mutable
 
@@ -65,9 +64,9 @@ class MyCompiler {
 
   def getPackage(parts: List[String]): PackageInfo = env.getPackage(parts)
 
-  def find(parts: Seq[String]): PackageContent = parts.foldLeft[PackageContent](env)(
-    (pck: PackageContent, part: String) => pck.asInstanceOf[PackageInfo].content(part))
-
   def find(methodId: MethodId): MethodInfo = find(methodId.className.parts)
     .asInstanceOf[ClassInfo].getMethod(methodId.methodName)
+
+  def find(parts: Seq[String]): PackageContent = parts.foldLeft[PackageContent](env)(
+    (pck: PackageContent, part: String) => pck.asInstanceOf[PackageInfo].content(part))
 }

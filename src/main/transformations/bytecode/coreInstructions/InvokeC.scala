@@ -2,7 +2,7 @@ package transformations.bytecode.coreInstructions
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 import transformations.javac.types.TypeC
 
 abstract class InvokeC extends InstructionC {

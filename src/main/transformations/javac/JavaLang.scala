@@ -1,8 +1,7 @@
 package transformations.javac
 
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.base.model.QualifiedClassName
-import transformations.javac.base.{MethodInfo, PackageInfo}
+import transformations.javac.classes.{MethodInfo, PackageInfo, QualifiedClassName}
 import transformations.javac.types.{IntTypeC, ObjectTypeC, VoidTypeC}
 
 object JavaLang {

@@ -2,7 +2,8 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.{ClassC, MethodC}
+import transformations.javac.classes.ClassC
+import transformations.javac.methods.MethodC
 
 object ImplicitSuperConstructorCall extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ConstructorC)

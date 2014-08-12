@@ -1,3 +1,3 @@
-package transformations.javac.base.model
+package transformations.javac.classes
 
 case class JavaImport(_package: Seq[String], end: Option[String])

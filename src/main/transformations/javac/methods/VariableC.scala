@@ -4,7 +4,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.LoadIntegerC
-import transformations.javac.base._
+import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionC
 
 
@@ -47,11 +47,11 @@ object VariableC extends GrammarTransformation {
     }
   }
 
+  def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
+
   def getType(variable: MetaObject, methodCompiler: MethodCompiler) = {
     methodCompiler.variables(VariableC.getVariableName(variable))._type
   }
-
-  def getVariableName(variable: MetaObject) = variable(variableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)

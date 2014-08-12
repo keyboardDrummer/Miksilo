@@ -4,7 +4,7 @@ import core.transformation._
 import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 
 trait InstructionC extends Injector {
 

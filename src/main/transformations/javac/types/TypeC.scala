@@ -5,7 +5,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.PrintByteCode._
-import transformations.javac.base.ConstantPool
+import transformations.javac.classes.ConstantPool
 import transformations.javac.types.BooleanTypeC.BooleanTypeKey
 import transformations.javac.types.ObjectTypeC.ObjectTypeName
 
@@ -38,6 +38,8 @@ object TypeC extends GrammarTransformation {
 
   def getTypeSize(_type: MetaObject, state: TransformationState): Int = getState(state).stackSize(_type.clazz)
 
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+
   def getByteCodeString(state: TransformationState): MetaObject => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
 
@@ -46,6 +48,20 @@ object TypeC extends GrammarTransformation {
   def checkAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject) = {
     if (!isAssignableTo(state)(to, from))
       throw new TypeMismatchException(to, from)
+  }
+
+  def isAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject): Boolean = {
+    val fromSuperTypes = getSuperTypes(state)(from)
+    if (to.equals(from))
+      return true
+
+    fromSuperTypes.exists(_type => _type.equals(to))
+  }
+
+  def getSuperTypes(state: TransformationState)(_type: MetaObject) = getSuperTypesRegistry(state)(_type.clazz)(_type)
+
+  def getSuperTypesRegistry(state: TransformationState) = {
+    getState(state).superTypes
   }
 
   def union(state: TransformationState)(first: MetaObject, second: MetaObject): MetaObject = {
@@ -57,14 +73,6 @@ object TypeC extends GrammarTransformation {
     resultDepth.head
   }
 
-  def isAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject): Boolean = {
-    val fromSuperTypes = getSuperTypes(state)(from)
-    if (to.equals(from))
-      return true
-
-    fromSuperTypes.exists(_type => _type.equals(to))
-  }
-
   def getAllSuperTypes(state: TransformationState)(_type: MetaObject): Stream[Set[MetaObject]] = {
     var returnedTypes = Set.empty[MetaObject]
     Stream.iterate(Set(_type))(previousDepthTypes => {
@@ -73,14 +81,6 @@ object TypeC extends GrammarTransformation {
       result
     })
   }
-
-  def getSuperTypes(state: TransformationState)(_type: MetaObject) = getSuperTypesRegistry(state)(_type.clazz)(_type)
-
-  def getSuperTypesRegistry(state: TransformationState) = {
-    getState(state).superTypes
-  }
-
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     grammars.create(TypeGrammar)

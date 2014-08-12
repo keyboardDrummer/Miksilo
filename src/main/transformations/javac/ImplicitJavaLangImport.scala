@@ -2,8 +2,7 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.base.ClassC
-import transformations.javac.base.model.JavaImport
+import transformations.javac.classes.{ClassC, JavaImport}
 
 object ImplicitJavaLangImport extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ClassC)

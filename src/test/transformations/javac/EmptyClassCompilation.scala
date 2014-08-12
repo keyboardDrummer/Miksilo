@@ -4,8 +4,7 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnInstructionC}
-import transformations.javac.base.ClassC
-import transformations.javac.base.model.QualifiedClassName
+import transformations.javac.classes.{ClassC, QualifiedClassName}
 import transformations.javac.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer

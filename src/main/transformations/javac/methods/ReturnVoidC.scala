@@ -4,7 +4,6 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.VoidReturnInstructionC
-import transformations.javac.base.{MethodC, MethodCompiler}
 import transformations.javac.statements.StatementC
 
 object ReturnVoidC extends GrammarTransformation {
