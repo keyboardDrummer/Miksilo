@@ -5,8 +5,8 @@ import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.{ConstructorC, TestUtils}
+import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

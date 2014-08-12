@@ -3,7 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 abstract class InvokeC extends InstructionC {
   override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = {

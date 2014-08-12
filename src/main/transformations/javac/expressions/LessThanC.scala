@@ -6,7 +6,7 @@ import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
-import transformations.javac.types.{BooleanTypeC, IntTypeC, TypeC}
+import transformations.types.{BooleanTypeC, IntTypeC, TypeC}
 
 object LessThanC extends ExpressionInstance {
 
@@ -21,6 +21,10 @@ object LessThanC extends ExpressionInstance {
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
   }
 
+  def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
+
+  def getSecond(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
+
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
     val getType = ExpressionC.getType(state)
     val firstType = getType(getFirst(expression))
@@ -29,10 +33,6 @@ object LessThanC extends ExpressionInstance {
     TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
     BooleanTypeC.booleanType
   }
-
-  def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
-
-  def getSecond(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)

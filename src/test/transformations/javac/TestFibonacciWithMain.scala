@@ -8,7 +8,7 @@ import transformations.javac.classes.QualifiedClassName
 import transformations.javac.expressions.NumberLiteralC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
-import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
+import transformations.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.Path
 

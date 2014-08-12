@@ -6,7 +6,7 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.javac.types.{BooleanTypeC, TypeC}
+import transformations.types.{BooleanTypeC, TypeC}
 
 object TernaryC extends GrammarTransformation {
 

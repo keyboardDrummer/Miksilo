@@ -1,4 +1,4 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}

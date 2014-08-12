@@ -1,4 +1,4 @@
-package transformations.javac.types
+package transformations.types
 
 import core.grammar.seqr
 import core.transformation.grammars.GrammarCatalogue
@@ -7,14 +7,12 @@ import core.transformation.{MetaObject, TransformationState}
 object ArrayTypeC extends TypeInstance {
   override val key: AnyRef = ArrayTypeKey
 
-  object ArrayTypeKey
-
-  object ArrayElementType
-
   override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty
 
   override def getByteCodeString(_type: MetaObject, state: TransformationState): String =
     s"[${TypeC.getByteCodeString(state)(getArrayElementType(_type))}"
+
+  def getArrayElementType(arrayType: MetaObject) = arrayType(ArrayElementType).asInstanceOf[MetaObject]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.find(TypeC.TypeGrammar)
@@ -28,8 +26,11 @@ object ArrayTypeC extends TypeInstance {
     }
   }
 
-
-  def getArrayElementType(arrayType: MetaObject) = arrayType(ArrayElementType).asInstanceOf[MetaObject]
-
   override def getStackSize: Int = 1
+
+
+  object ArrayTypeKey
+
+  object ArrayElementType
+
 }

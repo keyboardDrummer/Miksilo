@@ -5,7 +5,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 object InferredStackFrames extends ProgramTransformation {
   val initialStack = Seq[MetaObject]()

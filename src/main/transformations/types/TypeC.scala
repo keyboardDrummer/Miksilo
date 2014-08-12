@@ -1,4 +1,4 @@
-package transformations.javac.types
+package transformations.types
 
 import core.exceptions.BadInputException
 import core.transformation._
@@ -6,8 +6,8 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.BooleanTypeC.BooleanTypeKey
-import transformations.javac.types.ObjectTypeC.ObjectTypeName
+import transformations.types.BooleanTypeC.BooleanTypeKey
+import transformations.types.ObjectTypeC.ObjectTypeName
 
 import scala.collection.mutable
 

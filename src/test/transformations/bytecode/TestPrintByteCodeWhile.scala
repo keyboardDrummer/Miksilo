@@ -6,7 +6,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.javac.TestUtils
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.types.{IntTypeC, VoidTypeC}
+import transformations.types.{IntTypeC, VoidTypeC}
 
 import scala.collection.mutable.ArrayBuffer
 

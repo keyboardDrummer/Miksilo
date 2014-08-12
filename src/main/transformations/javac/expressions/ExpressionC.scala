@@ -5,7 +5,7 @@ import core.grammar.FailureG
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 import scala.collection.mutable
 
@@ -22,6 +22,10 @@ object ExpressionC extends GrammarTransformation {
 
   def getGetTypeRegistry(state: TransformationState) = getState(state).getTypeRegistry
 
+  private def getState(state: TransformationState): State = {
+    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  }
+
   def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
     expression => {
       val implementation = getExpressionToLines(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
@@ -30,10 +34,6 @@ object ExpressionC extends GrammarTransformation {
   }
 
   def getExpressionToLines(state: TransformationState): ToInstructionsRegistry = getState(state).transformations
-
-  private def getState(state: TransformationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     grammars.create(ExpressionGrammar, FailureG)

@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.{BlockC, StatementC}
-import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
+import transformations.types.{ObjectTypeC, TypeC, VoidTypeC}
 
 object MethodC extends GrammarTransformation {
 
@@ -65,12 +65,12 @@ object MethodC extends GrammarTransformation {
     ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p)))
   }
 
-  def getMethodParameters(metaObject: MetaObject) = {
-    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
-  }
-
   def getMethodReturnType(metaObject: MetaObject) = {
     metaObject(ReturnTypeKey).asInstanceOf[MetaObject]
+  }
+
+  def getMethodParameters(metaObject: MetaObject) = {
+    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
   }
 
   def getParameterType(metaObject: MetaObject) = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]

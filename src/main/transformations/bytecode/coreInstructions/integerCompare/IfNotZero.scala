@@ -5,7 +5,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.IntTypeC
+import transformations.types.IntTypeC
 
 object IfNotZero extends JumpInstruction {
 

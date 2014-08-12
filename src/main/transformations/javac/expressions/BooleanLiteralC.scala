@@ -3,7 +3,7 @@ package transformations.javac.expressions
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.IntegerConstantC
-import transformations.javac.types.BooleanTypeC
+import transformations.types.BooleanTypeC
 
 object BooleanLiteralC extends ExpressionInstance {
   val key = LiteralBooleanKey

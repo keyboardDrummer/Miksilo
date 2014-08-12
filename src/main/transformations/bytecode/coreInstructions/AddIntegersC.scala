@@ -4,7 +4,7 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.IntTypeC
+import transformations.types.IntTypeC
 
 object AddIntegersC extends InstructionC {
   override val key: AnyRef = AddIntegersKey

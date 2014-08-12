@@ -1,18 +1,14 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
-import transformations.javac.types.TypeC.TypeGrammar
+import transformations.types.TypeC.TypeGrammar
 
 object IntTypeC extends TypeInstance {
-
-  object IntTypeKey
 
   override val key: AnyRef = IntTypeKey
 
   override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty //TODO extend. long ?
-
-  def intType = new MetaObject(IntTypeKey)
 
   override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "I"
 
@@ -23,5 +19,10 @@ object IntTypeC extends TypeInstance {
 
   }
 
+  def intType = new MetaObject(IntTypeKey)
+
   override def getStackSize: Int = 1
+
+  object IntTypeKey
+
 }

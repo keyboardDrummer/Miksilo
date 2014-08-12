@@ -5,9 +5,11 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.AddIntegersC
-import transformations.javac.types.{IntTypeC, TypeC}
+import transformations.types.{IntTypeC, TypeC}
 
 object AdditionC extends GrammarTransformation with ExpressionInstance {
+
+  val key = AdditionClazz
 
   override def toByteCode(addition: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val toInstructions = ExpressionC.getToInstructions(state)
@@ -15,6 +17,10 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
+
+  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
+
+  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
     val getType = ExpressionC.getType(state)
@@ -40,16 +46,10 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
     data.put(SecondKey, second)
   }
 
-  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
-
-  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
-
   object AdditionClazz
 
   object FirstKey
 
   object SecondKey
-
-  val key = AdditionClazz
 
 }

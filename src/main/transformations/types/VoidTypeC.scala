@@ -1,13 +1,9 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 
 object VoidTypeC extends TypeInstance {
-
-  def voidType = new MetaObject(VoidTypeKey)
-
-  object VoidTypeKey
 
   override val key: AnyRef = VoidTypeKey
 
@@ -21,4 +17,9 @@ object VoidTypeC extends TypeInstance {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     typeGrammar.inner = typeGrammar.inner | ("void" ^^ (_ => voidType))
   }
+
+  def voidType = new MetaObject(VoidTypeKey)
+
+  object VoidTypeKey
+
 }

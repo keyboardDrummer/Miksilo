@@ -7,7 +7,7 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.types.{ObjectTypeC, TypeC}
+import transformations.types.{ObjectTypeC, TypeC}
 
 import scala.collection.mutable
 

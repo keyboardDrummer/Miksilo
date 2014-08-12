@@ -8,7 +8,7 @@ import transformations.javac.methods.CallC._
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
-import transformations.javac.types.IntTypeC
+import transformations.types.IntTypeC
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"

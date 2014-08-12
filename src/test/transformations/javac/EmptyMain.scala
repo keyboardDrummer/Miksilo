@@ -5,7 +5,7 @@ import org.junit.Test
 import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.methods.MethodC._
-import transformations.javac.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
+import transformations.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 class EmptyMain {
   val className = "EmptyMain"

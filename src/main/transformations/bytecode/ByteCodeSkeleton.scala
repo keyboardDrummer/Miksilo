@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.transformation.sillyCodePieces.Injector
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types._
+import transformations.types._
 
 import scala.collection.mutable
 

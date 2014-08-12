@@ -1,4 +1,4 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}

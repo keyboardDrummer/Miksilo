@@ -11,14 +11,12 @@ import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPa
 import transformations.javac.expressions._
 import transformations.javac.methods._
 import transformations.javac.statements._
-import transformations.javac.types._
+import transformations.types._
 
 object JavaCompiler {
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
-
-  def getTransformer = new Transformer(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
@@ -40,6 +38,8 @@ object JavaCompiler {
       IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
+
+  def getTransformer = new Transformer(javaCompilerTransformations)
 }
 
 

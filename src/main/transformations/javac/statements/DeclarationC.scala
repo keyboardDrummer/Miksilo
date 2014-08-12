@@ -6,7 +6,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.methods.{MethodC, VariablePool}
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 
 object DeclarationC extends GrammarTransformation {

@@ -1,11 +1,9 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 
 object LongTypeC extends TypeInstance {
-
-  object LongTypeKey
 
   override val key: AnyRef = LongTypeKey
 
@@ -19,4 +17,7 @@ object LongTypeC extends TypeInstance {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     typeGrammar.inner = typeGrammar.inner | ("long" ^^ (_ => ???))
   }
+
+  object LongTypeKey
+
 }

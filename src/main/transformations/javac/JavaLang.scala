@@ -2,7 +2,7 @@ package transformations.javac
 
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.{MethodInfo, PackageInfo, QualifiedClassName}
-import transformations.javac.types.{IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.types.{IntTypeC, ObjectTypeC, VoidTypeC}
 
 object JavaLang {
   val javaPackageName: String = "java"

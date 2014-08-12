@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.exceptions.BadInputException
 import core.transformation.{MetaObject, TransformationState}
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 import scala.collection.mutable
 

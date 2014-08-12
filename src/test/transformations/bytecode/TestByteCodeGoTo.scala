@@ -4,8 +4,8 @@ import core.transformation.{MetaObject, Transformer}
 import org.junit.Test
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.javac.types.IntTypeC
 import transformations.javac.{JavaCompiler, TestUtils}
+import transformations.types.IntTypeC
 
 import scala.collection.mutable
 

@@ -3,7 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
-import transformations.javac.types.IntTypeC
+import transformations.types.IntTypeC
 
 object LoadAddressC extends InstructionC {
 

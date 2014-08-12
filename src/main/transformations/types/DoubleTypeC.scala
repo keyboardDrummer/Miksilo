@@ -1,11 +1,9 @@
-package transformations.javac.types
+package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 
 object DoubleTypeC extends TypeInstance {
-
-  object DoubleTypeKey
 
   override val key: AnyRef = DoubleTypeKey
 
@@ -16,4 +14,7 @@ object DoubleTypeC extends TypeInstance {
   override def getStackSize: Int = 2
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = ???
+
+  object DoubleTypeKey
+
 }

@@ -6,7 +6,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.DeclarationC.{DeclarationName, DeclarationType}
-import transformations.javac.types.TypeC
+import transformations.types.TypeC
 
 object DeclarationWithInitializerC extends GrammarTransformation {
 

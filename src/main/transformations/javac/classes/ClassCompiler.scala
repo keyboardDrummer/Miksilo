@@ -3,7 +3,7 @@ package transformations.javac.classes
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.expressions.ExpressionC
-import transformations.javac.types.ObjectTypeC
+import transformations.types.ObjectTypeC
 
 object ClassCompiler {
 }
@@ -28,6 +28,8 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
   val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
 
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
+
+  def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   def findMethod(methodRef: MetaObject): MethodInfo = {
     val classIndex = ByteCodeSkeleton.getMethodRefClassRefIndex(methodRef)
@@ -93,8 +95,6 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
     }
     compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
   }
-
-  def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   private def getClassMapFromImports(imports: Seq[JavaImport]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {

@@ -4,7 +4,7 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
-import transformations.javac.types.ObjectTypeC
+import transformations.types.ObjectTypeC
 
 object InvokeVirtualC extends InvokeC {
 

@@ -8,7 +8,7 @@ import transformations.javac.classes._
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{CallC, MethodC}
 import transformations.javac.statements.StatementC
-import transformations.javac.types.VoidTypeC
+import transformations.types.VoidTypeC
 
 object ConstructorC extends ProgramTransformation {
   val constructorName: String = "<init>"
