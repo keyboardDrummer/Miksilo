@@ -9,6 +9,10 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPackageSelector}
 import transformations.javac.expressions._
+import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
+import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
+import transformations.javac.expressions.postfix.{PostFixPrecedenceC, PostfixPlusPlusC}
+import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.statements._
 import transformations.types._
@@ -21,9 +25,11 @@ object JavaCompiler {
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC, LessThanC, TernaryC, EqualityC,
-      AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence, BooleanLiteralC, NumberLiteralC,
-      DeclarationWithInitializerC, AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector, SelectorC, ClassOrPackageReference, VariableC,
-      ParenthesisC, NullC, DeclarationC, ClassC, MethodC, WhileC, BlockC,
+      AddEqualityPrecedence, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
+      PostfixPlusPlusC, PostFixPrecedenceC, BooleanLiteralC, NumberLiteralC,
+      DeclarationWithInitializerC, AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
+      SelectorC, ClassOrPackageReference, VariableC,
+      ParenthesisC, NullC, DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
       StatementC, ExpressionC) ++ allByteCodeTransformations
   }
 

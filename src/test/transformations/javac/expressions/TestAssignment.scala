@@ -1,4 +1,4 @@
-package transformations.javac.statement
+package transformations.javac.expressions
 
 import org.junit.{Assert, Test}
 import transformations.javac.TestUtils

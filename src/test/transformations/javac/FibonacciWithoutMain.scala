@@ -4,6 +4,8 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.javac.classes.ClassC._
 import transformations.javac.expressions._
+import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
+import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods.CallC._
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.ReturnExpressionC

@@ -24,11 +24,11 @@ object VariableC extends GrammarTransformation {
     })
   }
 
-  def getVariableName(variable: MetaObject) = variable(VariableNameKey).asInstanceOf[String]
-
   def getType(variable: MetaObject, methodCompiler: MethodCompiler) = {
     methodCompiler.variables(VariableC.getVariableName(variable))._type
   }
+
+  def getVariableName(variable: MetaObject) = variable(VariableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
@@ -37,6 +37,7 @@ object VariableC extends GrammarTransformation {
   }
 
   def variable(name: String) = new MetaObject(VariableKey, VariableNameKey -> name)
+
 
   object VariableNameKey
 

@@ -9,17 +9,7 @@ import transformations.javac.expressions.ExpressionC
 
 object WhileC extends StatementInstance {
 
-  object WhileKey
-
-  object WhileCondition
-
-  object WhileBody
-
   override val key: AnyRef = WhileKey
-
-  def getCondition(_while: MetaObject) = _while(WhileCondition).asInstanceOf[MetaObject]
-
-  def getBody(_while: MetaObject) = _while(WhileBody).asInstanceOf[Seq[MetaObject]]
 
   override def toByteCode(_while: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val conditionInstructions = ExpressionC.getToInstructions(state)(getCondition(_while))
@@ -35,6 +25,9 @@ object WhileC extends StatementInstance {
       Seq(LabelledTargets.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
 
+  def getCondition(_while: MetaObject) = _while(WhileCondition).asInstanceOf[MetaObject]
+
+  def getBody(_while: MetaObject) = _while(WhileBody).asInstanceOf[Seq[MetaObject]]
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
@@ -42,7 +35,17 @@ object WhileC extends StatementInstance {
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^ { case condition seqr body => new MetaObject(WhileKey, WhileCondition -> condition, WhileBody -> body)}
+    val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^ { case condition seqr body => _while(condition.asInstanceOf[MetaObject], body.asInstanceOf[Seq[MetaObject]])}
     statementGrammar.inner = statementGrammar.inner | whileGrammar
   }
+
+  def _while(condition: MetaObject, body: Seq[MetaObject]) = new MetaObject(WhileKey, WhileCondition -> condition, WhileBody -> body)
+
+
+  object WhileKey
+
+  object WhileCondition
+
+  object WhileBody
+
 }

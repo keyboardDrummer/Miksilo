@@ -10,7 +10,6 @@ import transformations.types.TypeC
 
 object DeclarationWithInitializerC extends GrammarTransformation {
 
-
   override def dependencies: Set[Contract] = Set(AssignmentC, DeclarationC)
 
   override def inject(state: TransformationState): Unit = {

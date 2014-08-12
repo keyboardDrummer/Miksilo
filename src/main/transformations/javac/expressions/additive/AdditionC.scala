@@ -1,10 +1,11 @@
-package transformations.javac.expressions
+package transformations.javac.expressions.additive
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.AddIntegersC
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.types.{IntTypeC, TypeC}
 
 object AdditionC extends GrammarTransformation with ExpressionInstance {
@@ -18,10 +19,6 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
-
-  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
-
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
     val getType = ExpressionC.getType(state)
     val firstType = getType(getFirst(expression))
@@ -30,6 +27,10 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
     TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
     IntTypeC.intType
   }
+
+  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
+
+  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersC)
 

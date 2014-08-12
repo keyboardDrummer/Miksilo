@@ -1,10 +1,11 @@
-package transformations.javac.expressions
+package transformations.javac.expressions.additive
 
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.SubtractIntegerC
+import transformations.javac.expressions.ExpressionC
 
 object SubtractionC extends GrammarTransformation {
   val clazz: String = "Subtraction"

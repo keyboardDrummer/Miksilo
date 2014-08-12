@@ -1,9 +1,10 @@
-package transformations.javac.expressions
+package transformations.javac.expressions.equality
 
 import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
+import transformations.javac.expressions.ExpressionC
 
 object EqualityC extends GrammarTransformation {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence)
