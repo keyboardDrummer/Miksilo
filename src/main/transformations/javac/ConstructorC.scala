@@ -5,15 +5,15 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
 import transformations.javac.classes._
-import transformations.javac.methods.{CallC, MethodC}
 import transformations.javac.methods.MethodC._
+import transformations.javac.methods.{CallC, MethodC}
 import transformations.javac.statements.StatementC
 import transformations.javac.types.VoidTypeC
 
 object ConstructorC extends ProgramTransformation {
   val constructorName: String = "<init>"
 
-  override def dependencies: Set[Contract] = Set(CallC, InvokeSpecialC, LoadAddressC)
+  override def dependencies: Set[Contract] = Set(ClassC, CallC, InvokeSpecialC, LoadAddressC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     def transformSuperOrThisCall(call: MetaObject): Seq[MetaObject] = {

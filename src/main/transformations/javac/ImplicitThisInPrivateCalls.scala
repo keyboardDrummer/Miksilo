@@ -9,7 +9,7 @@ import transformations.javac.methods.{CallC, SelectorC, VariableC}
 object ImplicitThisInPrivateCalls extends ProgramTransformation {
   val thisName: String = "this"
 
-  override def dependencies: Set[Contract] = Set(CallC, VariableC)
+  override def dependencies: Set[Contract] = Set(CallC, VariableC, ClassC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val original = ExpressionC.getExpressionToLines(state)(CallC.CallKey)

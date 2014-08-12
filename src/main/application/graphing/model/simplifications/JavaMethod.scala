@@ -1,13 +1,13 @@
 package application.graphing.model.simplifications
 
 import core.transformation.Contract
-import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, ReturnExpressionC}
+import transformations.javac.classes.ClassC
+import transformations.javac.methods.{CallC, ImplicitReturnAtEndOfMethod, ReturnExpressionC, VariableC}
 import transformations.javac.statements.AssignmentC
-import transformations.javac.{ConstructorC, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls}
 
 object JavaMethod extends TransformationGroup {
 
-  override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, ImplicitThisInPrivateCalls, AssignmentC, ReturnExpressionC)
+  override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, AssignmentC, ReturnExpressionC, CallC, VariableC)
 
-  override def dependants: Set[Contract] = Set(ConstructorC, ImplicitObjectSuperClass)
+  override def dependants: Set[Contract] = Set(ClassC)
 }

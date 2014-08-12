@@ -11,34 +11,7 @@ object SelectorC extends ExpressionInstance {
 
   override val key: AnyRef = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(ClassC, GetStaticC)
-
-  override def inject(state: TransformationState): Unit = {
-    ClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val compiler = ClassC.getClassCompiler(state)
-      getReferenceKind(selector, compiler)
-    })
-    super.inject(state)
-  }
-
-  def getReferenceKind(selector: MetaObject, compiler: ClassCompiler): ReferenceKind = {
-    val obj = SelectorC.getSelectorObject(selector)
-    val member = SelectorC.getSelectorMember(selector)
-    compiler.getReferenceKind(obj) match {
-      case PackageReference(info) => info.content(member) match {
-        case result: PackageInfo => new PackageReference(result)
-        case result: ClassInfo => new ClassOrObjectReference(result, true)
-      }
-      case ClassOrObjectReference(info, _) =>
-        val field = info.getField(member)
-        val fieldClassType = compiler.findClass(field._type.asInstanceOf[MetaObject])
-        new ClassOrObjectReference(fieldClassType, false)
-    }
-  }
-
-  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
-
-  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
+  override def dependencies: Set[Contract] = Set(MethodC, GetStaticC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
@@ -63,6 +36,10 @@ object SelectorC extends ExpressionInstance {
     val fieldInfo = classOrObjectReference.info.getField(member)
     fieldInfo._type
   }
+
+  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+
+  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val compiler = ClassC.getClassCompiler(state)
