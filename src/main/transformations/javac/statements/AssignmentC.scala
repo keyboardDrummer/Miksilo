@@ -5,7 +5,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.{StoreAddressC, StoreIntegerC}
-import transformations.javac.base.{ClassC, MethodC}
+import transformations.javac.base.MethodC
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.types.ArrayTypeC.ArrayTypeKey
 import transformations.javac.types.IntTypeC.IntTypeKey
@@ -34,7 +34,7 @@ object AssignmentC extends GrammarTransformation {
   /** TODO: separate variableC in a expression and package variable. Make variable, assignment and declaration both dependent on some VariablePoolC.
     * Variable and assignment should further depend on expression.
     */
-  override def dependencies: Set[Contract] = Set(ClassC, StoreAddressC, StoreIntegerC)
+  override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)

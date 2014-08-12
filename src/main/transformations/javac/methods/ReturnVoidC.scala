@@ -4,12 +4,12 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.VoidReturnInstructionC
-import transformations.javac.base.{ClassC, MethodC, MethodCompiler}
+import transformations.javac.base.{MethodC, MethodCompiler}
 import transformations.javac.statements.StatementC
 
 object ReturnVoidC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(ClassC, VoidReturnInstructionC)
+  override def dependencies: Set[Contract] = Set(MethodC, VoidReturnInstructionC)
 
   override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(ReturnVoid, (_return: MetaObject) => {

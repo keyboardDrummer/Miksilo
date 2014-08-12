@@ -3,27 +3,16 @@ package transformations.javac.base
 import core.grammar.seqr
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.javac.types.{ObjectTypeC, TypeC, VoidTypeC}
 
 object MethodC extends GrammarTransformation {
 
-  class State() {
-    var methodCompiler: MethodCompiler = null
-  }
-
-  private def getState(state: TransformationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
-
-  def getMethodDescriptor(method: MetaObject): MetaObject = {
-    val returnType = getMethodReturnType(method)
-    val parameters = getMethodParameters(method)
-    ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p)))
-  }
+  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
     //TODO don't depend on classCompiler and don't get called directly from ClassC.
@@ -69,6 +58,22 @@ object MethodC extends GrammarTransformation {
     }
   }
 
+  def getMethodDescriptor(method: MetaObject): MetaObject = {
+    val returnType = getMethodReturnType(method)
+    val parameters = getMethodParameters(method)
+    ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p)))
+  }
+
+  def getMethodParameters(metaObject: MetaObject) = {
+    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
+  }
+
+  def getMethodReturnType(metaObject: MetaObject) = {
+    metaObject(ReturnTypeKey).asInstanceOf[MetaObject]
+  }
+
+  def getParameterType(metaObject: MetaObject) = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
+
   def addMethodFlags(method: MetaObject) = {
     var flags = Set[ByteCodeSkeleton.MethodAccessFlag]()
     if (getMethodStatic(method))
@@ -81,6 +86,24 @@ object MethodC extends GrammarTransformation {
 
     method(ByteCodeSkeleton.MethodAccessFlags) = flags
   }
+
+  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
+
+  def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
+
+  def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
+
+  private def getState(state: TransformationState): State = {
+    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  }
+
+  def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
+
+  def getMethodName(method: MetaObject) = {
+    method(MethodNameKey).asInstanceOf[String]
+  }
+
+  def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)
@@ -107,13 +130,6 @@ object MethodC extends GrammarTransformation {
     })
   }
 
-  def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
-
-  object MethodGrammar
-
-
-  def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
-
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
     new MetaObject(ByteCodeSkeleton.MethodInfoKey) {
@@ -126,10 +142,6 @@ object MethodC extends GrammarTransformation {
     }
   }
 
-  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
-
-  def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
-
   def parameter(name: String, _type: Any) = {
     new MetaObject("JavaParameter") {
       data.put(ParameterNameKey, name)
@@ -137,22 +149,14 @@ object MethodC extends GrammarTransformation {
     }
   }
 
-  def getMethodName(method: MetaObject) = {
-    method(MethodNameKey).asInstanceOf[String]
+  class State() {
+    var methodCompiler: MethodCompiler = null
   }
 
-  def getMethodParameters(metaObject: MetaObject) = {
-    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
-  }
+  class Visibility
 
-  def getMethodReturnType(metaObject: MetaObject) = {
-    metaObject(ReturnTypeKey).asInstanceOf[MetaObject]
-  }
 
-  def getParameterType(metaObject: MetaObject) = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
-
-  def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
-
+  object MethodGrammar
 
   object MethodBodyKey
 
@@ -168,10 +172,8 @@ object MethodC extends GrammarTransformation {
 
   object MethodParametersKey
 
+
   object ParameterTypeKey
-
-
-  class Visibility
 
   object PublicVisibility extends Visibility
 
