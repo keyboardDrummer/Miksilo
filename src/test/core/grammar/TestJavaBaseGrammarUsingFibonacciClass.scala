@@ -6,8 +6,10 @@ import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
+import transformations.javac.expressions.literals.NumberLiteralC
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods._
+import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.{File, Path}
@@ -96,6 +98,14 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = "1 ? 2 : 3"
     val result: Any = getExpressionGrammarResult(input)
     val expectation: MetaObject = TernaryC.ternary(NumberLiteralC.literal(1), NumberLiteralC.literal(2), NumberLiteralC.literal(3))
+    Assert.assertEquals(expectation, result)
+  }
+
+  @Test
+  def testIncrementAssignment() {
+    val input = "x += 1"
+    val result: Any = getExpressionGrammarResult(input)
+    val expectation = IncrementAssignmentC.incrementAssignment("x", NumberLiteralC.literal(1))
     Assert.assertEquals(expectation, result)
   }
 

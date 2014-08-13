@@ -7,7 +7,7 @@ import transformations.types.TypeC
 import scala.collection.mutable
 
 case class VariableDoesNotExist(name: String) extends BadInputException {
-  override def toString = s"variable $name does not exist."
+  override def toString = s"variable '$name' does not exist."
 }
 
 case class VariableInfo(offset: Integer, _type: MetaObject)

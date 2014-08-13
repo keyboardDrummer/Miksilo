@@ -4,6 +4,7 @@ import core.transformation.Contract
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.EqualityC
+import transformations.javac.expressions.literals.{NumberLiteralC, NullC, BooleanLiteralC}
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.statements.StatementC
 

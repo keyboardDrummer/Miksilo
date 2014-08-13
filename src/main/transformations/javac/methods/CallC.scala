@@ -82,5 +82,4 @@ object CallC extends GrammarTransformation {
   object CallCallee
 
   object CallArguments
-
 }

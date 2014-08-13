@@ -4,7 +4,8 @@ import core.transformation.MetaObject
 import org.junit.Test
 import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.expressions.{BooleanLiteralC, NumberLiteralC, TernaryC}
+import transformations.javac.expressions.literals.{NumberLiteralC, BooleanLiteralC}
+import transformations.javac.expressions.TernaryC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods._
 import transformations.types._

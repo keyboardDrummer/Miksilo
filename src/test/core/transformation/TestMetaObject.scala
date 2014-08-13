@@ -1,7 +1,7 @@
 package core.transformation
 
 import org.junit.{Assert, Test}
-import transformations.javac.expressions.NumberLiteralC
+import transformations.javac.expressions.literals.NumberLiteralC
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
 
 class TestMetaObject {

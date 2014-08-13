@@ -5,7 +5,7 @@ import org.junit.{Assert, Test}
 import transformations.bytecode._
 import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.expressions.NumberLiteralC
+import transformations.javac.expressions.literals.NumberLiteralC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{CallC, SelectorC, VariableC}
 import transformations.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}

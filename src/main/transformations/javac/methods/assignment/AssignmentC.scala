@@ -31,7 +31,7 @@ object AssignmentC extends GrammarTransformation {
 
   def getAssignmentValue(assignment: MetaObject) = assignment(AssignmentValue).asInstanceOf[MetaObject]
 
-  override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC)
+  override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC, AssignmentPrecedence)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)

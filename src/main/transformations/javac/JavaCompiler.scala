@@ -11,10 +11,11 @@ import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPa
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
+import transformations.javac.expressions.literals.{NumberLiteralC, NullC, BooleanLiteralC}
 import transformations.javac.expressions.postfix.{PostfixPlusPlusC}
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
-import transformations.javac.methods.assignment.AssignmentC
+import transformations.javac.methods.assignment.{IncrementAssignmentC, AssignmentPrecedence, AssignmentC}
 import transformations.javac.statements._
 import transformations.types._
 
@@ -26,7 +27,8 @@ object JavaCompiler {
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC,
-      DeclarationWithInitializerC, AssignmentC, CallC, ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
+      DeclarationWithInitializerC, IncrementAssignmentC, AssignmentC, AssignmentPrecedence, CallC,
+      ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
       SelectorC, ClassOrPackageReference, VariableC,
       DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
       StatementC) ++ javaSimpleExpression

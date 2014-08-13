@@ -1,9 +1,10 @@
-package transformations.javac.expressions
+package transformations.javac.expressions.literals
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.PushNullC
+import transformations.javac.expressions.ExpressionC
 
 object NullC extends GrammarTransformation {
 
