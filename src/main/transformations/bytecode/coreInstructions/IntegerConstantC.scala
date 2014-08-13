@@ -11,7 +11,10 @@ object IntegerConstantC extends InstructionC {
 
   override val key: AnyRef = IntegerConstantKey
 
-  def integerConstant(value: Int) = instruction(IntegerConstantKey, Seq(value))
+  def integerConstant(value: Int) = {
+    require (value <= 5)
+    instruction(IntegerConstantKey, Seq(value))
+  }
 
   override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
 
@@ -24,6 +27,6 @@ object IntegerConstantC extends InstructionC {
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 
-  object IntegerConstantKey
+  private object IntegerConstantKey
 
 }
