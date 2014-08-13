@@ -2,20 +2,12 @@ package transformations.javac.methods
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.VoidReturnInstructionC
-import transformations.javac.statements.StatementC
+import transformations.javac.statements.{StatementC, StatementInstance}
 
-object ReturnVoidC extends GrammarTransformation {
+object ReturnVoidC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, VoidReturnInstructionC)
-
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(ReturnVoid, (_return: MetaObject) => {
-      val methodCompiler = MethodC.getMethodCompiler(state)
-      returnToLines(_return, methodCompiler)
-    })
-  }
 
   def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     Seq(VoidReturnInstructionC.voidReturn)
@@ -28,8 +20,13 @@ object ReturnVoidC extends GrammarTransformation {
     statement.inner = statement.inner | returnExpression
   }
 
-  def _return(): MetaObject = new MetaObject(ReturnVoid)
+  def _return(): MetaObject = new MetaObject(ReturnVoidKey)
 
-  object ReturnVoid
+  object ReturnVoidKey
 
+  override val key: AnyRef = ReturnVoidKey
+
+  override def toByteCode(_return: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    Seq(VoidReturnInstructionC.voidReturn)
+  }
 }

@@ -15,7 +15,7 @@ object SubtractIntegerC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = hexToBytes("64")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = binary(IntTypeC.intType)
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = binary(IntTypeC.intType)
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

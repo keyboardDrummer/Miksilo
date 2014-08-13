@@ -14,7 +14,7 @@ object PushNullC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = PrintByteCode.hexToBytes("01")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(IntTypeC.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

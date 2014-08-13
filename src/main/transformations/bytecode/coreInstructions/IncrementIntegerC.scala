@@ -20,7 +20,7 @@ object IncrementIntegerC extends InstructionC {
       byteToBytes(arguments(1))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq.empty, Seq.empty)
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq.empty, Seq.empty)
 
   override def getInstructionSize(instruction: MetaObject): Int = 3
 

@@ -18,7 +18,7 @@ object VoidReturnInstructionC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = PrintByteCode.hexToBytes("b1")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq())
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

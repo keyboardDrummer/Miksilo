@@ -9,7 +9,7 @@ import transformations.javac.classes.ConstantPool
 trait InstructionC extends Injector {
 
   override def inject(state: TransformationState): Unit = {
-    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, getInstructionInAndOutputs)
+    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (c,i) => getInstructionInAndOutputs(c,i,state))
     ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(key, (c, i) => getInstructionStackSizeModification(c, i, state))
     PrintByteCode.getBytesRegistry(state).put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
@@ -23,7 +23,7 @@ trait InstructionC extends Injector {
 
   def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] = Map.empty
 
-  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject])
+  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): (Seq[MetaObject], Seq[MetaObject])
 
   def getInstructionSize(instruction: MetaObject): Int = getInstructionByteCode(instruction).size
 
@@ -32,7 +32,7 @@ trait InstructionC extends Injector {
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte]
 
   def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = {
-    val inAndOutputs = getInstructionInAndOutputs(constantPool, instruction)
+    val inAndOutputs = getInstructionInAndOutputs(constantPool, instruction, state)
     inAndOutputs._2.size - inAndOutputs._1.size
   }
 

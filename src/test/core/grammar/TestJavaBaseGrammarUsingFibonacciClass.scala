@@ -10,6 +10,7 @@ import transformations.javac.expressions.literals.NumberLiteralC
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
+import transformations.javac.statements.ExpressionAsStatementC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 import scala.reflect.io.{File, Path}
@@ -144,9 +145,11 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMainMethod: MetaObject = {
+    val fibonacciCall = CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))
+    val printCall = CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
+      Seq(fibonacciCall))
     MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
-      Seq(CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-        Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))), true, MethodC.PublicVisibility)
+      Seq(ExpressionAsStatementC.asStatement(printCall)), true, MethodC.PublicVisibility)
   }
 
   def getFibonacciMethod: MetaObject = {

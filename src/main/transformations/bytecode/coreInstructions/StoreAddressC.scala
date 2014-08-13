@@ -22,7 +22,7 @@ object StoreAddressC extends InstructionC {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(IntTypeC.intType), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(IntTypeC.intType), Seq())
 
   override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
     Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)

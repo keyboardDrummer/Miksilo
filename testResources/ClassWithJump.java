@@ -1,12 +1,10 @@
-package classWithJump;
-
-public class ClassWithJump {
-  public static void main(String[] args)
+class ClassWithJump {
+  public static void main(java.lang.String[] args)
   {
     System.out.print(test(true));
   }
 
-  static int test(boolean b)
+  private static int test(boolean b)
   {
     return b ? 3 : 4;
   }

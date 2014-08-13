@@ -24,20 +24,17 @@ abstract class InvokeC extends InstructionC {
     getInvokeStackSizeModification(constantPool, instruction)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) =
-    getInvokeStackModification(constantPool, instruction)
-
-  def getInvokeStackModification(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val descriptor = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
-    getMethodStackModification(descriptor, constantPool)
+    getMethodStackModification(descriptor, constantPool, state)
   }
 
-  def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool): (Seq[MetaObject], Seq[MetaObject]) = {
+  def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool, state: TransformationState) = {
     val ins = ByteCodeSkeleton.getMethodDescriptorParameters(descriptor).map(_type => TypeC.toStackType(constantPool, _type))
     val outs = Seq(TypeC.toStackType(constantPool, ByteCodeSkeleton.getMethodDescriptorReturnType(descriptor)))
-    (ins, outs)
+    (ins, outs.filter(p => TypeC.getTypeSize(p, state) > 0))
   }
 
   def getInvokeTargetMethodRef(instruction: MetaObject, constantPool: ConstantPool) = {

@@ -2,27 +2,15 @@ package transformations.javac.methods.assignment
 
 import core.grammar.{Grammar, seqr}
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.additive.AdditionC
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.VariableC
-import transformations.javac.statements.StatementC
+import transformations.types.IntTypeC
 
-object IncrementAssignmentC extends GrammarTransformation {
+object IncrementAssignmentC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AdditionC, AssignmentC)
-
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(IncrementAssignmentKey, incrementAssignment => {
-      val target = incrementAssignment(TargetKey).asInstanceOf[String]
-      val value = incrementAssignment(ValueKey).asInstanceOf[MetaObject]
-      val newValue = AdditionC.addition(VariableC.variable(target), value)
-      val assignment = AssignmentC.assignment(target, newValue)
-
-      val toInstructions = StatementC.getToInstructions(state)
-      toInstructions(assignment)
-    })
-  }
 
   def incrementAssignment(target: String, value: MetaObject) =
     new MetaObject(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
@@ -38,4 +26,18 @@ object IncrementAssignmentC extends GrammarTransformation {
   object TargetKey
   object ValueKey
 
+  override val key: AnyRef = IncrementAssignmentKey
+
+  override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
+
+  override def toByteCode(incrementAssignment: MetaObject, state: TransformationState): Seq[MetaObject] = {
+
+    val target = incrementAssignment(TargetKey).asInstanceOf[String]
+    val value = incrementAssignment(ValueKey).asInstanceOf[MetaObject]
+    val newValue = AdditionC.addition(VariableC.variable(target), value)
+    val assignment = AssignmentC.assignment(target, newValue)
+
+    val toInstructions = ExpressionC.getToInstructions(state)
+    toInstructions(assignment)
+  }
 }

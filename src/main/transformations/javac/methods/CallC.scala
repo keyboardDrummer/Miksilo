@@ -3,27 +3,12 @@ package transformations.javac.methods
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.classes._
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
-object CallC extends GrammarTransformation {
-
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getGetTypeRegistry(state).put(CallKey, (call: MetaObject) => {
-      val compiler = ClassC.getClassCompiler(state)
-      val methodKey = getMethodKey(call, compiler)
-      val methodInfo = compiler.compiler.find(methodKey)
-      val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
-      returnType
-    })
-    ExpressionC.getExpressionToLines(state).put(CallKey, (call: MetaObject) => {
-      val compiler = ClassC.getClassCompiler(state)
-      callToLines(call, compiler)
-    })
-  }
+object CallC extends ExpressionInstance {
 
   def callToLines(call: MetaObject, compiler: ClassCompiler): Seq[MetaObject] = {
     val callCallee = getCallCallee(call)
@@ -65,10 +50,11 @@ object CallC extends GrammarTransformation {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
     val parseCall = expression ~ callArguments ^^ { case callee seqr arguments => call(callee, arguments)}
-    core.inner = core.inner | parseCall
+    core.orToInner(parseCall)
   }
 
-  def call(callee: Any, arguments: Any): MetaObject = call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
+  def call(callee: Any, arguments: Any): MetaObject =
+    call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
 
   def call(callee: MetaObject, arguments: Seq[MetaObject] = Seq()) = {
     new MetaObject(CallKey) {
@@ -82,4 +68,19 @@ object CallC extends GrammarTransformation {
   object CallCallee
 
   object CallArguments
+
+  override val key: AnyRef = CallKey
+
+  override def getType(call: MetaObject, state: TransformationState): MetaObject = {
+    val compiler = ClassC.getClassCompiler(state)
+    val methodKey = getMethodKey(call, compiler)
+    val methodInfo = compiler.compiler.find(methodKey)
+    val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
+    returnType
+  }
+
+  override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val compiler = ClassC.getClassCompiler(state)
+    callToLines(call, compiler)
+  }
 }

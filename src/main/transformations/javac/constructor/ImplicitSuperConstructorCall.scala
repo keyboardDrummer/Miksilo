@@ -1,9 +1,10 @@
-package transformations.javac
+package transformations.javac.constructor
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ClassC
 import transformations.javac.methods.MethodC
+import transformations.javac.statements.ExpressionAsStatementC
 
 object ImplicitSuperConstructorCall extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ConstructorC)
@@ -23,7 +24,7 @@ object ImplicitSuperConstructorCall extends ProgramTransformation {
       }
 
       if (addSuperCall)
-        constructor(MethodC.MethodBodyKey) = Seq(ConstructorC.superCall()) ++ statements
+        constructor(MethodC.MethodBodyKey) = Seq(ExpressionAsStatementC.asStatement(ConstructorC.superCall())) ++ statements
     }
   }
 }

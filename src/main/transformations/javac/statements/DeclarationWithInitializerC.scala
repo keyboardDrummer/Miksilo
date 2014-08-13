@@ -2,28 +2,15 @@ package transformations.javac.statements
 
 import core.grammar.{Grammar, seqr}
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.assignment.AssignmentC
 import transformations.javac.statements.DeclarationC.{DeclarationName, DeclarationType}
 import transformations.types.TypeC
 
-object DeclarationWithInitializerC extends GrammarTransformation {
+object DeclarationWithInitializerC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(AssignmentC, DeclarationC)
-
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(DeclarationWithInitializerKey, declarationWithInitializer => {
-      val name: String = DeclarationC.getDeclarationName(declarationWithInitializer)
-      val _type = DeclarationC.getDeclarationType(declarationWithInitializer)
-      val declaration = DeclarationC.declaration(name, _type)
-      val assignment = AssignmentC.assignment(name, getInitializer(declarationWithInitializer))
-
-      val toInstructions = StatementC.getToInstructions(state)
-      toInstructions(declaration) ++ toInstructions(assignment) //TODO maybe translate to statements instead of bytecode.
-    })
-  }
 
   def getInitializer(withInitializer: MetaObject) = withInitializer(InitializerKey).asInstanceOf[MetaObject]
 
@@ -42,4 +29,15 @@ object DeclarationWithInitializerC extends GrammarTransformation {
 
   object InitializerKey
 
+  override val key: AnyRef = DeclarationWithInitializerKey
+
+  override def toByteCode(declarationWithInitializer: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val name: String = DeclarationC.getDeclarationName(declarationWithInitializer)
+    val _type = DeclarationC.getDeclarationType(declarationWithInitializer)
+    val declaration = DeclarationC.declaration(name, _type)
+    val assignment = AssignmentC.assignment(name, getInitializer(declarationWithInitializer))
+
+    val toInstructions = StatementC.getToInstructions(state)
+    toInstructions(declaration) ++ toInstructions(ExpressionAsStatementC.asStatement(assignment)) //TODO maybe translate to statements instead of bytecode.
+  }
 }

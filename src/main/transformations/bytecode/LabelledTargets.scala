@@ -122,7 +122,7 @@ object LabelledTargets extends ProgramTransformation {
 
     override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
 
     override def getInstructionSize(instruction: MetaObject): Int = 0
   }

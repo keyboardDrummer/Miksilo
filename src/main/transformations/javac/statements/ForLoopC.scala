@@ -2,25 +2,11 @@ package transformations.javac.statements
 
 import core.grammar.seqr
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
 
-object ForLoopC extends GrammarTransformation {
+object ForLoopC extends StatementInstance {
 
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(ForLoopKey, forLoop => {
-      val initializer = getInitializer(forLoop)
-      val condition = getCondition(forLoop)
-      val forBody = getBody(forLoop)
-      val whileBody = forBody ++ Seq(getIncrement(forLoop))
-      val _while = WhileC._while(condition, whileBody)
-
-      val toInstructions = StatementC.getToInstructions(state)
-      toInstructions(initializer) ++ toInstructions(_while) //TODO maybe translate to statements instead of bytecode.
-    })
-    super.inject(state)
-  }
 
   def getInitializer(forLoop: MetaObject) = forLoop(InitializerKey).asInstanceOf[MetaObject]
 
@@ -55,4 +41,16 @@ object ForLoopC extends GrammarTransformation {
 
   object BodyKey
 
+  override val key: AnyRef = ForLoopKey
+
+  override def toByteCode(forLoop: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val initializer = getInitializer(forLoop)
+    val condition = getCondition(forLoop)
+    val forBody = getBody(forLoop)
+    val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
+    val _while = WhileC._while(condition, whileBody)
+
+    val toInstructions = StatementC.getToInstructions(state)
+    toInstructions(initializer) ++ toInstructions(_while) //TODO maybe translate to statements instead of bytecode.
+  }
 }

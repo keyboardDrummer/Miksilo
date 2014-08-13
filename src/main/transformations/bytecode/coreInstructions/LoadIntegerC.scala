@@ -23,7 +23,7 @@ object LoadIntegerC extends InstructionC {
       byteToBytes(hexToInt("1a") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(IntTypeC.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq(IntTypeC.intType))
 
   object IntegerLoad
 

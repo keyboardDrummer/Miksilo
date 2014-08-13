@@ -2,6 +2,7 @@ package transformations.javac
 
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.{MethodInfo, PackageInfo, QualifiedClassName}
+import transformations.javac.constructor.ConstructorC
 import transformations.types.{IntTypeC, ObjectTypeC, VoidTypeC}
 
 object JavaLang {

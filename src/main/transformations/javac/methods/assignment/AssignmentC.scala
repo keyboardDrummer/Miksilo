@@ -3,29 +3,14 @@ package transformations.javac.methods.assignment
 import core.grammar.{Grammar, seqr}
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.coreInstructions.{StoreAddressC, StoreIntegerC}
-import transformations.javac.expressions.ExpressionC
+import transformations.bytecode.coreInstructions.{LoadAddressC, LoadIntegerC, StoreAddressC, StoreIntegerC}
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.MethodC
 import transformations.types.ArrayTypeC.ArrayTypeKey
 import transformations.types.IntTypeC.IntTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeKey
 
-object AssignmentC extends GrammarTransformation {
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(AssignmentKey, assignment => {
-      val methodCompiler = MethodC.getMethodCompiler(state)
-      val value = getAssignmentValue(assignment)
-      val valueInstructions = ExpressionC.getToInstructions(state)(value)
-      val target = getAssignmentTarget(assignment)
-      val variable = methodCompiler.variables(target)
-      valueInstructions ++ Seq(variable._type.clazz match {
-        case IntTypeKey => StoreIntegerC.integerStore(variable.offset)
-        case ObjectTypeKey => StoreAddressC.addressStore(variable.offset)
-        case ArrayTypeKey => StoreAddressC.addressStore(variable.offset)
-      })
-    })
-  }
+object AssignmentC extends ExpressionInstance {
 
   def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[String]
 
@@ -47,4 +32,29 @@ object AssignmentC extends GrammarTransformation {
 
   object AssignmentValue
 
+  override val key: AnyRef = AssignmentKey
+
+  override def getType(assignment: MetaObject, state: TransformationState): MetaObject = {
+    val methodCompiler = MethodC.getMethodCompiler(state)
+    val target = getAssignmentTarget(assignment)
+    val variable = methodCompiler.variables(target)
+    variable._type
+  }
+
+  override def toByteCode(assignment: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val methodCompiler = MethodC.getMethodCompiler(state)
+    val value = getAssignmentValue(assignment)
+    val valueInstructions = ExpressionC.getToInstructions(state)(value)
+    val target = getAssignmentTarget(assignment)
+    val variable = methodCompiler.variables(target)
+    valueInstructions ++ Seq(variable._type.clazz match {
+      case IntTypeKey => StoreIntegerC.integerStore(variable.offset)
+      case ObjectTypeKey => StoreAddressC.addressStore(variable.offset)
+      case ArrayTypeKey => StoreAddressC.addressStore(variable.offset)
+    }) ++ Seq(variable._type.clazz match {
+      case IntTypeKey => LoadIntegerC.integerLoad(variable.offset)
+      case ObjectTypeKey => LoadAddressC.addressLoad(variable.offset)
+      case ArrayTypeKey => LoadAddressC.addressLoad(variable.offset)
+    })
+  }
 }

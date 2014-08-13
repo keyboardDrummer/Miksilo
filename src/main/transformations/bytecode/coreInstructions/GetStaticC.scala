@@ -19,7 +19,7 @@ object GetStaticC extends InstructionC {
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject) = (Seq(), Seq(getReturnType(constantPool, instruction)))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq(getReturnType(constantPool, instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
     val location = ByteCodeSkeleton.getInstructionArguments(getStatic)(0)

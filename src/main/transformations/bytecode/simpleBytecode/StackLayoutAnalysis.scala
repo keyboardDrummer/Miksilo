@@ -12,6 +12,9 @@ class StackLayoutAnalysis(instructions: Seq[MetaObject], getInputTypes: MetaObje
   }
 
   case class TargetInstructionEnteredWithDifferentLayouts(first: Seq[MetaObject], second: Seq[MetaObject]) extends RuntimeException
+  {
+    override def toString = s"TargetInstructionEnteredWithDifferentLayouts, first:=$first, second:= $second"
+  }
 
   override def combineState(first: Seq[MetaObject], second: Seq[MetaObject]): Option[Seq[MetaObject]] = {
     if (first == second)

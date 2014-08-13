@@ -7,9 +7,9 @@ import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.{MethodC, VariableC}
 import transformations.types.IntTypeC
 
-object PostfixPlusPlusC extends ExpressionInstance {
+object PostFixIncrementC extends ExpressionInstance {
 
-  override val key: AnyRef = PostfixPlusPlusKey
+  override val key: AnyRef = PostfixIncrementKey
 
   override def dependencies: Set[Contract] = Set(ExpressionC, VariableC, IncrementIntegerC)
 
@@ -26,11 +26,11 @@ object PostfixPlusPlusC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val plusPlus = identifier <~ "++" ^^
-      (name => new MetaObject(PostfixPlusPlusKey, VariableKey -> name))
+      (name => new MetaObject(PostfixIncrementKey, VariableKey -> name))
     expressionGrammar.inner = expressionGrammar.inner | plusPlus
   }
 
-  object PostfixPlusPlusKey
+  object PostfixIncrementKey
 
   object VariableKey
 

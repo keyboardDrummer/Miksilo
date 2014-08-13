@@ -8,11 +8,12 @@ import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, 
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPackageSelector}
+import transformations.javac.constructor.{ImplicitSuperConstructorCall, DefaultConstructorC, ConstructorC}
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
 import transformations.javac.expressions.literals.{NumberLiteralC, NullC, BooleanLiteralC}
-import transformations.javac.expressions.postfix.{PostfixPlusPlusC}
+import transformations.javac.expressions.postfix.{PostFixIncrementC}
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.{IncrementAssignmentC, AssignmentPrecedence, AssignmentC}
@@ -25,18 +26,18 @@ object JavaCompiler {
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[Injector] = {
-    Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructor, ImplicitSuperConstructorCall,
+    Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC,
       DeclarationWithInitializerC, IncrementAssignmentC, AssignmentC, AssignmentPrecedence, CallC,
       ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
       SelectorC, ClassOrPackageReference, VariableC,
       DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
-      StatementC) ++ javaSimpleExpression
+      ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
   }
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    PostfixPlusPlusC,  BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
+    PostFixIncrementC,  BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
 
@@ -45,7 +46,7 @@ object JavaCompiler {
   def byteCodeTransformations = typeTransformations ++ byteCodeInstructions ++ Seq(ByteCodeSkeleton)
 
   def byteCodeInstructions: Seq[InstructionC] = {
-    Seq(AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
+    Seq(PopC, AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
       IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }

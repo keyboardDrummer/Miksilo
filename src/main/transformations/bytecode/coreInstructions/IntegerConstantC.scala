@@ -19,7 +19,7 @@ object IntegerConstantC extends InstructionC {
     byteToBytes(3 + ByteCodeSkeleton.getIntegerConstantValue(instruction))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject)
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState)
   = (Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
