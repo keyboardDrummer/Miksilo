@@ -1,5 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
+import core.exceptions.BadInputException
 import core.transformation.{MetaObject, TransformationState}
 
 
@@ -24,18 +25,26 @@ class StackLayoutAnalysis(instructions: Seq[MetaObject], getInputTypes: MetaObje
   }
 
   override def updateState(state: Seq[MetaObject], instructionIndex: Int): Seq[MetaObject] = {
-    val instruction = instructions(instructionIndex)
-    val inputTypes = getInputTypes(instruction)
-    if (inputTypes.length > state.length)
-      throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
+    try
+    {
+      val instruction = instructions(instructionIndex)
+      val inputTypes = getInputTypes(instruction)
+      if (inputTypes.length > state.length)
+        throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
 
-    val stackTop = state.takeRight(inputTypes.length)
-    if (inputTypes != stackTop)
-      throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
+      val stackTop = state.takeRight(inputTypes.length)
+      if (inputTypes != stackTop)
+        throw new StackDoesNotFitInstructionInput(instruction, inputTypes, state)
 
-    val remainingStack = state.dropRight(inputTypes.length)
-    val newStack = remainingStack ++ getOutputTypes(instruction)
-    newStack
+      val remainingStack = state.dropRight(inputTypes.length)
+      val newStack = remainingStack ++ getOutputTypes(instruction)
+      newStack
+    }
+    catch {
+      case e: IndexOutOfBoundsException => throw MissingReturnInstruction
+    }
   }
+
+  object MissingReturnInstruction extends BadInputException
 
 }

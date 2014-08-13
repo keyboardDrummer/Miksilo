@@ -8,15 +8,15 @@ import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, 
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPackageSelector}
-import transformations.javac.constructor.{ImplicitSuperConstructorCall, DefaultConstructorC, ConstructorC}
+import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
-import transformations.javac.expressions.literals.{NumberLiteralC, NullC, BooleanLiteralC}
-import transformations.javac.expressions.postfix.{PostFixIncrementC}
+import transformations.javac.expressions.literals.{BooleanLiteralC, NullC, NumberLiteralC}
+import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
-import transformations.javac.methods.assignment.{IncrementAssignmentC, AssignmentPrecedence, AssignmentC}
+import transformations.javac.methods.assignment.{AssignmentC, AssignmentPrecedence, IncrementAssignmentC}
 import transformations.javac.statements._
 import transformations.types._
 
@@ -26,18 +26,19 @@ object JavaCompiler {
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
 
   def javaCompilerTransformations: Seq[Injector] = {
-    Seq(ImplicitThisInPrivateCalls, ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, ConstructorC,
-      DeclarationWithInitializerC, IncrementAssignmentC, AssignmentC, AssignmentPrecedence, CallC,
-      ReturnExpressionC, ReturnVoidC, ClassOrPackageSelector,
-      SelectorC, ClassOrPackageReference, VariableC,
-      DeclarationC, ClassC, MethodC, ForLoopC, WhileC, BlockC,
-      ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
+    Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ConstructorC, ClassOrPackageSelector, SelectorC, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++ javaMethod
   }
+
+  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC, AssignmentC, AssignmentPrecedence,
+    ReturnExpressionC, ReturnVoidC, CallC, DeclarationWithInitializerC, DeclarationC, VariableC, ClassC, MethodC) ++ javaSimpleStatement //todo move class.
+
+  def javaSimpleStatement = Seq(ForLoopC, WhileC, BlockC,
+    ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    PostFixIncrementC,  BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
+    PostFixIncrementC, BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
 

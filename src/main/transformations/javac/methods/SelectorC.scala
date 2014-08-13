@@ -13,7 +13,6 @@ object SelectorC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, GetStaticC)
 
-
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
 
   def selector(_object: MetaObject, member: String): MetaObject = {
