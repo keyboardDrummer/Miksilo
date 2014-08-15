@@ -8,7 +8,6 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.methods.{MethodC, VariablePool}
 import transformations.types.TypeC
 
-
 object DeclarationC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {

@@ -20,6 +20,12 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
     state.program
   }
 
+  def transform(program: MetaObject) = {
+    val state = new TransformationState()
+    state.program = program
+    PieceCombiner.combineAndExecute(state, transformations.reverse)
+  }
+
   def compile(input: File, outputDirectory: Directory) {
     val readFilePiece = ReadUsingGrammarTransformation
     val printByteCodePiece = PrintByteCodeToOutputDirectory
