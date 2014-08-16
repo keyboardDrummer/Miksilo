@@ -49,7 +49,7 @@ object JavaCompiler {
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(PopC, AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
       IfZeroC, IncrementIntegerC, LongConstantC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
-      LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
+      LoadAddressC, LoadLongC, StoreLongC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
 
   def getTransformer = new Transformer(javaCompilerTransformations)

@@ -4,29 +4,29 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
+import transformations.types.LongTypeC
 
-object StoreIntegerC extends InstructionC {
+object StoreLongC  extends InstructionC {
 
-  override val key: AnyRef = IntegerStore
+  override val key: AnyRef = LongStore
 
-  def integerStore(location: Int) = instruction(IntegerStore, Seq(location))
+  def longStore(location: Int) = instruction(LongStore, Seq(location))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
-      hexToBytes("36") ++ byteToBytes(location)
+      hexToBytes("37") ++ byteToBytes(location)
     else
-      byteToBytes(hexToInt("3b") + location)
+      byteToBytes(hexToInt("3f") + location)
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState)
-    = (Seq(IntTypeC.intType), Seq())
+  = (Seq(LongTypeC.longType), Seq())
 
   override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
-    Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)
+    Map(getInstructionArguments(instruction)(0) -> LongTypeC.longType)
 
-  object IntegerStore
+  object LongStore
 
 }

@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.PrintByteCode
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC

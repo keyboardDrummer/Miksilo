@@ -11,13 +11,11 @@ object LongConstantC extends InstructionC {
 
   override val key: AnyRef = LongConstantKey
 
-  def constant(value: Long) = {
+  def constant(value: Int) = {
     require (value <= 1)
     require (value >= 0)
     instruction(LongConstantKey, Seq(value))
   }
-
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     byteToBytes(9 + ByteCodeSkeleton.getInstructionArguments(instruction)(0))

@@ -16,7 +16,7 @@ class VariablePool(state: TransformationState) {
   private val variables = mutable.Map[String, VariableInfo]()
   var offset = 0
 
-  def localCount = variables.size
+  def localCount = offset
 
   def get(name: String) = variables.get(name)
 

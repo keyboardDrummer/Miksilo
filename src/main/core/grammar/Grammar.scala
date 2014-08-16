@@ -1,5 +1,7 @@
 package core.grammar
 
+import scala.util.matching.Regex
+
 
 trait GrammarWriter {
 
@@ -44,6 +46,8 @@ trait Grammar extends GrammarWriter {
 
   def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
 }
+
+class RegexG(val regex: Regex) extends Grammar
 
 class Many(var inner: Grammar) extends Grammar {
   override def toString: String = s"$inner*"

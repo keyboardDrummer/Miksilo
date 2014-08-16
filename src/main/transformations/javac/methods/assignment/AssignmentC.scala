@@ -3,11 +3,12 @@ package transformations.javac.methods.assignment
 import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.coreInstructions.{LoadAddressC, LoadIntegerC, StoreAddressC, StoreIntegerC}
+import transformations.bytecode.coreInstructions._
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.MethodC
 import transformations.types.ArrayTypeC.ArrayTypeKey
 import transformations.types.IntTypeC.IntTypeKey
+import transformations.types.LongTypeC.LongTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeKey
 
 object AssignmentC extends ExpressionInstance {
@@ -51,10 +52,12 @@ object AssignmentC extends ExpressionInstance {
       case IntTypeKey => StoreIntegerC.integerStore(variable.offset)
       case ObjectTypeKey => StoreAddressC.addressStore(variable.offset)
       case ArrayTypeKey => StoreAddressC.addressStore(variable.offset)
+      case LongTypeKey => StoreLongC.longStore(variable.offset)
     }) ++ Seq(variable._type.clazz match {
       case IntTypeKey => LoadIntegerC.integerLoad(variable.offset)
       case ObjectTypeKey => LoadAddressC.addressLoad(variable.offset)
       case ArrayTypeKey => LoadAddressC.addressLoad(variable.offset)
+      case LongTypeKey => LoadLongC.load(variable.offset)
     })
   }
 }

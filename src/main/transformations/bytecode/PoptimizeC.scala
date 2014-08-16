@@ -5,7 +5,6 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton.CodeInstructionsKey
 import transformations.bytecode.coreInstructions.PopC
 import transformations.javac.classes.ConstantPool
-import transformations.types.TypeC
 
 object PoptimizeC extends ProgramTransformation {
 
@@ -21,8 +20,8 @@ object PoptimizeC extends ProgramTransformation {
       val stackModRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
       def getInOutSizes(instruction: MetaObject) = {
         val signature = stackModRegistry(instruction.clazz)(constantPool, instruction)
-        val inCount = signature._1.map(t => TypeC.getTypeSize(t, state)).sum
-        val outCount = signature._2.map(t => TypeC.getTypeSize(t, state)).sum
+        val inCount = signature._1.size
+        val outCount = signature._2.size
         (inCount, outCount)
       }
 

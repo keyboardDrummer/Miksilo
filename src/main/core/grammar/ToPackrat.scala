@@ -2,42 +2,43 @@ package core.grammar
 
 
 import scala.collection.mutable
-import scala.util.parsing.combinator.PackratParsers
-import scala.util.parsing.combinator.lexical.StdLexical
-import scala.util.parsing.combinator.syntactical.StandardTokenParsers
+import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
+import scala.util.parsing.input.CharArrayReader._
 
-class ToPackrat extends StandardTokenParsers with PackratParsers {
+class ToPackrat extends JavaTokenParsers with PackratParsers {
 
+  var keywords: Set[String] = Set.empty
 
-  class NewLexical extends StdLexical {
+  def whitespaceG: Parser[Any] = rep(
+    whitespaceChar
+      | '/' ~ '*' ~ comment
+      | '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
+      | '/' ~ '*' ~ failure("unclosed comment")
+  )
 
-    case class LongLiteral(value: String) extends Token {
-      override def chars: String = value
-    }
+  def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != EofCh)
+  protected def comment: Parser[Any] = (
+    '*' ~ '/'  ^^ { case _ => ' '  }
+      | chrExcept(EofCh) ~ comment
+    )
 
-    override def token: Parser[Token] = super.token |
-      digit ~ rep(digit) <~ 'l' ^^ { case first ~ rest => new LongLiteral(first :: rest mkString "")}
-  }
-
-  override val lexical = new NewLexical
-
-  def longLit: Parser[String] =
-    elem("number", _.isInstanceOf[lexical.LongLiteral]) ^^ (_.chars)
-
+  def chrExcept(cs: Char*) = elem("", ch => (cs forall (ch != _)))
+  
   def convert(grammar: Grammar): PackratParser[Any] = {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
     def helper(grammar: Grammar): PackratParser[Any] = {
       map.getOrElseUpdate(grammar, grammar.simplify match {
         case choice: Choice => helper(choice.left) ||| helper(choice.right)
-        case sequence: Sequence => helper (sequence.first) ~ helper(sequence.second) ^^ {
-          case l ~ r => new core.grammar.~(l,r)
+        case sequence: Sequence => helper(sequence.first) ~ helper(sequence.second) ^^ {
+          case l ~ r => new core.grammar.~(l, r)
         }
-        case NumberG => numericLit
+        case regexG: RegexG => regex(regexG.regex)
+        case NumberG => wholeNumber
         case many: Many => helper(many.inner).*
-        case originalDelimiter: Delimiter => keyword(originalDelimiter.value)
-        case originalKeyword: Keyword => keyword(originalKeyword.value)
-        case Identifier => ident
+        case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value)
+        case originalKeyword: core.grammar.Keyword => literal(originalKeyword.value)
+        case core.grammar.Identifier => ident.filter(identifier => !keywords.contains(identifier))
         case SuccessG => success[Any](null)
         case labelled: Labelled => helper(labelled.inner)
         case map: MapGrammar => helper(map.inner) ^^ map.forward

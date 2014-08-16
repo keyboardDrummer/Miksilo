@@ -5,6 +5,7 @@ import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
 import transformations.javac.classes.ConstantPool
+import transformations.types.TypeC
 
 trait InstructionC extends Injector {
 
@@ -33,7 +34,7 @@ trait InstructionC extends Injector {
 
   def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = {
     val inAndOutputs = getInstructionInAndOutputs(constantPool, instruction, state)
-    inAndOutputs._2.size - inAndOutputs._1.size
+    inAndOutputs._2.map(t => TypeC.getTypeSize(t,state)).sum - inAndOutputs._1.map(t => TypeC.getTypeSize(t,state)).sum
   }
 
 
