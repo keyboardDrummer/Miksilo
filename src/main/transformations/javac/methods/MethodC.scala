@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.grammar.seqr
+
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}

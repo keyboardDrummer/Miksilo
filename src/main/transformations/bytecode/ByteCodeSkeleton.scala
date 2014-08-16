@@ -112,8 +112,6 @@ object ByteCodeSkeleton extends Injector {
 
   def getMethodDescriptorIndex(methodInfo: MetaObject) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
 
-  def getIntegerConstantValue(constant: MetaObject) = getInstructionArguments(constant)(0).asInstanceOf[Int]
-
   def getInstructionArguments(instruction: MetaObject) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
   def setInstructionArguments(instruction: MetaObject, arguments: Seq[Any]) {

@@ -1,10 +1,11 @@
 package core.grammar
 
-import scala.util.parsing.combinator.Parsers
+trait HasSeqr {
+  case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product with scala.Serializable {
+  }
+}
 
-
-trait GrammarWriter {
-
+trait GrammarWriter extends HasSeqr {
 
   def identifier = Identifier
 
@@ -22,12 +23,13 @@ trait GrammarWriter {
     if (value.forall(c => Character.isLetterOrDigit(c)))
       new Keyword(value)
     else new Delimiter(value)
+
 }
 
-case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product with scala.Serializable {
-}
 
-trait Grammar extends Parsers {
+trait Grammar extends GrammarWriter {
+
+  def simplify: Grammar = this
 
   def <~(right: Grammar) = new IgnoreRight(this, right)
 
@@ -52,16 +54,18 @@ class Many(var inner: Grammar) extends Grammar {
   override def toString: String = s"$inner*"
 }
 
-class IgnoreLeft(first: Grammar, second: Grammar)
-  extends MapGrammar(new Sequence(first, second), { case seqr(l, r) => r}, s => s) {
+class IgnoreLeft(first: Grammar, second: Grammar) extends Grammar {
+
+  override def simplify: Grammar = new MapGrammar(new Sequence(first, second), { case seqr(l, r) => r}, s => s)
+
   override def toString: String = s"$first ~> $second"
 }
 
-class IgnoreRight(first: Grammar, second: Grammar)
-  extends MapGrammar(new Sequence(first, second), { case seqr(l, r) => l}, s => s) {
+class IgnoreRight(first: Grammar, second: Grammar) extends Grammar {
+  override def simplify = new MapGrammar(new Sequence(first, second), { case seqr(l, r) => l}, s => s)
+
   override def toString: String = s"$first <~ $second"
 }
-
 
 class Sequence(var first: Grammar, var second: Grammar) extends Grammar {
   override def toString: String = s"$first ~ $second"

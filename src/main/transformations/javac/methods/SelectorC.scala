@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.grammar.seqr
+
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC

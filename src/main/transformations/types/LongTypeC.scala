@@ -15,8 +15,10 @@ object LongTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.inner = typeGrammar.inner | ("long" ^^ (_ => ???))
+    typeGrammar.inner = typeGrammar.inner | ("long" ^^ (_ => longType))
   }
+
+  def longType = new MetaObject(LongTypeKey)
 
   object LongTypeKey
 

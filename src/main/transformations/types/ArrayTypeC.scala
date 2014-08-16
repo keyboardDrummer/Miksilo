@@ -1,6 +1,6 @@
 package transformations.types
 
-import core.grammar.seqr
+
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 

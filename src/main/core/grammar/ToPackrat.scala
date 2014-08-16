@@ -1,14 +1,33 @@
 package core.grammar
 
+
 import scala.collection.mutable
 import scala.util.parsing.combinator.PackratParsers
+import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
 
-class ToPackrat extends StandardTokenParsers with PackratParsers {
-  def convert(grammar: Grammar): PackratParser[Any] = {
-    val map = new mutable.HashMap[Grammar,PackratParser[Any]]
+class ToPackrat extends StandardTokenParsers with PackratParsers with HasSeqr {
 
-    def helper(grammar: Grammar) : PackratParser[Any] = {
+
+  class NewLexical extends StdLexical {
+
+    case class LongLiteral(value: String) extends Token {
+      override def chars: String = value
+    }
+
+    override def token: Parser[Token] = super.token |
+      digit ~ rep(digit) <~ 'l' ^^ { case first ~ rest => new LongLiteral(first :: rest mkString "")}
+  }
+
+  override val lexical = new NewLexical
+
+  def longLit: Parser[String] =
+    elem("number", _.isInstanceOf[lexical.LongLiteral]) ^^ (_.chars)
+
+  def convert(grammar: Grammar): PackratParser[Any] = {
+    val map = new mutable.HashMap[Grammar, PackratParser[Any]]
+
+    def helper(grammar: Grammar): PackratParser[Any] = {
       map.getOrElseUpdate(grammar, grammar match {
         case sequence: Sequence => helper(sequence.first) ~ helper(sequence.second) ^^ {
           case l ~ r => new seqr(l, r)

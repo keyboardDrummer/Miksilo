@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.grammar.seqr
+
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledTargets

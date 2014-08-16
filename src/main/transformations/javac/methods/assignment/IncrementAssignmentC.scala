@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.grammar.{Grammar, seqr}
+import core.grammar.{Grammar}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.additive.AdditionC

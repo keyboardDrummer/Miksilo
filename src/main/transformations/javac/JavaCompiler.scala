@@ -12,7 +12,7 @@ import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, Imp
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
-import transformations.javac.expressions.literals.{BooleanLiteralC, NullC, NumberLiteralC}
+import transformations.javac.expressions.literals.{LongLiteralC, BooleanLiteralC, NullC, IntLiteralC}
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
@@ -38,7 +38,7 @@ object JavaCompiler {
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    PostFixIncrementC, BooleanLiteralC, NumberLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
+    PostFixIncrementC, BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
 
@@ -48,7 +48,7 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(PopC, AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
-      IfZeroC, IncrementIntegerC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+      IfZeroC, IncrementIntegerC, LongConstantC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
 

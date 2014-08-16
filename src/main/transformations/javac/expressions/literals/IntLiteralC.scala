@@ -6,18 +6,18 @@ import transformations.bytecode.coreInstructions.IntegerConstantC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.types.IntTypeC
 
-object NumberLiteralC extends ExpressionInstance {
-  val key = NumberLiteralKey
+object IntLiteralC extends ExpressionInstance {
+  val key = IntLiteralKey
 
   override def dependencies: Set[Contract] = Set(ExpressionC, IntegerConstantC)
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
-    val parseNumber = number ^^ (number => NumberLiteralC.literal(Integer.parseInt(number.asInstanceOf[String])))
+    val parseNumber = number ^^ (number => literal(Integer.parseInt(number.asInstanceOf[String])))
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
 
-  def literal(value: Int) = new MetaObject(NumberLiteralKey, ValueKey -> value)
+  def literal(value: Int) = new MetaObject(IntLiteralKey, ValueKey -> value)
 
   override def toByteCode(literal: MetaObject, state: TransformationState): Seq[MetaObject] = {
     Seq(IntegerConstantC.integerConstant(getValue(literal)))
@@ -27,7 +27,7 @@ object NumberLiteralC extends ExpressionInstance {
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
 
-  object NumberLiteralKey
+  object IntLiteralKey
 
   object ValueKey
 

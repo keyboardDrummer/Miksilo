@@ -6,7 +6,7 @@ import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
-import transformations.javac.expressions.literals.NumberLiteralC
+import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
@@ -31,7 +31,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = "System.out.print(fibonacci(5))"
     val result: Any = getExpressionGrammarResult(input)
     val expectation = CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
-      Seq(CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))))
+      Seq(CallC.call(VariableC.variable("fibonacci"), Seq(IntLiteralC.literal(5)))))
     Assert.assertEquals(expectation, result)
   }
 
@@ -49,8 +49,8 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = "1 < 2 ? 3 : 4"
     val result: Any = getExpressionGrammarResult(input)
 
-    val expectation: MetaObject = TernaryC.ternary(LessThanC.lessThan(NumberLiteralC.literal(1), NumberLiteralC.literal(2)),
-      NumberLiteralC.literal(3), NumberLiteralC.literal(4))
+    val expectation: MetaObject = TernaryC.ternary(LessThanC.lessThan(IntLiteralC.literal(1), IntLiteralC.literal(2)),
+      IntLiteralC.literal(3), IntLiteralC.literal(4))
     Assert.assertEquals(expectation, result)
   }
 
@@ -58,7 +58,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testLessThan() {
     val input = "index < 2"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: MetaObject = LessThanC.lessThan(VariableC.variable("index"), NumberLiteralC.literal(2))
+    val expectation: MetaObject = LessThanC.lessThan(VariableC.variable("index"), IntLiteralC.literal(2))
     Assert.assertEquals(expectation, result)
   }
 
@@ -66,7 +66,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testAddition() {
     val input = "index + 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: MetaObject = AdditionC.addition(VariableC.variable("index"), NumberLiteralC.literal(1))
+    val expectation: MetaObject = AdditionC.addition(VariableC.variable("index"), IntLiteralC.literal(1))
     Assert.assertEquals(expectation, result)
   }
 
@@ -90,7 +90,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testSubtraction() {
     val input = "index - 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: MetaObject = SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(1))
+    val expectation: MetaObject = SubtractionC.subtraction(VariableC.variable("index"), IntLiteralC.literal(1))
     Assert.assertEquals(expectation, result)
   }
 
@@ -98,7 +98,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testTernary() {
     val input = "1 ? 2 : 3"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: MetaObject = TernaryC.ternary(NumberLiteralC.literal(1), NumberLiteralC.literal(2), NumberLiteralC.literal(3))
+    val expectation: MetaObject = TernaryC.ternary(IntLiteralC.literal(1), IntLiteralC.literal(2), IntLiteralC.literal(3))
     Assert.assertEquals(expectation, result)
   }
 
@@ -106,7 +106,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testIncrementAssignment() {
     val input = "x += 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation = IncrementAssignmentC.incrementAssignment("x", NumberLiteralC.literal(1))
+    val expectation = IncrementAssignmentC.incrementAssignment("x", IntLiteralC.literal(1))
     Assert.assertEquals(expectation, result)
   }
 
@@ -145,7 +145,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMainMethod: MetaObject = {
-    val fibonacciCall = CallC.call(VariableC.variable("fibonacci"), Seq(NumberLiteralC.literal(5)))
+    val fibonacciCall = CallC.call(VariableC.variable("fibonacci"), Seq(IntLiteralC.literal(5)))
     val printCall = CallC.call(SelectorC.selector(SelectorC.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
@@ -158,10 +158,10 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getFibonacciExpression: MetaObject = {
-    val condition = LessThanC.lessThan(VariableC.variable("index"), NumberLiteralC.literal(2))
-    val firstCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(1))))
-    val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), NumberLiteralC.literal(2))))
-    val expectation = TernaryC.ternary(condition, NumberLiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
+    val condition = LessThanC.lessThan(VariableC.variable("index"), IntLiteralC.literal(2))
+    val firstCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), IntLiteralC.literal(1))))
+    val secondCall = CallC.call(VariableC.variable("fibonacci"), Seq(SubtractionC.subtraction(VariableC.variable("index"), IntLiteralC.literal(2))))
+    val expectation = TernaryC.ternary(condition, IntLiteralC.literal(1), AdditionC.addition(firstCall, secondCall))
     expectation
   }
 }
