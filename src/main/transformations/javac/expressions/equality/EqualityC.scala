@@ -4,12 +4,12 @@ import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.longs.CompareLongC
-import transformations.bytecode.extraBooleanInstructions.NotEqualInstructionC
+import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.BooleanTypeC
+import transformations.types.{IntTypeC, LongTypeC, BooleanTypeC}
 
 object EqualityC extends ExpressionInstance {
-  override def dependencies: Set[Contract] = Set(AddEqualityPrecedence)
+  override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
 
   def getFirst(equality: MetaObject) = equality(FirstKey).asInstanceOf[MetaObject]
 
@@ -33,10 +33,20 @@ object EqualityC extends ExpressionInstance {
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = BooleanTypeC.booleanType
 
+  def getInputType(equality: MetaObject, state: TransformationState)  = {
+    val first = getFirst(equality)
+    ExpressionC.getType(state)(first)
+  }
+
   override def toByteCode(equality: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionC.getToInstructions(state)
-    toInstructions(first) ++ toInstructions(second) ++ Seq(CompareLongC.compareLong, NotEqualInstructionC.notEqual)
+    val inputType = getInputType(equality,state)
+    val equalityInstructions: Seq[MetaObject] = inputType.clazz match {
+      case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
+      case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
+    }
+    toInstructions(first) ++ toInstructions(second) ++ equalityInstructions
   }
 }

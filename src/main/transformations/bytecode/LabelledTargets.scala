@@ -4,7 +4,7 @@ import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
-import transformations.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
 import transformations.javac.classes.ConstantPool
 
@@ -19,6 +19,8 @@ object LabelledTargets extends ProgramTransformation {
 
   def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualC.IfIntegerCompareGreaterKey, Seq(target))
   def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessC.key, Seq(target))
+  def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualC.key, Seq(target))
+  def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualC.key, Seq(target))
 
   def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey) {
     data.put(LabelNameKey, name)

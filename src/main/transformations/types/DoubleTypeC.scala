@@ -13,7 +13,12 @@ object DoubleTypeC extends TypeInstance {
 
   override def getStackSize: Int = 2
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = ???
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val typeGrammar = grammars.find(TypeC.TypeGrammar)
+    typeGrammar.orToInner("double" ^^ (_ => doubleType))
+  }
+
+  val doubleType = new MetaObject(key)
 
   object DoubleTypeKey
 

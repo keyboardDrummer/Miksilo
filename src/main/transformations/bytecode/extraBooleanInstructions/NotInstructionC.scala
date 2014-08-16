@@ -7,15 +7,15 @@ import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
-object NotEqualInstructionC extends ExpandInstruction {
+object NotInstructionC extends ExpandInstruction {
 
-  def notEqual = instruction(NotEqualInstructionKey)
+  def not = instruction(NotInstructionKey)
 
   override def dependencies: Set[Contract] = Set(LabelledTargets, IfZeroC)
 
-  object NotEqualInstructionKey
+  object NotInstructionKey
 
-  override def key: Any = NotEqualInstructionKey
+  override def key: Any = NotInstructionKey
 
   override def expand(instruction: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val falseStartLabel = state.getUniqueLabel("falseStart")

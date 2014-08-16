@@ -4,15 +4,14 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.javac.methods.{MethodC, VariableC}
+import transformations.javac.methods.MethodC
 import transformations.types.IntTypeC
 
 object PostFixIncrementC extends ExpressionInstance {
 
   override val key: AnyRef = PostfixIncrementKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionC, VariableC, IncrementIntegerC)
-
+  override def dependencies: Set[Contract] = Set(ExpressionC, MethodC, IncrementIntegerC)
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
 
@@ -33,5 +32,4 @@ object PostFixIncrementC extends ExpressionInstance {
   object PostfixIncrementKey
 
   object VariableKey
-
 }

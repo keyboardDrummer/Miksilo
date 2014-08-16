@@ -3,17 +3,19 @@ package transformations.bytecode.extraBooleanInstructions
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC.IfZeroKey
+import transformations.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
-import transformations.bytecode.extraBooleanInstructions.NotEqualInstructionC.NotEqualInstructionKey
+import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 
 import scala.collection.mutable
 
 object OptimizeBooleanInstructionsC extends ProgramTransformation {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
@@ -39,38 +41,59 @@ object OptimizeBooleanInstructionsC extends ProgramTransformation {
         val first = instructions(i)
         val second = instructions(i + 1)
 
-        var instructionToAdd = first
-        first.clazz match {
-          case LessThanInstructionKey => second.clazz match {
-            case IfZeroKey =>
-              val target = LabelledTargets.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledTargets.ifIntegerCompareGreaterEquals(target)
-              i += 1
-            case IfNotZeroKey =>
-              val target = LabelledTargets.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledTargets.ifIntegerCompareLess(target)
-              i += 1
-            case _ =>
-          }
-          case NotEqualInstructionKey => second.clazz match {
-            case IfZeroKey =>
-              val target = LabelledTargets.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledTargets.ifNotZero(target)
-              i += 1
-            case IfNotZeroKey =>
-              val target = LabelledTargets.getJumpInstructionLabel(second)
-              instructionToAdd = LabelledTargets.ifZero(target)
-              i += 1
-          }
-          case _ =>
+        val replacementInstruction : Option[MetaObject] = first.clazz match {
+          case LessThanInstructionKey => findLessThanReplacement(second)
+          case NotInstructionKey => findNotReplacement(second)
+          case IntegerEqualsInstructionKey => findIntegerEqualsReplacement(second)
+          case _ => None
         }
-        newInstructions += instructionToAdd
+        if (replacementInstruction.isDefined)
+          i += 1
+
+        newInstructions += replacementInstruction.fold(first)(x => x)
         i += 1
       }
-      if (i == instructions.size - 1)
+      val lastInstructionWasNotReplaced = i == instructions.size - 1
+      if (lastInstructionWasNotReplaced)
         newInstructions += instructions(i)
 
       newInstructions
+    }
+  }
+
+  def findIntegerEqualsReplacement(second: MetaObject): Option[MetaObject] = {
+    second.clazz match {
+      case IfZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifIntegerCompareNotEquals(target))
+      case IfNotZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifIntegerCompareEquals(target))
+      case _ => None
+    }
+  }
+
+  def findNotReplacement(second: MetaObject): Option[MetaObject] = {
+    second.clazz match {
+      case IfZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifNotZero(target))
+      case IfNotZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifZero(target))
+      case _ => None
+    }
+  }
+
+  def findLessThanReplacement(second: MetaObject): Option[MetaObject] = {
+    second.clazz match {
+      case IfZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifIntegerCompareGreaterEquals(target))
+      case IfNotZeroKey =>
+        val target = LabelledTargets.getJumpInstructionLabel(second)
+        Some(LabelledTargets.ifIntegerCompareLess(target))
+      case _ => None
     }
   }
 }

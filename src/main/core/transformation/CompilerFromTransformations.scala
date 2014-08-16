@@ -3,7 +3,7 @@ package core.transformation
 import core.exceptions.TransformationDependencyViolation
 import core.modularProgram.PieceCombiner
 import core.transformation.grammars.ReadUsingGrammarTransformation
-import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
+import core.transformation.sillyCodePieces.Injector
 
 import scala.reflect.io.{Directory, File}
 
@@ -40,10 +40,10 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
   def validateDependencies(transformations: Seq[Injector]) = {
     var available = Set.empty[Contract]
     for (transformation <- transformations.reverse) {
-      transformation.dependencies.collect({ case dependency: ProgramTransformation =>
+      transformation.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
           throw new TransformationDependencyViolation(dependency, transformation)
-      })
+      )
       available += transformation
     }
   }
