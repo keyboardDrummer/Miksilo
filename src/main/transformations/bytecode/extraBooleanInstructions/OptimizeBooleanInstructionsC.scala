@@ -3,9 +3,10 @@ package transformations.bytecode.extraBooleanInstructions
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.coreInstructions.integerCompare.IfNotZero.IfNotZeroKey
-import transformations.bytecode.coreInstructions.integerCompare.IfZeroC.IfZeroKey
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC.IfZeroKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
+import transformations.bytecode.extraBooleanInstructions.NotEqualInstructionC.NotEqualInstructionKey
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
 
 import scala.collection.mutable
@@ -50,6 +51,16 @@ object OptimizeBooleanInstructionsC extends ProgramTransformation {
               instructionToAdd = LabelledTargets.ifIntegerCompareLess(target)
               i += 1
             case _ =>
+          }
+          case NotEqualInstructionKey => second.clazz match {
+            case IfZeroKey =>
+              val target = LabelledTargets.getJumpInstructionLabel(second)
+              instructionToAdd = LabelledTargets.ifNotZero(target)
+              i += 1
+            case IfNotZeroKey =>
+              val target = LabelledTargets.getJumpInstructionLabel(second)
+              instructionToAdd = LabelledTargets.ifZero(target)
+              i += 1
           }
           case _ =>
         }

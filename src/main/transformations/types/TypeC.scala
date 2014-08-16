@@ -23,7 +23,7 @@ object TypeC extends GrammarTransformation {
   def getVerificationInfoBytes(clazz: MetaObject, _type: MetaObject, state: TransformationState): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
-      case LongTypeC.LongTypeKey => hexToBytes("02")
+      case LongTypeC.LongTypeKey => hexToBytes("04")
       case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeName).asInstanceOf[Int])
     }
   }
@@ -37,8 +37,6 @@ object TypeC extends GrammarTransformation {
   }
 
   def getTypeSize(_type: MetaObject, state: TransformationState): Int = getState(state).stackSize(_type.clazz)
-
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getByteCodeString(state: TransformationState): MetaObject => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
@@ -86,6 +84,8 @@ object TypeC extends GrammarTransformation {
     grammars.create(TypeGrammar)
   }
 
+
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {
     val superTypes = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()
     val toByteCodeString = new mutable.HashMap[Any, MetaObject => String]()

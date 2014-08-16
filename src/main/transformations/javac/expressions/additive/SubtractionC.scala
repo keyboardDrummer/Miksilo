@@ -4,7 +4,7 @@ import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.coreInstructions.SubtractIntegerC
+import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
 import transformations.javac.expressions.ExpressionC
 
 object SubtractionC extends GrammarTransformation {

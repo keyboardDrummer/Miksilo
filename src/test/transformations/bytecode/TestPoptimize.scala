@@ -2,7 +2,8 @@ package transformations.bytecode
 
 import core.transformation.{MetaObject, CompilerFromTransformations}
 import org.junit.{Assert, Test}
-import transformations.bytecode.coreInstructions.{PopC, StoreIntegerC, IntegerConstantC}
+import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
+import transformations.bytecode.coreInstructions.PopC
 import transformations.javac.JavaCompiler
 
 import scala.collection.mutable.ArrayBuffer

@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.coreInstructions.IntegerReturnInstructionC
+import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.statements.StatementC
 

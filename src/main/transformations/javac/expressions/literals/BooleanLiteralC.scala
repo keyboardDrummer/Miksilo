@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.coreInstructions.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.types.BooleanTypeC
 

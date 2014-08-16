@@ -1,4 +1,4 @@
-package transformations.bytecode.coreInstructions.integerCompare
+package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.transformation.MetaObject
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior

@@ -4,7 +4,8 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC}
+import transformations.bytecode.coreInstructions.InvokeSpecialC
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionInstance
 import transformations.javac.methods.MethodC._

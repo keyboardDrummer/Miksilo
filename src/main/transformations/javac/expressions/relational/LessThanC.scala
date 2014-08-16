@@ -4,7 +4,7 @@ import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.coreInstructions.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.types.{BooleanTypeC, IntTypeC, TypeC}

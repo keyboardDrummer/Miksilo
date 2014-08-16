@@ -1,8 +1,9 @@
-package transformations.bytecode.coreInstructions
+package transformations.bytecode.coreInstructions.integers
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.InstructionC
 import transformations.javac.classes.ConstantPool
 
 object IncrementIntegerC extends InstructionC {

@@ -3,7 +3,9 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.TestUtils
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{IntTypeC, VoidTypeC}
@@ -63,7 +65,7 @@ class TestPrintByteCodeWhile {
     val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(ByteCodeSkeleton.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),

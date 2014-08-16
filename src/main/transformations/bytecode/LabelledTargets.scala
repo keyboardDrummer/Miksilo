@@ -3,7 +3,8 @@ package transformations.bytecode
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
+import transformations.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
 import transformations.javac.classes.ConstantPool
 
@@ -12,11 +13,11 @@ import scala.collection.mutable.ArrayBuffer
 
 object LabelledTargets extends ProgramTransformation {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
+  def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
   def goTo(target: String) = instruction(GotoC.GoToKey, Seq(target))
 
   def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualC.IfIntegerCompareGreaterKey, Seq(target))
-
   def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessC.key, Seq(target))
 
   def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey) {

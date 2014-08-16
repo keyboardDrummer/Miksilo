@@ -22,7 +22,7 @@ class ToPackrat extends JavaTokenParsers with PackratParsers {
       | chrExcept(EofCh) ~ comment
     )
 
-  def chrExcept(cs: Char*) = elem("", ch => (cs forall (ch != _)))
+  def chrExcept(cs: Char*) = elem("", ch => cs forall (ch != _))
   
   def convert(grammar: Grammar): PackratParser[Any] = {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]

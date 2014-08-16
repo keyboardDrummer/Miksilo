@@ -13,7 +13,7 @@ object InvokeVirtualC extends InvokeC {
   def invokeVirtual(methodRefIndex: Int) = ByteCodeSkeleton.instruction(InvokeVirtual, Seq(methodRefIndex))
 
   override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int =
-    super.getInstructionStackSizeModification(constantPool, instruction, state) + 1
+    super.getInstructionStackSizeModification(constantPool, instruction, state) - 1
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)

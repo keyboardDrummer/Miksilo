@@ -3,8 +3,11 @@ package transformations.javac
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
-import transformations.bytecode.extraBooleanInstructions.{LessThanInstructionC, OptimizeBooleanInstructionsC}
+import transformations.bytecode.coreInstructions.integers.integerCompare.{IfNotZero, IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC, IfZeroC}
+import transformations.bytecode.coreInstructions.integers._
+import transformations.bytecode.coreInstructions.longs.{CompareLongC, LongConstantC, StoreLongC, LoadLongC}
+import transformations.bytecode.coreInstructions.objects.{StoreAddressC, PushNullC, LoadAddressC}
+import transformations.bytecode.extraBooleanInstructions.{ExpandInstructionsC, NotEqualInstructionC, LessThanInstructionC, OptimizeBooleanInstructionsC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{PoptimizeC, ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPackageSelector}
@@ -33,14 +36,16 @@ object JavaCompiler {
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC, AssignmentC, AssignmentPrecedence,
     ReturnExpressionC, ReturnVoidC, CallC, DeclarationWithInitializerC, DeclarationC, VariableC, ClassC, MethodC) ++ javaSimpleStatement //todo move class.
 
-  def javaSimpleStatement = Seq(ForLoopC, WhileC, BlockC,
+  def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
     ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     PostFixIncrementC, BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
-  def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++ Seq(LessThanInstructionC) ++ simpleByteCodeTransformations
+  def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++
+    Seq(LessThanInstructionC, NotEqualInstructionC, ExpandInstructionsC) ++
+    simpleByteCodeTransformations
 
   def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations
 
@@ -48,8 +53,8 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(PopC, AddIntegersC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareGreaterOrEqualC,
-      IfZeroC, IncrementIntegerC, LongConstantC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
-      LoadAddressC, LoadLongC, StoreLongC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
+      IfZeroC, IfNotZero, IncrementIntegerC, LongConstantC, IntegerConstantC, IntegerReturnInstructionC, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+      LoadAddressC, LoadLongC, StoreLongC, CompareLongC, LoadIntegerC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC)
   }
 
   def getTransformer = new Transformer(javaCompilerTransformations)

@@ -3,7 +3,8 @@ package transformations.javac.expressions.literals
 import core.grammar.RegexG
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.coreInstructions.{IntegerConstantC, LongConstantC}
+import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.types.LongTypeC
 

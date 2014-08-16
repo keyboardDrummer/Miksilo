@@ -3,7 +3,9 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers._
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.TestUtils
 import transformations.javac.constructor.ConstructorC
@@ -44,16 +46,16 @@ class TestPrintByteCodeFibonacciWithMain {
 
   def getFibonacciMethod: MetaObject = {
     val instructions = Seq(
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(2),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(7),
       IntegerConstantC.integerConstant(1),
       GotoC.goTo(16),
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(1),
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(2),
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),

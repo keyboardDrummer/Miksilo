@@ -3,7 +3,8 @@ package transformations.bytecode
 import core.transformation.{MetaObject, Transformer}
 import org.junit.Test
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
 import transformations.javac.{JavaCompiler, TestUtils}
 import transformations.types.IntTypeC
 
@@ -28,7 +29,7 @@ class TestByteCodeGoTo {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
@@ -47,7 +48,7 @@ class TestByteCodeGoTo {
       LabelledTargets.label("start", new MetaObject(ByteCodeSkeleton.AppendFrame) {
         data.put(ByteCodeSkeleton.AppendFrameTypes, Seq(IntTypeC.intType))
       }),
-      LoadIntegerC.integerLoad(0),
+      LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),

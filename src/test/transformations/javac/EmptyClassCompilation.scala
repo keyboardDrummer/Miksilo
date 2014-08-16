@@ -3,7 +3,8 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, LoadAddressC, VoidReturnInstructionC}
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.javac.classes.{ClassC, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.VoidTypeC

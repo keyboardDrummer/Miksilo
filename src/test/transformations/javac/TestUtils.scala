@@ -77,12 +77,13 @@ object TestUtils {
     val actualOutputDirectory = rootOutput / "actual"
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
-    JavaCompiler.getCompiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
-    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutputDirectory = rootOutput / "expected"
     val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
     Assert.assertEquals("", javaCompilerOutput)
+
+    JavaCompiler.getCompiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
+    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)
     try {
