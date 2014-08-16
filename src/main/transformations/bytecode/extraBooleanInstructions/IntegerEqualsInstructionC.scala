@@ -11,7 +11,7 @@ object IntegerEqualsInstructionC extends ExpandInstruction {
 
   def equals = instruction(IntegerEqualsInstructionKey)
 
-  override def dependencies: Set[Contract] = Set(LabelledTargets, IfIntegerCompareEqualC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfIntegerCompareEqualC)
 
   override def key: Any = IntegerEqualsInstructionKey
 

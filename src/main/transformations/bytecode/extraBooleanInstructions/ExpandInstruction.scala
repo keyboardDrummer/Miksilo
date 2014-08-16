@@ -1,10 +1,12 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{Contract, TransformationState, MetaObject}
 import core.transformation.sillyCodePieces.Injector
 
 trait ExpandInstruction extends Injector {
   def key: Any
+
+  override def dependencies: Set[Contract] = Set(ExpandInstructionsC)
 
   def expand(instruction: MetaObject, state: TransformationState) : Seq[MetaObject]
 

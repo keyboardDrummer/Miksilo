@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 object OptimizeBooleanInstructionsC extends ProgramTransformation {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC, NotInstructionC, IntegerEqualsInstructionC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 

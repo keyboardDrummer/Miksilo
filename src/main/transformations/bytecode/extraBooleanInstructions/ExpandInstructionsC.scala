@@ -1,12 +1,11 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{TransformationState, MetaObject, Contract}
 import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareLessC
 
 import scala.collection.mutable
 
@@ -14,7 +13,7 @@ object ExpandInstructionsC extends ProgramTransformation {
 
   def lessThanInstruction = instruction(LessThanInstructionKey)
 
-  override def dependencies: Set[Contract] = Set(LabelledTargets, IfIntegerCompareLessC)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {

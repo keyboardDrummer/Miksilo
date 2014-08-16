@@ -98,9 +98,9 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
 
   def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
     val incoming = origin.inDegreeOf(vertex)
-    val outgoingEdgesOf = origin.outDegreeOf(vertex)
-    val maximum = Math.max(incoming, outgoingEdgesOf)
-    Math.min(1000, maximum * 100)
+    val outgoing = origin.outDegreeOf(vertex)
+    val maximum = Math.max(incoming, outgoing)
+    maximum * 100
   }
 
   //

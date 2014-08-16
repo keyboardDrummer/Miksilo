@@ -11,7 +11,7 @@ object LessThanInstructionC extends ExpandInstruction {
 
   def lessThanInstruction = instruction(LessThanInstructionKey)
 
-  override def dependencies: Set[Contract] = Set(LabelledTargets, IfIntegerCompareLessC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfIntegerCompareLessC)
 
   override def key: Any = LessThanInstructionKey
 

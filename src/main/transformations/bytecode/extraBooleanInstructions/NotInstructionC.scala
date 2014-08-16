@@ -11,7 +11,7 @@ object NotInstructionC extends ExpandInstruction {
 
   def not = instruction(NotInstructionKey)
 
-  override def dependencies: Set[Contract] = Set(LabelledTargets, IfZeroC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfZeroC)
 
   object NotInstructionKey
 
