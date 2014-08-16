@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.additive.AdditionC
@@ -18,7 +18,7 @@ object IncrementAssignmentC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
     val incrementAssignmentGrammar: Grammar = identifier ~ ("+=" ~> assignmentGrammar) ^^
-      { case target seqr value => new MetaObject(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value) }
+      { case target ~ value => new MetaObject(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value) }
     assignmentGrammar.orToInner(incrementAssignmentGrammar)
   }
 

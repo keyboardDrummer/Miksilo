@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.{LoadAddressC, LoadIntegerC, StoreAddressC, StoreIntegerC}
@@ -20,7 +20,7 @@ object AssignmentC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val assignmentGrammar: Grammar = (identifier <~ "=") ~ expressionGrammar ^^ { case target seqr value => assignment(target.asInstanceOf[String], value.asInstanceOf[MetaObject])}
+    val assignmentGrammar: Grammar = (identifier <~ "=") ~ expressionGrammar ^^ { case target ~ value => assignment(target.asInstanceOf[String], value.asInstanceOf[MetaObject])}
     expressionGrammar.inner = expressionGrammar.inner | assignmentGrammar
   }
 

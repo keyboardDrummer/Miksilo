@@ -24,7 +24,7 @@ object EqualityC extends GrammarTransformation {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
-    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ { case left seqr right => equality(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])}
+    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ { case left ~ right => equality(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])}
     equalityGrammar.inner = equalityGrammar.inner | equalityGrammar
   }
 

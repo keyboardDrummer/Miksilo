@@ -1,6 +1,6 @@
 package transformations.javac.expressions.additive
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
@@ -36,7 +36,7 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseAddition: Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left seqr right => addition(left, right)}
+    val parseAddition: Grammar = (additiveGrammar <~ "+") ~ additiveGrammar ^^ { case left ~ right => addition(left, right)}
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
   }
 

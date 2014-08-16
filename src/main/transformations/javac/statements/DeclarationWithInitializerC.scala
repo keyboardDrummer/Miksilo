@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
@@ -18,7 +18,7 @@ object DeclarationWithInitializerC extends StatementInstance {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val parseDeclarationWithInitializer: Grammar = typeGrammar ~ identifier ~ ("=" ~> expression) <~ ";" ^^ { case _type seqr name seqr initializer => declarationWithInitializer(name.asInstanceOf[String], _type.asInstanceOf[MetaObject], initializer.asInstanceOf[MetaObject])}
+    val parseDeclarationWithInitializer: Grammar = typeGrammar ~ identifier ~ ("=" ~> expression) <~ ";" ^^ { case _type ~ name ~ initializer => declarationWithInitializer(name.asInstanceOf[String], _type.asInstanceOf[MetaObject], initializer.asInstanceOf[MetaObject])}
     statement.inner = statement.inner | parseDeclarationWithInitializer
   }
 

@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
@@ -49,7 +49,7 @@ object CallC extends ExpressionInstance {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
-    val parseCall = expression ~ callArguments ^^ { case callee seqr arguments => call(callee, arguments)}
+    val parseCall = expression ~ callArguments ^^ { case callee ~ arguments => call(callee, arguments)}
     core.orToInner(parseCall)
   }
 

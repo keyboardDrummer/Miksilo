@@ -1,11 +1,7 @@
 package core.grammar
 
-trait HasSeqr {
-  case class seqr[+a, +b](_1: a, _2: b) extends scala.AnyRef with scala.Product with scala.Serializable {
-  }
-}
 
-trait GrammarWriter extends HasSeqr {
+trait GrammarWriter {
 
   def identifier = Identifier
 
@@ -23,7 +19,6 @@ trait GrammarWriter extends HasSeqr {
     if (value.forall(c => Character.isLetterOrDigit(c)))
       new Keyword(value)
     else new Delimiter(value)
-
 }
 
 
@@ -38,7 +33,7 @@ trait Grammar extends GrammarWriter {
   def |(other: Grammar) = new Choice(this, other)
 
   def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this) *) ^^ {
-    case first seqr rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
+    case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
   def ~(other: Grammar) = new Sequence(this, other)
@@ -54,15 +49,14 @@ class Many(var inner: Grammar) extends Grammar {
   override def toString: String = s"$inner*"
 }
 
-class IgnoreLeft(first: Grammar, second: Grammar) extends Grammar {
+class IgnoreLeft(first: Grammar, second2: Grammar) extends Grammar {
+  override def simplify = new MapGrammar(new Sequence(first, second2), { case ~(l, r) => r}, s => s)
 
-  override def simplify: Grammar = new MapGrammar(new Sequence(first, second), { case seqr(l, r) => r}, s => s)
-
-  override def toString: String = s"$first ~> $second"
+  override def toString: String = s"$first ~> $second2"
 }
 
 class IgnoreRight(first: Grammar, second: Grammar) extends Grammar {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case seqr(l, r) => l}, s => s)
+  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l}, s => s)
 
   override def toString: String = s"$first <~ $second"
 }

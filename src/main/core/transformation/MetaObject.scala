@@ -17,12 +17,11 @@ object MetaObject {
         case (seq1: Set[_], seq2: Set[_]) =>
           if (seq1.size != seq2.size)
             return false
-          return true
-        case (seq1: Seq[_], seq2: Seq[_]) => {
+          true //TODO missing checks.
+        case (seq1: Seq[_], seq2: Seq[_]) =>
           if (seq1.length != seq2.length)
             return false
           seq1.zip(seq2).forall(p => deepEquality(p._1, p._2, closed))
-        }
         case (meta1: MetaObject, meta2: MetaObject) => deepEqualityMeta(meta1, meta2, closed)
         case (int1: Integer, int2: Integer) => if (options.compareIntegers) first == second else true
         case _ => first == second

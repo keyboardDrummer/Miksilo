@@ -1,6 +1,6 @@
 package transformations.javac.expressions.relational
 
-import core.grammar.{Grammar}
+import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
@@ -37,7 +37,7 @@ object LessThanC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan: Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left seqr right => lessThan(left, right)}
+    val parseLessThan: Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left ~ right => lessThan(left, right)}
     relationalGrammar.inner = relationalGrammar.inner | parseLessThan
   }
 

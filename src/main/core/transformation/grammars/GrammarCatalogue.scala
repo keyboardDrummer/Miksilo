@@ -22,7 +22,7 @@ class GrammarCatalogue {
         return
 
       closed += grammar
-      grammar match {
+      grammar.simplify match {
         case labelled: Labelled => inner(labelled.inner)
         case sequence: Sequence =>
           inner(sequence.first)

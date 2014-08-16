@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-
+import core.grammar.~
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
@@ -51,7 +51,7 @@ object SelectorC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val selection = (expression <~ ".") ~ identifier ^^ { case left seqr right => selector(left, right)}
+    val selection = (expression <~ ".") ~ identifier ^^ { case left ~ right => selector(left, right)}
     core.inner = core.inner | selection
   }
 

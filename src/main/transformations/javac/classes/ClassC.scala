@@ -79,7 +79,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
     val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^ {
-      case (_package seqr _imports) seqr (name seqr members) =>
+      case (_package ~ _imports) ~ (name ~ members) =>
         val methods = members
         clazz(_package.asInstanceOf[Seq[String]],
           name.asInstanceOf[String],

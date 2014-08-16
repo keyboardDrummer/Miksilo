@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-
+import core.grammar.~
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
@@ -113,7 +113,7 @@ object MethodC extends GrammarTransformation {
     val parseReturnType = "void" ^^ (_ => VoidTypeC.voidType) | parseType
 
     val parseParameter = parseType ~ identifier ^^ {
-      case _type seqr _name => parameter(_name.asInstanceOf[String], _type)
+      case _type ~ _name => parameter(_name.asInstanceOf[String], _type)
     }
     val parseParameters = "(" ~> parseParameter.someSeparated(",") <~ ")"
     val parseStatic = "static" ^^ (_ => true) | produce(false)
@@ -125,7 +125,7 @@ object MethodC extends GrammarTransformation {
 
     grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
       parseParameters ~ block ^^ {
-      case visibility seqr static seqr returnType seqr name seqr parameters seqr body =>
+      case visibility ~ static ~ returnType ~ name ~ parameters ~ body =>
         method(name.asInstanceOf[String], returnType, parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
           static.asInstanceOf[Boolean], visibility.asInstanceOf[Visibility])
     })

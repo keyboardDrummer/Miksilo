@@ -6,7 +6,7 @@ import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
 
-class ToPackrat extends StandardTokenParsers with PackratParsers with HasSeqr {
+class ToPackrat extends StandardTokenParsers with PackratParsers {
 
 
   class NewLexical extends StdLexical {
@@ -28,11 +28,11 @@ class ToPackrat extends StandardTokenParsers with PackratParsers with HasSeqr {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
     def helper(grammar: Grammar): PackratParser[Any] = {
-      map.getOrElseUpdate(grammar, grammar match {
-        case sequence: Sequence => helper(sequence.first) ~ helper(sequence.second) ^^ {
-          case l ~ r => new seqr(l, r)
-        }
+      map.getOrElseUpdate(grammar, grammar.simplify match {
         case choice: Choice => helper(choice.left) ||| helper(choice.right)
+        case sequence: Sequence => helper (sequence.first) ~ helper(sequence.second) ^^ {
+          case l ~ r => new core.grammar.~(l,r)
+        }
         case NumberG => numericLit
         case many: Many => helper(many.inner).*
         case originalDelimiter: Delimiter => keyword(originalDelimiter.value)
