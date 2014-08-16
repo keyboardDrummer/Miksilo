@@ -7,7 +7,7 @@ import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.{MethodC, VariableC}
 import transformations.types.IntTypeC
 
-object PostfixIncrementC extends ExpressionInstance {
+object PostFixIncrementC extends ExpressionInstance {
 
   override val key: AnyRef = PostfixIncrementKey
 
