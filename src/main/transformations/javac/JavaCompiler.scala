@@ -16,7 +16,7 @@ import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
 import transformations.javac.expressions.literals.{LongLiteralC, BooleanLiteralC, NullC, IntLiteralC}
-import transformations.javac.expressions.postfix.PostFixIncrementC
+import transformations.javac.expressions.postfix.PostfixIncrementC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.{AssignmentC, AssignmentPrecedence, IncrementAssignmentC}
@@ -41,7 +41,7 @@ object JavaCompiler {
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    PostFixIncrementC, BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
+    PostfixIncrementC, BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++
     Seq(LessThanInstructionC, NotEqualInstructionC, ExpandInstructionsC) ++

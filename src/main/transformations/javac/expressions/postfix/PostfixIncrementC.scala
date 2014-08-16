@@ -2,12 +2,12 @@ package transformations.javac.expressions.postfix
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.coreInstructions.{IncrementIntegerC, LoadIntegerC}
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.{MethodC, VariableC}
 import transformations.types.IntTypeC
 
-object PostFixIncrementC extends ExpressionInstance {
+object PostfixIncrementC extends ExpressionInstance {
 
   override val key: AnyRef = PostfixIncrementKey
 
@@ -20,7 +20,7 @@ object PostFixIncrementC extends ExpressionInstance {
     val methodCompiler = MethodC.getMethodCompiler(state)
     val name: String = plusPlus(VariableKey).asInstanceOf[String]
     val variableAddress = methodCompiler.variables(name).offset
-    Seq(LoadIntegerC.integerLoad(variableAddress), IncrementIntegerC.integerIncrement(variableAddress, 1))
+    Seq(LoadIntegerC.load(variableAddress), IncrementIntegerC.integerIncrement(variableAddress, 1))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

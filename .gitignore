@@ -51,4 +51,9 @@ pip-log.txt
 #############
 
 .idea/workspace.xml
+.idea/workspace*
 out/
+
+
+nonEssentialFiles/*
+target/*
