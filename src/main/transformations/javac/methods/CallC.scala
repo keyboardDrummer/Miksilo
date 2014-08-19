@@ -10,26 +10,6 @@ import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
 object CallC extends ExpressionInstance {
 
-  def callToLines(call: MetaObject, compiler: ClassCompiler): Seq[MetaObject] = {
-    val callCallee = getCallCallee(call)
-    val objectExpression = SelectorC.getSelectorObject(callCallee)
-    val methodKey: MethodId = getMethodKey(call, compiler)
-    val methodInfo = compiler.compiler.find(methodKey)
-    val staticCall = methodInfo._static
-    val expressionToInstruction = ExpressionC.getToInstructions(compiler.state)
-    val calleeInstructions =
-      if (!staticCall) expressionToInstruction(objectExpression)
-      else Seq[MetaObject]()
-    val callArguments = getCallArguments(call)
-    val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
-    val invokeInstructions = Seq(if (staticCall)
-      InvokeStaticC.invokeStatic(methodRefIndex)
-    else
-      InvokeVirtualC.invokeVirtual(methodRefIndex))
-    calleeInstructions ++ argumentInstructions ++ invokeInstructions
-  }
-
   def getMethodKey(call: MetaObject, compiler: ClassCompiler) = {
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
@@ -81,6 +61,23 @@ object CallC extends ExpressionInstance {
 
   override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val compiler = ClassC.getClassCompiler(state)
-    callToLines(call, compiler)
+
+    val callCallee = getCallCallee(call)
+    val objectExpression = SelectorC.getSelectorObject(callCallee)
+    val methodKey: MethodId = getMethodKey(call, compiler)
+    val methodInfo = compiler.compiler.find(methodKey)
+    val staticCall = methodInfo._static
+    val expressionToInstruction = ExpressionC.getToInstructions(compiler.state)
+    val calleeInstructions =
+      if (!staticCall) expressionToInstruction(objectExpression)
+      else Seq[MetaObject]()
+    val callArguments = getCallArguments(call)
+    val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
+    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
+    val invokeInstructions = Seq(if (staticCall)
+      InvokeStaticC.invokeStatic(methodRefIndex)
+    else
+      InvokeVirtualC.invokeVirtual(methodRefIndex))
+    calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 }

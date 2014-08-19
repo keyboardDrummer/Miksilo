@@ -15,7 +15,7 @@ import transformations.types.TypeC
 
 object AssignToVariable extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(AssignmentC)
+  override def dependencies: Set[Contract] = Set(AssignmentC, VariableC)
 
   override def inject(state: TransformationState): Unit = {
     AssignmentC.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObject) => {

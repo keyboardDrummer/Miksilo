@@ -1,17 +1,16 @@
-package transformations.javac.methods
+package transformations.javac.classes
 
 import core.grammar.~
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
-import transformations.javac.classes._
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
 object SelectorC extends ExpressionInstance {
 
   override val key: AnyRef = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(MethodC, GetStaticC)
+  override def dependencies: Set[Contract] = Set(ClassC, GetStaticC)
 
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
 
@@ -52,8 +51,10 @@ object SelectorC extends ExpressionInstance {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier ^^ { case left ~ right => selector(left, right)}
-    core.inner = core.inner | selection
+    core.orToInner(grammars.create(SelectGrammar, selection))
   }
+
+  object SelectGrammar
 
   object SelectorKey
 

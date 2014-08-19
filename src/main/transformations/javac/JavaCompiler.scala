@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.objects.{LoadAddressC, PushNull
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets, PoptimizeC}
-import transformations.javac.classes.{ClassC, ClassOrPackageReference, ClassOrPackageSelector}
+import transformations.javac.classes.{SelectorC, ClassC, ClassOrPackageReference, ClassOrPackageSelector}
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}

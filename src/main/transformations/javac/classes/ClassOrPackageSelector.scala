@@ -2,8 +2,7 @@ package transformations.javac.classes
 
 import core.transformation.sillyCodePieces.Injector
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.methods.SelectorC
-import transformations.javac.methods.SelectorC.SelectorKey
+import SelectorC.SelectorKey
 
 object ClassOrPackageSelector extends Injector {
   override def dependencies: Set[Contract] = Set(SelectorC, ClassC)

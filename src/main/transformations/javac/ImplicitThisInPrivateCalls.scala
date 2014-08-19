@@ -2,9 +2,9 @@ package transformations.javac
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.classes.ClassC
+import transformations.javac.classes.{SelectorC, ClassC}
 import transformations.javac.expressions.ExpressionC
-import transformations.javac.methods.{CallC, SelectorC, VariableC}
+import transformations.javac.methods.{CallC, VariableC}
 
 object ImplicitThisInPrivateCalls extends ProgramTransformation {
   val thisName: String = "this"
