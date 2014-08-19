@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionC
@@ -27,5 +27,7 @@ object LoadIntegerC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq(IntTypeC.intType))
 
   object IntegerLoad
+
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
 }

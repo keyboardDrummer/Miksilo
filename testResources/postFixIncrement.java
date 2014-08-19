@@ -3,6 +3,7 @@ class PostFixIncrement {
   {
     int x = 1;
     x++;
+    x = 3 + x++;
     System.out.print(x++);
   }
 }

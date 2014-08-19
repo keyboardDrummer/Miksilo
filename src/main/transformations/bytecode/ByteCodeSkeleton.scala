@@ -189,13 +189,16 @@ object ByteCodeSkeleton extends Injector {
 
   def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  override def dependencies: Set[Contract] = Set(ObjectTypeC, IntTypeC, DoubleTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC)
+  override def dependencies: Set[Contract] = Set(ObjectTypeC, DoubleTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC)
 
   trait MethodAccessFlag
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
 
+  def getConstantPool(state: TransformationState) = getState(state).constantPool
+
   class State {
+    var constantPool: ConstantPool = null
     val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
     val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => (Seq[MetaObject], Seq[MetaObject])]
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]

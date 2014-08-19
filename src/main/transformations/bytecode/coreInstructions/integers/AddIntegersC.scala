@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionC
@@ -22,4 +22,5 @@ object AddIntegersC extends InstructionC {
 
   object AddIntegersKey
 
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 }

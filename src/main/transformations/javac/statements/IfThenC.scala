@@ -8,8 +8,11 @@ import transformations.javac.expressions.ExpressionC
 import core.grammar.~
 
 object IfThenC extends StatementInstance {
+
   object IfThenKey
+
   object ConditionKey
+
   object ThenKey
 
   override val key: AnyRef = IfThenKey
@@ -34,9 +37,9 @@ object IfThenC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^
-      { case condition ~ body => new MetaObject(IfThenKey, ConditionKey -> condition, ThenKey -> body)}
+    val bodyGrammar = grammars.find(BlockC.BlockGrammar) | (statementGrammar ^^ (statement => Seq(statement)))
+    val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^
+      { case condition ~ body => new MetaObject(IfThenKey, ConditionKey -> condition, ThenKey -> body) }
     statementGrammar.orToInner(ifThenGrammar)
   }
 }

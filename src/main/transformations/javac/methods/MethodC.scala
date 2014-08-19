@@ -16,9 +16,9 @@ object MethodC extends GrammarTransformation {
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
-    //TODO don't depend on classCompiler and don't get called directly from ClassC.
 
-    def getMethodDescriptorIndex(method: MetaObject): Int = classCompiler.constantPool.store(getMethodDescriptor(method))
+    val constantPool = ByteCodeSkeleton.getState(state).constantPool
+    def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method))
 
     addMethodFlags(method)
     val methodNameIndex: Int = classCompiler.getMethodNameIndex(getMethodName(method))
@@ -36,7 +36,7 @@ object MethodC extends GrammarTransformation {
       val statements = getMethodBody(method)
       val statementToInstructions = StatementC.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
-      val codeIndex = classCompiler.constantPool.store(ByteCodeSkeleton.CodeAttributeId)
+      val codeIndex = constantPool.store(ByteCodeSkeleton.CodeAttributeId)
       val exceptionTable = Seq[MetaObject]()
       val codeAttributes = Seq[MetaObject]()
       val codeAttribute = new MetaObject(ByteCodeSkeleton.CodeKey) {
@@ -49,6 +49,7 @@ object MethodC extends GrammarTransformation {
       method(ByteCodeSkeleton.MethodAnnotations) = Seq(codeAttribute)
     }
 
+    //TODO don't depend on classCompiler and don't get called directly from ClassC.
     def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
       val methodCompiler = new MethodCompiler(state)
       if (!getMethodStatic(method))

@@ -106,7 +106,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testIncrementAssignment() {
     val input = "x += 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation = IncrementAssignmentC.incrementAssignment("x", IntLiteralC.literal(1))
+    val expectation = IncrementAssignmentC.incrementAssignment(VariableC.variable("x"), IntLiteralC.literal(1))
     Assert.assertEquals(expectation, result)
   }
 

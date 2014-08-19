@@ -4,6 +4,7 @@ import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
 import transformations.types.BooleanTypeC.BooleanTypeKey
@@ -28,7 +29,11 @@ object TypeC extends GrammarTransformation {
     }
   }
 
-  def toStackType(constantPool: ConstantPool, _type: MetaObject) = {
+  def toStackType(_type: MetaObject, state: TransformationState) : MetaObject = {
+    toStackType(ByteCodeSkeleton.getState(state).constantPool, _type)
+  }
+
+  def toStackType(constantPool: ConstantPool, _type: MetaObject) : MetaObject  = {
     _type.clazz match {
       case BooleanTypeKey => IntTypeC.intType
       case ObjectTypeC.ObjectTypeKey => ObjectTypeC.stackObjectType(constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))

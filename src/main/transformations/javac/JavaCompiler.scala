@@ -17,9 +17,10 @@ import transformations.javac.expressions.additive.{AddAdditivePrecedence, Additi
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
 import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
 import transformations.javac.expressions.postfix.PostFixIncrementC
+import transformations.javac.expressions.prefix.NotC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
-import transformations.javac.methods.assignment.{AssignmentC, AssignmentPrecedence, IncrementAssignmentC}
+import transformations.javac.methods.assignment.{AssignToVariable, AssignmentC, AssignmentPrecedence, IncrementAssignmentC}
 import transformations.javac.statements._
 import transformations.types._
 
@@ -33,7 +34,7 @@ object JavaCompiler {
   }
 
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
-    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignmentC, AssignmentPrecedence,DeclarationC,
+    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable, AssignmentC, AssignmentPrecedence,DeclarationC,
     PostFixIncrementC, VariableC, ClassC, MethodC) ++
     javaSimpleStatement //todo move class.
 
@@ -42,10 +43,10 @@ object JavaCompiler {
 
   def javaSimpleExpression = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
+    BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++
-    Seq(LessThanInstructionC, NotInstructionC, ExpandInstructionsC, IntegerEqualsInstructionC) ++
+    Seq(LessThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandInstructionsC) ++
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations

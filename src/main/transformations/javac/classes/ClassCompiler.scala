@@ -16,7 +16,7 @@ case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMem
 
 case class MethodId(className: QualifiedClassName, methodName: String)
 
-case class ClassCompiler(currentClass: MetaObject, transformationState: TransformationState) {
+case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
 
 
   val compiler = new MyCompiler()
@@ -24,7 +24,9 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
   val className = ClassC.getClassName(currentClass)
   val currentClassInfo = myPackage.newClassInfo(className)
 
-  val constantPool = new ConstantPool()
+  ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()
+  def constantPool = ByteCodeSkeleton.getState(state).constantPool
+
   val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
 
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
@@ -77,14 +79,14 @@ case class ClassCompiler(currentClass: MetaObject, transformationState: Transfor
   }
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = ClassC.getReferenceKindRegistry(transformationState).get(expression.clazz)
+    val getReferenceKindOption = ClassC.getReferenceKindRegistry(state).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(expression)
     })(implementation => implementation(expression))
   }
 
   def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
-    val classInfo: ClassInfo = findClass(ExpressionC.getType(transformationState)(expression))
+    val classInfo: ClassInfo = findClass(ExpressionC.getType(state)(expression))
     new ClassOrObjectReference(classInfo, false)
   }
 

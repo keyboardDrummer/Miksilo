@@ -4,6 +4,7 @@ import core.grammar._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
+import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentC
 import transformations.javac.statements.DeclarationC.{DeclarationName, DeclarationType}
 import transformations.types.TypeC
@@ -35,7 +36,7 @@ object DeclarationWithInitializerC extends StatementInstance {
     val name: String = DeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = DeclarationC.getDeclarationType(declarationWithInitializer)
     val declaration = DeclarationC.declaration(name, _type)
-    val assignment = AssignmentC.assignment(name, getInitializer(declarationWithInitializer))
+    val assignment = AssignmentC.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
     val toInstructions = StatementC.getToInstructions(state)
     toInstructions(declaration) ++ toInstructions(ExpressionAsStatementC.asStatement(assignment)) //TODO maybe translate to statements instead of bytecode.

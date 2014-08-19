@@ -6,7 +6,7 @@ import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.{IntTypeC, LongTypeC, BooleanTypeC}
+import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeC}
 
 object EqualityC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
@@ -42,7 +42,7 @@ object EqualityC extends ExpressionInstance {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionC.getToInstructions(state)
-    val inputType = getInputType(equality,state)
+    val inputType = TypeC.toStackType(getInputType(equality,state),state)
     val equalityInstructions: Seq[MetaObject] = inputType.clazz match {
       case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)

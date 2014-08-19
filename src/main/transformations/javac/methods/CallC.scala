@@ -16,7 +16,7 @@ object CallC extends ExpressionInstance {
     val methodKey: MethodId = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
-    val expressionToInstruction = ExpressionC.getToInstructions(compiler.transformationState)
+    val expressionToInstruction = ExpressionC.getToInstructions(compiler.state)
     val calleeInstructions =
       if (!staticCall) expressionToInstruction(objectExpression)
       else Seq[MetaObject]()

@@ -3,31 +3,32 @@ package transformations.javac.methods.assignment
 import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.coreInstructions.integers.{LoadIntegerC, StoreIntegerC}
-import transformations.bytecode.coreInstructions.longs.{LoadLongC, StoreLongC}
-import transformations.bytecode.coreInstructions.objects.{LoadAddressC, StoreAddressC}
+import transformations.bytecode.coreInstructions.integers.StoreIntegerC
+import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.MethodC
-import transformations.types.ArrayTypeC.ArrayTypeKey
-import transformations.types.IntTypeC.IntTypeKey
-import transformations.types.LongTypeC.LongTypeKey
-import transformations.types.ObjectTypeC.ObjectTypeKey
+
+import scala.collection.mutable
 
 object AssignmentC extends ExpressionInstance {
 
-  def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[String]
+  def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[MetaObject]
 
   def getAssignmentValue(assignment: MetaObject) = assignment(AssignmentValue).asInstanceOf[MetaObject]
 
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC, AssignmentPrecedence)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val targetGrammar = grammars.create(AssignmentTargetGrammar, FailureG)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val assignmentGrammar: Grammar = (identifier <~ "=") ~ expressionGrammar ^^ { case target ~ value => assignment(target.asInstanceOf[String], value.asInstanceOf[MetaObject])}
-    expressionGrammar.inner = expressionGrammar.inner | assignmentGrammar
+    val assignmentGrammar: Grammar = (targetGrammar <~ "=") ~ expressionGrammar ^^
+      { case target ~ value => assignment(target.asInstanceOf[MetaObject], value.asInstanceOf[MetaObject])}
+    expressionGrammar.orToInner(assignmentGrammar)
   }
 
-  def assignment(target: String, value: MetaObject) = new MetaObject(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
+  object AssignmentTargetGrammar
+
+  def assignment(target: MetaObject, value: MetaObject) = new MetaObject(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
   object AssignmentKey
 
@@ -38,28 +39,22 @@ object AssignmentC extends ExpressionInstance {
   override val key: AnyRef = AssignmentKey
 
   override def getType(assignment: MetaObject, state: TransformationState): MetaObject = {
-    val methodCompiler = MethodC.getMethodCompiler(state)
     val target = getAssignmentTarget(assignment)
-    val variable = methodCompiler.variables(target)
-    variable._type
+    ExpressionC.getType(state)(target)
+  }
+
+  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+
+  class State {
+    val assignFromStackByteCodeRegistry = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]
   }
 
   override def toByteCode(assignment: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val methodCompiler = MethodC.getMethodCompiler(state)
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionC.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)
-    val variable = methodCompiler.variables(target)
-    valueInstructions ++ Seq(variable._type.clazz match {
-      case IntTypeKey => StoreIntegerC.integerStore(variable.offset)
-      case ObjectTypeKey => StoreAddressC.addressStore(variable.offset)
-      case ArrayTypeKey => StoreAddressC.addressStore(variable.offset)
-      case LongTypeKey => StoreLongC.longStore(variable.offset)
-    }) ++ Seq(variable._type.clazz match {
-      case IntTypeKey => LoadIntegerC.load(variable.offset)
-      case ObjectTypeKey => LoadAddressC.addressLoad(variable.offset)
-      case ArrayTypeKey => LoadAddressC.addressLoad(variable.offset)
-      case LongTypeKey => LoadLongC.load(variable.offset)
-    })
+    val assignInstructions = getState(state).assignFromStackByteCodeRegistry(target.clazz)(target)
+    valueInstructions ++ assignInstructions
+
   }
 }
