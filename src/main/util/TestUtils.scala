@@ -1,9 +1,10 @@
-package transformations.javac
+package util
 
 import core.transformation._
 import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
 import org.junit.Assert
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
@@ -37,7 +38,7 @@ object TestUtils {
     Assert.assertEquals(expectedResult, Integer.parseInt(line))
   }
 
-  def runByteCode(className: String, code: MetaObject) = {
+  def runByteCode(className: String, code: MetaObject) : String = {
     val bytes = getBytes(code).toArray
     val currentDir = new File(new java.io.File("."))
     val testDirectory = currentDir / Path("testOutput")
@@ -53,7 +54,6 @@ object TestUtils {
   def parseAndTransform(className: String, inputDirectory: Path, compiler: CompilerFromTransformations): MetaObject = {
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
-    val testOutput = Directory(currentDir / Path("testOutput"))
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
     compiler.parseAndTransform(input)

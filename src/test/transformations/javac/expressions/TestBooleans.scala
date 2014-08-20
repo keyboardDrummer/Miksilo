@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import org.junit.Test
-import transformations.javac.TestUtils
+import util.TestUtils
 
 import scala.reflect.io.Path
 

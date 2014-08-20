@@ -7,9 +7,9 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfInteg
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.QualifiedClassName
-import transformations.javac.TestUtils
 import transformations.javac.constructor.ConstructorC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import util.TestUtils
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

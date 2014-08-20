@@ -4,7 +4,8 @@ import core.transformation.{CompilerFromTransformations, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
-import transformations.javac.{JavaCompiler, TestUtils}
+import transformations.javac.JavaCompiler
+import util.TestUtils
 
 import scala.reflect.io.Path
 

@@ -8,6 +8,7 @@ import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInst
 import transformations.javac.classes.{ClassC, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.VoidTypeC
+import util.TestUtils
 
 import scala.collection.mutable.ArrayBuffer
 

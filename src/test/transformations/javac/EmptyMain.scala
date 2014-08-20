@@ -6,6 +6,7 @@ import transformations.javac.classes.ClassC._
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.methods.MethodC._
 import transformations.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
+import util.TestUtils
 
 class EmptyMain {
   val className = "EmptyMain"

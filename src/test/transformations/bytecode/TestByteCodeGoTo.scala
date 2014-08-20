@@ -5,8 +5,9 @@ import org.junit.Test
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
-import transformations.javac.{JavaCompiler, TestUtils}
+import transformations.javac.JavaCompiler
 import transformations.types.IntTypeC
+import util.TestUtils
 
 import scala.collection.mutable
 

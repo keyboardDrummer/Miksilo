@@ -6,9 +6,9 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.TestUtils
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{IntTypeC, VoidTypeC}
+import util.TestUtils
 
 import scala.collection.mutable.ArrayBuffer
 
