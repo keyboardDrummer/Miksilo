@@ -3,6 +3,7 @@ package application
 import java.awt._
 import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
+import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.RowFilter.Entry
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing._
@@ -48,17 +49,13 @@ object Program extends SimpleSwingApplication {
     val presetsPanel: JPanel = getPresetsPanel
     val presetsConstraints = getConstraints
 
-    val separatorConstraints = getSeparatorConstraints
-
     layout.setConstraints(presetsPanel, presetsConstraints)
     panel.add(presetsPanel)
-    //panel.add(new JSeparator(SwingConstants.VERTICAL), separatorConstraints)
 
     val availableScrollPane = getAvailableScrollPane
     val availableListConstraints: GridBagConstraints = getConstraints
     panel.add(availableScrollPane, availableListConstraints)
 
-    //panel.add(new JSeparator(SwingConstants.VERTICAL), separatorConstraints)
 
     val programPanel: JPanel = getCompilerPanel
     val programPanelConstraints = getConstraints
@@ -67,7 +64,6 @@ object Program extends SimpleSwingApplication {
 
     panel
   }
-
 
   def getSeparatorConstraints: GridBagConstraints = {
     val separatorConstraints = new GridBagConstraints()
@@ -113,7 +109,7 @@ object Program extends SimpleSwingApplication {
 
   def setTitleBorder(presetsPanel: JComponent, titleString: String) {
     val hugeFont = new Font("Courier New", Font.BOLD, 24)
-    presetsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), titleString.toUpperCase(), TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, hugeFont))
+    presetsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), titleString.toUpperCase, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, hugeFont))
   }
 
   def defaultInsets: Insets = {
@@ -208,10 +204,15 @@ object Program extends SimpleSwingApplication {
     val actionButtonsLayout = new FlowLayout()
     actionButtonsLayout.setAlignment(FlowLayout.RIGHT)
     val actionButtons = new JPanel(actionButtonsLayout)
-    actionButtons.add(new JButton("Get Compiler with Grammar Output"))
-    actionButtons.add(new JButton("Get Compiler with ByteCode Output"))
-    actionButtons.add(new JButton("Show Input Grammar"))
-    actionButtons.add(new JButton("Show Output Grammar"))
+    val buildCompilerButton = new JButton("Build Compiler")
+    buildCompilerButton.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        val cockpit = new CompilerCockpit(JavaCompiler.javaCompilerTransformations)
+        cockpit.pack()
+        cockpit.visible = true
+      }
+    })
+    actionButtons.add(buildCompilerButton)
 
     constraints.weighty = 0
     constraints
