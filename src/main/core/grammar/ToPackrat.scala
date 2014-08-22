@@ -41,7 +41,7 @@ class ToPackrat extends JavaTokenParsers with PackratParsers {
         case core.grammar.Identifier => ident.filter(identifier => !keywords.contains(identifier))
         case SuccessG => success[Any](null)
         case labelled: Labelled => helper(labelled.inner)
-        case map: MapGrammar => helper(map.inner) ^^ map.forward
+        case map: MapGrammar => helper(map.inner) ^^ map.map
         case produce: Produce => success(produce.result)
         case FailureG => failure("fail")
         case null => throw new RuntimeException("cannot convert empty grammar")

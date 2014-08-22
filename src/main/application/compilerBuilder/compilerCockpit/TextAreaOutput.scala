@@ -2,13 +2,14 @@ package application.compilerBuilder.compilerCockpit
 
 import core.transformation.TransformationState
 
-class TextAreaOutput(cockpit: CompilerCockpit) extends OutputOption {
+class TextAreaOutput(setText: String => Unit) extends OutputOption {
 
    override def enter(state: TransformationState): Unit = {}
 
    override def leave(state: TransformationState): Unit = {
-     cockpit.outputTextArea.setText(OutputOption.getOutput(state))
+     setText(OutputOption.getOutput(state))
+     state.stop = true
    }
 
-   override def toString = "TextAreaOutput"
+   override def toString = "Output to text area"
  }

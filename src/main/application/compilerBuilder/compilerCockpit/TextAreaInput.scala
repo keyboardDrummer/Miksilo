@@ -3,12 +3,12 @@ package application.compilerBuilder.compilerCockpit
 import core.grammar.ParseException
 import core.transformation.{MetaObject, TransformationsToPackrat, TransformationState}
 
-class TextAreaInput(cockpit: CompilerCockpit) extends InputOption {
+class TextAreaInput(getText: () => String) extends InputOption {
 
    override def enter(state: TransformationState): Unit = {}
 
    override def leave(state: TransformationState): Unit = {
-     val inputStream = cockpit.inputTextArea.getText
+     val inputStream = getText()
      val manager = new TransformationsToPackrat()
      val parser = manager.buildParser(state.grammarCatalogue)
 
@@ -19,5 +19,5 @@ class TextAreaInput(cockpit: CompilerCockpit) extends InputOption {
      state.program = parseResult.get.asInstanceOf[MetaObject]
    }
 
-   override def toString = "TextAreaInput"
+   override def toString = "Input from text area"
  }

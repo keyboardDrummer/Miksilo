@@ -5,7 +5,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.{QualifiedClassName, ConstantPool}
 import util.TestUtils
 
-object Run extends CompileOption {
+object CompileAndRun extends CompileOption {
   override def leave(state: TransformationState): Unit = {
     val clazz: MetaObject = state.program
     val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)

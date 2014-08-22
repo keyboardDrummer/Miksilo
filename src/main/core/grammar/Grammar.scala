@@ -1,7 +1,9 @@
 package core.grammar
 
-import scala.util.matching.Regex
+import core.responsiveDocument.ResponsiveDocument
 
+import scala.collection.immutable.Stream.Cons
+import scala.util.matching.Regex
 
 trait GrammarWriter {
 
@@ -26,6 +28,9 @@ trait GrammarWriter {
 
 trait Grammar extends GrammarWriter {
 
+  def toDocument : ResponsiveDocument
+  override def toString = toDocument.renderString
+
   def simplify: Grammar = this
 
   def <~(right: Grammar) = new IgnoreRight(this, right)
@@ -44,62 +49,102 @@ trait Grammar extends GrammarWriter {
 
   def * = new Many(this)
 
-  def ^^(f: (Any) => Any): Grammar = new MapGrammar(this, f, s => s)
+  def ^^(map: (Any) => Any): Grammar = new MapGrammar(this, map)
+
+  def traverse(): Stream[Grammar] = {
+    var closed = Set.empty[Grammar]
+
+    def helper(grammar: Grammar): Stream[Grammar] = {
+      if (closed.contains(grammar))
+        return Stream.empty
+      
+      closed += grammar
+      
+      new Cons(grammar, grammar.simplify match {
+        case choice: Choice => helper(choice.left) ++ helper(choice.right)
+        case sequence: Sequence => helper(sequence.first) ++ helper(sequence.second)
+        case many: Many => helper(many.inner)
+        case labelled: Labelled => helper(labelled.inner)
+        case map: MapGrammar => helper(map.inner)
+        case x => Stream.empty
+      })
+    }
+
+    helper(this)
+  }
+
 }
 
-class RegexG(val regex: Regex) extends Grammar
+class RegexG(val regex: Regex) extends Grammar {
+  override def toDocument: ResponsiveDocument = s"Regex($regex)"
+}
 
 class Many(var inner: Grammar) extends Grammar {
-  override def toString: String = s"$inner*"
+  override def toDocument: ResponsiveDocument = ResponsiveDocument.text("(") ~ inner.toDocument ~ ")" ~ "*"
 }
 
-class IgnoreLeft(first: Grammar, second2: Grammar) extends Grammar {
-  override def simplify = new MapGrammar(new Sequence(first, second2), { case ~(l, r) => r}, s => s)
-
-  override def toString: String = s"$first ~> $second2"
+class IgnoreLeft(first: Grammar, second: Grammar) extends Grammar {
+  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => r})
+  override def toDocument: ResponsiveDocument = first.toDocument | second.toDocument
 }
 
 class IgnoreRight(first: Grammar, second: Grammar) extends Grammar {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l}, s => s)
-
-  override def toString: String = s"$first <~ $second"
+  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l})
+  override def toDocument: ResponsiveDocument = first.toDocument | second.toDocument
 }
 
 class Sequence(var first: Grammar, var second: Grammar) extends Grammar {
-  override def toString: String = s"$first ~ $second"
+  override def toDocument: ResponsiveDocument = first.toDocument | second.toDocument
 }
 
 class Produce(var result: Any) extends Grammar {
-
+  override def toDocument: ResponsiveDocument = ""
 }
 
 class Delimiter(var value: String) extends Grammar {
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def toString: String = value
+  override def toDocument: ResponsiveDocument = value
 }
 
 class Keyword(var value: String) extends Grammar {
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def toString: String = value
+  override def toDocument: ResponsiveDocument = value
 }
-
 
 class Choice(var left: Grammar, var right: Grammar) extends Grammar {
-  override def toString: String = s"$left | $right"
+  override def toDocument: ResponsiveDocument = ResponsiveDocument.text("(") ~ left.toDocument | "^" | right.toDocument ~ ")"
 }
 
-class MapGrammar(val inner: Grammar, val forward: Any => Any, val backward: Any => Any) extends Grammar {
+class MapGrammar(val inner: Grammar, val map: Any => Any) extends Grammar {
   override def toString: String = inner.toString
+  override def toDocument: ResponsiveDocument = inner.toDocument // ResponsiveDocument.text("(") ~ inner.toDocument ~ ")"
 }
 
 class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
-  override def toString: String = name.getClass.getSimpleName
 
   def orToInner(addition: Grammar) {
     inner = inner | addition
   }
+
+  override def toDocument: ResponsiveDocument = name.getClass.getSimpleName
+}
+
+object FailureG extends Grammar {
+  override def toDocument: ResponsiveDocument = "fail"
+}
+
+object SuccessG extends Grammar {
+  override def toDocument: ResponsiveDocument = "success"
+}
+
+object NumberG extends Grammar {
+  override def toDocument: ResponsiveDocument = "number"
+}
+
+object Identifier extends Grammar {
+  override def toDocument: ResponsiveDocument = "identifier"
 }

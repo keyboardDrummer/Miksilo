@@ -9,5 +9,5 @@ object CompileByteCode extends CompileOption {
     OutputOption.setOutput(state, PrintByteCode.printBytes(bytes))
   }
 
-  override def toString = "Compile"
+  override def toString = "Compile to ByteCode"
 }

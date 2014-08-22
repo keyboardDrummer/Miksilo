@@ -6,16 +6,13 @@ import java.awt.dnd.DnDConstants
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.RowFilter.Entry
 import javax.swing.TransferHandler.TransferSupport
-import javax.swing.border.{TitledBorder, BevelBorder}
 import javax.swing._
+import javax.swing.border.{BevelBorder, TitledBorder}
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.Document
 
-import application.ExampleListCellRenderer
+import application.{StyleSheet, ExampleListCellRenderer}
 import application.compilerBuilder.compilerCockpit.CompilerCockpit
-import application.graphing.GraphView
-import application.graphing.model.TransformationGraph
-import com.mxgraph.swing.mxGraphComponent
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
@@ -91,8 +88,8 @@ object CompilerBuilderPanel {
   }
 
   def setTitleBorder(presetsPanel: JComponent, titleString: String) {
-    val hugeFont = new Font("Courier New", Font.BOLD, 24)
-    presetsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), titleString.toUpperCase, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, hugeFont))
+    presetsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), titleString.toUpperCase,
+      TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, StyleSheet.hugeFont))
   }
 
   def defaultInsets: Insets = {
@@ -192,6 +189,7 @@ object CompilerBuilderPanel {
       override def actionPerformed(e: ActionEvent): Unit = {
         val cockpit = new CompilerCockpit(JavaCompiler.javaCompilerTransformations)
         cockpit.pack()
+        cockpit.maximize()
         cockpit.visible = true
       }
     })
