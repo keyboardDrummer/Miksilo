@@ -6,6 +6,7 @@ import javax.swing._
 import javax.swing.text.PlainDocument
 
 import application.StyleSheet
+import core.layouts.SwingEquationLayout
 import core.modularProgram.PieceCombiner
 import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
@@ -21,7 +22,6 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
   private var outputOption: OutputOption = {
     textAreaOutput
   }
-  val minimumTextAreaWidth = 600
 
   private var compileOption: CompileOption = CompileAndRun
   val compileOptions = Array(CompileByteCode, compileOption)
@@ -35,35 +35,48 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
   }
 
   def initialise() {
-    val panel = new JPanel(new GridBagLayout())
+    val panel = new JPanel()
+    val layout = new GroupLayout(panel)
+    panel.setLayout(layout)
     contents = Component.wrap(panel)
 
-    val constraints = getConstraints
+    val equationLayout = new SwingEquationLayout(panel)
 
-    constraints.gridx = 0
-    panel.add(getChooseInput,constraints)
+    val chooseInputSwing: JPanel = getChooseInput
+    val chooseInput = equationLayout.addComponent(chooseInputSwing)
+    val chooseCompileSwing: JPanel = getChooseCompile
+    val chooseCompile = equationLayout.addComponent(chooseCompileSwing)
+    val chooseOutputSwing: JPanel = getChooseOutput
+    val chooseOutput = equationLayout.addComponent(chooseOutputSwing)
+    val executeButtonSwing: JButton = getExecuteButton
+    val executeButton = equationLayout.addComponent(executeButtonSwing)
+    val inputPanel = equationLayout.addComponent(getInputPanel)
+    val outputPanel = equationLayout.addComponent(getOutputPanel)
+    val grammarButtonSwing: JButton = getShowInputGrammarButton
+    val grammarButton = equationLayout.addComponent(grammarButtonSwing)
 
-    constraints.gridx = 1
-    panel.add(getChooseCompile, constraints)
+    val innerLayout = equationLayout.equationLayout
 
-    constraints.gridx = 2
-    panel.add(getChooseOutput, constraints)
+    equationLayout.makePreferredSize(chooseCompile)
+    equationLayout.makePreferredSize(chooseOutput)
+    equationLayout.makePreferredSize(chooseInput)
+    equationLayout.makePreferredSize(grammarButton)
 
-    constraints.fill = GridBagConstraints.BOTH
-    constraints.gridy = 1
-    constraints.gridx = 1
-    panel.add(getExecuteButton, constraints)
+    //HORIZONTAL
+    innerLayout.addLeftToRight(innerLayout.container, inputPanel, executeButton, outputPanel, innerLayout.container)
+    innerLayout.expressions += inputPanel.width - outputPanel.width
+    innerLayout.expressions += executeButton.width - executeButtonSwing.getPreferredSize.width
 
-    constraints.fill = GridBagConstraints.BOTH
-    constraints.weightx = 1
-    constraints.weighty = 1
-    constraints.gridy = 1
-    constraints.gridx = 0
-    panel.add(getInputPanel, constraints)
+    innerLayout.expressions ++= Seq(chooseInput.horizontalCenter2 - inputPanel.horizontalCenter2,
+      chooseCompile.horizontalCenter2 - executeButton.horizontalCenter2,
+      chooseOutput.horizontalCenter2 - outputPanel.horizontalCenter2)
 
-    constraints.gridx = 2
-    panel.add(getOutputPanel, constraints)
+    innerLayout.addEquals(grammarButton.left, 0)
 
+    //VERTICAL
+    innerLayout.addEquals(chooseInput.verticalCenter2, chooseCompile.verticalCenter2, chooseOutput.verticalCenter2, grammarButton.verticalCenter2)
+    innerLayout.addRow(inputPanel, executeButton, outputPanel)
+    innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
   }
 
   def getExecuteButton: JButton = {
@@ -97,7 +110,6 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
     val inputTextArea = new JTextArea()
     inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new JScrollPane(inputTextArea))
-    panel.setMinimumSize(new Dimension(minimumTextAreaWidth, 0))
     panel
   }
 
@@ -107,7 +119,6 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
     val outputTextArea = new JTextArea(outputDocument)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     outputPanel.add(new JScrollPane(outputTextArea))
-    outputPanel.setMinimumSize(new Dimension(minimumTextAreaWidth, 0))
     outputPanel
   }
 
@@ -124,7 +135,6 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
       override def setSelectedItem(selectedItem: scala.Any): Unit = inputOption = selectedItem.asInstanceOf[InputOption]
     })
     chooseInput.add(inputComboBox)
-    chooseInput.add(getShowInputGrammarButton)
     chooseInput
   }
 
