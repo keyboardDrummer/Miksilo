@@ -1,4 +1,4 @@
-package application.compilerBuilder.compilerCockpit
+package application.compilerCockpit
 
 import core.grammar.ToDocument
 import core.transformation.TransformationState

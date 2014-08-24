@@ -6,7 +6,7 @@ import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
-import application.compilerBuilder.compilerCockpit.CompilerCockpit
+import application.compilerCockpit.CompilerCockpit
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 
