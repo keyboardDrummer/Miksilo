@@ -116,7 +116,7 @@ object MethodC extends GrammarTransformation {
     val parseParameter = parseType ~ identifier ^^ {
       case _type ~ _name => parameter(_name.asInstanceOf[String], _type)
     }
-    val parseParameters = "(" ~> parseParameter.someSeparated(",") <~ ")"
+    val parseParameters = "(" ~> parseParameter.manySeparated(",") <~ ")"
     val parseStatic = "static" ^^ (_ => true) | produce(false)
     val visibilityModifier =
       "public" ^^ (_ => PublicVisibility) |

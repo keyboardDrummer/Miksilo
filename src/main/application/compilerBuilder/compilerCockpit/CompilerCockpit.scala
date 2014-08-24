@@ -108,6 +108,7 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
     val cardLayout = new CardLayout()
     val panel = new JPanel(cardLayout)
     val inputTextArea = new JTextArea()
+    inputTextArea.setFont(StyleSheet.codeFont)
     inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new JScrollPane(inputTextArea))
     panel
@@ -117,6 +118,7 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
     val outputTextArea = new JTextArea(outputDocument)
+    outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     outputPanel.add(new JScrollPane(outputTextArea))
     outputPanel

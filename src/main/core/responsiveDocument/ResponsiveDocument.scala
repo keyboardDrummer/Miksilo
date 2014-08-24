@@ -19,4 +19,7 @@ trait ResponsiveDocument {
   def ~(right: ResponsiveDocument) = new ResponsiveLeftRight(this,right)
   def ^(bottom: ResponsiveDocument) = new ResponsiveTopBottom(this,bottom)
   def ^^(bottom: ResponsiveDocument) = this ^ BlankLine ^ bottom
+  def inParenthesis = ResponsiveDocument.text("(") ~ this ~ ")"
+
+  override def toString = renderString
 }

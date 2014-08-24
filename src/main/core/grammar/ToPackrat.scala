@@ -39,7 +39,6 @@ class ToPackrat extends JavaTokenParsers with PackratParsers {
         case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value)
         case originalKeyword: core.grammar.Keyword => literal(originalKeyword.value)
         case core.grammar.Identifier => ident.filter(identifier => !keywords.contains(identifier))
-        case SuccessG => success[Any](null)
         case labelled: Labelled => helper(labelled.inner)
         case map: MapGrammar => helper(map.inner) ^^ map.map
         case produce: Produce => success(produce.result)
