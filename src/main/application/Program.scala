@@ -20,7 +20,7 @@ object Program extends SimpleSwingApplication {
     val tabbedPane = new JTabbedPane()
     tabbedPane.add("Architecture", graphComponent)
 
-    val panel = CompilerBuilderPanel.getCompilerBuilderPanel
+    val panel = new CompilerBuilderPanel()
     tabbedPane.add("Compiler Builder", panel)
 
     contents = Component.wrap(tabbedPane)

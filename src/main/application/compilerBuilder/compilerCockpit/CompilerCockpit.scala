@@ -6,9 +6,11 @@ import javax.swing._
 import javax.swing.text.PlainDocument
 
 import application.StyleSheet
+import core.grammar.ToDocument
 import core.layouts.SwingEquationLayout
 import core.modularProgram.PieceCombiner
 import core.transformation.TransformationState
+import core.transformation.grammars.GrammarNotFoundException
 import core.transformation.sillyCodePieces.Injector
 
 import scala.swing.{Component, Frame}
@@ -17,7 +19,7 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
 
   private val inputDocument = new PlainDocument()
   private val outputDocument = new PlainDocument()
-  private var inputOption: InputOption = new TextAreaInput(() => inputDocument.getText(0,inputDocument.getLength))
+  private var inputOption: InputOption = new TextAreaInput(() => inputDocument.getText(0, inputDocument.getLength))
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
   private var outputOption: OutputOption = {
     textAreaOutput
@@ -98,7 +100,14 @@ class CompilerCockpit(transformations: Seq[Injector]) extends Frame {
       override def actionPerformed(e: ActionEvent): Unit = {
         val pieces = Seq(InputGrammarToOutput, textAreaOutput) ++ transformations
         val state = new TransformationState()
-        PieceCombiner.combineAndExecute(state, pieces.reverse)
+        try {
+          PieceCombiner.combineAndExecute(state, pieces.reverse)
+        }
+        catch {
+          case e: GrammarNotFoundException =>
+            val keyName = ToDocument.grammarKeyToName(e.key)
+            setOutputText(s"Error occurred while constructing grammar, key $keyName not found")
+        }
       }
     })
     executeButton

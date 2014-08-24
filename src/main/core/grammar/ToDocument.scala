@@ -47,8 +47,13 @@ object ToDocument {
     case NumberG => "number"
     case Identifier => "identifier"
     case labelled: Labelled =>
-      val regex = new Regex("Grammar\\$")
-      regex.replaceAllIn(labelled.name.getClass.getSimpleName, "")
+      val key: AnyRef = labelled.name
+      grammarKeyToName(key)
+  }
+
+  def grammarKeyToName(key: Any): String = {
+    val regex = new Regex("Grammar\\$")
+    regex.replaceAllIn(key.getClass.getSimpleName, "")
   }
 
   case class Option(inner: Grammar) extends Grammar
