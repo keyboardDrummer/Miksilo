@@ -2,20 +2,18 @@ package application.graphing.model
 
 import application.graphing.model.simplifications._
 import com.google.common.collect.Lists
-import core.transformation.Contract
 import org.jgrapht.alg.StrongConnectivityInspector
-import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 import org.jgrapht.traverse.TopologicalOrderIterator
 import transformations.javac.JavaCompiler
 
 import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
-class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
+class TransformationGraph
+  extends GraphFromTransformations(JavaCompiler.javaCompilerTransformations) {
 
   val simplifications = Seq(ByteCodeTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
     , JavaSimpleStatement, JavaMethod, JavaC)
-  buildInitialGraph()
   addSimplifications()
 
   //  val sinks: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.outDegreeOf(vertex) == 0)
@@ -27,17 +25,6 @@ class TransformationGraph extends DefaultDirectedGraph[TransformationVertex, Def
     throw new RuntimeException("more than once source")
 
   optimizeDependencies()
-
-  def buildInitialGraph() {
-    val transformations: Set[Contract] = JavaCompiler.javaCompilerTransformations.toSet
-
-    DepthFirstTraversal.traverse[Contract](transformations, transformation => transformation.dependencies,
-      transformation => addVertex(new TransformationVertex(transformation)),
-      transformation => {
-        for (outgoing <- transformation.dependencies)
-          addEdge(outgoing, transformation)
-      })
-  }
 
   def addSimplifications() {
     for (simplification <- simplifications) {

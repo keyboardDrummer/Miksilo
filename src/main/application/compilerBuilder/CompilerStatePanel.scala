@@ -1,7 +1,7 @@
 package application.compilerBuilder
 
+import java.awt._
 import java.awt.event.{ActionEvent, ActionListener}
-import java.awt.{BorderLayout, FlowLayout, GridBagConstraints, GridBagLayout}
 import javax.swing._
 
 import application.StyleSheet
@@ -22,15 +22,10 @@ class CompilerStatePanel extends JPanel(new GridBagLayout()) {
   constraints.weighty = 2
   add(firstPanel, constraints)
 
-  add(new JSeparator(SwingConstants.HORIZONTAL), getSeparatorConstraints)
-  val console = new JTextArea()
-  console.setBorder(BorderFactory.createLoweredBevelBorder())
-  val consoleWrapper = new JPanel(new BorderLayout())
-  consoleWrapper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Console"))
-  consoleWrapper.add(console)
+  val consolePanel = new ConsolePanel(compilerParticles)
 
   constraints.weighty = 1
-  add(consoleWrapper, constraints)
+  add(consolePanel, constraints)
 
   val actionButtons: JPanel = getActionButtonPanel
 
@@ -54,6 +49,7 @@ class CompilerStatePanel extends JPanel(new GridBagLayout()) {
     actionButtons
   }
 
+
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
@@ -75,12 +71,5 @@ class CompilerStatePanel extends JPanel(new GridBagLayout()) {
     cons.weightx = 1
     cons.weighty = 1
     cons
-  }
-
-  def getSeparatorConstraints: GridBagConstraints = {
-    val separatorConstraints = new GridBagConstraints()
-    separatorConstraints.fill = GridBagConstraints.BOTH
-    separatorConstraints.insets = StyleSheet.defaultInsets
-    separatorConstraints
   }
 }

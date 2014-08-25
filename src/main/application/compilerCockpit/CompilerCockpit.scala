@@ -48,18 +48,13 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
 
     val equationLayout = new SwingEquationLayout(panel)
 
-    val chooseInputSwing: JPanel = getChooseInput
-    val chooseInput = equationLayout.addComponent(chooseInputSwing)
-    val chooseCompileSwing: JPanel = getChooseCompile
-    val chooseCompile = equationLayout.addComponent(chooseCompileSwing)
-    val chooseOutputSwing: JPanel = getChooseOutput
-    val chooseOutput = equationLayout.addComponent(chooseOutputSwing)
-    val executeButtonSwing: JButton = new ExecuteButton(this)
-    val executeButton = equationLayout.addComponent(executeButtonSwing)
+    val chooseInput = equationLayout.addComponent(getChooseInput)
+    val chooseCompile = equationLayout.addComponent(getChooseCompile)
+    val chooseOutput = equationLayout.addComponent(getChooseOutput)
+    val executeButton = equationLayout.addComponent(new ExecuteButton(this))
     val inputPanel = equationLayout.addComponent(getInputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
-    val grammarButtonSwing: JButton = new ShowInputGrammarButton(this)
-    val grammarButton = equationLayout.addComponent(grammarButtonSwing)
+    val grammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
 
     val innerLayout = equationLayout.equationLayout
 
@@ -71,7 +66,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     //HORIZONTAL
     innerLayout.addLeftToRight(innerLayout.container, inputPanel, executeButton, outputPanel, innerLayout.container)
     innerLayout.expressions += inputPanel.width - outputPanel.width
-    innerLayout.expressions += executeButton.width - executeButtonSwing.getPreferredSize.width
+    equationLayout.makePreferredWidth(executeButton)
 
     innerLayout.expressions ++= Seq(chooseInput.horizontalCenter2 - inputPanel.horizontalCenter2,
       chooseCompile.horizontalCenter2 - executeButton.horizontalCenter2,

@@ -8,4 +8,6 @@ case class ResponsiveLeftRight(left: ResponsiveDocument, right: ResponsiveDocume
     val sizedRight = right.render(preferredWidth - sizedLeft.width)
     new LeftRight(sizedLeft, sizedRight)
   }
+
+  override def isEmpty: Boolean = left.isEmpty && right.isEmpty
 }

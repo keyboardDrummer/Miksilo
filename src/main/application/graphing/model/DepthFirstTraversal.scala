@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 object DepthFirstTraversal {
 
-  def traverse[T](nodes: Set[T], getOutgoing: T => Set[T], enter: T => Unit, leave: T => Unit) {
+  def traverse[T](nodes: Iterable[T], getOutgoing: T => Set[T], enter: T => Unit, leave: T => Unit) {
     val remainingNodes = mutable.Stack[T]()
     remainingNodes.pushAll(nodes)
     var enteredNodes = Set.empty[T]

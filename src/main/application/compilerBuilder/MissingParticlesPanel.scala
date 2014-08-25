@@ -5,11 +5,11 @@ import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
 
+import application.graphing.model.DepthFirstTraversal
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
-import scala.collection.mutable
 
 object MissingParticlesPanel {
 
@@ -52,17 +52,11 @@ object MissingParticlesPanel {
   }
 
   def getMissingDependencies(transformations: Seq[Injector]): Seq[Injector] = {
-    var available = transformations.toSet[Injector]
-    var result = Seq.empty[Injector]
-    val queue: mutable.Queue[Injector] = mutable.Queue(transformations.reverse: _*)
-    while (queue.nonEmpty) {
-      val transformation = queue.dequeue()
-      val newMissingDependencies: Seq[Injector] = transformation.dependencies.collect({ case contract: Injector => contract}).diff(available).toSeq
-      queue.enqueue(newMissingDependencies: _*)
-      result ++= newMissingDependencies
-      available += transformation
-      available ++= newMissingDependencies
-    }
-    result.distinct
+    var result = List.empty[Injector]
+    val transformationSet = transformations.toSet
+    DepthFirstTraversal.traverse[Injector](transformations,
+      t => t.dependencies.collect({case x:Injector => x}),
+      t => {}, t => result = t :: result)
+    result.filter(e => !transformationSet.contains(e))
   }
 }

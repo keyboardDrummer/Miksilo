@@ -15,4 +15,6 @@ case class ResponsiveTopBottom(top: ResponsiveDocument, bottom: ResponsiveDocume
 
     new TopBottom(renderTop, renderBottom)
   }
+
+  override def isEmpty: Boolean = top.isEmpty && bottom.isEmpty
 }

@@ -22,4 +22,6 @@ case class Wrapped(items: Seq[ResponsiveDocument]) extends ResponsiveDocument {
     }
     result
   }
+
+  override def isEmpty: Boolean = items.forall(item => item.isEmpty)
 }

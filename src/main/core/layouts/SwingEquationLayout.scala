@@ -10,14 +10,20 @@ class SwingEquationLayout(val container: Container) {
   container.setLayout(toLayoutManager)
 
   def expressions = equationLayout.expressions
+
   def expressions_=(value: Set[Expression]) = equationLayout.expressions = value
 
-  def addComponent(comp: awt.Component) : Component = {
+  def addComponent(comp: awt.Component): Component = {
     val result = equationLayout.createComponent
     container.add(comp)
     componentMapping += comp -> result
     componentMappingReverse += result -> comp
     result
+  }
+
+  def makePreferredWidth(component: Component) = {
+    val swingComponent = componentMappingReverse(component)
+    equationLayout.expressions ++= Seq(component.width - swingComponent.getPreferredSize.width)
   }
 
   def makePreferredSize(component: Component) = {
@@ -47,8 +53,8 @@ class SwingEquationLayout(val container: Container) {
 
     override def addLayoutComponent(name: String, comp: awt.Component): Unit = throw new UnsupportedOperationException
 
-    override def preferredLayoutSize(parent: Container): Dimension =  new Dimension(1000,1000)
+    override def preferredLayoutSize(parent: Container): Dimension = new Dimension(1000, 1000)
 
-    override def minimumLayoutSize(parent: Container): Dimension =  new Dimension(500,500)
+    override def minimumLayoutSize(parent: Container): Dimension = new Dimension(500, 500)
   }
 }

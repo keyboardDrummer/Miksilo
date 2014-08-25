@@ -10,4 +10,5 @@ trait Injector extends Contract with PieceOfCode[TransformationState] {
 
   def inject(state: TransformationState) = {}
 
+  def dependencies2: Set[Injector] = dependencies.collect({case x: Injector => x})
 }
