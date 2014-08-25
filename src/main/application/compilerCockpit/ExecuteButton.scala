@@ -12,7 +12,8 @@ class ExecuteButton(compilerCockpit: CompilerCockpit) extends JButton("EXECUTE")
   setFont(StyleSheet.hugeFont)
   addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
-      val pieces = Seq(compilerCockpit.inputOption) ++ compilerCockpit.transformations ++ Seq(compilerCockpit.compileOption, compilerCockpit.outputOption)
+      val pieces = Seq(compilerCockpit.inputOption) ++ compilerCockpit.transformations ++
+        Seq(compilerCockpit.compileOption, compilerCockpit.outputOption)
       val state = new TransformationState()
       PieceCombiner.combineAndExecute(state, pieces.reverse)
     }

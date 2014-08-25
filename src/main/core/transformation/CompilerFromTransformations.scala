@@ -37,6 +37,8 @@ class CompilerFromTransformations(val transformations: Seq[Injector]) extends Co
     PieceCombiner.combineAndExecute(state, pieces.reverse)
   }
 
+  //Bad order error
+  //All missing dependencies.
   def validateDependencies(transformations: Seq[Injector]) = {
     var available = Set.empty[Contract]
     for (transformation <- transformations.reverse) {

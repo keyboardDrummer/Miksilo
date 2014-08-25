@@ -88,7 +88,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   def getInputPanel: JPanel = {
     val cardLayout = new CardLayout()
     val panel = new JPanel(cardLayout)
-    val inputTextArea = new JTextArea()
+    val inputTextArea = new JTextArea(inputDocument)
     inputTextArea.setFont(StyleSheet.codeFont)
     inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new JScrollPane(inputTextArea))

@@ -1,14 +1,12 @@
 package application.compilerBuilder
 
 import java.awt.event.{ActionEvent, ActionListener}
-import java.awt.{GridBagConstraints, FlowLayout, BorderLayout, GridBagLayout}
+import java.awt.{BorderLayout, FlowLayout, GridBagConstraints, GridBagLayout}
 import javax.swing._
-import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
 import core.transformation.sillyCodePieces.Injector
-import org.jdesktop.swingx.JXList
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
@@ -59,48 +57,16 @@ class CompilerStatePanel extends JPanel(new GridBagLayout()) {
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
-    val compilerListPanel: JPanel = getCompilerListPanel
+    val compilerListPanel: JPanel = ChosenParticlesPanel.getPanel(compilerParticles)
     val compilerListConstraints = getConstraints
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)
 
-    val dependentPanel: JPanel = getDependentPanel
+    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(compilerParticles)
     val dependentConstraints = getConstraints
     dependentConstraints.gridx = 1
     firstPanel.add(dependentPanel, dependentConstraints)
     firstPanel
-  }
-
-  def getDependentPanel: JPanel = {
-    val dependentItems = new DefaultListModel[Injector]()
-    val dependentList = new JXList()
-    dependentList.setModel(dependentItems)
-    val dependentPanel = CompilerBuilderPanel.getInjectorListVisuals(dependentList)
-    dependentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Automatically added"))
-    dependentPanel
-  }
-
-  def getCompilerListPanel: JPanel = {
-    val compilerList = new JXList()
-    compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerParticles))
-    compilerList.setDropMode(DropMode.INSERT)
-    compilerList.setModel(compilerParticles)
-    compilerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-    val compilerListPanel = CompilerBuilderPanel.getInjectorListVisuals(compilerList)
-    compilerListPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Chosen"))
-
-    val removeButton = new JButton("Remove")
-    compilerList.addListSelectionListener(new ListSelectionListener {
-      override def valueChanged(e: ListSelectionEvent): Unit = removeButton.setEnabled(compilerList.getSelectedValues.nonEmpty)
-    })
-    removeButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        for(selectedValue <- compilerList.getSelectedValues)
-          compilerParticles.removeElement(selectedValue)
-      }
-    })
-    compilerListPanel.add(removeButton, BorderLayout.PAGE_END)
-    compilerListPanel
   }
 
   def getConstraints: GridBagConstraints = {
