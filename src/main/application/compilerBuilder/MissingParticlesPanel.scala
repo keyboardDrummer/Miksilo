@@ -18,8 +18,11 @@ object MissingParticlesPanel {
     val dependentList = new JXList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+    dependentList.setTransferHandler(new ParticleProviderTransferHandler(dependentList))
+    dependentList.setDragEnabled(true)
     val dependentPanel = CompilerBuilderPanel.getInjectorListVisuals(dependentList)
     dependentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Missing"))
+
 
     val addButton = new JButton("Add")
     dependentList.addListSelectionListener(new ListSelectionListener {

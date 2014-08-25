@@ -11,7 +11,7 @@ import org.jdesktop.swingx.JXList
 object ChosenParticlesPanel {
   def getPanel(compilerParticles: DefaultListModel[Injector]) = {
     val compilerList = new JXList()
-    compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerParticles))
+    compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)
     compilerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -29,6 +29,6 @@ object ChosenParticlesPanel {
       }
     })
     compilerListPanel.add(removeButton, BorderLayout.PAGE_END)
-    compilerListPanel
+    compilerList
   }
 }

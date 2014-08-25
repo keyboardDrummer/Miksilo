@@ -1,7 +1,6 @@
 package application.compilerBuilder
 
 import java.awt._
-import java.awt.datatransfer.DataFlavor
 import javax.swing._
 import javax.swing.border.BevelBorder
 
@@ -11,7 +10,6 @@ import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
 object CompilerBuilderPanel {
-  val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Injector], "java/ListItem")
 
   def getInjectorListVisuals(list: JXList) = {
 
@@ -58,7 +56,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
     val availableItems: Seq[Injector] = JavaCompiler.javaCompilerTransformations
     val availableList = new JXList(availableItems.toArray.asInstanceOf[Array[Object]])
 
-    availableList.setTransferHandler(new AvailableParticlesTransferHandler(availableList, availableItems))
+    availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))
     availableList.setDragEnabled(true)
 
     val result = CompilerBuilderPanel.getInjectorListVisuals(availableList)
