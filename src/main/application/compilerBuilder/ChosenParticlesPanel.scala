@@ -9,13 +9,13 @@ import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 
 object ChosenParticlesPanel {
-  def getPanel(compilerParticles: DefaultListModel[Injector]) = {
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Injector]) = {
     val compilerList = new JXList()
     compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)
     compilerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-    val compilerListPanel = CompilerBuilderPanel.getInjectorListVisuals(compilerList)
+    val compilerListPanel = panel.getInjectorListVisuals(compilerList)
     compilerListPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Chosen"))
 
     val removeButton = new JButton("Remove")
@@ -29,6 +29,6 @@ object ChosenParticlesPanel {
       }
     })
     compilerListPanel.add(removeButton, BorderLayout.PAGE_END)
-    compilerList
+    compilerListPanel
   }
 }

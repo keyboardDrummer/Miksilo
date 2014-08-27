@@ -3,41 +3,25 @@ package application.compilerBuilder
 import java.awt._
 import javax.swing._
 import javax.swing.border.BevelBorder
+import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import application.{ExampleListCellRenderer, StyleSheet}
+import application.{InjectorListCellRenderer, StyleSheet}
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
 object CompilerBuilderPanel {
-
-  def getInjectorListVisuals(list: JXList) = {
-
-    val result = new JPanel(new BorderLayout())
-
-    list.setAutoCreateRowSorter(true)
-    val listener = new SearchFieldListener(list)
-    val searchField = new JTextField(20)
-    searchField.getDocument.addDocumentListener(listener)
-    result.add(searchField, BorderLayout.PAGE_START)
-
-    val scrollPane: JScrollPane = StyleSheet.getAnyListVisuals(list)
-    list.setCellRenderer(new ExampleListCellRenderer())
-    scrollPane
-
-    result.add(scrollPane, BorderLayout.CENTER)
-
-    result
-  }
-
+  val availableParticles = JavaCompiler.javaCompilerTransformations
 }
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
+  val painter = new ParticleLabelPainter(this, CompilerBuilderPanel.availableParticles)
+
   setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED))
   setAutoscrolls(true)
 
-  val programPanel = new CompilerStatePanel()
+  val programPanel = new CompilerStatePanel(this)
   val compilerParticles = programPanel.compilerParticles
   val presetsPanel: JPanel = new PresetsPanel(compilerParticles)
 
@@ -52,14 +36,41 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   programPanelConstraints.weightx = 2
   add(programPanel, programPanelConstraints)
 
+  def getInjectorListVisuals(list: JXList) = {
+
+    val result = new JPanel(new BorderLayout())
+
+    list.setAutoCreateRowSorter(true)
+
+    list.addListSelectionListener(new ListSelectionListener {
+      override def valueChanged(e: ListSelectionEvent): Unit = {
+        painter.select(list.getSelectedValues.map(i => i.asInstanceOf[Injector]).toSeq)
+      }
+    })
+
+    val listener = new SearchFieldListener(list)
+    val searchField = new JTextField(20)
+    searchField.getDocument.addDocumentListener(listener)
+    result.add(searchField, BorderLayout.PAGE_START)
+
+    val scrollPane: JScrollPane = StyleSheet.getAnyListVisuals(list)
+    list.setCellRenderer(new InjectorListCellRenderer(painter))
+    list.repaint()
+    scrollPane
+
+    result.add(scrollPane, BorderLayout.CENTER)
+
+    result
+  }
+
   def getAvailableScrollPane = {
-    val availableItems: Seq[Injector] = JavaCompiler.javaCompilerTransformations
+    val availableItems: Seq[Injector] = CompilerBuilderPanel.availableParticles
     val availableList = new JXList(availableItems.toArray.asInstanceOf[Array[Object]])
 
     availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))
     availableList.setDragEnabled(true)
 
-    val result = CompilerBuilderPanel.getInjectorListVisuals(availableList)
+    val result = getInjectorListVisuals(availableList)
     StyleSheet.setTitleBorder(result, "Available")
     result
   }

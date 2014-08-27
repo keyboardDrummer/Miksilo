@@ -10,7 +10,7 @@ import core.transformation.sillyCodePieces.Injector
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
-class CompilerStatePanel extends JPanel(new GridBagLayout()) {
+class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
   val compilerParticles = new DefaultListModel[Injector]()
 
   StyleSheet.setTitleBorder(this, "Compiler")
@@ -53,12 +53,12 @@ class CompilerStatePanel extends JPanel(new GridBagLayout()) {
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
-    val compilerListPanel = ChosenParticlesPanel.getPanel(compilerParticles)
+    val compilerListPanel = ChosenParticlesPanel.getPanel(panel, compilerParticles)
     val compilerListConstraints = getConstraints
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)
 
-    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(compilerParticles)
+    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, compilerParticles)
     val dependentConstraints = getConstraints
     dependentConstraints.gridx = 1
     firstPanel.add(dependentPanel, dependentConstraints)

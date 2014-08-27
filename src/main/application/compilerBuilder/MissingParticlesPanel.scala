@@ -13,14 +13,14 @@ import scala.collection.convert.Wrappers.JEnumerationWrapper
 
 object MissingParticlesPanel {
 
-  def getPanel(compilerParticles: DefaultListModel[Injector]) = {
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Injector]) = {
     val dependentItems = new DefaultListModel[Injector]()
     val dependentList = new JXList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
     dependentList.setTransferHandler(new ParticleProviderTransferHandler(dependentList))
     dependentList.setDragEnabled(true)
-    val dependentPanel = CompilerBuilderPanel.getInjectorListVisuals(dependentList)
+    val dependentPanel = panel.getInjectorListVisuals(dependentList)
     dependentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Missing"))
 
 
