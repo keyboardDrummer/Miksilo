@@ -6,6 +6,8 @@ import javax.swing.text.PlainDocument
 
 import application.StyleSheet
 import core.layouts.SwingEquationLayout
+import core.modularProgram.PieceCombiner
+import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
 
 import scala.swing.{Component, Frame}
@@ -17,7 +19,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   val textAreaInput: TextAreaInput = new TextAreaInput(() => inputDocument.getText(0, inputDocument.getLength))
 
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
-  val compileOptions = Array(CompileByteCode, CompileAndRun)
+  val compileOptions = Array(EmitByteCode, CompileAndRun)
   val outputOptions = Array[OutputOption](textAreaOutput)
   val inputOptions = Array[InputOption](textAreaInput)
 
@@ -40,6 +42,14 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     outputDocument.replace(0, outputDocument.getLength, text, null)
   }
 
+  def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) {
+    val cockpitOutputActions = if (transformations.contains(PerformCockpitOutputAction)) Seq.empty else Seq(PerformCockpitOutputAction)
+    val pieces = inputParticles ++ transformations ++ cockpitOutputActions
+    val state = new TransformationState()
+    PerformCockpitOutputAction.setState(state, outputParticles)
+    PieceCombiner.combineAndExecute(state, pieces.reverse)
+  }
+
   def initialise() {
     val panel = new JPanel()
     val layout = new GroupLayout(panel)
@@ -54,14 +64,16 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
     val inputPanel = equationLayout.addComponent(getInputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
-    val grammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
+    val inputgrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
+    val outputGrammarButton = equationLayout.addComponent(new ShowOutputGrammarButton(this))
 
     val innerLayout = equationLayout.equationLayout
 
     equationLayout.makePreferredSize(chooseCompile)
     equationLayout.makePreferredSize(chooseOutput)
     equationLayout.makePreferredSize(chooseInput)
-    equationLayout.makePreferredSize(grammarButton)
+    equationLayout.makePreferredSize(inputgrammarButton)
+    equationLayout.makePreferredSize(outputGrammarButton)
 
     //HORIZONTAL
     innerLayout.addLeftToRight(innerLayout.container, inputPanel, executeButton, outputPanel, innerLayout.container)
@@ -72,10 +84,15 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
       chooseCompile.horizontalCenter2 - executeButton.horizontalCenter2,
       chooseOutput.horizontalCenter2 - outputPanel.horizontalCenter2)
 
-    innerLayout.addEquals(grammarButton.left, 0)
+    innerLayout.addEquals(inputgrammarButton.left, inputPanel.left)
+    innerLayout.addEquals(outputGrammarButton.right, outputPanel.right)
 
     //VERTICAL
-    innerLayout.addEquals(chooseInput.verticalCenter2, chooseCompile.verticalCenter2, chooseOutput.verticalCenter2, grammarButton.verticalCenter2)
+    innerLayout.addEquals(chooseInput.verticalCenter2,
+      chooseCompile.verticalCenter2,
+      chooseOutput.verticalCenter2,
+      inputgrammarButton.verticalCenter2,
+      outputGrammarButton.verticalCenter2)
     innerLayout.addRow(inputPanel, executeButton, outputPanel)
     innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
   }
@@ -116,7 +133,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
 
   def getChooseCompile: JPanel = {
     val chooseCompile = new JPanel()
-    chooseCompile.add(new JLabel("Compile:"))
+    chooseCompile.add(new JLabel("Action:"))
     val compileComboBox: JComboBox[CompileOption] = new JComboBox(compileOptionModel)
     chooseCompile.add(compileComboBox)
     chooseCompile

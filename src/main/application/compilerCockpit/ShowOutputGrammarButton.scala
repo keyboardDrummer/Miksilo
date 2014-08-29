@@ -5,16 +5,16 @@ import javax.swing.JButton
 import core.grammar.ToDocument
 import core.transformation.grammars.GrammarNotFoundException
 
-class ShowInputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show input grammar") {
+class ShowOutputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show output grammar") {
   addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       try {
-        compilerCockpit.execute(Seq(GrammarToOutput, compilerCockpit.textAreaOutput), Seq())
+        compilerCockpit.execute(Seq(), Seq(GrammarToOutput, compilerCockpit.textAreaOutput))
       }
       catch {
         case e: GrammarNotFoundException =>
           val keyName = ToDocument.grammarKeyToName(e.key)
-          compilerCockpit.setOutputText(s"Error occurred while constructing input grammar, key $keyName not found")
+          compilerCockpit.setOutputText(s"Error occurred while constructing output grammar, key $keyName not found")
       }
     }
   })

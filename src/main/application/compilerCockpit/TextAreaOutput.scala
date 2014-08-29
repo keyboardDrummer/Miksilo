@@ -7,7 +7,8 @@ class TextAreaOutput(setText: String => Unit) extends OutputOption {
    override def enter(state: TransformationState): Unit = {}
 
    override def leave(state: TransformationState): Unit = {
-     setText(OutputOption.getOutput(state))
+     val outputOption = OutputOption.getOutput(state)
+     setText(outputOption.getOrElse("No output."))
      state.stop = true
    }
 

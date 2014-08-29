@@ -6,10 +6,17 @@ trait StoppableState {
 object PieceCombiner {
 
   def combineAndExecute[T <: StoppableState](state: T, pieces: Seq[PieceOfCode[T]]) : Unit = {
-    for (piece <- pieces)
-      piece.enter(state)
+    var enteredPieces = List.empty[PieceOfCode[T]]
+    for (piece <- pieces) {
+      if (!state.stop) {
+        piece.enter(state)
+        enteredPieces ::= piece
+      }
+    }
 
-    for (piece <- pieces.reverse) {
+    state.stop = false
+
+    for (piece <- enteredPieces) {
       piece.leave(state)
       if (state.stop)
         return

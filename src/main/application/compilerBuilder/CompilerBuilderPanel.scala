@@ -5,13 +5,14 @@ import javax.swing._
 import javax.swing.border.BevelBorder
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
+import application.compilerCockpit.PerformCockpitOutputAction
 import application.{InjectorListCellRenderer, StyleSheet}
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
 object CompilerBuilderPanel {
-  val availableParticles = JavaCompiler.javaCompilerTransformations
+  val availableParticles = JavaCompiler.javaCompilerTransformations ++ Seq(PerformCockpitOutputAction)
 }
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
@@ -55,7 +56,6 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
     val scrollPane: JScrollPane = StyleSheet.getAnyListVisuals(list)
     list.setCellRenderer(new InjectorListCellRenderer(painter))
-    list.repaint()
     scrollPane
 
     result.add(scrollPane, BorderLayout.CENTER)
@@ -74,7 +74,6 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
     StyleSheet.setTitleBorder(result, "Available")
     result
   }
-
 
   def getConstraints: GridBagConstraints = {
     val cons = new GridBagConstraints()

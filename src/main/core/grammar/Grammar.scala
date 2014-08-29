@@ -78,7 +78,7 @@ case class IgnoreRight(first: Grammar, second: Grammar) extends Grammar
 
 case class Choice(left: Grammar, right: Grammar) extends Grammar
 
-case class Sequence(var first: Grammar, var second: Grammar) extends Grammar
+case class Sequence(first: Grammar, second: Grammar) extends Grammar
 
 case class Produce(result: Any) extends Grammar
 
@@ -92,7 +92,7 @@ case class Keyword(value: String) extends Grammar {
     throw new RuntimeException("value must have non-zero length")
 }
 
-class MapGrammar(val inner: Grammar, val map: Any => Any) extends Grammar
+case class MapGrammar(inner: Grammar, map: Any => Any) extends Grammar
 
 class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
 
