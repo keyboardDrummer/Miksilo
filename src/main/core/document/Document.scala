@@ -6,7 +6,7 @@ object Document {
 
 trait Document {
   def render: String = {
-    0.until(height).map(y => renderLine(y)).mkString("\n")
+    0.until(height).map(y => renderLine(y).reverse.dropWhile(_ == ' ').reverse).mkString("\n")
   }
 
   def renderLine(y: Int): String

@@ -31,7 +31,7 @@ class TestDocument {
   @Test
   def testLeftRightLeftHigher()
   {
-    val expected = "ab\na "
+    val expected = "ab\na"
     val document = (new Text("a") ^ "a") ~ "b"
     Assert.assertEquals(expected, document.render)
   }
@@ -47,7 +47,7 @@ class TestDocument {
   @Test
   def testTopBottomTopWider()
   {
-    val expected = "aa\nb "
+    val expected = "aa\nb"
     val document = new Text("aa") ^ "b"
     Assert.assertEquals(expected, document.render)
   }
@@ -55,7 +55,7 @@ class TestDocument {
   @Test
   def testTopBottomBottomWider()
   {
-    val expected = "a \nbb"
+    val expected = "a\nbb"
     val document = new Text("a") ^ "bb"
     Assert.assertEquals(expected, document.render)
   }

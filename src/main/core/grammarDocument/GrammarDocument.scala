@@ -52,6 +52,8 @@ trait GrammarDocument extends GrammarDocumentWriter {
 
   def * = new Many(this)
 
+  def ^(bottom: GrammarDocument) = new TopBottom(this, bottom)
+
   def ^^(map: (Any => Any, Any => Option[Any])): GrammarDocument = new MapGrammar(this, map._1, map._2)
 
 }

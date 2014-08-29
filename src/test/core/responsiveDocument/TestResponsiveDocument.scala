@@ -3,7 +3,7 @@ package core.responsiveDocument
 import core.responsiveDocument.ResponsiveDocument._
 import org.junit.{Assert, Test}
 
-class DocumentTests {
+class TestResponsiveDocument {
 
   @Test
   def testText()
@@ -32,7 +32,7 @@ class DocumentTests {
   @Test
   def testLeftRightLeftHigher()
   {
-    val expected = "ab\na "
+    val expected = "ab\na"
     val document = (text("a") ^ "a") ~ "b"
     Assert.assertEquals(expected, document.renderString)
   }
@@ -48,7 +48,7 @@ class DocumentTests {
   @Test
   def testTopBottomTopWider()
   {
-    val expected = "aa\nb "
+    val expected = "aa\nb"
     val document = text("aa") ^ "b"
     Assert.assertEquals(expected, document.renderString)
   }
@@ -56,7 +56,7 @@ class DocumentTests {
   @Test
   def testTopBottomBottomWider()
   {
-    val expected = "a \nbb"
+    val expected = "a\nbb"
     val document = text("a") ^ "bb"
     Assert.assertEquals(expected, document.renderString)
   }

@@ -4,6 +4,7 @@ import core.grammar.{Grammar, NumberG, ToPackrat}
 import org.junit.{Assert, Test}
 
 import scala.util.parsing.input.CharArrayReader
+import core.grammar.~
 
 class TestGrammar extends GrammarDocumentWriter {
 
@@ -47,6 +48,14 @@ class TestGrammar extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
+  @Test
+  def testIf() {
+    val example = "3\n? 4\n: 2"
+    val expected = IfNotZero(Value(3), Value(4),Value(2))
+
+    parseAndPrint(example, expected)
+  }
+
   def parseAndPrint(example: String, expected: TestExpression) {
     val grammarDocument = getExpressionGrammarDocument
     val grammar: Grammar = ToGrammar.toGrammar(grammarDocument)
@@ -63,6 +72,13 @@ class TestGrammar extends GrammarDocumentWriter {
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled("expression")
     val parenthesis: GrammarDocument = "(" ~> expression <~ ")"
+
+    val _if: GrammarDocument = expression ^ ("?" ~~> expression) ^ (":" ~~> expression) ^^( {
+      case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
+    }, {
+      case IfNotZero(cond, then, _else) => Some(core.grammar.~(core.grammar.~(cond, then), _else))
+      case _ => None
+    })
 
     val number: GrammarDocument = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
       case Value(i) => Some(i)
@@ -90,6 +106,7 @@ class TestGrammar extends GrammarDocumentWriter {
     addLabel.orToInner(add)
     addLabel.orToInner(multipleLabel)
 
+    expression.orToInner(_if)
     expression.orToInner(addLabel)
     expression
   }
