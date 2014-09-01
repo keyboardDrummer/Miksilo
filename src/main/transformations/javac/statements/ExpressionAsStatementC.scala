@@ -9,6 +9,7 @@ import transformations.types.VoidTypeC
 object ExpressionAsStatementC extends StatementInstance {
 
   object ExpressionAsStatementKey
+
   object ExpressionKey
 
   def asStatement(expression: MetaObject) = new MetaObject(ExpressionAsStatementKey, ExpressionKey -> expression)
@@ -25,8 +26,7 @@ object ExpressionAsStatementC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
-    val expressionAsStatement = expressionGrammar <~ ";" ^^
-      (value => new MetaObject(ExpressionAsStatementKey, ExpressionKey -> value))
+    val expressionAsStatement = expressionGrammar <~ ";" ^^ parseMap(ExpressionAsStatementKey, ExpressionKey)
     statementGrammar.orToInner(expressionAsStatement)
   }
 }

@@ -16,13 +16,19 @@ object ObjectTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseObjectType = identifier.someSeparated(".") ^^ { case ids: Seq[Any] =>
-      val stringIds = ids.collect({ case v: String => v})
-      if (ids.size > 1)
-        objectType(new QualifiedClassName(stringIds))
-      else
-        objectType(stringIds(0))
+    val construct: Any => Any = {
+      case ids: Seq[Any] =>
+        val stringIds = ids.collect({ case v: String => v})
+        if (ids.size > 1)
+          Right(new QualifiedClassName(stringIds))
+        else
+          Left(stringIds(0))
     }
+    def deconstruct(value: Any): Option[Any] = Some(value match {
+      case Right(QualifiedClassName(stringIds)) => stringIds
+      case Left(string) => Seq(string)
+    })
+    val parseObjectType = identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName)
     parseType.inner = parseType.inner | parseObjectType
   }
 

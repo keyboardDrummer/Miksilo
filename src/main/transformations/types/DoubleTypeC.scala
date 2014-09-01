@@ -15,7 +15,7 @@ object DoubleTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.orToInner("double" ^^ (_ => doubleType))
+    typeGrammar.orToInner("double" ~> produce(doubleType))
   }
 
   val doubleType = new MetaObject(key)

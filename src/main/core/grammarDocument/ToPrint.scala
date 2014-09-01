@@ -34,7 +34,7 @@ object ToPrint {
         for {
           firstDoc <- toDocument(firstValue, top)
           secondDoc <- toDocument(secondValue, bottom)
-        } yield firstDoc ^ secondDoc
+        } yield firstDoc % secondDoc
       case FailureG => None
       case WhiteSpace(width, height) => Some(WrappedSizedDocument(core.document.WhiteSpace(width, height)))
     }

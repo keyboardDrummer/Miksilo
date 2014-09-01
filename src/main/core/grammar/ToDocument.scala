@@ -1,5 +1,6 @@
 package core.grammar
 
+import core.grammarDocument.ToGrammar
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 
@@ -9,9 +10,9 @@ import scala.util.matching.Regex
 object ToDocument {
 
   def toDocument(catalogue: GrammarCatalogue) = {
-    val program = catalogue.find(ProgramGrammar)
+    val program = ToGrammar.toGrammar(catalogue.find(ProgramGrammar))
     val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
-    val document = reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a ^^ b)
+    val document = reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
     document
   }
 
@@ -24,7 +25,7 @@ object ToDocument {
 
     val transformed: Grammar = transform(labelled.inner)
     val ors: Seq[Grammar] = getOrs(transformed)
-    val result = toDocument(labelled) | "=>" | ors.map(or => toDocument(or)).reduce((a, b) => a ^ b)
+    val result = toDocument(labelled) ~~ "=>" ~~ ors.map(or => toDocument(or)).reduce((a, b) => a % b)
     result
   }
 
@@ -34,8 +35,8 @@ object ToDocument {
         case choice: Choice => toDocument(choice).inParenthesis
         case _ => toDocument(grammar)
       }
-      withParenthesis(left) | withParenthesis(right)
-    case Choice(left, right) => toDocument(left) | "|" | toDocument(right)
+      withParenthesis(left) ~~ withParenthesis(right)
+    case Choice(left, right) => toDocument(left) ~~ "|" ~~ toDocument(right)
     case Many(inner: Labelled) => toDocument(inner) ~ "*"
     case Many(inner) => toDocument(inner).inParenthesis ~ "*"
     case Keyword(value) => ResponsiveDocument.text(value)

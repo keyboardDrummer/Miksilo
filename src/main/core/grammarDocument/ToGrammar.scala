@@ -24,6 +24,7 @@ object ToGrammar {
         case TopBottom(top, bottom) => core.grammar.Sequence(helper(top), helper(bottom))
         case FailureG => core.grammar.FailureG
         case WhiteSpace(_,_) => core.grammar.Produce(null)
+        case Produce(value) => core.grammar.Produce(value)
       })
     }
 

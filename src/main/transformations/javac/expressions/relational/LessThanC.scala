@@ -1,9 +1,7 @@
 package transformations.javac.expressions.relational
 
-import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
@@ -22,9 +20,9 @@ object LessThanC extends ExpressionInstance {
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
   }
 
-  def getFirst(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(0).asInstanceOf[MetaObject]
+  def getFirst(lessThan: MetaObject) = lessThan(LessThanFirst).asInstanceOf[MetaObject]
 
-  def getSecond(lessThan: MetaObject) = ByteCodeSkeleton.getInstructionArguments(lessThan)(1).asInstanceOf[MetaObject]
+  def getSecond(lessThan: MetaObject) = lessThan(LessThanSecond).asInstanceOf[MetaObject]
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
     val getType = ExpressionC.getType(state)
@@ -37,13 +35,11 @@ object LessThanC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan: Grammar = (relationalGrammar <~ "<") ~ relationalGrammar ^^ { case left ~ right => lessThan(left, right)}
-    relationalGrammar.inner = relationalGrammar.inner | parseLessThan
+    val parseLessThan = (relationalGrammar <~ "<") ~ relationalGrammar ^^ parseMap(LessThanKey, LessThanFirst, LessThanSecond)
+    relationalGrammar.orToInner(parseLessThan)
   }
 
-  private def lessThan(left: Any, right: Any): MetaObject = lessThan(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])
-
-  def lessThan(first: MetaObject, second: MetaObject) = ByteCodeSkeleton.instruction(LessThanKey, Seq(first, second))
+  def lessThan(first: MetaObject, second: MetaObject) = new MetaObject(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
 
   object LessThanKey
 

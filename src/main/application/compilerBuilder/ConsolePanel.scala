@@ -29,7 +29,7 @@ class ConsolePanel(val compilerParticles: DefaultListModel[Injector])  extends J
 
   def refreshConsolePanel() = {
     val errors = getDependencyErrors(JEnumerationWrapper(compilerParticles.elements()).toSeq)
-    val document = errors.map(e => e.toDocument).fold[ResponsiveDocument](Empty)((a, b) => a ^^ b)
+    val document = errors.map(e => e.toDocument).fold[ResponsiveDocument](Empty)((a, b) => a %% b)
     console.setText(document.renderString)
   }
 

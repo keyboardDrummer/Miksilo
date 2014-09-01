@@ -29,7 +29,7 @@ object ReturnExpressionC extends GrammarTransformation {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val statement = grammars.find(StatementC.StatementGrammar)
 
-    val returnExpression = "return" ~> expression <~ ";" ^^ (expr => _return(expr.asInstanceOf[MetaObject]))
+    val returnExpression = "return" ~> expression <~ ";" ^^ parseMap(ReturnInteger, ReturnValue)
     statement.inner = statement.inner | returnExpression
   }
 

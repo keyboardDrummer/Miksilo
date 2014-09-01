@@ -15,7 +15,7 @@ object VoidTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.inner = typeGrammar.inner | ("void" ^^ (_ => voidType))
+    typeGrammar.inner = typeGrammar.inner | ("void" ~> produce(voidType))
   }
 
   def voidType = new MetaObject(VoidTypeKey)

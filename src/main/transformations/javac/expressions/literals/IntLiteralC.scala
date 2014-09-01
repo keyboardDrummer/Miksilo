@@ -12,7 +12,7 @@ object IntLiteralC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionC, IntegerConstantC)
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
-    val parseNumber = number ^^ (number => literal(Integer.parseInt(number.asInstanceOf[String])))
+    val parseNumber = number ^^ (number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i)) ^^ parseMap(IntLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }

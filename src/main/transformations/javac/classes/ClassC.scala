@@ -1,10 +1,11 @@
 package transformations.javac.classes
 
-import core.grammar._
+import core.grammarDocument.GrammarDocument
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
@@ -51,7 +52,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
 
   def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
 
-  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[mutable.Buffer[MetaObject]]
+  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
   def getClassCompiler(state: TransformationState) = getState(state).classCompiler
 
@@ -73,24 +74,19 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val classMethod = grammars.find(MethodC.MethodGrammar)
 
-    val classMember: Grammar = classMethod
+    val classMember: GrammarDocument = classMethod
     // val _import = "import" ~> identifier.someSeparated(".") <~ ";"
-    val importsP: Grammar = produce(Seq.empty[JavaImport]) //success_import*
+    val importsP: GrammarDocument = produce(Seq.empty[JavaImport]) //success_import*
     val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
-    val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^ {
-      case (_package ~ _imports) ~ (name ~ members) =>
-        val methods = members
-        clazz(_package.asInstanceOf[Seq[String]],
-          name.asInstanceOf[String],
-          methods.asInstanceOf[Seq[MetaObject]],
-          _imports.asInstanceOf[List[JavaImport]], None)
-    })
+    val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^
+      parseMap(ClassFileKey, ClassPackage, ClassImports, ClassName, ByteCodeSkeleton.ClassMethodsKey))
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
-  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) = new MetaObject(ByteCodeSkeleton.ClassFileKey) {
-    data.put(ByteCodeSkeleton.ClassMethodsKey, methods.toBuffer)
+  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) =
+    new MetaObject(ByteCodeSkeleton.ClassFileKey) {
+    data.put(ByteCodeSkeleton.ClassMethodsKey, methods)
     data.put(ClassPackage, _package)
     data.put(ClassName, name)
     data.put(ClassImports, imports)

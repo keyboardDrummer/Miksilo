@@ -24,8 +24,7 @@ object PostFixIncrementC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val coreGrammar = grammars.find(ExpressionC.CoreGrammar)
-    val postFixIncrement = identifier <~ "++" ^^
-      (name => new MetaObject(PostfixIncrementKey, VariableKey -> name))
+    val postFixIncrement = identifier <~ "++" ^^ parseMap(PostfixIncrementKey, VariableKey)
     coreGrammar.orToInner(postFixIncrement)
   }
 

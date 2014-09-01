@@ -12,9 +12,10 @@ object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
     val methods = ClassC.getMethods(clazz)
     for (method <- methods) {
       val statements = MethodC.getMethodBody(method)
-      val hasNoReturn = statements.isEmpty || (statements.last.clazz != ReturnExpressionC.ReturnInteger && statements.last.clazz != ReturnVoidC.ReturnVoidKey)
+      val hasNoReturn = statements.isEmpty ||
+        (statements.last.clazz != ReturnExpressionC.ReturnInteger && statements.last.clazz != ReturnVoidC.ReturnVoidKey)
       if (hasNoReturn) {
-        method(MethodC.MethodBodyKey) = statements ++ Seq(ReturnVoidC._return())
+        method(MethodC.MethodBodyKey) = statements ++ Seq(ReturnVoidC._return)
       }
     }
   }

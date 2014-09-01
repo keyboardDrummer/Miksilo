@@ -36,7 +36,7 @@ object ExpressionC extends GrammarTransformation {
   def getExpressionToLines(state: TransformationState): ToInstructionsRegistry = getState(state).transformations
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    val core = grammars.create(CoreGrammar, FailureG)
+    val core = grammars.create(CoreGrammar)
     grammars.create(ExpressionGrammar, core)
   }
 

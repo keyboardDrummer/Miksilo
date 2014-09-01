@@ -25,7 +25,7 @@ class TestResponsiveDocument {
   def testTopBottom()
   {
     val expected = "a" + "\n" + "b"
-    val document = ("a" : ResponsiveDocument) ^ "b"
+    val document = ("a" : ResponsiveDocument) % "b"
     Assert.assertEquals(expected, document.renderString)
   }
 
@@ -33,7 +33,7 @@ class TestResponsiveDocument {
   def testLeftRightLeftHigher()
   {
     val expected = "ab\na"
-    val document = (text("a") ^ "a") ~ "b"
+    val document = (text("a") % "a") ~ "b"
     Assert.assertEquals(expected, document.renderString)
   }
 
@@ -41,7 +41,7 @@ class TestResponsiveDocument {
   def testLeftRightRightHigher()
   {
     val expected = "ab\n b"
-    val document = text("a") ~ (text("b") ^ "b")
+    val document = text("a") ~ (text("b") % "b")
     Assert.assertEquals(expected, document.renderString)
   }
 
@@ -49,7 +49,7 @@ class TestResponsiveDocument {
   def testTopBottomTopWider()
   {
     val expected = "aa\nb"
-    val document = text("aa") ^ "b"
+    val document = text("aa") % "b"
     Assert.assertEquals(expected, document.renderString)
   }
 
@@ -57,7 +57,7 @@ class TestResponsiveDocument {
   def testTopBottomBottomWider()
   {
     val expected = "a\nbb"
-    val document = text("a") ^ "bb"
+    val document = text("a") % "bb"
     Assert.assertEquals(expected, document.renderString)
   }
 }

@@ -1,9 +1,13 @@
 package core.grammarDocument
 
-import core.grammar.{Grammar, ~}
+import core.grammar.{Identifier, NumberG, Grammar, ~}
 import core.responsiveDocument.ResponsiveDocument
 
 trait GrammarDocumentWriter {
+
+  def identifier: GrammarDocument = consume(Identifier)
+
+  def number: GrammarDocument = consume(NumberG)
 
   def failure: GrammarDocument = FailureG
 
@@ -25,8 +29,6 @@ trait GrammarDocumentWriter {
 trait GrammarDocument extends GrammarDocumentWriter {
 
   def simplify: GrammarDocument = this
-
-  // override def toString = ToDocument.toDocument(ToDocument.transform(this)).renderString
 
   def <~(right: GrammarDocument) = new IgnoreRight(this, right)
   def <~~(right: GrammarDocument) = this <~ (space ~ right)
@@ -52,7 +54,7 @@ trait GrammarDocument extends GrammarDocumentWriter {
 
   def * = new Many(this)
 
-  def ^(bottom: GrammarDocument) = new TopBottom(this, bottom)
+  def %(bottom: GrammarDocument) = new TopBottom(this, bottom)
 
   def ^^(map: (Any => Any, Any => Option[Any])): GrammarDocument = new MapGrammar(this, map._1, map._2)
 

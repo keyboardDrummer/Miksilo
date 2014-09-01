@@ -1,6 +1,5 @@
 package transformations.javac.expressions.equality
 
-import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.longs.CompareLongC
@@ -17,7 +16,7 @@ object EqualityC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
-    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ { case left ~ right => equality(left.asInstanceOf[MetaObject], right.asInstanceOf[MetaObject])}
+    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ parseMap(EqualityKey, FirstKey, SecondKey)
     equalityGrammar.orToInner(parseEquality)
   }
 

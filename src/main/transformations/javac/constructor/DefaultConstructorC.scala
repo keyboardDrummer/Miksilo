@@ -2,6 +2,7 @@ package transformations.javac.constructor
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton.ClassMethodsKey
 import transformations.javac.classes.ClassC
 import transformations.javac.methods.MethodC.PublicVisibility
 
@@ -12,7 +13,9 @@ object DefaultConstructorC extends ProgramTransformation {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      ClassC.getMethods(clazz).prepend(ConstructorC.constructor(Seq(), Seq(), PublicVisibility))
+      val methods = ClassC.getMethods(clazz)
+      val constructor = ConstructorC.constructor(Seq(), Seq(), PublicVisibility)
+      clazz(ClassMethodsKey) = Seq(constructor) ++ methods
     }
   }
 }

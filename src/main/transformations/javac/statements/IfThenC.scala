@@ -5,7 +5,6 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionC
-import core.grammar.~
 
 object IfThenC extends StatementInstance {
 
@@ -37,9 +36,8 @@ object IfThenC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val bodyGrammar = grammars.find(BlockC.BlockGrammar) | (statementGrammar ^^ (statement => Seq(statement)))
-    val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^
-      { case condition ~ body => new MetaObject(IfThenKey, ConditionKey -> condition, ThenKey -> body) }
+    val bodyGrammar = grammars.find(BlockC.BlockGrammar) | (statementGrammar ^^ (statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]](0))))
+    val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^ parseMap(IfThenKey, ConditionKey, ThenKey)
     statementGrammar.orToInner(ifThenGrammar)
   }
 }

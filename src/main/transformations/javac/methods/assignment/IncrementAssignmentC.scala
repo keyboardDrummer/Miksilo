@@ -1,6 +1,5 @@
 package transformations.javac.methods.assignment
 
-import core.grammar._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.additive.AdditionC
@@ -17,13 +16,14 @@ object IncrementAssignmentC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = grammars.find(AssignmentC.AssignmentTargetGrammar)
-    val incrementAssignmentGrammar: Grammar = assignmentTarget ~ ("+=" ~> assignmentGrammar) ^^
-      { case target ~ value => new MetaObject(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value) }
+    val incrementAssignmentGrammar = assignmentTarget ~ ("+=" ~> assignmentGrammar) ^^ parseMap(IncrementAssignmentKey, TargetKey, ValueKey)
     assignmentGrammar.orToInner(incrementAssignmentGrammar)
   }
 
   object IncrementAssignmentKey
+
   object TargetKey
+
   object ValueKey
 
   override val key: AnyRef = IncrementAssignmentKey

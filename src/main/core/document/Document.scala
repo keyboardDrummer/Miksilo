@@ -20,7 +20,7 @@ trait Document {
 
   def ~(right: Document) = new LeftRight(this, right)
 
-  def ^(bottom: Document) = new TopBottom(this, bottom)
-
-  def ^^(bottom: Document) = this ^ BlankLine ^ bottom
+  def %(bottom: Document) = new TopBottom(this, bottom)
+  
+  def %%(bottom: Document) = this % BlankLine % bottom
 }

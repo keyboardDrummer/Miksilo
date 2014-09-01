@@ -1,7 +1,6 @@
 package transformations.javac.statements
 
 import core.exceptions.BadInputException
-import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
@@ -33,8 +32,8 @@ object DeclarationC extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    val parseDeclaration: Grammar = typeGrammar ~ identifier <~ ";" ^^ { case _type ~ name => declaration(name.asInstanceOf[String], _type.asInstanceOf[MetaObject])}
-    statement.inner = statement.inner | parseDeclaration
+    val parseDeclaration = typeGrammar ~ identifier <~ ";" ^^ parseMap(DeclarationKey, DeclarationType, DeclarationName)
+    statement.orToInner(parseDeclaration)
   }
 
   def declaration(name: String, _type: MetaObject): MetaObject = {

@@ -40,12 +40,13 @@ object VariableC extends GrammarTransformation {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionC.CoreGrammar)
-    val variableGrammar = identifier ^^ (name => variable(name.asInstanceOf[String]))
+    val variableGrammar = grammars.create(VariableGrammar, identifier ^^ parseMap(VariableKey, VariableNameKey))
     core.inner = core.inner | variableGrammar
   }
 
-  def variable(name: String) = new MetaObject(VariableKey, VariableNameKey -> name)
+  object VariableGrammar
 
+  def variable(name: String) = new MetaObject(VariableKey, VariableNameKey -> name)
 
   object VariableNameKey
 

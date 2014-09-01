@@ -22,6 +22,6 @@ object NotC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val coreGrammar = grammars.find(ExpressionC.CoreGrammar)
-    coreGrammar.orToInner("!" ~> coreGrammar ^^ (inner => new MetaObject(NotKey, NotExpression -> inner)))
+    coreGrammar.orToInner("!" ~> coreGrammar ^^ parseMap(NotKey, NotExpression))
   }
 }

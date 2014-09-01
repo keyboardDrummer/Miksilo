@@ -140,7 +140,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = File(inputFile).slurp()
 
     val result = getGrammarResult(input)
-    val expectation = ClassC.clazz(Seq(), "Fibonacci", Seq(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
+    val expectation = ClassC.clazz(Seq(), "Fibonacci", List(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
 

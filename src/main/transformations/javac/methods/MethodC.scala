@@ -1,6 +1,5 @@
 package transformations.javac.methods
 
-import core.grammar.~
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
@@ -111,25 +110,19 @@ object MethodC extends GrammarTransformation {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseReturnType = "void" ^^ (_ => VoidTypeC.voidType) | parseType
+    val parseReturnType = "void" ~> produce(VoidTypeC.voidType) | parseType
 
-    val parseParameter = parseType ~ identifier ^^ {
-      case _type ~ _name => parameter(_name.asInstanceOf[String], _type)
-    }
+    val parseParameter = parseType ~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = "(" ~> parseParameter.manySeparated(",") <~ ")"
-    val parseStatic = "static" ^^ (_ => true) | produce(false)
+    val parseStatic = "static" ~> produce(true) | produce(false)
     val visibilityModifier =
-      "public" ^^ (_ => PublicVisibility) |
-        "protected" ^^ (_ => ProtectedVisibility) |
-        "private" ^^ (_ => PrivateVisibility) |
+      "public" ~> produce(PublicVisibility) |
+        "protected" ~> produce(ProtectedVisibility) |
+        "private" ~> produce(PrivateVisibility) |
         produce(DefaultVisibility)
 
-    grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~
-      parseParameters ~ block ^^ {
-      case visibility ~ static ~ returnType ~ name ~ parameters ~ body =>
-        method(name.asInstanceOf[String], returnType, parameters.asInstanceOf[Seq[MetaObject]], body.asInstanceOf[Seq[MetaObject]],
-          static.asInstanceOf[Boolean], visibility.asInstanceOf[Visibility])
-    })
+    grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~ parseParameters ~ block ^^
+      parseMap(ByteCodeSkeleton.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
   }
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
@@ -144,8 +137,9 @@ object MethodC extends GrammarTransformation {
     }
   }
 
+  object ParameterKey
   def parameter(name: String, _type: Any) = {
-    new MetaObject("JavaParameter") {
+    new MetaObject(ParameterKey) {
       data.put(ParameterNameKey, name)
       data.put(ParameterTypeKey, _type)
     }

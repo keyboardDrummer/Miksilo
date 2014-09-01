@@ -40,6 +40,7 @@ object AssignToVariable extends GrammarTransformation {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val targetGrammar = grammars.find(AssignmentC.AssignmentTargetGrammar)
-    targetGrammar.orToInner(identifier ^^ (name => VariableC.variable(name.asInstanceOf[String])))
+    val variableGrammar = grammars.find(VariableC.VariableGrammar)
+    targetGrammar.orToInner(variableGrammar)
   }
 }

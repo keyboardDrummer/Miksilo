@@ -1,6 +1,6 @@
 package core.transformation
 
-import core.grammar.FailureG
+import core.grammarDocument.FailureG
 import core.modularProgram.StoppableState
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 

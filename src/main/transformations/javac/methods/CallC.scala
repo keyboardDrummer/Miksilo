@@ -1,6 +1,5 @@
 package transformations.javac.methods
 
-import core.grammar._
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
@@ -19,8 +18,8 @@ object CallC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val callArguments: Grammar = "(" ~> expression.manySeparated(",") <~ ")"
-    val parseCall = expression ~ callArguments ^^ { case callee ~ arguments => call(callee, arguments)}
+    val callArguments = "(" ~> expression.manySeparated(",") <~ ")"
+    val parseCall = expression ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
     core.orToInner(parseCall)
   }
 

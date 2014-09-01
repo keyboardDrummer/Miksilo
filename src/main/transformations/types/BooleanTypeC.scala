@@ -12,7 +12,7 @@ object BooleanTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.inner = ("boolean" ^^ (_ => booleanType)) | typeGrammar.inner
+    typeGrammar.orToInner("boolean" ~> produce(booleanType))
   }
 
   def booleanType = new MetaObject(BooleanTypeKey)

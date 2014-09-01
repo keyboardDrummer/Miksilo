@@ -1,6 +1,4 @@
 package transformations.javac.statements
-import core.grammar.{Grammar,~}
-
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
@@ -23,9 +21,7 @@ object ForLoopC extends StatementInstance {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") ~ blockGrammar ^^
-      { case initializer ~ condition ~ increment ~ body => forLoop(initializer.asInstanceOf[MetaObject],
-      condition.asInstanceOf[MetaObject], increment.asInstanceOf[MetaObject], body.asInstanceOf[Seq[MetaObject]])
-    }
+      parseMap(ForLoopKey, InitializerKey, ConditionKey, IncrementKey, BodyKey)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 

@@ -18,7 +18,7 @@ trait ResponsiveDocument {
   def renderString: String = render(Int.MaxValue).render
   def isEmpty : Boolean
 
-  def |(right: ResponsiveDocument) : ResponsiveDocument = {
+  def ~~(right: ResponsiveDocument) : ResponsiveDocument = {
     if (isEmpty)
       return right
 
@@ -32,17 +32,17 @@ trait ResponsiveDocument {
   def ~(right: ResponsiveDocument) = {
     new ResponsiveLeftRight(this,right)
   }
-  def ^(bottom: ResponsiveDocument) = {
+  def %(bottom: ResponsiveDocument) = {
     new ResponsiveTopBottom(this,bottom)
   }
-  def ^^(bottom: ResponsiveDocument): ResponsiveDocument  = {
+  def %%(bottom: ResponsiveDocument): ResponsiveDocument  = {
     if (isEmpty)
       return bottom
 
     if (bottom.isEmpty)
       return this
 
-    this ^ BlankLine ^ bottom
+    this % BlankLine % bottom
   }
   def inParenthesis = ResponsiveDocument.text("(") ~ this ~ ")"
 

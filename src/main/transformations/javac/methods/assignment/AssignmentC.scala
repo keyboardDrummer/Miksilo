@@ -21,8 +21,7 @@ object AssignmentC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, FailureG)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val assignmentGrammar: Grammar = (targetGrammar <~ "=") ~ expressionGrammar ^^
-      { case target ~ value => assignment(target.asInstanceOf[MetaObject], value.asInstanceOf[MetaObject])}
+    val assignmentGrammar = (targetGrammar <~ "=") ~ expressionGrammar ^^ parseMap(AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.orToInner(assignmentGrammar)
   }
 

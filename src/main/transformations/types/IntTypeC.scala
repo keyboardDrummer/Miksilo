@@ -14,7 +14,7 @@ object IntTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.create(TypeGrammar)
-    val parseIntType = "int" ^^ (_ => IntTypeC.intType)
+    val parseIntType = "int" ~> produce(IntTypeC.intType)
     parseType.inner = parseType.inner | parseIntType
 
   }

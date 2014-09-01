@@ -12,7 +12,7 @@ object NullC extends GrammarTransformation {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val parseNull = "null" ^^ { _ => _null}
+    val parseNull = "null" ~> produce(_null)
     expressionGrammar.inner = expressionGrammar.inner | parseNull
   }
 

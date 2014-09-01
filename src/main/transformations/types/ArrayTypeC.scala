@@ -3,7 +3,6 @@ package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
-import core.grammar.{Grammar,~}
 
 object ArrayTypeC extends TypeInstance {
   override val key: AnyRef = ArrayTypeKey
@@ -17,8 +16,8 @@ object ArrayTypeC extends TypeInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseArrayType = parseType ~ "[]" ^^ { case _type ~ _ => arrayType(_type.asInstanceOf[MetaObject])}
-    parseType.inner = parseType.inner | parseArrayType
+    val parseArrayType = parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
+    parseType.orToInner(parseArrayType)
   }
 
   def arrayType(elementType: MetaObject) = {

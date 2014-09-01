@@ -16,11 +16,11 @@ object ReturnVoidC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
 
-    val returnExpression = "return" <~ ";" ^^ (_ => _return())
+    val returnExpression = ("return" ~ ";") ~> produce(_return)
     statement.inner = statement.inner | returnExpression
   }
 
-  def _return(): MetaObject = new MetaObject(ReturnVoidKey)
+  def _return: MetaObject = new MetaObject(ReturnVoidKey)
 
   object ReturnVoidKey
 

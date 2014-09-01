@@ -6,7 +6,6 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionC
-import core.grammar.{Grammar,~}
 
 object WhileC extends StatementInstance {
 
@@ -36,8 +35,9 @@ object WhileC extends StatementInstance {
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^ { case condition ~ body => _while(condition.asInstanceOf[MetaObject], body.asInstanceOf[Seq[MetaObject]])}
-    statementGrammar.inner = statementGrammar.inner | whileGrammar
+    val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^
+      parseMap(WhileKey, WhileCondition, WhileBody)
+    statementGrammar.orToInner(whileGrammar)
   }
 
   def _while(condition: MetaObject, body: Seq[MetaObject]) = new MetaObject(WhileKey, WhileCondition -> condition, WhileBody -> body)
