@@ -1,6 +1,6 @@
 package core.grammarDocument
 
-import core.grammar.{Identifier, NumberG, Grammar, ~}
+import core.grammar._
 import core.responsiveDocument.ResponsiveDocument
 
 trait GrammarDocumentWriter {
@@ -13,7 +13,7 @@ trait GrammarDocumentWriter {
 
   def produce(value: Any): GrammarDocument = new Produce(value)
 
-  def space: GrammarDocument = new WhiteSpace(1,1)
+  def space: GrammarDocument = new WhiteSpace(1, 1)
 
   def keyword(word: String): GrammarDocument = new Keyword(word)
 
@@ -28,28 +28,33 @@ trait GrammarDocumentWriter {
 
 trait GrammarDocument extends GrammarDocumentWriter {
 
+  override def toString = PrintGrammar.toDocument(GrammarDocumentToGrammar.toGrammar(this)).renderString(false)
+
   def simplify: GrammarDocument = this
 
   def <~(right: GrammarDocument) = new IgnoreRight(this, right)
+
   def <~~(right: GrammarDocument) = this <~ (space ~ right)
 
   def manySeparated(separator: GrammarDocument): GrammarDocument = someSeparated(separator) | new Produce(Seq.empty[Any])
 
   def |(other: GrammarDocument) = new Choice(this, other)
 
-  def ~~(right: GrammarDocument) : GrammarDocument = {
+  def ~~(right: GrammarDocument): GrammarDocument = {
     (this <~ space) ~ right
   }
 
-  def someSeparated(separator: GrammarDocument): GrammarDocument = this ~ ((separator ~> this) *) ^^( {
-    case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
-  }, {
-    case seq: Seq[Any] => Some(core.grammar.~(seq.head, seq.tail))
-  })
+  def someSeparated(separator: GrammarDocument): GrammarDocument = this ~ ((separator ~> this) *) ^^
+    ( {
+      case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
+    }, {
+      case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
+    })
 
   def ~(other: GrammarDocument) = new Sequence(this, other)
 
   def ~>(right: GrammarDocument) = new IgnoreLeft(this, right)
+
   def ~~>(right: GrammarDocument) = (this ~ space) ~> right
 
   def * = new Many(this)

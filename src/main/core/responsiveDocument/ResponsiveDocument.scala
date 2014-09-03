@@ -15,7 +15,7 @@ case class WrappedSizedDocument(sized: Document) extends ResponsiveDocument {
 
 trait ResponsiveDocument {
   def render(preferredWidth: Int) : Document
-  def renderString: String = render(Int.MaxValue).render
+  def renderString(trim: Boolean = true): String = render(Int.MaxValue).render(trim)
   def isEmpty : Boolean
 
   def ~~(right: ResponsiveDocument) : ResponsiveDocument = {
@@ -46,5 +46,5 @@ trait ResponsiveDocument {
   }
   def inParenthesis = ResponsiveDocument.text("(") ~ this ~ ")"
 
-  override def toString = renderString
+  override def toString = renderString(false)
 }

@@ -2,7 +2,7 @@ package application.compilerCockpit
 
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.JButton
-import core.grammar.ToDocument
+import core.grammar.PrintGrammar
 import core.transformation.grammars.GrammarNotFoundException
 
 class ShowInputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show input grammar") {
@@ -13,7 +13,7 @@ class ShowInputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("
       }
       catch {
         case e: GrammarNotFoundException =>
-          val keyName = ToDocument.grammarKeyToName(e.key)
+          val keyName = PrintGrammar.grammarKeyToName(e.key)
           compilerCockpit.setOutputText(s"Error occurred while constructing input grammar, key $keyName not found")
       }
     }

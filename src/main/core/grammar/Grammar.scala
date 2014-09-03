@@ -25,7 +25,7 @@ trait Grammar extends GrammarWriter {
 
   def simplify: Grammar = this
 
-  override def toString = ToDocument.toDocument(ToDocument.transform(this)).renderString
+  override def toString = PrintGrammar.toDocument(this).renderString(false)
 
   def <~(right: Grammar) = new IgnoreRight(this, right)
 

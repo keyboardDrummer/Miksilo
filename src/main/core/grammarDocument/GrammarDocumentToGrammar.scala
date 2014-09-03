@@ -3,7 +3,7 @@ package core.grammarDocument
 import core.grammar.Grammar
 import scala.collection.mutable
 
-object ToGrammar {
+object GrammarDocumentToGrammar {
   def toGrammar(grammarDocument: GrammarDocument): Grammar = {
     val closed = new mutable.HashMap[GrammarDocument, Grammar]()
 
@@ -15,7 +15,7 @@ object ToGrammar {
         case Keyword(keyword) => core.grammar.Keyword(keyword)
         case Delimiter(keyword) => core.grammar.Delimiter(keyword)
         case labelled: Labelled =>
-          val result = new core.grammar.Labelled(labelled.name, null) //TODO remove recursion
+          val result = new core.grammar.Labelled(labelled.name, null)
           closed.put(grammarDocument, result)
           result.inner = helper(labelled.inner)
           result

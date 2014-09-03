@@ -52,11 +52,16 @@ object TestUtils {
   }
 
   def parseAndTransform(className: String, inputDirectory: Path, compiler: CompilerFromTransformations): MetaObject = {
+    val input: File = getTestFile(className, inputDirectory)
+    compiler.parseAndTransform(input)
+  }
+
+  def getTestFile(className: String, inputDirectory: Path): File = {
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
-    compiler.parseAndTransform(input)
+    input
   }
 
   def compileAndRun(className: String, inputDirectory: Path): String = {

@@ -1,12 +1,9 @@
 package core.grammarDocument
 
-import core.grammar.{Grammar, NumberG, ToPackrat}
-import org.junit.{Assert, Test}
+import core.grammar.{NumberG, ~}
+import org.junit.Test
 
-import scala.util.parsing.input.CharArrayReader
-import core.grammar.~
-
-class TestGrammar extends GrammarDocumentWriter {
+class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
 
   @Test
   def testSimpleAddition() {
@@ -56,29 +53,15 @@ class TestGrammar extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  def parseAndPrint(example: String, expected: TestExpression) {
+  def parseAndPrint(example: String, expected: Any) {
     val grammarDocument = getExpressionGrammarDocument
-    val grammar: Grammar = ToGrammar.toGrammar(grammarDocument)
-
-    val packrat: ToPackrat = new ToPackrat()
-    val result = packrat.phrase(packrat.convert(grammar))(new CharArrayReader(example.toCharArray)).get
-
-    Assert.assertEquals(expected, result)
-
-    val documentResult = ToPrint.toDocument(result, grammarDocument).get.renderString
-    Assert.assertEquals(example, documentResult)
+    TestGrammarUtils.parseAndPrint(example, Some(expected), grammarDocument)
   }
 
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled("expression")
     val parenthesis: GrammarDocument = "(" ~> expression <~ ")"
 
-    val _if: GrammarDocument = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
-      case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
-    }, {
-      case IfNotZero(cond, then, _else) => Some(core.grammar.~(core.grammar.~(cond, then), _else))
-      case _ => None
-    })
 
     val number: GrammarDocument = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
       case Value(i) => Some(i)
@@ -105,6 +88,13 @@ class TestGrammar extends GrammarDocumentWriter {
     })
     addLabel.orToInner(add)
     addLabel.orToInner(multipleLabel)
+
+    val _if: GrammarDocument = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
+      case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
+    }, {
+      case IfNotZero(cond, then, _else) => Some(core.grammar.~(core.grammar.~(cond, then), _else))
+      case _ => None
+    })
 
     expression.orToInner(_if)
     expression.orToInner(addLabel)

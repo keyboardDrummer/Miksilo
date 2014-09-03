@@ -1,7 +1,7 @@
 package core.grammar
 
+import core.grammarDocument.TestGrammarUtils
 import core.transformation._
-import core.transformation.grammars.ProgramGrammar
 import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._
@@ -20,7 +20,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   @Test
   def testBasicClass() {
     val input = "package bla; class Help {}"
-    val result = getGrammarResult(input)
+    val result = TestGrammarUtils.getGrammarResult(input)
     val expectation = ClassC.clazz(Seq("bla"), "Help", Seq.empty[MetaObject], List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }
@@ -71,20 +71,10 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = getGrammarResult(input, ExpressionC.ExpressionGrammar)
+    val result: Any = TestGrammarUtils.getGrammarResult(input, ExpressionC.ExpressionGrammar)
     result
   }
 
-  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val parser = TestGrammarUtils.getJavaParser(grammarTransformer)
-    val parseResult = parser(input)
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
-
-    val result = parseResult.get
-    Assert.assertTrue(result.toString, parseResult.next.atEnd)
-    result
-  }
 
   @Test
   def testSubtraction() {
@@ -120,7 +110,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = getGrammarResult(input, MethodC.MethodGrammar)
+    val result = TestGrammarUtils.getGrammarResult(input, MethodC.MethodGrammar)
     result
   }
 
@@ -139,7 +129,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
 
     val input = File(inputFile).slurp()
 
-    val result = getGrammarResult(input)
+    val result = TestGrammarUtils.getGrammarResult(input)
     val expectation = ClassC.clazz(Seq(), "Fibonacci", List(getMainMethod, getFibonacciMethod), List.empty[JavaImport])
     Assert.assertEquals(expectation, result)
   }

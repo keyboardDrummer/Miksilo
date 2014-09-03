@@ -26,7 +26,7 @@ object ExpressionAsStatementC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
-    val expressionAsStatement = expressionGrammar <~ ";" ^^ parseMap(ExpressionAsStatementKey, ExpressionKey)
+    val expressionAsStatement = (expressionGrammar <~ ";") ^^ parseMap(ExpressionAsStatementKey, ExpressionKey)
     statementGrammar.orToInner(expressionAsStatement)
   }
 }

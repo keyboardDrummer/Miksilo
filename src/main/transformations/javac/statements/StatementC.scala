@@ -1,6 +1,5 @@
 package transformations.javac.statements
 
-import core.grammar.FailureG
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
@@ -26,7 +25,7 @@ object StatementC extends GrammarTransformation {
     state.data.getOrElseUpdate(this, new StatementTransformations()).asInstanceOf[StatementTransformations]
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    grammars.create(StatementGrammar, FailureG)
+    grammars.create(StatementGrammar)
   }
 
   class StatementTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]

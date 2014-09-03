@@ -1,16 +1,16 @@
 package core.grammar
 
-import core.grammarDocument.ToGrammar
+import core.grammarDocument.GrammarDocumentToGrammar
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.collection.immutable.Stream.Cons
 import scala.util.matching.Regex
 
-object ToDocument {
+object PrintGrammar {
 
   def toDocument(catalogue: GrammarCatalogue) = {
-    val program = ToGrammar.toGrammar(catalogue.find(ProgramGrammar))
+    val program = GrammarDocumentToGrammar.toGrammar(catalogue.find(ProgramGrammar))
     val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
     val document = reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
     document
@@ -25,23 +25,25 @@ object ToDocument {
 
     val transformed: Grammar = transform(labelled.inner)
     val ors: Seq[Grammar] = getOrs(transformed)
-    val result = toDocument(labelled) ~~ "=>" ~~ ors.map(or => toDocument(or)).reduce((a, b) => a % b)
+    val result = toDocumentInner(labelled) ~~ "=>" ~~ ors.map(or => toDocumentInner(or)).reduce((a, b) => a % b)
     result
   }
 
-  def toDocument(grammar: Grammar): ResponsiveDocument = grammar match {
+  def toDocument(grammar: Grammar) = toDocumentInner(transform(grammar))
+
+  private def toDocumentInner(grammar: Grammar): ResponsiveDocument = grammar match {
     case Sequence(left, right) =>
       def withParenthesis(grammar: Grammar): ResponsiveDocument = grammar match {
-        case choice: Choice => toDocument(choice).inParenthesis
-        case _ => toDocument(grammar)
+        case choice: Choice => toDocumentInner(choice).inParenthesis
+        case _ => toDocumentInner(grammar)
       }
       withParenthesis(left) ~~ withParenthesis(right)
-    case Choice(left, right) => toDocument(left) ~~ "|" ~~ toDocument(right)
-    case Many(inner: Labelled) => toDocument(inner) ~ "*"
-    case Many(inner) => toDocument(inner).inParenthesis ~ "*"
+    case Choice(left, right) => toDocumentInner(left) ~~ "|" ~~ toDocumentInner(right)
+    case Many(inner: Labelled) => toDocumentInner(inner) ~ "*"
+    case Many(inner) => toDocumentInner(inner).inParenthesis ~ "*"
     case Keyword(value) => ResponsiveDocument.text(value)
-    case Option(inner: Labelled) => toDocument(inner) ~ "?"
-    case Option(inner) => toDocument(inner).inParenthesis ~ "?"
+    case Option(inner: Labelled) => toDocumentInner(inner) ~ "?"
+    case Option(inner) => toDocumentInner(inner).inParenthesis ~ "?"
     case RegexG(value) => s"Regex($value)"
     case Produce(value) => "produce"
     case FailureG => "fail"
@@ -52,9 +54,12 @@ object ToDocument {
       grammarKeyToName(key)
   }
 
-  def grammarKeyToName(key: Any): String = {
-    val regex = new Regex("Grammar\\$")
-    regex.replaceAllIn(key.getClass.getSimpleName, "")
+  def grammarKeyToName(key: Any): String = key match {
+    case string: String => string
+    case _ => {
+      val regex = new Regex("Grammar\\$")
+      regex.replaceAllIn(key.getClass.getSimpleName, "")
+    }
   }
 
   case class Option(inner: Grammar) extends Grammar

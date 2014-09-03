@@ -9,6 +9,8 @@ import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
+import core.grammar.~
+
 
 import scala.collection.mutable
 
@@ -80,6 +82,8 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
     val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^
+      ({ case (_package ~ imports) ~ (name ~ methods) => core.grammar.~(core.grammar.~(core.grammar.~(_package, imports), name), methods) },
+        { case _package ~ imports ~ name ~ methods => Some(core.grammar.~(core.grammar.~(_package, imports), core.grammar.~(name, methods))) }) ^^
       parseMap(ClassFileKey, ClassPackage, ClassImports, ClassName, ByteCodeSkeleton.ClassMethodsKey))
     grammars.find(ProgramGrammar).inner = classGrammar
   }

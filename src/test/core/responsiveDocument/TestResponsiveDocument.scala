@@ -10,7 +10,7 @@ class TestResponsiveDocument {
   {
     val expected: String = "hallo"
     val document: ResponsiveDocument = text(expected)
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -18,7 +18,7 @@ class TestResponsiveDocument {
   {
     val expected = "hallo" + "daar"
     val document = ("hallo": ResponsiveDocument) ~ "daar"
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -26,7 +26,7 @@ class TestResponsiveDocument {
   {
     val expected = "a" + "\n" + "b"
     val document = ("a" : ResponsiveDocument) % "b"
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -34,7 +34,7 @@ class TestResponsiveDocument {
   {
     val expected = "ab\na"
     val document = (text("a") % "a") ~ "b"
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -42,7 +42,7 @@ class TestResponsiveDocument {
   {
     val expected = "ab\n b"
     val document = text("a") ~ (text("b") % "b")
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -50,7 +50,7 @@ class TestResponsiveDocument {
   {
     val expected = "aa\nb"
     val document = text("aa") % "b"
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 
   @Test
@@ -58,6 +58,6 @@ class TestResponsiveDocument {
   {
     val expected = "a\nbb"
     val document = text("a") % "bb"
-    Assert.assertEquals(expected, document.renderString)
+    Assert.assertEquals(expected, document.renderString())
   }
 }

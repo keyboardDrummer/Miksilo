@@ -5,11 +5,18 @@ import org.junit.{Assert, Test}
 class TestDocument {
 
   @Test
+  def testEmptyWithExclamation() {
+    val expected = "!"
+    val text = new LeftRight(Empty, new Text("!"))
+    Assert.assertEquals(expected, text.render())
+  }
+
+  @Test
   def testText()
   {
     val expected: String = "hallo"
     val text = new Text(expected)
-    Assert.assertEquals(expected, text.render)
+    Assert.assertEquals(expected, text.render())
   }
 
   @Test
@@ -17,7 +24,7 @@ class TestDocument {
   {
     val expected = "hallo" + "daar"
     val document = ("hallo": Document) ~ "daar"
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 
   @Test
@@ -25,7 +32,7 @@ class TestDocument {
   {
     val expected = "a" + "\n" + "b"
     val document = ("a" : Document) % "b"
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 
   @Test
@@ -33,7 +40,7 @@ class TestDocument {
   {
     val expected = "ab\na"
     val document = (new Text("a") % "a") ~ "b"
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 
   @Test
@@ -41,7 +48,7 @@ class TestDocument {
   {
     val expected = "ab\n b"
     val document = new Text("a") ~ (new Text("b") % "b")
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 
   @Test
@@ -49,7 +56,7 @@ class TestDocument {
   {
     val expected = "aa\nb"
     val document = new Text("aa") % "b"
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 
   @Test
@@ -57,6 +64,6 @@ class TestDocument {
   {
     val expected = "a\nbb"
     val document = new Text("a") % "bb"
-    Assert.assertEquals(expected, document.render)
+    Assert.assertEquals(expected, document.render())
   }
 }

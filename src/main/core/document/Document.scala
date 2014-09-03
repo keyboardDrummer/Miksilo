@@ -5,8 +5,13 @@ object Document {
 }
 
 trait Document {
-  def render: String = {
-    0.until(height).map(y => renderLine(y).reverse.dropWhile(_ == ' ').reverse).mkString("\n")
+  def render(trim: Boolean = true): String = {
+    0.until(height).map(y => {
+      var line = renderLine(y)
+      if (trim)
+        line = line.reverse.dropWhile(_ == ' ').reverse
+      line
+    }).mkString("\n")
   }
 
   def renderLine(y: Int): String
