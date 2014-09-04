@@ -53,7 +53,7 @@ object TernaryC extends GrammarTransformation {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    val parseTernary = (expressionGrammar <~ "?") ~ (expressionGrammar <~ ":") ~ expressionGrammar ^^
+    val parseTernary = (expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar ^^
       parseMap(TernaryKey, ConditionKey, TrueKey, FalseKey)
     val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar

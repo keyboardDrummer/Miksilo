@@ -36,12 +36,11 @@ class TestRecursion extends GrammarDocumentWriter {
   @Test
   def testLeftRecursion() {
     val grammar: Labelled = new Labelled("leftRec")
-    grammar.orToInner(grammar ~ "!")
     grammar.orToInner(produce(null))
+    grammar.orToInner(grammar ~ "!")
 
     testUsingGrammar(grammar)
   }
-
 
   @Test
   def testLeftRecursionPrintOnly() {
@@ -51,7 +50,7 @@ class TestRecursion extends GrammarDocumentWriter {
 
     val result = "!!!!!".map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
 
-    val document = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument).get
+    val document = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }

@@ -15,7 +15,8 @@ object TestGrammarUtils {
     val grammar: Grammar = GrammarDocumentToGrammar.toGrammar(grammarDocument)
 
     val packrat: ToPackrat = new ToPackrat()
-    val parseResult = packrat.phrase(packrat.convert(grammar))(new CharArrayReader(example.toCharArray))
+    val packratParser = packrat.convert(grammar)
+    val parseResult = packratParser(new packrat.PackratReader(new CharArrayReader(example.toCharArray)))
     if (parseResult.isEmpty)
       Assert.fail(parseResult.toString)
 
@@ -24,7 +25,7 @@ object TestGrammarUtils {
     expectedOption.foreach(expected =>
       Assert.assertEquals(expected, result))
 
-    val documentResult = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument).get.renderString()
+    val documentResult = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument).renderString()
     Assert.assertEquals(example, documentResult)
   }
 
@@ -34,7 +35,7 @@ object TestGrammarUtils {
 
   def getPrintResult(value: Any, grammarTransformer: Any = ProgramGrammar): String = {
     val document = getGrammarUsingTransformer(grammarTransformer)
-    PrintValueUsingGrammarDocument.toDocument(value, document).get.renderString()
+    PrintValueUsingGrammarDocument.toDocument(value, document).renderString()
   }
 
   def getGrammarUsingTransformer(grammarTransformer: Any): Labelled = {

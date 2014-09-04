@@ -12,7 +12,6 @@ class TestPackratParsing extends StandardTokenParsers with PackratParsers {
   lexical.delimiters += "]"
   lexical.delimiters ++= Seq("+", "<", "?", ":")
 
-
   @Test
   def testParseType() {
 
