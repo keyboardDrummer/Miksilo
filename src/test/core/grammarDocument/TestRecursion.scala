@@ -26,10 +26,10 @@ class TestRecursion extends GrammarDocumentWriter {
   }
 
   def testUsingGrammar(grammar: Labelled) {
-    TestGrammarUtils.parseAndPrint(input, Some(getExpectedResult), grammar)
+    TestGrammarUtils.parseAndPrint(input, Some(getExpectedRightRecursiveResult), grammar)
   }
 
-  def getExpectedResult: AnyRef = {
+  def getExpectedRightRecursiveResult: AnyRef = {
     "!!!!!".map(s => s.toString).foldRight[AnyRef](null)((a, b) => core.grammar.~(a, b))
   }
 
@@ -48,9 +48,25 @@ class TestRecursion extends GrammarDocumentWriter {
     grammarDocument.orToInner(grammarDocument ~ "!")
     grammarDocument.orToInner(produce(null))
 
-    val result = "!!!!!".map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
+    val result = getExpectedLeftRecursiveResult
 
     val document = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument)
+    val documentResult = document.renderString()
+    Assert.assertEquals(input, documentResult)
+  }
+
+  def getExpectedLeftRecursiveResult: AnyRef = {
+    "!!!!!".map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
+  }
+
+  @Test
+  def testPrintingIndirectLeftRecursion() {
+    val inner = new Labelled("boep")
+    val outer = new Labelled("woep", inner)
+    inner.orToInner(outer ~ "!")
+    inner.orToInner(produce(null))
+
+    val document = PrintValueUsingGrammarDocument.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }

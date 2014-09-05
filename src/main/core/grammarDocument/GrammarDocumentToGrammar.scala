@@ -23,7 +23,7 @@ object GrammarDocumentToGrammar {
         case MapGrammar(inner, construct, _) => core.grammar.MapGrammar(helper(inner), construct)
         case TopBottom(top, bottom) => core.grammar.Sequence(helper(top), helper(bottom))
         case FailureG => core.grammar.FailureG
-        case WhiteSpace(_,_) => core.grammar.Produce(null)
+        case WhiteSpace(_,_) => core.grammar.Produce(Unit)
         case Produce(value) => core.grammar.Produce(value)
       })
     }

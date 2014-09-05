@@ -61,8 +61,25 @@ trait GrammarDocument extends GrammarDocumentWriter {
 
   def %(bottom: GrammarDocument) = new TopBottom(this, bottom)
 
+  def %>(bottom: GrammarDocument) = new TopBottom(this, bottom).ignoreLeft
+
+  def %<(bottom: GrammarDocument) = new TopBottom(this, bottom).ignoreRight
+
   def ^^(map: (Any => Any, Any => Option[Any])): GrammarDocument = new MapGrammar(this, map._1, map._2)
 
+  def indent(width: Int) = new WhiteSpace(width,0) ~> this
+
+}
+
+trait SequenceLike extends GrammarDocument
+{
+  def ignoreLeft: MapGrammar = {
+    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(MissingValue, r)))
+  }
+
+  def ignoreRight: MapGrammar = {
+    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, MissingValue)))
+  }
 }
 
 case class Delimiter(value: String) extends GrammarDocument
@@ -76,16 +93,16 @@ case class Many(var inner: GrammarDocument) extends GrammarDocument
 object MissingValue
 
 case class IgnoreLeft(first: GrammarDocument, second: GrammarDocument) extends GrammarDocument {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => r}, r => Some(core.grammar.~(MissingValue, r)))
+  override def simplify = new Sequence(first, second).ignoreLeft
 }
 
 case class IgnoreRight(first: GrammarDocument, second: GrammarDocument) extends GrammarDocument {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l}, l => Some(core.grammar.~(l, MissingValue)))
+  override def simplify = new Sequence(first, second).ignoreRight
 }
 
 case class Choice(left: GrammarDocument, right: GrammarDocument) extends GrammarDocument
 
-case class Sequence(first: GrammarDocument, second: GrammarDocument) extends GrammarDocument
+case class Sequence(first: GrammarDocument, second: GrammarDocument) extends GrammarDocument with SequenceLike
 
 case class MapGrammar(inner: GrammarDocument, construct: Any => Any, deconstruct: Any => Option[Any]) extends GrammarDocument
 
@@ -96,7 +113,7 @@ class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureG) extends 
   }
 }
 
-case class TopBottom(top: GrammarDocument, bottom: GrammarDocument) extends GrammarDocument
+case class TopBottom(top: GrammarDocument, bottom: GrammarDocument) extends GrammarDocument with SequenceLike
 
 case class WhiteSpace(width: Int, height: Int) extends GrammarDocument
 

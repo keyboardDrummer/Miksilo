@@ -112,7 +112,7 @@ object MethodC extends GrammarTransformation {
     val parseType = grammars.find(TypeC.TypeGrammar)
     val parseReturnType = "void" ~> produce(VoidTypeC.voidType) | parseType
 
-    val parseParameter = parseType ~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
+    val parseParameter = parseType ~~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = "(" ~> parseParameter.manySeparated(",") <~ ")"
     val parseStatic = "static" ~> produce(true) | produce(false)
     val visibilityModifier =
@@ -121,7 +121,7 @@ object MethodC extends GrammarTransformation {
         "private" ~> produce(PrivateVisibility) |
         produce(DefaultVisibility)
 
-    grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~ identifier ~ parseParameters ~ block ^^
+    grammars.create(MethodGrammar, visibilityModifier ~~ parseStatic ~~ parseReturnType ~~ identifier ~ parseParameters % block ^^
       parseMap(ByteCodeSkeleton.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
   }
 
