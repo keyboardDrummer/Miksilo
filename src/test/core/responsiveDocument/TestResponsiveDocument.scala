@@ -5,6 +5,8 @@ import org.junit.{Assert, Test}
 
 class TestResponsiveDocument {
 
+  val newLine = System.lineSeparator()
+
   @Test
   def testText()
   {
@@ -24,7 +26,7 @@ class TestResponsiveDocument {
   @Test
   def testTopBottom()
   {
-    val expected = "a" + "\n" + "b"
+    val expected = "a" + newLine + "b"
     val document = ("a" : ResponsiveDocument) % "b"
     Assert.assertEquals(expected, document.renderString())
   }
@@ -32,7 +34,7 @@ class TestResponsiveDocument {
   @Test
   def testLeftRightLeftHigher()
   {
-    val expected = "ab\na"
+    val expected = "ab" + newLine + "a"
     val document = (text("a") % "a") ~ "b"
     Assert.assertEquals(expected, document.renderString())
   }
@@ -40,7 +42,7 @@ class TestResponsiveDocument {
   @Test
   def testLeftRightRightHigher()
   {
-    val expected = "ab\n b"
+    val expected = "ab" + newLine + " b"
     val document = text("a") ~ (text("b") % "b")
     Assert.assertEquals(expected, document.renderString())
   }
@@ -48,7 +50,7 @@ class TestResponsiveDocument {
   @Test
   def testTopBottomTopWider()
   {
-    val expected = "aa\nb"
+    val expected = "aa" + newLine + "b"
     val document = text("aa") % "b"
     Assert.assertEquals(expected, document.renderString())
   }
@@ -56,7 +58,7 @@ class TestResponsiveDocument {
   @Test
   def testTopBottomBottomWider()
   {
-    val expected = "a\nbb"
+    val expected = "a" + newLine + "bb"
     val document = text("a") % "bb"
     Assert.assertEquals(expected, document.renderString())
   }

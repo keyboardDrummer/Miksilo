@@ -1,6 +1,7 @@
 package transformations.javac.expressions.literals
 
 import core.grammar.RegexG
+import core.grammarDocument.GrammarDocument
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
@@ -13,10 +14,13 @@ object LongLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionC, IntegerConstantC)
 
+  def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
+
   override def transformGrammars(grammars: GrammarCatalogue) = {
-    val parseLong = new RegexG("""-?\d+l""".r) ^^ (number => literal(java.lang.Long.parseLong(number.asInstanceOf[String].dropRight(1))))
+    val longGrammar : GrammarDocument = (new RegexG("""-?\d+l""".r) : GrammarDocument) ^^
+      (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) ^^ parseMap(LongLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    expressionGrammar.inner = expressionGrammar.inner | parseLong
+    expressionGrammar.orToInner(longGrammar)
   }
 
   def literal(value: Long) = new MetaObject(LongLiteralKey, ValueKey -> value)

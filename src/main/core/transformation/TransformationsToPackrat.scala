@@ -1,7 +1,7 @@
 package core.transformation
 
-import core.grammar.{Grammar, Keyword, ToPackrat}
-import core.grammarDocument.{FailureG, Labelled, GrammarDocumentToGrammar}
+import core.grammar.ToPackrat
+import core.grammarDocument.{FailureG, GrammarDocumentToGrammar, Labelled}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 
@@ -33,9 +33,6 @@ class TransformationsToPackrat extends ToPackrat {
 
   def buildParser(programGrammarDocument: Labelled): (String) => ParseResult[Any] = {
     val programGrammar = GrammarDocumentToGrammar.toGrammar(programGrammarDocument)
-    val allGrammars: Set[Grammar] = programGrammar.getGrammars
-    keywords ++= allGrammars.collect({ case keyword: Keyword => keyword.value})
-    val packratParser = phrase(convert(programGrammar))
-    input => packratParser(new CharArrayReader(input.toCharArray))
+    input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }
 }

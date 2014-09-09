@@ -4,6 +4,8 @@ import org.junit.{Assert, Test}
 
 class TestDocument {
 
+  val lineSep = System.lineSeparator()
+
   @Test
   def testEmptyWithExclamation() {
     val expected = "!"
@@ -30,7 +32,7 @@ class TestDocument {
   @Test
   def testTopBottom()
   {
-    val expected = "a" + "\n" + "b"
+    val expected = "a" + lineSep + "b"
     val document = ("a" : Document) % "b"
     Assert.assertEquals(expected, document.render())
   }
@@ -38,7 +40,7 @@ class TestDocument {
   @Test
   def testLeftRightLeftHigher()
   {
-    val expected = "ab\na"
+    val expected = "ab" + lineSep + "a"
     val document = (new Text("a") % "a") ~ "b"
     Assert.assertEquals(expected, document.render())
   }
@@ -46,7 +48,7 @@ class TestDocument {
   @Test
   def testLeftRightRightHigher()
   {
-    val expected = "ab\n b"
+    val expected = "ab" + lineSep + " b"
     val document = new Text("a") ~ (new Text("b") % "b")
     Assert.assertEquals(expected, document.render())
   }
@@ -54,7 +56,7 @@ class TestDocument {
   @Test
   def testTopBottomTopWider()
   {
-    val expected = "aa\nb"
+    val expected = "aa" + lineSep + "b"
     val document = new Text("aa") % "b"
     Assert.assertEquals(expected, document.render())
   }
@@ -62,7 +64,7 @@ class TestDocument {
   @Test
   def testTopBottomBottomWider()
   {
-    val expected = "a\nbb"
+    val expected = "a" + lineSep + "bb"
     val document = new Text("a") % "bb"
     Assert.assertEquals(expected, document.render())
   }

@@ -35,7 +35,7 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseAddition = (additiveGrammar <~ "+") ~ additiveGrammar ^^ parseMap(AdditionClazz, FirstKey, SecondKey)
+    val parseAddition = (additiveGrammar <~~ "+") ~~ additiveGrammar ^^ parseMap(AdditionClazz, FirstKey, SecondKey)
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
   }
 

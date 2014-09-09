@@ -23,8 +23,14 @@ class ToPackrat extends JavaTokenParsers with PackratParsers {
     )
 
   def chrExcept(cs: Char*) = elem("", ch => cs forall (ch != _))
-  
-  def convert(grammar: Grammar): PackratParser[Any] = {
+
+  def convert(grammar: Grammar) : PackratParser[Any] = {
+    val allGrammars: Set[Grammar] = grammar.getGrammars
+    keywords ++= allGrammars.collect({ case keyword: Keyword => keyword.value})
+    phrase(convertInner(grammar))
+  }
+
+  def convertInner(grammar: Grammar): PackratParser[Any] = {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
     def helper(grammar: Grammar): PackratParser[Any] = {

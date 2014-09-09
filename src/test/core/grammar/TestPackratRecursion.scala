@@ -1,6 +1,6 @@
 package core.grammar
 
-import org.junit.{Assert, Test}
+import org.junit.{Ignore, Assert, Test}
 
 import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
@@ -17,6 +17,7 @@ class TestPackratRecursion extends StandardTokenParsers with PackratParsers {
     Assert.assertEquals(input, result.get)
   }
 
+  @Ignore
   @Test
   def testLeftRecursion() {
     lazy val parser: Parser[String] = success("") ||| parser ~ keyword("!") ^^ { case a ~ b => a + b}

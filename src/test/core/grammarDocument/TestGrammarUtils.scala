@@ -16,7 +16,7 @@ object TestGrammarUtils {
 
     val packrat: ToPackrat = new ToPackrat()
     val packratParser = packrat.convert(grammar)
-    val parseResult = packratParser(new packrat.PackratReader(new CharArrayReader(example.toCharArray)))
+    val parseResult = packratParser(new CharArrayReader(example.toCharArray))
     if (parseResult.isEmpty)
       Assert.fail(parseResult.toString)
 

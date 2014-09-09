@@ -11,7 +11,7 @@ trait Document {
       if (trim)
         line = line.reverse.dropWhile(_ == ' ').reverse
       line
-    }).mkString("\n")
+    }).mkString(System.lineSeparator)
   }
 
   def renderLine(y: Int): String

@@ -11,9 +11,12 @@ object PrintGrammar {
 
   def toDocument(catalogue: GrammarCatalogue) = {
     val program = GrammarDocumentToGrammar.toGrammar(catalogue.find(ProgramGrammar))
+    printReachableGrammars(program)
+  }
+
+  def printReachableGrammars(program: Grammar): ResponsiveDocument = {
     val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
-    val document = reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
-    document
+    reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
   }
 
   def toTopLevelDocument(labelled: Labelled): ResponsiveDocument = {

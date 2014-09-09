@@ -1,5 +1,6 @@
 package transformations.javac.classes
 
+import core.document.BlankLine
 import core.grammarDocument.GrammarDocument
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -80,7 +81,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     // val _import = "import" ~> identifier.someSeparated(".") <~ ";"
     val importsP: GrammarDocument = produce(Seq.empty[JavaImport]) //success_import*
     val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
-    val _classContent = "class" ~> identifier ~ ("{" ~> (classMember *) <~ "}")
+    val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(4) %< "}")
     val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^
       ({ case (_package ~ imports) ~ (name ~ methods) => core.grammar.~(core.grammar.~(core.grammar.~(_package, imports), name), methods) },
         { case _package ~ imports ~ name ~ methods => Some(core.grammar.~(core.grammar.~(_package, imports), core.grammar.~(name, methods))) }) ^^

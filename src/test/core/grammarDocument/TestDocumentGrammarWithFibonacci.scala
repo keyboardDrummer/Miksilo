@@ -9,6 +9,7 @@ import util.TestUtils
 import scala.reflect.io.Path
 
 class TestDocumentGrammarWithFibonacci {
+  val lineSeparator = System.lineSeparator()
 
   @Test
   def testFibonacci() {
@@ -24,13 +25,13 @@ class TestDocumentGrammarWithFibonacci {
 
   @Test
   def testFibonacciMainMethod() {
-    val input = "public static void main(java.lang.String[] args)\n{\n    System.out.print(fibonacci(5));\n}"
+    val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
     TestGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
   }
 
   @Test
   def testBlock() {
-    val input = "{\n    System.out.print(fibonacci(5));\n}"
+    val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
     TestGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
   }
 }

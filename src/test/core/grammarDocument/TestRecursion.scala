@@ -1,6 +1,6 @@
 package core.grammarDocument
 
-import org.junit.{Assert, Test}
+import org.junit.{Ignore, Assert, Test}
 
 class TestRecursion extends GrammarDocumentWriter {
 
@@ -33,6 +33,7 @@ class TestRecursion extends GrammarDocumentWriter {
     "!!!!!".map(s => s.toString).foldRight[AnyRef](null)((a, b) => core.grammar.~(a, b))
   }
 
+  @Ignore
   @Test
   def testLeftRecursion() {
     val grammar: Labelled = new Labelled("leftRec")

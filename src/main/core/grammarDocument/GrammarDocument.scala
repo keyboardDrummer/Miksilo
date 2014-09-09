@@ -1,5 +1,6 @@
 package core.grammarDocument
 
+import core.document.{WhiteSpace, Document}
 import core.grammar._
 import core.responsiveDocument.ResponsiveDocument
 
@@ -13,11 +14,13 @@ trait GrammarDocumentWriter {
 
   def produce(value: Any): GrammarDocument = new Produce(value)
 
-  def space: GrammarDocument = new WhiteSpace(1, 1)
+  def space: GrammarDocument = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): GrammarDocument = new Keyword(word)
 
   implicit def consume(grammar: Grammar) = new Consume(grammar)
+  implicit def print(document: ResponsiveDocument) = new Print(document)
+  implicit def print(document: Document) = new Print(document)
 
   implicit def stringToGrammar(value: String): GrammarDocument =
     if (value.forall(c => Character.isLetterOrDigit(c)))
@@ -44,12 +47,20 @@ trait GrammarDocument extends GrammarDocumentWriter {
     (this <~ space) ~ right
   }
 
-  def someSeparated(separator: GrammarDocument): GrammarDocument = this ~ ((separator ~> this) *) ^^
+  def someSeparatedVertical(separator: GrammarDocument): GrammarDocument =
+    this % new ManyVertical(separator %> this) ^^ separatedMap
+
+  def manySeparatedVertical(separator: GrammarDocument): GrammarDocument = someSeparatedVertical(separator) | new Produce(Seq.empty[Any])
+
+  def someSeparated(separator: GrammarDocument): GrammarDocument = this ~ ((separator ~> this) *) ^^ separatedMap
+
+  private def separatedMap: ((Any) => Seq[Any], (Any) => Option[~[Any, Seq[Any]]]) = {
     ( {
       case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
     }, {
       case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
     })
+  }
 
   def ~(other: GrammarDocument) = new Sequence(this, other)
 
@@ -57,7 +68,7 @@ trait GrammarDocument extends GrammarDocumentWriter {
 
   def ~~>(right: GrammarDocument) = (this ~ space) ~> right
 
-  def * = new Many(this)
+  def * = new ManyHorizontal(this)
 
   def %(bottom: GrammarDocument) = new TopBottom(this, bottom)
 
@@ -68,7 +79,6 @@ trait GrammarDocument extends GrammarDocumentWriter {
   def ^^(map: (Any => Any, Any => Option[Any])): GrammarDocument = new MapGrammar(this, map._1, map._2)
 
   def indent(width: Int) = new WhiteSpace(width,0) ~> this
-
 }
 
 trait SequenceLike extends GrammarDocument
@@ -88,7 +98,9 @@ case class Keyword(value: String) extends GrammarDocument
 
 case class Consume(grammar: Grammar) extends GrammarDocument
 
-case class Many(var inner: GrammarDocument) extends GrammarDocument
+abstract case class Many(inner: GrammarDocument) extends GrammarDocument
+class ManyVertical(inner: GrammarDocument) extends Many(inner)
+class ManyHorizontal(inner: GrammarDocument) extends Many(inner)
 
 object MissingValue
 
@@ -114,8 +126,6 @@ class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureG) extends 
 }
 
 case class TopBottom(top: GrammarDocument, bottom: GrammarDocument) extends GrammarDocument with SequenceLike
-
-case class WhiteSpace(width: Int, height: Int) extends GrammarDocument
 
 case class Print(document: ResponsiveDocument) extends GrammarDocument
 

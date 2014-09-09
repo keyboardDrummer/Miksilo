@@ -47,7 +47,8 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
 
   @Test
   def testIf() {
-    val example = "3\n? 4\n: 2"
+    val newLine = System.lineSeparator()
+    val example = s"3$newLine? 4$newLine: 2"
     val expected = IfNotZero(Value(3), Value(4),Value(2))
 
     parseAndPrint(example, expected)
