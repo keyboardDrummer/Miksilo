@@ -86,7 +86,7 @@ object PrintValueUsingGrammarDocument {
         case Keyword(keyword) => Try(keyword)
         case Delimiter(keyword) => Try(keyword)
         case labelled: Labelled =>
-          if (labelledValues.get(labelled).exists(v => v.equals(value)))
+          if (labelledValues.get(labelled).exists(v => Objects.equals(v, value)))
             return emptyFailure(value, FoundDirectRecursionInLabel(labelled), -1000)
           labelledValues += labelled -> value
           val result = helper(value, labelled.inner)
