@@ -33,7 +33,7 @@ object DeclarationC extends GrammarTransformation {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val parseDeclaration = typeGrammar ~ identifier <~ ";" ^^ parseMap(DeclarationKey, DeclarationType, DeclarationName)
-    statement.orToInner(parseDeclaration)
+    statement.addOption(parseDeclaration)
   }
 
   def declaration(name: String, _type: MetaObject): MetaObject = {

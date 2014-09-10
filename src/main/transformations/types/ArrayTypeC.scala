@@ -17,7 +17,7 @@ object ArrayTypeC extends TypeInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.find(TypeC.TypeGrammar)
     val parseArrayType = parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
-    parseType.orToInner(parseArrayType)
+    parseType.addOption(parseArrayType)
   }
 
   def arrayType(elementType: MetaObject) = {

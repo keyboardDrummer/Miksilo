@@ -12,7 +12,6 @@ import transformations.javac.JavaCompiler
 class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel(new GridBagLayout()) {
 
   val model = new DefaultListModel[Preset]()
-  val javaCompilerPreset = new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations)
   initialise()
 
   def initialise() {
@@ -27,7 +26,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     val presetsList = new JList(model)
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-    model.addElement(javaCompilerPreset)
+    model.addElement(new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations))
     add(StyleSheet.getAnyListVisuals(presetsList), listConstraints)
 
     val buttonConstraints: GridBagConstraints = new GridBagConstraints()

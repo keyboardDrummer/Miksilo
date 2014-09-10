@@ -17,7 +17,7 @@ object EqualityC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
     val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ parseMap(EqualityKey, FirstKey, SecondKey)
-    equalityGrammar.orToInner(parseEquality)
+    equalityGrammar.addOption(parseEquality)
   }
 
   def equality(first: MetaObject, second: MetaObject) = new MetaObject(EqualityKey, FirstKey -> first, SecondKey -> second)

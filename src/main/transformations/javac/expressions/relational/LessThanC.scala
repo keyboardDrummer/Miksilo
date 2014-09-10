@@ -36,7 +36,7 @@ object LessThanC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = (relationalGrammar <~~ "<") ~~ relationalGrammar ^^ parseMap(LessThanKey, LessThanFirst, LessThanSecond)
-    relationalGrammar.orToInner(parseLessThan)
+    relationalGrammar.addOption(parseLessThan)
   }
 
   def lessThan(first: MetaObject, second: MetaObject) = new MetaObject(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)

@@ -76,9 +76,9 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
       case Multiply(l, r) => Some(core.grammar.~(l, r))
       case _ => None
     })
-    multipleLabel.orToInner(multiply)
-    multipleLabel.orToInner(number)
-    multipleLabel.orToInner(parenthesis)
+    multipleLabel.addOption(multiply)
+    multipleLabel.addOption(number)
+    multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled("add")
     val add: GrammarDocument = (addLabel <~~ "+") ~~ addLabel ^^( {
@@ -87,8 +87,8 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
       case Add(l, r) => Some(core.grammar.~(l, r))
       case _ => None
     })
-    addLabel.orToInner(add)
-    addLabel.orToInner(multipleLabel)
+    addLabel.addOption(add)
+    addLabel.addOption(multipleLabel)
 
     val _if: GrammarDocument = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
       case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
@@ -97,8 +97,8 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
       case _ => None
     })
 
-    expression.orToInner(_if)
-    expression.orToInner(addLabel)
+    expression.addOption(_if)
+    expression.addOption(addLabel)
     expression
   }
 }

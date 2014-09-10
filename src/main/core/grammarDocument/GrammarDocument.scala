@@ -1,8 +1,10 @@
 package core.grammarDocument
 
 import core.document.{WhiteSpace, Document}
-import core.grammar._
+import core.grammar.{PrintGrammar, Grammar, NumberG, Identifier}
+import core.grammar.~
 import core.responsiveDocument.ResponsiveDocument
+import scala.collection.mutable
 
 trait GrammarDocumentWriter {
 
@@ -79,6 +81,31 @@ trait GrammarDocument extends GrammarDocumentWriter {
   def ^^(map: (Any => Any, Any => Option[Any])): GrammarDocument = new MapGrammar(this, map._1, map._2)
 
   def indent(width: Int) = new WhiteSpace(width,0) ~> this
+
+  def deepClone: GrammarDocument = {
+    val map = new mutable.HashMap[GrammarDocument, GrammarDocument]
+    def helper(_grammar: GrammarDocument): GrammarDocument = {
+      val grammar = _grammar.simplify
+      if (map.contains(grammar))
+        return map(grammar)
+
+      map.getOrElseUpdate(grammar, grammar match {
+        case Choice(first, second) => Choice(helper(first), helper(second))
+        case labelled:Labelled =>
+          val clone = new Labelled(labelled.name)
+          map.put(labelled, clone)
+          clone.inner = helper(labelled.inner)
+          clone
+        case many:ManyVertical => new ManyVertical(helper(many.inner))
+        case many:ManyHorizontal => new ManyHorizontal(helper(many.inner))
+        case MapGrammar(inner, construct, deconstruct) => MapGrammar(helper(inner),construct, deconstruct)
+        case Sequence(first, second) => Sequence(helper(first), helper(second))
+        case TopBottom(top,bottom) => TopBottom(helper(top),helper(bottom))
+        case _ => grammar
+      })
+    }
+    helper(this)
+  }
 }
 
 trait SequenceLike extends GrammarDocument
@@ -120,7 +147,7 @@ case class MapGrammar(inner: GrammarDocument, construct: Any => Any, deconstruct
 
 class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureG) extends GrammarDocument {
 
-  def orToInner(addition: GrammarDocument) {
+  def addOption(addition: GrammarDocument) {
     inner = inner | addition
   }
 }

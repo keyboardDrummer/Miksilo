@@ -19,7 +19,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   val textAreaInput: TextAreaInput = new TextAreaInput(() => inputDocument.getText(0, inputDocument.getLength))
 
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
-  val compileOptions = Array(EmitByteCode, CompileAndRun)
+  val compileOptions = Array(EmitByteCode, CompileAndRun, PrettyPrint)
   val outputOptions = Array[OutputOption](textAreaOutput)
   val inputOptions = Array[InputOption](textAreaInput)
 

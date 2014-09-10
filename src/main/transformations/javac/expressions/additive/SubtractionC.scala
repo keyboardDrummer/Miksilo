@@ -29,7 +29,7 @@ object SubtractionC extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val parseSubtraction = (additiveGrammar <~ "-") ~ additiveGrammar ^^ parseMap(SubtractionKey, FirstKey, SecondKey)
-    additiveGrammar.orToInner(parseSubtraction)
+    additiveGrammar.addOption(parseSubtraction)
   }
 
   def subtraction(first: Any, second: Any): MetaObject = subtraction(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])

@@ -17,7 +17,7 @@ object IncrementAssignmentC extends ExpressionInstance {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = grammars.find(AssignmentC.AssignmentTargetGrammar)
     val incrementAssignmentGrammar = assignmentTarget ~ ("+=" ~> assignmentGrammar) ^^ parseMap(IncrementAssignmentKey, TargetKey, ValueKey)
-    assignmentGrammar.orToInner(incrementAssignmentGrammar)
+    assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
   object IncrementAssignmentKey

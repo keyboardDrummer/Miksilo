@@ -12,6 +12,6 @@ object ParenthesisC extends GrammarTransformation {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val parseParenthesis = "(" ~> expression <~ ")"
-    core.orToInner(parseParenthesis)
+    core.addOption(parseParenthesis)
   }
 }

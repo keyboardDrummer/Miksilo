@@ -20,7 +20,7 @@ object LongLiteralC extends ExpressionInstance {
     val longGrammar : GrammarDocument = (new RegexG("""-?\d+l""".r) : GrammarDocument) ^^
       (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) ^^ parseMap(LongLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
-    expressionGrammar.orToInner(longGrammar)
+    expressionGrammar.addOption(longGrammar)
   }
 
   def literal(value: Long) = new MetaObject(LongLiteralKey, ValueKey -> value)

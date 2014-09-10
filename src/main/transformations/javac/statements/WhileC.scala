@@ -37,7 +37,7 @@ object WhileC extends StatementInstance {
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") ~ blockGrammar ^^
       parseMap(WhileKey, WhileCondition, WhileBody)
-    statementGrammar.orToInner(whileGrammar)
+    statementGrammar.addOption(whileGrammar)
   }
 
   def _while(condition: MetaObject, body: Seq[MetaObject]) = new MetaObject(WhileKey, WhileCondition -> condition, WhileBody -> body)

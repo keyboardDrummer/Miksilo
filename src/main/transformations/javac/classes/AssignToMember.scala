@@ -17,6 +17,6 @@ object AssignToMember extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignTarget = grammars.find(AssignmentC.AssignmentTargetGrammar)
     val selectGrammar = grammars.find(SelectorC.SelectGrammar)
-    assignTarget.orToInner(selectGrammar)
+    assignTarget.addOption(selectGrammar)
   }
 }

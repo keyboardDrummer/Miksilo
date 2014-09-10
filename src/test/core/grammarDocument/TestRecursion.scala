@@ -9,8 +9,8 @@ class TestRecursion extends GrammarDocumentWriter {
   @Test
   def testRightRecursion() {
     val grammar: Labelled = new Labelled("leftRec")
-    grammar.orToInner("!" ~ grammar)
-    grammar.orToInner(produce(null))
+    grammar.addOption("!" ~ grammar)
+    grammar.addOption(produce(null))
 
     testUsingGrammar(grammar)
   }
@@ -18,9 +18,9 @@ class TestRecursion extends GrammarDocumentWriter {
   @Test
   def testDirectRecursion() {
     val grammar: Labelled = new Labelled("leftRec")
-    grammar.orToInner("!" ~ grammar)
-    grammar.orToInner(grammar)
-    grammar.orToInner(produce(null))
+    grammar.addOption("!" ~ grammar)
+    grammar.addOption(grammar)
+    grammar.addOption(produce(null))
 
     testUsingGrammar(grammar)
   }
@@ -37,8 +37,8 @@ class TestRecursion extends GrammarDocumentWriter {
   @Test
   def testLeftRecursion() {
     val grammar: Labelled = new Labelled("leftRec")
-    grammar.orToInner(produce(null))
-    grammar.orToInner(grammar ~ "!")
+    grammar.addOption(produce(null))
+    grammar.addOption(grammar ~ "!")
 
     testUsingGrammar(grammar)
   }
@@ -46,8 +46,8 @@ class TestRecursion extends GrammarDocumentWriter {
   @Test
   def testLeftRecursionPrintOnly() {
     val grammarDocument: Labelled = new Labelled("leftRec")
-    grammarDocument.orToInner(grammarDocument ~ "!")
-    grammarDocument.orToInner(produce(null))
+    grammarDocument.addOption(grammarDocument ~ "!")
+    grammarDocument.addOption(produce(null))
 
     val result = getExpectedLeftRecursiveResult
 
@@ -64,8 +64,8 @@ class TestRecursion extends GrammarDocumentWriter {
   def testPrintingIndirectLeftRecursion() {
     val inner = new Labelled("boep")
     val outer = new Labelled("woep", inner)
-    inner.orToInner(outer ~ "!")
-    inner.orToInner(produce(null))
+    inner.addOption(outer ~ "!")
+    inner.addOption(produce(null))
 
     val document = PrintValueUsingGrammarDocument.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()

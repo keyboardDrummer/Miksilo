@@ -50,7 +50,7 @@ object SelectorC extends ExpressionInstance {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier ^^ parseMap(SelectorKey, SelectorObject, SelectorMember)
-    core.orToInner(grammars.create(SelectGrammar, selection))
+    core.addOption(grammars.create(SelectGrammar, selection))
   }
 
   object SelectGrammar

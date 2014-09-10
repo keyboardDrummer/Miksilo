@@ -20,7 +20,7 @@ object DeclarationWithInitializerC extends StatementInstance {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val parseDeclarationWithInitializer = typeGrammar ~ identifier ~ ("=" ~> expression) <~ ";" ^^
       parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey)
-    statement.orToInner(parseDeclarationWithInitializer)
+    statement.addOption(parseDeclarationWithInitializer)
   }
 
   def declarationWithInitializer(name: String, _type: MetaObject, initializer: MetaObject) = new MetaObject(DeclarationWithInitializerKey,

@@ -20,7 +20,7 @@ object CallC extends ExpressionInstance {
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
     val callArguments = "(" ~> expression.manySeparated(",") <~ ")"
     val parseCall = expression ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
-    core.orToInner(parseCall)
+    core.addOption(parseCall)
   }
 
   def call(callee: Any, arguments: Any): MetaObject =
