@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.objects.{LoadAddressC, PushNull
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets, PoptimizeC}
-import transformations.javac.classes.{SelectorC, ClassC, ClassOrPackageReference, ClassOrPackageSelector}
+import transformations.javac.classes._
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
@@ -34,8 +34,8 @@ object JavaCompiler {
   }
 
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
-    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable, AssignmentC, AssignmentPrecedence,DeclarationC,
-    PostFixIncrementC, VariableC, ClassC, MethodC) ++
+    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable, AssignmentC, AssignmentPrecedence, DeclarationC,
+    PostFixIncrementC, VariableC, WildcardImportC, BasicImportC, ClassC, MethodC) ++
     javaSimpleStatement //todo move class.
 
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
@@ -56,8 +56,8 @@ object JavaCompiler {
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
   def byteCodeInstructions: Seq[InstructionC] = {
-    Seq(PopC , GetStaticC, GotoC, IfIntegerCompareLessC,
-      IfZeroC, IfNotZero , InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+    Seq(PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
+      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC) ++
       integerInstructions ++ longInstructions
   }

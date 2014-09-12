@@ -20,9 +20,9 @@ class TransformationGraph
   //  if (sinks.size > 1)
   //    throw new RuntimeException("more than once sink")
 
-  val source: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
-  if (source.size > 1)
-    throw new RuntimeException("more than once source")
+  val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
+  if (sources.size > 1)
+    throw new RuntimeException(s"more than once source, sources = $sources")
 
   optimizeDependencies()
 

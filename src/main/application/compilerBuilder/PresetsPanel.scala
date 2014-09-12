@@ -6,8 +6,10 @@ import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
+import application.compilerCockpit.PerformCockpitOutputAction
 import core.transformation.sillyCodePieces.Injector
-import transformations.javac.JavaCompiler
+import transformations.javac.constructor.ImplicitSuperConstructorCall
+import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
 
 class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel(new GridBagLayout()) {
 
@@ -27,6 +29,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
     model.addElement(new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations))
+    addAddImplicitsPreset()
     add(StyleSheet.getAnyListVisuals(presetsList), listConstraints)
 
     val buttonConstraints: GridBagConstraints = new GridBagConstraints()
@@ -42,6 +45,15 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     add(secondButton, buttonConstraints)
   }
 
+  def addAddImplicitsPreset() {
+    val implicits = Seq[Injector](ImplicitJavaLangImport, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls)
+    val implicitsSet = implicits.toSet
+    val transformations = implicits ++ Seq(PerformCockpitOutputAction) ++
+      JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
+    model.addElement(new Preset("Add Implicits", transformations))
+  }
+
   def getApplyButton(presetsList: JList[Preset]): JButton = {
     val applyButton = new JButton()
     applyButton.setText("Apply")
@@ -52,7 +64,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     applyButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         compilerParticles.clear()
-        for(particle <- presetsList.getSelectedValue.particles)
+        for (particle <- presetsList.getSelectedValue.particles)
           compilerParticles.addElement(particle)
       }
     })
@@ -60,7 +72,6 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 }
 
-case class Preset(name: String, particles: Seq[Injector])
-{
+case class Preset(name: String, particles: Seq[Injector]) {
   override def toString = name
 }

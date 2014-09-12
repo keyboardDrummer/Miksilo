@@ -3,7 +3,7 @@ package application.compilerCockpit
 import core.grammar.ParseException
 import core.transformation.{MetaObject, TransformationsToPackrat, TransformationState}
 
-class TextAreaInput(getText: () => String) extends InputOption {
+class ParseFromFunction(getText: () => String) extends InputOption {
 
    override def enter(state: TransformationState): Unit = {}
 

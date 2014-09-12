@@ -3,25 +3,10 @@ package transformations.javac.statements
 import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.javac.methods.{MethodC, VariablePool}
+import transformations.javac.methods.{VariablePool, MethodC}
 import transformations.types.TypeC
 
-object DeclarationC extends GrammarTransformation {
-
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(DeclarationKey, declaration => {
-      val methodCompiler = MethodC.getMethodCompiler(state)
-      val variables: VariablePool = methodCompiler.variables
-      val name: String = getDeclarationName(declaration)
-
-      if (variables.contains(name))
-        throw new VariableAlreadyDefined(name)
-
-      variables.add(name, getDeclarationType(declaration))
-      Seq.empty[MetaObject]
-    })
-  }
+object DeclarationC extends StatementInstance {
 
   def getDeclarationType(declaration: MetaObject) = declaration(DeclarationType).asInstanceOf[MetaObject]
 
@@ -48,4 +33,17 @@ object DeclarationC extends GrammarTransformation {
 
   object DeclarationType
 
+  override val key: AnyRef = DeclarationKey
+
+  override def toByteCode(declaration: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val methodCompiler = MethodC.getMethodCompiler(state)
+    val variables: VariablePool = methodCompiler.variables
+    val name: String = getDeclarationName(declaration)
+
+    if (variables.contains(name))
+      throw new VariableAlreadyDefined(name)
+
+    variables.add(name, getDeclarationType(declaration))
+    Seq.empty[MetaObject]
+  }
 }

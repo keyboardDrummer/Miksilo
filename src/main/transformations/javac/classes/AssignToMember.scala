@@ -13,6 +13,7 @@ object AssignToMember extends GrammarTransformation {
     AssignmentC.getState(state).assignFromStackByteCodeRegistry.put(SelectorC.SelectorKey, (target: MetaObject) => {
       ???
     })
+    super.inject(state)
   }
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignTarget = grammars.find(AssignmentC.AssignmentTargetGrammar)

@@ -11,7 +11,7 @@ object ImplicitSuperConstructorCall extends ProgramTransformation {
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
 
-    for (constructor <- ClassC.getMethods(clazz).filter(method => method.clazz == ConstructorC.Constructor)) {
+    for (constructor <- ClassC.getMethods(clazz).filter(method => method.clazz == ConstructorC.ConstructorKey)) {
       val statements = MethodC.getMethodBody(constructor)
       var addSuperCall = false
       if (statements.isEmpty)

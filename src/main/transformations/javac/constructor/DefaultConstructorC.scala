@@ -9,13 +9,10 @@ import transformations.javac.methods.MethodC.PublicVisibility
 object DefaultConstructorC extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
-  def transform(program: MetaObject, state: TransformationState): Unit = {
-    transformClass(program)
-
-    def transformClass(clazz: MetaObject) {
-      val methods = ClassC.getMethods(clazz)
-      val constructor = ConstructorC.constructor(Seq(), Seq(), PublicVisibility)
-      clazz(ClassMethodsKey) = Seq(constructor) ++ methods
-    }
+  def transform(clazz: MetaObject, state: TransformationState): Unit = {
+    val className = ClassC.getClassName(clazz)
+    val methods = ClassC.getMethods(clazz)
+    val constructor = ConstructorC.constructor(className, Seq(), Seq(), PublicVisibility)
+    clazz(ClassMethodsKey) = Seq(constructor) ++ methods
   }
 }

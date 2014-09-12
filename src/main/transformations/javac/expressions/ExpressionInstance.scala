@@ -9,6 +9,7 @@ trait ExpressionInstance extends GrammarTransformation {
   override def inject(state: TransformationState): Unit = {
     ExpressionC.getExpressionToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
     ExpressionC.getGetTypeRegistry(state).put(key, (expression: MetaObject) => getType(expression, state))
+    super.inject(state)
   }
 
   def toByteCode(expression: MetaObject, state: TransformationState): Seq[MetaObject]

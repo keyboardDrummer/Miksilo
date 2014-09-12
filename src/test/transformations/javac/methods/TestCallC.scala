@@ -9,6 +9,7 @@ class TestCallC {
   @Test
   def test() {
     val state = new TransformationState()
+    ExpressionC.inject(state)
     CallC.inject(state)
     Assert.assertTrue(ExpressionC.getExpressionToLines(state).get(CallC.CallKey).nonEmpty)
   }

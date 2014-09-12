@@ -17,17 +17,16 @@ case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMem
 case class MethodId(className: QualifiedClassName, methodName: String)
 
 case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
-
-
   val compiler = new MyCompiler()
   val myPackage = compiler.getPackage(ClassC.getPackage(currentClass).toList)
   val className = ClassC.getClassName(currentClass)
   val currentClassInfo = myPackage.newClassInfo(className)
 
   ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()
+
   def constantPool = ByteCodeSkeleton.getState(state).constantPool
 
-  val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
+  lazy val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
 
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
 
@@ -98,17 +97,9 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
     compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
   }
 
-  private def getClassMapFromImports(imports: Seq[JavaImport]): Map[String, QualifiedClassName] = {
+  private def getClassMapFromImports(imports: Seq[MetaObject]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
-      val finalPackage = compiler.find(_import._package).asInstanceOf[PackageInfo]
-      val result: Iterable[(String, QualifiedClassName)] = _import.end match {
-        case Some(importedClassName) =>
-          val qualifiedClassName = new QualifiedClassName(_import._package ++ Seq(importedClassName))
-          Seq((importedClassName, qualifiedClassName)).toMap
-        case _ => finalPackage.flattenContents().map(entry =>
-          (entry._1.last, new QualifiedClassName(_import._package ++ entry._1)))
-      }
-      result
+      ClassC.getState(state).importToClassMap(_import.clazz)(_import)
     }).toMap ++ Map(className -> ClassC.getQualifiedClassName(currentClass))
   }
 }

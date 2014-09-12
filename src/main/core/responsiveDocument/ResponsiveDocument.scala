@@ -1,6 +1,6 @@
 package core.responsiveDocument
 
-import core.document.{BlankLine, Document}
+import core.document.{WhiteSpace, BlankLine, Document}
 
 object ResponsiveDocument {
   implicit def toResponsive(sized: Document) = new WrappedSizedDocument(sized)
@@ -45,6 +45,8 @@ trait ResponsiveDocument {
     this % BlankLine % bottom
   }
   def inParenthesis = ResponsiveDocument.text("(") ~ this ~ ")"
+
+  def indent(width: Int) = new WhiteSpace(width,0) ~ this
 
   override def toString = renderString(false)
 }

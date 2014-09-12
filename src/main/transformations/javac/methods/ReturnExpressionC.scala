@@ -2,21 +2,13 @@ package transformations.javac.methods
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
 import transformations.javac.expressions.ExpressionC
-import transformations.javac.statements.StatementC
+import transformations.javac.statements.{StatementC, StatementInstance}
 
-object ReturnExpressionC extends GrammarTransformation {
+object ReturnExpressionC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionC)
-
-  override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(ReturnInteger, (_return: MetaObject) => {
-      val methodCompiler = MethodC.getMethodCompiler(state)
-      returnToLines(_return, methodCompiler)
-    })
-  }
 
   def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     val returnValueInstructions = ExpressionC.getToInstructions(compiler.transformationState)(getReturnValue(_return))
@@ -39,4 +31,10 @@ object ReturnExpressionC extends GrammarTransformation {
 
   object ReturnValue
 
+  override val key: AnyRef = ReturnInteger
+
+  override def toByteCode(_return: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    val methodCompiler = MethodC.getMethodCompiler(state)
+    returnToLines(_return, methodCompiler)
+  }
 }

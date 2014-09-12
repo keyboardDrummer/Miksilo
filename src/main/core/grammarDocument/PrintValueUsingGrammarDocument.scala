@@ -9,7 +9,13 @@ import core.responsiveDocument.ResponsiveDocument
 import scala.util.{Failure, Success, Try}
 
 case class PrintFailure(depth: Int, partial: ResponsiveDocument, value: Any, inner: Throwable) extends Throwable {
-  override def toString = s"print failure, depth = $depth, value = $value, inner = \n$inner\npartial = \n${partial.renderString()}"
+  override def toString = toDocument.renderString()
+
+  def toDocument: ResponsiveDocument = ("print failure": ResponsiveDocument) %
+    ((s"depth = $depth": ResponsiveDocument) % s"value = $value" %
+      s"inner = $inner" %
+      s"trace = " % inner.getStackTrace.map(e => e.toString: ResponsiveDocument).reduce((a, b) => a % b).indent(4) %
+      "partial = " % partial.indent(4)).indent(4)
 }
 
 object ValueWasNotASequence extends Throwable
@@ -100,7 +106,7 @@ object PrintValueUsingGrammarDocument {
         } yield result
         case TopBottom(top, bottom) =>
           sequenceHelper(value, top, bottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
-        case FailureG => emptyFailure(value, EncounteredFailure)
+        case FailureG => emptyFailure(value, EncounteredFailure, -10000)
         case Produce(producedValue) =>
           if (Objects.equals(producedValue, value)) Try(Empty)
           else emptyFailure(value, FoundProduceWithNotEqualValue(producedValue), -100)

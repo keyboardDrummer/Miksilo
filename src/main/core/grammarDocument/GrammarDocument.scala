@@ -1,9 +1,10 @@
 package core.grammarDocument
 
-import core.document.{WhiteSpace, Document}
+import core.document.{BlankLine, WhiteSpace, Document}
 import core.grammar.{PrintGrammar, Grammar, NumberG, Identifier}
 import core.grammar.~
 import core.responsiveDocument.ResponsiveDocument
+import core.transformation.MetaObject
 import scala.collection.mutable
 
 trait GrammarDocumentWriter {
@@ -52,7 +53,7 @@ trait GrammarDocument extends GrammarDocumentWriter {
   def someSeparatedVertical(separator: GrammarDocument): GrammarDocument =
     this % new ManyVertical(separator %> this) ^^ separatedMap
 
-  def manySeparatedVertical(separator: GrammarDocument): GrammarDocument = someSeparatedVertical(separator) | new Produce(Seq.empty[Any])
+  def manySeparatedVertical(separator: GrammarDocument): GrammarDocument = someSeparatedVertical(separator) | new Produce(Seq.empty[MetaObject])
 
   def someSeparated(separator: GrammarDocument): GrammarDocument = this ~ ((separator ~> this) *) ^^ separatedMap
 
@@ -73,6 +74,10 @@ trait GrammarDocument extends GrammarDocumentWriter {
   def * = new ManyHorizontal(this)
 
   def %(bottom: GrammarDocument) = new TopBottom(this, bottom)
+
+  def %%(bottom: GrammarDocument): GrammarDocument  = {
+    (this %< BlankLine) % bottom
+  }
 
   def %>(bottom: GrammarDocument) = new TopBottom(this, bottom).ignoreLeft
 

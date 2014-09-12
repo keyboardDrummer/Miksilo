@@ -89,7 +89,6 @@ object TypeC extends GrammarTransformation {
     grammars.create(TypeGrammar)
   }
 
-
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {
     val superTypes = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()

@@ -2,11 +2,10 @@ package transformations.javac.expressions.literals
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.objects.PushNullC
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
-object NullC extends GrammarTransformation {
+object NullC extends ExpressionInstance {
 
   val _null = new MetaObject(NullKey)
 
@@ -16,15 +15,15 @@ object NullC extends GrammarTransformation {
     expressionGrammar.inner = expressionGrammar.inner | parseNull
   }
 
-  override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(NullKey, _null => {
-      Seq(PushNullC.pushNull)
-    })
-  }
-
-
   override def dependencies: Set[Contract] = Set(ExpressionC, PushNullC)
 
   object NullKey
 
+  override val key: AnyRef = NullKey
+
+  override def getType(expression: MetaObject, state: TransformationState): MetaObject = ???
+
+  override def toByteCode(expression: MetaObject, state: TransformationState): Seq[MetaObject] = {
+    Seq(PushNullC.pushNull)
+  }
 }

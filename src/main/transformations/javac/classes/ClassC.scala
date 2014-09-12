@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.document.BlankLine
+import core.document.{Empty, BlankLine}
 import core.grammarDocument.GrammarDocument
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -74,22 +74,26 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, MethodC)
 
+  object ClassMemberGrammar
   override def transformGrammars(grammars: GrammarCatalogue) {
     val classMethod = grammars.find(MethodC.MethodGrammar)
 
-    val classMember: GrammarDocument = classMethod
-    // val _import = "import" ~> identifier.someSeparated(".") <~ ";"
-    val importsP: GrammarDocument = produce(Seq.empty[JavaImport]) //success_import*
-    val packageP = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
-    val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(4) %< "}")
-    val classGrammar = grammars.create(ClassGrammar, packageP ~ importsP ~ _classContent ^^
-      ({ case (_package ~ imports) ~ (name ~ methods) => core.grammar.~(core.grammar.~(core.grammar.~(_package, imports), name), methods) },
+    val classMember: GrammarDocument = grammars.create(ClassMemberGrammar, classMethod)
+    val importGrammar = grammars.create(ImportGrammar)
+    val importsGrammar: GrammarDocument = importGrammar.manySeparatedVertical(Empty)
+    val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
+    val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}")
+    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % _classContent ^^
+      (
+        { case (_package ~ imports) ~ (name ~ methods) => core.grammar.~(core.grammar.~(core.grammar.~(_package, imports), name), methods) },
         { case _package ~ imports ~ name ~ methods => Some(core.grammar.~(core.grammar.~(_package, imports), core.grammar.~(name, methods))) }) ^^
       parseMap(ClassFileKey, ClassPackage, ClassImports, ClassName, ByteCodeSkeleton.ClassMethodsKey))
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
-  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[JavaImport] = List(), mbParent: Option[String] = None) =
+  object ImportGrammar
+
+  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
     new MetaObject(ByteCodeSkeleton.ClassFileKey) {
     data.put(ByteCodeSkeleton.ClassMethodsKey, methods)
     data.put(ClassPackage, _package)
@@ -101,11 +105,12 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
     }
   }
 
-  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[List[JavaImport]]
+  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[Seq[MetaObject]]
 
   class State() {
     val referenceKindRegistry = new GetReferenceKindRegistry()
     var classCompiler: ClassCompiler = null
+    val importToClassMap = new mutable.HashMap[AnyRef, MetaObject => Map[String, QualifiedClassName]]()
   }
 
   class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]

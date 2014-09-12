@@ -8,8 +8,9 @@ import core.transformation.{MetaObject, TransformationState}
 trait GrammarTransformation extends Injector with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)
 
-  override def enter(state: TransformationState): Unit = {
-    super.enter(state)
+
+  override def inject(state: TransformationState): Unit = {
+    super.inject(state)
     transformGrammars(state.grammarCatalogue)
   }
 
@@ -39,7 +40,8 @@ trait GrammarTransformation extends Injector with GrammarDocumentWriter {
   def construct(value: Any, key: AnyRef, fields: List[Any]) = {
     val result = new MetaObject(key)
     val values = tildeValuesToSeq(value)
-    fields.zip(values).foreach(pair => result(pair._1) = pair._2)
+    fields.zip(values).foreach(pair =>
+      result(pair._1) = pair._2)
     result
   }
 }

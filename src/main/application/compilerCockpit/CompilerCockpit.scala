@@ -1,6 +1,7 @@
 package application.compilerCockpit
 
 import java.awt._
+import java.io.CharArrayWriter
 import javax.swing._
 import javax.swing.text.PlainDocument
 
@@ -11,12 +12,14 @@ import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
 
 import scala.swing.{Component, Frame}
+import scala.tools.nsc.NewLinePrintWriter
+import scala.util.Try
 
 class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
 
   private val inputDocument = new PlainDocument()
   private val outputDocument = new PlainDocument()
-  val textAreaInput: TextAreaInput = new TextAreaInput(() => inputDocument.getText(0, inputDocument.getLength))
+  val textAreaInput: ParseFromFunction = new ParseFromFunction(() => inputDocument.getText(0, inputDocument.getLength))
 
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
   val compileOptions = Array(EmitByteCode, CompileAndRun, PrettyPrint)
@@ -47,7 +50,12 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
     val state = new TransformationState()
     PerformCockpitOutputAction.setState(state, outputParticles)
-    PieceCombiner.combineAndExecute(state, pieces.reverse)
+    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).recover({case e: Exception =>
+      val writer = new CharArrayWriter()
+      e.printStackTrace(new NewLinePrintWriter(writer))
+      e.printStackTrace()
+      setOutputText(writer.toString)
+    })
   }
 
   def initialise() {

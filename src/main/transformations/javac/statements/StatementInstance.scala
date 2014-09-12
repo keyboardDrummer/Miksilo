@@ -7,6 +7,7 @@ trait StatementInstance extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     StatementC.getStatementToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
+    super.inject(state)
   }
 
   val key: AnyRef

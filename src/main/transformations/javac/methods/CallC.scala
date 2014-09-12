@@ -15,10 +15,11 @@ object CallC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(SelectorC, InvokeStaticC, InvokeVirtualC)
 
+  object CallArgumentsGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionC.CoreGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val callArguments = "(" ~> expression.manySeparated(",") <~ ")"
+    val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") <~ ")")
     val parseCall = expression ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
     core.addOption(parseCall)
   }
