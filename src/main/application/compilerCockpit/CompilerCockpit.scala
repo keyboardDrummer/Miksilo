@@ -10,6 +10,7 @@ import core.layouts.SwingEquationLayout
 import core.modularProgram.PieceCombiner
 import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
+import transformations.bytecode.ByteCodeSkeleton
 
 import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
@@ -22,7 +23,15 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   val textAreaInput: ParseFromFunction = new ParseFromFunction(() => inputDocument.getText(0, inputDocument.getLength))
 
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
-  val compileOptions = Array(EmitByteCode, CompileAndRun, PrettyPrint)
+  val compileOptions = getCompileOptions.toArray
+
+  def getCompileOptions: Seq[CompileOption] = {
+    val selection = Set(PerformCockpitOutputAction, ByteCodeSkeleton)
+    val orderedSelection = transformations.filter(o => selection.contains(o))
+    val byteCodeActions = if (orderedSelection(0) == ByteCodeSkeleton) Seq(CompileAndRun, EmitByteCode) else Seq.empty
+    byteCodeActions ++ Seq(PrettyPrint)
+  }
+
   val outputOptions = Array[OutputOption](textAreaOutput)
   val inputOptions = Array[InputOption](textAreaInput)
 
@@ -33,12 +42,14 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   outputOptionModel.setSelectedItem(textAreaOutput)
 
   val compileOptionModel = new DefaultComboBoxModel[CompileOption](compileOptions)
-  compileOptionModel.setSelectedItem(CompileAndRun)
+  compileOptionModel.setSelectedItem(compileOptions(0))
 
   initialise()
 
   def outputOption = outputOptionModel.getSelectedItem.asInstanceOf[OutputOption]
+
   def compileOption: CompileOption = compileOptionModel.getSelectedItem.asInstanceOf[CompileOption]
+
   def inputOption = inputOptionModel.getSelectedItem.asInstanceOf[InputOption]
 
   def setOutputText(text: String) {
@@ -50,7 +61,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
     val state = new TransformationState()
     PerformCockpitOutputAction.setState(state, outputParticles)
-    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).recover({case e: Exception =>
+    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).recover({ case e: Exception =>
       val writer = new CharArrayWriter()
       e.printStackTrace(new NewLinePrintWriter(writer))
       e.printStackTrace()

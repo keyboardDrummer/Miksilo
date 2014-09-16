@@ -8,7 +8,8 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import application.StyleSheet
 import application.compilerCockpit.PerformCockpitOutputAction
 import core.transformation.sillyCodePieces.Injector
-import transformations.javac.constructor.ImplicitSuperConstructorCall
+import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
+import transformations.javac.methods.ImplicitReturnAtEndOfMethod
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
 
 class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel(new GridBagLayout()) {
@@ -46,8 +47,8 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def addAddImplicitsPreset() {
-    val implicits = Seq[Injector](ImplicitJavaLangImport, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls)
+    val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
     val implicitsSet = implicits.toSet
     val transformations = implicits ++ Seq(PerformCockpitOutputAction) ++
       JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
