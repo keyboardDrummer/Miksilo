@@ -41,10 +41,6 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     buttonConstraints.insets = StyleSheet.defaultInsets
     val applyButton: JButton = getApplyButton(presetsList)
     add(applyButton, buttonConstraints)
-
-    val secondButton = new JButton()
-    secondButton.setText("Add")
-    add(secondButton, buttonConstraints)
   }
 
   def getJavaCompilerPreset: Preset = {

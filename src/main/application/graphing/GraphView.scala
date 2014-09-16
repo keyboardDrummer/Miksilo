@@ -9,7 +9,7 @@ import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.transformation.sillyCodePieces.GrammarTransformation
+import core.transformation.sillyCodePieces.{ProgramTransformation, GrammarTransformation}
 import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
@@ -58,8 +58,12 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     val grammarStyle = new util.Hashtable[String, Object]()
     grammarStyle.put(mxConstants.STYLE_FILLCOLOR, "#44E35C")
 
+    val transformationStyle = new util.Hashtable[String, Object]()
+    transformationStyle.put(mxConstants.STYLE_FILLCOLOR, "#FF6666")
+
     stylesheet.putCellStyle("GRAMMAR", grammarStyle)
     stylesheet.putCellStyle("SIMPLIFICATION", simplification)
+    stylesheet.putCellStyle("TRANSFORMATION", transformationStyle)
   }
 
   def setLayout() {
@@ -86,6 +90,9 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     vertex.transformation match {
       case _: TransformationGroup =>
         cell.setStyle("SIMPLIFICATION")
+
+      case _: ProgramTransformation =>
+        cell.setStyle("TRANSFORMATION")
 
       case _: GrammarTransformation =>
         cell.setStyle("GRAMMAR")
