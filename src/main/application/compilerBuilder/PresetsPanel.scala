@@ -29,8 +29,9 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     val presetsList = new JList(model)
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-    model.addElement(new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations))
-    addAddImplicitsPreset()
+    model.addElement(getJavaCompilerPreset)
+    model.addElement(getAddImplicitsPreset)
+    model.addElement(getPrettyPrintPreset)
     add(StyleSheet.getAnyListVisuals(presetsList), listConstraints)
 
     val buttonConstraints: GridBagConstraints = new GridBagConstraints()
@@ -46,13 +47,21 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     add(secondButton, buttonConstraints)
   }
 
-  def addAddImplicitsPreset() {
+  def getJavaCompilerPreset: Preset = {
+    new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations)
+  }
+
+  def getPrettyPrintPreset = {
+    new Preset("Pretty Print", Seq(PerformCockpitOutputAction) ++ JavaCompiler.javaCompilerTransformations)
+  }
+
+  def getAddImplicitsPreset: Preset = {
     val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
     val implicitsSet = implicits.toSet
     val transformations = implicits ++ Seq(PerformCockpitOutputAction) ++
       JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
-    model.addElement(new Preset("Add Implicits", transformations))
+    new Preset("Add Implicits", transformations)
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {

@@ -6,6 +6,7 @@ import javax.swing._
 import javax.swing.text.PlainDocument
 
 import application.StyleSheet
+import core.exceptions.CompileException
 import core.layouts.SwingEquationLayout
 import core.modularProgram.PieceCombiner
 import core.transformation.TransformationState
@@ -61,7 +62,9 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
     val state = new TransformationState()
     PerformCockpitOutputAction.setState(state, outputParticles)
-    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).recover({ case e: Exception =>
+    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).
+      recover({ case e: CompileException => setOutputText(e.toString)}).
+      recover({ case e: Exception =>
       val writer = new CharArrayWriter()
       e.printStackTrace(new NewLinePrintWriter(writer))
       e.printStackTrace()
