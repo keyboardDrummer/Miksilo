@@ -57,6 +57,10 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     outputDocument.replace(0, outputDocument.getLength, text, null)
   }
 
+  def setInputText(text: String) {
+    inputDocument.replace(0, inputDocument.getLength, text, null)
+  }
+
   def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) {
     val cockpitOutputActions = if (transformations.contains(PerformCockpitOutputAction)) Seq.empty else Seq(PerformCockpitOutputAction)
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
@@ -86,16 +90,19 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
     val inputPanel = equationLayout.addComponent(getInputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
-    val inputgrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
+    val inputGrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
     val outputGrammarButton = equationLayout.addComponent(new ShowOutputGrammarButton(this))
+    val exampleDropdown = equationLayout.addComponent(new ExampleDropdown(this))
 
     val innerLayout = equationLayout.equationLayout
 
     equationLayout.makePreferredSize(chooseCompile)
     equationLayout.makePreferredSize(chooseOutput)
     equationLayout.makePreferredSize(chooseInput)
-    equationLayout.makePreferredSize(inputgrammarButton)
+    equationLayout.makePreferredSize(inputGrammarButton)
     equationLayout.makePreferredSize(outputGrammarButton)
+    equationLayout.makePreferredSize(exampleDropdown)
+
 
     //HORIZONTAL
     innerLayout.addLeftToRight(innerLayout.container, inputPanel, executeButton, outputPanel, innerLayout.container)
@@ -106,15 +113,17 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
       chooseCompile.horizontalCenter2 - executeButton.horizontalCenter2,
       chooseOutput.horizontalCenter2 - outputPanel.horizontalCenter2)
 
-    innerLayout.addEquals(inputgrammarButton.left, inputPanel.left)
+    innerLayout.addEquals(inputGrammarButton.left, inputPanel.left)
     innerLayout.addEquals(outputGrammarButton.right, outputPanel.right)
+    innerLayout.addLeftToRight(chooseInput, exampleDropdown)
 
     //VERTICAL
     innerLayout.addEquals(chooseInput.verticalCenter2,
       chooseCompile.verticalCenter2,
       chooseOutput.verticalCenter2,
-      inputgrammarButton.verticalCenter2,
-      outputGrammarButton.verticalCenter2)
+      inputGrammarButton.verticalCenter2,
+      outputGrammarButton.verticalCenter2,
+      exampleDropdown.verticalCenter2)
     innerLayout.addRow(inputPanel, executeButton, outputPanel)
     innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
   }

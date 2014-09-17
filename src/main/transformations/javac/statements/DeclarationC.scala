@@ -17,7 +17,7 @@ object DeclarationC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    val parseDeclaration = typeGrammar ~ identifier <~ ";" ^^ parseMap(DeclarationKey, DeclarationType, DeclarationName)
+    val parseDeclaration = typeGrammar ~~ identifier <~ ";" ^^ parseMap(DeclarationKey, DeclarationType, DeclarationName)
     statement.addOption(parseDeclaration)
   }
 

@@ -18,7 +18,7 @@ object DeclarationWithInitializerC extends StatementInstance {
     val statement = grammars.find(StatementC.StatementGrammar)
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val parseDeclarationWithInitializer = typeGrammar ~ identifier ~ ("=" ~> expression) <~ ";" ^^
+    val parseDeclarationWithInitializer = typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";" ^^
       parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey)
     statement.addOption(parseDeclarationWithInitializer)
   }
