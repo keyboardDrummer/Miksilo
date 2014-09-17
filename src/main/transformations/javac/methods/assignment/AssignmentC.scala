@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.grammar._
+import core.grammarDocument.FailureG
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC

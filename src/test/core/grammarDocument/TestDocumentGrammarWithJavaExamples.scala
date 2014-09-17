@@ -14,8 +14,20 @@ import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestDocumentGrammarWithFibonacci {
+class TestDocumentGrammarWithJavaExamples {
   val lineSeparator = System.lineSeparator()
+
+  @Test
+  def testSimpleForLoop() {
+    val testFileContent = TestUtils.getTestFile("SimpleForLoop", Path("")).slurp()
+    TestGrammarUtils.compareInputWithPrint(testFileContent, None)
+  }
+
+  @Test
+  def testWhile() {
+    val testFileContent = TestUtils.getTestFile("whilee", Path("")).slurp()
+    TestGrammarUtils.compareInputWithPrint(testFileContent, None)
+  }
 
   @Test
   def testFibonacci() {

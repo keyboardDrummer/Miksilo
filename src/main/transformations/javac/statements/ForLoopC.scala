@@ -20,7 +20,7 @@ object ForLoopC extends StatementInstance {
     val statementGrammar = grammars.find(StatementC.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") ~ blockGrammar ^^
+    val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
       parseMap(ForLoopKey, InitializerKey, ConditionKey, IncrementKey, BodyKey)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }

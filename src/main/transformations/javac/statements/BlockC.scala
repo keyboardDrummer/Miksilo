@@ -9,7 +9,7 @@ object BlockC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(StatementC)
 
-  val indentAmount = 2
+  val indentAmount = 4
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
     grammars.create(BlockGrammar, "{" %> statement.someSeparatedVertical(Empty).indent(indentAmount) %< "}")

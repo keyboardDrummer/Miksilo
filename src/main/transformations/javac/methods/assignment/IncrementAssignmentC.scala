@@ -16,7 +16,7 @@ object IncrementAssignmentC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = grammars.find(AssignmentC.AssignmentTargetGrammar)
-    val incrementAssignmentGrammar = assignmentTarget ~ ("+=" ~> assignmentGrammar) ^^ parseMap(IncrementAssignmentKey, TargetKey, ValueKey)
+    val incrementAssignmentGrammar = assignmentTarget ~~ ("+=" ~~> assignmentGrammar) ^^ parseMap(IncrementAssignmentKey, TargetKey, ValueKey)
     assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
