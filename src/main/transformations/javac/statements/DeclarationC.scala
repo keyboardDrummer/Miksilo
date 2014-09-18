@@ -26,6 +26,9 @@ object DeclarationC extends StatementInstance {
   }
 
   case class VariableAlreadyDefined(variable: String) extends BadInputException
+  {
+    override def toString = s"variable '$variable' was defined more than once."
+  }
 
   object DeclarationKey
 
