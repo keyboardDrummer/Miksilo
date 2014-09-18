@@ -11,6 +11,7 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
 import core.grammar.~
+import transformations.types.{ObjectTypeC, ArrayTypeC}
 
 
 import scala.collection.mutable
@@ -38,6 +39,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassFields) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool.constants
+
       val methods = getMethods(clazz)
       for (method <- methods)
         bindMethod(method)
@@ -47,10 +49,18 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
 
       def bindMethod(method: MetaObject) = {
         val methodName: String = MethodC.getMethodName(method)
-        val descriptor = MethodC.getMethodDescriptor(method)
+        val descriptor = MethodC.getMethodDescriptor(method, classCompiler)
         classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
       }
     }
+  }
+
+  def fullyQualify(_type: MetaObject, classCompiler: ClassCompiler): Unit =  _type.clazz match {
+    case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
+    case ObjectTypeC.ObjectTypeKey =>
+      val newName = ObjectTypeC.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
+      _type(ObjectTypeC.ObjectTypeName) = newName
+    case _ =>
   }
 
   def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])

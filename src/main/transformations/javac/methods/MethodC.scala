@@ -6,7 +6,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.javac.classes.ClassCompiler
+import transformations.javac.classes.{ClassC, ClassCompiler}
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.types.{ObjectTypeC, TypeC, VoidTypeC}
 
@@ -14,10 +14,22 @@ object MethodC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
-  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
+  def getParameterType(metaObject: MetaObject, classCompiler: ClassCompiler) = {
+    val result = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
+    ClassC.fullyQualify(result, classCompiler)
+    result
+  }
 
+
+  def getMethodDescriptor(method: MetaObject, classCompiler: ClassCompiler): MetaObject = {
+    val returnType = getMethodReturnType(method)
+    val parameters = getMethodParameters(method)
+    ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+  }
+
+  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
     val constantPool = ByteCodeSkeleton.getState(state).constantPool
-    def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method))
+    def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
     addMethodFlags(method)
     val methodNameIndex: Int = classCompiler.getMethodNameIndex(getMethodName(method))
@@ -54,15 +66,9 @@ object MethodC extends GrammarTransformation {
       if (!getMethodStatic(method))
         methodCompiler.variables.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))
       for (parameter <- parameters)
-        methodCompiler.variables.add(getParameterName(parameter), getParameterType(parameter))
+        methodCompiler.variables.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
       getState(state).methodCompiler = methodCompiler
     }
-  }
-
-  def getMethodDescriptor(method: MetaObject): MetaObject = {
-    val returnType = getMethodReturnType(method)
-    val parameters = getMethodParameters(method)
-    ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p)))
   }
 
   def getMethodReturnType(metaObject: MetaObject) = {
@@ -73,7 +79,6 @@ object MethodC extends GrammarTransformation {
     metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
   }
 
-  def getParameterType(metaObject: MetaObject) = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
 
   def addMethodFlags(method: MetaObject) = {
     var flags = Set[ByteCodeSkeleton.MethodAccessFlag]()
