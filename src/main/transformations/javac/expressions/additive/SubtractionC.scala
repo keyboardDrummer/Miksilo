@@ -18,7 +18,7 @@ object SubtractionC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseSubtraction = (additiveGrammar <~ "-") ~ additiveGrammar ^^ parseMap(SubtractionKey, FirstKey, SecondKey)
+    val parseSubtraction = (additiveGrammar <~~ "-") ~~  additiveGrammar ^^ parseMap(SubtractionKey, FirstKey, SecondKey)
     additiveGrammar.addOption(parseSubtraction)
   }
 
