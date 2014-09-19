@@ -5,8 +5,6 @@ import core.transformation.{MetaObject, TransformationsToPackrat, Transformation
 
 class ParseFromFunction(getText: () => String) extends InputOption {
 
-   override def enter(state: TransformationState): Unit = {}
-
    override def leave(state: TransformationState): Unit = {
      val inputStream = getText()
      val manager = new TransformationsToPackrat()

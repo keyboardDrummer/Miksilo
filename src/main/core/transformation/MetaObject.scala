@@ -50,6 +50,16 @@ object MetaObject {
 
     deepEquality(first, second, mutable.Set[(MetaObject, MetaObject)]())
   }
+
+  def classDebugRepresentation(_clazz: Any): String = _clazz match {
+    case string: String => string
+    case anyRef: AnyRef =>
+      val simpleName: String = anyRef.getClass.getSimpleName
+      if (simpleName.last == '$')
+        return simpleName.dropRight(1)
+      simpleName
+    case _ => _clazz.toString
+  }
 }
 
 class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) {
@@ -61,20 +71,10 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) {
   def update(key: Any, value: Any) = data.put(key, value)
 
   override def toString: String = {
-    val className = classDebugRepresentation(clazz)
+    val className = MetaObject.classDebugRepresentation(clazz)
     if (data.isEmpty)
       return className
-    s"$className: ${data.map(kv => (classDebugRepresentation(kv._1), kv._2))}"
-  }
-
-  def classDebugRepresentation(_clazz: Any): String = _clazz match {
-    case string: String => string
-    case anyRef: AnyRef =>
-      val simpleName: String = anyRef.getClass.getSimpleName
-      if (simpleName.last == '$')
-        return simpleName.dropRight(1)
-      simpleName
-    case _ => clazz.toString
+    s"$className: ${data.map(kv => (MetaObject.classDebugRepresentation(kv._1), kv._2))}"
   }
 
   override def equals(other: Any): Boolean = other match {

@@ -10,6 +10,7 @@ import transformations.bytecode.coreInstructions.objects.{LoadAddressC, PushNull
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets, PoptimizeC}
+import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions._
@@ -27,6 +28,8 @@ import transformations.types._
 object JavaCompiler {
 
   def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
+
+  def allTransformations = javaCompilerTransformations ++ Seq(ExpressionMethodC)
 
   def javaCompilerTransformations: Seq[Injector] = {
     Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,

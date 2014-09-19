@@ -13,9 +13,9 @@ class TestOptimizeBooleanInstructions {
 
   @Test
   def testForFibonacci() {
-    val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""), JavaCompiler.getCompiler)
+    val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeBooleanInstructionsC)
-    val withoutOptimization = TestUtils.parseAndTransform("fibonacci", Path(""), new CompilerFromTransformations(withoutOptimizationTransformations))
+    val withoutOptimization = new TestUtils(new CompilerFromTransformations(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)

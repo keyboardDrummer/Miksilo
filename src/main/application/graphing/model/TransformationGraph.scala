@@ -10,15 +10,11 @@ import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class TransformationGraph
-  extends GraphFromTransformations(JavaCompiler.javaCompilerTransformations) {
+  extends GraphFromTransformations(JavaCompiler.allTransformations) {
 
   val simplifications = Seq(ByteCodeTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
     , JavaSimpleStatement, JavaMethod, JavaC)
   addSimplifications()
-
-  //  val sinks: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.outDegreeOf(vertex) == 0)
-  //  if (sinks.size > 1)
-  //    throw new RuntimeException("more than once sink")
 
   val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
   if (sources.size > 1)

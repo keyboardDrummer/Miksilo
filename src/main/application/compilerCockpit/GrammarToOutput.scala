@@ -5,8 +5,10 @@ import core.transformation.TransformationState
 
 object GrammarToOutput extends CompileOption {
 
-  override def enter(state: TransformationState): Unit = {
+
+  override def inject(state: TransformationState): Unit = {
     OutputOption.setOutput(state, PrintGrammar.toDocument(state.grammarCatalogue).renderString())
     state.stop = true
+    super.inject(state)
   }
 }

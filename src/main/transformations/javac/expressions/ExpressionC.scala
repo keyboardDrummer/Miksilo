@@ -1,13 +1,17 @@
 package transformations.javac.expressions
 
 import core.exceptions.CompilerException
-import core.grammar.FailureG
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.types.TypeC
 
 import scala.collection.mutable
+import scala.util.Try
+
+case class GetTypeNotFound(key: Any) extends CompilerException {
+  override def toString = s"'get type' method not found for class ${MetaObject.classDebugRepresentation(key)}"
+}
 
 object ExpressionC extends GrammarTransformation {
 
@@ -17,8 +21,11 @@ object ExpressionC extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(TypeC)
 
-  def getType(state: TransformationState): MetaObject => MetaObject =
-    expression => getGetTypeRegistry(state)(expression.clazz)(expression)
+  def getType(state: TransformationState): MetaObject => MetaObject = expression => {
+    val getTypeMethod = Try(getGetTypeRegistry(state)(expression.clazz)).
+      recover({case e: NoSuchElementException => throw new GetTypeNotFound(expression.clazz)}).get
+    getTypeMethod(expression)
+  }
 
   def getGetTypeRegistry(state: TransformationState) = getState(state).getTypeRegistry
 

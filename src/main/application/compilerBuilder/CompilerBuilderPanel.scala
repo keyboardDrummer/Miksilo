@@ -12,7 +12,7 @@ import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
 object CompilerBuilderPanel {
-  val availableParticles = JavaCompiler.javaCompilerTransformations ++ Seq(PerformCockpitOutputAction)
+  val availableParticles = JavaCompiler.allTransformations ++ Seq(PerformCockpitOutputAction)
 }
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
@@ -64,7 +64,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane = {
-    val availableItems: Seq[Injector] = CompilerBuilderPanel.availableParticles
+    val availableItems: Seq[Injector] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
     val availableList = new JXList(availableItems.toArray.asInstanceOf[Array[Object]])
 
     availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))

@@ -113,15 +113,18 @@ object MethodC extends GrammarTransformation {
 
   object ParametersGrammar
   object VisibilityGrammar
+  object StaticGrammar
+  object ReturnTypeGrammar
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseReturnType = "void" ~> produce(VoidTypeC.voidType) | parseType
+    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType ~~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") <~ ")")
-    val parseStatic = "static" ~> produce(true) | produce(false)
+    val parseStatic = grammars.create(StaticGrammar, "static" ~> produce(true) | produce(false))
+
     val visibilityModifier = grammars.create(VisibilityGrammar,
       "public" ~> produce(PublicVisibility) |
         "protected" ~> produce(ProtectedVisibility) |

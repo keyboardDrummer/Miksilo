@@ -9,7 +9,7 @@ import scala.util.Try
 
 object PrettyPrint extends CompileOption {
 
-  override def enter(state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     val programGrammar = state.grammarCatalogue.find(ProgramGrammar)
     state.data(this) = programGrammar.deepClone
   }

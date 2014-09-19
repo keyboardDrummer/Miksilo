@@ -9,7 +9,9 @@ import transformations.javac.JavaCompiler
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object TestUtils {
+object TestUtils extends TestUtils(JavaCompiler.getCompiler)
+
+class TestUtils(val compiler: CompilerFromTransformations) {
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
@@ -51,7 +53,7 @@ object TestUtils {
     runJavaClass(className, testDirectory)
   }
 
-  def parseAndTransform(className: String, inputDirectory: Path, compiler: CompilerFromTransformations): MetaObject = {
+  def parseAndTransform(className: String, inputDirectory: Path): MetaObject = {
     val input: File = getTestFile(className, inputDirectory)
     compiler.parseAndTransform(input)
   }
@@ -70,7 +72,7 @@ object TestUtils {
     val testOutput = Directory(currentDir / Path("testOutput"))
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
-    JavaCompiler.getCompiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
+    compiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
@@ -87,7 +89,7 @@ object TestUtils {
     val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
     Assert.assertEquals("", javaCompilerOutput)
 
-    JavaCompiler.getCompiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
+    compiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)

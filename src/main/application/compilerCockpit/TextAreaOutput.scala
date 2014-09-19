@@ -4,7 +4,7 @@ import core.transformation.TransformationState
 
 class TextAreaOutput(setText: String => Unit) extends OutputOption {
 
-   override def enter(state: TransformationState): Unit = {}
+   override def inject(state: TransformationState): Unit = {}
 
    override def leave(state: TransformationState): Unit = {
      val outputOption = OutputOption.getOutput(state)

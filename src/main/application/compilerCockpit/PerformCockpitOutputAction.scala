@@ -9,7 +9,7 @@ object PerformCockpitOutputAction extends Injector {
 
   def getState(state: TransformationState) = state.data(this).asInstanceOf[Seq[Injector]]
 
-  override def enter(state: TransformationState): Unit = {
+  override def inject(state: TransformationState): Unit = {
     for(particle <- getState(state))
       particle.enter(state)
   }
