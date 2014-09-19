@@ -29,7 +29,8 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   def getCompileOptions: Seq[CompileOption] = {
     val selection = Set(PerformCockpitOutputAction, ByteCodeSkeleton)
     val orderedSelection = transformations.filter(o => selection.contains(o))
-    val byteCodeActions = if (orderedSelection(0) == ByteCodeSkeleton) Seq(CompileAndRun, EmitByteCode) else Seq.empty
+    val byteCodeActions = if (orderedSelection.take(1) == Seq(ByteCodeSkeleton))
+      Seq(CompileAndRun, EmitByteCode) else Seq.empty
     byteCodeActions ++ Seq(PrettyPrint)
   }
 
@@ -102,30 +103,30 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     equationLayout.makePreferredSize(inputGrammarButton)
     equationLayout.makePreferredSize(outputGrammarButton)
     equationLayout.makePreferredSize(exampleDropdown)
+    equationLayout.makePreferredSize(executeButton)
 
+    def addHorizontalEquations() {
+      innerLayout.addLeftToRight(innerLayout.container, inputPanel, outputPanel, innerLayout.container)
+      innerLayout.addLeftToRight(exampleDropdown, inputGrammarButton, outputGrammarButton, innerLayout.container)
+      innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton)
 
-    //HORIZONTAL
-    innerLayout.addLeftToRight(innerLayout.container, inputPanel, executeButton, outputPanel, innerLayout.container)
-    innerLayout.expressions += inputPanel.width - outputPanel.width
-    equationLayout.makePreferredWidth(executeButton)
+      innerLayout.expressions += inputPanel.width - outputPanel.width
+    }
+    addHorizontalEquations()
 
-    innerLayout.expressions ++= Seq(chooseInput.horizontalCenter2 - inputPanel.horizontalCenter2,
-      chooseCompile.horizontalCenter2 - executeButton.horizontalCenter2,
-      chooseOutput.horizontalCenter2 - outputPanel.horizontalCenter2)
+    def addVerticalEquations() {
+      innerLayout.addEquals(chooseInput.verticalCenter2,
+        chooseCompile.verticalCenter2,
+        chooseOutput.verticalCenter2,
+        inputGrammarButton.verticalCenter2,
+        outputGrammarButton.verticalCenter2,
+        exampleDropdown.verticalCenter2,
+        executeButton.verticalCenter2)
 
-    innerLayout.addEquals(inputGrammarButton.left, inputPanel.left)
-    innerLayout.addEquals(outputGrammarButton.right, outputPanel.right)
-    innerLayout.addLeftToRight(chooseInput, exampleDropdown)
-
-    //VERTICAL
-    innerLayout.addEquals(chooseInput.verticalCenter2,
-      chooseCompile.verticalCenter2,
-      chooseOutput.verticalCenter2,
-      inputGrammarButton.verticalCenter2,
-      outputGrammarButton.verticalCenter2,
-      exampleDropdown.verticalCenter2)
-    innerLayout.addRow(inputPanel, executeButton, outputPanel)
-    innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
+      innerLayout.addRow(inputPanel, outputPanel)
+      innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
+    }
+    addVerticalEquations()
   }
 
   def getInputPanel: JPanel = {

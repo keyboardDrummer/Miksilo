@@ -1,6 +1,8 @@
 package core.layouts
 
-import org.apache.commons.math3.linear.{LUDecomposition, MatrixUtils}
+import org.apache.commons.math3.linear.{DecompositionSolver, NonSquareMatrixException, LUDecomposition, MatrixUtils}
+
+import scala.util.Try
 
 case class Equation(elements: Map[Variable, Double], constant: Double)
 
@@ -23,8 +25,8 @@ class EquationLayout() {
   }
 
   def addRow(components: Component*) {
-    addEquals(components.map(c => c.height).toSeq:_*)
-    addEquals(components.map(c => c.bottom).toSeq:_*)
+    addEquals(components.map(c => c.height).toSeq: _*)
+    addEquals(components.map(c => c.bottom).toSeq: _*)
   }
 
   def addLeftToRight(components: Component*) {
@@ -37,6 +39,11 @@ class EquationLayout() {
     for (pair <- components.zip(components.drop(1))) {
       expressions += pair._1.bottom - pair._2.top
     }
+  }
+
+  case class TooManyEquationsError(amount: Int, expected: Int) extends RuntimeException
+  {
+    override def toString = s"too many equations, had $amount, expected $expected"
   }
 
   def solve(width: Int, height: Int): Map[Variable, Double] = {
@@ -55,7 +62,8 @@ class EquationLayout() {
     val orderedVariables = variables.toSeq
     def elementsToRow(elements: Map[Variable, Double]) = orderedVariables.map(variable => elements.getOrElse(variable, 0.0))
     val a = MatrixUtils.createRealMatrix(equations.map(equation => elementsToRow(equation.elements).toArray).toArray)
-    val solver = new LUDecomposition(a).getSolver
+    val solver : DecompositionSolver = Try(new LUDecomposition(a).getSolver).
+      recover({ case e: NonSquareMatrixException => throw new TooManyEquationsError(e.getArgument.intValue() - 4,e.getDimension - 4)}).get
     val b = MatrixUtils.createRealVector(equations.map(equation => -1 * equation.constant).toArray)
     val x = solver.solve(b)
     orderedVariables.zipWithIndex.map(indexedVariable => indexedVariable._1 -> x.getEntry(indexedVariable._2)).toMap
