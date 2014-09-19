@@ -8,13 +8,13 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import application.StyleSheet
 import application.compilerCockpit.PerformCockpitOutputAction
 import core.transformation.sillyCodePieces.Injector
+import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
 
 class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel(new GridBagLayout()) {
 
-  val model = new DefaultListModel[Preset]()
   initialise()
 
   def initialise() {
@@ -25,13 +25,12 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     listConstraints.gridx = 0
     listConstraints.insets = StyleSheet.defaultInsets
 
+    val model: DefaultListModel[Preset] = createModel
+
     StyleSheet.setTitleBorder(this, "Presets")
     val presetsList = new JList(model)
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-    model.addElement(getJavaCompilerPreset)
-    model.addElement(getAddImplicitsPreset)
-    model.addElement(getPrettyPrintPreset)
     add(StyleSheet.getAnyListVisuals(presetsList), listConstraints)
 
     val buttonConstraints: GridBagConstraints = new GridBagConstraints()
@@ -43,12 +42,25 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     add(applyButton, buttonConstraints)
   }
 
+  def createModel: DefaultListModel[Preset] = {
+    val model = new DefaultListModel[Preset]()
+    model.addElement(getJavaCompilerPreset)
+    model.addElement(getAddImplicitsPreset)
+    model.addElement(getPrettyPrintPreset)
+    model.addElement(getFibonacciExpressionMethodPreset)
+    model
+  }
+
   def getJavaCompilerPreset: Preset = {
-    new Preset("Java Compiler", JavaCompiler.javaCompilerTransformations)
+    new Preset("Java", JavaCompiler.javaCompilerTransformations)
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print", Seq(PerformCockpitOutputAction) ++ JavaCompiler.javaCompilerTransformations)
+    new Preset("Pretty Print Java", Seq(PerformCockpitOutputAction) ++ JavaCompiler.javaCompilerTransformations)
+  }
+
+  def getFibonacciExpressionMethodPreset = {
+    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ JavaCompiler.javaCompilerTransformations)
   }
 
   def getAddImplicitsPreset: Preset = {
@@ -57,7 +69,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     val implicitsSet = implicits.toSet
     val transformations = implicits ++ Seq(PerformCockpitOutputAction) ++
       JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
-    new Preset("Add Implicits", transformations)
+    new Preset("Reveal Java Implicits", transformations)
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {
