@@ -1,6 +1,7 @@
 package core.grammarDocument
 
 import core.grammar.Grammar
+
 import scala.collection.mutable
 
 object GrammarDocumentToGrammar {
@@ -22,7 +23,7 @@ object GrammarDocumentToGrammar {
         case Many(inner) => core.grammar.Many(helper(inner))
         case MapGrammar(inner, construct, _) => core.grammar.MapGrammar(helper(inner), construct)
         case TopBottom(top, bottom) => core.grammar.Sequence(helper(top), helper(bottom))
-        case FailureG => core.grammar.FailureG
+        case FailureGD => core.grammar.FailureG
         case Print(_) => core.grammar.Produce(Unit)
         case Produce(value) => core.grammar.Produce(value)
       })

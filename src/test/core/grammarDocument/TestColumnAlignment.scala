@@ -1,0 +1,14 @@
+package core.grammarDocument
+
+import org.junit.Test
+
+class TestColumnAlignment extends GrammarDocumentWriter {
+
+  @Test
+  def test() {
+    val input = "Hallo.                           Hier staat een tweede gesprek." +
+                "\nHoe gaat het met je?"
+    val grammar: GrammarDocument = (("Hallo." : GrammarDocument) % "Hoe gaat het met je?") ~ "Hier staat een tweede gesprek."
+    TestGrammarUtils.parseAndPrint(input, None, grammar)
+  }
+}

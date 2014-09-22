@@ -58,19 +58,19 @@ object LabelledTargets extends ProgramTransformation {
 
     val clazz = program
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
-    val codeAnnotations: Seq[MetaObject] = getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[MetaObject] = CodeAnnotation.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
     def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
-      val instructions = ByteCodeSkeleton.getCodeInstructions(codeAnnotation)
+      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
-      codeAnnotation(ByteCodeSkeleton.CodeAttributesKey) = ByteCodeSkeleton.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
+      codeAnnotation(CodeAnnotation.CodeAttributesKey) = CodeAnnotation.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
 
       val newInstructions: Seq[MetaObject] = getNewInstructions(instructions, targetLocations)
-      codeAnnotation(ByteCodeSkeleton.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions
     }
 
     def determineTargetLocations(instructions: Seq[MetaObject]): Map[String, Int] = {
@@ -102,13 +102,13 @@ object LabelledTargets extends ProgramTransformation {
       val frame = framePair._2
       val offset = location - adjustedZero
 
-      frame(ByteCodeSkeleton.OffsetDelta) = offset
+      frame(StackMapTable.OffsetDelta) = offset
       stackFrames += frame
       adjustedZero = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(ByteCodeSkeleton.StackMapTableId)
-      Seq(ByteCodeSkeleton.stackMapTable(nameIndex, stackFrames))
+      val nameIndex = constantPool.store(StackMapTable.StackMapTableId)
+      Seq(StackMapTable.stackMapTable(nameIndex, stackFrames))
     }
     else
       Seq[MetaObject]()

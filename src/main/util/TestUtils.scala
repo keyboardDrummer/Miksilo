@@ -3,7 +3,7 @@ package util
 import core.transformation._
 import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
 import org.junit.Assert
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.{CodeAnnotation, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}
@@ -22,7 +22,7 @@ class TestUtils(val compiler: CompilerFromTransformations) {
   }
 
   def getMethodInstructions(method: MetaObject) =
-    ByteCodeSkeleton.getCodeInstructions(ByteCodeSkeleton.getMethodAttributes(method)(0))
+    CodeAnnotation.getCodeInstructions(ByteCodeSkeleton.getMethodAttributes(method)(0))
 
   def printByteCode(byteCode: MetaObject): String = {
     PrintByteCode.printBytes(getBytes(byteCode))

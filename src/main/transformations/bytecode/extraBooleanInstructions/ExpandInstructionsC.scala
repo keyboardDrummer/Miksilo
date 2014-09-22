@@ -5,7 +5,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.{CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
 
 import scala.collection.mutable
 
@@ -23,16 +23,16 @@ object ExpandInstructionsC extends ProgramTransformation {
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[MetaObject] = getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[MetaObject] = CodeAnnotation.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
     def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
-      val instructions = ByteCodeSkeleton.getCodeInstructions(codeAnnotation)
+      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
       val newInstructions: Seq[MetaObject] = getNewInstructions(instructions)
-      codeAnnotation(ByteCodeSkeleton.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[MetaObject]) = {

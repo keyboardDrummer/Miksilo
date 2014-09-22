@@ -13,7 +13,7 @@ trait GrammarDocumentWriter {
 
   def number: GrammarDocument = consume(NumberG)
 
-  def failure: GrammarDocument = FailureG
+  def failure: GrammarDocument = FailureGD
 
   def produce(value: Any): GrammarDocument = new Produce(value)
 
@@ -37,6 +37,8 @@ trait GrammarDocument extends GrammarDocumentWriter {
   override def toString = PrintGrammar.toDocument(GrammarDocumentToGrammar.toGrammar(this)).renderString(false)
 
   def simplify: GrammarDocument = this
+
+  lazy val height = 1
 
   def <~(right: GrammarDocument) = new IgnoreRight(this, right)
 
@@ -150,7 +152,7 @@ case class Sequence(first: GrammarDocument, second: GrammarDocument) extends Gra
 
 case class MapGrammar(inner: GrammarDocument, construct: Any => Any, deconstruct: Any => Option[Any]) extends GrammarDocument
 
-class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureG) extends GrammarDocument {
+class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureGD) extends GrammarDocument {
 
   def addOption(addition: GrammarDocument) {
     inner = inner | addition
@@ -158,9 +160,12 @@ class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureG) extends 
 }
 
 case class TopBottom(top: GrammarDocument, bottom: GrammarDocument) extends GrammarDocument with SequenceLike
+{
+  override lazy val height = top.height + bottom.height
+}
 
 case class Print(document: ResponsiveDocument) extends GrammarDocument
 
 case class Produce(result: Any) extends GrammarDocument
 
-object FailureG extends GrammarDocument
+object FailureGD extends GrammarDocument

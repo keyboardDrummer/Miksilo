@@ -14,7 +14,7 @@ import scala.collection.mutable
 class TestByteCodeGoTo {
 
   def testMain(instructions: Seq[MetaObject]): MetaObject = {
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(ByteCodeSkeleton.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](), Seq(method))
   }
 
@@ -36,28 +36,28 @@ class TestByteCodeGoTo {
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8))
 
-    val stackMapTable = ByteCodeSkeleton.stackMapTable(1, Seq(ByteCodeSkeleton.appendFrame(2, Seq(IntTypeC.intType)),
-      ByteCodeSkeleton.sameFrame(10)))
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(ByteCodeSkeleton.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
-    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](ByteCodeSkeleton.StackMapTableId), Seq(method))
+    val stackMapTable = StackMapTable.stackMapTable(1, Seq(StackMapTable.appendFrame(2, Seq(IntTypeC.intType)),
+      StackMapTable.sameFrame(10)))
+    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
+    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](StackMapTable.StackMapTableId), Seq(method))
   }
 
   def getLabelledJumpWhile: MetaObject = {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledTargets.label("start", new MetaObject(ByteCodeSkeleton.AppendFrame) {
-        data.put(ByteCodeSkeleton.AppendFrameTypes, Seq(IntTypeC.intType))
+      LabelledTargets.label("start", new MetaObject(StackMapTable.AppendFrame) {
+        data.put(StackMapTable.AppendFrameTypes, Seq(IntTypeC.intType))
       }),
       LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
       LabelledTargets.goTo("start"),
-      LabelledTargets.label("end", new MetaObject(ByteCodeSkeleton.SameFrameKey))
+      LabelledTargets.label("end", new MetaObject(StackMapTable.SameFrameKey))
     )
 
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(ByteCodeSkeleton.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](), Seq(method))
   }
 }

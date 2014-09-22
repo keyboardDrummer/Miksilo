@@ -3,7 +3,8 @@ package transformations.javac.methods
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.CodeAnnotation.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
+import transformations.bytecode.{CodeAnnotation, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.classes.{ClassC, ClassCompiler}
@@ -47,16 +48,15 @@ object MethodC extends GrammarTransformation {
       val statements = getMethodBody(method)
       val statementToInstructions = StatementC.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
-      val codeIndex = constantPool.store(ByteCodeSkeleton.CodeAttributeId)
+      val codeIndex = constantPool.store(CodeAnnotation.CodeAttributeId)
       val exceptionTable = Seq[MetaObject]()
       val codeAttributes = Seq[MetaObject]()
-      val codeAttribute = new MetaObject(ByteCodeSkeleton.CodeKey) {
-        data.put(AttributeNameKey, codeIndex)
-        data.put(CodeMaxLocalsKey, getMethodCompiler(state).variables.localCount)
-        data.put(CodeInstructionsKey, instructions)
-        data.put(CodeExceptionTableKey, exceptionTable)
-        data.put(CodeAttributesKey, codeAttributes)
-      }
+      val codeAttribute = new MetaObject(CodeAnnotation.CodeKey,
+        AttributeNameKey -> codeIndex,
+        CodeMaxLocalsKey -> getMethodCompiler(state).variables.localCount,
+        CodeInstructionsKey -> instructions,
+        CodeExceptionTableKey -> exceptionTable,
+        CodeAttributesKey -> codeAttributes)
       method(ByteCodeSkeleton.MethodAnnotations) = Seq(codeAttribute)
     }
 

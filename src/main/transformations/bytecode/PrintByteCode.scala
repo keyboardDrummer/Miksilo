@@ -33,7 +33,7 @@ object PrintByteCode extends ProgramTransformation {
   }
 
   def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
-    val entries = ByteCodeSkeleton.getLineNumberTableEntries(attribute)
+    val entries = LineNumberTable.getLineNumberTableEntries(attribute)
     shortToBytes(entries.length) ++
       entries.flatMap(getLineNumberTableEntryByteCode)
   }
@@ -144,9 +144,9 @@ object PrintByteCode extends ProgramTransformation {
               toUTF8ConstantEntry(parametersString + returnString)
             case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
           }
-        case CodeAttributeId => toUTF8ConstantEntry("Code")
-        case StackMapTableId => toUTF8ConstantEntry("StackMapTable")
-        case LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
+        case CodeAnnotation.CodeAttributeId => toUTF8ConstantEntry("Code")
+        case StackMapTable.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
+        case LineNumberTable.LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
         case SourceFileId => toUTF8ConstantEntry("SourceFile")
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
@@ -154,19 +154,19 @@ object PrintByteCode extends ProgramTransformation {
     }
 
     def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
-      val offset = ByteCodeSkeleton.getFrameOffset(frame)
+      val offset = StackMapTable.getFrameOffset(frame)
       frame.clazz match {
-        case ByteCodeSkeleton.SameFrameKey =>
+        case StackMapTable.SameFrameKey =>
           if (offset > 63)
             byteToBytes(251) ++ shortToBytes(offset)
           else
             byteToBytes(offset)
-        case ByteCodeSkeleton.AppendFrame =>
-          val localVerificationTypes = ByteCodeSkeleton.getAppendFrameTypes(frame)
+        case StackMapTable.AppendFrame =>
+          val localVerificationTypes = StackMapTable.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
             shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(clazz, info, state))
-        case ByteCodeSkeleton.SameLocals1StackItem =>
-          val _type = ByteCodeSkeleton.getSameLocals1StackItemType(frame)
+        case StackMapTable.SameLocals1StackItem =>
+          val _type = StackMapTable.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
             byteToBytes(code) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
@@ -177,7 +177,7 @@ object PrintByteCode extends ProgramTransformation {
     }
 
     def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
-      val entries = ByteCodeSkeleton.getStackMapTableEntries(attribute)
+      val entries = StackMapTable.getStackMapTableEntries(attribute)
       shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
     }
 
@@ -207,23 +207,23 @@ object PrintByteCode extends ProgramTransformation {
     def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
         prefixWithIntLength(() => attribute.clazz match {
-          case ByteCodeSkeleton.CodeKey =>
+          case CodeAnnotation.CodeKey =>
             getCodeAttributeBytes(attribute)
-          case ByteCodeSkeleton.LineNumberTableKey =>
+          case LineNumberTable.LineNumberTableKey =>
             getLineNumberTableBytes(attribute)
-          case ByteCodeSkeleton.StackMapTableKey => getStackMapTableBytes(attribute)
+          case StackMapTable.StackMapTableKey => getStackMapTableBytes(attribute)
           case ByteCodeSkeleton.SourceFileAttribute => getSourceFileBytes(attribute)
         })
     }
 
     def getCodeAttributeBytes(attribute: MetaObject): Seq[Byte] = {
-      val exceptionTable = ByteCodeSkeleton.getCodeExceptionTable(attribute)
-      shortToBytes(ByteCodeSkeleton.getCodeMaxStack(attribute)) ++
-        shortToBytes(ByteCodeSkeleton.getCodeMaxLocals(attribute)) ++
-        prefixWithIntLength(() => ByteCodeSkeleton.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+      val exceptionTable = CodeAnnotation.getCodeExceptionTable(attribute)
+      shortToBytes(CodeAnnotation.getCodeMaxStack(attribute)) ++
+        shortToBytes(CodeAnnotation.getCodeMaxLocals(attribute)) ++
+        prefixWithIntLength(() => CodeAnnotation.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
         shortToBytes(exceptionTable.length) ++
         exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-        getAttributesByteCode(ByteCodeSkeleton.getCodeAttributes(attribute))
+        getAttributesByteCode(CodeAnnotation.getCodeAttributes(attribute))
     }
 
     def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {

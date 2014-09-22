@@ -106,7 +106,7 @@ object PrintValueUsingGrammarDocument {
         } yield result
         case TopBottom(top, bottom) =>
           sequenceHelper(value, top, bottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
-        case FailureG => emptyFailure(value, EncounteredFailure, -10000)
+        case FailureGD => emptyFailure(value, EncounteredFailure, -10000)
         case Produce(producedValue) =>
           if (Objects.equals(producedValue, value)) Try(Empty)
           else emptyFailure(value, FoundProduceWithNotEqualValue(producedValue), -100)

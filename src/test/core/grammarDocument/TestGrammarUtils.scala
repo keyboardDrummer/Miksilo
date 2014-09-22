@@ -11,7 +11,7 @@ import scala.util.parsing.input.CharArrayReader
 
 object TestGrammarUtils {
 
-  def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: Labelled) {
+  def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: GrammarDocument) {
     val grammar: Grammar = GrammarDocumentToGrammar.toGrammar(grammarDocument)
 
     val packrat: ToPackrat = new ToPackrat()

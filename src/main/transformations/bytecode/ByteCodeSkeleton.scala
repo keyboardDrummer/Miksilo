@@ -1,15 +1,14 @@
 package transformations.bytecode
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.grammars.{ProgramGrammar, GrammarCatalogue}
+import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ConstantPool
 import transformations.types._
 
 import scala.collection.mutable
 
-case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
-
-object ByteCodeSkeleton extends Injector {
+object ByteCodeSkeleton extends GrammarTransformation {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
@@ -19,35 +18,9 @@ object ByteCodeSkeleton extends Injector {
 
   def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
 
-  def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
-    ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
-      .flatMap(annotation => if (annotation.clazz == ByteCodeSkeleton.CodeKey) Some(annotation) else None)
-  }
-
   def getMethodAttributes(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
-
-  def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
-    data.put(OffsetDelta, offset)
-  }
-
-  def getFrameOffset(frame: MetaObject) = frame(OffsetDelta).asInstanceOf[Int]
-
-  def sameFrameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem) {
-    data.put(OffsetDelta, offsetDelta)
-    data.put(SameLocals1StackItemType, _type)
-  }
-
-  def getSameLocals1StackItemType(sameLocals1StackItem: MetaObject) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[MetaObject]
-
-  def appendFrame(offset: Int, newLocalTypes: Seq[MetaObject]) = new MetaObject(AppendFrame) {
-    data.put(OffsetDelta, offset)
-    data.put(AppendFrameTypes, newLocalTypes)
-  }
-
-  def getAppendFrameTypes(appendFrame: MetaObject) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[MetaObject]]
 
   def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttribute) {
     data.put(SourceFileFileNameIndex, fileNameIndex)
@@ -55,20 +28,6 @@ object ByteCodeSkeleton extends Injector {
   }
 
   def getSourceFileFileNameIndex(sourceFile: MetaObject) = sourceFile(SourceFileFileNameIndex).asInstanceOf[Int]
-
-  def stackMapTable(nameIndex: Int, stackMaps: Seq[MetaObject]) = new MetaObject(StackMapTableKey) {
-    data.put(AttributeNameKey, nameIndex)
-    data.put(StackMapTableMaps, stackMaps)
-  }
-
-  def getStackMapTableEntries(stackMapTable: MetaObject) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[MetaObject]]
-
-  def lineNumberTable(nameIndex: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberTableKey) {
-    data.put(AttributeNameKey, nameIndex)
-    data.put(LineNumberTableLines, lines)
-  }
-
-  def getLineNumberTableEntries(lineNumberTable: MetaObject) = lineNumberTable(LineNumberTableLines).asInstanceOf[Seq[LineNumberRef]]
 
   def nameAndType(nameIndex: Int, typeIndex: Int): MetaObject = new MetaObject(NameAndTypeKey) {
     data.put(NameAndTypeName, nameIndex)
@@ -131,31 +90,9 @@ object ByteCodeSkeleton extends Injector {
 
   def getMethodDescriptorParameters(descriptor: MetaObject) = descriptor(MethodDescriptorParameters).asInstanceOf[Seq[MetaObject]]
 
-  def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
-                    instructions: Seq[MetaObject],
-                    exceptionTable: Seq[MetaObject],
-                    attributes: Seq[MetaObject]) = {
-    new MetaObject(CodeKey) {
-      data.put(AttributeNameKey, nameIndex)
-      data.put(CodeMaxStackKey, maxStack)
-      data.put(CodeMaxLocalsKey, maxLocals)
-      data.put(CodeInstructionsKey, instructions)
-      data.put(CodeExceptionTableKey, exceptionTable)
-      data.put(CodeAttributesKey, attributes)
-    }
-  }
 
   def getAttributeNameIndex(attribute: MetaObject) = attribute(AttributeNameKey).asInstanceOf[Int]
 
-  def getCodeMaxStack(code: MetaObject) = code(CodeMaxStackKey).asInstanceOf[Int]
-
-  def getCodeMaxLocals(code: MetaObject) = code(CodeMaxLocalsKey).asInstanceOf[Int]
-
-  def getCodeExceptionTable(code: MetaObject) = code(CodeExceptionTableKey).asInstanceOf[Seq[MetaObject]]
-
-  def getCodeAttributes(code: MetaObject) = code(CodeAttributesKey).asInstanceOf[Seq[MetaObject]]
-
-  def getCodeInstructions(code: MetaObject) = code(CodeInstructionsKey).asInstanceOf[Seq[MetaObject]]
 
   def clazz(name: Int, parent: Int, constantPool: mutable.Buffer[Any], methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
             classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey) {
@@ -206,43 +143,9 @@ object ByteCodeSkeleton extends Injector {
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
   }
 
-  object SameFrameKey
-
-  object OffsetDelta
-
-  object SameLocals1StackItem
-
-  object SameLocals1StackItemType
-
-  object AppendFrame
-
-  object AppendFrameTypes
-
-  object FullFrame
-
-  object FullFrameLocals
-
-  object FullFrameStack
-
-  object ChopFrame
-
-  object ChopFrameCount
-
   object SourceFileAttribute
 
   object SourceFileFileNameIndex
-
-  object StackMapTableKey
-
-  object StackMapTableMaps
-
-  object StackMapTableId
-
-  object LineNumberTableKey
-
-  object LineNumberTableLines
-
-  object LineNumberTableId
 
   object SourceFileId
 
@@ -288,21 +191,9 @@ object ByteCodeSkeleton extends Injector {
 
   object AttributeKey
 
-  object CodeAttributeId
-
-  object CodeKey
 
   object AttributeNameKey
 
-  object CodeMaxStackKey
-
-  object CodeMaxLocalsKey
-
-  object CodeInstructionsKey
-
-  object CodeExceptionTableKey
-
-  object CodeAttributesKey
 
   object ClassFileKey
 
@@ -326,4 +217,12 @@ object ByteCodeSkeleton extends Injector {
 
   object FieldRefNameAndTypeIndex
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val program = grammars.find(ProgramGrammar)
+
+    val constantPool = "ConstantPool:"
+    val classGrammar = grammars.create(ClassFileKey, "class" ~~ identifier %% constantPool)
+
+    program.inner = classGrammar
+  }
 }

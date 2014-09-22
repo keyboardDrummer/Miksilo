@@ -17,7 +17,7 @@ class GrammarCatalogue {
     }
   }
 
-  def create(key: AnyRef, inner: GrammarDocument = FailureG): Labelled = {
+  def create(key: AnyRef, inner: GrammarDocument = FailureGD): Labelled = {
     val result = new Labelled(key, inner)
     grammars += key -> result
     result

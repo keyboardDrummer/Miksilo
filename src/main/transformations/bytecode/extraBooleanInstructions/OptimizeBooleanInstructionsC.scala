@@ -2,34 +2,34 @@ package transformations.bytecode.extraBooleanInstructions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC.IfZeroKey
 import transformations.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
-import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.{ByteCodeSkeleton, CodeAnnotation, LabelledTargets}
 
 import scala.collection.mutable
 
 object OptimizeBooleanInstructionsC extends ProgramTransformation {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC, NotInstructionC, IntegerEqualsInstructionC)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
+    NotInstructionC, IntegerEqualsInstructionC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[MetaObject] = getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[MetaObject] = CodeAnnotation.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
     def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
-      val instructions = ByteCodeSkeleton.getCodeInstructions(codeAnnotation)
+      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
       val newInstructions: Seq[MetaObject] = getNewInstructions(instructions)
-      codeAnnotation(ByteCodeSkeleton.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[MetaObject]) = {

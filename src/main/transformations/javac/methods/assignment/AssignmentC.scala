@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.grammarDocument.FailureG
+import core.grammarDocument.FailureGD
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
@@ -19,7 +19,7 @@ object AssignmentC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC, AssignmentPrecedence)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val targetGrammar = grammars.create(AssignmentTargetGrammar, FailureG)
+    val targetGrammar = grammars.create(AssignmentTargetGrammar, FailureGD)
     val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
     val assignmentGrammar = (targetGrammar <~~ "=") ~~ expressionGrammar ^^ parseMap(AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.addOption(assignmentGrammar)

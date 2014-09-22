@@ -2,8 +2,8 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton.{FullFrameLocals, FullFrameStack}
-import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.StackMapTable.{FullFrameStack, FullFrameLocals}
+import transformations.bytecode.{StackMapTable, CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.ConstantPool
 import transformations.types.TypeC
 
@@ -22,8 +22,8 @@ object InferredStackFrames extends ProgramTransformation {
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val methodDescriptor = constantPool.getValue(ByteCodeSkeleton.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
       val initialLocals = ByteCodeSkeleton.getMethodDescriptorParameters(methodDescriptor)
-      val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == ByteCodeSkeleton.CodeKey).get
-      val instructions = ByteCodeSkeleton.getCodeInstructions(codeAnnotation)
+      val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAnnotation.CodeKey).get
+      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
 
       val stackLayouts: Map[Int, Seq[MetaObject]] = getStackLayoutsPerInstruction(state, instructions)
       val localTypes: Map[Int, Map[Int, MetaObject]] = getLocalTypes(initialLocals, instructions)
@@ -73,25 +73,25 @@ object InferredStackFrames extends ProgramTransformation {
       val addedLocals = locals.drop(sameLocalsPrefix.length)
       val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
       if (unchangedLocals && stack.isEmpty) {
-        new MetaObject(ByteCodeSkeleton.SameFrameKey)
+        new MetaObject(StackMapTable.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new MetaObject(ByteCodeSkeleton.SameLocals1StackItem) {
-          data.put(ByteCodeSkeleton.SameLocals1StackItemType, stack(0))
+        new MetaObject(StackMapTable.SameLocals1StackItem) {
+          data.put(StackMapTable.SameLocals1StackItemType, stack(0))
         }
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
-        new MetaObject(ByteCodeSkeleton.ChopFrame) {
-          data.put(ByteCodeSkeleton.ChopFrameCount, removedLocals.length)
+        new MetaObject(StackMapTable.ChopFrame) {
+          data.put(StackMapTable.ChopFrameCount, removedLocals.length)
         }
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new MetaObject(ByteCodeSkeleton.AppendFrame) {
-          data.put(ByteCodeSkeleton.AppendFrameTypes, addedLocals.map(toStackType))
+        new MetaObject(StackMapTable.AppendFrame) {
+          data.put(StackMapTable.AppendFrameTypes, addedLocals.map(toStackType))
         }
       }
       else {
-        new MetaObject(ByteCodeSkeleton.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+        new MetaObject(StackMapTable.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
       }
 
     }

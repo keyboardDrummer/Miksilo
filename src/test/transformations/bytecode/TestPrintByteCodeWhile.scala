@@ -26,10 +26,10 @@ class TestPrintByteCodeWhile {
       ByteCodeSkeleton.classRef(14),
       "<init>",
       ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
-      ByteCodeSkeleton.CodeAttributeId,
-      ByteCodeSkeleton.LineNumberTableId,
+      CodeAnnotation.CodeAttributeId,
+      LineNumberTable.LineNumberTableId,
       "whilee",
-      ByteCodeSkeleton.StackMapTableId,
+      StackMapTable.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Whilee.java",
       ByteCodeSkeleton.nameAndType(4, 5),
@@ -43,9 +43,9 @@ class TestPrintByteCodeWhile {
   }
 
   def getConstructor: MetaObject = {
-    val lineNumberTable = ByteCodeSkeleton.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
+    val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeSkeleton.methodInfo(4, 5, Seq(
-      ByteCodeSkeleton.codeAttribute(6, 1, 1, Seq(
+      CodeAnnotation.codeAttribute(6, 1, 1, Seq(
         LoadAddressC.addressLoad(0),
         InvokeSpecialC.invokeSpecial(1),
         VoidReturnInstructionC.voidReturn
@@ -54,15 +54,15 @@ class TestPrintByteCodeWhile {
   }
 
   def getWhile: MetaObject = {
-    val lineNumberTable = ByteCodeSkeleton.lineNumberTable(7, Seq(
+    val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(
       new LineNumberRef(5, 0),
       new LineNumberRef(6, 2),
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = ByteCodeSkeleton.stackMapTable(9, Seq(ByteCodeSkeleton.appendFrame(2, Seq(IntTypeC.intType)),
-      ByteCodeSkeleton.sameFrame(10)))
-    val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(ByteCodeSkeleton.codeAttribute(6, 2, 1, Seq(
+    val stackMapTable = StackMapTable.stackMapTable(9, Seq(StackMapTable.appendFrame(2, Seq(IntTypeC.intType)),
+      StackMapTable.sameFrame(10)))
+    val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(CodeAnnotation.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LoadIntegerC.load(0),
