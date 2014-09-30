@@ -1,9 +1,10 @@
 package core.grammarDocument
 
-import org.junit.Test
+import org.junit.{Ignore, Test}
 
 class TestColumnAlignment extends GrammarDocumentWriter {
 
+  @Ignore
   @Test
   def test() {
     val input = "Hallo.              Hier staat een tweede gesprek." + System.lineSeparator() +
