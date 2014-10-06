@@ -2,8 +2,8 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.StackMapTable.{FullFrameStack, FullFrameLocals}
-import transformations.bytecode.{StackMapTable, CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.StackMapTableC.{FullFrameStack, FullFrameLocals}
+import transformations.bytecode.{StackMapTableC, CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
 import transformations.javac.classes.ConstantPool
 import transformations.types.TypeC
 
@@ -73,25 +73,25 @@ object InferredStackFrames extends ProgramTransformation {
       val addedLocals = locals.drop(sameLocalsPrefix.length)
       val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
       if (unchangedLocals && stack.isEmpty) {
-        new MetaObject(StackMapTable.SameFrameKey)
+        new MetaObject(StackMapTableC.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new MetaObject(StackMapTable.SameLocals1StackItem) {
-          data.put(StackMapTable.SameLocals1StackItemType, stack(0))
+        new MetaObject(StackMapTableC.SameLocals1StackItem) {
+          data.put(StackMapTableC.SameLocals1StackItemType, stack(0))
         }
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
-        new MetaObject(StackMapTable.ChopFrame) {
-          data.put(StackMapTable.ChopFrameCount, removedLocals.length)
+        new MetaObject(StackMapTableC.ChopFrame) {
+          data.put(StackMapTableC.ChopFrameCount, removedLocals.length)
         }
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new MetaObject(StackMapTable.AppendFrame) {
-          data.put(StackMapTable.AppendFrameTypes, addedLocals.map(toStackType))
+        new MetaObject(StackMapTableC.AppendFrame) {
+          data.put(StackMapTableC.AppendFrameTypes, addedLocals.map(toStackType))
         }
       }
       else {
-        new MetaObject(StackMapTable.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+        new MetaObject(StackMapTableC.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
       }
 
     }

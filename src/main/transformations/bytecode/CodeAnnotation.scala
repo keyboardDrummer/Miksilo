@@ -52,5 +52,7 @@ object CodeAnnotation extends GrammarTransformation {
 
   object CodeAttributesKey
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = ???
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+
+  }
 }

@@ -60,9 +60,23 @@ class TestDocumentGrammarWithJavaExamples {
 
     val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
-    val implicitsSet = implicits.toSet
     val newTransformations = Seq(new ParseFromFunction(() => input)) ++ implicits ++ Seq(PrettyPrint) ++
-      JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
+      JavaCompiler.spliceAfterTransformations(implicits, Seq(PrettyPrint))
+
+    val state = new TransformationState
+    PieceCombiner.combineAndExecute(state, newTransformations.reverse)
+    val output = OutputOption.getOutput(state).get
+
+    Assert.assertEquals(expectation, output)
+  }
+
+  @Test
+  def testPrettyPrintByteCode() {
+    val input = TestUtils.getTestFile("fibonacci", Path("")).slurp()
+    val expectation = TestUtils.getTestFile("ExplicitFibonacci", Path("")).slurp()
+
+    val newTransformations = Seq(new ParseFromFunction(() => input)) ++
+      JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeWithoutInstructions, Seq(PrettyPrint))
 
     val state = new TransformationState
     PieceCombiner.combineAndExecute(state, newTransformations.reverse)

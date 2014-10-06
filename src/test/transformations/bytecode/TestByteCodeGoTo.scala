@@ -36,25 +36,25 @@ class TestByteCodeGoTo {
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8))
 
-    val stackMapTable = StackMapTable.stackMapTable(1, Seq(StackMapTable.appendFrame(2, Seq(IntTypeC.intType)),
-      StackMapTable.sameFrame(10)))
+    val stackMapTable = StackMapTableC.stackMapTable(1, Seq(StackMapTableC.appendFrame(2, Seq(IntTypeC.intType)),
+      StackMapTableC.sameFrame(10)))
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
-    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](StackMapTable.StackMapTableId), Seq(method))
+    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](StackMapTableC.StackMapTableId), Seq(method))
   }
 
   def getLabelledJumpWhile: MetaObject = {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledTargets.label("start", new MetaObject(StackMapTable.AppendFrame) {
-        data.put(StackMapTable.AppendFrameTypes, Seq(IntTypeC.intType))
+      LabelledTargets.label("start", new MetaObject(StackMapTableC.AppendFrame) {
+        data.put(StackMapTableC.AppendFrameTypes, Seq(IntTypeC.intType))
       }),
       LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
       LabelledTargets.goTo("start"),
-      LabelledTargets.label("end", new MetaObject(StackMapTable.SameFrameKey))
+      LabelledTargets.label("end", new MetaObject(StackMapTableC.SameFrameKey))
     )
 
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

@@ -102,13 +102,13 @@ object LabelledTargets extends ProgramTransformation {
       val frame = framePair._2
       val offset = location - adjustedZero
 
-      frame(StackMapTable.OffsetDelta) = offset
+      frame(StackMapTableC.OffsetDelta) = offset
       stackFrames += frame
       adjustedZero = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTable.StackMapTableId)
-      Seq(StackMapTable.stackMapTable(nameIndex, stackFrames))
+      val nameIndex = constantPool.store(StackMapTableC.StackMapTableId)
+      Seq(StackMapTableC.stackMapTable(nameIndex, stackFrames))
     }
     else
       Seq[MetaObject]()

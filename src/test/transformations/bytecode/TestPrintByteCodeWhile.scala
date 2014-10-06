@@ -29,7 +29,7 @@ class TestPrintByteCodeWhile {
       CodeAnnotation.CodeAttributeId,
       LineNumberTable.LineNumberTableId,
       "whilee",
-      StackMapTable.StackMapTableId,
+      StackMapTableC.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Whilee.java",
       ByteCodeSkeleton.nameAndType(4, 5),
@@ -60,8 +60,8 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = StackMapTable.stackMapTable(9, Seq(StackMapTable.appendFrame(2, Seq(IntTypeC.intType)),
-      StackMapTable.sameFrame(10)))
+    val stackMapTable = StackMapTableC.stackMapTable(9, Seq(StackMapTableC.appendFrame(2, Seq(IntTypeC.intType)),
+      StackMapTableC.sameFrame(10)))
     val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(CodeAnnotation.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),

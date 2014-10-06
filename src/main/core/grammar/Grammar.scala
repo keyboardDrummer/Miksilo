@@ -132,6 +132,8 @@ class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
 object FailureG extends Grammar {
 }
 
+object StringLiteral extends Grammar
+
 object NumberG extends Grammar {
 }
 

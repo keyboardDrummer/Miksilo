@@ -41,6 +41,7 @@ class ToPackrat extends JavaTokenParsers with PackratParsers {
         }
         case regexG: RegexG => regex(regexG.regex)
         case NumberG => wholeNumber
+        case StringLiteral => stringLiteral
         case many: Many => helper(many.inner).*
         case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value)
         case originalKeyword: core.grammar.Keyword => literal(originalKeyword.value)

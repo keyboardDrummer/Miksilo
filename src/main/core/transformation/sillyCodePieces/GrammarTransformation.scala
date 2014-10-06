@@ -14,17 +14,31 @@ trait GrammarTransformation extends Injector with GrammarDocumentWriter {
     transformGrammars(state.grammarCatalogue)
   }
 
-  def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
-    val fieldList = fields.toList
-    (input => construct(input, key, fieldList), obj => destruct(obj.asInstanceOf[MetaObject], key, fieldList))
+  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
+    (x => x, x => if (clazz.isInstance(x)) Some(x) else None)
   }
 
-  def destruct(value: MetaObject, key: AnyRef, fields: List[Any]): Option[Any] = {
-    if (value.clazz == key) {
+  case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException
+  {
+    override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
+  }
+
+  def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
+    val fieldList = fields.toList
+    (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
+  }
+
+  def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
+    if (!value.isInstanceOf[MetaObject])
+      return None
+
+    val metaObject = value.asInstanceOf[MetaObject]
+
+    if (metaObject.clazz == key) {
       val first :: rest = fields
-      var result: Any = value(first)
+      var result: Any = metaObject(first)
       for (other <- rest) {
-        result = core.grammar.~(result, value(other))
+        result = core.grammar.~(result, metaObject(other))
       }
       Some(result)
     } else {
@@ -32,8 +46,8 @@ trait GrammarTransformation extends Injector with GrammarDocumentWriter {
     }
   }
 
-  def tildeValuesToSeq(value: Any) : Seq[Any] = value match {
-    case ~(l,r) => tildeValuesToSeq(l) ++ tildeValuesToSeq(r)
+  def tildeValuesToSeq(value: Any): Seq[Any] = value match {
+    case ~(l, r) => tildeValuesToSeq(l) ++ tildeValuesToSeq(r)
     case _ => Seq(value)
   }
 

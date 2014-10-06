@@ -67,6 +67,8 @@ trait GrammarDocument extends GrammarDocumentWriter {
     })
   }
 
+  def inParenthesis = ("(" : GrammarDocument) ~> this <~ ")"
+
   def ~(other: GrammarDocument) = new Sequence(this, other)
 
   def ~>(right: GrammarDocument) = new IgnoreLeft(this, right)
@@ -150,7 +152,7 @@ case class Choice(left: GrammarDocument, right: GrammarDocument) extends Grammar
 
 case class Sequence(first: GrammarDocument, second: GrammarDocument) extends GrammarDocument with SequenceLike
 
-case class MapGrammar(inner: GrammarDocument, construct: Any => Any, deconstruct: Any => Option[Any]) extends GrammarDocument
+case class MapGrammar(inner: GrammarDocument, construct: Any => Any, deconstruct: Any => Option[Any]) extends GrammarDocument //TODO change option into Try.
 
 class Labelled(val name: AnyRef, var inner: GrammarDocument = FailureGD) extends GrammarDocument {
 

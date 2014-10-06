@@ -1,9 +1,14 @@
 package transformations.bytecode
 
-import core.transformation.grammars.{ProgramGrammar, GrammarCatalogue}
+import core.document.Empty
+import core.grammar.StringLiteral
+import core.grammarDocument.GrammarDocument
+import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.classes.ConstantPool
+import transformations.bytecode.CodeAnnotation.CodeAttributeId
+import transformations.bytecode.StackMapTableC.StackMapTableId
+import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._
 
 import scala.collection.mutable
@@ -217,12 +222,58 @@ object ByteCodeSkeleton extends GrammarTransformation {
 
   object FieldRefNameAndTypeIndex
 
+  private object EnrichedClassConstantEntry
+
+  private object ClassConstantEntryIndex
+
+  private object ClassConstantEntryContent
+
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
 
-    val constantPool = "ConstantPool:"
-    val classGrammar = grammars.create(ClassFileKey, "class" ~~ identifier %% constantPool)
+    val codeAttribute = "Code" ~> produce(CodeAttributeId)
+    val stackMapTableAttribute = "StackMapTable" ~> produce(StackMapTableId)
+    val methodRef = "method reference:" ~~> (number <~ ".") ~ number ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+    val fieldRef = "field reference:" ~~> (number <~ ".") ~ number ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+    val classRefKey = "class reference:" ~~> number ^^ parseMap(ClassRefKey, ClassRefName)
+    val nameAndType = "name and type: " ~~> (number <~ ":") ~ number ^^ parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
+    val parseType : GrammarDocument = grammars.find(TypeC.TypeGrammar)
+    val methodDescriptor = (parseType ~~ parseType.manySeparated(";").inParenthesis) ^^
+      parseMap(MethodDescriptor, MethodReturnType, MethodDescriptorParameters)
+    val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
+    val qualifiedClassName: GrammarDocument = getQualifiedClassNameParser
+    val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar) // TODO object type shouldn't be in the constantPool.
+    val constantPoolItemContent = utf8 | qualifiedClassName | classRefKey | methodDescriptor | nameAndType |
+      methodRef | codeAttribute | objectTypeGrammar | fieldRef | stackMapTableAttribute
+    val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
+      parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
+    val constantPool = "ConstantPool:" %> constantPoolItem.manySeparatedVertical(Empty) ^^ biMapClassConstantEntryEnrichment
+    val classGrammar = grammars.create(ClassFileKey, "class" ~~> identifier %% constantPool ^^
+      parseMap(ClassFileKey, ClassNameIndexKey, ClassConstantPool))
 
     program.inner = classGrammar
+  }
+
+  def getQualifiedClassNameParser: GrammarDocument = {
+    val construct: Any => Any = {
+      case ids: Seq[Any] =>
+        val stringIds = ids.collect({ case v: String => v})
+        new QualifiedClassName(stringIds)
+    }
+    val parseQualifiedClassName = identifier.someSeparated(".") ^^(construct, {
+      case QualifiedClassName(stringIds) => Some(stringIds)
+      case _ => None
+    })
+    parseQualifiedClassName
+  }
+
+  def biMapClassConstantEntryEnrichment: ((Any) => Seq[Any], (Any) => Some[Seq[MetaObject]]) = {
+    ( {
+      case items: Seq[MetaObject] => items.map(i => i(ClassConstantEntryContent))
+    }, {
+      case items: Seq[Any] => Some(items.zipWithIndex.map(p => new MetaObject(EnrichedClassConstantEntry,
+        ClassConstantEntryIndex -> (p._2.asInstanceOf[Int] + 1),
+        ClassConstantEntryContent -> p._1)))
+    })
   }
 }

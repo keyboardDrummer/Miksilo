@@ -52,7 +52,8 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getJavaCompilerPreset: Preset = {
-    new Preset("Java", JavaCompiler.javaCompilerTransformations)
+    val implicits = JavaCompiler.javaCompilerTransformations
+    new Preset("Java", JavaCompiler.spliceBeforeTransformations(implicits, Seq(PerformCockpitOutputAction)))
   }
 
   def getPrettyPrintPreset = {
@@ -66,10 +67,8 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   def getAddImplicitsPreset: Preset = {
     val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
-    val implicitsSet = implicits.toSet
-    val transformations = implicits ++ Seq(PerformCockpitOutputAction) ++
-      JavaCompiler.javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
-    new Preset("Reveal Java Implicits", transformations)
+
+    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(PerformCockpitOutputAction)))
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {

@@ -145,7 +145,7 @@ object PrintByteCode extends ProgramTransformation {
             case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
           }
         case CodeAnnotation.CodeAttributeId => toUTF8ConstantEntry("Code")
-        case StackMapTable.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
+        case StackMapTableC.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
         case LineNumberTable.LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
         case SourceFileId => toUTF8ConstantEntry("SourceFile")
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
@@ -154,19 +154,19 @@ object PrintByteCode extends ProgramTransformation {
     }
 
     def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
-      val offset = StackMapTable.getFrameOffset(frame)
+      val offset = StackMapTableC.getFrameOffset(frame)
       frame.clazz match {
-        case StackMapTable.SameFrameKey =>
+        case StackMapTableC.SameFrameKey =>
           if (offset > 63)
             byteToBytes(251) ++ shortToBytes(offset)
           else
             byteToBytes(offset)
-        case StackMapTable.AppendFrame =>
-          val localVerificationTypes = StackMapTable.getAppendFrameTypes(frame)
+        case StackMapTableC.AppendFrame =>
+          val localVerificationTypes = StackMapTableC.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
             shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(clazz, info, state))
-        case StackMapTable.SameLocals1StackItem =>
-          val _type = StackMapTable.getSameLocals1StackItemType(frame)
+        case StackMapTableC.SameLocals1StackItem =>
+          val _type = StackMapTableC.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
             byteToBytes(code) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
@@ -177,7 +177,7 @@ object PrintByteCode extends ProgramTransformation {
     }
 
     def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
-      val entries = StackMapTable.getStackMapTableEntries(attribute)
+      val entries = StackMapTableC.getStackMapTableEntries(attribute)
       shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
     }
 
@@ -211,7 +211,7 @@ object PrintByteCode extends ProgramTransformation {
             getCodeAttributeBytes(attribute)
           case LineNumberTable.LineNumberTableKey =>
             getLineNumberTableBytes(attribute)
-          case StackMapTable.StackMapTableKey => getStackMapTableBytes(attribute)
+          case StackMapTableC.StackMapTableKey => getStackMapTableBytes(attribute)
           case ByteCodeSkeleton.SourceFileAttribute => getSourceFileBytes(attribute)
         })
     }

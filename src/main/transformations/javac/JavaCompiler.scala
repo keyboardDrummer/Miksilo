@@ -2,6 +2,7 @@ package transformations.javac
 
 import core.transformation._
 import core.transformation.sillyCodePieces.Injector
+import transformations.bytecode._
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -9,7 +10,6 @@ import transformations.bytecode.coreInstructions.longs.{CompareLongC, LoadLongC,
 import transformations.bytecode.coreInstructions.objects.{LoadAddressC, PushNullC, StoreAddressC}
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets, PoptimizeC}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -54,7 +54,9 @@ object JavaCompiler {
 
   def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations
 
-  def byteCodeTransformations = byteCodeInstructions ++ Seq(ByteCodeSkeleton) ++ typeTransformations
+  def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
+
+  def byteCodeWithoutInstructions = Seq(StackMapTableC, LineNumberTable, CodeAnnotation, ByteCodeSkeleton) ++ typeTransformations
 
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
@@ -71,6 +73,16 @@ object JavaCompiler {
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
 
   def getTransformer = new Transformer(javaCompilerTransformations)
+
+  def spliceBeforeTransformations(implicits: Seq[Injector], splice: Seq[Injector]): Seq[Injector] = {
+    val implicitsSet = implicits.toSet
+    javaCompilerTransformations.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+  }
+
+  def spliceAfterTransformations(implicits: Seq[Injector], splice: Seq[Injector]): Seq[Injector] = {
+    val implicitsSet = implicits.toSet
+    implicits ++ splice ++ javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
+  }
 }
 
 

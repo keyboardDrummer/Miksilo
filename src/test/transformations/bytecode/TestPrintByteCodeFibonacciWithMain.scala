@@ -63,8 +63,8 @@ class TestPrintByteCodeFibonacciWithMain {
       IntegerReturnInstructionC.integerReturn
     )
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
-    val stackMapTable = StackMapTable.stackMapTable(15, Seq(StackMapTable.sameFrame(9),
-      StackMapTable.sameFrameLocals1StackItem(12, IntTypeC.intType)))
+    val stackMapTable = StackMapTableC.stackMapTable(15, Seq(StackMapTableC.sameFrame(9),
+      StackMapTableC.sameFrameLocals1StackItem(12, IntTypeC.intType)))
     val method = ByteCodeSkeleton.methodInfo(13, 14, Seq(CodeAnnotation.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
     method
@@ -86,7 +86,7 @@ class TestPrintByteCodeFibonacciWithMain {
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
       ByteCodeSkeleton.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
-      StackMapTable.StackMapTableId,
+      StackMapTableC.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Fibonacci.java",
       ByteCodeSkeleton.nameAndType(7, 8),

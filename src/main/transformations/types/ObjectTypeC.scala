@@ -14,6 +14,7 @@ object ObjectTypeC extends TypeInstance {
 
   def stackObjectType(constantPoolClassRef: Int) = new MetaObject(ObjectTypeKey, ObjectTypeName -> constantPoolClassRef)
 
+  object ObjectTypeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val parseType = grammars.find(TypeC.TypeGrammar)
     val construct: Any => Any = {
@@ -28,7 +29,8 @@ object ObjectTypeC extends TypeInstance {
       case Right(QualifiedClassName(stringIds)) => stringIds
       case Left(string) => Seq(string)
     })
-    val parseObjectType = identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName)
+    val parseObjectType = grammars.create(ObjectTypeGrammar,
+      identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
     parseType.inner = parseType.inner | parseObjectType
   }
 

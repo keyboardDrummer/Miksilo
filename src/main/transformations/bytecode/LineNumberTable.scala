@@ -22,5 +22,7 @@ object LineNumberTable extends GrammarTransformation {
 
   object LineNumberTableId
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = ???
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+
+  }
 }
