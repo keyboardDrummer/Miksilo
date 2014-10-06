@@ -51,7 +51,7 @@ class TestRecursion extends GrammarDocumentWriter {
 
     val result = getExpectedLeftRecursiveResult
 
-    val document = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument)
+    val document = BiGrammarToDocument.toDocument(result, grammarDocument)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }
@@ -67,7 +67,7 @@ class TestRecursion extends GrammarDocumentWriter {
     inner.addOption(outer ~ "!")
     inner.addOption(produce(null))
 
-    val document = PrintValueUsingGrammarDocument.toDocument(getExpectedLeftRecursiveResult, outer)
+    val document = BiGrammarToDocument.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }

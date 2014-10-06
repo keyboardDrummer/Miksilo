@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.document.{Empty, BlankLine}
-import core.grammarDocument.GrammarDocument
+import core.grammarDocument.BiGrammar
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
@@ -88,9 +88,9 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val classMethod = grammars.find(MethodC.MethodGrammar)
 
-    val classMember: GrammarDocument = grammars.create(ClassMemberGrammar, classMethod)
+    val classMember: BiGrammar = grammars.create(ClassMemberGrammar, classMethod)
     val importGrammar = grammars.create(ImportGrammar)
-    val importsGrammar: GrammarDocument = importGrammar.manySeparatedVertical(Empty)
+    val importsGrammar: BiGrammar = importGrammar.manySeparatedVertical(Empty)
     val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}")
     val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % _classContent ^^

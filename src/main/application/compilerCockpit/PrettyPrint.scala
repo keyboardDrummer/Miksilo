@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.grammarDocument.{GrammarDocument, PrintFailure, PrintValueUsingGrammarDocument}
+import core.grammarDocument.{BiGrammar, PrintFailure, BiGrammarToDocument}
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.TransformationState
 import core.transformation.grammars.ProgramGrammar
@@ -15,8 +15,8 @@ object PrettyPrint extends CompileOption {
   }
 
   override def leave(state: TransformationState): Unit = {
-    val programGrammar = state.data(this).asInstanceOf[GrammarDocument]
-    val document: ResponsiveDocument = Try(PrintValueUsingGrammarDocument.toDocument(state.program, programGrammar)).
+    val programGrammar = state.data(this).asInstanceOf[BiGrammar]
+    val document: ResponsiveDocument = Try(BiGrammarToDocument.toDocument(state.program, programGrammar)).
       recover({ case e: PrintFailure => e.toDocument }).get
     val result = document.renderString()
     OutputOption.setOutput(state, result)

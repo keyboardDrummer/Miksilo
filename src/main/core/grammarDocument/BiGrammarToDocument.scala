@@ -33,12 +33,12 @@ case class FoundProduceWithNotEqualValue(expected: Any) extends Throwable {
 
 object EncounteredFailure extends Throwable
 
-object PrintValueUsingGrammarDocument {
+object BiGrammarToDocument {
 
-  def toDocument(outerValue: Any, grammar: GrammarDocument): ResponsiveDocument = {
+  def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     var labelledValues: Map[Labelled, Any] = Map.empty
 
-    def toDocumentCached(value: Any, grammar: GrammarDocument): Try[ResponsiveDocument] = grammar.simplify match {
+    def toDocumentCached(value: Any, grammar: BiGrammar): Try[ResponsiveDocument] = grammar.simplify match {
 
       case Sequence(first, second) =>
         foldProduct(value, first, second, (left, right) => left ~ right)
@@ -74,7 +74,7 @@ object PrintValueUsingGrammarDocument {
       case Print(document) => Try(document)
     }
 
-    def foldProduct(value: Any, first: GrammarDocument, second: GrammarDocument,
+    def foldProduct(value: Any, first: BiGrammar, second: BiGrammar,
                     combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument):
     Try[ResponsiveDocument] = {
       extractProduct(value).flatMap({ case ~(firstValue, secondValue) =>
@@ -82,7 +82,7 @@ object PrintValueUsingGrammarDocument {
       })
     }
 
-    def foldSequence(value: Any, inner: GrammarDocument, combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument):
+    def foldSequence(value: Any, inner: BiGrammar, combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument):
     Try[ResponsiveDocument] = {
       for {
         valueSequence <- Try.apply(value.asInstanceOf[Seq[Any]]).recoverWith({ case e: ClassCastException => emptyFailure(value, e)})

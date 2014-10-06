@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.document.Empty
 import core.grammar.StringLiteral
-import core.grammarDocument.GrammarDocument
+import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
@@ -237,11 +237,11 @@ object ByteCodeSkeleton extends GrammarTransformation {
     val fieldRef = "field reference:" ~~> (number <~ ".") ~ number ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
     val classRefKey = "class reference:" ~~> number ^^ parseMap(ClassRefKey, ClassRefName)
     val nameAndType = "name and type: " ~~> (number <~ ":") ~ number ^^ parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
-    val parseType : GrammarDocument = grammars.find(TypeC.TypeGrammar)
+    val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
     val methodDescriptor = (parseType ~~ parseType.manySeparated(";").inParenthesis) ^^
       parseMap(MethodDescriptor, MethodReturnType, MethodDescriptorParameters)
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
-    val qualifiedClassName: GrammarDocument = getQualifiedClassNameParser
+    val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
     val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar) // TODO object type shouldn't be in the constantPool.
     val constantPoolItemContent = utf8 | qualifiedClassName | classRefKey | methodDescriptor | nameAndType |
       methodRef | codeAttribute | objectTypeGrammar | fieldRef | stackMapTableAttribute
@@ -254,7 +254,7 @@ object ByteCodeSkeleton extends GrammarTransformation {
     program.inner = classGrammar
   }
 
-  def getQualifiedClassNameParser: GrammarDocument = {
+  def getQualifiedClassNameParser: BiGrammar = {
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})

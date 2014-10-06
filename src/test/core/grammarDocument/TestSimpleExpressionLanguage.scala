@@ -61,10 +61,10 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
 
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled("expression")
-    val parenthesis: GrammarDocument = "(" ~> expression <~ ")"
+    val parenthesis: BiGrammar = "(" ~> expression <~ ")"
 
 
-    val number: GrammarDocument = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
+    val number: BiGrammar = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
       case Value(i) => Some(i)
       case _ => None
     })
@@ -81,7 +81,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled("add")
-    val add: GrammarDocument = (addLabel <~~ "+") ~~ addLabel ^^( {
+    val add: BiGrammar = (addLabel <~~ "+") ~~ addLabel ^^( {
       case core.grammar.~(l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
       case Add(l, r) => Some(core.grammar.~(l, r))
@@ -90,7 +90,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     addLabel.addOption(add)
     addLabel.addOption(multipleLabel)
 
-    val _if: GrammarDocument = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
+    val _if: BiGrammar = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
       case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
     }, {
       case IfNotZero(cond, then, _else) => Some(core.grammar.~(core.grammar.~(cond, then), _else))

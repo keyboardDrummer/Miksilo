@@ -11,7 +11,7 @@ import scala.util.parsing.input.CharArrayReader
 
 object TestGrammarUtils {
 
-  def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: GrammarDocument) {
+  def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar) {
     val grammar: Grammar = GrammarDocumentToGrammar.toGrammar(grammarDocument)
 
     val packrat: ToPackrat = new ToPackrat()
@@ -25,7 +25,7 @@ object TestGrammarUtils {
     expectedOption.foreach(expected =>
       Assert.assertEquals(expected, result))
 
-    val documentResult = PrintValueUsingGrammarDocument.toDocument(result, grammarDocument).renderString()
+    val documentResult = BiGrammarToDocument.toDocument(result, grammarDocument).renderString()
     Assert.assertEquals(example, documentResult)
   }
 
@@ -35,7 +35,7 @@ object TestGrammarUtils {
 
   def getPrintResult(value: Any, grammarTransformer: Any = ProgramGrammar): String = {
     val document = getGrammarUsingTransformer(grammarTransformer)
-    PrintValueUsingGrammarDocument.toDocument(value, document).renderString()
+    BiGrammarToDocument.toDocument(value, document).renderString()
   }
 
   def getGrammarUsingTransformer(grammarTransformer: Any): Labelled = {
