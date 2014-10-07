@@ -7,8 +7,7 @@ object BiGrammarToGrammar {
     override def labelledEnter(name: AnyRef): Grammar = new core.grammar.Labelled(name)
 
     override def handleGrammar(self: BiGrammar, recursive: (BiGrammar) => Grammar): Grammar = self match {
-      case Sequence(first, second) => core.grammar.Sequence(recursive(first), recursive(second))
-      case TopBottom(top, bottom) => core.grammar.Sequence(recursive(top), recursive(bottom))
+      case sequence: SequenceLike => core.grammar.Sequence(recursive(sequence.first), recursive(sequence.second))
       case Choice(first, second) => core.grammar.Choice(recursive(first), recursive(second))
       case Consume(consume) => consume
       case Keyword(keyword) => core.grammar.Keyword(keyword)

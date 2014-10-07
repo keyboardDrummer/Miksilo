@@ -134,6 +134,8 @@ trait BiGrammarObserver[Result] {
 }
 
 trait SequenceLike extends BiGrammar {
+  def first: BiGrammar
+  def second: BiGrammar
   def ignoreLeft: MapGrammar = {
     new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(MissingValue, r)))
   }
@@ -170,8 +172,8 @@ class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGra
   }
 }
 
-case class TopBottom(top: BiGrammar, bottom: BiGrammar) extends BiGrammar with SequenceLike {
-  override lazy val height = top.height + bottom.height
+case class TopBottom(first: BiGrammar, second: BiGrammar) extends BiGrammar with SequenceLike {
+  override lazy val height = first.height + second.height
 }
 
 case class Print(document: ResponsiveDocument) extends BiGrammar
