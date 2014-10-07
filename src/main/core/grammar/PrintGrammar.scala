@@ -1,6 +1,6 @@
 package core.grammar
 
-import core.grammarDocument.GrammarDocumentToGrammar
+import core.grammarDocument.BiGrammarToGrammar
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 
@@ -10,7 +10,7 @@ import scala.util.matching.Regex
 object PrintGrammar {
 
   def toDocument(catalogue: GrammarCatalogue) = {
-    val program = GrammarDocumentToGrammar.toGrammar(catalogue.find(ProgramGrammar))
+    val program = BiGrammarToGrammar.toGrammar(catalogue.find(ProgramGrammar))
     printReachableGrammars(program)
   }
 

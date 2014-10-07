@@ -1,7 +1,7 @@
 package core.transformation
 
 import core.grammar.ToPackrat
-import core.grammarDocument.{FailureGD, GrammarDocumentToGrammar, Labelled}
+import core.grammarDocument.{BiFailure, BiGrammarToGrammar, Labelled}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 
@@ -11,7 +11,7 @@ object GrammarDocumentUtil {
 
   def getGrammarFromTransformations(transformations: Seq[GrammarTransformation]): Labelled = {
     val grammars: GrammarCatalogue = new GrammarCatalogue()
-    grammars.create(ProgramGrammar, FailureGD)
+    grammars.create(ProgramGrammar, BiFailure)
     for (transformation <- transformations) {
       transformation.transformGrammars(grammars)
     }
@@ -32,7 +32,7 @@ class TransformationsToPackrat extends ToPackrat {
   }
 
   def buildParser(programGrammarDocument: Labelled): (String) => ParseResult[Any] = {
-    val programGrammar = GrammarDocumentToGrammar.toGrammar(programGrammarDocument)
+    val programGrammar = BiGrammarToGrammar.toGrammar(programGrammarDocument)
     input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }
 }

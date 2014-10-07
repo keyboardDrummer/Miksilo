@@ -1,6 +1,6 @@
 package core.transformation
 
-import core.grammarDocument.FailureGD
+import core.grammarDocument.BiFailure
 import core.modularProgram.StoppableState
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 
@@ -16,5 +16,5 @@ class TransformationState() extends StoppableState {
 
   def getGUID: Long = Random.nextLong()
 
-  grammarCatalogue.create(ProgramGrammar, FailureGD)
+  grammarCatalogue.create(ProgramGrammar, BiFailure)
 }

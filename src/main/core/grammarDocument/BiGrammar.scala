@@ -1,11 +1,9 @@
 package core.grammarDocument
 
-import core.document.{BlankLine, WhiteSpace, Document}
-import core.grammar.{PrintGrammar, Grammar, NumberG, Identifier}
-import core.grammar.~
+import core.document.{BlankLine, Document, WhiteSpace}
+import core.grammar.{Grammar, Identifier, NumberG, PrintGrammar, ~}
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.MetaObject
-import scala.collection.mutable
 
 trait GrammarDocumentWriter {
 
@@ -13,7 +11,7 @@ trait GrammarDocumentWriter {
 
   def number: BiGrammar = consume(NumberG)
 
-  def failure: BiGrammar = FailureGD
+  def failure: BiGrammar = BiFailure
 
   def produce(value: Any): BiGrammar = new Produce(value)
 
@@ -22,7 +20,9 @@ trait GrammarDocumentWriter {
   def keyword(word: String): BiGrammar = new Keyword(word)
 
   implicit def consume(grammar: Grammar) = new Consume(grammar)
+
   implicit def print(document: ResponsiveDocument) = new Print(document)
+
   implicit def print(document: Document) = new Print(document)
 
   implicit def stringToGrammar(value: String): BiGrammar =
@@ -34,9 +34,10 @@ trait GrammarDocumentWriter {
 
 trait BiGrammar extends GrammarDocumentWriter {
 
-  override def toString = PrintGrammar.toDocument(GrammarDocumentToGrammar.toGrammar(this)).renderString(false)
+  override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(false)
 
-  def simplify: BiGrammar = this
+  def simplifySelf: BiGrammar = this
+  def simplify = SimplifyBiGrammar.observe(this)
 
   lazy val height = 1
 
@@ -67,7 +68,7 @@ trait BiGrammar extends GrammarDocumentWriter {
     })
   }
 
-  def inParenthesis = ("(" : BiGrammar) ~> this <~ ")"
+  def inParenthesis = ("(": BiGrammar) ~> this <~ ")"
 
   def ~(other: BiGrammar) = new Sequence(this, other)
 
@@ -79,7 +80,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def %(bottom: BiGrammar) = new TopBottom(this, bottom)
 
-  def %%(bottom: BiGrammar): BiGrammar  = {
+  def %%(bottom: BiGrammar): BiGrammar = {
     (this %< BlankLine) % bottom
   }
 
@@ -89,36 +90,57 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def ^^(map: (Any => Any, Any => Option[Any])): BiGrammar = new MapGrammar(this, map._1, map._2)
 
-  def indent(width: Int) = new WhiteSpace(width,0) ~> this
+  def indent(width: Int) = new WhiteSpace(width, 0) ~> this
 
-  def deepClone: BiGrammar = {
-    val map = new mutable.HashMap[BiGrammar, BiGrammar]
-    def helper(_grammar: BiGrammar): BiGrammar = {
-      val grammar = _grammar.simplify
-      if (map.contains(grammar))
-        return map(grammar)
+  def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
+}
 
-      map.getOrElseUpdate(grammar, grammar match {
-        case Choice(first, second) => Choice(helper(first), helper(second))
-        case labelled:Labelled =>
-          val clone = new Labelled(labelled.name)
-          map.put(labelled, clone)
-          clone.inner = helper(labelled.inner)
-          clone
-        case many:ManyVertical => new ManyVertical(helper(many.inner))
-        case many:ManyHorizontal => new ManyHorizontal(helper(many.inner))
-        case MapGrammar(inner, construct, deconstruct) => MapGrammar(helper(inner),construct, deconstruct)
-        case Sequence(first, second) => Sequence(helper(first), helper(second))
-        case TopBottom(top,bottom) => TopBottom(helper(top),helper(bottom))
-        case _ => grammar
-      })
-    }
-    helper(this)
+class DeepCloneBiGrammar extends BiGrammarObserver[BiGrammar] {
+
+  override def labelledEnter(name: AnyRef): BiGrammar = new Labelled(name)
+
+  override def labelledLeave(inner: BiGrammar, partial: BiGrammar): Unit = partial.asInstanceOf[Labelled].inner = inner
+
+  override def handleGrammar(self: BiGrammar, helper: (BiGrammar) => BiGrammar): BiGrammar = self match {
+    case Choice(first, second) => Choice(helper(first), helper(second))
+    case many: ManyVertical => new ManyVertical(helper(many.inner))
+    case many: ManyHorizontal => new ManyHorizontal(helper(many.inner))
+    case MapGrammar(inner, construct, deconstruct) => MapGrammar(helper(inner), construct, deconstruct)
+    case Sequence(first, second) => Sequence(helper(first), helper(second))
+    case TopBottom(top, bottom) => TopBottom(helper(top), helper(bottom))
+    case _ => self
   }
 }
 
-trait SequenceLike extends BiGrammar
-{
+object SimplifyBiGrammar extends DeepCloneBiGrammar {
+  override def handleGrammar(self: BiGrammar, helper: (BiGrammar) => BiGrammar): BiGrammar = super.handleGrammar(self.simplifySelf, helper)
+}
+
+trait BiGrammarObserver[Result] {
+
+  def labelledEnter(name: AnyRef): Result
+
+  def labelledLeave(inner: Result, partial: Result)
+
+  def handleGrammar(self: BiGrammar, recursive: BiGrammar => Result): Result
+
+  def observe(grammar: BiGrammar) = {
+    var cache = Map.empty[Labelled, Result]
+    def helper(grammar: BiGrammar): Result = grammar match {
+      case labelled: Labelled =>
+        cache.getOrElse(labelled, {
+          val result = labelledEnter(labelled.name)
+          cache += labelled -> result
+          labelledLeave(helper(labelled.inner), result)
+          result
+        })
+      case grammar => handleGrammar(grammar, helper)
+    }
+    helper(grammar)
+  }
+}
+
+trait SequenceLike extends BiGrammar {
   def ignoreLeft: MapGrammar = {
     new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(MissingValue, r)))
   }
@@ -135,34 +157,35 @@ case class Keyword(value: String) extends BiGrammar
 case class Consume(grammar: Grammar) extends BiGrammar
 
 abstract case class Many(inner: BiGrammar) extends BiGrammar
+
 class ManyVertical(inner: BiGrammar) extends Many(inner)
+
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
 object MissingValue
 
 case class IgnoreLeft(first: BiGrammar, second: BiGrammar) extends BiGrammar {
-  override def simplify = new Sequence(first, second).ignoreLeft
+  override def simplifySelf = new Sequence(first, second).ignoreLeft
 }
 
 case class IgnoreRight(first: BiGrammar, second: BiGrammar) extends BiGrammar {
-  override def simplify = new Sequence(first, second).ignoreRight
+  override def simplifySelf = new Sequence(first, second).ignoreRight
 }
 
 case class Choice(left: BiGrammar, right: BiGrammar) extends BiGrammar
 
 case class Sequence(first: BiGrammar, second: BiGrammar) extends BiGrammar with SequenceLike
 
-case class MapGrammar(inner: BiGrammar, construct: Any => Any, deconstruct: Any => Option[Any]) extends BiGrammar //TODO change option into Try.
+case class MapGrammar(inner: BiGrammar, construct: Any => Any, deconstruct: Any => Option[Any]) extends BiGrammar
 
-class Labelled(val name: AnyRef, var inner: BiGrammar = FailureGD) extends BiGrammar {
+class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGrammar {
 
   def addOption(addition: BiGrammar) {
     inner = inner | addition
   }
 }
 
-case class TopBottom(top: BiGrammar, bottom: BiGrammar) extends BiGrammar with SequenceLike
-{
+case class TopBottom(top: BiGrammar, bottom: BiGrammar) extends BiGrammar with SequenceLike {
   override lazy val height = top.height + bottom.height
 }
 
@@ -170,4 +193,8 @@ case class Print(document: ResponsiveDocument) extends BiGrammar
 
 case class Produce(result: Any) extends BiGrammar
 
-object FailureGD extends BiGrammar
+case class RowRepeater(inners: Seq[BiGrammar], construct: Seq[Any] => Any, deconstruct: Any => Option[Seq[Any]]) extends BiGrammar
+{
+}
+
+object BiFailure extends BiGrammar

@@ -38,7 +38,7 @@ object BiGrammarToDocument {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     var labelledValues: Map[Labelled, Any] = Map.empty
 
-    def toDocumentCached(value: Any, grammar: BiGrammar): Try[ResponsiveDocument] = grammar.simplify match {
+    def toDocumentCached(value: Any, grammar: BiGrammar): Try[ResponsiveDocument] = grammar match {
 
       case Sequence(first, second) =>
         foldProduct(value, first, second, (left, right) => left ~ right)
@@ -48,8 +48,7 @@ object BiGrammarToDocument {
             pickBestFailure(leftFailure, rightFailure)
           })
         })
-      case Consume(consume) =>
-        Try(value.toString)
+      case Consume(consume) => Try(value.toString)
       case Keyword(keyword) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled =>
@@ -67,7 +66,7 @@ object BiGrammarToDocument {
       } yield result
       case TopBottom(top, bottom) =>
         foldProduct(value, top, bottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
-      case FailureGD => emptyFailure(value, EncounteredFailure, -10000)
+      case BiFailure => emptyFailure(value, EncounteredFailure, -10000)
       case Produce(producedValue) =>
         if (Objects.equals(producedValue, value)) Try(Empty)
         else emptyFailure(value, FoundProduceWithNotEqualValue(producedValue), -100)
@@ -92,7 +91,7 @@ object BiGrammarToDocument {
       } yield result
     }
 
-    toDocumentCached(outerValue, grammar).get
+    toDocumentCached(outerValue, grammar.simplify).get
   }
 
   def pickBestFailure(left: PrintFailure, right: PrintFailure): Try[ResponsiveDocument] =

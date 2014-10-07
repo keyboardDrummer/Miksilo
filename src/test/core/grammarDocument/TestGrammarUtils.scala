@@ -12,7 +12,7 @@ import scala.util.parsing.input.CharArrayReader
 object TestGrammarUtils {
 
   def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar) {
-    val grammar: Grammar = GrammarDocumentToGrammar.toGrammar(grammarDocument)
+    val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
 
     val packrat: ToPackrat = new ToPackrat()
     val packratParser = packrat.convert(grammar)
