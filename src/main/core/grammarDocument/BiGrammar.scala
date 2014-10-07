@@ -36,12 +36,9 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(false)
 
-  def simplifySelf: BiGrammar = this
-  def simplify = SimplifyBiGrammar.observe(this)
-
   lazy val height = 1
 
-  def <~(right: BiGrammar) = new IgnoreRight(this, right)
+  def <~(right: BiGrammar) = new Sequence(this, right).ignoreRight
 
   def <~~(right: BiGrammar) = this <~ (space ~ right)
 
@@ -72,7 +69,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def ~(other: BiGrammar) = new Sequence(this, other)
 
-  def ~>(right: BiGrammar) = new IgnoreLeft(this, right)
+  def ~>(right: BiGrammar) = new Sequence(this, right).ignoreLeft
 
   def ~~>(right: BiGrammar) = (this ~ space) ~> right
 
@@ -112,10 +109,6 @@ class DeepCloneBiGrammar extends BiGrammarObserver[BiGrammar] {
   }
 }
 
-object SimplifyBiGrammar extends DeepCloneBiGrammar {
-  override def handleGrammar(self: BiGrammar, helper: (BiGrammar) => BiGrammar): BiGrammar = super.handleGrammar(self.simplifySelf, helper)
-}
-
 trait BiGrammarObserver[Result] {
 
   def labelledEnter(name: AnyRef): Result
@@ -134,7 +127,7 @@ trait BiGrammarObserver[Result] {
           labelledLeave(helper(labelled.inner), result)
           result
         })
-      case grammar => handleGrammar(grammar, helper)
+      case _ => handleGrammar(grammar, helper)
     }
     helper(grammar)
   }
@@ -163,14 +156,6 @@ class ManyVertical(inner: BiGrammar) extends Many(inner)
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
 object MissingValue
-
-case class IgnoreLeft(first: BiGrammar, second: BiGrammar) extends BiGrammar {
-  override def simplifySelf = new Sequence(first, second).ignoreLeft
-}
-
-case class IgnoreRight(first: BiGrammar, second: BiGrammar) extends BiGrammar {
-  override def simplifySelf = new Sequence(first, second).ignoreRight
-}
 
 case class Choice(left: BiGrammar, right: BiGrammar) extends BiGrammar
 

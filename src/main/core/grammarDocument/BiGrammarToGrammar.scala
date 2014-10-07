@@ -23,5 +23,5 @@ object BiGrammarToGrammar {
     override def labelledLeave(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner
   }
   
-  def toGrammar(grammar: BiGrammar): Grammar = Observer.observe(grammar.simplify)
+  def toGrammar(grammar: BiGrammar): Grammar = Observer.observe(grammar)
 }

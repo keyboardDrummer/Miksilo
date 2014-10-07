@@ -91,7 +91,7 @@ object BiGrammarToDocument {
       } yield result
     }
 
-    toDocumentCached(outerValue, grammar.simplify).get
+    toDocumentCached(outerValue, grammar).get
   }
 
   def pickBestFailure(left: PrintFailure, right: PrintFailure): Try[ResponsiveDocument] =
