@@ -6,7 +6,7 @@ import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
+import transformations.bytecode.attributes.{CodeAttribute, Instruction, SourceFileAttribute}
 import transformations.bytecode.constants._
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._

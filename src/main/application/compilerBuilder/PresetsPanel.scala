@@ -8,7 +8,6 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import application.StyleSheet
 import application.compilerCockpit.PerformCockpitOutputAction
 import core.transformation.sillyCodePieces.Injector
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
@@ -57,7 +56,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getJavaCompiler: Seq[Injector] = {
-    JavaCompiler.spliceBeforeTransformations(Seq(ByteCodeSkeleton) ++ JavaCompiler.typeTransformations, Seq(PerformCockpitOutputAction))
+    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeWithoutInstructions, Seq(PerformCockpitOutputAction))
   }
 
   def getPrettyPrintPreset = {

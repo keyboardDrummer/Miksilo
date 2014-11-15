@@ -64,7 +64,6 @@ object StackMapTableAttribute extends GrammarTransformation {
     data.put(OffsetDelta, offset)
   }
 
-
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(StackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
