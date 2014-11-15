@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.transformation.Contract
-import transformations.bytecode.LabelledTargets
+import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.extraBooleanInstructions.ExpandInstructionsC
 import transformations.javac.JavaCompiler
 

@@ -1,7 +1,8 @@
 package transformations.bytecode
 
 import core.transformation.{TransformationState, MetaObject}
-import transformations.bytecode.LabelledTargets.LabelKey
+import transformations.bytecode.additions.LabelledTargets
+import LabelledTargets.LabelKey
 import transformations.javac.classes.ConstantPool
 
 object Instructions {

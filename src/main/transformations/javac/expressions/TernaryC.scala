@@ -2,7 +2,7 @@ package transformations.javac.expressions
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.LabelledTargets
+import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.types.{BooleanTypeC, TypeC}
 

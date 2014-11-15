@@ -1,8 +1,10 @@
-package transformations.bytecode
+package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.PopC
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
 
 object PoptimizeC extends ProgramTransformation {
@@ -13,8 +15,8 @@ object PoptimizeC extends ProgramTransformation {
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAnnotation.CodeKey).get
-      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
+      val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
       val stackModRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
       def getInOutSizes(instruction: MetaObject) = {
@@ -54,7 +56,7 @@ object PoptimizeC extends ProgramTransformation {
       for (instruction <- instructions.reverse) {
         processInstruction(instruction)
       }
-      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions.toSeq
+      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions.toSeq
     }
   }
 }

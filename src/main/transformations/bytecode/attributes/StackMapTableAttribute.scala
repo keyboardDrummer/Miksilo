@@ -1,10 +1,11 @@
-package transformations.bytecode
+package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 
-object StackMapTableC extends GrammarTransformation {
+object StackMapTableAttribute extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -63,7 +64,10 @@ object StackMapTableC extends GrammarTransformation {
     data.put(OffsetDelta, offset)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(StackMapTableId)
+    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
+    constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
   }
 }

@@ -3,9 +3,11 @@ package transformations.bytecode.extraBooleanInstructions
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.bytecode.{CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 
@@ -23,16 +25,16 @@ object ExpandInstructionsC extends ProgramTransformation {
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[MetaObject] = CodeAnnotation.getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
     def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
-      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
+      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val newInstructions: Seq[MetaObject] = getNewInstructions(instructions)
-      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[MetaObject]) = {

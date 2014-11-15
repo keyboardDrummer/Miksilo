@@ -2,7 +2,7 @@ package transformations.bytecode.coreInstructions
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 
 object VoidReturnInstructionC extends InstructionC {

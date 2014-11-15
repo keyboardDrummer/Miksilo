@@ -2,8 +2,10 @@ package transformations.bytecode
 
 import core.transformation.{MetaObject, CompilerFromTransformations}
 import org.junit.{Assert, Test}
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.PopC
+import transformations.bytecode.additions.PoptimizeC
 import transformations.javac.JavaCompiler
 
 import scala.collection.mutable.ArrayBuffer
@@ -65,11 +67,11 @@ class TestPoptimize {
   }
 
   def transformInstructions(instructions: Seq[MetaObject]) = {
-    val codeAnnotation = CodeAnnotation.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
+    val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(codeAnnotation))
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ArrayBuffer[Any](), Seq(method))
     val compiler = new CompilerFromTransformations(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
-    CodeAnnotation.getCodeInstructions(codeAnnotation)
+    CodeAttribute.getCodeInstructions(codeAnnotation)
   }
 }

@@ -1,10 +1,26 @@
-package transformations.bytecode
+package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject}
 import core.transformation.sillyCodePieces.GrammarTransformation
+import core.transformation.{Contract, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 
-object CodeAnnotation extends GrammarTransformation {
+trait Instruction {
+
+  object InstructionArgumentsKey
+
+  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
+    data.put(InstructionArgumentsKey, arguments)
+  }
+
+  def getInstructionArguments(instruction: MetaObject) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
+
+  def setInstructionArguments(instruction: MetaObject, arguments: Seq[Any]) {
+    instruction(InstructionArgumentsKey) = arguments
+  }
+}
+
+object CodeAttribute extends GrammarTransformation with Instruction {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -52,7 +68,10 @@ object CodeAnnotation extends GrammarTransformation {
 
   object CodeAttributesKey
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val codeAttributeConstantGrammar = "Code" ~> produce(CodeAttributeId)
+    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
+    constantPoolItemContent.addOption(codeAttributeConstantGrammar)
   }
 }

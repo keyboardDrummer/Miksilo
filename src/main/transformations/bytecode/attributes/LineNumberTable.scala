@@ -1,8 +1,8 @@
-package transformations.bytecode
+package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, Contract}
 import core.transformation.sillyCodePieces.GrammarTransformation
+import core.transformation.{Contract, MetaObject}
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 

@@ -4,8 +4,8 @@ import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import PrintByteCode._
 import transformations.javac.classes.ConstantPool
 import transformations.types.BooleanTypeC.BooleanTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeName

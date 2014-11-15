@@ -16,15 +16,16 @@ object Program extends SimpleSwingApplication {
     maximize()
     title = "Particle Compiler"
 
-    val graphComponent = getGraphComponent
     val tabbedPane = new JTabbedPane()
-    tabbedPane.add("Architecture", graphComponent)
+    
+    val compilerBuilder = new CompilerBuilderPanel()
+    tabbedPane.add("Compiler Builder", compilerBuilder)
 
-    val panel = new CompilerBuilderPanel()
-    tabbedPane.add("Compiler Builder", panel)
+    val architecturePanel = getGraphComponent
+    tabbedPane.add("Architecture", architecturePanel)
 
     contents = Component.wrap(tabbedPane)
-    graphComponent.scrollToCenter(true)
+    architecturePanel.scrollToCenter(true)
   }
 
   def getGraphComponent = {

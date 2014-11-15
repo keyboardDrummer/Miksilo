@@ -2,6 +2,7 @@ package transformations.bytecode
 
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
+import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, LineNumberRef, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
@@ -26,10 +27,10 @@ class TestPrintByteCodeWhile {
       ByteCodeSkeleton.classRef(14),
       "<init>",
       ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
-      CodeAnnotation.CodeAttributeId,
+      CodeAttribute.CodeAttributeId,
       LineNumberTable.LineNumberTableId,
       "whilee",
-      StackMapTableC.StackMapTableId,
+      StackMapTableAttribute.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Whilee.java",
       ByteCodeSkeleton.nameAndType(4, 5),
@@ -45,7 +46,7 @@ class TestPrintByteCodeWhile {
   def getConstructor: MetaObject = {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeSkeleton.methodInfo(4, 5, Seq(
-      CodeAnnotation.codeAttribute(6, 1, 1, Seq(
+      CodeAttribute.codeAttribute(6, 1, 1, Seq(
         LoadAddressC.addressLoad(0),
         InvokeSpecialC.invokeSpecial(1),
         VoidReturnInstructionC.voidReturn
@@ -60,9 +61,9 @@ class TestPrintByteCodeWhile {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = StackMapTableC.stackMapTable(9, Seq(StackMapTableC.appendFrame(2, Seq(IntTypeC.intType)),
-      StackMapTableC.sameFrame(10)))
-    val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(CodeAnnotation.codeAttribute(6, 2, 1, Seq(
+    val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
+      StackMapTableAttribute.sameFrame(10)))
+    val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LoadIntegerC.load(0),

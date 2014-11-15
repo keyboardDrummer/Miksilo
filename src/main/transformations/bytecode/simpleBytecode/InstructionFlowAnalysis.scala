@@ -2,7 +2,8 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.{ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.additions.LabelledTargets
 import util.DataFlowAnalysis
 
 abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject], state: TransformationState)

@@ -2,7 +2,9 @@ package transformations.bytecode.coreInstructions.objects
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.PrintByteCode
+import PrintByteCode._
+import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.InstructionC
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC

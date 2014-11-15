@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.LabelledTargets
+import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionC
 

@@ -2,8 +2,10 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.LabelledTargets.LabelKey
-import transformations.bytecode.{CodeAnnotation, ByteCodeSkeleton, LabelledTargets}
+import transformations.bytecode.additions.LabelledTargets
+import LabelledTargets.LabelKey
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.javac.classes.ConstantPool
 
 object InferredMaxStack extends ProgramTransformation {
@@ -14,7 +16,7 @@ object InferredMaxStack extends ProgramTransformation {
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
 
     def getMaxStack(code: MetaObject): Integer = {
-      val instructions = CodeAnnotation.getCodeInstructions(code)
+      val instructions = CodeAttribute.getCodeInstructions(code)
       val registry = ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state)
       val currentStacks = new StackSizeAnalysis(instructions, instruction => registry(instruction.clazz)(constantPool, instruction), state).run(0, 0)
       val maxStack = currentStacks.values.max
@@ -22,8 +24,8 @@ object InferredMaxStack extends ProgramTransformation {
     }
 
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val code = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAnnotation.CodeKey).get
-      code(CodeAnnotation.CodeMaxStackKey) = getMaxStack(code)
+      val code = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+      code(CodeAttribute.CodeMaxStackKey) = getMaxStack(code)
     }
   }
 

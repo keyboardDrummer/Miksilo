@@ -1,9 +1,9 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.transformation.{TransformationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.PrintByteCode._
+import PrintByteCode._
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 

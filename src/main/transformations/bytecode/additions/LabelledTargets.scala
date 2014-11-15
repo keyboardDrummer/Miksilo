@@ -1,11 +1,13 @@
-package transformations.bytecode
+package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable
@@ -58,19 +60,19 @@ object LabelledTargets extends ProgramTransformation {
 
     val clazz = program
     val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
-    val codeAnnotations: Seq[MetaObject] = CodeAnnotation.getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
     def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
-      val instructions = CodeAnnotation.getCodeInstructions(codeAnnotation)
+      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
-      codeAnnotation(CodeAnnotation.CodeAttributesKey) = CodeAnnotation.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
+      codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
 
       val newInstructions: Seq[MetaObject] = getNewInstructions(instructions, targetLocations)
-      codeAnnotation(CodeAnnotation.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
     }
 
     def determineTargetLocations(instructions: Seq[MetaObject]): Map[String, Int] = {
@@ -102,13 +104,13 @@ object LabelledTargets extends ProgramTransformation {
       val frame = framePair._2
       val offset = location - adjustedZero
 
-      frame(StackMapTableC.OffsetDelta) = offset
+      frame(StackMapTableAttribute.OffsetDelta) = offset
       stackFrames += frame
       adjustedZero = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableC.StackMapTableId)
-      Seq(StackMapTableC.stackMapTable(nameIndex, stackFrames))
+      val nameIndex = constantPool.store(StackMapTableAttribute.StackMapTableId)
+      Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else
       Seq[MetaObject]()

@@ -2,7 +2,7 @@ package transformations.bytecode.extraBooleanInstructions
 
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.LabelledTargets
+import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareLessC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
