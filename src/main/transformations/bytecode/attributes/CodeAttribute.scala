@@ -68,7 +68,6 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
   object CodeAttributesKey
 
-
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val codeAttributeConstantGrammar = "Code" ~> produce(CodeAttributeId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
