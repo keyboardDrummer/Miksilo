@@ -29,8 +29,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   def getCompileOptions: Seq[CompileOption] = {
     val selection = Set(PerformCockpitOutputAction, ByteCodeSkeleton)
     val orderedSelection = transformations.filter(o => selection.contains(o))
-    val byteCodeActions = if (orderedSelection.take(1) == Seq(ByteCodeSkeleton))
-      Seq(CompileAndRun, EmitByteCode) else Seq.empty
+    val byteCodeActions = Seq(CompileAndRun, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
     byteCodeActions ++ Seq(PrettyPrint)
   }
 

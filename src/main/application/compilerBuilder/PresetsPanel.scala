@@ -8,6 +8,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import application.StyleSheet
 import application.compilerCockpit.PerformCockpitOutputAction
 import core.transformation.sillyCodePieces.Injector
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
@@ -52,8 +53,11 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getJavaCompilerPreset: Preset = {
-    val implicits = JavaCompiler.javaCompilerTransformations
-    new Preset("Java", JavaCompiler.spliceBeforeTransformations(implicits, Seq(PerformCockpitOutputAction)))
+    new Preset("Java", getJavaCompiler)
+  }
+
+  def getJavaCompiler: Seq[Injector] = {
+    JavaCompiler.spliceBeforeTransformations(Seq(ByteCodeSkeleton) ++ JavaCompiler.typeTransformations, Seq(PerformCockpitOutputAction))
   }
 
   def getPrettyPrintPreset = {
@@ -61,7 +65,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getFibonacciExpressionMethodPreset = {
-    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ JavaCompiler.javaCompilerTransformations)
+    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompiler)
   }
 
   def getAddImplicitsPreset: Preset = {
