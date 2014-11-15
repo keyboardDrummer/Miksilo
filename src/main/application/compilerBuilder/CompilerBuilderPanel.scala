@@ -56,7 +56,6 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
     val scrollPane: JScrollPane = StyleSheet.getAnyListVisuals(list)
     list.setCellRenderer(new InjectorListCellRenderer(painter))
-    scrollPane
 
     result.add(scrollPane, BorderLayout.CENTER)
 

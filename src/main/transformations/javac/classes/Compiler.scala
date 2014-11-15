@@ -52,7 +52,7 @@ case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[Str
     result
   }
 
-  def newMethodInfo(name: String, descriptor: MetaObject, _static: Boolean) {
+  def newMethodInfo(name: String, descriptor: MetaObject, _static: Boolean) = {
     val result = new MethodInfo(descriptor, _static)
     content(name) = result
     result

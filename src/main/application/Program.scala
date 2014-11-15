@@ -14,7 +14,7 @@ object Program extends SimpleSwingApplication {
 
   def top = new MainFrame {
     maximize()
-    title = "Modular Compiler"
+    title = "Particle Compiler"
 
     val graphComponent = getGraphComponent
     val tabbedPane = new JTabbedPane()
