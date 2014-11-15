@@ -6,7 +6,7 @@ import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.attributes.SourceFileAttribute
+import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
 import transformations.bytecode.constants._
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._
@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 object ByteCodeSkeleton extends GrammarTransformation
   with NameAndType with MethodRefConstant with FieldRefConstant with MethodDescriptorConstant with ClassRefConstant with SourceFileAttribute
-  with MethodInfo {
+  with MethodInfo with Instruction {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 

@@ -1,6 +1,9 @@
 package transformations.bytecode.constants
 
-trait NameAndType {
+import core.transformation.MetaObject
+import core.transformation.sillyCodePieces.GrammarTransformation
+
+trait NameAndType extends GrammarTransformation {
 
   object NameAndTypeKey
 

@@ -3,6 +3,7 @@ package transformations.bytecode.attributes
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 

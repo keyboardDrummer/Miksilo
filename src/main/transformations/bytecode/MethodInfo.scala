@@ -1,6 +1,9 @@
 package transformations.bytecode
 
-trait MethodInfo {
+import core.transformation.MetaObject
+import core.transformation.sillyCodePieces.GrammarTransformation
+
+trait MethodInfo extends GrammarTransformation {
   trait MethodAccessFlag
 
   object PublicAccess extends MethodAccessFlag

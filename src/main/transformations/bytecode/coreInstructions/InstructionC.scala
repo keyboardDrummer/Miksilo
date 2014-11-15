@@ -4,7 +4,6 @@ import core.transformation._
 import core.transformation.sillyCodePieces.Injector
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
-import PrintByteCode
 import transformations.javac.classes.ConstantPool
 import transformations.types.TypeC
 

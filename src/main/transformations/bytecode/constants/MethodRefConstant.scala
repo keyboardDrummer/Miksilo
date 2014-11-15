@@ -1,6 +1,9 @@
 package transformations.bytecode.constants
 
-trait MethodRefConstant {
+import core.transformation.MetaObject
+import core.transformation.sillyCodePieces.GrammarTransformation
+
+trait MethodRefConstant extends GrammarTransformation {
 
   object MethodRefKey
 

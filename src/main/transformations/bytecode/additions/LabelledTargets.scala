@@ -2,12 +2,12 @@ package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ProgramTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable

@@ -87,6 +87,7 @@ class TestUtils(val compiler: CompilerFromTransformations) {
     val input: File = File(testResources / relativeFilePath)
 
     val expectedOutputDirectory = rootOutput / "expected"
+    expectedOutputDirectory.createDirectory()
     val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
     Assert.assertEquals("", javaCompilerOutput)
 
