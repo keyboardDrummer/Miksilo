@@ -62,13 +62,20 @@ object MetaObject {
   }
 }
 
-class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) {
+class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   data ++= entries
 
   def apply(key: Any) = data(key)
 
   def update(key: Any, value: Any) = data.put(key, value)
+
+  def selectDynamic(name: String) =
+    data.getOrElse(name, sys.error("member not found"))
+
+  def updateDynamic(name: String)(value: Any) {
+    data += name -> value
+  }
 
   override def toString: String = {
     val className = MetaObject.classDebugRepresentation(clazz)
