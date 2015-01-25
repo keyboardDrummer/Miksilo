@@ -39,7 +39,8 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     val buildCompilerButton = new JButton("Build Compiler")
     buildCompilerButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        val cockpit = new CompilerCockpit(new JEnumerationWrapper(compilerParticles.elements()).toSeq)
+        val particlesAsSequence = new JEnumerationWrapper(compilerParticles.elements()).toList
+        val cockpit = new CompilerCockpit(particlesAsSequence)
         cockpit.pack()
         cockpit.maximize()
         cockpit.visible = true
@@ -48,7 +49,6 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     actionButtons.add(buildCompilerButton)
     actionButtons
   }
-
 
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())

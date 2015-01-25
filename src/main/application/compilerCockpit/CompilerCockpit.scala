@@ -67,13 +67,12 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val state = new TransformationState()
     PerformCockpitOutputAction.setState(state, outputParticles)
     Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).
-      recover({ case e: CompileException => setOutputText(e.toString)}).
-      recover({ case e: Exception =>
-      val writer = new CharArrayWriter()
-      e.printStackTrace(new NewLinePrintWriter(writer))
-      e.printStackTrace()
-      setOutputText(writer.toString)
-    })
+      recover({ case e: CompileException => setOutputText(e.toString) }).
+      recover({ case e: Error =>
+        val writer = new CharArrayWriter()
+        e.printStackTrace(new NewLinePrintWriter(writer))
+        e.printStackTrace()
+        setOutputText(writer.toString) })
   }
 
   def initialise() {
