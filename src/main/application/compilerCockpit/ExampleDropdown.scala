@@ -17,27 +17,27 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getFibonacci = {
-    val fibonacciContent = TestUtils.getTestFile("Fibonacci", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
     new Example("Fibonacci", fibonacciContent)
   }
 
   def getForLoop = {
-    val fibonacciContent = TestUtils.getTestFile("SimpleForLoop", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
     new Example("For Loop", fibonacciContent)
   }
 
   def getWhile = {
-    val fibonacciContent = TestUtils.getTestFile("Whilee", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("Whilee", Path("")).slurp()
     new Example("While", fibonacciContent)
   }
 
   def getFibonacciExpressionMethod = {
-    val fibonacciContent = TestUtils.getTestFile("FibonacciWithExpressionMethod", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("FibonacciWithExpressionMethod", Path("")).slurp()
     new Example("Fibonacci with expression method", fibonacciContent)
   }
 
   def getVariableAlreadyDefined = {
-    val fibonacciContent = TestUtils.getTestFile("VariableAlreadyDefined", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("VariableAlreadyDefined", Path("")).slurp()
     new Example("Variable defined twice", fibonacciContent)
   }
 

@@ -1,5 +1,7 @@
 package util
 
+import java.io
+
 import core.transformation._
 import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
 import org.junit.Assert
@@ -55,13 +57,17 @@ class TestUtils(val compiler: CompilerFromTransformations) {
   }
 
   def parseAndTransform(className: String, inputDirectory: Path): MetaObject = {
-    val input: File = getTestFile(className, inputDirectory)
+    val input: File = getJavaTestFile(className, inputDirectory)
     compiler.parseAndTransform(input)
   }
 
-  def getTestFile(className: String, inputDirectory: Path): File = {
+  def getJavaTestFile(className: String, inputDirectory: Path): File = {
     val relativeFilePath = inputDirectory / (className + ".java")
-    val currentDir = new File(new java.io.File("."))
+    getTestFile(relativeFilePath)
+  }
+
+  def getTestFile(relativeFilePath: Path): File = {
+    val currentDir = new File(new io.File("."))
     val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
     input

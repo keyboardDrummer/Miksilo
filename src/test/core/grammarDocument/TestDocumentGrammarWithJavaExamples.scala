@@ -21,19 +21,19 @@ class TestDocumentGrammarWithJavaExamples {
 
   @Test
   def testSimpleForLoop() {
-    val testFileContent = TestUtils.getTestFile("SimpleForLoop", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   @Test
   def testWhile() {
-    val testFileContent = TestUtils.getTestFile("whilee", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFile("whilee", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   @Test
   def testFibonacci() {
-    val testFileContent = TestUtils.getTestFile("fibonacci", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
@@ -57,8 +57,8 @@ class TestDocumentGrammarWithJavaExamples {
 
   @Test
   def testPrintAfterImplicitAddition() {
-    val input = TestUtils.getTestFile("fibonacci", Path("")).slurp()
-    val expectation = TestUtils.getTestFile("ExplicitFibonacci", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
 
     val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
@@ -74,8 +74,8 @@ class TestDocumentGrammarWithJavaExamples {
 
   @Test
   def testPrettyPrintByteCode() {
-    val input = TestUtils.getTestFile("fibonacci", Path("")).slurp()
-    val expectation = TestUtils.getTestFile("ExplicitFibonacci", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
     val newTransformations = Seq(new ParseFromFunction(() => input)) ++
       JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PrettyPrint))

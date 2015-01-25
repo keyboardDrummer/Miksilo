@@ -28,7 +28,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     val model: DefaultListModel[Preset] = createModel
 
     StyleSheet.setTitleBorder(this, "Presets")
-    val presetsList = new JList(model)C
+    val presetsList = new JList(model)
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
     presetsList.addMouseListener(new MouseAdapter {
       override def mouseClicked(e: MouseEvent): Unit = {
