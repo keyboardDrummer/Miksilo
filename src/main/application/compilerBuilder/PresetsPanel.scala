@@ -1,6 +1,6 @@
 package application.compilerBuilder
 
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event._
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
@@ -28,8 +28,17 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     val model: DefaultListModel[Preset] = createModel
 
     StyleSheet.setTitleBorder(this, "Presets")
-    val presetsList = new JList(model)
+    val presetsList = new JList(model)C
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+    presetsList.addMouseListener(new MouseAdapter {
+      override def mouseClicked(e: MouseEvent): Unit = {
+        if(e.getClickCount == 2) {
+          val index = presetsList.locationToIndex(e.getPoint)
+          val item = model.getElementAt(index)
+          applyPreset(item)
+        }
+      }
+    })
 
     add(StyleSheet.getAnyListVisuals(presetsList), listConstraints)
 
@@ -83,12 +92,17 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     })
     applyButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        compilerParticles.clear()
-        for (particle <- presetsList.getSelectedValue.particles)
-          compilerParticles.addElement(particle)
+        val preset: Preset = presetsList.getSelectedValue
+        applyPreset(preset)
       }
     })
     applyButton
+  }
+
+  def applyPreset(preset: Preset) {
+    compilerParticles.clear()
+    for (particle <- preset.particles)
+      compilerParticles.addElement(particle)
   }
 }
 
