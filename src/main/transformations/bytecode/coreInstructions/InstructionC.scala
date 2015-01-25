@@ -1,15 +1,19 @@
 package transformations.bytecode.coreInstructions
 
+import core.grammarDocument.BiGrammar
 import core.transformation._
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
+import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute}
 import transformations.javac.classes.ConstantPool
 import transformations.types.TypeC
 
-trait InstructionC extends Injector {
+trait InstructionC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
+    super.inject(state)
     ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (c,i) => getInstructionInAndOutputs(c,i,state))
     ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state).put(key, (c, i) => getInstructionStackSizeModification(c, i, state))
     PrintByteCode.getBytesRegistry(state).put(key, getInstructionByteCode)
@@ -37,6 +41,14 @@ trait InstructionC extends Injector {
     inAndOutputs._2.map(t => TypeC.getTypeSize(t,state)).sum - inAndOutputs._1.map(t => TypeC.getTypeSize(t,state)).sum
   }
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
+    instructionGrammar.addOption(getGrammarForThisInstruction)
+  }
+
+  def getGrammarForThisInstruction: BiGrammar = {
+    name ~> number.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
+  }
 
   protected def binary(_type: MetaObject) = (Seq(_type, _type), Seq(_type))
 }

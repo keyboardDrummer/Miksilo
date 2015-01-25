@@ -22,7 +22,6 @@ object MethodC extends GrammarTransformation {
     result
   }
 
-
   def getMethodDescriptor(method: MetaObject, classCompiler: ClassCompiler): MetaObject = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)

@@ -1,9 +1,12 @@
 package transformations.bytecode.attributes
 
+import core.document.Empty
+import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.types.TypeC
 
 object StackMapTableAttribute extends GrammarTransformation {
 
@@ -46,7 +49,7 @@ object StackMapTableAttribute extends GrammarTransformation {
 
   def getFrameOffset(frame: MetaObject) = frame(OffsetDelta).asInstanceOf[Int]
 
-  def sameFrameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem) {
+  def sameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem) {
     data.put(OffsetDelta, offsetDelta)
     data.put(SameLocals1StackItemType, _type)
   }
@@ -68,5 +71,17 @@ object StackMapTableAttribute extends GrammarTransformation {
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(StackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
+
+    val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
+    val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> number % parseType.indent() ^^
+      parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
+    val appendFrameGrammar = "append frame, delta:" ~> number % parseType.manySeparatedVertical(Empty).indent() ^^
+      parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
+    val sameFrameGrammar = "same frame, delta:" ~> number ^^ parseMap(SameFrameKey, OffsetDelta)
+    val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
+    val stackMapTableGrammar = "nameIndex:" ~> number % stackMapGrammar.manySeparatedVertical(Empty).indent() ^^
+      parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
+
+    grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(stackMapTableGrammar)
   }
 }

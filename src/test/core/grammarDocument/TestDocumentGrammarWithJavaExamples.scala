@@ -2,9 +2,11 @@ package core.grammarDocument
 
 import application.compilerCockpit.{OutputOption, ParseFromFunction, PrettyPrint}
 import core.modularProgram.PieceCombiner
-import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
+import core.transformation.{MetaObject, TransformationState}
 import org.junit.{Assert, Test}
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.TernaryC
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
@@ -76,12 +78,25 @@ class TestDocumentGrammarWithJavaExamples {
     val expectation = TestUtils.getTestFile("ExplicitFibonacci", Path("")).slurp()
 
     val newTransformations = Seq(new ParseFromFunction(() => input)) ++
-      JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeWithoutInstructions, Seq(PrettyPrint))
+      JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PrettyPrint))
 
     val state = new TransformationState
     PieceCombiner.combineAndExecute(state, newTransformations.reverse)
     val output = OutputOption.getOutput(state).get
 
     Assert.assertEquals(expectation, output)
+  }
+
+  @Test
+  def testPrettyPrintMethodInfo(): Unit = {
+    val methodInfo = ByteCodeSkeleton.methodInfo(1,2,Seq.empty[MetaObject],Set.empty[ByteCodeSkeleton.MethodAccessFlag])
+    val document = BiGrammarToDocument.toDocument(methodInfo, ByteCodeSkeleton.getMethodInfoGrammar(new Keyword("attribute")))
+  }
+
+  @Test
+  def testPrettyAddressLoad(): Unit = {
+    val grammar = LoadAddressC.getGrammarForThisInstruction
+    val addressLoad = LoadAddressC.addressLoad(0)
+    val document = BiGrammarToDocument.toDocument(addressLoad, grammar)
   }
 }

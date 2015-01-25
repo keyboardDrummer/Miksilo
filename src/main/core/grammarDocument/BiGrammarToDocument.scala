@@ -106,11 +106,17 @@ object BiGrammarToDocument {
         case Success(secondSuccess) => Success(combine(firstSuccess, secondSuccess))
         case Failure(PrintFailure(depth, partial, value, inner)) =>
           Failure(new PrintFailure(depth + 1, combine(firstSuccess, partial), value, inner))
-        case Failure(x) =>
-          throw new RuntimeException("failed toDocument with something different than a print failure: " + x.toString)
+        case Failure(e: NonePrintFailureException) => throw e
+        case Failure(e: RuntimeException) =>
+          throw new NonePrintFailureException(e)
       }
       case failure: Failure[ResponsiveDocument] => failure
     }
+  }
+
+  class NonePrintFailureException(e: RuntimeException) extends RuntimeException
+  {
+    override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
 
   def extractProduct(value: Any): Try[core.grammar.~[Any, Any]] = value match {

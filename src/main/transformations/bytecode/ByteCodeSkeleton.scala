@@ -2,11 +2,11 @@ package transformations.bytecode
 
 import core.document.Empty
 import core.grammar.StringLiteral
-import core.grammarDocument.BiGrammar
+import core.grammarDocument.{BiGrammar, ManyVertical}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.attributes.{CodeAttribute, Instruction, SourceFileAttribute}
+import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
 import transformations.bytecode.constants._
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._
@@ -99,22 +99,42 @@ object ByteCodeSkeleton extends GrammarTransformation
 
   object ConstantPoolItemContentGrammar
 
+  object AttributeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
-    val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
+    val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
+    val parseAttribute = grammars.create(AttributeGrammar)
+    val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(parseAttribute)
+    val methods = "Methods: " %> methodInfoGrammar.manySeparatedVertical(Empty).indent(2)
+    val classGrammar = grammars.create(ClassFileKey, "class" ~~> identifier %% constantPool %% methods ^^
+      parseMap(ClassFileKey, ClassNameIndexKey, ClassConstantPool, ClassMethodsKey))
+
+    program.inner = classGrammar
+  }
+
+  def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    val parseType: BiGrammar = grammars.find(TypeC.TypeGrammar)
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
     val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar) // TODO object type shouldn't be in the constantPool.
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar,
         utf8 | qualifiedClassName | classRefGrammar | getMethodDescriptorGrammar(parseType) | nameAndTypeGrammar |
-        methodRefGrammar | objectTypeGrammar | fieldRefGrammar)
+          methodRefGrammar | objectTypeGrammar | fieldRefGrammar)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
-    val constantPool = "ConstantPool:" %> constantPoolItem.manySeparatedVertical(Empty) ^^ biMapClassConstantEntryEnrichment
-    val classGrammar = grammars.create(ClassFileKey, "class" ~~> identifier %% constantPool ^^
-      parseMap(ClassFileKey, ClassNameIndexKey, ClassConstantPool))
+    "ConstantPool:" %> constantPoolItem.manySeparatedVertical(Empty).indent() ^^ biMapClassConstantEntryEnrichment
+  }
 
-    program.inner = classGrammar
+  def getMethodInfoGrammar(parseAttribute: BiGrammar): BiGrammar = {
+    val parseAccessFlag = "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess)
+    val methodHeader: BiGrammar = Seq[BiGrammar](
+      "nameIndex:" ~> number,
+      "descriptorIndex:" ~> number,
+      "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
+      reduce((l, r) => (l <~ ",") ~~ r)
+    val methodInfoGrammar: BiGrammar = methodHeader % ("annotations:" %> new ManyVertical(parseAttribute).indent(2)) ^^
+      parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, MethodAccessFlags, MethodAnnotations)
+    methodInfoGrammar
   }
 
   def getQualifiedClassNameParser: BiGrammar = {
@@ -130,14 +150,12 @@ object ByteCodeSkeleton extends GrammarTransformation
     parseQualifiedClassName
   }
 
-  def biMapClassConstantEntryEnrichment: ((Any) => Seq[Any], (Any) => Some[Seq[MetaObject]]) = {
-    ( {
-      case items: Seq[MetaObject] => items.map(i => i(ClassConstantEntryContent))
-    }, {
-      case items: Seq[Any] => Some(items.zipWithIndex.map(p => new MetaObject(EnrichedClassConstantEntry,
-        ClassConstantEntryIndex -> (p._2.asInstanceOf[Int] + 1),
-        ClassConstantEntryContent -> p._1)))
-    })
+  def biMapClassConstantEntryEnrichment = {
+    val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[MetaObject]].map(i => i(ClassConstantEntryContent))
+    val addIndexForPrinting: (Any) => Some[Seq[MetaObject]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map(p => new MetaObject(EnrichedClassConstantEntry,
+      ClassConstantEntryIndex -> (p._2.asInstanceOf[Int] + 1),
+      ClassConstantEntryContent -> p._1)))
+    ( removeIndexForParsing, addIndexForPrinting )
   }
 }
 

@@ -64,12 +64,14 @@ trait BiGrammar extends GrammarDocumentWriter {
       case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
     })
   }
+  
+  def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))
 
   def inParenthesis = ("(": BiGrammar) ~> this <~ ")"
 
   def ~(other: BiGrammar) = new Sequence(this, other)
 
-  def ~>(right: BiGrammar) = new Sequence(this, right).ignoreLeft
+  def ~>(right: BiGrammar): BiGrammar = new Sequence(this, right).ignoreLeft
 
   def ~~>(right: BiGrammar) = (this ~ space) ~> right
 
@@ -87,7 +89,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def ^^(map: (Any => Any, Any => Option[Any])): BiGrammar = new MapGrammar(this, map._1, map._2)
 
-  def indent(width: Int) = new WhiteSpace(width, 0) ~> this
+  def indent(width: Int = 2) = new WhiteSpace(width, 0) ~> this
 
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
 }
@@ -158,6 +160,9 @@ class ManyVertical(inner: BiGrammar) extends Many(inner)
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
 object MissingValue
+{
+  override def toString = "_"
+}
 
 case class Choice(left: BiGrammar, right: BiGrammar) extends BiGrammar
 
