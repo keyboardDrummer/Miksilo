@@ -65,7 +65,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getJavaCompiler: Seq[Injector] = {
-    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeWithoutInstructions, Seq(PerformCockpitOutputAction))
+    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PerformCockpitOutputAction))
   }
 
   def getPrettyPrintPreset = {
