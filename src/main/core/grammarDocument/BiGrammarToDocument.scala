@@ -107,14 +107,14 @@ object BiGrammarToDocument {
         case Failure(PrintFailure(depth, partial, value, inner)) =>
           Failure(new PrintFailure(depth + 1, combine(firstSuccess, partial), value, inner))
         case Failure(e: NonePrintFailureException) => throw e
-        case Failure(e: RuntimeException) =>
+        case Failure(e: Throwable) =>
           throw new NonePrintFailureException(e)
       }
       case failure: Failure[ResponsiveDocument] => failure
     }
   }
 
-  class NonePrintFailureException(e: RuntimeException) extends RuntimeException
+  class NonePrintFailureException(e: Throwable) extends RuntimeException
   {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
