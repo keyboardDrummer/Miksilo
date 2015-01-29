@@ -3,7 +3,7 @@ package application.compilerCockpit
 import java.awt._
 import java.io.CharArrayWriter
 import javax.swing._
-import javax.swing.text.PlainDocument
+import javax.swing.text.{DefaultCaret, PlainDocument}
 
 import application.StyleSheet
 import core.exceptions.CompileException
@@ -61,19 +61,20 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     inputDocument.replace(0, inputDocument.getLength, text, null)
   }
 
-  def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) {
+  def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) = {
     val cockpitOutputActions = if (transformations.contains(PerformCockpitOutputAction)) Seq.empty else Seq(PerformCockpitOutputAction)
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
     val state = new TransformationState()
     PerformCockpitOutputAction.setState(state, outputParticles)
     Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).
       recover({ case e: CompileException => setOutputText(e.toString) }).
-      recover({ case e: Error =>
+      recover({ case e: Throwable =>
         val writer = new CharArrayWriter()
         e.printStackTrace(new NewLinePrintWriter(writer))
         e.printStackTrace()
-        setOutputText(writer.toString) })
+        setOutputText(writer.toString) }).get
   }
+
 
   def initialise() {
     val panel = new JPanel()
@@ -141,8 +142,12 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
     val outputTextArea = new JTextArea(outputDocument)
+    outputTextArea.setAutoscrolls(false)
     outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
+
+    outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+
     outputPanel.add(new JScrollPane(outputTextArea))
     outputPanel
   }

@@ -24,3 +24,6 @@ class GrammarCatalogue {
   }
 }
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)
+{
+  override def toString = s"Could not find grammar $key."
+}

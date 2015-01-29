@@ -55,6 +55,7 @@ object PrintGrammar {
     case labelled: Labelled =>
       val key: AnyRef = labelled.name
       grammarKeyToName(key)
+    case StringLiteral => "string"
   }
 
   def grammarKeyToName(key: Any): String = key match {
