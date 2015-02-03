@@ -72,6 +72,7 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
   object InstructionGrammar
 
+  object CodeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val codeAttributeConstantGrammar = "Code" ~> produce(CodeAttributeId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
@@ -81,11 +82,11 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
     val parseInstruction: BiGrammar = instructionGrammar
-    val codeAttributeGrammar = Seq("nameIndex:" ~> number, "maxStack:" ~> number, "maxLocal:" ~> number).reduce((l,r) => (l <~ ",") ~~ r) %
+    val codeAttributeGrammar = Seq("code: nameIndex:" ~> number, "maxStack:" ~> number, "maxLocal:" ~> number).reduce((l,r) => (l <~ ",") ~~ r) %
       new ManyVertical(parseInstruction) %
       ("attributes:" %> new ManyVertical(attributeGrammar).indent()) ^^
       parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, CodeMaxStackKey, CodeMaxLocalsKey, CodeInstructionsKey, CodeAttributesKey)
 
-    attributeGrammar.addOption(codeAttributeGrammar)
+    attributeGrammar.addOption(grammars.create(CodeGrammar, codeAttributeGrammar))
   }
 }

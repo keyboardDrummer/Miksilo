@@ -5,26 +5,26 @@ ConstantPool:
   #2: class reference: 1
   #3: java.lang.Object
   #4: class reference: 3
-  #5: <init>
+  #5: "<init>"
   #6: void ()
   #7: name and type:  5:6
   #8: method reference: 4.7
   #9: Code
-  #10: main
+  #10: "main"
   #11: void (java.lang.String[])
   #12: java.lang.System
   #13: class reference: 12
-  #14: out
+  #14: "out"
   #15: java.io.PrintStream
   #16: name and type:  14:15
   #17: field reference: 13.16
-  #18: fibonacci
+  #18: "fibonacci"
   #19: int (int)
   #20: name and type:  18:19
   #21: method reference: 2.20
   #22: java.io.PrintStream
   #23: class reference: 22
-  #24: print
+  #24: "print"
   #25: void (int)
   #26: name and type:  24:25
   #27: method reference: 23.26
@@ -32,15 +32,15 @@ ConstantPool:
 
 Methods:
   nameIndex:5, descriptorIndex:6, flags:ACC_PUBLIC
-  annotations:
-    nameIndex:9, maxStack:1, maxLocal:1
+  attributes:
+    code: nameIndex:9, maxStack:1, maxLocal:1
     load address(0)
     invoke special(8)
     void return instruction()
     attributes:
   nameIndex:10, descriptorIndex:11, flags:ACC_STATIC, ACC_PUBLIC
-  annotations:
-    nameIndex:9, maxStack:2, maxLocal:1
+  attributes:
+    code: nameIndex:9, maxStack:2, maxLocal:1
     get static(17)
     integer constant(5)
     invoke static(21)
@@ -48,8 +48,8 @@ Methods:
     void return instruction()
     attributes:
   nameIndex:18, descriptorIndex:19, flags:ACC_STATIC, ACC_PUBLIC
-  annotations:
-    nameIndex:9, maxStack:3, maxLocal:1
+  attributes:
+    code: nameIndex:9, maxStack:3, maxLocal:1
     load integer(0)
     integer constant(2)
     if integer compare greater or equal(7)
@@ -66,7 +66,7 @@ Methods:
     add integers()
     integer return instruction()
     attributes:
-      nameIndex:28
+      sm nameIndex:28
         same frame, delta:9
         same locals, 1 stack item, delta:12
           int

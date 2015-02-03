@@ -1,8 +1,9 @@
 package core.grammarDocument
 
-import application.compilerCockpit.{OutputOption, ParseFromFunction, PrettyPrint}
+import application.compilerCockpit.{EmitByteCode, OutputOption, ParseFromFunction, PrettyPrint}
 import core.modularProgram.PieceCombiner
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.sillyCodePieces.{GrammarTransformation, Injector}
 import core.transformation.{MetaObject, TransformationState}
 import org.junit.{Assert, Test}
 import transformations.bytecode.ByteCodeSkeleton
@@ -87,16 +88,48 @@ class TestDocumentGrammarWithJavaExamples {
     Assert.assertEquals(expectation, output)
   }
 
+
+  @Test
+  def testPrettyPrintAndParseByteCode() {
+    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+
+    val byteCodeTransformations: Seq[GrammarTransformation] = JavaCompiler.byteCodeTransformations
+    val prettyPrintTransformations = Seq(new ParseFromFunction(() => input)) ++
+      JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(PrettyPrint))
+
+    val firstState = new TransformationState
+    PieceCombiner.combineAndExecute(firstState, prettyPrintTransformations.reverse)
+    val byteCode = OutputOption.getOutput(firstState).get
+
+    val secondState = new TransformationState
+    val parseTransformations = Seq(new ParseFromFunction(() => byteCode)) ++ byteCodeTransformations ++ Seq(EmitByteCode)
+    PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
+    val output = OutputOption.getOutput(secondState).get
+    Assert.assertEquals(8, output)
+  }
+
+  @Test
+  def parseByteCode() {
+    val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val secondState = new TransformationState
+    val parseTransformations = Seq(new ParseFromFunction(() => input)) ++ JavaCompiler.byteCodeTransformations ++ Seq(EmitByteCode)
+    PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
+    val output = OutputOption.getOutput(secondState).get
+    Assert.assertEquals(8, output)
+  }
+
   @Test
   def testPrettyPrintMethodInfo(): Unit = {
     val methodInfo = ByteCodeSkeleton.methodInfo(1,2,Seq.empty[MetaObject],Set.empty[ByteCodeSkeleton.MethodAccessFlag])
-    val document = BiGrammarToDocument.toDocument(methodInfo, ByteCodeSkeleton.getMethodInfoGrammar(new Keyword("attribute")))
+    val grammars = new GrammarCatalogue
+    ByteCodeSkeleton.transformGrammars(grammars)
+    BiGrammarToDocument.toDocument(methodInfo, grammars.find(ByteCodeSkeleton.MethodInfoGrammar))
   }
 
   @Test
   def testPrettyAddressLoad(): Unit = {
     val grammar = LoadAddressC.getGrammarForThisInstruction
     val addressLoad = LoadAddressC.addressLoad(0)
-    val document = BiGrammarToDocument.toDocument(addressLoad, grammar)
+    BiGrammarToDocument.toDocument(addressLoad, grammar)
   }
 }

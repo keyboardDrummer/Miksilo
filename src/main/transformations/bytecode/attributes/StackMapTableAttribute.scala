@@ -1,6 +1,5 @@
 package transformations.bytecode.attributes
 
-import core.document.Empty
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
@@ -67,6 +66,7 @@ object StackMapTableAttribute extends GrammarTransformation {
     data.put(OffsetDelta, offset)
   }
 
+  object StackMapTableGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(StackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
@@ -75,13 +75,13 @@ object StackMapTableAttribute extends GrammarTransformation {
     val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
     val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> number % parseType.indent() ^^
       parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
-    val appendFrameGrammar = "append frame, delta:" ~> number % parseType.manySeparatedVertical(Empty).indent() ^^
+    val appendFrameGrammar = "append frame, delta:" ~> number % parseType.manyVertical.indent() ^^
       parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
     val sameFrameGrammar = "same frame, delta:" ~> number ^^ parseMap(SameFrameKey, OffsetDelta)
     val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
-    val stackMapTableGrammar = "nameIndex:" ~> number % stackMapGrammar.manySeparatedVertical(Empty).indent() ^^
+    val stackMapTableGrammar = "sm nameIndex:" ~> number % stackMapGrammar.manyVertical.indent() ^^
       parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
 
-    grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(stackMapTableGrammar)
+    grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammars.create(StackMapTableGrammar, stackMapTableGrammar))
   }
 }

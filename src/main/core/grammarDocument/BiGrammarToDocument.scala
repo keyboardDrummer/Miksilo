@@ -3,7 +3,7 @@ package core.grammarDocument
 import java.util.Objects
 
 import core.document.Empty
-import core.grammar.~
+import core.grammar.{StringLiteral, ~}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.{Failure, Success, Try}
@@ -48,6 +48,7 @@ object BiGrammarToDocument {
             pickBestFailure(leftFailure, rightFailure)
           })
         })
+      case Consume(StringLiteral) => Try("\"" + value + "\"")
       case Consume(consume) => Try(value.toString)
       case Keyword(keyword) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)

@@ -68,6 +68,7 @@ object PrintGrammar {
 
   case class Option(inner: Grammar) extends Grammar
 
+
   def transform(grammar: Grammar): Grammar = grammar.simplify match {
     case Choice(_left, _right) =>
       val left = transform(_left)

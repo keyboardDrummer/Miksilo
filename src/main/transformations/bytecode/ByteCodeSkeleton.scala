@@ -1,6 +1,5 @@
 package transformations.bytecode
 
-import core.document.Empty
 import core.grammar.StringLiteral
 import core.grammarDocument.{BiGrammar, ManyVertical}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -99,18 +98,21 @@ object ByteCodeSkeleton extends GrammarTransformation
 
   object ConstantPoolItemContentGrammar
 
+  object MethodsGrammar
   object AttributeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
+    grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
-    val parseAttribute = grammars.create(AttributeGrammar)
-    val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(parseAttribute)
-    val methods = "Methods: " %> methodInfoGrammar.manySeparatedVertical(Empty).indent(2)
-    val classGrammar = grammars.create(ClassFileKey, "class" ~~> identifier %% constantPool %% methods ^^
+    val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
+    val methods = grammars.create(MethodsGrammar, "Methods:" %> methodInfoGrammar.manyVertical.indent(2))
+    val classGrammar = grammars.create(ClassFileKey, "class" ~~> number %% constantPool %% methods ^^
       parseMap(ClassFileKey, ClassNameIndexKey, ClassConstantPool, ClassMethodsKey))
 
     program.inner = classGrammar
   }
+
+  object ConstantPoolGrammar
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val parseType: BiGrammar = grammars.find(TypeC.TypeGrammar)
@@ -122,19 +124,23 @@ object ByteCodeSkeleton extends GrammarTransformation
           methodRefGrammar | objectTypeGrammar | fieldRefGrammar)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
-    "ConstantPool:" %> constantPoolItem.manySeparatedVertical(Empty).indent() ^^ biMapClassConstantEntryEnrichment
+    val result = "ConstantPool:" %> constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
+    grammars.create(ConstantPoolGrammar, result)
   }
 
-  def getMethodInfoGrammar(parseAttribute: BiGrammar): BiGrammar = {
-    val parseAccessFlag = "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess)
+  object AccessFlagGrammar
+  object MethodInfoGrammar
+  def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    val parseAttribute = grammars.find(AttributeGrammar)
+    val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
     val methodHeader: BiGrammar = Seq[BiGrammar](
       "nameIndex:" ~> number,
       "descriptorIndex:" ~> number,
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
-    val methodInfoGrammar: BiGrammar = methodHeader % ("annotations:" %> new ManyVertical(parseAttribute).indent(2)) ^^
+    val methodInfoGrammar: BiGrammar = methodHeader % ("attributes:" %> new ManyVertical(parseAttribute).indent(2)) ^^
       parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, MethodAccessFlags, MethodAnnotations)
-    methodInfoGrammar
+    grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 
   def getQualifiedClassNameParser: BiGrammar = {

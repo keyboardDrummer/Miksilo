@@ -1,6 +1,7 @@
 package transformations.javac.classes
 
-import core.document.{Empty, BlankLine}
+import core.document.BlankLine
+import core.grammar.~
 import core.grammarDocument.BiGrammar
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -10,9 +11,7 @@ import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
-import core.grammar.~
-import transformations.types.{ObjectTypeC, ArrayTypeC}
-
+import transformations.types.{ArrayTypeC, ObjectTypeC}
 
 import scala.collection.mutable
 
@@ -90,7 +89,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar, classMethod)
     val importGrammar = grammars.create(ImportGrammar)
-    val importsGrammar: BiGrammar = importGrammar.manySeparatedVertical(Empty)
+    val importsGrammar: BiGrammar = importGrammar.manyVertical
     val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}")
     val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % _classContent ^^

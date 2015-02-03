@@ -1,6 +1,5 @@
 package transformations.javac.statements
 
-import core.document.Empty
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
@@ -12,7 +11,7 @@ object BlockC extends GrammarTransformation {
   val indentAmount = 4
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementC.StatementGrammar)
-    grammars.create(BlockGrammar, "{" %> statement.manySeparatedVertical(Empty).indent(indentAmount) %< "}")
+    grammars.create(BlockGrammar, "{" %> statement.manyVertical.indent(indentAmount) %< "}")
   }
 
   object BlockGrammar
