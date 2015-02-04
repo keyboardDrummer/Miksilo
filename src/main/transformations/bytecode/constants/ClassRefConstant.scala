@@ -15,5 +15,5 @@ trait ClassRefConstant {
 
   def getClassRefName(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
 
-  val classRefGrammar = "class reference:" ~~> number ^^ parseMap(ClassRefKey, ClassRefName)
+  val classRefGrammar = "class reference:" ~~> integer ^^ parseMap(ClassRefKey, ClassRefName)
 }

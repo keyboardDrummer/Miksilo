@@ -32,7 +32,7 @@ object ByteCodeSkeleton extends GrammarTransformation
 
   def getAttributeNameIndex(attribute: MetaObject) = attribute(AttributeNameKey).asInstanceOf[Int]
 
-  def clazz(name: Int, parent: Int, constantPool: mutable.Buffer[Any], methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
+  def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
             classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey) {
     data.put(ClassMethodsKey, methods)
     data.put(ClassNameIndexKey, name)
@@ -45,7 +45,7 @@ object ByteCodeSkeleton extends GrammarTransformation
 
   def getParentIndex(clazz: MetaObject) = clazz(ClassParentIndex).asInstanceOf[Int]
 
-  def getConstantPool(clazz: MetaObject) = clazz(ClassConstantPool).asInstanceOf[mutable.Buffer[Any]]
+  def getConstantPool(clazz: MetaObject): ConstantPool = clazz(ClassConstantPool).asInstanceOf[ConstantPool]
 
   def getClassNameIndex(clazz: MetaObject) = clazz(ClassNameIndexKey).asInstanceOf[Int]
 
@@ -102,12 +102,19 @@ object ByteCodeSkeleton extends GrammarTransformation
   object AttributeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
-    grammars.create(AttributeGrammar)
+    val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
-    val methods = grammars.create(MethodsGrammar, "Methods:" %> methodInfoGrammar.manyVertical.indent(2))
-    val classGrammar = grammars.create(ClassFileKey, "class" ~~> number %% constantPool %% methods ^^
-      parseMap(ClassFileKey, ClassNameIndexKey, ClassConstantPool, ClassMethodsKey))
+    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
+    val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
+    val classIndexGrammar: BiGrammar = "class" ~~> integer
+    val parseIndexGrammar: BiGrammar = "extends" ~~> integer
+    val parseFields = produce(Seq.empty[Any])
+    val attributesGrammar = "attributes:" %> (attributeGrammar*).indent()
+    val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
+      constantPool %% parseFields %% methods %% attributesGrammar ^^
+      parseMap(ClassFileKey, ClassNameIndexKey, ClassParentIndex, ClassInterfaces, ClassConstantPool,
+        ClassFields, ClassMethodsKey, ClassAttributes))
 
     program.inner = classGrammar
   }
@@ -124,7 +131,10 @@ object ByteCodeSkeleton extends GrammarTransformation
           methodRefGrammar | objectTypeGrammar | fieldRefGrammar)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
-    val result = "ConstantPool:" %> constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
+    val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
+    val result = "ConstantPool:" %> entries ^^ (
+      entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
+      constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
     grammars.create(ConstantPoolGrammar, result)
   }
 
@@ -134,8 +144,8 @@ object ByteCodeSkeleton extends GrammarTransformation
     val parseAttribute = grammars.find(AttributeGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
     val methodHeader: BiGrammar = Seq[BiGrammar](
-      "nameIndex:" ~> number,
-      "descriptorIndex:" ~> number,
+      "nameIndex:" ~> integer,
+      "descriptorIndex:" ~> integer,
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
     val methodInfoGrammar: BiGrammar = methodHeader % ("attributes:" %> new ManyVertical(parseAttribute).indent(2)) ^^

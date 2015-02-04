@@ -8,6 +8,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
 import transformations.javac.JavaCompiler
+import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 import util.TestUtils
 
@@ -17,7 +18,7 @@ class TestByteCodeGoTo {
 
   def testMain(instructions: Seq[MetaObject]): MetaObject = {
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](), Seq(method))
+    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 
   @Test
@@ -41,7 +42,7 @@ class TestByteCodeGoTo {
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
-    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](StackMapTableAttribute.StackMapTableId), Seq(method))
+    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.StackMapTableId)), Seq(method))
   }
 
   def getLabelledJumpWhile: MetaObject = {
@@ -60,6 +61,6 @@ class TestByteCodeGoTo {
     )
 
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    ByteCodeSkeleton.clazz(2, 3, mutable.Buffer[Any](), Seq(method))
+    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 }

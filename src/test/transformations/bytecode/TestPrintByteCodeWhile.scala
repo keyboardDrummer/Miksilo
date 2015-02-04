@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types.{IntTypeC, VoidTypeC}
 import util.TestUtils
 
@@ -22,7 +22,7 @@ class TestPrintByteCodeWhile {
   }
 
   def getByteCode: MetaObject = {
-    val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(3, 12),
+    val constantPool = new ConstantPool(Seq(ByteCodeSkeleton.methodRef(3, 12),
       ByteCodeSkeleton.classRef(13),
       ByteCodeSkeleton.classRef(14),
       "<init>",
@@ -35,7 +35,7 @@ class TestPrintByteCodeWhile {
       "Whilee.java",
       ByteCodeSkeleton.nameAndType(4, 5),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
-      new QualifiedClassName(Seq("java", "lang", "Object")))
+      new QualifiedClassName(Seq("java", "lang", "Object"))))
     val constructor: MetaObject = getConstructor
     val _while: MetaObject = getWhile
     val methods = Seq(constructor, _while)

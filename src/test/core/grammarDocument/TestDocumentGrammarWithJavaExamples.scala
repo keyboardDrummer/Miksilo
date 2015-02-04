@@ -1,6 +1,6 @@
 package core.grammarDocument
 
-import application.compilerCockpit.{EmitByteCode, OutputOption, ParseFromFunction, PrettyPrint}
+import application.compilerCockpit._
 import core.modularProgram.PieceCombiner
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.{GrammarTransformation, Injector}
@@ -112,7 +112,7 @@ class TestDocumentGrammarWithJavaExamples {
   def parseByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
     val secondState = new TransformationState
-    val parseTransformations = Seq(new ParseFromFunction(() => input)) ++ JavaCompiler.byteCodeTransformations ++ Seq(EmitByteCode)
+    val parseTransformations = Seq(new ParseFromFunction(() => input)) ++ JavaCompiler.byteCodeTransformations ++ Seq(CompileAndRun)
     PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
     val output = OutputOption.getOutput(secondState).get
     Assert.assertEquals(8, output)

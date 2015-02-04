@@ -9,7 +9,7 @@ object CompileAndRun extends CompileOption {
   override def leave(state: TransformationState): Unit = {
     val clazz: MetaObject = state.program
     val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     val classNameIndex = ByteCodeSkeleton.getClassRefName(constantPool.getValue(classRefIndex).asInstanceOf[MetaObject])
     val className = constantPool.getValue(classNameIndex).asInstanceOf[QualifiedClassName].toString
     val result = TestUtils.runByteCode(className, clazz)

@@ -4,7 +4,8 @@ import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 
-class ConstantPool(val constants: mutable.Buffer[Any] = mutable.Buffer()) {
+class ConstantPool(items: Seq[Any] = Seq.empty) {
+  val constants: mutable.Buffer[Any] = new mutable.ArrayBuffer[Any]() ++ items
   val reverseRouter = mutable.Map[Any, Int]()
   for (indexedConstant <- constants.zipWithIndex)
     reverseRouter(indexedConstant._1) = indexedConstant._2 + 1

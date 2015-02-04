@@ -6,7 +6,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
-import transformations.javac.classes.{ClassC, QualifiedClassName}
+import transformations.javac.classes.{ConstantPool, ClassC, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.VoidTypeC
 import util.TestUtils
@@ -35,7 +35,7 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClassByteCode = {
-    val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(3, 10),
+    val constantPool = new ConstantPool(Seq(ByteCodeSkeleton.methodRef(3, 10),
       ByteCodeSkeleton.classRef(11),
       ByteCodeSkeleton.classRef(12),
       ConstructorC.constructorName,
@@ -43,7 +43,7 @@ class EmptyClassCompilation {
       CodeAttribute.CodeAttributeId,
       ByteCodeSkeleton.nameAndType(4, 5),
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
-      new QualifiedClassName(Seq("java", "lang", "Object"))
+      new QualifiedClassName(Seq("java", "lang", "Object")))
     )
     val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))

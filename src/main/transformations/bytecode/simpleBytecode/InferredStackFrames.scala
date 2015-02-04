@@ -20,7 +20,7 @@ object InferredStackFrames extends ProgramTransformation {
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val methodDescriptor = constantPool.getValue(ByteCodeSkeleton.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
       val initialLocals = ByteCodeSkeleton.getMethodDescriptorParameters(methodDescriptor)

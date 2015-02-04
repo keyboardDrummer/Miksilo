@@ -1,4 +1,4 @@
-class 2
+class 2 extends 3 with interfaces: ()
 
 ConstantPool:
   #1: Fibonacci
@@ -30,43 +30,51 @@ ConstantPool:
   #27: method reference: 23.26
   #28: StackMapTable
 
-Methods:
+methods:
   nameIndex:5, descriptorIndex:6, flags:ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:1, maxLocal:1
-    load address(0)
-    invoke special(8)
-    void return instruction()
+    instructions:
+      load address(0)
+      invoke special(8)
+      void return instruction()
     attributes:
+    exceptions:
   nameIndex:10, descriptorIndex:11, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:2, maxLocal:1
-    get static(17)
-    integer constant(5)
-    invoke static(21)
-    invoke virtual(27)
-    void return instruction()
+    instructions:
+      get static(17)
+      integer constant(5)
+      invoke static(21)
+      invoke virtual(27)
+      void return instruction()
     attributes:
+    exceptions:
   nameIndex:18, descriptorIndex:19, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:3, maxLocal:1
-    load integer(0)
-    integer constant(2)
-    if integer compare greater or equal(7)
-    integer constant(1)
-    goto(16)
-    load integer(0)
-    integer constant(1)
-    subtract integer()
-    invoke static(21)
-    load integer(0)
-    integer constant(2)
-    subtract integer()
-    invoke static(21)
-    add integers()
-    integer return instruction()
+    instructions:
+      load integer(0)
+      integer constant(2)
+      if integer compare greater or equal(7)
+      integer constant(1)
+      goto(16)
+      load integer(0)
+      integer constant(1)
+      subtract integer()
+      invoke static(21)
+      load integer(0)
+      integer constant(2)
+      subtract integer()
+      invoke static(21)
+      add integers()
+      integer return instruction()
     attributes:
       sm nameIndex:28
         same frame, delta:9
         same locals, 1 stack item, delta:12
           int
+    exceptions:
+
+attributes:

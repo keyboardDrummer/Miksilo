@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ScalaCompilerConfiguration">
     <option name="dynamics" value="true" />
+    <option name="postfixOps" value="true" />
     <parameters>
       <parameter value="-usejavacp" />
     </parameters>

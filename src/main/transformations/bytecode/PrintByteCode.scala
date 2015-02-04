@@ -104,7 +104,7 @@ object PrintByteCode extends ProgramTransformation {
 
       result ++= intToBytes(0xCAFEBABE)
       result ++= intToBytes(0x00000033)
-      val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
+      val constantPool = ByteCodeSkeleton.getConstantPool(clazz).constants
       val constantPoolSizePlusOne = shortToBytes(constantPool.length + 1)
       result ++= constantPoolSizePlusOne
       for (constantPoolEntry <- constantPool) {

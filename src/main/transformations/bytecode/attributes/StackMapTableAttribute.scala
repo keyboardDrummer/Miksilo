@@ -73,13 +73,13 @@ object StackMapTableAttribute extends GrammarTransformation {
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
     val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
-    val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> number % parseType.indent() ^^
+    val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> integer % parseType.indent() ^^
       parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
-    val appendFrameGrammar = "append frame, delta:" ~> number % parseType.manyVertical.indent() ^^
+    val appendFrameGrammar = "append frame, delta:" ~> integer % parseType.manyVertical.indent() ^^
       parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
-    val sameFrameGrammar = "same frame, delta:" ~> number ^^ parseMap(SameFrameKey, OffsetDelta)
+    val sameFrameGrammar = "same frame, delta:" ~> integer ^^ parseMap(SameFrameKey, OffsetDelta)
     val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
-    val stackMapTableGrammar = "sm nameIndex:" ~> number % stackMapGrammar.manyVertical.indent() ^^
+    val stackMapTableGrammar = "sm nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
       parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
 
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammars.create(StackMapTableGrammar, stackMapTableGrammar))

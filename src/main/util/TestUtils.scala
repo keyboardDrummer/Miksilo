@@ -155,8 +155,8 @@ class TestUtils(val compiler: CompilerFromTransformations) {
   }
 
   def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {
-    val expectedConstantPoolSet = ByteCodeSkeleton.getConstantPool(expectedByteCode)
-    val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode)
+    val expectedConstantPoolSet = ByteCodeSkeleton.getConstantPool(expectedByteCode).constants
+    val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode).constants
     Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
     Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem => {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => MetaObject.deepEquality(compiledItem, expectedItem,

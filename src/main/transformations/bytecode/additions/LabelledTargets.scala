@@ -59,7 +59,7 @@ object LabelledTargets extends ProgramTransformation {
     }
 
     val clazz = program
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {

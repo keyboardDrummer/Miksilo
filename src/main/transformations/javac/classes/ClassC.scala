@@ -37,7 +37,7 @@ object ClassC extends GrammarTransformation with ProgramTransformation {
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassFields) = Seq()
-      clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool.constants
+      clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
       val methods = getMethods(clazz)
       for (method <- methods)

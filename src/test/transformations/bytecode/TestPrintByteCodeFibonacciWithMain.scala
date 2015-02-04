@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import util.TestUtils
@@ -39,7 +39,7 @@ class TestPrintByteCodeFibonacciWithMain {
   }
 
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
-    val constantPool: mutable.Buffer[Any] = getConstantPool
+    val constantPool = getConstantPool
     val method: MetaObject = getFibonacciMethod
     val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
     nativeClass
@@ -71,7 +71,7 @@ class TestPrintByteCodeFibonacciWithMain {
     method
   }
 
-  def getConstantPool: mutable.Buffer[Any] = {
+  def getConstantPool: ConstantPool = {
     val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(6, 18),
       ByteCodeSkeleton.fieldRef(19, 20),
       ByteCodeSkeleton.methodRef(5, 21),
@@ -105,7 +105,7 @@ class TestPrintByteCodeFibonacciWithMain {
       "print",
       ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
-    constantPool
+    new ConstantPool(constantPool)
   }
 
   def getConstructorByteCode: MetaObject = {

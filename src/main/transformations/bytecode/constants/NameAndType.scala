@@ -16,7 +16,8 @@ trait NameAndType extends GrammarTransformation {
     data.put(NameAndTypeType, typeIndex)
   }
 
-  val nameAndTypeGrammar = "name and type: " ~~> (number <~ ":") ~ number ^^ parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
+  val nameAndTypeGrammar = "name and type: " ~~> (integer <~ ":") ~ integer ^^
+    parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
 
   def getNameAndTypeName(nameAndType: MetaObject) = nameAndType(NameAndTypeName).asInstanceOf[Int]
 

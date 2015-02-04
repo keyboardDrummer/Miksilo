@@ -20,5 +20,5 @@ trait FieldRefConstant {
 
   def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  val fieldRefGrammar = "field reference:" ~~> (number <~ ".") ~ number ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+  val fieldRefGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 }

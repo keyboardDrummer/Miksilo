@@ -47,7 +47,7 @@ trait InstructionC extends GrammarTransformation {
   }
 
   def getGrammarForThisInstruction: BiGrammar = {
-    name ~> number.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
+    name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
   }
 
   protected def binary(_type: MetaObject) = (Seq(_type, _type), Seq(_type))

@@ -13,7 +13,7 @@ object InferredMaxStack extends ProgramTransformation {
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
 
     def getMaxStack(code: MetaObject): Integer = {
       val instructions = CodeAttribute.getCodeInstructions(code)

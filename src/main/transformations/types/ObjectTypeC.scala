@@ -20,10 +20,7 @@ object ObjectTypeC extends TypeInstance {
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})
-        if (ids.size > 1)
-          Right(new QualifiedClassName(stringIds))
-        else
-          Left(stringIds(0))
+        Right(new QualifiedClassName(stringIds))
     }
     def deconstruct(value: Any): Option[Any] = Some(value match {
       case Right(QualifiedClassName(stringIds)) => stringIds

@@ -7,6 +7,7 @@ import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, Sto
 import transformations.bytecode.coreInstructions.PopC
 import transformations.bytecode.additions.PoptimizeC
 import transformations.javac.JavaCompiler
+import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -69,7 +70,7 @@ class TestPoptimize {
   def transformInstructions(instructions: Seq[MetaObject]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(codeAnnotation))
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ArrayBuffer[Any](), Seq(method))
+    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(), Seq(method))
     val compiler = new CompilerFromTransformations(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)

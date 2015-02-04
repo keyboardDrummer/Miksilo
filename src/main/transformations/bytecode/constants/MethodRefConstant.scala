@@ -11,7 +11,7 @@ trait MethodRefConstant extends GrammarTransformation {
 
   object MethodRefMethodName
 
-  val methodRefGrammar = "method reference:" ~~> (number <~ ".") ~ number ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+  val methodRefGrammar = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey) {
     data.put(MethodRefClassName, classNameIndex)

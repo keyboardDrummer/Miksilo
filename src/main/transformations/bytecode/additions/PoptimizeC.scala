@@ -13,7 +13,7 @@ object PoptimizeC extends ProgramTransformation {
   override def dependencies: Set[Contract] = Set(PopC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
-    val constantPool = new ConstantPool(ByteCodeSkeleton.getConstantPool(clazz))
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)

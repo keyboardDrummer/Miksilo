@@ -1,6 +1,7 @@
 package transformations.bytecode.attributes
 
-import core.grammarDocument.{ManyVertical, BiGrammar}
+import core.document.Empty
+import core.grammarDocument.{MapGrammar, ManyVertical, BiGrammar}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject}
@@ -78,14 +79,15 @@ object CodeAttribute extends GrammarTransformation with Instruction {
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(codeAttributeConstantGrammar)
 
-    val instructionGrammar = grammars.create(InstructionGrammar)
-
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
-    val parseInstruction: BiGrammar = instructionGrammar
-    val codeAttributeGrammar = Seq("code: nameIndex:" ~> number, "maxStack:" ~> number, "maxLocal:" ~> number).reduce((l,r) => (l <~ ",") ~~ r) %
-      new ManyVertical(parseInstruction) %
-      ("attributes:" %> new ManyVertical(attributeGrammar).indent()) ^^
-      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, CodeMaxStackKey, CodeMaxLocalsKey, CodeInstructionsKey, CodeAttributesKey)
+    val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
+    val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
+    val attributesGrammar: MapGrammar = "attributes:" %> new ManyVertical(attributeGrammar).indent()
+    val header: BiGrammar = Seq("code: nameIndex:" ~> integer, "maxStack:" ~> integer, "maxLocal:" ~> integer).reduce((l, r) => (l <~ ",") ~~ r)
+    val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
+    val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
+      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, CodeMaxStackKey, CodeMaxLocalsKey,
+        CodeInstructionsKey, CodeAttributesKey, CodeExceptionTableKey)
 
     attributeGrammar.addOption(grammars.create(CodeGrammar, codeAttributeGrammar))
   }
