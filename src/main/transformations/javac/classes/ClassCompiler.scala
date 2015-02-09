@@ -72,7 +72,7 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
 
   def getFieldNameAndTypeIndex(info: FieldInfo): Int = {
     val fieldNameIndex = constantPool.storeUtf8(info.name)
-    val typeIndex = constantPool.store(info._type)
+    val typeIndex =   constantPool.store(info._type)
     val result: MetaObject = ByteCodeSkeleton.nameAndType(fieldNameIndex, typeIndex)
     constantPool.store(result)
   }

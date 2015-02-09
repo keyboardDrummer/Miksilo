@@ -105,11 +105,11 @@ object ByteCodeSkeleton extends GrammarTransformation
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
-    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> integer
     val parseIndexGrammar: BiGrammar = "extends" ~~> integer
-    val parseFields = produce(Seq.empty[Any])
+    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
+    val parseFields = "fields:" %> produce(Seq.empty[Any])
     val attributesGrammar = "attributes:" %> (attributeGrammar*).indent()
     val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
       constantPool %% parseFields %% methods %% attributesGrammar ^^
@@ -125,14 +125,14 @@ object ByteCodeSkeleton extends GrammarTransformation
     val parseType: BiGrammar = grammars.find(TypeC.TypeGrammar)
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
-    val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar) // TODO object type shouldn't be in the constantPool.
+    val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar,
         utf8 | qualifiedClassName | classRefGrammar | getMethodDescriptorGrammar(parseType) | nameAndTypeGrammar |
-          methodRefGrammar | objectTypeGrammar | fieldRefGrammar)
+          methodRefGrammar | ("T" ~> typeGrammar) | fieldRefGrammar)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
     val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
-    val result = "ConstantPool:" %> entries ^^ (
+    val result = "constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
     grammars.create(ConstantPoolGrammar, result)
