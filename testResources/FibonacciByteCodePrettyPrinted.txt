@@ -7,7 +7,7 @@ constant pool:
   #4: class reference: 3
   #5: "<init>"
   #6: void ()
-  #7: name and type:  5:6
+  #7: name and type: 5:6
   #8: method reference: 4.7
   #9: Code
   #10: "main"
@@ -16,17 +16,17 @@ constant pool:
   #13: class reference: 12
   #14: "out"
   #15: Tjava.io.PrintStream
-  #16: name and type:  14:15
+  #16: name and type: 14:15
   #17: field reference: 13.16
   #18: "fibonacci"
   #19: int (int)
-  #20: name and type:  18:19
+  #20: name and type: 18:19
   #21: method reference: 2.20
   #22: java.io.PrintStream
   #23: class reference: 22
   #24: "print"
   #25: void (int)
-  #26: name and type:  24:25
+  #26: name and type: 24:25
   #27: method reference: 23.26
   #28: StackMapTable
 
