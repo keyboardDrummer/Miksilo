@@ -3,7 +3,7 @@ package application.compilerCockpit
 import core.transformation.TransformationState
 import core.transformation.sillyCodePieces.Injector
 
-object PerformCockpitOutputAction extends Injector {
+object CockpitOutputMarker extends Injector {
 
   def setState(state: TransformationState, injectors: Seq[Injector]) = state.data(this) = injectors
 

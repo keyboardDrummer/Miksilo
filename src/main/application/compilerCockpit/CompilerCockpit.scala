@@ -27,7 +27,7 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   val compileOptions = getCompileOptions.toArray
 
   def getCompileOptions: Seq[CompileOption] = {
-    val selection = Set(PerformCockpitOutputAction, ByteCodeSkeleton)
+    val selection = Set(CockpitOutputMarker, ByteCodeSkeleton)
     val orderedSelection = transformations.filter(o => selection.contains(o))
     val byteCodeActions = Seq(CompileAndRun, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
     byteCodeActions ++ Seq(PrettyPrint)
@@ -62,10 +62,10 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
   }
 
   def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) = {
-    val cockpitOutputActions = if (transformations.contains(PerformCockpitOutputAction)) Seq.empty else Seq(PerformCockpitOutputAction)
+    val cockpitOutputActions = if (transformations.contains(CockpitOutputMarker)) Seq.empty else Seq(CockpitOutputMarker)
     val pieces = inputParticles ++ transformations ++ cockpitOutputActions
     val state = new TransformationState()
-    PerformCockpitOutputAction.setState(state, outputParticles)
+    CockpitOutputMarker.setState(state, outputParticles)
     Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).
       recover({ case e: CompileException => setOutputText(e.toString) }).
       recover({ case e: Throwable =>

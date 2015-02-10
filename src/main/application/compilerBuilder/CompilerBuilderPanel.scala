@@ -5,14 +5,14 @@ import javax.swing._
 import javax.swing.border.BevelBorder
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import application.compilerCockpit.PerformCockpitOutputAction
+import application.compilerCockpit.CockpitOutputMarker
 import application.{InjectorListCellRenderer, StyleSheet}
 import core.transformation.sillyCodePieces.Injector
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
 object CompilerBuilderPanel {
-  val availableParticles = JavaCompiler.allTransformations ++ Seq(PerformCockpitOutputAction)
+  val availableParticles = JavaCompiler.allTransformations ++ Seq(CockpitOutputMarker)
 }
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
