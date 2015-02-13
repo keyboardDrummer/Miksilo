@@ -7,12 +7,13 @@ class ExecuteButton(compilerCockpit: CompilerCockpit) extends JButton("Execute")
 
   addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
-      compilerCockpit.execute(() => {
-        val input = compilerCockpit.inputOption.getInput
-        val output = compilerCockpit.compileOption.perform(compilerCockpit, input)
-        compilerCockpit.outputOption.handleOutput(output)
-      })
+      compilerCockpit.execute(executeClicked)
     }
   })
 
+  def executeClicked(): Unit = {
+    val input = compilerCockpit.inputOption.getInput
+    val output = compilerCockpit.compileOption.perform(compilerCockpit, input)
+    compilerCockpit.outputOption.handleOutput(output)
+  }
 }

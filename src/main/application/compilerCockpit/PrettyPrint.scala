@@ -26,7 +26,7 @@ object PrettyPrint extends Particle
 object PrettyPrintOption extends CompileOption {
 
   override def perform(cockpit: CompilerCockpit, input: String): String = {
-    val splicedParticles = cockpit.compiler.spliceBefore(Seq(CockpitOutputMarker),Seq(PrettyPrint))
+    val splicedParticles = cockpit.compiler.replace(CockpitOutputMarker,Seq(PrettyPrint))
     val compiler = new CompilerFromParticles(splicedParticles)
 
     val state = compiler.parseAndTransform(input)

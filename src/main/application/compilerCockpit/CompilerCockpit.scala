@@ -62,7 +62,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
   }
 
   def execute(action: () => Unit) = {
-    Try(action).
+    Try[Unit](action()).
       recover({ case e: CompileException => setOutputText(e.toString) }).
       recover({ case e: Throwable =>
         val writer = new CharArrayWriter()

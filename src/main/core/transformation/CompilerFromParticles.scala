@@ -58,13 +58,9 @@ class CompilerFromParticles(val particles: Seq[Particle]) extends Compiler {
     }
   }
 
-  def spliceBefore(beforeThese: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
-    val beforeSet = beforeThese.toSet
-    particles.filter(particle => !beforeSet.contains(particle)) ++ splice ++ beforeThese
-  }
-
-  def spliceAfter(afterThese: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
-    val afterTheseSet = afterThese.toSet
-    afterThese ++ splice ++ particles.filter(particle => !afterTheseSet.contains(particle))
+  def replace(marker: Particle, splice: Seq[Particle]): Seq[Particle] = {
+    val pivot = particles.indexWhere(particle => marker == particle)
+    val (before,after) = particles.splitAt(pivot)
+    before ++ splice ++ after.drop(1)
   }
 }
