@@ -22,6 +22,7 @@ trait GrammarTransformation extends Particle with GrammarDocumentWriter {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
   }
 
+  object PartialSelf
   def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
     val fieldList = fields.toList
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
@@ -35,14 +36,18 @@ trait GrammarTransformation extends Particle with GrammarDocumentWriter {
 
     if (metaObject.clazz == key) {
       val first :: rest = fields
-      var result: Any = metaObject(first)
+      var result: Any = getWithPartial(metaObject, first)
       for (other <- rest) {
-        result = core.grammar.~(result, metaObject(other))
+        result = core.grammar.~(result, getWithPartial(metaObject, other))
       }
       Some(result)
     } else {
       None
     }
+  }
+
+  def getWithPartial(meta: MetaObject, key: Any): Any = {
+    if (key == PartialSelf) meta else meta(key)
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {
@@ -53,8 +58,16 @@ trait GrammarTransformation extends Particle with GrammarDocumentWriter {
   def construct(value: Any, key: AnyRef, fields: List[Any]) = {
     val result = new MetaObject(key)
     val values = tildeValuesToSeq(value)
-    fields.zip(values).foreach(pair =>
-      result(pair._1) = pair._2)
+    fields.zip(values).foreach(pair => {
+      val field: Any = pair._1
+      val fieldValue: Any = pair._2
+      if (field == PartialSelf)
+      {
+        result.data ++= fieldValue.asInstanceOf[MetaObject].data
+      }
+      else
+        result(field) = fieldValue
+    })
     result
   }
 }
