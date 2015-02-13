@@ -1,18 +1,16 @@
 package transformations.bytecode
 
-import core.transformation.{MetaObject, Transformer}
+import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.Test
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 import util.TestUtils
-
-import scala.collection.mutable
 
 class TestByteCodeGoTo {
 
@@ -24,7 +22,7 @@ class TestByteCodeGoTo {
   @Test
   def compareCompiledVersusNativeCode() {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = new Transformer(Seq(LabelledTargets) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
+    val compiledWhile = new CompilerFromParticles(Seq(LabelledTargets) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }

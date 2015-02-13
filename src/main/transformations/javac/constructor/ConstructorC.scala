@@ -2,7 +2,7 @@ package transformations.javac.constructor
 
 import core.exceptions.BadInputException
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.coreInstructions.InvokeSpecialC
@@ -14,7 +14,7 @@ import transformations.javac.methods.{CallC, MethodC}
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.types.VoidTypeC
 
-object ConstructorC extends GrammarTransformation with ProgramTransformation {
+object ConstructorC extends GrammarTransformation with ParticleWithPhase {
   val constructorName: String = "<init>"
 
   override def dependencies: Set[Contract] = Set(ClassC, CallC, InvokeSpecialC, LoadAddressC)

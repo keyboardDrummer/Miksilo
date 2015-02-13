@@ -6,12 +6,12 @@ import javax.swing._
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
 class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
-  val compilerParticles = new DefaultListModel[Injector]()
+  val compilerParticles = new DefaultListModel[Particle]()
 
   StyleSheet.setTitleBorder(this, "Compiler")
 

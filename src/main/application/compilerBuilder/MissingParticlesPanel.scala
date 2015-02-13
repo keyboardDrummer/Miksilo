@@ -6,15 +6,15 @@ import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
 
 import application.graphing.model.DepthFirstTraversal
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import org.jdesktop.swingx.JXList
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
 object MissingParticlesPanel {
 
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Injector]) = {
-    val dependentItems = new DefaultListModel[Injector]()
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
+    val dependentItems = new DefaultListModel[Particle]()
     val dependentList = new JXList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -31,7 +31,7 @@ object MissingParticlesPanel {
     addButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         for (selectedValue <- dependentList.getSelectedValues)
-          compilerParticles.addElement(selectedValue.asInstanceOf[Injector])
+          compilerParticles.addElement(selectedValue.asInstanceOf[Particle])
       }
     })
     dependentPanel.add(addButton, BorderLayout.PAGE_END)
@@ -54,11 +54,11 @@ object MissingParticlesPanel {
     dependentPanel
   }
 
-  def getMissingDependencies(transformations: Seq[Injector]): Seq[Injector] = {
-    var result = List.empty[Injector]
+  def getMissingDependencies(transformations: Seq[Particle]): Seq[Particle] = {
+    var result = List.empty[Particle]
     val transformationSet = transformations.toSet
-    DepthFirstTraversal.traverse[Injector](transformations,
-      t => t.dependencies.collect({case x:Injector => x}),
+    DepthFirstTraversal.traverse[Particle](transformations,
+      t => t.dependencies.collect({case x:Particle => x}),
       t => {}, t => result = t :: result)
     result.filter(e => !transformationSet.contains(e))
   }

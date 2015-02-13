@@ -22,7 +22,7 @@ class EmptyMain {
 
   def getByteCode: MetaObject = {
     val java = getJava
-    val byteCode = JavaCompiler.getTransformer.transform(java)
+    val byteCode = JavaCompiler.getCompiler.transform(java)
     byteCode
   }
 

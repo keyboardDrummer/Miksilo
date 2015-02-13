@@ -1,7 +1,7 @@
 package transformations.javaPlus
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ClassC
@@ -9,7 +9,7 @@ import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}
 
-object ExpressionMethodC extends GrammarTransformation with ProgramTransformation {
+object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, ClassC) ++ super.dependencies
 

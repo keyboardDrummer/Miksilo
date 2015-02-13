@@ -2,20 +2,20 @@ package application.compilerBuilder
 
 import javax.swing.JPanel
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import util.Cache
 
 import scala.collection.mutable
 
-class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Injector]) {
+class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Particle]) {
   val dependants = getDependants
-  var selection: Seq[Injector] = Seq.empty
-  val dependenciesCache = new Cache[Set[Injector]](() => selection.flatMap(s => s.dependencies2).toSet)
-  val dependantsCache = new Cache[Set[Injector]](() => selection.flatMap(s => dependants(s)).toSet)
+  var selection: Seq[Particle] = Seq.empty
+  val dependenciesCache = new Cache[Set[Particle]](() => selection.flatMap(s => s.dependencies2).toSet)
+  val dependantsCache = new Cache[Set[Particle]](() => selection.flatMap(s => dependants(s)).toSet)
 
   def getDependants = {
-    val dependants = new mutable.HashMap[Injector, mutable.Set[Injector]]()
-      with mutable.MultiMap[Injector, Injector]
+    val dependants = new mutable.HashMap[Particle, mutable.Set[Particle]]()
+      with mutable.MultiMap[Particle, Particle]
 
     for (particle <- availableParticles) {
       for (dependency <- particle.dependencies2) {
@@ -25,20 +25,20 @@ class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Injector])
     dependants
   }
 
-  def select(selection: Seq[Injector]) {
+  def select(selection: Seq[Particle]) {
     this.selection = selection
     dependenciesCache.clear()
     container.repaint()
   }
 
-  def isDependency(particle: Injector) : Boolean = {
+  def isDependency(particle: Particle) : Boolean = {
     if (selection == null)
       return false
 
     dependenciesCache.get.contains(particle)
   }
 
-  def isDependant(particle: Injector): Boolean = {
+  def isDependant(particle: Particle): Boolean = {
     if (selection == null)
       return false
 

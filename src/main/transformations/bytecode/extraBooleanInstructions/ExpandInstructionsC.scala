@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
@@ -11,7 +11,7 @@ import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 
-object ExpandInstructionsC extends ProgramTransformation {
+object ExpandInstructionsC extends ParticleWithPhase {
 
   def lessThanInstruction = instruction(LessThanInstructionKey)
 

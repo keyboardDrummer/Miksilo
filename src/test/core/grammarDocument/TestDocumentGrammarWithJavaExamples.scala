@@ -1,9 +1,8 @@
 package core.grammarDocument
 
 import application.compilerCockpit._
-import core.modularProgram.PieceCombiner
-import core.transformation.TransformationState
-import core.transformation.sillyCodePieces.{GrammarTransformation, Injector}
+import core.transformation.CompilerFromParticles
+import core.transformation.sillyCodePieces.{GrammarTransformation, Particle}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -59,14 +58,12 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
 
-    val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
-    val newTransformations = Seq(new ParseFromFunction(() => input)) ++ implicits ++ Seq(PrettyPrint) ++
-      JavaCompiler.spliceAfterTransformations(implicits, Seq(PrettyPrint))
+    val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(PrettyPrint))
 
-    val state = new TransformationState
-    PieceCombiner.combineAndExecute(state, newTransformations.reverse)
-    val output = OutputOption.getOutput(state).get
+    val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
+    val output = state.output
 
     Assert.assertEquals(expectation, output)
   }
@@ -76,14 +73,10 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
-    val newTransformations = Seq(new ParseFromFunction(() => input)) ++
-      JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PrettyPrint))
+    val newTransformations = JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PrettyPrint))
 
-    val state = new TransformationState
-    PieceCombiner.combineAndExecute(state, newTransformations.reverse)
-    val output = OutputOption.getOutput(state).get
-
-    Assert.assertEquals(expectation, output)
+    val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
+    Assert.assertEquals(expectation, state.output)
   }
 
 
@@ -92,37 +85,29 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
 
     val byteCodeTransformations: Seq[GrammarTransformation] = JavaCompiler.byteCodeTransformations
-    val prettyPrintTransformations = Seq(new ParseFromFunction(() => input)) ++
-      JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(PrettyPrint))
+    val prettyPrintTransformations = JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(PrettyPrint))
 
-    val firstState = new TransformationState
-    PieceCombiner.combineAndExecute(firstState, prettyPrintTransformations.reverse)
-    val byteCode = OutputOption.getOutput(firstState).get
+    val state = new CompilerFromParticles(prettyPrintTransformations).parseAndTransform(input)
+    val byteCode = state.output
 
-    val secondState = new TransformationState
-    val parseTransformations = Seq(new ParseFromFunction(() => byteCode)) ++ byteCodeTransformations ++ Seq(CompileAndRun)
-    PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
-    val output = OutputOption.getOutput(secondState).get
+    val parseTransformations = byteCodeTransformations ++ Seq(RunWithJVM)
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(byteCode).output
     Assert.assertEquals("8", output)
   }
 
   @Test
   def prettyPrintByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
-    val secondState = new TransformationState
-    val parseTransformations = Seq(new ParseFromFunction(() => input)) ++ Seq(PrettyPrint) ++ JavaCompiler.byteCodeTransformations
-    PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
-    val output = OutputOption.getOutput(secondState).get
+    val parseTransformations = Seq(PrettyPrint) ++ JavaCompiler.byteCodeTransformations
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
     Assert.assertEquals(input, output)
   }
 
   @Test
   def parseByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
-    val secondState = new TransformationState
-    val parseTransformations = Seq(new ParseFromFunction(() => input)) ++ JavaCompiler.byteCodeTransformations ++ Seq(CompileAndRun)
-    PieceCombiner.combineAndExecute(secondState, parseTransformations.reverse)
-    val output = OutputOption.getOutput(secondState).get
+    val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
     Assert.assertEquals("8", output)
   }
 

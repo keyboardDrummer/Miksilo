@@ -1,11 +1,11 @@
 package transformations.javac.classes
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.VariableKey
 
-object ClassOrPackageReference extends Injector {
+object ClassOrPackageReference extends Particle {
   override def inject(state: TransformationState): Unit = {
     ClassC.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val compiler = ClassC.getClassCompiler(state)

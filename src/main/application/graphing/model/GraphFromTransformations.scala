@@ -1,13 +1,13 @@
 package application.graphing.model
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 
-class GraphFromTransformations(transformations: Seq[Injector])
+class GraphFromTransformations(transformations: Seq[Particle])
   extends DefaultDirectedGraph[TransformationVertex, DefaultEdge](classOf[DefaultEdge]) {
 
-  DepthFirstTraversal.traverse[Injector](transformations,
-    transformation => transformation.dependencies.collect({case x: Injector => x}),
+  DepthFirstTraversal.traverse[Particle](transformations,
+    transformation => transformation.dependencies.collect({case x: Particle => x}),
     transformation => addVertex(new TransformationVertex(transformation)),
     transformation => {
       for (outgoing <- transformation.dependencies)

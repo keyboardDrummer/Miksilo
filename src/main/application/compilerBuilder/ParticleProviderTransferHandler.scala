@@ -4,7 +4,7 @@ import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 import javax.swing.{JComponent, JList, TransferHandler}
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 
 import scala.collection.convert.Wrappers.JListWrapper
 
@@ -13,17 +13,17 @@ class ParticleProviderTransferHandler(val availableList: JList[_]) extends Trans
 
   @Override
   override def createTransferable(comp: JComponent): Transferable = {
-    new ListItemTransferable(JListWrapper(availableList.getSelectedValuesList).collect({ case x: Injector => x}).toSeq)
+    new ListItemTransferable(JListWrapper(availableList.getSelectedValuesList).collect({ case x: Particle => x}).toSeq)
   }
 
   override def getSourceActions(c: JComponent): Int = DnDConstants.ACTION_COPY
 }
 
 object ListItemTransferable {
-  val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Seq[Injector]], "java/ListItem")
+  val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Seq[Particle]], "java/ListItem")
 }
 
-case class ListItemTransferable(listItems: Seq[Injector]) extends Transferable {
+case class ListItemTransferable(listItems: Seq[Particle]) extends Transferable {
 
 
   @Override

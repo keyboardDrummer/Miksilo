@@ -8,17 +8,17 @@ import javax.swing.text.{DefaultCaret, PlainDocument}
 import application.StyleSheet
 import core.exceptions.CompileException
 import core.layouts.SwingEquationLayout
-import core.modularProgram.PieceCombiner
-import core.transformation.TransformationState
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.CompilerFromParticles
+import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode.ByteCodeSkeleton
 
 import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
+class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
+  val compiler = new CompilerFromParticles(particles)
   private val inputDocument = new PlainDocument()
   private val outputDocument = new PlainDocument()
   val textAreaInput: ParseFromFunction = new ParseFromFunction(() => inputDocument.getText(0, inputDocument.getLength))
@@ -28,9 +28,9 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
 
   def getCompileOptions: Seq[CompileOption] = {
     val selection = Set(CockpitOutputMarker, ByteCodeSkeleton)
-    val orderedSelection = transformations.filter(o => selection.contains(o))
-    val byteCodeActions = Seq(CompileAndRun, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
-    byteCodeActions ++ Seq(PrettyPrint)
+    val orderedSelection = particles.filter(o => selection.contains(o))
+    val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
+    byteCodeActions ++ Seq(PrettyPrintOption)
   }
 
   val outputOptions = Array[OutputOption](textAreaOutput)
@@ -61,12 +61,8 @@ class CompilerCockpit(val transformations: Seq[Injector]) extends Frame {
     inputDocument.replace(0, inputDocument.getLength, text, null)
   }
 
-  def execute(inputParticles: Seq[Injector], outputParticles: Seq[Injector]) = {
-    val cockpitOutputActions = if (transformations.contains(CockpitOutputMarker)) Seq.empty else Seq(CockpitOutputMarker)
-    val pieces = inputParticles ++ transformations ++ cockpitOutputActions
-    val state = new TransformationState()
-    CockpitOutputMarker.setState(state, outputParticles)
-    Try(PieceCombiner.combineAndExecute(state, pieces.reverse)).
+  def execute(action: () => Unit) = {
+    Try(action).
       recover({ case e: CompileException => setOutputText(e.toString) }).
       recover({ case e: Throwable =>
         val writer = new CharArrayWriter()

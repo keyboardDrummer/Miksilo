@@ -4,9 +4,9 @@ import java.awt.dnd.DnDConstants
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.{DefaultListModel, JComponent, JList}
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 
-class ChosenParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[Injector]) extends ParticleProviderTransferHandler(availableList) {
+class ChosenParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[Particle]) extends ParticleProviderTransferHandler(availableList) {
   override def canImport(support: TransferSupport): Boolean = {
     val injectors = getInjectors(support)
     injectors != null
@@ -37,8 +37,8 @@ class ChosenParticlesTransferHandler(availableList: JList[_], val model: Default
     true
   }
 
-  def getInjectors(support: TransferSupport): Seq[Injector] = {
-    support.getTransferable.getTransferData(ListItemTransferable.LIST_ITEM_DATA_FLAVOR).asInstanceOf[Seq[Injector]]
+  def getInjectors(support: TransferSupport): Seq[Particle] = {
+    support.getTransferable.getTransferData(ListItemTransferable.LIST_ITEM_DATA_FLAVOR).asInstanceOf[Seq[Particle]]
   }
 
   override def getSourceActions(c: JComponent): Int = DnDConstants.ACTION_MOVE

@@ -1,6 +1,6 @@
 package transformations.javaPlus
 
-import core.transformation.CompilerFromTransformations
+import core.transformation.CompilerFromParticles
 import org.junit.{Assert, Test}
 import transformations.javac.JavaCompiler
 import util.TestUtils
@@ -12,7 +12,7 @@ class TestExpressionMethod {
   @Test
   def test() {
     val inputDirectory = Path("")
-    val compiler = new CompilerFromTransformations(Seq(ExpressionMethodC) ++ JavaCompiler.javaCompilerTransformations)
+    val compiler = new CompilerFromParticles(Seq(ExpressionMethodC) ++ JavaCompiler.javaCompilerTransformations)
     val result = new TestUtils(compiler).compileAndRun("FibonacciWithExpressionMethod", inputDirectory)
     Assert.assertEquals(8, Integer.parseInt(result))
   }

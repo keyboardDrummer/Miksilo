@@ -1,12 +1,13 @@
 package application.compilerCockpit
 
-import core.transformation.TransformationState
 import transformations.bytecode.PrintByteCode
 
 object EmitByteCode extends CompileOption {
-  override def leave(state: TransformationState): Unit = {
+
+  override def perform(cockpit: CompilerCockpit, input: String): String = {
+    val state = cockpit.compiler.parseAndTransform(input)
     val bytes = PrintByteCode.getBytes(state.program, state).toArray
-    OutputOption.setOutput(state, PrintByteCode.printBytes(bytes))
+    PrintByteCode.printBytes(bytes)
   }
 
   override def toString = "Emit ByteCode"

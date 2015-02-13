@@ -1,12 +1,12 @@
 package transformations.javac.constructor
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ClassC
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.ExpressionAsStatementC
 
-object ImplicitSuperConstructorCall extends ProgramTransformation {
+object ImplicitSuperConstructorCall extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {

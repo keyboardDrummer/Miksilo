@@ -1,10 +1,10 @@
 package transformations.javac.classes
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import core.transformation.{Contract, MetaObject, TransformationState}
 import SelectorC.SelectorKey
 
-object ClassOrPackageSelector extends Injector {
+object ClassOrPackageSelector extends Particle {
   override def dependencies: Set[Contract] = Set(SelectorC, ClassC)
 
   override def inject(state: TransformationState): Unit = {

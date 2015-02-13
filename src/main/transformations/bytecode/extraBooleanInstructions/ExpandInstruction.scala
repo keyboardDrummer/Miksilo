@@ -1,9 +1,9 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.transformation.{Contract, TransformationState, MetaObject}
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 
-trait ExpandInstruction extends Injector {
+trait ExpandInstruction extends Particle {
   def key: Any
 
   override def dependencies: Set[Contract] = Set(ExpandInstructionsC)

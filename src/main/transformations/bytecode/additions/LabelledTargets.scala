@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
@@ -13,7 +13,7 @@ import transformations.javac.classes.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledTargets extends ProgramTransformation {
+object LabelledTargets extends ParticleWithPhase {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
@@ -30,6 +30,7 @@ object LabelledTargets extends ProgramTransformation {
   }
 
   override def inject(state: TransformationState): Unit = {
+    super.inject(state)
     LabelC.inject(state)
   }
 

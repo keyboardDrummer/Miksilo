@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBytecodeInstructions
 
-import core.transformation.{CompilerFromTransformations, MetaObject}
+import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
@@ -16,7 +16,7 @@ class TestOptimizeBooleanInstructions {
   def testForFibonacci() {
     val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeBooleanInstructionsC)
-    val withoutOptimization = new TestUtils(new CompilerFromTransformations(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
+    val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)

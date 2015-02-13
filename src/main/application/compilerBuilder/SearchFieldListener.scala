@@ -5,14 +5,14 @@ import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.Document
 import javax.swing.{ListModel, RowFilter}
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import org.jdesktop.swingx.JXList
 
 
 class ContactRowFilter(val compare: String) extends RowFilter[ListModel[_], java.lang.Integer] {
   override def include(entry: Entry[_ <: ListModel[_], _ <: Integer]): Boolean = {
     val index = entry.getIdentifier
-    val contact = entry.getValue(index).asInstanceOf[Injector]
+    val contact = entry.getValue(index).asInstanceOf[Particle]
     contact.name.contains(compare)
   }
 }

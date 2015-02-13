@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.compilerCockpit.CockpitOutputMarker
 import application.{InjectorListCellRenderer, StyleSheet}
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 
@@ -45,7 +45,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
     list.addListSelectionListener(new ListSelectionListener {
       override def valueChanged(e: ListSelectionEvent): Unit = {
-        painter.select(list.getSelectedValues.map(i => i.asInstanceOf[Injector]).toSeq)
+        painter.select(list.getSelectedValues.map(i => i.asInstanceOf[Particle]).toSeq)
       }
     })
 
@@ -63,7 +63,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane = {
-    val availableItems: Seq[Injector] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
+    val availableItems: Seq[Particle] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
     val availableList = new JXList(availableItems.toArray.asInstanceOf[Array[Object]])
 
     availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))

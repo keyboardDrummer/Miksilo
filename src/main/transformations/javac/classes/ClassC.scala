@@ -5,7 +5,7 @@ import core.grammar.~
 import core.grammarDocument.BiGrammar
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.sillyCodePieces.{GrammarTransformation, ProgramTransformation}
+import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -16,7 +16,7 @@ import transformations.types.{ArrayTypeC, ObjectTypeC}
 import scala.collection.mutable
 
 
-object ClassC extends GrammarTransformation with ProgramTransformation {
+object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
 

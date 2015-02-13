@@ -5,11 +5,11 @@ import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import org.jdesktop.swingx.JXList
 
 object ChosenParticlesPanel {
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Injector]) = {
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
     val compilerList = new JXList()
     compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)

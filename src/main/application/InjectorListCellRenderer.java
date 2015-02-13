@@ -1,7 +1,7 @@
 package application;
 
 import application.compilerBuilder.ParticleLabelPainter;
-import core.transformation.sillyCodePieces.Injector;
+import core.transformation.sillyCodePieces.Particle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,11 +16,11 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
   public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
     JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-    Injector injector = (Injector) value;
-    label.setText(injector.name());
+    Particle particle = (Particle) value;
+    label.setText(particle.name());
     if (!isSelected) {
-      Color color = painter.isDependency(injector) ? Color.RED
-              : painter.isDependant(injector) ? Color.GREEN : getBackground();
+      Color color = painter.isDependency(particle) ? Color.RED
+              : painter.isDependant(particle) ? Color.GREEN : getBackground();
       this.setBackground(color);
     }
 

@@ -3,7 +3,7 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import akka.util.Convert
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, LineNumberRef, StackMapTableAttribute}
@@ -12,7 +12,7 @@ import transformations.types.{ObjectTypeC, TypeC}
 
 import scala.collection.mutable
 
-object PrintByteCode extends ProgramTransformation {
+object PrintByteCode extends ParticleWithPhase {
   val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 

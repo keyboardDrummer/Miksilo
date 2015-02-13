@@ -1,13 +1,13 @@
 package transformations.bytecode.additions
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.PopC
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
 
-object PoptimizeC extends ProgramTransformation {
+object PoptimizeC extends ParticleWithPhase {
 
 
   override def dependencies: Set[Contract] = Set(PopC)

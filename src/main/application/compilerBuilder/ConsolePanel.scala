@@ -7,11 +7,11 @@ import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 import core.transformation.Contract
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
-class ConsolePanel(val compilerParticles: DefaultListModel[Injector])  extends JPanel(new BorderLayout()) {
+class ConsolePanel(val compilerParticles: DefaultListModel[Particle])  extends JPanel(new BorderLayout()) {
 
   val console = new JTextArea()
   console.setBorder(BorderFactory.createLoweredBevelBorder())
@@ -39,15 +39,15 @@ class ConsolePanel(val compilerParticles: DefaultListModel[Injector])  extends J
   object MissingDependenciesError extends DependencyError {
     override def toDocument: ResponsiveDocument = "Some dependencies are missing."
   }
-  case class BadOrderError(dependency: Injector, dependant: Injector) extends DependencyError {
+  case class BadOrderError(dependency: Particle, dependant: Particle) extends DependencyError {
     override def toDocument: ResponsiveDocument = s"Dependency ${dependency.name} should be placed below ${dependant.name}."
   }
 
-  def getDependencyErrors(transformations: Seq[Injector]) : Set[DependencyError] = {
+  def getDependencyErrors(transformations: Seq[Particle]) : Set[DependencyError] = {
     val allTransformations = transformations.toSet
     var available = Set.empty[Contract]
     var result = Set.empty[DependencyError]
-    var badOrderErrors = Map.empty[Injector, BadOrderError]
+    var badOrderErrors = Map.empty[Particle, BadOrderError]
     for (transformation <- transformations.reverse) {
       transformation.dependencies2.foreach(dependency =>
         if (!available.contains(dependency))

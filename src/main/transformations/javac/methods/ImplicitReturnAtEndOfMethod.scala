@@ -1,10 +1,10 @@
 package transformations.javac.methods
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.ClassC
 
-object ImplicitReturnAtEndOfMethod extends ProgramTransformation {
+object ImplicitReturnAtEndOfMethod extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {

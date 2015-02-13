@@ -6,12 +6,10 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
-import transformations.javac.classes.{ConstantPool, ClassC, QualifiedClassName}
+import transformations.javac.classes.{ClassC, ConstantPool, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.VoidTypeC
 import util.TestUtils
-
-import scala.collection.mutable.ArrayBuffer
 
 class EmptyClassCompilation {
   val className: String = "EmptyClass"
@@ -21,7 +19,7 @@ class EmptyClassCompilation {
   def testEquivalentConstantPool() {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: MetaObject = getEmptyClass
-    val compiledCode = JavaCompiler.getTransformer.transform(javaCode)
+    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
@@ -29,7 +27,7 @@ class EmptyClassCompilation {
   def testEquivalentMethod() {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = JavaCompiler.getTransformer.transform(javaCode)
+    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

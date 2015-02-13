@@ -1,12 +1,12 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.{SelectorC, ClassC}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.{CallC, VariableC}
 
-object ImplicitThisInPrivateCalls extends ProgramTransformation {
+object ImplicitThisInPrivateCalls extends ParticleWithPhase {
   val thisName: String = "this"
 
   override def dependencies: Set[Contract] = Set(CallC, VariableC, ClassC)

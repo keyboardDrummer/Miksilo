@@ -1,5 +1,5 @@
 package application.compilerCockpit
 
-import core.transformation.sillyCodePieces.Injector
-
-trait CompileOption extends Injector
+trait CompileOption {
+  def perform(cockpit: CompilerCockpit, input: String): String
+}

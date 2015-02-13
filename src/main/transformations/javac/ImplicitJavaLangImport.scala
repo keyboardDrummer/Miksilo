@@ -1,10 +1,10 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.{ClassC, WildcardImportC}
 
-object ImplicitJavaLangImport extends ProgramTransformation {
+object ImplicitJavaLangImport extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ClassC, WildcardImportC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {

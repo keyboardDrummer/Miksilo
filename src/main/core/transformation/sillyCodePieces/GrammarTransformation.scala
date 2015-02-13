@@ -5,9 +5,8 @@ import core.grammarDocument.GrammarDocumentWriter
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 
-trait GrammarTransformation extends Injector with GrammarDocumentWriter {
+trait GrammarTransformation extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)
-
 
   override def inject(state: TransformationState): Unit = {
     super.inject(state)

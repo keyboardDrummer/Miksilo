@@ -3,7 +3,7 @@ package util
 import java.io
 
 import core.transformation._
-import core.transformation.sillyCodePieces.{Injector, ProgramTransformation}
+import core.transformation.sillyCodePieces.{Particle, ParticleWithPhase}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
@@ -14,7 +14,7 @@ import scala.sys.process.{Process, ProcessLogger}
 
 object TestUtils extends TestUtils(JavaCompiler.getCompiler)
 
-class TestUtils(val compiler: CompilerFromTransformations) {
+class TestUtils(val compiler: CompilerFromParticles) {
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
@@ -33,8 +33,8 @@ class TestUtils(val compiler: CompilerFromTransformations) {
 
   def getBytes(byteCode: MetaObject): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val transformations: Seq[Injector] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
-    new Transformer(transformations).transform(byteCode)
+    val particles: Seq[Particle] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
+    new CompilerFromParticles(particles).transform(byteCode)
     output
   }
 
@@ -58,7 +58,7 @@ class TestUtils(val compiler: CompilerFromTransformations) {
 
   def parseAndTransform(className: String, inputDirectory: Path): MetaObject = {
     val input: File = getJavaTestFile(className, inputDirectory)
-    compiler.parseAndTransform(input)
+    compiler.parseAndTransform(input).program
   }
 
   def getJavaTestFile(className: String, inputDirectory: Path): File = {
@@ -165,7 +165,7 @@ class TestUtils(val compiler: CompilerFromTransformations) {
     }))
   }
 
-  class GetBytes(write: Seq[Byte] => Unit) extends ProgramTransformation {
+  class GetBytes(write: Seq[Byte] => Unit) extends ParticleWithPhase {
     override def transform(program: MetaObject, state: TransformationState): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }

@@ -1,7 +1,7 @@
 package transformations.javac
 
 import core.transformation._
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
@@ -29,11 +29,11 @@ import transformations.types._
 
 object JavaCompiler {
 
-  def getCompiler = new CompilerFromTransformations(javaCompilerTransformations)
+  def getCompiler = new CompilerFromParticles(javaCompilerTransformations)
 
   def allTransformations = javaCompilerTransformations ++ Seq(ExpressionMethodC)
 
-  def javaCompilerTransformations: Seq[Injector] = {
+  def javaCompilerTransformations: Seq[Particle] = {
     Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++ javaMethod
   }
@@ -74,14 +74,12 @@ object JavaCompiler {
   def integerInstructions = Seq(AddIntegersC, IntegerConstantC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
 
-  def getTransformer = new Transformer(javaCompilerTransformations)
-
-  def spliceBeforeTransformations(implicits: Seq[Injector], splice: Seq[Injector]): Seq[Injector] = {
+  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
     val implicitsSet = implicits.toSet
     javaCompilerTransformations.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
   }
 
-  def spliceAfterTransformations(implicits: Seq[Injector], splice: Seq[Injector]): Seq[Injector] = {
+  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
     val implicitsSet = implicits.toSet
     implicits ++ splice ++ javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
   }

@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ConstantPool
 import transformations.types.TypeC
 
-object InferredStackFrames extends ProgramTransformation {
+object InferredStackFrames extends ParticleWithPhase {
   val initialStack = Seq[MetaObject]()
 
   override def dependencies: Set[Contract] = Set(LabelledTargets)

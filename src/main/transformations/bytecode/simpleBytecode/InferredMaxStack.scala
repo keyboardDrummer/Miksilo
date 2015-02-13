@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.additions.LabelledTargets
 import LabelledTargets.LabelKey
@@ -8,7 +8,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.javac.classes.ConstantPool
 
-object InferredMaxStack extends ProgramTransformation {
+object InferredMaxStack extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {

@@ -1,10 +1,10 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ProgramTransformation
+import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.classes.{ClassC, QualifiedClassName}
 
-object ImplicitObjectSuperClass extends ProgramTransformation {
+object ImplicitObjectSuperClass extends ParticleWithPhase {
   val objectName = "Object"
   val packageName = Seq("java", "lang")
   val qualifiedObjectName = new QualifiedClassName(packageName ++ Seq(objectName))

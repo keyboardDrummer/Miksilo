@@ -1,7 +1,6 @@
 package application.compilerCockpit
 
 import core.transformation.TransformationState
-import core.transformation.sillyCodePieces.Injector
 
 object OutputOption {
 
@@ -12,5 +11,6 @@ object OutputOption {
   def setOutput(state: TransformationState, value: String) = state.data(Output) = value
 }
 
-trait OutputOption extends Injector {
+trait OutputOption {
+  def handleOutput(output: String)
 }

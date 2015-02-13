@@ -7,13 +7,13 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
 import application.compilerCockpit.CockpitOutputMarker
-import core.transformation.sillyCodePieces.Injector
+import core.transformation.sillyCodePieces.Particle
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
 
-class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel(new GridBagLayout()) {
+class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel(new GridBagLayout()) {
 
   initialise()
 
@@ -64,7 +64,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
     new Preset("Java", getJavaCompiler)
   }
 
-  def getJavaCompiler: Seq[Injector] = {
+  def getJavaCompiler: Seq[Particle] = {
     JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(CockpitOutputMarker))
   }
 
@@ -77,7 +77,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 
   def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Injector](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
 
     new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(CockpitOutputMarker)))
@@ -106,6 +106,6 @@ class PresetsPanel(compilerParticles: DefaultListModel[Injector]) extends JPanel
   }
 }
 
-case class Preset(name: String, particles: Seq[Injector]) {
+case class Preset(name: String, particles: Seq[Particle]) {
   override def toString = name
 }
