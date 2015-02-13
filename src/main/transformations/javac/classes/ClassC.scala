@@ -1,8 +1,7 @@
 package transformations.javac.classes
 
 import core.document.BlankLine
-import core.grammar.~
-import core.grammarDocument.BiGrammar
+import core.grammarDocument.{BiGrammar, MapGrammar}
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
@@ -62,7 +61,7 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     case _ =>
   }
 
-  def getParent(clazz: MetaObject): Option[String] = clazz.data.get(ClassParent).map(a => a.asInstanceOf[String])
+  def getParent(clazz: MetaObject): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
 
   def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
@@ -91,12 +90,12 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     val importGrammar = grammars.create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical
     val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
-    val _classContent = "class" ~~> identifier % ("{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}")
-    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % _classContent ^^
-      (
-        { case (_package ~ imports) ~ (name ~ methods) => core.grammar.~(core.grammar.~(core.grammar.~(_package, imports), name), methods) },
-        { case _package ~ imports ~ name ~ methods => Some(core.grammar.~(core.grammar.~(_package, imports), core.grammar.~(name, methods))) }) ^^
-      parseMap(ClassFileKey, ClassPackage, ClassImports, ClassName, ByteCodeSkeleton.ClassMethodsKey))
+    val classParentGrammar = ("extends" ~~> identifier ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]])) | produce(None)
+    val nameGrammar: BiGrammar = "class" ~~> identifier
+    val methodsGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"
+    val nameAndParent: BiGrammar = nameGrammar ~~ classParentGrammar ^^ parseMap(ClassFileKey, ClassName, ClassParent)
+    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % methodsGrammar ^^
+      parseMap(ClassFileKey, ClassPackage, ClassImports, PartialSelf, ByteCodeSkeleton.ClassMethodsKey))
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
@@ -108,10 +107,7 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     data.put(ClassPackage, _package)
     data.put(ClassName, name)
     data.put(ClassImports, imports)
-    mbParent match {
-      case Some(parent) => data.put(ClassParent, parent)
-      case _ =>
-    }
+    data.put(ClassParent, mbParent)
   }
 
   def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[Seq[MetaObject]]

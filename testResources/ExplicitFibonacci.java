@@ -1,5 +1,5 @@
 import java.lang.*;
-class Fibonacci
+class Fibonacci extends Object
 {
     public Fibonacci()
     {

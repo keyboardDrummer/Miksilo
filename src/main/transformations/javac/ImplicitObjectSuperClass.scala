@@ -13,7 +13,7 @@ object ImplicitObjectSuperClass extends ParticleWithPhase {
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     if (ClassC.getParent(program).isEmpty) {
-      program(ClassC.ClassParent) = objectName
+      program(ClassC.ClassParent) = Some(objectName)
     }
   }
 }
