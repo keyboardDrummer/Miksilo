@@ -14,7 +14,7 @@ object PrettyPrint extends Particle
     val foundGrammar = state.grammarCatalogue.find(ProgramGrammar)
     state.data(this) = foundGrammar.deepClone
 
-    state.compilerPhases ::= (() => {
+    state.compilerPhases = List(() => {
       val grammar = state.data(this).asInstanceOf[BiGrammar]
       val document: ResponsiveDocument = Try(BiGrammarToDocument.toDocument(state.program, grammar)).
         recover({ case e: PrintFailure => e.toDocument }).get
