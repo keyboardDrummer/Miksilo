@@ -53,7 +53,7 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
-    val compilerListPanel = ChosenParticlesPanel.getPanel(panel, compilerParticles)
+    val compilerListPanel = SelectedParticlesPanel.getPanel(panel, compilerParticles)
     val compilerListConstraints = getConstraints
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)

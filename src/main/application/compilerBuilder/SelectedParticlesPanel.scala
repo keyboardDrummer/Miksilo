@@ -8,15 +8,15 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import core.transformation.sillyCodePieces.Particle
 import org.jdesktop.swingx.JXList
 
-object ChosenParticlesPanel {
+object SelectedParticlesPanel {
   def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
     val compilerList = new JXList()
-    compilerList.setTransferHandler(new ChosenParticlesTransferHandler(compilerList, compilerParticles))
+    compilerList.setTransferHandler(new SelectedParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)
     compilerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
     val compilerListPanel = panel.getInjectorListVisuals(compilerList)
-    compilerListPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Chosen"))
+    compilerListPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Selected"))
 
     val removeButton = new JButton("Remove")
     compilerList.addListSelectionListener(new ListSelectionListener {

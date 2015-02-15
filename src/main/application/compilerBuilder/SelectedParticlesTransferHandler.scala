@@ -6,7 +6,7 @@ import javax.swing.{DefaultListModel, JComponent, JList}
 
 import core.transformation.sillyCodePieces.Particle
 
-class ChosenParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[Particle]) extends ParticleProviderTransferHandler(availableList) {
+class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[Particle]) extends ParticleProviderTransferHandler(availableList) {
   override def canImport(support: TransferSupport): Boolean = {
     val injectors = getInjectors(support)
     injectors != null

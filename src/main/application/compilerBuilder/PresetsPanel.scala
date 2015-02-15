@@ -6,7 +6,7 @@ import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
-import application.compilerCockpit.CockpitOutputMarker
+import application.compilerCockpit.MarkOutputGrammar
 import core.transformation.sillyCodePieces.Particle
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -65,11 +65,11 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   }
 
   def getJavaCompiler: Seq[Particle] = {
-    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(CockpitOutputMarker))
+    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(CockpitOutputMarker) ++ JavaCompiler.javaCompilerTransformations)
+    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations)
   }
 
   def getFibonacciExpressionMethodPreset = {
@@ -80,7 +80,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
 
-    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(CockpitOutputMarker)))
+    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {

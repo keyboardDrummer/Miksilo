@@ -27,7 +27,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
   val compileOptions = getCompileOptions.toArray
 
   def getCompileOptions: Seq[CompileOption] = {
-    val selection = Set(CockpitOutputMarker, ByteCodeSkeleton)
+    val selection = Set(MarkOutputGrammar, ByteCodeSkeleton)
     val orderedSelection = particles.filter(o => selection.contains(o))
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
     byteCodeActions ++ Seq(PrettyPrintOption)
