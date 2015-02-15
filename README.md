@@ -12,9 +12,9 @@ Particle compiler focuses purely on intermediate languages to achieve modularisa
 Using weak typing it becomes simple to define a new intermediate language by applying a delta to an existing one.
 
 ###GUI
-Particle compiler includes a GUI. You can use this to play around with the defined particles and construct a compiler form them.
+Particle compiler includes a GUI. You can use this to play around with the defined particles and construct a compiler from them.
 Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can of course run the compiler,
-but also do thing like ask the compiler for its in- and output grammar.
+but also do things like ask the compiler for its in- and output grammar.
 
 ###BiGrammar
 To enable parsing and printing with little development effort, particle compiler uses a 'BiGrammar'.
