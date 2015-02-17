@@ -4,8 +4,9 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
+import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC}
+import transformations.types.{ObjectTypeC, BooleanTypeC, IntTypeC, LongTypeC}
 
 
 object VariableC extends ExpressionInstance {
@@ -45,6 +46,7 @@ object VariableC extends ExpressionInstance {
       case BooleanTypeC.BooleanTypeKey => LoadIntegerC.load(variableAddress)
       case IntTypeC.IntTypeKey => LoadIntegerC.load(variableAddress)
       case LongTypeC.LongTypeKey => LoadLongC.load(variableAddress)
+      case ObjectTypeC.ObjectTypeKey => LoadAddressC.addressLoad(variableAddress)
     })
   }
 }

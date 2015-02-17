@@ -1,8 +1,8 @@
-class Fibonacci
+class FibonacciInstanceMethod
 {
     public static void main(String[] args)
     {
-        System.out.print(new Fibonacci().fibonacci(5));
+        System.out.print(new FibonacciInstanceMethod().fibonacci(5));
     }
 
     public int fibonacci(int index)

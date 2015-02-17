@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs.{CompareLongC, LoadLongC, LongConstantC, StoreLongC}
-import transformations.bytecode.coreInstructions.objects.{LoadAddressC, PushNullC, StoreAddressC}
+import transformations.bytecode.coreInstructions.objects.{NewByteCodeC, LoadAddressC, PushNullC, StoreAddressC}
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.additions.{LabelledTargets, PoptimizeC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -35,7 +35,7 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++ javaMethod
+      ImplicitObjectSuperClass, NewC, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++ javaMethod
   }
 
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
@@ -64,7 +64,7 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
-      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC,
+      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, DuplicateInstructionC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC) ++
       integerInstructions ++ longInstructions
   }
