@@ -13,8 +13,7 @@ object LongConstantC extends InstructionC {
   override val key: AnyRef = LongConstantKey
 
   def constant(value: Int) = {
-    require (value <= 1)
-    require (value >= 0)
+    require (0 <= value && value <= 1)
     instruction(LongConstantKey, Seq(value))
   }
 

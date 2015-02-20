@@ -4,7 +4,8 @@ import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.{VoidReturnInstructionC, PopC}
+import transformations.bytecode.coreInstructions.longs.LongConstantC
+import transformations.bytecode.coreInstructions.{Pop2C, VoidReturnInstructionC, PopC}
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
@@ -75,5 +76,14 @@ class TestPoptimize {
     val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)
+  }
+  
+  @Test
+  def testPop2() = {
+    val instructions = Seq(LongConstantC.constant(1), Pop2C.pop2)
+    val expected = Seq.empty[MetaObject]
+    val newInstructions = transformInstructions(instructions)
+    Assert.assertEquals(expected, newInstructions)
+    
   }
 }

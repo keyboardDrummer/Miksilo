@@ -22,7 +22,7 @@ object ExpressionAsStatementC extends StatementInstance {
     val extra = TypeC.getTypeSize(_type, state) match {
       case 0 => Seq.empty
       case 1 => Seq(PopC.pop)
-      case 2 => Seq(Pop2C.pop)
+      case 2 => Seq(Pop2C.pop2)
     }
     ExpressionC.getToInstructions(state)(expression) ++ extra
   }

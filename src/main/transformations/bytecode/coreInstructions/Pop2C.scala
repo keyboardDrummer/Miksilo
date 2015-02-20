@@ -9,7 +9,7 @@ object Pop2C extends InstructionC {
   object Pop2Key
   override val key: AnyRef = Pop2Key
 
-  def pop = new MetaObject(Pop2Key)
+  def pop2 = new MetaObject(Pop2Key)
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     PrintByteCode.hexToBytes("58")
