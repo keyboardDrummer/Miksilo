@@ -63,7 +63,7 @@ object JavaCompiler {
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
   def byteCodeInstructions: Seq[InstructionC] = {
-    Seq(PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
+    Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, DuplicateInstructionC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC) ++
       integerInstructions ++ longInstructions

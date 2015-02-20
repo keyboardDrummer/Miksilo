@@ -1,10 +1,9 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.Instruction
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
 
 object DuplicateInstructionC extends InstructionC with Instruction {
 
@@ -17,8 +16,10 @@ object DuplicateInstructionC extends InstructionC with Instruction {
     PrintByteCode.hexToBytes("59")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState):
-  (Seq[MetaObject], Seq[MetaObject]) = {
-    (Seq(IntTypeC.intType),Seq(IntTypeC.intType, IntTypeC.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature = {
+    val input: MetaObject = stackTypes.last
+    assertSingleWord(state, input)
+    new InstructionSignature(Seq(input),Seq(input, input))
   }
 }

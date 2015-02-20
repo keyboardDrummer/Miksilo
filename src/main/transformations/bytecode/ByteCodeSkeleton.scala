@@ -7,6 +7,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
 import transformations.bytecode.constants._
+import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._
 
@@ -21,8 +22,6 @@ object ByteCodeSkeleton extends GrammarTransformation
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
-
-  def getInstructionStackSizeModificationRegistry(state: TransformationState) = getState(state).getInstructionStackSizeModificationRegistry
 
   def getMethodAttributes(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
 
@@ -64,7 +63,7 @@ object ByteCodeSkeleton extends GrammarTransformation
   class State {
     var constantPool: ConstantPool = null
     val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
-    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => (Seq[MetaObject], Seq[MetaObject])]
+    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, Seq[MetaObject]) => InstructionSignature]
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]

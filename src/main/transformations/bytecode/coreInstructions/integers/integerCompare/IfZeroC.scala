@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.transformation.{TransformationState, MetaObject}
+import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import PrintByteCode._
@@ -17,7 +18,8 @@ object IfZeroC extends JumpInstruction {
     hexToBytes("99") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(IntTypeC.intType), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   object IfZeroKey
 

@@ -11,8 +11,6 @@ object GotoC extends InstructionC {
 
   def goTo(target: Int): MetaObject = ByteCodeSkeleton.instruction(GoToKey, Seq(target))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 0
-
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
     PrintByteCode.hexToBytes("a7") ++ PrintByteCode.shortToBytes(arguments(0))
@@ -20,7 +18,8 @@ object GotoC extends InstructionC {
 
   override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, true)
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature = InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize(instruction: MetaObject): Int = 3
 

@@ -2,24 +2,24 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.additions.LabelledTargets
-import LabelledTargets.LabelKey
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.javac.classes.ConstantPool
+import transformations.types.TypeC
 
 object InferredMaxStack extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
 
     def getMaxStack(code: MetaObject): Integer = {
       val instructions = CodeAttribute.getCodeInstructions(code)
-      val registry = ByteCodeSkeleton.getInstructionStackSizeModificationRegistry(state)
-      val currentStacks = new StackSizeAnalysis(instructions, instruction => registry(instruction.clazz)(constantPool, instruction), state).run(0, 0)
-      val maxStack = currentStacks.values.max
+      val stackLayoutAnalysis = new StackLayoutAnalysisFromState(state, instructions)
+
+      val maxStack = stackLayoutAnalysis.inputsPerInstructionIndex.values.map(
+        stackLayout => stackLayout.map(_type => TypeC.getTypeSize(_type,state)).sum).max
       maxStack
     }
 

@@ -4,7 +4,7 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import PrintByteCode._
-import transformations.bytecode.coreInstructions.InstructionC
+import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.javac.classes.ConstantPool
 import transformations.types.LongTypeC
 
@@ -22,8 +22,8 @@ object LongConstantC extends InstructionC {
     byteToBytes(9 + ByteCodeSkeleton.getInstructionArguments(instruction)(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState)
-  = (Seq(), Seq(LongTypeC.longType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature = InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

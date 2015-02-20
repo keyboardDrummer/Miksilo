@@ -3,7 +3,7 @@ package transformations.bytecode.coreInstructions.longs
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import PrintByteCode._
-import transformations.bytecode.coreInstructions.InstructionC
+import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.javac.classes.ConstantPool
 import transformations.types.LongTypeC
 
@@ -22,8 +22,9 @@ object LoadLongC extends InstructionC {
       byteToBytes(hexToInt("1e") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) =
-    (Seq(), Seq(LongTypeC.longType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature =
+    InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   object LongLoad
 }

@@ -11,14 +11,13 @@ object VoidReturnInstructionC extends InstructionC {
 
   def voidReturn: MetaObject = ByteCodeSkeleton.instruction(VoidReturn)
 
-
   override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, false)
-
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 0
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = PrintByteCode.hexToBytes("b1")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature =
+    InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

@@ -4,7 +4,7 @@ import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.PopC
+import transformations.bytecode.coreInstructions.{VoidReturnInstructionC, PopC}
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
@@ -13,9 +13,9 @@ class TestPoptimize {
 
   @Test
   def testBasic() {
-    val instructions = Seq(IntegerConstantC.integerConstant(3), PopC.pop)
+    val instructions = Seq(IntegerConstantC.integerConstant(3), PopC.pop, VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
-    Assert.assertEquals(Seq.empty[MetaObject], newInstructions)
+    Assert.assertEquals(Seq(VoidReturnInstructionC.voidReturn), newInstructions)
   }
 
   @Test
@@ -23,27 +23,29 @@ class TestPoptimize {
     val instructions = Seq(IntegerConstantC.integerConstant(3),
       IntegerConstantC.integerConstant(2),
       PopC.pop,
-      PopC.pop)
+      PopC.pop,
+      VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
-    Assert.assertEquals(Seq.empty[MetaObject], newInstructions)
+    Assert.assertEquals(Seq(VoidReturnInstructionC.voidReturn), newInstructions)
   }
 
 
   @Test
   def testEncapsulation() {
-    val expected = Seq(IntegerConstantC.integerConstant(2), StoreIntegerC.integerStore(0))
-    val instructions = Seq(IntegerConstantC.integerConstant(3)) ++ expected ++ Seq(PopC.pop)
+    val middle = Seq(IntegerConstantC.integerConstant(2), StoreIntegerC.integerStore(0))
+    val expected = middle ++ Seq(VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(IntegerConstantC.integerConstant(3)) ++ middle ++ Seq(PopC.pop, VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(expected, newInstructions)
   }
-
 
   @Test
   def testAdvanced() {
     val expected = Seq(IntegerConstantC.integerConstant(3),
       IntegerConstantC.integerConstant(3),
       StoreIntegerC.integerStore(0),
-      StoreIntegerC.integerStore(0))
+      StoreIntegerC.integerStore(0),
+      VoidReturnInstructionC.voidReturn)
     val instructions = Seq(IntegerConstantC.integerConstant(3),
       IntegerConstantC.integerConstant(3),
       IntegerConstantC.integerConstant(3),
@@ -53,14 +55,15 @@ class TestPoptimize {
       StoreIntegerC.integerStore(0),
       PopC.pop,
       StoreIntegerC.integerStore(0),
-      PopC.pop)
+      PopC.pop,
+      VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(expected, newInstructions)
   }
 
   @Test
   def testRobustness(){
-    val instructions = Seq(IntegerConstantC.integerConstant(3))
+    val instructions = Seq(IntegerConstantC.integerConstant(3), VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(instructions, newInstructions)
   }

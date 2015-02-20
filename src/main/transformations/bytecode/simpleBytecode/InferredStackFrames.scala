@@ -2,15 +2,14 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.additions.LabelledTargets
-import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
-import StackMapTableAttribute.{FullFrameStack, FullFrameLocals}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.classes.ConstantPool
+import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
+import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
+import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.types.TypeC
 
 object InferredStackFrames extends ParticleWithPhase {
-  val initialStack = Seq[MetaObject]()
 
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
@@ -27,15 +26,15 @@ object InferredStackFrames extends ParticleWithPhase {
       val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
-      val stackLayouts: Map[Int, Seq[MetaObject]] = getStackLayoutsPerInstruction(state, instructions)
+      val stackLayouts = new StackLayoutAnalysisFromState(state, instructions)
       val localTypes: Map[Int, Map[Int, MetaObject]] = getLocalTypes(initialLocals, instructions)
       localTypes.size
-      var previousStack = initialStack
+      var previousStack = stackLayouts.initialStack
       var previousLocals = initialLocals
       for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledTargets.LabelKey)) {
         val index = indexedLabel._2
         val label = indexedLabel._1
-        val currentStack = stackLayouts(index)
+        val currentStack = stackLayouts.inputsPerInstructionIndex(index)
         val locals = getLocalTypesSequenceFromMap(localTypes(index))
         label(LabelledTargets.LabelStackFrame) = getStackMap(previousStack, currentStack, previousLocals, locals)
         previousStack = currentStack
@@ -50,17 +49,11 @@ object InferredStackFrames extends ParticleWithPhase {
 
     def getLocalTypes(initialLocals: Seq[MetaObject], instructions: Seq[MetaObject]): Map[Int, Map[Int, MetaObject]] = {
       val instructionVariableUpdateRegistry = ByteCodeSkeleton.getState(state).localUpdates
-      val analysis: LocalTypeAnalysis = new LocalTypeAnalysis(instructions, instruction => instructionVariableUpdateRegistry(instruction.clazz)(instruction), state)
+      val getVariableUpdates: (MetaObject) => Map[Int, MetaObject] = instruction => instructionVariableUpdateRegistry(instruction.clazz)(instruction)
+      val jumpBehaviorRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
+      val getJumpBehavior: (Any) => JumpBehavior = clazz => jumpBehaviorRegistry(clazz)
+      val analysis: LocalTypeAnalysis = new LocalTypeAnalysis(instructions, getVariableUpdates, getJumpBehavior)
       analysis.run(0, initialLocals.zipWithIndex.map(p => p._2 -> p._1).toMap)
-    }
-
-    def getStackLayoutsPerInstruction(state: TransformationState, instructions: Seq[MetaObject]): Map[Int, Seq[MetaObject]] = {
-      val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
-      val stackAnalysis: StackLayoutAnalysis = new StackLayoutAnalysis(instructions,
-        instruction => instructionSignatureRegistry(instruction.clazz)(constantPool, instruction)._1,
-        instruction => instructionSignatureRegistry(instruction.clazz)(constantPool, instruction)._2,
-        state)
-      stackAnalysis.run(0, initialStack)
     }
 
     def toStackType(_type: MetaObject) = TypeC.toStackType(constantPool, _type)

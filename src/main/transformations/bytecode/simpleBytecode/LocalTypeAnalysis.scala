@@ -1,9 +1,10 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.MetaObject
+import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 
-class LocalTypeAnalysis(instructions: Seq[MetaObject], getVariableUpdates: MetaObject => Map[Int, MetaObject], state: TransformationState)
-  extends InstructionFlowAnalysis[Map[Int, MetaObject]](instructions, state) {
+class LocalTypeAnalysis(instructions: Seq[MetaObject], getVariableUpdates: MetaObject => Map[Int, MetaObject], getJumpBehavior: Any => JumpBehavior)
+  extends InstructionFlowAnalysis[Map[Int, MetaObject]](instructions, getJumpBehavior) {
 
   override def combineState(first: Map[Int, MetaObject], second: Map[Int, MetaObject]): Option[Map[Int, MetaObject]] = {
     if (first == second)

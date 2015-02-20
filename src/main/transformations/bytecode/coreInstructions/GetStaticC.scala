@@ -12,14 +12,14 @@ object GetStaticC extends InstructionC {
 
   def getStatic(fieldRefIndex: Int): MetaObject = instruction(GetStaticKey, Seq(fieldRefIndex))
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
-
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState) = (Seq(), Seq(getReturnType(constantPool, instruction)))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature =
+    new InstructionSignature(Seq(), Seq(getReturnType(constantPool, instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
     val location = ByteCodeSkeleton.getInstructionArguments(getStatic)(0)

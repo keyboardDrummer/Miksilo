@@ -2,29 +2,20 @@ package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.PopC
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.classes.ConstantPool
+import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.coreInstructions.{InstructionC, PopC}
 
 object PoptimizeC extends ParticleWithPhase {
-
 
   override def dependencies: Set[Contract] = Set(PopC)
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
-      val stackModRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
-      def getInOutSizes(instruction: MetaObject) = {
-        val signature = stackModRegistry(instruction.clazz)(constantPool, instruction)
-        val inCount = signature._1.size
-        val outCount = signature._2.size
-        (inCount, outCount)
-      }
+      def getInOutSizes(instruction: MetaObject) = InstructionC.getInOutSizes(instruction, state)
 
       var newInstructions = List.empty[MetaObject]
       var consumptions = List.empty[Boolean]

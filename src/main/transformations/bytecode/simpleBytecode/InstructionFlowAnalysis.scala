@@ -1,27 +1,27 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.MetaObject
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
 import util.DataFlowAnalysis
 
-abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject], state: TransformationState)
+abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject], getJumpBehavior: Any => JumpBehavior)
   extends DataFlowAnalysis[Int, State] {
 
-  val labels = instructions.zipWithIndex.filter(i => i._1.clazz == LabelledTargets.LabelKey)
-    .map(p => (LabelledTargets.getLabelName(p._1), p._2)).toMap
+  val labelIndices = instructions.zipWithIndex.
+    filter(indexedInstruction => indexedInstruction._1.clazz == LabelledTargets.LabelKey).
+    map(indexedInstruction => (LabelledTargets.getLabelName(indexedInstruction._1), indexedInstruction._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)
 
-    val jumpBehavior = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry(instruction.clazz)
+    val jumpBehavior = getJumpBehavior(instruction.clazz)
     var result = Set.empty[Int]
     if (jumpBehavior.movesToNext)
       result += instructionIndex + 1
 
     if (jumpBehavior.hasJumpInFirstArgument)
-      result += labels(getInstructionArguments(instruction)(0).asInstanceOf[String])
+      result += labelIndices(getInstructionArguments(instruction)(0).asInstanceOf[String])
 
     result
   }

@@ -2,10 +2,8 @@ package transformations.bytecode.coreInstructions.longs
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.PrintByteCode
-import PrintByteCode._
-import transformations.bytecode.PrintByteCode
-import transformations.bytecode.coreInstructions.InstructionC
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.javac.classes.ConstantPool
 import transformations.types.LongTypeC
 
@@ -24,8 +22,8 @@ object StoreLongC  extends InstructionC {
       byteToBytes(hexToInt("3f") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState)
-  = (Seq(LongTypeC.longType), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
 
   override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
     Map(getInstructionArguments(instruction)(0) -> LongTypeC.longType)

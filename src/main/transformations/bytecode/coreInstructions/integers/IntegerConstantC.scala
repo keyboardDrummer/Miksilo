@@ -4,7 +4,7 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import PrintByteCode._
-import transformations.bytecode.coreInstructions.InstructionC
+import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
@@ -18,14 +18,13 @@ object IntegerConstantC extends InstructionC {
     instruction(IntegerConstantKey, Seq(value))
   }
 
-  override def getInstructionStackSizeModification(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): Int = 1
-
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     byteToBytes(3 + ByteCodeSkeleton.getInstructionArguments(instruction)(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState)
-  = (Seq(), Seq(IntTypeC.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
+                                          state: TransformationState): InstructionSignature =
+    InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

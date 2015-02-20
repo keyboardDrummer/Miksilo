@@ -7,7 +7,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
-import transformations.bytecode.coreInstructions.{GotoC, InstructionC}
+import transformations.bytecode.coreInstructions.{InstructionSignature, GotoC, InstructionC}
 import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable
@@ -128,7 +128,8 @@ object LabelledTargets extends ParticleWithPhase {
 
     override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, state: TransformationState): (Seq[MetaObject], Seq[MetaObject]) = (Seq.empty, Seq.empty)
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject], state: TransformationState):
+    InstructionSignature = new InstructionSignature(Seq.empty, Seq.empty)
 
     override def getInstructionSize(instruction: MetaObject): Int = 0
   }
