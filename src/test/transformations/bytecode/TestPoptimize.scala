@@ -84,6 +84,5 @@ class TestPoptimize {
     val expected = Seq.empty[MetaObject]
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(expected, newInstructions)
-    
   }
 }

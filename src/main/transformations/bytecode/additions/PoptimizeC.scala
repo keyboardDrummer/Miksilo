@@ -4,7 +4,7 @@ import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.{InstructionC, PopC}
+import transformations.bytecode.coreInstructions._
 
 object PoptimizeC extends ParticleWithPhase {
 
@@ -22,6 +22,11 @@ object PoptimizeC extends ParticleWithPhase {
       def processInstruction(instruction: MetaObject) {
         if (instruction.clazz == PopC.PopKey) {
           consumptions ::= true
+          return
+        }
+
+        if (instruction.clazz == Pop2C.Pop2Key) {
+          consumptions = List(true,true) ++ consumptions
           return
         }
 
