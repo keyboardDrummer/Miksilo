@@ -40,7 +40,7 @@ object PoptimizeC extends ParticleWithPhase {
           outLeft -= 1
         }
         val outConsumption = out - outPop
-        val hasSideEffect = out == 0 //TODO dangerous assumption :D
+        val hasSideEffect = guessIfInstructionHasSideEffect(out)
         val keepInstruction = outConsumption != 0 || hasSideEffect
         if (keepInstruction) {
           newInstructions = 0.until(outPop).map(_ => PopC.pop).toList ++ newInstructions
@@ -54,5 +54,9 @@ object PoptimizeC extends ParticleWithPhase {
       }
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions.toSeq
     }
+  }
+
+  def guessIfInstructionHasSideEffect(out: Int): Boolean = {
+    out == 0 //dangerous assumption :D
   }
 }
