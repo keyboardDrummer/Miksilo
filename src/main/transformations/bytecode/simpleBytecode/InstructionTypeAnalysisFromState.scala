@@ -27,8 +27,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
       instructionSignatureRegistry(instruction.clazz)(constantPool, instruction, inputTypes)
     val instructionVariableUpdateRegistry = ByteCodeSkeleton.getState(state).localUpdates
     val getVariableUpdates: (MetaObject) => Map[Int, MetaObject] = instruction => instructionVariableUpdateRegistry(instruction.clazz)(instruction)
-    val typeAnalysis: InstructionTypeAnalysis = new InstructionTypeAnalysis(instructions, getVariableUpdates, getInstructionSignature, getJumpBehavior)
-    typeAnalysis
+    new InstructionTypeAnalysis(instructions, getVariableUpdates, getInstructionSignature, getJumpBehavior)
   }
   
   def getMethodParameters = {

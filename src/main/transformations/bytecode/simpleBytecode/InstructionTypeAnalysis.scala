@@ -4,6 +4,7 @@ import core.exceptions.BadInputException
 import core.transformation.MetaObject
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.types.ObjectTypeC
 
 case class ProgramTypeState(stackTypes: Seq[MetaObject], variableTypes: Map[Int, MetaObject])
 
@@ -39,9 +40,9 @@ class InstructionTypeAnalysis(instructions: Seq[MetaObject],
       if (input.length > stateStack.length)
         throw new StackDoesNotFitInstructionInput(instruction, input, stateStack)
 
-//      val stackTop = stateStack.takeRight(input.length) //TODO deze typecheck weer terughalen maar met slechts 1 object type.
-//      if (input != stackTop)
-//        throw new StackDoesNotFitInstructionInput(instruction, input, stateStack)
+      val stackTop = stateStack.takeRight(input.length)
+      if (convertObjectTypesToObjectKey(input) != convertObjectTypesToObjectKey(stackTop))
+        throw new StackDoesNotFitInstructionInput(instruction, input, stateStack)
 
       val remainingStack = stateStack.dropRight(input.length)
       val newStack = remainingStack ++ signature.outputs
@@ -53,6 +54,13 @@ class InstructionTypeAnalysis(instructions: Seq[MetaObject],
     catch {
       case e: IndexOutOfBoundsException => throw MissingReturnInstruction
     }
+  }
+
+  def convertObjectTypesToObjectKey(input: Seq[MetaObject]): Seq[Object] = {
+    input.map(_type => _type.clazz match {
+      case ObjectTypeC.ObjectTypeKey => ObjectTypeC.ObjectTypeKey
+      case _ => _type
+    })
   }
 
   object MissingReturnInstruction extends BadInputException
