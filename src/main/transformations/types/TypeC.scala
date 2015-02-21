@@ -20,7 +20,7 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
-object TypeC extends GrammarTransformation {
+object TypeC extends GrammarTransformation { //TODO move some specific type code to the respective type.
   def getVerificationInfoBytes(clazz: MetaObject, _type: MetaObject, state: TransformationState): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")

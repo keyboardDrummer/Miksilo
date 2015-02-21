@@ -6,6 +6,7 @@ import transformations.bytecode.PrintByteCode
 import PrintByteCode._
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
@@ -16,8 +17,7 @@ object AddIntegersC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = hexToBytes("60")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
-                                          state: TransformationState): InstructionSignature = binary(IntTypeC.intType)
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = binary(IntTypeC.intType)
 
   override def getInstructionSize(instruction: MetaObject): Int = 1
 

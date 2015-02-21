@@ -2,6 +2,7 @@ package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.transformation.{TransformationState, MetaObject}
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import PrintByteCode._
@@ -19,8 +20,7 @@ object IfIntegerCompareNotEqualC extends JumpInstruction {
     hexToBytes("a0") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
-                                          state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   object IfIntegerCompareNotEqualKey

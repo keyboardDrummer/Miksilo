@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.transformation.{MetaObject, TransformationState}
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import PrintByteCode._
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
@@ -22,8 +23,7 @@ object LoadLongC extends InstructionC {
       byteToBytes(hexToInt("1e") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
-                                          state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   object LongLoad

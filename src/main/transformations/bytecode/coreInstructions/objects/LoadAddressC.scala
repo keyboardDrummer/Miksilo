@@ -1,10 +1,10 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.transformation.{MetaObject, TransformationState}
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
+import transformations.bytecode.simpleBytecode.ProgramTypeState
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
 
 object LoadAddressC extends InstructionC {
 
@@ -21,8 +21,13 @@ object LoadAddressC extends InstructionC {
       PrintByteCode.byteToBytes(PrintByteCode.hexToInt("2a") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, stackTypes: Seq[MetaObject],
-                                          state: TransformationState): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                          state: TransformationState): InstructionSignature = {
+    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val location = arguments(0)
+
+    InstructionSignature(Seq(), Seq(typeState.variableTypes(location)))
+  }
 
   object AddressLoad
 

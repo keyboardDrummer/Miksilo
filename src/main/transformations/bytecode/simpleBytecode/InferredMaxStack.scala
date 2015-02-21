@@ -14,21 +14,19 @@ object InferredMaxStack extends ParticleWithPhase {
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
 
-    def getMaxStack(code: MetaObject): Integer = {
-      val instructions = CodeAttribute.getCodeInstructions(code)
-      val stackLayoutAnalysis = new StackLayoutAnalysisFromState(state, instructions)
+    def getMaxStack(method: MetaObject): Integer = {
+      val stackLayoutAnalysis = new StackLayoutAnalysisFromState(state, method)
 
-      val maxStack = stackLayoutAnalysis.inputsPerInstructionIndex.values.map(
-        stackLayout => stackLayout.map(_type => TypeC.getTypeSize(_type,state)).sum).max
+      val maxStack = stackLayoutAnalysis.typeStatePerInstruction.values.map(
+        stackLayout => stackLayout.stackTypes.map(_type => TypeC.getTypeSize(_type,state)).sum).max
       maxStack
     }
 
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val code = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
-      code(CodeAttribute.CodeMaxStackKey) = getMaxStack(code)
+      code(CodeAttribute.CodeMaxStackKey) = getMaxStack(method)
     }
   }
-
 
   def getInstructionStackSizeModification(constantPool: Seq[Any], instruction: MetaObject): Integer =
     instruction.clazz match {

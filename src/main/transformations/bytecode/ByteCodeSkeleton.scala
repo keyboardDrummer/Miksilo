@@ -8,6 +8,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types._
 
@@ -63,7 +64,7 @@ object ByteCodeSkeleton extends GrammarTransformation
   class State {
     var constantPool: ConstantPool = null
     val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
-    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, Seq[MetaObject]) => InstructionSignature]
+    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]

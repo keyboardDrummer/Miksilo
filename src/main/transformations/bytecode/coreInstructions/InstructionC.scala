@@ -7,6 +7,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 import transformations.types.{LongTypeC, IntTypeC, TypeC}
 
@@ -16,17 +17,19 @@ class ByteCodeTypeException(message: String) extends Exception(message)
 
 object InstructionC
 {
-  def getInOutSizes(instruction: MetaObject, state: TransformationState): (Int,Int) = {
+  def getInOutSizes(instruction: MetaObject, state: TransformationState): (Int,Int) = { //TODO deze methode fatsoenlijk maken.
     val getSignature = ByteCodeSkeleton.getInstructionSignatureRegistry(state)(instruction.clazz)
     val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
     try
     {
-      val signature = getSignature(constantPool,instruction, Seq(IntTypeC.intType))
+      val intTypeState = new ProgramTypeState(Seq(IntTypeC.intType), 0.to(10).map(index => (index,IntTypeC.intType)).toMap)
+      val signature = getSignature(constantPool,instruction, intTypeState)
       getSignatureInOutLengths(state, signature)
     } catch
       {
         case e:ByteCodeTypeException =>
-          val signature = getSignature(constantPool,instruction, Seq(LongTypeC.longType))
+          val longTypeState = new ProgramTypeState(Seq(LongTypeC.longType), 0.to(10).map(index => (index,LongTypeC.longType)).toMap)
+          val signature = getSignature(constantPool,instruction, longTypeState)
           getSignatureInOutLengths(state, signature)
       }
   }
@@ -67,8 +70,7 @@ trait InstructionC extends GrammarTransformation {
 
   def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] = Map.empty
 
-  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject,
-                                 stackTypes: Seq[MetaObject], state: TransformationState): InstructionSignature
+  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature
 
   def getInstructionSize(instruction: MetaObject): Int = getInstructionByteCode(instruction).size
 

@@ -12,7 +12,7 @@ import transformations.types.{ObjectTypeC, TypeC}
 
 import scala.collection.mutable
 
-object PrintByteCode extends ParticleWithPhase {
+object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naar byte code particles verplaatsen.
   val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 
