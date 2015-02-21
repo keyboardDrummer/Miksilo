@@ -7,7 +7,7 @@ import transformations.bytecode.coreInstructions.InstructionSignature
 
 case class ProgramTypeState(stackTypes: Seq[MetaObject], variableTypes: Map[Int, MetaObject])
 
-class StackLayoutAnalysis(instructions: Seq[MetaObject],
+class InstructionTypeAnalysis(instructions: Seq[MetaObject],
                           getVariableUpdates: MetaObject => Map[Int, MetaObject],
                           getSignature: (ProgramTypeState, MetaObject) => InstructionSignature,
                           getJumpBehavior: Any => JumpBehavior)

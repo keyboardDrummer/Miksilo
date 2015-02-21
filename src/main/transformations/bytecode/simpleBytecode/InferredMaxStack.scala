@@ -15,7 +15,7 @@ object InferredMaxStack extends ParticleWithPhase {
     val clazz = program
 
     def getMaxStack(method: MetaObject): Integer = {
-      val stackLayoutAnalysis = new StackLayoutAnalysisFromState(state, method)
+      val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, method)
 
       val maxStack = stackLayoutAnalysis.typeStatePerInstruction.values.map(
         stackLayout => stackLayout.stackTypes.map(_type => TypeC.getTypeSize(_type,state)).sum).max

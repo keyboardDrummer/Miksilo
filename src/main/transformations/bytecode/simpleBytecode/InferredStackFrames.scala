@@ -23,7 +23,7 @@ object InferredStackFrames extends ParticleWithPhase {
       val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
-      val stackLayouts = new StackLayoutAnalysisFromState(state, method)
+      val stackLayouts = new InstructionTypeAnalysisFromState(state, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
       for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledTargets.LabelKey)) {
