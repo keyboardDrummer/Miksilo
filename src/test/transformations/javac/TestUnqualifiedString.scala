@@ -6,7 +6,7 @@ import util.TestUtils
 import scala.reflect.io.Path
 
 
-class UnqualifiedString {
+class TestUnqualifiedString {
 
   @Test
   def test() {
