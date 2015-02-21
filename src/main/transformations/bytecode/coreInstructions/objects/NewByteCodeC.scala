@@ -2,6 +2,7 @@ package transformations.bytecode.coreInstructions.objects
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
@@ -25,7 +26,7 @@ object NewByteCodeC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
     val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
     val classRef = constantPool.getValue(location).asInstanceOf[MetaObject]
-    val className = constantPool.getValue(ByteCodeSkeleton.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val className = constantPool.getValue(ClassRefConstant.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
     InstructionSignature(Seq.empty, Seq(classType))
   }

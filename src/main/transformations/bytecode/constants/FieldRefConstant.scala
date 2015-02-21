@@ -1,9 +1,11 @@
 package transformations.bytecode.constants
 
-import core.transformation.MetaObject
-import transformations.bytecode.ByteCodeSkeleton._
+import core.grammarDocument.BiGrammar
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.{TransformationState, MetaObject}
+import transformations.bytecode.PrintByteCode._
 
-trait FieldRefConstant {
+object FieldRefConstant extends ConstantEntry {
 
   object FieldRef
 
@@ -16,9 +18,17 @@ trait FieldRefConstant {
     data.put(FieldRefNameAndTypeIndex, nameAndTypeIndex)
   }
 
+  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+    byteToBytes(9) ++
+      shortToBytes(getFieldRefClassIndex(constant)) ++
+      shortToBytes(getFieldRefNameAndTypeIndex(constant))
+  }
+
+  override def key: Any = FieldRef
+
   def getFieldRefClassIndex(fieldRef: MetaObject) = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
   def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  val fieldRefGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 }

@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.constants.{FieldRefConstant, NameAndType, ClassRefConstant, MethodRefConstant}
 import transformations.javac.expressions.ExpressionC
 import transformations.types.ObjectTypeC
 
@@ -33,12 +34,12 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
   def findMethod(methodRef: MetaObject): MethodInfo = {
-    val classIndex = ByteCodeSkeleton.getMethodRefClassRefIndex(methodRef)
+    val classIndex = MethodRefConstant.getMethodRefClassRefIndex(methodRef)
     val classRef = constantPool.getValue(classIndex).asInstanceOf[MetaObject]
-    val className = constantPool.getValue(ByteCodeSkeleton.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
-    val nameAndTypeIndex = ByteCodeSkeleton.getMethodRefMethodNameIndex(methodRef)
+    val className = constantPool.getValue(ClassRefConstant.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val nameAndTypeIndex = MethodRefConstant.getMethodRefMethodNameIndex(methodRef)
     val nameAndType = constantPool.getValue(nameAndTypeIndex).asInstanceOf[MetaObject]
-    val methodName = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeName(nameAndType)).asInstanceOf[String]
+    val methodName = constantPool.getValue(NameAndType.getNameAndTypeName(nameAndType)).asInstanceOf[String]
     val methodId = new MethodId(className, methodName)
     compiler.find(methodId)
   }
@@ -46,13 +47,13 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   def getMethodRefIndex(methodKey: MethodId): Int = {
     val classRefIndex = constantPool.getClassRef(methodKey.className)
     val nameAndTypeIndex = getMethodNameAndTypeIndex(methodKey)
-    constantPool.store(ByteCodeSkeleton.methodRef(classRefIndex, nameAndTypeIndex))
+    constantPool.store(MethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex))
   }
 
   def getMethodNameAndTypeIndex(methodKey: MethodId): Int = {
     val methodNameIndex = getMethodNameIndex(methodKey.methodName)
     val descriptorIndex = constantPool.store(compiler.find(methodKey).descriptor)
-    val result: MetaObject = ByteCodeSkeleton.nameAndType(methodNameIndex, descriptorIndex)
+    val result: MetaObject = NameAndType.nameAndType(methodNameIndex, descriptorIndex)
     constantPool.store(result)
   }
 
@@ -63,7 +64,7 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   def getFieldRefIndex(info: FieldInfo): Int = {
     val classRef = getClassRef(info.parent)
     val fieldNameAndTypeIndex = getFieldNameAndTypeIndex(info)
-    constantPool.store(ByteCodeSkeleton.fieldRef(classRef, fieldNameAndTypeIndex))
+    constantPool.store(FieldRefConstant.fieldRef(classRef, fieldNameAndTypeIndex))
   }
 
   def getClassRef(info: ClassInfo): Int = {
@@ -73,7 +74,7 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   def getFieldNameAndTypeIndex(info: FieldInfo): Int = {
     val fieldNameIndex = constantPool.storeUtf8(info.name)
     val typeIndex =   constantPool.store(info._type)
-    val result: MetaObject = ByteCodeSkeleton.nameAndType(fieldNameIndex, typeIndex)
+    val result: MetaObject = NameAndType.nameAndType(fieldNameIndex, typeIndex)
     constantPool.store(result)
   }
 

@@ -1,9 +1,11 @@
 package transformations.bytecode.constants
 
-import core.transformation.MetaObject
-import core.transformation.sillyCodePieces.GrammarTransformation
+import core.grammarDocument.BiGrammar
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.{TransformationState, MetaObject}
+import transformations.bytecode.PrintByteCode._
 
-trait NameAndType extends GrammarTransformation {
+object NameAndType extends ConstantEntry {
 
   object NameAndTypeKey
 
@@ -16,11 +18,17 @@ trait NameAndType extends GrammarTransformation {
     data.put(NameAndTypeType, typeIndex)
   }
 
-  val nameAndTypeGrammar = "name and type:" ~~> (integer <~ ":") ~ integer ^^
-    parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
-
   def getNameAndTypeName(nameAndType: MetaObject) = nameAndType(NameAndTypeName).asInstanceOf[Int]
 
   def getNameAndTypeType(nameAndType: MetaObject) = nameAndType(NameAndTypeType).asInstanceOf[Int]
 
+  override def key: Any = NameAndTypeKey
+
+  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+    byteToBytes(12) ++ shortToBytes(getNameAndTypeName(constant)) ++
+      shortToBytes(getNameAndTypeType(constant))
+  }
+
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "name and type:" ~~> (integer <~ ":") ~ integer ^^
+    parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
 }

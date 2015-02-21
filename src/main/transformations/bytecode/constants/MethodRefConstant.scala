@@ -1,9 +1,10 @@
 package transformations.bytecode.constants
 
-import core.transformation.MetaObject
-import core.transformation.sillyCodePieces.GrammarTransformation
+import core.transformation.grammars.GrammarCatalogue
+import core.transformation.{TransformationState, MetaObject}
+import transformations.bytecode.PrintByteCode._
 
-trait MethodRefConstant extends GrammarTransformation {
+object MethodRefConstant extends ConstantEntry {
 
   object MethodRefKey
 
@@ -11,7 +12,13 @@ trait MethodRefConstant extends GrammarTransformation {
 
   object MethodRefMethodName
 
-  val methodRefGrammar = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+    byteToBytes(10) ++
+      shortToBytes(getMethodRefClassRefIndex(constant)) ++
+      shortToBytes(getMethodRefMethodNameIndex(constant))
+  }
+
+  override def key: Any = MethodRefKey
 
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey) {
     data.put(MethodRefClassName, classNameIndex)
@@ -21,4 +28,6 @@ trait MethodRefConstant extends GrammarTransformation {
   def getMethodRefClassRefIndex(methodRef: MetaObject) = methodRef(MethodRefClassName).asInstanceOf[Int]
 
   def getMethodRefMethodNameIndex(methodRef: MetaObject) = methodRef(MethodRefMethodName).asInstanceOf[Int]
+
+  def getGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 }

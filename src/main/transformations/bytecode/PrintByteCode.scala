@@ -122,30 +122,12 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
+
         case metaEntry: MetaObject =>
           metaEntry.clazz match {
-            case ByteCodeSkeleton.MethodRefKey =>
-              byteToBytes(10) ++
-                shortToBytes(ByteCodeSkeleton.getMethodRefClassRefIndex(metaEntry)) ++
-                shortToBytes(ByteCodeSkeleton.getMethodRefMethodNameIndex(metaEntry))
-            case ByteCodeSkeleton.FieldRef =>
-              byteToBytes(9) ++
-                shortToBytes(ByteCodeSkeleton.getFieldRefClassIndex(metaEntry)) ++
-                shortToBytes(ByteCodeSkeleton.getFieldRefNameAndTypeIndex(metaEntry))
-            case ByteCodeSkeleton.ClassRefKey =>
-              byteToBytes(7) ++ shortToBytes(ByteCodeSkeleton.getClassRefName(metaEntry))
-            case ByteCodeSkeleton.NameAndTypeKey =>
-              byteToBytes(12) ++ shortToBytes(ByteCodeSkeleton.getNameAndTypeName(metaEntry)) ++
-                shortToBytes(ByteCodeSkeleton.getNameAndTypeType(metaEntry))
-            case ByteCodeSkeleton.MethodDescriptor =>
-              val returnString = javaTypeToString(ByteCodeSkeleton.getMethodDescriptorReturnType(metaEntry))
-              val parametersString = s"(${
-                ByteCodeSkeleton.getMethodDescriptorParameters(metaEntry).map(javaTypeToString).mkString("")
-              })"
-              toUTF8ConstantEntry(parametersString + returnString)
             case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
+            case _ => ByteCodeSkeleton.getState(state).getConstantByteCode(metaEntry.clazz)(metaEntry)
           }
-        case CodeAttribute.CodeAttributeId => toUTF8ConstantEntry("Code")
         case StackMapTableAttribute.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
         case LineNumberTable.LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
         case SourceFileId => toUTF8ConstantEntry("SourceFile")

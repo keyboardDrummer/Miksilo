@@ -4,6 +4,7 @@ import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.ObjectTypeC
 
@@ -33,7 +34,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
   def getMethodParameters = {
     val methodIsStatic: Boolean = ByteCodeSkeleton.getMethodAccessFlags(method).contains(ByteCodeSkeleton.StaticAccess)
     val methodDescriptor = constantPool.getValue(ByteCodeSkeleton.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
-    val methodParameters = ByteCodeSkeleton.getMethodDescriptorParameters(methodDescriptor)
+    val methodParameters = MethodDescriptorConstant.getMethodDescriptorParameters(methodDescriptor)
     if (methodIsStatic) {
       methodParameters
     }
@@ -41,7 +42,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
       val clazz = state.program
       val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
       val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[MetaObject]
-      val className = constantPool.getValue(ByteCodeSkeleton.getClassRefName(clazzRef)).asInstanceOf[QualifiedClassName]
+      val className = constantPool.getValue(ClassRefConstant.getClassRefName(clazzRef)).asInstanceOf[QualifiedClassName]
       Seq(ObjectTypeC.objectType(className)) ++ methodParameters
     }
   }

@@ -3,7 +3,8 @@ package transformations.javac
 import core.transformation._
 import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode._
-import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, StackMapTableAttribute}
+import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute, LineNumberTable, StackMapTableAttribute}
+import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -58,7 +59,9 @@ object JavaCompiler {
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
-  def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, LineNumberTable, CodeAttribute, ByteCodeSkeleton) ++ typeTransformations
+  val constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
+  def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
+    Seq(ByteCodeSkeleton) ++ typeTransformations
 
   val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 

@@ -1,10 +1,11 @@
 package transformations.bytecode.coreInstructions
 
 import core.transformation.{MetaObject, TransformationState}
-import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
-import PrintByteCode._
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
 object GetStaticC extends InstructionC {
@@ -24,8 +25,8 @@ object GetStaticC extends InstructionC {
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
     val location = ByteCodeSkeleton.getInstructionArguments(getStatic)(0)
     val fieldRef = constantPool.getValue(location).asInstanceOf[MetaObject]
-    val nameAndType = constantPool.getValue(ByteCodeSkeleton.getFieldRefNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
-    val fieldType = constantPool.getValue(ByteCodeSkeleton.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
+    val nameAndType = constantPool.getValue(FieldRefConstant.getFieldRefNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
+    val fieldType = constantPool.getValue(NameAndType.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
     fieldType
   }
 

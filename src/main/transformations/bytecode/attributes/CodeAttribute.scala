@@ -1,7 +1,6 @@
 package transformations.bytecode.attributes
 
-import core.document.Empty
-import core.grammarDocument.{MapGrammar, ManyVertical, BiGrammar}
+import core.grammarDocument.{BiGrammar, ManyVertical, MapGrammar}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject}
@@ -10,7 +9,6 @@ import transformations.bytecode.ByteCodeSkeleton
 object InstructionArgumentsKey
 
 trait Instruction {
-
 
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
     data.put(InstructionArgumentsKey, arguments)
@@ -25,7 +23,7 @@ trait Instruction {
 
 object CodeAttribute extends GrammarTransformation with Instruction {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, CodeConstantEntry)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
                     instructions: Seq[MetaObject],
@@ -57,7 +55,6 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
   def getCodeInstructions(code: MetaObject) = code(CodeInstructionsKey).asInstanceOf[Seq[MetaObject]]
 
-  object CodeAttributeId
 
   object CodeKey
 
@@ -75,10 +72,6 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
   object CodeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val codeAttributeConstantGrammar = "Code" ~> produce(CodeAttributeId)
-    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
-    constantPoolItemContent.addOption(codeAttributeConstantGrammar)
-
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])

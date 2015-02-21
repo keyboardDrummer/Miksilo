@@ -2,17 +2,17 @@ package transformations.bytecode
 
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
-import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, LineNumberRef, StackMapTableAttribute}
+import transformations.bytecode.attributes._
+import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers._
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.javac.constructor.ConstructorC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import util.TestUtils
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeFibonacciWithMain {
@@ -72,30 +72,30 @@ class TestPrintByteCodeFibonacciWithMain {
   }
 
   def getConstantPool: ConstantPool = {
-    val constantPool = ArrayBuffer[Any](ByteCodeSkeleton.methodRef(6, 18),
-      ByteCodeSkeleton.fieldRef(19, 20),
-      ByteCodeSkeleton.methodRef(5, 21),
-      ByteCodeSkeleton.methodRef(22, 23),
-      ByteCodeSkeleton.classRef(24),
-      ByteCodeSkeleton.classRef(25),
+    val constantPool = ArrayBuffer[Any](MethodRefConstant.methodRef(6, 18),
+      FieldRefConstant.fieldRef(19, 20),
+      MethodRefConstant.methodRef(5, 21),
+      MethodRefConstant.methodRef(22, 23),
+      ClassRefConstant.classRef(24),
+      ClassRefConstant.classRef(25),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
-      CodeAttribute.CodeAttributeId,
+      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      CodeConstantEntry.entry,
       LineNumberTable.LineNumberTableId,
       "main",
-      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(
+      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
-      ByteCodeSkeleton.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
+      MethodDescriptorConstant.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
       StackMapTableAttribute.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Fibonacci.java",
-      ByteCodeSkeleton.nameAndType(7, 8),
-      ByteCodeSkeleton.classRef(26),
-      ByteCodeSkeleton.nameAndType(27, 28),
-      ByteCodeSkeleton.nameAndType(13, 14),
-      ByteCodeSkeleton.classRef(29),
-      ByteCodeSkeleton.nameAndType(30, 31),
+      NameAndType.nameAndType(7, 8),
+      ClassRefConstant.classRef(26),
+      NameAndType.nameAndType(27, 28),
+      NameAndType.nameAndType(13, 14),
+      ClassRefConstant.classRef(29),
+      NameAndType.nameAndType(30, 31),
       "Fibonacci",
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
@@ -103,7 +103,7 @@ class TestPrintByteCodeFibonacciWithMain {
       ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       "java/io/PrintStream",
       "print",
-      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
+      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
     new ConstantPool(constantPool)
   }

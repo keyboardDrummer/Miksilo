@@ -2,16 +2,15 @@ package transformations.bytecode
 
 import core.transformation.MetaObject
 import org.junit.{Assert, Test}
-import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, LineNumberRef, StackMapTableAttribute}
+import transformations.bytecode.attributes._
+import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, StoreIntegerC, LoadIntegerC}
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.types.{IntTypeC, VoidTypeC}
 import util.TestUtils
-
-import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeWhile {
 
@@ -22,18 +21,18 @@ class TestPrintByteCodeWhile {
   }
 
   def getByteCode: MetaObject = {
-    val constantPool = new ConstantPool(Seq(ByteCodeSkeleton.methodRef(3, 12),
-      ByteCodeSkeleton.classRef(13),
-      ByteCodeSkeleton.classRef(14),
+    val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 12),
+      ClassRefConstant.classRef(13),
+      ClassRefConstant.classRef(14),
       "<init>",
-      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
-      CodeAttribute.CodeAttributeId,
+      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      CodeConstantEntry.entry,
       LineNumberTable.LineNumberTableId,
       "whilee",
       StackMapTableAttribute.StackMapTableId,
       ByteCodeSkeleton.SourceFileId,
       "Whilee.java",
-      ByteCodeSkeleton.nameAndType(4, 5),
+      NameAndType.nameAndType(4, 5),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
       new QualifiedClassName(Seq("java", "lang", "Object"))))
     val constructor: MetaObject = getConstructor

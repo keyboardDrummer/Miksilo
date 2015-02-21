@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.classes._
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
@@ -46,7 +46,7 @@ object CallC extends ExpressionInstance {
     val compiler = ClassC.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
-    val returnType = ByteCodeSkeleton.getMethodDescriptorReturnType(methodInfo.descriptor)
+    val returnType = MethodDescriptorConstant.getMethodDescriptorReturnType(methodInfo.descriptor)
     returnType
   }
 

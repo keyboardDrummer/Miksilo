@@ -3,7 +3,8 @@ package transformations.javac
 import core.transformation.MetaObject
 import org.junit.Test
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
+import transformations.bytecode.constants.{MethodRefConstant, ClassRefConstant, NameAndType, MethodDescriptorConstant}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.javac.classes.{ClassC, ConstantPool, QualifiedClassName}
@@ -33,13 +34,13 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClassByteCode = {
-    val constantPool = new ConstantPool(Seq(ByteCodeSkeleton.methodRef(3, 10),
-      ByteCodeSkeleton.classRef(11),
-      ByteCodeSkeleton.classRef(12),
+    val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
+      ClassRefConstant.classRef(11),
+      ClassRefConstant.classRef(12),
       ConstructorC.constructorName,
-      ByteCodeSkeleton.methodDescriptor(VoidTypeC.voidType, Seq()),
-      CodeAttribute.CodeAttributeId,
-      ByteCodeSkeleton.nameAndType(4, 5),
+      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      CodeConstantEntry.entry,
+      NameAndType.nameAndType(4, 5),
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
       new QualifiedClassName(Seq("java", "lang", "Object")))
     )

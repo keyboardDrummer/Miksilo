@@ -3,10 +3,11 @@ package transformations.javac.methods
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.classes.{ClassC, ClassCompiler}
 import transformations.javac.statements.{BlockC, StatementC}
@@ -25,7 +26,7 @@ object MethodC extends GrammarTransformation {
   def getMethodDescriptor(method: MetaObject, classCompiler: ClassCompiler): MetaObject = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)
-    ByteCodeSkeleton.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    MethodDescriptorConstant.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
   }
 
   def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
@@ -48,7 +49,7 @@ object MethodC extends GrammarTransformation {
       val statements = getMethodBody(method)
       val statementToInstructions = StatementC.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
-      val codeIndex = constantPool.store(CodeAttribute.CodeAttributeId)
+      val codeIndex = constantPool.store(CodeConstantEntry.entry)
       val exceptionTable = Seq[MetaObject]()
       val codeAttributes = Seq[MetaObject]()
       val codeAttribute = new MetaObject(CodeAttribute.CodeKey,

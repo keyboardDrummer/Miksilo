@@ -6,7 +6,6 @@ import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.attributes.{Instruction, SourceFileAttribute}
-import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
@@ -14,8 +13,7 @@ import transformations.types._
 
 import scala.collection.mutable
 
-object ByteCodeSkeleton extends GrammarTransformation
-  with NameAndType with MethodRefConstant with FieldRefConstant with MethodDescriptorConstant with ClassRefConstant with SourceFileAttribute
+object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
   with MethodInfo with Instruction {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
@@ -68,6 +66,7 @@ object ByteCodeSkeleton extends GrammarTransformation
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
+    val getConstantByteCode = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
   }
 
   object AttributeKey
@@ -122,13 +121,11 @@ object ByteCodeSkeleton extends GrammarTransformation
   object ConstantPoolGrammar
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val parseType: BiGrammar = grammars.find(TypeC.TypeGrammar)
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
     val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar,
-        utf8 | qualifiedClassName | classRefGrammar | getMethodDescriptorGrammar(parseType) | nameAndTypeGrammar |
-          methodRefGrammar | ("T" ~> typeGrammar) | fieldRefGrammar)
+        utf8 | qualifiedClassName | ("T" ~> typeGrammar))
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
     val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment

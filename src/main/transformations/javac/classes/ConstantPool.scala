@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.constants.ClassRefConstant
 
 import scala.collection.mutable
 
@@ -14,7 +14,7 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
 
   def getClassRef(nameParts: QualifiedClassName): Int = {
     val nameIndex = store(nameParts)
-    store(ByteCodeSkeleton.classRef(nameIndex))
+    store(ClassRefConstant.classRef(nameIndex))
   }
 
   def store(ref: Any): Int = {
