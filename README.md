@@ -22,3 +22,8 @@ A BiGrammar defines a bidirectional mapping between text and an AST.
 The approach taken here is very similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
 A BiGrammar may be defined in a left recursive fashion because our implementation uses packrat parsing as described in
 '*Packrat Parsing: Simple, Powerful, Lazy, Linear Time*' to deal with problems associated with such grammars.
+
+###Introduction Video
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k
+" target="_blank"><img src="http://img.youtube.com/vi/IHFHcf61g-k/0.jpg" 
+alt="Introduction video" width="240" height="180" border="10" /></a>
