@@ -11,6 +11,7 @@ class TransformationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
+  grammarCatalogue.create(ProgramGrammar, BiFailure)
   var program: MetaObject = null
   var compilerPhases: List[() => Unit] = List.empty
 
@@ -18,7 +19,6 @@ class TransformationState {
 
   def getGUID: Long = Random.nextLong()
 
-  grammarCatalogue.create(ProgramGrammar, BiFailure)
 
   def parseString(input: String): Unit = {
     val manager = new TransformationsToPackrat()
@@ -27,6 +27,9 @@ class TransformationState {
     val parseResult = parser(input)
     if (!parseResult.successful)
       throw new ParseException(parseResult.toString)
+
+    if(!parseResult.next.atEnd)
+      throw new ParseException("Did not parse until end.")
 
     program = parseResult.get.asInstanceOf[MetaObject]
   }

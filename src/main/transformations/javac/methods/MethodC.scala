@@ -9,13 +9,44 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.javac.classes.{ClassC, ClassCompiler}
+import transformations.javac.classes.{MethodInfo, ClassC, ClassCompiler}
 import transformations.javac.statements.{BlockC, StatementC}
 import transformations.types.{ObjectTypeC, TypeC, VoidTypeC}
 
 object MethodC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
+  override def inject(state: TransformationState): Unit = {
+    super.inject(state)
+
+    ClassC.getState(state).firstMemberPasses ::= (clazz => bindMethods(state, clazz))
+    ClassC.getState(state).secondMemberPasses ::= (clazz => convertMethods(state, clazz))
+  }
+
+  def convertMethods(state: TransformationState, clazz: MetaObject) = {
+    val classCompiler = ClassC.getClassCompiler(state)
+
+    val methods = getMethods(clazz)
+    for (method <- methods)
+      convertMethod(method, classCompiler, state)
+  }
+
+  def bindMethods(state: TransformationState, clazz: MetaObject): Unit = {
+    val classCompiler = ClassC.getClassCompiler(state)
+    val classInfo = classCompiler.currentClassInfo
+
+    val methods = getMethods(clazz)
+    for (method <- methods)
+      bindMethod(method)
+
+    def bindMethod(method: MetaObject) = {
+      val methodName: String = MethodC.getMethodName(method)
+      val descriptor = MethodC.getMethodDescriptor(method, classCompiler)
+      classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
+    }
+  }
+
+
+  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, ClassC)
 
   def getParameterType(metaObject: MetaObject, classCompiler: ClassCompiler) = {
     val result = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
@@ -116,6 +147,7 @@ object MethodC extends GrammarTransformation {
   object VisibilityGrammar
   object StaticGrammar
   object ReturnTypeGrammar
+
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)
 
@@ -132,8 +164,11 @@ object MethodC extends GrammarTransformation {
         "private" ~> produce(PrivateVisibility) |
         produce(DefaultVisibility))
 
-    grammars.create(MethodGrammar, visibilityModifier ~~ parseStatic ~~ parseReturnType ~~ identifier ~ parseParameters % block ^^
+    val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~~ parseStatic ~~ parseReturnType ~~ identifier ~ parseParameters % block ^^
       parseMap(ByteCodeSkeleton.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+
+    val memberGrammar = grammars.find(ClassC.ClassMemberGrammar)
+    memberGrammar.addOption(methodGrammar)
   }
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],

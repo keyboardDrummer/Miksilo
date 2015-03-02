@@ -66,7 +66,7 @@ object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
     val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
-    val getConstantByteCode = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
+    val getBytes = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
   }
 
   object AttributeKey

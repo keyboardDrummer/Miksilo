@@ -46,7 +46,7 @@ trait InstructionC extends GrammarTransformation {
   override def inject(state: TransformationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (c,i, stackTypes) => getInstructionInAndOutputs(c, i, stackTypes, state))
-    PrintByteCode.getBytesRegistry(state).put(key, getInstructionByteCode)
+    ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
     ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, getJumpBehavior)
     ByteCodeSkeleton.getState(state).localUpdates.put(key, getVariableUpdates)

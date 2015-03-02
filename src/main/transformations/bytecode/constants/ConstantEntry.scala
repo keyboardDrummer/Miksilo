@@ -13,7 +13,7 @@ trait ConstantEntry extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getConstantByteCode.put(key, (constant: MetaObject) => getByteCode(constant, state))
+    ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: MetaObject) => getByteCode(constant, state))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

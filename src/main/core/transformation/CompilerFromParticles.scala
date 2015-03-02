@@ -1,6 +1,8 @@
 package core.transformation
 
 import core.exceptions.ParticleDependencyViolation
+import core.grammarDocument.Labelled
+import core.transformation.grammars.ProgramGrammar
 import core.transformation.sillyCodePieces.Particle
 
 import scala.reflect.io.{Directory, File}
@@ -8,6 +10,11 @@ import scala.reflect.io.{Directory, File}
 class CompilerFromParticles(val particles: Seq[Particle]) extends Compiler {
 
   validateDependencies(particles)
+
+  def getGrammar: Labelled = {
+    val state = buildState
+    state.grammarCatalogue.find(ProgramGrammar)
+  }
 
   def parseAndTransform(input: File): TransformationState = {
     val inputStream = File(input).slurp()
@@ -26,6 +33,12 @@ class CompilerFromParticles(val particles: Seq[Particle]) extends Compiler {
     val state = buildState
     state.program = program
     state.runPhases()
+    state.program
+  }
+
+  def parse(input: String): MetaObject = {
+    val state = buildState
+    state.parseString(input)
     state.program
   }
 

@@ -39,24 +39,16 @@ object TestGrammarUtils {
   }
 
   def getGrammarUsingTransformer(grammarTransformer: Any): Labelled = {
-    GrammarDocumentUtil.getGrammarFromTransformations(getTransformations(grammarTransformer))
+    new CompilerFromParticles(getTransformations(grammarTransformer)).getGrammar
   }
 
   def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val manager: TransformationsToPackrat = new TransformationsToPackrat()
-    val parser = manager.buildParser(getTransformations(grammarTransformer))
-    val parseResult = parser(input)
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
-
-    val result = parseResult.get
-    Assert.assertTrue(result.toString, parseResult.next.atEnd)
-    result
+    val compiler = new CompilerFromParticles(getTransformations(grammarTransformer))
+    compiler.parse(input)
   }
 
-  def getTransformations(key: Any): Seq[GrammarTransformation] = {
-    JavaCompiler.javaCompilerTransformations.reverse.collect({ case x: GrammarTransformation => x}) ++
-      Seq(new SelectorTransformation(key))
+  def getTransformations(key: Any) = {
+    Seq(new SelectorTransformation(key)) ++ JavaCompiler.javaCompilerTransformations
   }
 
   class SelectorTransformation(key: Any) extends GrammarTransformation {

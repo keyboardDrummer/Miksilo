@@ -6,19 +6,15 @@ import akka.util.Convert
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.attributes.{CodeAttribute, LineNumberTable, LineNumberRef, StackMapTableAttribute}
+import transformations.bytecode.attributes.{CodeAttribute, LineNumberRef, LineNumberTable, StackMapTableAttribute}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeC}
-
-import scala.collection.mutable
 
 object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naar byte code particles verplaatsen.
   val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-
-  def getBytesRegistry(state: TransformationState) = getState(state).getBytesRegistry
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
     hexToBytes("cafebabe")
@@ -126,7 +122,7 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
         case metaEntry: MetaObject =>
           metaEntry.clazz match {
             case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
-            case _ => ByteCodeSkeleton.getState(state).getConstantByteCode(metaEntry.clazz)(metaEntry)
+            case _ => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
           }
         case StackMapTableAttribute.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
         case LineNumberTable.LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
@@ -210,7 +206,7 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
     }
 
     def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-      getBytesRegistry(state)(instruction.clazz)(instruction)
+      ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
     }
 
     getBytes(byteCode)
@@ -218,13 +214,8 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
 
-
   }
 
   override def dependencies: Set[Contract] = Set.empty
-
-  class State {
-    var getBytesRegistry = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
-  }
 
 }

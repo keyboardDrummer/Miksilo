@@ -8,7 +8,6 @@ import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithP
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.javac.methods.MethodC
 import transformations.javac.statements.BlockC
 import transformations.types.{ArrayTypeC, ObjectTypeC}
 
@@ -38,18 +37,11 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
       clazz(ByteCodeSkeleton.ClassFields) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
-      val methods = getMethods(clazz)
-      for (method <- methods)
-        bindMethod(method)
+      for(firstMemberPass <- getState(state).firstMemberPasses)
+        firstMemberPass(clazz)
 
-      for (method <- methods)
-        MethodC.convertMethod(method, classCompiler, state)
-
-      def bindMethod(method: MetaObject) = {
-        val methodName: String = MethodC.getMethodName(method)
-        val descriptor = MethodC.getMethodDescriptor(method, classCompiler)
-        classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
-      }
+      for(secondMemberPass <- getState(state).secondMemberPasses)
+        secondMemberPass(clazz)
     }
   }
 
@@ -80,13 +72,12 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, MethodC)
+  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar
   override def transformGrammars(grammars: GrammarCatalogue) {
-    val classMethod = grammars.find(MethodC.MethodGrammar)
 
-    val classMember: BiGrammar = grammars.create(ClassMemberGrammar, classMethod)
+    val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical
     val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
@@ -116,6 +107,8 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     val referenceKindRegistry = new GetReferenceKindRegistry()
     var classCompiler: ClassCompiler = null
     val importToClassMap = new mutable.HashMap[AnyRef, MetaObject => Map[String, QualifiedClassName]]()
+    var firstMemberPasses = List.empty[MetaObject => Unit]
+    var secondMemberPasses = List.empty[MetaObject => Unit]
   }
 
   class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]

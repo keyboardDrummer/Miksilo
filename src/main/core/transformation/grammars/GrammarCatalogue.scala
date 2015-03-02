@@ -6,7 +6,6 @@ import core.grammarDocument._
 
 class GrammarCatalogue {
 
-
   var grammars: Map[Any, Labelled] = Map.empty
 
   def find(key: Any): Labelled = {

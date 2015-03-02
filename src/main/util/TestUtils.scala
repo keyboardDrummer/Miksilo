@@ -84,7 +84,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
-  def compareWithJavacAfterRunning(className: String, inputDirectory: Path) {
+  def compareWithJavacAfterRunning(className: String, inputDirectory: Path = Path("")) {
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
     val rootOutput = currentDir / Path("testOutput")

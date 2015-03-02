@@ -35,14 +35,15 @@ object JavaCompiler {
   def allTransformations = javaCompilerTransformations ++ Seq(ExpressionMethodC)
 
   def javaCompilerTransformations: Seq[Particle] = {
-    Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, NewC, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++ javaMethod
+    Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
+      NewC, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++
+      javaMethod
   }
 
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
-    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable, AssignmentC, AssignmentPrecedence, DeclarationC,
-    PostFixIncrementC, VariableC, WildcardImportC, BasicImportC, ClassC, MethodC) ++
-    javaSimpleStatement //todo move class.
+    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable,
+    AssignmentC, AssignmentPrecedence, DeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
+    BasicImportC, MethodC) ++ Seq(ClassC) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
     ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
@@ -59,11 +60,11 @@ object JavaCompiler {
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
-  val constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
+  def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
   def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
     Seq(ByteCodeSkeleton) ++ typeTransformations
 
-  val typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
+  def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
