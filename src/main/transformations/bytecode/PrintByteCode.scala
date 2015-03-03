@@ -6,7 +6,7 @@ import akka.util.Convert
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.attributes.{CodeAttribute, LineNumberRef, LineNumberTable, StackMapTableAttribute}
+import transformations.bytecode.attributes.{LineNumberRef, LineNumberTable, StackMapTableAttribute}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeC}
 
@@ -105,9 +105,9 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
       result ++= shortToBytes(ByteCodeSkeleton.getClassNameIndex(clazz))
       result ++= shortToBytes(ByteCodeSkeleton.getParentIndex(clazz))
       result ++= getInterfacesByteCode(clazz)
-      result ++= getFieldsByteCode(clazz)
-      result ++= getMethodsByteCode(clazz)
-      result ++= getAttributesByteCode(ByteCodeSkeleton.getClassAttributes(clazz))
+      result ++= ByteCodeField.getFieldsByteCode(clazz, state)
+      result ++= ByteCodeMethodInfo.getMethodsByteCode(clazz, state)
+      result ++= ByteCodeAttributes.getAttributesByteCode(clazz, state, ByteCodeSkeleton.getClassAttributes(clazz))
       result
     }
 
@@ -127,93 +127,7 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
       }
     }
 
-    def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
-      val offset = StackMapTableAttribute.getFrameOffset(frame)
-      frame.clazz match {
-        case StackMapTableAttribute.SameFrameKey =>
-          if (offset > 63)
-            byteToBytes(251) ++ shortToBytes(offset)
-          else
-            byteToBytes(offset)
-        case StackMapTableAttribute.AppendFrame =>
-          val localVerificationTypes = StackMapTableAttribute.getAppendFrameTypes(frame)
-          byteToBytes(252 + localVerificationTypes.length - 1) ++
-            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(clazz, info, state))
-        case StackMapTableAttribute.SameLocals1StackItem =>
-          val _type = StackMapTableAttribute.getSameLocals1StackItemType(frame)
-          val code = 64 + offset
-          if (code <= 127) {
-            byteToBytes(code) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
-          } else {
-            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(clazz, _type, state)
-          }
-      }
-    }
-
-    def getStackMapTableBytes(attribute: MetaObject): Seq[Byte] = {
-      val entries = StackMapTableAttribute.getStackMapTableEntries(attribute)
-      shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
-    }
-
     def javaTypeToString(_type: MetaObject): String = TypeC.getByteCodeString(state)(_type)
-
-    def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
-      val methods = ByteCodeSkeleton.getMethods(clazz)
-      shortToBytes(methods.length) ++ methods.flatMap(method => getMethodByteCode(method))
-    }
-
-    def getMethodByteCode(methodInfo: MetaObject) = {
-      val accessCodes = Map(
-        ByteCodeSkeleton.PublicAccess -> "0001",
-        ByteCodeSkeleton.StaticAccess -> "0008",
-        ByteCodeSkeleton.PrivateAccess -> "0002").mapValues(s => hexToInt(s))
-      shortToBytes(ByteCodeSkeleton.getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
-        shortToBytes(ByteCodeSkeleton.getMethodNameIndex(methodInfo)) ++
-        shortToBytes(ByteCodeSkeleton.getMethodDescriptorIndex(methodInfo)) ++
-        getAttributesByteCode(ByteCodeSkeleton.getMethodAttributes(methodInfo))
-    }
-
-    def getFieldsByteCode(clazz: MetaObject) = {
-      val fields = ByteCodeSkeleton.getClassFields(clazz)
-      shortToBytes(fields.length) ++ fields.map(emitField)
-    }
-
-    def emitField(field: MetaObject) : Seq[Byte] = {
-      getAccessFlagsByteCode(field(AccessFlagsKey).asInstanceOf[MetaObject]) ++
-        shortToBytes(field(ByteCodeField.FieldNameIndex).asInstanceOf[Int]) ++
-        shortToBytes(field(ByteCodeField.DescriptorIndex).asInstanceOf[Int]) ++
-        getAttributesByteCode(field(ByteCodeField.FieldAttributes).asInstanceOf[Seq[MetaObject]])
-    }
-
-    def getAttributesByteCode(attributes: Seq[MetaObject]) = {
-      shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))
-    }
-
-    def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
-      shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
-        prefixWithIntLength(() => attribute.clazz match {
-          case CodeAttribute.CodeKey =>
-            getCodeAttributeBytes(attribute)
-          case LineNumberTable.LineNumberTableKey =>
-            getLineNumberTableBytes(attribute)
-          case StackMapTableAttribute.StackMapTableKey => getStackMapTableBytes(attribute)
-          case ByteCodeSkeleton.SourceFileAttribute => getSourceFileBytes(attribute)
-        })
-    }
-
-    def getCodeAttributeBytes(attribute: MetaObject): Seq[Byte] = {
-      val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)
-      shortToBytes(CodeAttribute.getCodeMaxStack(attribute)) ++
-        shortToBytes(CodeAttribute.getCodeMaxLocals(attribute)) ++
-        prefixWithIntLength(() => CodeAttribute.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
-        shortToBytes(exceptionTable.length) ++
-        exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-        getAttributesByteCode(CodeAttribute.getCodeAttributes(attribute))
-    }
-
-    def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-      ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
-    }
 
     getBytes(byteCode)
   }

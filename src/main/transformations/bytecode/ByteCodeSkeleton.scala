@@ -13,10 +13,10 @@ import transformations.types._
 
 import scala.collection.mutable
 
-
+import ByteCodeMethodInfo._
 
 object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
-  with MethodInfo with Instruction {
+  with Instruction {
 
   def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
 
