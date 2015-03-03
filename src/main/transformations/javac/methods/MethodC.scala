@@ -45,7 +45,6 @@ object MethodC extends GrammarTransformation {
     }
   }
 
-
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, ClassC)
 
   def getParameterType(metaObject: MetaObject, classCompiler: ClassCompiler) = {
@@ -89,7 +88,7 @@ object MethodC extends GrammarTransformation {
         CodeInstructionsKey -> instructions,
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
-      method(ByteCodeSkeleton.MethodAnnotations) = Seq(codeAttribute)
+      method(ByteCodeSkeleton.MethodAttributes) = Seq(codeAttribute)
     }
 
     //TODO don't depend on classCompiler and don't get called directly from ClassC.
@@ -122,7 +121,7 @@ object MethodC extends GrammarTransformation {
       case MethodC.PrivateVisibility => flags += ByteCodeSkeleton.PrivateAccess
     }
 
-    method(ByteCodeSkeleton.MethodAccessFlags) = flags
+    method(ByteCodeSkeleton.AccessFlagsKey) = flags
   }
 
   def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]

@@ -43,11 +43,6 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
-  def getFieldsByteCode(clazz: MetaObject) = {
-    val fields = ByteCodeSkeleton.getClassFields(clazz)
-    shortToBytes(fields.length) ++ fields.map(field => ???)
-  }
-
   def getAccessFlagsByteCode(clazz: MetaObject): Seq[Byte] = {
     shortToBytes(accessFlags("super"))
   }
@@ -178,10 +173,21 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
         getAttributesByteCode(ByteCodeSkeleton.getMethodAttributes(methodInfo))
     }
 
+    def getFieldsByteCode(clazz: MetaObject) = {
+      val fields = ByteCodeSkeleton.getClassFields(clazz)
+      shortToBytes(fields.length) ++ fields.map(emitField)
+    }
+
+    def emitField(field: MetaObject) : Seq[Byte] = {
+      getAccessFlagsByteCode(field(AccessFlagsKey).asInstanceOf[MetaObject]) ++
+        shortToBytes(field(ByteCodeField.FieldNameIndex).asInstanceOf[Int]) ++
+        shortToBytes(field(ByteCodeField.DescriptorIndex).asInstanceOf[Int]) ++
+        getAttributesByteCode(field(ByteCodeField.FieldAttributes).asInstanceOf[Seq[MetaObject]])
+    }
+
     def getAttributesByteCode(attributes: Seq[MetaObject]) = {
       shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))
     }
-
 
     def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++

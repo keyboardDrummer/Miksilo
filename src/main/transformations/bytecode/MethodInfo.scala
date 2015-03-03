@@ -3,14 +3,9 @@ package transformations.bytecode
 import core.transformation.MetaObject
 import core.transformation.sillyCodePieces.GrammarTransformation
 
-trait MethodInfo extends GrammarTransformation {
-  trait MethodAccessFlag
 
-  object PublicAccess extends MethodAccessFlag
 
-  object StaticAccess extends MethodAccessFlag
-
-  object PrivateAccess extends MethodAccessFlag
+trait MethodInfo extends GrammarTransformation with AccessFlags {
 
   object MethodInfoKey
 
@@ -18,19 +13,17 @@ trait MethodInfo extends GrammarTransformation {
 
   object MethodDescriptorIndex
 
-  object MethodAnnotations
+  object MethodAttributes
 
-  object MethodAccessFlags
-
-  def methodInfo(nameIndex: Int, descriptorIndex: Int, annotations: Seq[MetaObject], flags: Set[MethodAccessFlag] = Set()) =
+  def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[MetaObject], flags: Set[AccessFlags] = Set()) =
     new MetaObject(MethodInfoKey) {
-      data.put(MethodAnnotations, annotations)
+      data.put(MethodAttributes, attributes)
       data.put(MethodNameIndex, nameIndex)
       data.put(MethodDescriptorIndex, descriptorIndex)
-      data.put(MethodAccessFlags, flags)
+      data.put(AccessFlagsKey, flags)
     }
 
-  def getMethodAccessFlags(method: MetaObject) = method(MethodAccessFlags).asInstanceOf[Set[MethodAccessFlag]]
+  def getMethodAccessFlags(method: MetaObject) = method(AccessFlagsKey).asInstanceOf[Set[MethodAccessFlag]]
 
   def getMethodNameIndex(methodInfo: MetaObject) = methodInfo(MethodNameIndex).asInstanceOf[Int]
 

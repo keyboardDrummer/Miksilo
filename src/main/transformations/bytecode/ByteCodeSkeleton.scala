@@ -13,6 +13,8 @@ import transformations.types._
 
 import scala.collection.mutable
 
+
+
 object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
   with MethodInfo with Instruction {
 
@@ -22,7 +24,7 @@ object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
 
   def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
 
-  def getMethodAttributes(method: MetaObject) = method(MethodAnnotations).asInstanceOf[Seq[MetaObject]]
+  def getMethodAttributes(method: MetaObject) = method(MethodAttributes).asInstanceOf[Seq[MetaObject]]
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
@@ -146,7 +148,7 @@ object ByteCodeSkeleton extends GrammarTransformation with SourceFileAttribute
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
     val methodInfoGrammar: BiGrammar = methodHeader % ("attributes:" %> new ManyVertical(parseAttribute).indent(2)) ^^
-      parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, MethodAccessFlags, MethodAnnotations)
+      parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 
