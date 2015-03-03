@@ -1,5 +1,10 @@
 package transformations.bytecode
 
+import core.transformation.{TransformationState, MetaObject}
+import transformations.bytecode.attributes.{StackMapTableAttribute, LineNumberTable, CodeAttribute}
+import PrintByteCode._
+import transformations.types.TypeC
+
 object ByteCodeAttributes {
 
   def getAttributesByteCode(clazz: MetaObject, state: TransformationState, attributes: Seq[MetaObject]): Seq[Byte] = {
