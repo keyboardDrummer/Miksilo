@@ -71,7 +71,7 @@ class TestPoptimize {
 
   def transformInstructions(instructions: Seq[MetaObject]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(codeAnnotation))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(codeAnnotation))
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(), Seq(method))
     val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)

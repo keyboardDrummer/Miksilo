@@ -3,8 +3,9 @@ package transformations.bytecode.attributes
 import core.grammarDocument.{BiGrammar, ManyVertical, MapGrammar}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject}
+import core.transformation.{TransformationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.PrintByteCode._
 
 object InstructionArgumentsKey
 
@@ -38,6 +39,28 @@ object CodeAttribute extends GrammarTransformation with Instruction {
       data.put(CodeAttributesKey, attributes)
     }
   }
+
+
+  override def inject(state: TransformationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
+  }
+
+  def getCodeAttributeBytes(attribute: MetaObject, state: TransformationState): Seq[Byte] = {
+
+    def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+      ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
+    }
+
+    val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)
+    shortToBytes(CodeAttribute.getCodeMaxStack(attribute)) ++
+      shortToBytes(CodeAttribute.getCodeMaxLocals(attribute)) ++
+      prefixWithIntLength(() => CodeAttribute.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+      shortToBytes(exceptionTable.length) ++
+      exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
+      getAttributesByteCode(state, CodeAttribute.getCodeAttributes(attribute))
+  }
+
 
   def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
     ByteCodeSkeleton.getMethods(clazz)

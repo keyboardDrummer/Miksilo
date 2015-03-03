@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import transformations.bytecode.constants.{MethodRefConstant, ClassRefConstant, NameAndType, MethodDescriptorConstant}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
@@ -46,7 +46,7 @@ class EmptyClassCompilation {
     )
     val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
-    val defaultConstructor = ByteCodeSkeleton.methodInfo(3, 4, codeAttribute, Set(ByteCodeSkeleton.PublicAccess))
+    val defaultConstructor = ByteCodeMethodInfo.methodInfo(3, 4, codeAttribute, Set(ByteCodeMethodInfo.PublicAccess))
     ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }
 

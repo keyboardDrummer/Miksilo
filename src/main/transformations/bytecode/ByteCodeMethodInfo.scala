@@ -1,5 +1,6 @@
 package transformations.bytecode
 
+import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{TransformationState, MetaObject}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import PrintByteCode._
@@ -14,7 +15,7 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
 
   object MethodAttributes
 
-  def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[MetaObject], flags: Set[AccessFlags] = Set()) =
+  def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[MetaObject], flags: Set[MethodAccessFlag] = Set()) =
     new MetaObject(MethodInfoKey) {
       data.put(MethodAttributes, attributes)
       data.put(MethodNameIndex, nameIndex)
@@ -30,19 +31,23 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
 
 
   def getMethodsByteCode(clazz: MetaObject, state: TransformationState): Seq[Byte] = {
-    val methods = ByteCodeSkeleton.getMethods(clazz)
-    shortToBytes(methods.length) ++ methods.flatMap(method => getMethodByteCode(method))
 
     def getMethodByteCode(methodInfo: MetaObject) = {
       val accessCodes = Map(
-        ByteCodeSkeleton.PublicAccess -> "0001",
-        ByteCodeSkeleton.StaticAccess -> "0008",
-        ByteCodeSkeleton.PrivateAccess -> "0002").mapValues(s => hexToInt(s))
-      shortToBytes(ByteCodeSkeleton.getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
-        shortToBytes(ByteCodeSkeleton.getMethodNameIndex(methodInfo)) ++
-        shortToBytes(ByteCodeSkeleton.getMethodDescriptorIndex(methodInfo)) ++
-        ByteCodeAttributes.getAttributesByteCode(clazz, state, ByteCodeSkeleton.getMethodAttributes(methodInfo))
+        PublicAccess -> "0001",
+        StaticAccess -> "0008",
+        PrivateAccess -> "0002").mapValues(s => hexToInt(s))
+      shortToBytes(getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
+        shortToBytes(getMethodNameIndex(methodInfo)) ++
+        shortToBytes(getMethodDescriptorIndex(methodInfo)) ++
+        getAttributesByteCode(state, ByteCodeSkeleton.getMethodAttributes(methodInfo))
     }
+
+    val methods = ByteCodeSkeleton.getMethods(clazz)
+    shortToBytes(methods.length) ++ methods.flatMap(method => getMethodByteCode(method))
   }
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+
+  }
 }

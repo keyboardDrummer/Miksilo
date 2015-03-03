@@ -5,7 +5,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -65,10 +65,10 @@ object MethodC extends GrammarTransformation {
 
     addMethodFlags(method)
     val methodNameIndex: Int = classCompiler.getMethodNameIndex(getMethodName(method))
-    method(ByteCodeSkeleton.MethodNameIndex) = methodNameIndex
+    method(ByteCodeMethodInfo.MethodNameIndex) = methodNameIndex
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptorIndex(method)
-    method(ByteCodeSkeleton.MethodDescriptorIndex) = methodDescriptorIndex
+    method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
     addCodeAnnotation(method)
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
@@ -88,7 +88,7 @@ object MethodC extends GrammarTransformation {
         CodeInstructionsKey -> instructions,
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
-      method(ByteCodeSkeleton.MethodAttributes) = Seq(codeAttribute)
+      method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)
     }
 
     //TODO don't depend on classCompiler and don't get called directly from ClassC.
@@ -112,16 +112,16 @@ object MethodC extends GrammarTransformation {
 
 
   def addMethodFlags(method: MetaObject) = {
-    var flags = Set[ByteCodeSkeleton.MethodAccessFlag]()
+    var flags = Set[ByteCodeMethodInfo.MethodAccessFlag]()
     if (getMethodStatic(method))
-      flags += ByteCodeSkeleton.StaticAccess
+      flags += ByteCodeMethodInfo.StaticAccess
 
     getMethodVisibility(method) match {
-      case MethodC.PublicVisibility => flags += ByteCodeSkeleton.PublicAccess
-      case MethodC.PrivateVisibility => flags += ByteCodeSkeleton.PrivateAccess
+      case MethodC.PublicVisibility => flags += ByteCodeMethodInfo.PublicAccess
+      case MethodC.PrivateVisibility => flags += ByteCodeMethodInfo.PrivateAccess
     }
 
-    method(ByteCodeSkeleton.AccessFlagsKey) = flags
+    method(ByteCodeMethodInfo.AccessFlagsKey) = flags
   }
 
   def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
@@ -164,7 +164,7 @@ object MethodC extends GrammarTransformation {
         produce(DefaultVisibility))
 
     val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~~ parseStatic ~~ parseReturnType ~~ identifier ~ parseParameters % block ^^
-      parseMap(ByteCodeSkeleton.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+      parseMap(ByteCodeMethodInfo.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
 
     val memberGrammar = grammars.find(ClassC.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
@@ -172,7 +172,7 @@ object MethodC extends GrammarTransformation {
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
-    new MetaObject(ByteCodeSkeleton.MethodInfoKey) {
+    new MetaObject(ByteCodeMethodInfo.MethodInfoKey) {
       data.put(MethodNameKey, name)
       data.put(ReturnTypeKey, _returnType)
       data.put(MethodParametersKey, _parameters)

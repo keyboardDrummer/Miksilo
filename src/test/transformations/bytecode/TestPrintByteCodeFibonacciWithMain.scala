@@ -27,7 +27,7 @@ class TestPrintByteCodeFibonacciWithMain {
   }
 
   def getByteCode: MetaObject = {
-    val classAttributes = Seq(ByteCodeSkeleton.sourceFile(16, 17))
+    val classAttributes = Seq(SourceFileAttribute.sourceFile(16, 17))
     ByteCodeSkeleton.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
   }
 
@@ -66,8 +66,8 @@ class TestPrintByteCodeFibonacciWithMain {
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = StackMapTableAttribute.stackMapTable(15, Seq(StackMapTableAttribute.sameFrame(9),
       StackMapTableAttribute.sameLocals1StackItem(12, IntTypeC.intType)))
-    val method = ByteCodeSkeleton.methodInfo(13, 14, Seq(CodeAttribute.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
-      Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
+    val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttribute.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
+      Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     method
   }
 
@@ -81,14 +81,14 @@ class TestPrintByteCodeFibonacciWithMain {
       ConstructorC.constructorName,
       MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
-      LineNumberTable.LineNumberTableId,
+      LineNumberTable.lineNumberTableId,
       "main",
       MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
       MethodDescriptorConstant.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
-      StackMapTableAttribute.StackMapTableId,
-      ByteCodeSkeleton.SourceFileId,
+      StackMapTableAttribute.stackMapTableId,
+      SourceFileAttribute.sourceFileId,
       "Fibonacci.java",
       NameAndType.nameAndType(7, 8),
       ClassRefConstant.classRef(26),
@@ -113,7 +113,7 @@ class TestPrintByteCodeFibonacciWithMain {
       InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
     val codeAttribute = Seq(CodeAttribute.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
-    ByteCodeSkeleton.methodInfo(7, 8, codeAttribute, Set())
+    ByteCodeMethodInfo.methodInfo(7, 8, codeAttribute, Set())
   }
 
   def getMainByteCode: MetaObject = {
@@ -123,7 +123,7 @@ class TestPrintByteCodeFibonacciWithMain {
       InvokeVirtualC.invokeVirtual(4),
       VoidReturnInstructionC.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
-    ByteCodeSkeleton.methodInfo(11, 12, Seq(CodeAttribute.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
-      Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
+    ByteCodeMethodInfo.methodInfo(11, 12, Seq(CodeAttribute.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
+      Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
   }
 }

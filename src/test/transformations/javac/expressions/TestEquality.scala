@@ -9,7 +9,6 @@ class TestEquality {
 
   @Test
   def test() {
-    val inputDirectory = Path("")
-    TestUtils.compareWithJavacAfterRunning("SimpleEquality", inputDirectory)
+    TestUtils.compareWithJavacAfterRunning("SimpleEquality")
   }
 }

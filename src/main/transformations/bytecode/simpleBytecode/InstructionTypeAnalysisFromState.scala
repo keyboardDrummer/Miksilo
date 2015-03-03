@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.transformation.{MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant}
@@ -32,8 +32,8 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
   }
   
   def getMethodParameters = {
-    val methodIsStatic: Boolean = ByteCodeSkeleton.getMethodAccessFlags(method).contains(ByteCodeSkeleton.StaticAccess)
-    val methodDescriptor = constantPool.getValue(ByteCodeSkeleton.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
+    val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
+    val methodDescriptor = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
     val methodParameters = MethodDescriptorConstant.getMethodDescriptorParameters(methodDescriptor)
     if (methodIsStatic) {
       methodParameters

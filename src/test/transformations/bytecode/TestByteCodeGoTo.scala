@@ -15,7 +15,7 @@ import util.TestUtils
 class TestByteCodeGoTo {
 
   def testMain(instructions: Seq[MetaObject]): MetaObject = {
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 
@@ -39,8 +39,8 @@ class TestByteCodeGoTo {
 
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
-    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.StackMapTableId)), Seq(method))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
+    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.stackMapTableId)), Seq(method))
   }
 
   def getLabelledJumpWhile: MetaObject = {
@@ -58,7 +58,7 @@ class TestByteCodeGoTo {
       LabelledTargets.label("end", new MetaObject(StackMapTableAttribute.SameFrameKey))
     )
 
-    val method = ByteCodeSkeleton.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 }

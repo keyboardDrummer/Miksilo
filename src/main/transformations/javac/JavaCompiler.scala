@@ -3,7 +3,7 @@ package transformations.javac
 import core.transformation._
 import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode._
-import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute, LineNumberTable, StackMapTableAttribute}
+import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
@@ -61,7 +61,7 @@ object JavaCompiler {
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
   def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
-  def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
+  def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
     Seq(ByteCodeSkeleton) ++ typeTransformations
 
   def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)

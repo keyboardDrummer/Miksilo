@@ -27,10 +27,10 @@ class TestPrintByteCodeWhile {
       "<init>",
       MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
-      LineNumberTable.LineNumberTableId,
+      LineNumberTable.lineNumberTableId,
       "whilee",
-      StackMapTableAttribute.StackMapTableId,
-      ByteCodeSkeleton.SourceFileId,
+      StackMapTableAttribute.stackMapTableId,
+      SourceFileAttribute.sourceFileId,
       "Whilee.java",
       NameAndType.nameAndType(4, 5),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
@@ -38,13 +38,13 @@ class TestPrintByteCodeWhile {
     val constructor: MetaObject = getConstructor
     val _while: MetaObject = getWhile
     val methods = Seq(constructor, _while)
-    val classAttributes = Seq(ByteCodeSkeleton.sourceFile(10, 11))
+    val classAttributes = Seq(SourceFileAttribute.sourceFile(10, 11))
     ByteCodeSkeleton.clazz(2, 3, constantPool, methods, attributes = classAttributes)
   }
 
   def getConstructor: MetaObject = {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
-    val constructor = ByteCodeSkeleton.methodInfo(4, 5, Seq(
+    val constructor = ByteCodeMethodInfo.methodInfo(4, 5, Seq(
       CodeAttribute.codeAttribute(6, 1, 1, Seq(
         LoadAddressC.addressLoad(0),
         InvokeSpecialC.invokeSpecial(1),
@@ -62,7 +62,7 @@ class TestPrintByteCodeWhile {
     ))
     val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
-    val _while = ByteCodeSkeleton.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
+    val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LoadIntegerC.load(0),
@@ -71,7 +71,7 @@ class TestPrintByteCodeWhile {
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8),
       VoidReturnInstructionC.voidReturn
-    ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCodeSkeleton.PublicAccess, ByteCodeSkeleton.StaticAccess))
+    ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     _while
   }
 }

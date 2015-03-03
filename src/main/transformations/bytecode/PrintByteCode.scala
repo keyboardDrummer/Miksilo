@@ -5,8 +5,7 @@ import java.math.BigInteger
 import akka.util.Convert
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.attributes.{LineNumberRef, LineNumberTable, StackMapTableAttribute}
+import transformations.bytecode.ByteCodeSkeleton.State
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeC}
 
@@ -25,19 +24,6 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
     Convert.intToBytes(bytes.length) ++ bytes
   }
 
-  def getSourceFileBytes(sourceFile: MetaObject) = {
-    shortToBytes(ByteCodeSkeleton.getSourceFileFileNameIndex(sourceFile))
-  }
-
-  def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
-    val entries = LineNumberTable.getLineNumberTableEntries(attribute)
-    shortToBytes(entries.length) ++
-      entries.flatMap(getLineNumberTableEntryByteCode)
-  }
-
-  def getLineNumberTableEntryByteCode(entry: LineNumberRef) =
-    shortToBytes(entry.startProgramCounter) ++ shortToBytes(entry.lineNumber)
-
   def getInterfacesByteCode(clazz: MetaObject): Seq[Byte] = {
     val interfaces = ByteCodeSkeleton.getClassInterfaces(clazz)
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
@@ -47,7 +33,6 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
     shortToBytes(accessFlags("super"))
   }
 
-
   def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2))
 
   def toUTF8ConstantEntry(utf8: String): Seq[Byte] = {
@@ -56,6 +41,16 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
   }
 
   def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
+
+  def getAttributesByteCode(state: TransformationState, attributes: Seq[MetaObject]): Seq[Byte] = {
+
+    def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
+      shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
+        prefixWithIntLength(() => ByteCodeSkeleton.getState(state).getBytes(attribute.clazz)(attribute))
+    }
+
+    shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))
+  }
 
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
@@ -107,21 +102,17 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
       result ++= getInterfacesByteCode(clazz)
       result ++= ByteCodeField.getFieldsByteCode(clazz, state)
       result ++= ByteCodeMethodInfo.getMethodsByteCode(clazz, state)
-      result ++= ByteCodeAttributes.getAttributesByteCode(clazz, state, ByteCodeSkeleton.getClassAttributes(clazz))
+      result ++= getAttributesByteCode(state, ByteCodeSkeleton.getClassAttributes(clazz))
       result
     }
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-
         case metaEntry: MetaObject =>
           metaEntry.clazz match {
             case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
             case _ => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
           }
-        case StackMapTableAttribute.StackMapTableId => toUTF8ConstantEntry("StackMapTable")
-        case LineNumberTable.LineNumberTableId => toUTF8ConstantEntry("LineNumberTable")
-        case SourceFileId => toUTF8ConstantEntry("SourceFile")
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
       }

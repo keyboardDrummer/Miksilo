@@ -111,7 +111,7 @@ object LabelledTargets extends ParticleWithPhase {
       adjustedZero = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableAttribute.StackMapTableId)
+      val nameIndex = constantPool.store(StackMapTableAttribute.stackMapTableId)
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else

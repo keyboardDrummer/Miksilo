@@ -4,7 +4,7 @@ import core.exceptions.BadInputException
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
@@ -83,7 +83,7 @@ object ConstructorC extends GrammarTransformation with ParticleWithPhase {
       if (!constructorClassName.equals(className))
         throw new BadConstructorNameException(clazz, constructor)
 
-      constructor.clazz = ByteCodeSkeleton.MethodInfoKey
+      constructor.clazz = ByteCodeMethodInfo.MethodInfoKey
       constructor(MethodC.MethodNameKey) = constructorName
       constructor(MethodC.ReturnTypeKey) = VoidTypeC.voidType
       constructor(StaticKey) = false

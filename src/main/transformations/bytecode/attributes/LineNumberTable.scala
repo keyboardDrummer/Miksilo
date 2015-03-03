@@ -2,8 +2,9 @@ package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject}
+import core.transformation.{TransformationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.PrintByteCode._
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 
@@ -15,13 +16,29 @@ object LineNumberTable extends GrammarTransformation {
     data.put(LineNumberTableLines, lines)
   }
 
+  override def inject(state: TransformationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
+    ByteCodeSkeleton.getState(state).getBytes(LineNumberTableId) = _ => toUTF8ConstantEntry("LineNumberTable")
+  }
+
+  def getLineNumberTableBytes(attribute: MetaObject): Seq[Byte] = {
+    val entries = LineNumberTable.getLineNumberTableEntries(attribute)
+    shortToBytes(entries.length) ++
+      entries.flatMap(getLineNumberTableEntryByteCode)
+  }
+
+  def getLineNumberTableEntryByteCode(entry: LineNumberRef) =
+    shortToBytes(entry.startProgramCounter) ++ shortToBytes(entry.lineNumber)
+
   def getLineNumberTableEntries(lineNumberTable: MetaObject) = lineNumberTable(LineNumberTableLines).asInstanceOf[Seq[LineNumberRef]]
 
   object LineNumberTableKey
 
   object LineNumberTableLines
 
-  object LineNumberTableId
+  private object LineNumberTableId
+  def lineNumberTableId = new MetaObject(LineNumberTableId)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
