@@ -63,7 +63,11 @@ trait GrammarTransformation extends Particle with GrammarDocumentWriter {
       val fieldValue: Any = pair._2
       if (field == PartialSelf)
       {
-        result.data ++= fieldValue.asInstanceOf[MetaObject].data
+        fieldValue match {
+          case metaFieldValue: MetaObject =>
+            result.data ++= fieldValue.asInstanceOf[MetaObject].data
+          case _ =>
+        }
       }
       else
         result(field) = fieldValue

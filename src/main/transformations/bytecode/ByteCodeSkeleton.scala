@@ -1,7 +1,8 @@
 package transformations.bytecode
 
+import core.document.Empty
 import core.grammar.StringLiteral
-import core.grammarDocument.{Produce, BiGrammar}
+import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
@@ -104,7 +105,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
     val classIndexGrammar: BiGrammar = "class" ~~> integer
     val parseIndexGrammar: BiGrammar = "extends" ~~> integer
     val attributesGrammar = "attributes:" %> (attributeGrammar*).indent()
-    val membersGrammar = grammars.create(MembersGrammar, Produce(new MetaObject(new Object())))
+    val membersGrammar = grammars.create(MembersGrammar, Empty)
     val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
       constantPool %% membersGrammar %% attributesGrammar ^^
       parseMap(ClassFileKey, ClassNameIndexKey, ClassParentIndex, ClassInterfaces, ClassConstantPool,

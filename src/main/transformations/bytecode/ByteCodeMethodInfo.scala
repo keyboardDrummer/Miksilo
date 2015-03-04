@@ -54,7 +54,7 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = membersGrammar.inner %% methods ^^ parseMap(ClassFileKey, ClassFields, ClassMethodsKey) //TODO: remove ClassFields reference.
+    membersGrammar.inner = membersGrammar.inner %% methods ^^ parseMap(ClassFileKey, PartialSelf, ClassMethodsKey)
   }
 
   object AccessFlagGrammar

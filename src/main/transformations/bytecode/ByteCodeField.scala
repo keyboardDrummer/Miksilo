@@ -3,6 +3,7 @@ package transformations.bytecode
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.ByteCodeSkeleton.{ClassFields, ClassFileKey}
 
 object ByteCodeField extends GrammarTransformation with AccessFlags {
   object FieldKey
@@ -33,6 +34,6 @@ object ByteCodeField extends GrammarTransformation with AccessFlags {
     val parseFields = "fields:" %> produce(Seq.empty[Any])
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = parseFields //TODO: ~ membersGrammar.inner ^^ parseMap(ClassFileKey, PartialSelf, PartialSelf)
+    membersGrammar.inner = parseFields ~ membersGrammar.inner ^^ parseMap(ClassFileKey, ClassFields, PartialSelf)
   }
 }

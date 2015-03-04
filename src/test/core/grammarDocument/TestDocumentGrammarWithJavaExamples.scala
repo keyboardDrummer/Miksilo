@@ -60,7 +60,7 @@ class TestDocumentGrammarWithJavaExamples {
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
-    val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(PrettyPrint))
+    val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
     val output = state.output
@@ -73,7 +73,7 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
-    val newTransformations = JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(PrettyPrint))
+    val newTransformations = JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
     Assert.assertEquals(expectation, state.output)
@@ -85,7 +85,7 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
 
     val byteCodeTransformations: Seq[GrammarTransformation] = JavaCompiler.byteCodeTransformations
-    val prettyPrintTransformations = JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(PrettyPrint))
+    val prettyPrintTransformations = JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(prettyPrintTransformations).parseAndTransform(input)
     val byteCode = state.output
@@ -98,7 +98,7 @@ class TestDocumentGrammarWithJavaExamples {
   @Test
   def prettyPrintByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
-    val parseTransformations = Seq(PrettyPrint) ++ JavaCompiler.byteCodeTransformations
+    val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
     Assert.assertEquals(input, output)
   }
