@@ -2,7 +2,7 @@ package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 
@@ -12,7 +12,7 @@ object PoptimizeC extends ParticleWithPhase {
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+      val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
       def getInOutSizes(instruction: MetaObject) = InstructionC.getInOutSizes(instruction, state)

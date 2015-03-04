@@ -48,7 +48,7 @@ object JavaCompiler {
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
     ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
 
-  def javaSimpleExpression = Seq(TernaryC, EqualityC,
+  def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionC) ++ allByteCodeTransformations
 
@@ -62,6 +62,7 @@ object JavaCompiler {
 
   def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
   def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
+    Seq(ByteCodeMethodInfo, ByteCodeField) ++
     Seq(ByteCodeSkeleton) ++ typeTransformations
 
   def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)

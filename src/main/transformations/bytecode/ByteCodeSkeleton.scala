@@ -1,11 +1,10 @@
 package transformations.bytecode
 
 import core.grammar.StringLiteral
-import core.grammarDocument.{BiGrammar, ManyVertical}
+import core.grammarDocument.{Produce, BiGrammar}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -21,8 +20,6 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
-
-  def getMethodAttributes(method: MetaObject) = method(MethodAttributes).asInstanceOf[Seq[MetaObject]]
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
@@ -97,23 +94,21 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
 
   object ConstantPoolItemContentGrammar
 
-  object MethodsGrammar
   object AttributeGrammar
+  object MembersGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
-    val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> integer
     val parseIndexGrammar: BiGrammar = "extends" ~~> integer
-    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
-    val parseFields = "fields:" %> produce(Seq.empty[Any])
     val attributesGrammar = "attributes:" %> (attributeGrammar*).indent()
+    val membersGrammar = grammars.create(MembersGrammar, Produce(new MetaObject(new Object())))
     val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
-      constantPool %% parseFields %% methods %% attributesGrammar ^^
+      constantPool %% membersGrammar %% attributesGrammar ^^
       parseMap(ClassFileKey, ClassNameIndexKey, ClassParentIndex, ClassInterfaces, ClassConstantPool,
-        ClassFields, ClassMethodsKey, ClassAttributes))
+        PartialSelf, ClassAttributes))
 
     program.inner = classGrammar
   }
@@ -133,21 +128,6 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
     grammars.create(ConstantPoolGrammar, result)
-  }
-
-  object AccessFlagGrammar
-  object MethodInfoGrammar
-  def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val parseAttribute = grammars.find(AttributeGrammar)
-    val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
-    val methodHeader: BiGrammar = Seq[BiGrammar](
-      "nameIndex:" ~> integer,
-      "descriptorIndex:" ~> integer,
-      "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
-      reduce((l, r) => (l <~ ",") ~~ r)
-    val methodInfoGrammar: BiGrammar = methodHeader % ("attributes:" %> new ManyVertical(parseAttribute).indent(2)) ^^
-      parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
-    grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 
   def getQualifiedClassNameParser: BiGrammar = {

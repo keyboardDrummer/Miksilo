@@ -5,15 +5,12 @@ import java.math.BigInteger
 import akka.util.Convert
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton.State
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeC}
 
 object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naar byte code particles verplaatsen.
   val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
-
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
     hexToBytes("cafebabe")
@@ -100,10 +97,24 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
       result ++= shortToBytes(ByteCodeSkeleton.getClassNameIndex(clazz))
       result ++= shortToBytes(ByteCodeSkeleton.getParentIndex(clazz))
       result ++= getInterfacesByteCode(clazz)
-      result ++= ByteCodeField.getFieldsByteCode(clazz, state)
-      result ++= ByteCodeMethodInfo.getMethodsByteCode(clazz, state)
+      result ++= getFieldsByteCode(clazz)
+      result ++= getMethodsByteCode(clazz)
       result ++= getAttributesByteCode(state, ByteCodeSkeleton.getClassAttributes(clazz))
       result
+    }
+
+    def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
+      val methods = ByteCodeSkeleton.getMethods(clazz)
+      shortToBytes(methods.length) ++ methods.flatMap(method => {
+        ByteCodeSkeleton.getState(state).getBytes(method.clazz)(method)
+      })
+    }
+
+    def getFieldsByteCode(clazz: MetaObject): Seq[Byte] = {
+      val fields = ByteCodeSkeleton.getClassFields(clazz)
+      PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
+        ByteCodeSkeleton.getState(state).getBytes(field.clazz)(field)
+      })
     }
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {

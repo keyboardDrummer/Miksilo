@@ -2,7 +2,7 @@ package transformations.bytecode.simpleBytecode
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
@@ -23,7 +23,7 @@ object InferredMaxStack extends ParticleWithPhase {
     }
 
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val code = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+      val code = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       code(CodeAttribute.CodeMaxStackKey) = getMaxStack(method)
     }
   }

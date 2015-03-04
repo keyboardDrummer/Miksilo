@@ -4,7 +4,7 @@ import core.grammarDocument.{BiGrammar, ManyVertical, MapGrammar}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{TransformationState, Contract, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.PrintByteCode._
 
 object InstructionArgumentsKey
@@ -64,7 +64,7 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
   def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
     ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
+      .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
   }
 

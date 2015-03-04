@@ -6,7 +6,7 @@ import core.transformation._
 import core.transformation.sillyCodePieces.{Particle, ParticleWithPhase}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.{ByteCodeMethodInfo, PrintByteCode, ByteCodeSkeleton}
 import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}
@@ -25,7 +25,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   def getMethodInstructions(method: MetaObject) =
-    CodeAttribute.getCodeInstructions(ByteCodeSkeleton.getMethodAttributes(method)(0))
+    CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method)(0))
 
   def printByteCode(byteCode: MetaObject): String = {
     PrintByteCode.printBytes(getBytes(byteCode))
@@ -33,7 +33,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def getBytes(byteCode: MetaObject): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Particle] = JavaCompiler.byteCodeTransformations ++ Seq(new GetBytes(s => output = s))
+    val particles: Seq[Particle] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
     new CompilerFromParticles(particles).transform(byteCode)
     output
   }

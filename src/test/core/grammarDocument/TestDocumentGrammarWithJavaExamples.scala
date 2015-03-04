@@ -90,7 +90,7 @@ class TestDocumentGrammarWithJavaExamples {
     val state = new CompilerFromParticles(prettyPrintTransformations).parseAndTransform(input)
     val byteCode = state.output
 
-    val parseTransformations = byteCodeTransformations ++ Seq(RunWithJVM)
+    val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(byteCode).output
     Assert.assertEquals("8", output)
   }

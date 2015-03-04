@@ -19,7 +19,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
   def getTypeAnalysis = {
-    val codeAnnotation = ByteCodeSkeleton.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+    val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
     val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
     val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
     val jumpBehaviorRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry

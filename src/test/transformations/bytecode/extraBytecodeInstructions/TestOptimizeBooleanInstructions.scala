@@ -2,7 +2,7 @@ package transformations.bytecode.extraBytecodeInstructions
 
 import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
 import transformations.javac.JavaCompiler
@@ -27,7 +27,7 @@ class TestOptimizeBooleanInstructions {
 
   def getFibonacciInstructions(clazz: MetaObject) = {
     ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeSkeleton.getMethodAttributes(methodInfo))
+      .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == CodeAttribute.CodeKey) Some(annotation) else None)
       .flatMap(codeAnnotation => CodeAttribute.getCodeInstructions(codeAnnotation))
   }
