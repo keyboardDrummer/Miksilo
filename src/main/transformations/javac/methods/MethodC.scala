@@ -123,6 +123,7 @@ object MethodC extends GrammarTransformation {
     getMethodVisibility(method) match {
       case MethodC.PublicVisibility => flags += ByteCodeMethodInfo.PublicAccess
       case MethodC.PrivateVisibility => flags += ByteCodeMethodInfo.PrivateAccess
+      case MethodC.DefaultVisibility => flags += ByteCodeMethodInfo.PrivateAccess
     }
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = flags
