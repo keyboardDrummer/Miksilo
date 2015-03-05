@@ -14,4 +14,9 @@ class TestFields {
   def fieldMethodMix() {
     TestUtils.compareWithJavacAfterRunning("FieldMethodMix")
   }
+
+  @Test
+  def illegalForwardFieldReference() {
+    TestUtils.compareWithJavacAfterRunning("IllegalForwardFieldReference")
+  }
 }

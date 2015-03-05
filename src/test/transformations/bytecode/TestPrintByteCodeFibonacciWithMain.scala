@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
-import transformations.javac.constructor.ConstructorC
+import transformations.javac.constructor.SuperCallExpression
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import util.TestUtils
 
@@ -78,7 +78,7 @@ class TestPrintByteCodeFibonacciWithMain {
       MethodRefConstant.methodRef(22, 23),
       ClassRefConstant.classRef(24),
       ClassRefConstant.classRef(25),
-      ConstructorC.constructorName,
+      SuperCallExpression.constructorName,
       MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       LineNumberTable.lineNumberTableId,

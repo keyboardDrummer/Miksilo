@@ -1,9 +1,8 @@
 package transformations.javac
 
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.javac.classes.{MethodInfo, PackageInfo, QualifiedClassName}
-import transformations.javac.constructor.ConstructorC
+import transformations.javac.constructor.SuperCallExpression
 import transformations.types.{IntTypeC, ObjectTypeC, VoidTypeC}
 
 object JavaLang {
@@ -14,7 +13,7 @@ object JavaLang {
   val javaPackage = standardLib.newPackageInfo(javaPackageName)
   val langPackage = javaPackage.newPackageInfo(langPackageName)
   val objectClass = langPackage.newClassInfo(ImplicitObjectSuperClass.objectName)
-  objectClass.content(ConstructorC.constructorName) =
+  objectClass.content(SuperCallExpression.constructorName) =
     new MethodInfo(MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()), false)
 
   val systemClass = langPackage.newClassInfo("System")

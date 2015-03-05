@@ -15,7 +15,7 @@ import transformations.bytecode.additions.{LabelledTargets, PoptimizeC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
-import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
+import transformations.javac.constructor._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
@@ -37,13 +37,14 @@ object JavaCompiler {
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
       NewC, ConstructorC, ClassOrPackageSelector, ClassOrPackageReference, ImplicitThisInPrivateCalls) ++
+      Seq(ThisCallExpression, SuperCallExpression) ++
       javaMethod
   }
 
-  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
+    def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
     ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable,
     AssignmentC, AssignmentPrecedence, DeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
-    BasicImportC, MethodC) ++ Seq(ClassC) ++ javaSimpleStatement
+    BasicImportC, MethodC, FieldDeclaration) ++ Seq(ClassC) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
     ExpressionAsStatementC, StatementC) ++ javaSimpleExpression
@@ -60,7 +61,8 @@ object JavaCompiler {
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
-  def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant)
+  def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant,
+    FieldDescriptorConstant)
   def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
     Seq(ByteCodeMethodInfo, ByteCodeField) ++
     Seq(ByteCodeSkeleton) ++ typeTransformations

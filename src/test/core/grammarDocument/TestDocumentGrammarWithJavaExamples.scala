@@ -5,7 +5,7 @@ import core.transformation.CompilerFromParticles
 import core.transformation.sillyCodePieces.{GrammarTransformation, Particle}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
+import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.TernaryC
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
 import transformations.javac.statements.BlockC
@@ -59,7 +59,7 @@ class TestDocumentGrammarWithJavaExamples {
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
+      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ConstructorC, ImplicitReturnAtEndOfMethod)
     val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)

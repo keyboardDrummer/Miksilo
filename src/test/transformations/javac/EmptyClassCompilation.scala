@@ -2,13 +2,13 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
-import transformations.bytecode.constants.{MethodRefConstant, ClassRefConstant, NameAndType, MethodDescriptorConstant}
+import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
+import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ClassC, ConstantPool, QualifiedClassName}
-import transformations.javac.constructor.ConstructorC
+import transformations.javac.constructor.SuperCallExpression
 import transformations.types.VoidTypeC
 import util.TestUtils
 
@@ -37,7 +37,7 @@ class EmptyClassCompilation {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
       ClassRefConstant.classRef(11),
       ClassRefConstant.classRef(12),
-      ConstructorC.constructorName,
+      SuperCallExpression.constructorName,
       MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       NameAndType.nameAndType(4, 5),

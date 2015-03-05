@@ -3,7 +3,6 @@ package transformations.javaPlus
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeMethodInfo
 import transformations.javac.classes.ClassC
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.MethodC._
@@ -31,10 +30,10 @@ object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
   }
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
-    for(expressionMethod <- ClassC.getMethods(clazz).filter(method => method.clazz == ExpressionMethodKey))
+    for(expressionMethod <- ClassC.getMembers(clazz).filter(method => method.clazz == ExpressionMethodKey))
     {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[MetaObject]
-      expressionMethod.clazz = ByteCodeMethodInfo.MethodInfoKey
+      expressionMethod.clazz = MethodC.MethodKey
       expressionMethod(MethodC.MethodBodyKey) = Seq(ReturnExpressionC._return(expression))
     }
   }

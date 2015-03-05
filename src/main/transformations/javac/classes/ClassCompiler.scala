@@ -51,13 +51,13 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   }
 
   def getMethodNameAndTypeIndex(methodKey: MethodId): Int = {
-    val methodNameIndex = getMethodNameIndex(methodKey.methodName)
+    val methodNameIndex = getNameIndex(methodKey.methodName)
     val descriptorIndex = constantPool.store(compiler.find(methodKey).descriptor)
     val result: MetaObject = NameAndType.nameAndType(methodNameIndex, descriptorIndex)
     constantPool.store(result)
   }
 
-  def getMethodNameIndex(methodName: String): Int = {
+  def getNameIndex(methodName: String): Int = {
     constantPool.storeUtf8(methodName)
   }
 

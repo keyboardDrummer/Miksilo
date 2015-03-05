@@ -2,9 +2,9 @@ package transformations.javac.classes
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, DuplicateInstructionC}
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
-import transformations.javac.constructor.ConstructorC
+import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
+import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.CallC
 import transformations.types.ObjectTypeC
@@ -40,7 +40,7 @@ object NewC extends ExpressionInstance {
     val callArguments = CallC.getCallArguments(expression)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
 
-    val methodKey = new MethodId(classInfo.getQualifiedName, ConstructorC.constructorName)
+    val methodKey = new MethodId(classInfo.getQualifiedName, SuperCallExpression.constructorName)
     Seq(NewByteCodeC.newInstruction(classRef), DuplicateInstructionC.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }

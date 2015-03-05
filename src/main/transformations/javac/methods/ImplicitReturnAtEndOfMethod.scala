@@ -2,14 +2,13 @@ package transformations.javac.methods
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.classes.ClassC
 
 object ImplicitReturnAtEndOfMethod extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     val clazz = program
-    val methods = ClassC.getMethods(clazz)
+    val methods = MethodC.getMethods(clazz)
     for (method <- methods) {
       val statements = MethodC.getMethodBody(method)
       val hasNoReturn = statements.isEmpty ||

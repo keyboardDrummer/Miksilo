@@ -26,8 +26,10 @@ object MethodC extends GrammarTransformation {
     val classCompiler = ClassC.getClassCompiler(state)
 
     val methods = getMethods(clazz)
-    for (method <- methods)
+    clazz(ByteCodeSkeleton.ClassMethodsKey) = methods.map(method => {
       convertMethod(method, classCompiler, state)
+      method
+    })
   }
 
   def bindMethods(state: TransformationState, clazz: MetaObject): Unit = {
@@ -59,12 +61,13 @@ object MethodC extends GrammarTransformation {
     MethodDescriptorConstant.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
   }
 
-  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
+  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState): Unit = {
     val constantPool = ByteCodeSkeleton.getState(state).constantPool
     def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
+    method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
-    val methodNameIndex: Int = classCompiler.getMethodNameIndex(getMethodName(method))
+    val methodNameIndex: Int = classCompiler.getNameIndex(getMethodName(method))
     method(ByteCodeMethodInfo.MethodNameIndex) = methodNameIndex
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptorIndex(method)
@@ -77,6 +80,7 @@ object MethodC extends GrammarTransformation {
       val parameters = getMethodParameters(method)
       setMethodCompiler(method, parameters)
       val statements = getMethodBody(method)
+      method.data.remove(MethodBodyKey)
       val statementToInstructions = StatementC.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val codeIndex = constantPool.store(CodeConstantEntry.entry)
@@ -140,6 +144,8 @@ object MethodC extends GrammarTransformation {
     method(MethodNameKey).asInstanceOf[String]
   }
 
+  def getMethods(clazz: MetaObject) = ClassC.getMembers(clazz).filter(member => member.clazz == MethodKey)
+
   def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
 
   object ParametersGrammar
@@ -164,7 +170,7 @@ object MethodC extends GrammarTransformation {
         produce(DefaultVisibility))
 
     val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~~ parseStatic ~~ parseReturnType ~~ identifier ~ parseParameters % block ^^
-      parseMap(ByteCodeMethodInfo.MethodInfoKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+      parseMap(MethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
 
     val memberGrammar = grammars.find(ClassC.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
@@ -172,7 +178,7 @@ object MethodC extends GrammarTransformation {
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
-    new MetaObject(ByteCodeMethodInfo.MethodInfoKey) {
+    new MetaObject(MethodKey) {
       data.put(MethodNameKey, name)
       data.put(ReturnTypeKey, _returnType)
       data.put(MethodParametersKey, _parameters)
@@ -196,6 +202,7 @@ object MethodC extends GrammarTransformation {
 
   class Visibility
 
+  object MethodKey
 
   object MethodGrammar
 

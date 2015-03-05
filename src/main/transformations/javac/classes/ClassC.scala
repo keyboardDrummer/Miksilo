@@ -55,8 +55,6 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   def getParent(clazz: MetaObject): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
 
-  def getMethods(clazz: MetaObject) = clazz(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
-
   def getClassCompiler(state: TransformationState) = getState(state).classCompiler
 
   def getState(state: TransformationState): State = {
@@ -83,10 +81,10 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val classParentGrammar = ("extends" ~~> identifier ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]])) | produce(None)
     val nameGrammar: BiGrammar = "class" ~~> identifier
-    val methodsGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"
+    val membersGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"
     val nameAndParent: BiGrammar = nameGrammar ~~ classParentGrammar ^^ parseMap(ClassFileKey, ClassName, ClassParent)
-    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % methodsGrammar ^^
-      parseMap(ClassFileKey, ClassPackage, ClassImports, PartialSelf, ByteCodeSkeleton.ClassMethodsKey))
+    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % membersGrammar ^^
+      parseMap(ClassFileKey, ClassPackage, ClassImports, PartialSelf, Members))
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
@@ -94,7 +92,7 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
     new MetaObject(ByteCodeSkeleton.ClassFileKey) {
-    data.put(ByteCodeSkeleton.ClassMethodsKey, methods)
+    data.put(Members, methods)
     data.put(ClassPackage, _package)
     data.put(ClassName, name)
     data.put(ClassImports, imports)
@@ -111,6 +109,8 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
     var secondMemberPasses = List.empty[MetaObject => Unit]
   }
 
+  def getMembers(clazz: MetaObject) = clazz(Members).asInstanceOf[Seq[MetaObject]]
+
   class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
 
   object ClassGrammar
@@ -120,6 +120,8 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
   object ClassImports
 
   object ClassParent
+
+  object Members
 
   object ClassName
 
