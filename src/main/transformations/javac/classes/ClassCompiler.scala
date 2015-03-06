@@ -10,7 +10,7 @@ object ClassCompiler {
 }
 
 
-case class FieldInfo(parent: ClassInfo, name: String, _type: MetaObject) extends ClassMember {
+case class FieldInfo(parent: ClassInfo, name: String, _static: Boolean, _type: MetaObject) extends ClassMember {
 }
 
 case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMember

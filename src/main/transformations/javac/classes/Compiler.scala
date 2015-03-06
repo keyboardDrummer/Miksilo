@@ -38,6 +38,9 @@ case class PackageInfo(parent: Option[PackageInfo], name: String, content: mutab
 }
 
 trait ClassMember
+{
+  def _static: Boolean
+}
 
 case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[String, ClassMember] = mutable.Map()) extends PackageContent(Some(parent), name) {
   def getMethod(name: String) = content(name).asInstanceOf[MethodInfo]
@@ -46,8 +49,8 @@ case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[Str
 
   def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.getQualifiedName.parts ++ Seq(name))
 
-  def newFieldInfo(name: String, _type: MetaObject) = {
-    val result = new FieldInfo(this, name, _type)
+  def newFieldInfo(name: String, _type: MetaObject, _static: Boolean = false) = {
+    val result = new FieldInfo(this, name, _static, _type)
     content(name) = result
     result
   }
