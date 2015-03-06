@@ -21,7 +21,7 @@ abstract class InvokeC extends InstructionC {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val classRef = constantPool.getValue(MethodRefConstant.getMethodRefClassRefIndex(methodRef)).asInstanceOf[MetaObject]
-    val className = constantPool.getValue(ClassRefConstant.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
     val descriptor = constantPool.getValue(NameAndType.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
     val InstructionSignature(ins, outs) = getMethodStackModification(descriptor, constantPool, state)

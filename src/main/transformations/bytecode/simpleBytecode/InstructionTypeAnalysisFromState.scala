@@ -18,7 +18,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
   val initialProgramTypeState: ProgramTypeState = ProgramTypeState(initialStack, initialVariables)
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
-  def getTypeAnalysis = {
+  private def getTypeAnalysis = {
     val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
     val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
     val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
@@ -31,7 +31,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
     new InstructionTypeAnalysis(instructions, getVariableUpdates, getInstructionSignature, getJumpBehavior)
   }
   
-  def getMethodParameters = {
+  private def getMethodParameters = {
     val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
     val methodDescriptor = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
     val methodParameters = MethodDescriptorConstant.getMethodDescriptorParameters(methodDescriptor)
@@ -42,7 +42,7 @@ class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaO
       val clazz = state.program
       val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
       val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[MetaObject]
-      val className = constantPool.getValue(ClassRefConstant.getClassRefName(clazzRef)).asInstanceOf[QualifiedClassName]
+      val className = constantPool.getValue(ClassRefConstant.getNameIndex(clazzRef)).asInstanceOf[QualifiedClassName]
       Seq(ObjectTypeC.objectType(className)) ++ methodParameters
     }
   }

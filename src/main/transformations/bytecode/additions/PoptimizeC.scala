@@ -2,24 +2,42 @@ package transformations.bytecode.additions
 
 import core.transformation.sillyCodePieces.ParticleWithPhase
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
+import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.types.TypeC
 
 object PoptimizeC extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopC)
 
+  private def getSignatureInOutLengths(state: TransformationState, signature: InstructionSignature): (Int, Int) = {
+    val inputLength = signature.inputs.map(_type => TypeC.getTypeSize(_type, state)).sum
+    val outputLength = signature.outputs.map(_type => TypeC.getTypeSize(_type, state)).sum
+    (inputLength, outputLength)
+  }
+
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
+
+    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
+      val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
-      def getInOutSizes(instruction: MetaObject) = InstructionC.getInOutSizes(instruction, state)
+      def getInOutSizes(instructionIndex: Int) = {
+        val instruction = instructions(instructionIndex)
+        val getSignature = ByteCodeSkeleton.getInstructionSignatureRegistry(state)(instruction.clazz)
+        val signature = getSignature(constantPool, instruction, typeAnalysis.typeStatePerInstruction(instructionIndex))
+        getSignatureInOutLengths(state, signature)
+      }
 
       var newInstructions = List.empty[MetaObject]
       var consumptions = List.empty[Boolean]
-      def processInstruction(instruction: MetaObject) {
+
+      def processInstruction(instructionIndex: Int) {
+        val instruction = instructions(instructionIndex)
         if (instruction.clazz == PopC.PopKey) {
           consumptions ::= true
           return
@@ -30,7 +48,7 @@ object PoptimizeC extends ParticleWithPhase {
           return
         }
 
-        val (in, out) = getInOutSizes(instruction)
+        val (in, out) = getInOutSizes(instructionIndex)
         var outLeft = out
         var outPop = 0
         while (outLeft > 0 && consumptions.nonEmpty) {
@@ -49,8 +67,8 @@ object PoptimizeC extends ParticleWithPhase {
         }
       }
 
-      for (instruction <- instructions.reverse) {
-        processInstruction(instruction)
+      for (instructionIndex <- instructions.indices.reverse) {
+        processInstruction(instructionIndex)
       }
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions.toSeq
     }

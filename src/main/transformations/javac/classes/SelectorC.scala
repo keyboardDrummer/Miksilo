@@ -35,15 +35,25 @@ object SelectorC extends ExpressionInstance {
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val compiler = ClassC.getClassCompiler(state)
-    val obj = getSelectorObject(selector)
-    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
-    val member = getSelectorMember(selector)
-    val fieldInfo = classOrObjectReference.info.getField(member)
-    val fieldRef = compiler.getFieldRefIndex(fieldInfo)
+    val classOrObjectReference = getClassOrObjectReference(selector, compiler)
+    val fieldRef = getFieldRefIndex(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
       Seq(GetStaticC.getStatic(fieldRef))
     else
       ???
+  }
+
+  def getClassOrObjectReference(selector: MetaObject, compiler: ClassCompiler): ClassOrObjectReference = {
+    val obj = getSelectorObject(selector)
+    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    classOrObjectReference
+  }
+
+  def getFieldRefIndex(selector: MetaObject, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Int = {
+    val member = getSelectorMember(selector)
+    val fieldInfo = classOrObjectReference.info.getField(member)
+    val fieldRef = compiler.getFieldRefIndex(fieldInfo)
+    fieldRef
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

@@ -15,32 +15,6 @@ case class InstructionSignature(inputs: Seq[MetaObject], outputs: Seq[MetaObject
 
 class ByteCodeTypeException(message: String) extends Exception(message)
 
-object InstructionC
-{
-  def getInOutSizes(instruction: MetaObject, state: TransformationState): (Int,Int) = { //TODO deze methode fatsoenlijk maken.
-    val getSignature = ByteCodeSkeleton.getInstructionSignatureRegistry(state)(instruction.clazz)
-    val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
-    try
-    {
-      val intTypeState = new ProgramTypeState(Seq(IntTypeC.intType), 0.to(10).map(index => (index,IntTypeC.intType)).toMap)
-      val signature = getSignature(constantPool,instruction, intTypeState)
-      getSignatureInOutLengths(state, signature)
-    } catch
-      {
-        case e:ByteCodeTypeException =>
-          val longTypeState = new ProgramTypeState(Seq(LongTypeC.longType), 0.to(10).map(index => (index,LongTypeC.longType)).toMap)
-          val signature = getSignature(constantPool,instruction, longTypeState)
-          getSignatureInOutLengths(state, signature)
-      }
-  }
-
-  private def getSignatureInOutLengths(state: TransformationState, signature: InstructionSignature): (Int, Int) = {
-    val inputLength = signature.inputs.map(_type => TypeC.getTypeSize(_type, state)).sum
-    val outputLength = signature.outputs.map(_type => TypeC.getTypeSize(_type, state)).sum
-    (inputLength, outputLength)
-  }
-}
-
 trait InstructionC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {

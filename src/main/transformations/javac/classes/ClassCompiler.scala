@@ -36,7 +36,7 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   def findMethod(methodRef: MetaObject): MethodInfo = {
     val classIndex = MethodRefConstant.getMethodRefClassRefIndex(methodRef)
     val classRef = constantPool.getValue(classIndex).asInstanceOf[MetaObject]
-    val className = constantPool.getValue(ClassRefConstant.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val nameAndTypeIndex = MethodRefConstant.getMethodRefMethodNameIndex(methodRef)
     val nameAndType = constantPool.getValue(nameAndTypeIndex).asInstanceOf[MetaObject]
     val methodName = constantPool.getValue(NameAndType.getNameAndTypeName(nameAndType)).asInstanceOf[String]

@@ -14,7 +14,7 @@ object RunWithJVM extends Particle
       val clazz: MetaObject = state.program
       val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
       val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
-      val classNameIndex = ClassRefConstant.getClassRefName(constantPool.getValue(classRefIndex).asInstanceOf[MetaObject])
+      val classNameIndex = ClassRefConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[MetaObject])
       val className = constantPool.getValue(classNameIndex).asInstanceOf[QualifiedClassName].toString
       state.output = TestUtils.runByteCode(className, clazz)
     })

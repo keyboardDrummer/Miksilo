@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs.{CompareLongC, LoadLongC, LongConstantC, StoreLongC}
-import transformations.bytecode.coreInstructions.objects.{NewByteCodeC, LoadAddressC, PushNullC, StoreAddressC}
+import transformations.bytecode.coreInstructions.objects._
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.additions.{LabelledTargets, PoptimizeC}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -41,7 +41,7 @@ object JavaCompiler {
       javaMethod
   }
 
-    def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
+  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
     ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable,
     AssignmentC, AssignmentPrecedence, DeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
     BasicImportC, MethodC, FieldDeclaration) ++ Seq(ClassC) ++ javaSimpleStatement
@@ -72,7 +72,8 @@ object JavaCompiler {
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, DuplicateInstructionC,
-      LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC) ++
+      LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
+      SwapInstruction, PutField) ++
       integerInstructions ++ longInstructions
   }
 

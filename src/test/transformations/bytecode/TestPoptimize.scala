@@ -4,11 +4,13 @@ import core.transformation.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.bytecode.coreInstructions.{Pop2C, VoidReturnInstructionC, PopC}
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
+import transformations.types.VoidTypeC
 
 class TestPoptimize {
 
@@ -71,8 +73,9 @@ class TestPoptimize {
 
   def transformInstructions(instructions: Seq[MetaObject]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
-    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(codeAnnotation))
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(), Seq(method))
+    val method = ByteCodeMethodInfo.methodInfo(0, 1, Seq(codeAnnotation))
+    method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
+    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq(MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType,Seq.empty))), Seq(method))
     val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)
@@ -80,8 +83,8 @@ class TestPoptimize {
   
   @Test
   def testPop2() = {
-    val instructions = Seq(LongConstantC.constant(1), Pop2C.pop2)
-    val expected = Seq.empty[MetaObject]
+    val instructions = Seq(LongConstantC.constant(1), Pop2C.pop2, VoidReturnInstructionC.voidReturn)
+    val expected = Seq(VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(expected, newInstructions)
   }

@@ -26,7 +26,7 @@ object NewByteCodeC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
     val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
     val classRef = constantPool.getValue(location).asInstanceOf[MetaObject]
-    val className = constantPool.getValue(ClassRefConstant.getClassRefName(classRef)).asInstanceOf[QualifiedClassName]
+    val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
     InstructionSignature(Seq.empty, Seq(classType))
   }

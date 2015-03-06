@@ -15,13 +15,12 @@ object ClassRefConstant extends ConstantEntry {
     data.put(ClassRefName, classRefNameIndex)
   }
 
-  def getClassRefName(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
-
+  def getNameIndex(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
 
   override def key: Any = ClassRefKey
 
   override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
-    byteToBytes(7) ++ shortToBytes(getClassRefName(constant))
+    byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~> integer ^^ parseMap(ClassRefKey, ClassRefName)
