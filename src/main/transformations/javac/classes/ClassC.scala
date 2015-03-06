@@ -34,7 +34,6 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
       val parentRef = classCompiler.constantPool.getClassRef(classCompiler.fullyQualify(parentName))
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
-      clazz(ByteCodeSkeleton.ClassFields) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
       for(firstMemberPass <- getState(state).firstMemberPasses)
@@ -90,9 +89,9 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   object ImportGrammar
 
-  def clazz(_package: Seq[String], name: String, methods: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
+  def clazz(_package: Seq[String], name: String, members: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
     new MetaObject(ByteCodeSkeleton.ClassFileKey) {
-    data.put(Members, methods)
+    data.put(Members, members)
     data.put(ClassPackage, _package)
     data.put(ClassName, name)
     data.put(ClassImports, imports)

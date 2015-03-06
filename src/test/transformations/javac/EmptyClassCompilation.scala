@@ -51,6 +51,6 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClass: MetaObject = {
-    ClassC.clazz(classPackage, className, methods = Seq[MetaObject]())
+    ClassC.clazz(classPackage, className, members = Seq[MetaObject]())
   }
 }

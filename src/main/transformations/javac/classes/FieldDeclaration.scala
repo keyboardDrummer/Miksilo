@@ -46,18 +46,20 @@ object FieldDeclaration extends GrammarTransformation {
   }
 
   def getFields(clazz: MetaObject): Seq[MetaObject] = {
-    ByteCodeSkeleton.getClassFields(clazz)
+    ClassC.getMembers(clazz).filter(member => member.clazz == FieldKey)
   }
 
   def convertFields(state: TransformationState, clazz: MetaObject) = {
     val classCompiler = ClassC.getClassCompiler(state)
 
     val fields = getFields(clazz)
-    for (field <- fields)
-      convertMethod(field, classCompiler, state)
+    clazz(ByteCodeSkeleton.ClassFields) = fields.map(field => {
+      convertField(field, classCompiler, state)
+      field
+    })
   }
   
-  def convertMethod(field: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
+  def convertField(field: MetaObject, classCompiler: ClassCompiler, state: TransformationState) {
     val constantPool = classCompiler.constantPool
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
