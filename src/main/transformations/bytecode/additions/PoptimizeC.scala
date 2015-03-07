@@ -61,7 +61,9 @@ object PoptimizeC extends ParticleWithPhase {
         val hasSideEffect = guessIfInstructionHasSideEffect(out)
         val keepInstruction = outConsumption != 0 || hasSideEffect
         if (keepInstruction) {
-          newInstructions = 0.until(outPop).map(_ => PopC.pop).toList ++ newInstructions
+          val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2C.pop2).toList
+          val pop1Instructions: ((Nothing) => Any) with Iterable[MetaObject] = if (outPop % 2 == 1) Seq(PopC.pop) else Set.empty
+          newInstructions = pop2Instructions ++ pop1Instructions ++ newInstructions
           consumptions = 0.until(in).map(_ => false).toList ++ consumptions
           newInstructions = instruction :: newInstructions
         }

@@ -3,10 +3,12 @@ package transformations.javac.methods.assignment
 import core.grammarDocument.BiFailure
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
+import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 import transformations.javac.methods.MethodC
+import transformations.types.TypeC
 
 import scala.collection.mutable
 
@@ -53,7 +55,12 @@ object AssignmentC extends ExpressionInstance {
     val valueInstructions = ExpressionC.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)
     val assignInstructions = getState(state).assignFromStackByteCodeRegistry(target.clazz)(target)
-    valueInstructions ++ assignInstructions
-
+    val valueType = ExpressionC.getType(state)(value)
+    val duplicateInstruction = TypeC.getTypeSize(valueType, state) match
+    {
+      case 1 => DuplicateInstructionC.duplicate
+      case 2 =>  Duplicate2InstructionC.duplicate
+    }
+    valueInstructions ++ Seq(duplicateInstruction) ++ assignInstructions
   }
 }

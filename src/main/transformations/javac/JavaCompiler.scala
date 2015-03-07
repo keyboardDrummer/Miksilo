@@ -1,5 +1,6 @@
 package transformations.javac
 
+import application.compilerCockpit.PrettyPrint
 import core.transformation._
 import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode._
@@ -71,7 +72,7 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
-      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, DuplicateInstructionC,
+      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
       SwapInstruction, PutField) ++
       integerInstructions ++ longInstructions
@@ -90,6 +91,10 @@ object JavaCompiler {
   def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
     val implicitsSet = implicits.toSet
     implicits ++ splice ++ javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
+  }
+
+  def getPrettyPrintJavaToByteCodeCompiler = {
+    new CompilerFromParticles(spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint)))
   }
 }
 

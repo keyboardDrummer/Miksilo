@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.grammarDocument.{BiGrammar, ManyVertical}
+import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{MetaObject, TransformationState}
@@ -56,14 +56,14 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
   object AccessFlagGrammar
   object MethodInfoGrammar
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val parseAttribute = grammars.find(AttributeGrammar)
+    val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
     val methodHeader: BiGrammar = Seq[BiGrammar](
       "nameIndex:" ~> integer,
       "descriptorIndex:" ~> integer,
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
-    val methodInfoGrammar: BiGrammar = methodHeader % ("attributes:" %> new ManyVertical(parseAttribute).indent(2)) ^^
+    val methodInfoGrammar: BiGrammar = methodHeader % attributesGrammar ^^
       parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }

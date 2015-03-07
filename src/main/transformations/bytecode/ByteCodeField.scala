@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.bytecode.ByteCodeSkeleton.{ClassFields, ClassFileKey}
+import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
 object ByteCodeField extends GrammarTransformation with AccessFlags {
   object FieldKey
@@ -30,7 +30,10 @@ object ByteCodeField extends GrammarTransformation with AccessFlags {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val parseFields = "fields:" %> produce(Seq.empty[Any])
+    val attributesGrammar = grammars.find(AttributesGrammar)
+    val fieldGrammar = "nameIndex:" ~~ integer ~~ ", descriptorIndex" ~~ integer ~~ ", attributes" % attributesGrammar ^^
+      parseMap(FieldKey, NameIndex, DescriptorIndex, FieldAttributes)
+    val parseFields = "fields:" %> fieldGrammar.manyVertical.indent()
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~ membersGrammar.inner ^^ parseMap(ClassFileKey, ClassFields, PartialSelf)

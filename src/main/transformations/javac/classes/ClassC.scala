@@ -41,6 +41,8 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
       for(secondMemberPass <- getState(state).secondMemberPasses)
         secondMemberPass(clazz)
+
+      clazz.data.remove(Members)
     }
   }
 

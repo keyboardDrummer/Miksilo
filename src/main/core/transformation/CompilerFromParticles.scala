@@ -7,7 +7,7 @@ import core.transformation.sillyCodePieces.Particle
 
 import scala.reflect.io.{Directory, File}
 
-class CompilerFromParticles(val particles: Seq[Particle]) extends Compiler {
+class CompilerFromParticles(val particles: Seq[Particle]) {
 
   validateDependencies(particles)
 
@@ -22,18 +22,24 @@ class CompilerFromParticles(val particles: Seq[Particle]) extends Compiler {
     state
   }
 
-  def compile(input: File, outputDirectory: Directory) {
+  def compile(input: File, outputDirectory: Directory): TransformationState = {
     val inputStream = File(input).slurp()
     val state: TransformationState = parseAndTransform(inputStream)
 
     PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
+    state
   }
 
   def transform(program: MetaObject): MetaObject = {
+    val state: TransformationState = transformReturnState(program)
+    state.program
+  }
+
+  def transformReturnState(program: MetaObject): TransformationState = {
     val state = buildState
     state.program = program
     state.runPhases()
-    state.program
+    state
   }
 
   def parse(input: String): MetaObject = {

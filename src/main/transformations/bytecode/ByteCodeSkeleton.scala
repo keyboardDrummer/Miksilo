@@ -96,6 +96,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
 
   object AttributeGrammar
   object MembersGrammar
+  object AttributesGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
@@ -103,7 +104,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> integer
     val parseIndexGrammar: BiGrammar = "extends" ~~> integer
-    val attributesGrammar = "attributes:" %> (attributeGrammar*).indent()
+    val attributesGrammar = grammars.create(AttributesGrammar, "attributes:" %> attributeGrammar.manyVertical.indent())
     val membersGrammar = grammars.create(MembersGrammar, Empty)
     val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
       constantPool %% membersGrammar %% attributesGrammar ^^

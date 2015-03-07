@@ -2,6 +2,7 @@ package util
 
 import java.io
 
+import application.compilerCockpit.PrettyPrint
 import core.transformation._
 import core.transformation.sillyCodePieces.{Particle, ParticleWithPhase}
 import org.junit.Assert
@@ -15,6 +16,11 @@ import scala.sys.process.{Process, ProcessLogger}
 object TestUtils extends TestUtils(JavaCompiler.getCompiler)
 
 class TestUtils(val compiler: CompilerFromParticles) {
+
+  val currentDir = new File(new java.io.File("."))
+  val rootOutput = currentDir / Path("testOutput")
+  val actualOutputDirectory = rootOutput / "actual"
+  val testResources = currentDir / Path("testResources")
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
@@ -86,10 +92,6 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def compareWithJavacAfterRunning(className: String, inputDirectory: Path = Path("")) {
     val relativeFilePath = inputDirectory / (className + ".java")
-    val currentDir = new File(new java.io.File("."))
-    val rootOutput = currentDir / Path("testOutput")
-    val actualOutputDirectory = rootOutput / "actual"
-    val testResources = currentDir / Path("testResources")
     val input: File = File(testResources / relativeFilePath)
 
     val expectedOutputDirectory = rootOutput / "expected"
@@ -97,7 +99,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
     Assert.assertEquals("", javaCompilerOutput)
 
-    compiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
+    val state = compiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)
@@ -107,18 +109,26 @@ class TestUtils(val compiler: CompilerFromParticles) {
     }
     catch {
       case e: AssertionError =>
-        val relativeClassPath = inputDirectory / (className + ".class")
-        val actualByteCode = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
-        val expectedByteCode = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
-
-        val originalMessage = e.getMessage
-        val errorMessage: String = s"Output comparison failed with message: \n$originalMessage \n\n" +
-          s"javac byteCode was: \n\n$expectedByteCode \n\n" +
-          s"Actual byteCode was: \n$actualByteCode"
-        (rootOutput / "outputLog.txt").createFile().writeAll(errorMessage)
-        throw new AssertionError(errorMessage)
+        throw new AssertionError(getErrorMessage(className, inputDirectory, expectedOutputDirectory, state, e))
     }
+  }
 
+  def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: TransformationState, e: AssertionError): String = {
+    val relativeClassPath = inputDirectory / (className + ".class")
+    val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
+    val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
+
+    val prettyPrintByteCodeCompiler = new CompilerFromParticles(Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations)
+    val prettyPrintState = prettyPrintByteCodeCompiler.transformReturnState(state.program)
+    val prettyPrintActualByteCode = prettyPrintState.output
+
+    val originalMessage = e.getMessage
+    val errorMessage: String = s"Output comparison failed with message: \n$originalMessage \n\n" +
+      s"javac byteCode was: \n\n$expectedByteCodeAccordingToJavap \n\n" +
+      s"actual byteCode according to javap was: \n$actualByteCodeAccordingToJavap \n\n" +
+      s" actual byteCode according to prettyPrint was: \n${prettyPrintActualByteCode}"
+    (rootOutput / "outputLog.txt").createFile().writeAll(errorMessage)
+    errorMessage
   }
 
   def runJavaP(input: File): String = {

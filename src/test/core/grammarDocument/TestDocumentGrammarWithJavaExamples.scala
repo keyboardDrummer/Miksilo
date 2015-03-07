@@ -73,21 +73,20 @@ class TestDocumentGrammarWithJavaExamples {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
-    val newTransformations = JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint))
+    val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
-    val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
+    val state = prettyPrintCompiler.parseAndTransform(input)
     Assert.assertEquals(expectation, state.output)
   }
-
 
   @Test
   def testPrettyPrintAndParseByteCode() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
 
     val byteCodeTransformations: Seq[GrammarTransformation] = JavaCompiler.byteCodeTransformations
-    val prettyPrintTransformations = JavaCompiler.spliceBeforeTransformations(byteCodeTransformations, Seq(new PrettyPrint))
+    val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
-    val state = new CompilerFromParticles(prettyPrintTransformations).parseAndTransform(input)
+    val state = prettyPrintCompiler.parseAndTransform(input)
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations

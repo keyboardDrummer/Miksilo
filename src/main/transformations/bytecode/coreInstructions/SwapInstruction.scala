@@ -17,7 +17,7 @@ object SwapInstruction extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                           state: TransformationState): InstructionSignature = {
-    val stackTop = typeState.stackTypes.take(2)
+    val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }
 }

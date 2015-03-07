@@ -21,7 +21,7 @@ object PutField extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                           state: TransformationState): InstructionSignature = {
-    val stackTop = typeState.stackTypes.take(2)
+    val stackTop = typeState.stackTypes.takeRight(2)
 
     if (stackTop.size != 2)
       throw new ByteCodeTypeException("PutField requires two arguments on the stack.")

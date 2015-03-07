@@ -1,12 +1,12 @@
 package transformations.javac.methods.assignment
 
-import core.transformation.{Contract, MetaObject, TransformationState}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.bytecode.coreInstructions.integers.{LoadIntegerC, StoreIntegerC}
-import transformations.bytecode.coreInstructions.longs.{LoadLongC, StoreLongC}
-import transformations.bytecode.coreInstructions.objects.{LoadAddressC, StoreAddressC}
-import transformations.javac.methods.{MethodC, VariableC}
+import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.coreInstructions.integers.StoreIntegerC
+import transformations.bytecode.coreInstructions.longs.StoreLongC
+import transformations.bytecode.coreInstructions.objects.StoreAddressC
+import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 import transformations.types.ArrayTypeC.ArrayTypeKey
 import transformations.types.IntTypeC.IntTypeKey
 import transformations.types.LongTypeC.LongTypeKey
@@ -23,19 +23,18 @@ object AssignToVariable extends GrammarTransformation {
       val target = VariableC.getVariableName(targetVariable)
       val variableInfo = methodCompiler.variables(target)
       val byteCodeType = TypeC.toStackType(variableInfo._type, state)
-      Seq(byteCodeType.clazz match {
-        case IntTypeKey => StoreIntegerC.integerStore(variableInfo.offset)
-        case ObjectTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-        case ArrayTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-        case LongTypeKey => StoreLongC.longStore(variableInfo.offset)
-      }) ++ Seq(byteCodeType.clazz match {
-        case IntTypeKey => LoadIntegerC.load(variableInfo.offset)
-        case ObjectTypeKey => LoadAddressC.addressLoad(variableInfo.offset)
-        case ArrayTypeKey => LoadAddressC.addressLoad(variableInfo.offset)
-        case LongTypeKey => LoadLongC.load(variableInfo.offset)
-      })
+      Seq(getStoreInstruction(variableInfo, byteCodeType))
     })
     super.inject(state)
+  }
+
+  def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: MetaObject): MetaObject = {
+    byteCodeType.clazz match {
+      case IntTypeKey => StoreIntegerC.integerStore(variableInfo.offset)
+      case ObjectTypeKey => StoreAddressC.addressStore(variableInfo.offset)
+      case ArrayTypeKey => StoreAddressC.addressStore(variableInfo.offset)
+      case LongTypeKey => StoreLongC.longStore(variableInfo.offset)
+    }
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
