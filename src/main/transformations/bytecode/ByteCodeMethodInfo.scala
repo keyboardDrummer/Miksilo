@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
@@ -67,4 +67,6 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
       parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
+
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
 }

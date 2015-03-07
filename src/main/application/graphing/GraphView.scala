@@ -103,6 +103,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     cell
   }
 
+
   def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
     val incoming = origin.inDegreeOf(vertex)
     val outgoing = origin.outDegreeOf(vertex)

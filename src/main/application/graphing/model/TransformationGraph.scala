@@ -12,13 +12,16 @@ import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 class TransformationGraph
   extends GraphFromTransformations(JavaCompiler.allTransformations) {
 
-  val simplifications = Seq(ByteCodeTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
+  val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
     , JavaSimpleStatement, JavaMethod, JavaC)
-  addSimplifications()
+  //addSimplifications() TODO bring this back.
 
   val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
   if (sources.size > 1)
-    throw new RuntimeException(s"more than once source, sources = $sources")
+    throw new RuntimeException(s"more than once source, sources = $sources.")
+
+  if (sources.size == 0)
+    throw new RuntimeException("zero sources.")
 
   optimizeDependencies()
 

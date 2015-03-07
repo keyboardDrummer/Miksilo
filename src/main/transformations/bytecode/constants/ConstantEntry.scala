@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{Contract, TransformationState, MetaObject}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
@@ -22,4 +22,6 @@ trait ConstantEntry extends GrammarTransformation {
   }
   
   def getGrammar(grammars: GrammarCatalogue): BiGrammar
+
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
 }

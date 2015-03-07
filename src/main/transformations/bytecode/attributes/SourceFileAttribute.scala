@@ -1,7 +1,7 @@
 package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{Contract, TransformationState, MetaObject}
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
@@ -9,7 +9,7 @@ import transformations.bytecode.PrintByteCode._
 
 object SourceFileAttribute extends GrammarTransformation {
 
-  object SourceFileAttribute
+  object SourceFileAttributeKey
 
   object SourceFileFileNameIndex
 
@@ -17,14 +17,14 @@ object SourceFileAttribute extends GrammarTransformation {
 
   def sourceFileId = new MetaObject(SourceFileId)
 
-  def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttribute) {
+  def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttributeKey) {
     data.put(SourceFileFileNameIndex, fileNameIndex)
     data.put(AttributeNameKey, nameIndex)
   }
 
   override def inject(state: TransformationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(SourceFileAttribute) = getSourceFileBytes
+    ByteCodeSkeleton.getState(state).getBytes(SourceFileAttributeKey) = getSourceFileBytes
     ByteCodeSkeleton.getState(state).getBytes(SourceFileId) = _ => toUTF8ConstantEntry("SourceFile")
   }
 
@@ -37,4 +37,6 @@ object SourceFileAttribute extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
   }
+
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
 }

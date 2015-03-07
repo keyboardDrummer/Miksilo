@@ -17,10 +17,10 @@ object TestUtils extends TestUtils(JavaCompiler.getCompiler)
 
 class TestUtils(val compiler: CompilerFromParticles) {
 
-  val currentDir = new File(new java.io.File("."))
-  val rootOutput = currentDir / Path("testOutput")
-  val actualOutputDirectory = rootOutput / "actual"
-  val testResources = currentDir / Path("testResources")
+  def currentDir = new File(new java.io.File("."))
+  def rootOutput = currentDir / Path("testOutput")
+  def actualOutputDirectory = rootOutput / "actual"
+  def testResources = currentDir / Path("testResources")
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
