@@ -2,7 +2,6 @@ package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
-import transformations.types.TypeC.TypeGrammar
 
 object IntTypeC extends TypeInstance {
 
@@ -12,11 +11,8 @@ object IntTypeC extends TypeInstance {
 
   override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "I"
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val parseType = grammars.create(TypeGrammar)
-    val parseIntType = "int" ~> produce(IntTypeC.intType)
-    parseType.inner = parseType.inner | parseIntType
-
+  override def getJavaGrammar(grammars: GrammarCatalogue) = {
+    "int" ~> produce(IntTypeC.intType)
   }
 
   def intType = new MetaObject(IntTypeKey)

@@ -10,9 +10,8 @@ object BooleanTypeC extends TypeInstance {
 
   override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "Z"
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.addOption("boolean" ~> produce(booleanType))
+  override def getJavaGrammar(grammars: GrammarCatalogue) = {
+    "boolean" ~> produce(booleanType)
   }
 
   def booleanType = new MetaObject(BooleanTypeKey)

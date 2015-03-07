@@ -18,7 +18,7 @@ object ByteCodeField extends GrammarTransformation with AccessFlags {
   }
 
   def emitField(field: MetaObject, state: TransformationState): Seq[Byte] = {
-      PrintByteCode.getAccessFlagsByteCode(field(AccessFlagsKey).asInstanceOf[MetaObject]) ++
+      getAccessFlagsByteCode(field) ++
         PrintByteCode.shortToBytes(field(ByteCodeField.NameIndex).asInstanceOf[Int]) ++
         PrintByteCode.shortToBytes(field(ByteCodeField.DescriptorIndex).asInstanceOf[Int]) ++
         PrintByteCode.getAttributesByteCode(state, field(ByteCodeField.FieldAttributes).asInstanceOf[Seq[MetaObject]])

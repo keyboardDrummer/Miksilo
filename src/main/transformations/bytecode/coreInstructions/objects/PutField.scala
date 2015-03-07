@@ -26,11 +26,11 @@ object PutField extends InstructionC {
     if (stackTop.size != 2)
       throw new ByteCodeTypeException("PutField requires two arguments on the stack.")
 
-    val valueType = stackTop(0)
-    val objectType = stackTop(1)
+    val valueType = stackTop(1)
+    val objectType = stackTop(0)
 
     if (objectType.clazz != ObjectTypeC.ObjectTypeKey)
-      throw new ByteCodeTypeException("PutField requires an object on the second stack item.")
+      throw new ByteCodeTypeException(s"PutField requires an object on the second stack item and not a ${objectType}.")
 
     new InstructionSignature(Seq.empty, Seq(valueType, objectType))
   }

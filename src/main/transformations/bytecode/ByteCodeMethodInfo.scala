@@ -39,11 +39,7 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
   }
 
   def getMethodByteCode(methodInfo: MetaObject, state: TransformationState) = {
-      val accessCodes = Map(
-        PublicAccess -> "0001",
-        StaticAccess -> "0008",
-        PrivateAccess -> "0002").mapValues(s => hexToInt(s))
-      shortToBytes(getMethodAccessFlags(methodInfo).map(flag => accessCodes(flag)).sum) ++
+    getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(getMethodNameIndex(methodInfo)) ++
         shortToBytes(getMethodDescriptorIndex(methodInfo)) ++
       getAttributesByteCode(state, ByteCodeMethodInfo.getMethodAttributes(methodInfo))

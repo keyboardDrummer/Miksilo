@@ -1,5 +1,6 @@
 package transformations.types
 
+import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 import transformations.javac.classes.QualifiedClassName
@@ -15,8 +16,7 @@ object ObjectTypeC extends TypeInstance {
   def stackObjectType(constantPoolClassRef: Int) = new MetaObject(ObjectTypeKey, ObjectTypeName -> constantPoolClassRef)
 
   object ObjectTypeGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val parseType = grammars.find(TypeC.TypeGrammar)
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})
@@ -31,7 +31,7 @@ object ObjectTypeC extends TypeInstance {
     })
     val parseObjectType = grammars.create(ObjectTypeGrammar,
       identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
-    parseType.inner = parseType.inner | parseObjectType
+    parseObjectType
   }
 
   def objectType(name: QualifiedClassName) = new MetaObject(ObjectTypeKey) {
@@ -52,5 +52,4 @@ object ObjectTypeC extends TypeInstance {
   object ObjectTypeName
 
   object ObjectTypeKey
-
 }

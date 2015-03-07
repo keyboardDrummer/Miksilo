@@ -1,9 +1,13 @@
 package transformations.types
 
+import core.grammarDocument.BiGrammar
+import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.constants.ConstantEntry
 
-trait TypeInstance extends GrammarTransformation {
+trait TypeInstance extends GrammarTransformation with ConstantEntry  {
 
   val key: AnyRef
 
@@ -22,5 +26,23 @@ trait TypeInstance extends GrammarTransformation {
 
   def getStackSize: Int
 
-  override def dependencies: Set[Contract] = Set(TypeC)
+  override def dependencies: Set[Contract] = Set(TypeC, ByteCodeSkeleton)
+
+  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+    PrintByteCode.toUTF8ConstantEntry(getByteCodeString(constant, state))
+  }
+
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val javaGrammar: BiGrammar = getJavaGrammar(grammars)
+    grammars.create(key, javaGrammar)
+    val parseType = grammars.find(TypeC.TypeGrammar)
+    parseType.addOption(javaGrammar)
+    super.transformGrammars(grammars)
+  }
+
+  def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar
+
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    "T" ~> grammars.find(key)
+  }
 }

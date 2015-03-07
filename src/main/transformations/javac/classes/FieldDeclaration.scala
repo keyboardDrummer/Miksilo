@@ -64,9 +64,12 @@ object FieldDeclaration extends GrammarTransformation {
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
     field(ByteCodeField.NameIndex) = nameIndex
+    field.clazz = ByteCodeField.FieldKey
 
     val fieldDescriptorIndex = constantPool.store(FieldDescriptorConstant.constructor(getFieldType(field)))
     field(ByteCodeField.DescriptorIndex) = fieldDescriptorIndex
+    field(ByteCodeField.AccessFlagsKey) = Set.empty
+    field(ByteCodeField.FieldAttributes) = Seq.empty
 
     field.data.remove(FieldName)
     field.data.remove(FieldType)

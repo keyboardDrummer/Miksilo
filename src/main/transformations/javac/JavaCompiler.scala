@@ -65,7 +65,7 @@ object JavaCompiler {
     FieldDescriptorConstant)
   def byteCodeWithoutInstructions = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable, CodeAttribute) ++ constantEntryParticles ++
     Seq(ByteCodeMethodInfo, ByteCodeField) ++
-    Seq(ByteCodeSkeleton) ++ typeTransformations
+    typeTransformations ++ Seq(ByteCodeSkeleton)
 
   def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeC)
 

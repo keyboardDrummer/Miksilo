@@ -13,9 +13,8 @@ object LongTypeC extends TypeInstance {
 
   override def getStackSize: Int = 2
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
-    typeGrammar.inner = typeGrammar.inner | ("long" ~> produce(longType))
+  override def getJavaGrammar(grammars: GrammarCatalogue) = {
+    "long" ~> produce(longType)
   }
 
   def longType = new MetaObject(LongTypeKey)

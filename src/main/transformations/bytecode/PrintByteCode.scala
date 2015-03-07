@@ -9,7 +9,7 @@ import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeC}
 
 object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naar byte code particles verplaatsen.
-  val accessFlags: Map[String, Int] = Map("super" -> 0x0020)
+  val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
@@ -27,7 +27,7 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
   }
 
   def getAccessFlagsByteCode(clazz: MetaObject): Seq[Byte] = {
-    shortToBytes(accessFlags("super"))
+    shortToBytes(classAccessFlags("super"))
   }
 
   def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2))

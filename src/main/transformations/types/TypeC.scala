@@ -46,7 +46,7 @@ object TypeC extends GrammarTransformation { //TODO move some specific type code
   def getByteCodeString(state: TransformationState): MetaObject => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
 
-  override def dependencies: Set[Contract] = Set.empty
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def checkAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject) = {
     if (!isAssignableTo(state)(to, from))

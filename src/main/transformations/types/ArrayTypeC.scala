@@ -14,10 +14,9 @@ object ArrayTypeC extends TypeInstance {
 
   def getArrayElementType(arrayType: MetaObject) = arrayType(ArrayElementType).asInstanceOf[MetaObject]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def getJavaGrammar(grammars: GrammarCatalogue)= {
     val parseType = grammars.find(TypeC.TypeGrammar)
-    val parseArrayType = parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
-    parseType.addOption(parseArrayType)
+     parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
   }
 
   def arrayType(elementType: MetaObject) = {

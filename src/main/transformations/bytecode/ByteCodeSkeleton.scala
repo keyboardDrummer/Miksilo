@@ -10,7 +10,6 @@ import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
-import transformations.types._
 
 import scala.collection.mutable
 
@@ -51,7 +50,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
 
   def getClassAttributes(clazz: MetaObject) = clazz(ClassAttributes).asInstanceOf[Seq[MetaObject]]
 
-  override def dependencies: Set[Contract] = Set(ObjectTypeC, DoubleTypeC, ArrayTypeC, BooleanTypeC, LongTypeC, VoidTypeC)
+  override def dependencies: Set[Contract] = Set.empty
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
 
@@ -119,9 +118,8 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar,
-        utf8 | qualifiedClassName | ("T" ~> typeGrammar))
+        utf8 | qualifiedClassName)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
     val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
