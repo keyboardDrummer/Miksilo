@@ -7,7 +7,7 @@ import transformations.javac.statements._
 
 object JavaSimpleStatement extends TransformationGroup {
 
-  override def dependencies: Set[Contract] = Set(DeclarationC, IfThenC, ExpressionAsStatementC, ForLoopC)
+  override def dependencies: Set[Contract] = Set(LocalDeclarationC, IfThenC, ExpressionAsStatementC, ForLoopC)
 
   override def dependants: Set[Contract] = Set(MethodC, AssignmentPrecedence)
 }

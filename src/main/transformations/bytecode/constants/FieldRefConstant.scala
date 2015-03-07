@@ -21,14 +21,14 @@ object FieldRefConstant extends ConstantEntry {
   override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
     byteToBytes(9) ++
       shortToBytes(getFieldRefClassIndex(constant)) ++
-      shortToBytes(getFieldRefNameAndTypeIndex(constant))
+      shortToBytes(getNameAndTypeIndex(constant))
   }
 
   override def key: Any = FieldRef
 
   def getFieldRefClassIndex(fieldRef: MetaObject) = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
-  def getFieldRefNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
+  def getNameAndTypeIndex(fieldRef: MetaObject) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 }

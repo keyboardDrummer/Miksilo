@@ -1,5 +1,7 @@
 package transformations.javac
 
+import java.io.ObjectInputStream.GetField
+
 import application.compilerCockpit.PrettyPrint
 import core.transformation._
 import core.transformation.sillyCodePieces.Particle
@@ -44,7 +46,7 @@ object JavaCompiler {
 
   def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
     ReturnExpressionC, ReturnVoidC, CallC, SelectorC, DeclarationWithInitializerC, AssignToVariable,
-    AssignmentC, AssignmentPrecedence, DeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
+    AssignmentC, AssignmentPrecedence, LocalDeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
     BasicImportC, MethodC, FieldDeclaration) ++ Seq(ClassC) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
@@ -74,7 +76,7 @@ object JavaCompiler {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
-      SwapInstruction, PutField) ++
+      SwapInstruction, GetFieldC, PutField) ++
       integerInstructions ++ longInstructions
   }
 

@@ -6,7 +6,6 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
 
 object StoreAddressC extends InstructionC {
   override val key: AnyRef = AddressStore
@@ -22,10 +21,18 @@ object StoreAddressC extends InstructionC {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                          state: TransformationState): InstructionSignature = {
+    val stackTop = typeState.stackTypes.last
+    assertObjectTypeStackTop(stackTop, "StoreAddress")
+    InstructionSignature(Seq(stackTop), Seq())
+  }
 
-  override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
-    Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)
+  override def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState ): Map[Int, MetaObject] = {
+    val variableLocation: Int = getInstructionArguments(instruction)(0)
+    val _type = typeState.stackTypes.last
+    Map(variableLocation -> _type)
+  }
 
   object AddressStore
 

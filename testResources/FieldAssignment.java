@@ -2,7 +2,9 @@ class FieldAssignment {
     int myField;
 
     public static void main(String[] args) {
-        new FieldAssignment().assignMyField();
+        FieldAssignment me = new FieldAssignment();
+        me.assignMyField();
+        System.out.print(me.myField);
     }
 
     void assignMyField() {

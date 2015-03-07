@@ -5,12 +5,12 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.expressions.ExpressionC
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentC
-import transformations.javac.statements.DeclarationC.{DeclarationName, DeclarationType}
+import transformations.javac.statements.LocalDeclarationC.{DeclarationName, DeclarationType}
 import transformations.types.TypeC
 
 object DeclarationWithInitializerC extends StatementInstance {
 
-  override def dependencies: Set[Contract] = Set(AssignmentC, DeclarationC)
+  override def dependencies: Set[Contract] = Set(AssignmentC, LocalDeclarationC)
 
   def getInitializer(withInitializer: MetaObject) = withInitializer(InitializerKey).asInstanceOf[MetaObject]
 
@@ -33,9 +33,9 @@ object DeclarationWithInitializerC extends StatementInstance {
   override val key: AnyRef = DeclarationWithInitializerKey
 
   override def toByteCode(declarationWithInitializer: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val name: String = DeclarationC.getDeclarationName(declarationWithInitializer)
-    val _type = DeclarationC.getDeclarationType(declarationWithInitializer)
-    val declaration = DeclarationC.declaration(name, _type)
+    val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
+    val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
+    val declaration = LocalDeclarationC.declaration(name, _type)
     val assignment = AssignmentC.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
     val toInstructions = StatementC.getToInstructions(state)

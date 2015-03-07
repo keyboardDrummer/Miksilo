@@ -3,10 +3,11 @@ package transformations.javac.statements
 import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
+import transformations.javac.classes.ClassC
 import transformations.javac.methods.{VariablePool, MethodC}
 import transformations.types.TypeC
 
-object DeclarationC extends StatementInstance {
+object LocalDeclarationC extends StatementInstance {
 
   def getDeclarationType(declaration: MetaObject) = declaration(DeclarationType).asInstanceOf[MetaObject]
 
@@ -46,7 +47,9 @@ object DeclarationC extends StatementInstance {
     if (variables.contains(name))
       throw new VariableAlreadyDefined(name)
 
-    variables.add(name, getDeclarationType(declaration))
+    val declarationType: MetaObject = getDeclarationType(declaration)
+    ClassC.fullyQualify(declarationType, ClassC.getClassCompiler(state))
+    variables.add(name, declarationType)
     Seq.empty[MetaObject]
   }
 }

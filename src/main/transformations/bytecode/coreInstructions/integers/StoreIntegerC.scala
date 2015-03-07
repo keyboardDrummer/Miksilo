@@ -26,7 +26,7 @@ object StoreIntegerC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType), Seq())
 
-  override def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] =
+  override def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState ): Map[Int, MetaObject] =
     Map(getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 
   object IntegerStore

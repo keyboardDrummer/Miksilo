@@ -17,7 +17,8 @@ object InvokeVirtualC extends InvokeC {
     hexToBytes("b6") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                          state: TransformationState): InstructionSignature = {
     getInstanceInstructionInAndOutputs(constantPool, instruction, typeState, state)
   }
 

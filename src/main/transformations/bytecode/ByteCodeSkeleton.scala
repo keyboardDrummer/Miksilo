@@ -62,7 +62,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
     val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
-    val localUpdates = new mutable.HashMap[Any, MetaObject => Map[Int, MetaObject]]
+    val localUpdates = new mutable.HashMap[Any, (MetaObject, ProgramTypeState) => Map[Int, MetaObject]]
     val getBytes = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
   }
 

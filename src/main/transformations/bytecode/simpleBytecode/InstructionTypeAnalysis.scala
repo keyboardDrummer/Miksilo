@@ -9,7 +9,7 @@ import transformations.types.ObjectTypeC
 case class ProgramTypeState(stackTypes: Seq[MetaObject], variableTypes: Map[Int, MetaObject])
 
 class InstructionTypeAnalysis(instructions: Seq[MetaObject],
-                          getVariableUpdates: MetaObject => Map[Int, MetaObject],
+                          getVariableUpdates: (MetaObject, ProgramTypeState) => Map[Int, MetaObject],
                           getSignature: (ProgramTypeState, MetaObject) => InstructionSignature,
                           getJumpBehavior: Any => JumpBehavior)
   extends InstructionFlowAnalysis[ProgramTypeState](instructions, getJumpBehavior) {
@@ -47,7 +47,7 @@ class InstructionTypeAnalysis(instructions: Seq[MetaObject],
       val remainingStack = stateStack.dropRight(input.length)
       val newStack = remainingStack ++ signature.outputs
 
-      val updates = getVariableUpdates(instruction)
+      val updates = getVariableUpdates(instruction, state)
       val newVariables = updates ++ state.variableTypes
       ProgramTypeState(newStack, newVariables)
     }

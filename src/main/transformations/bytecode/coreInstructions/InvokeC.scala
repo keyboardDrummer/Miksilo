@@ -12,7 +12,7 @@ abstract class InvokeC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
-    val descriptor = constantPool.getValue(NameAndType.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
+    val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
     getMethodStackModification(descriptor, constantPool, state)
   }
 
@@ -23,7 +23,7 @@ abstract class InvokeC extends InstructionC {
     val classRef = constantPool.getValue(MethodRefConstant.getMethodRefClassRefIndex(methodRef)).asInstanceOf[MetaObject]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
-    val descriptor = constantPool.getValue(NameAndType.getNameAndTypeType(nameAndType)).asInstanceOf[MetaObject]
+    val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
     val InstructionSignature(ins, outs) = getMethodStackModification(descriptor, constantPool, state)
     InstructionSignature(Seq(classType) ++ ins, outs)
   }

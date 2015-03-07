@@ -3,6 +3,7 @@ package transformations.javac.classes
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
+import transformations.bytecode.coreInstructions.objects.GetFieldC
 import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
 
 object SelectorC extends ExpressionInstance {
@@ -36,11 +37,15 @@ object SelectorC extends ExpressionInstance {
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val compiler = ClassC.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
-    val fieldRef = getFieldRefIndex(selector, compiler, classOrObjectReference)
+    val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
-      Seq(GetStaticC.getStatic(fieldRef))
+      Seq(GetStaticC.getStatic(fieldRefIndex))
     else
-      ???
+    {
+      val obj = getSelectorObject(selector)
+      val objInstructions = ExpressionC.getToInstructions(state)(obj)
+      objInstructions ++ Seq(GetFieldC.construct(fieldRefIndex))
+    }
   }
 
   def getClassOrObjectReference(selector: MetaObject, compiler: ClassCompiler): ClassOrObjectReference = {

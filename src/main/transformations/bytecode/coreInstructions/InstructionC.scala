@@ -9,7 +9,7 @@ import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.{LongTypeC, IntTypeC, TypeC}
+import transformations.types.{ObjectTypeC, TypeC}
 
 case class InstructionSignature(inputs: Seq[MetaObject], outputs: Seq[MetaObject])
 
@@ -19,11 +19,17 @@ trait InstructionC extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (c,i, stackTypes) => getInstructionInAndOutputs(c, i, stackTypes, state))
+    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (constantPool,instruction, stackTypes) => 
+      getInstructionInAndOutputs(constantPool, instruction, stackTypes, state))
     ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
     ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, getJumpBehavior)
-    ByteCodeSkeleton.getState(state).localUpdates.put(key, getVariableUpdates)
+    ByteCodeSkeleton.getState(state).localUpdates.put(key, (instruction: MetaObject, stackTypes) => getVariableUpdates(instruction, stackTypes))
+  }
+
+  def assertObjectTypeStackTop(stackTop: MetaObject, name: String): Unit = {
+    if (stackTop.clazz != ObjectTypeC.ObjectTypeKey)
+      throw new ByteCodeTypeException(s"$name requires an object on top of the stack and not a $stackTop.")
   }
 
   def assertDoubleWord(state: TransformationState, input: MetaObject): Unit = {
@@ -42,7 +48,7 @@ trait InstructionC extends GrammarTransformation {
 
   val key: AnyRef
 
-  def getVariableUpdates(instruction: MetaObject): Map[Int, MetaObject] = Map.empty
+  def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject] = Map.empty
 
   def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature
 

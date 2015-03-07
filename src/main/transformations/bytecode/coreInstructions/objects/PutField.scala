@@ -5,7 +5,6 @@ import transformations.bytecode.coreInstructions.{ByteCodeTypeException, Instruc
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
-import transformations.types.ObjectTypeC
 
 object PutField extends InstructionC {
 
@@ -29,8 +28,7 @@ object PutField extends InstructionC {
     val valueType = stackTop(1)
     val objectType = stackTop(0)
 
-    if (objectType.clazz != ObjectTypeC.ObjectTypeKey)
-      throw new ByteCodeTypeException(s"PutField requires an object on the second stack item and not a ${objectType}.")
+    assertObjectTypeStackTop(objectType, "PutField")
 
     new InstructionSignature(Seq.empty, Seq(valueType, objectType))
   }
