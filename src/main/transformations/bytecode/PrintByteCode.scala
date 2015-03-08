@@ -5,7 +5,7 @@ import java.math.BigInteger
 import akka.util.Convert
 import core.transformation.{MetaObject, CompilationState}
 import transformations.javac.classes.QualifiedClassName
-import transformations.types.{ObjectTypeC, TypeSkeleton}
+import transformations.types.TypeSkeleton
 
 object PrintByteCode { //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
@@ -118,11 +118,7 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-        case metaEntry: MetaObject =>
-          metaEntry.clazz match {
-            case ObjectTypeC.ObjectTypeKey => toUTF8ConstantEntry(javaTypeToString(metaEntry))
-            case _ => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
-          }
+        case metaEntry: MetaObject => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
       }
