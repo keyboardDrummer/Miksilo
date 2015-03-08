@@ -3,12 +3,11 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import akka.util.Convert
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{MetaObject, TransformationState}
 import transformations.javac.classes.QualifiedClassName
-import transformations.types.{ObjectTypeC, TypeC}
+import transformations.types.{ObjectTypeC, TypeSkeleton}
 
-object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naar byte code particles verplaatsen.
+object PrintByteCode { //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
   var debugCounter: Int = 0
 
@@ -129,15 +128,8 @@ object PrintByteCode extends ParticleWithPhase { //TODO code uit deze classe naa
       }
     }
 
-    def javaTypeToString(_type: MetaObject): String = TypeC.getByteCodeString(state)(_type)
+    def javaTypeToString(_type: MetaObject): String = TypeSkeleton.getByteCodeString(state)(_type)
 
     getBytes(byteCode)
   }
-
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
-
-  }
-
-  override def dependencies: Set[Contract] = Set.empty
-
 }

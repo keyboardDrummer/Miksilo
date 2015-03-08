@@ -21,4 +21,6 @@ object Pop2C extends InstructionC {
     assertDoubleWord(state, input)
     InstructionSignature(Seq(input),Seq())
   }
+
+  override def description: String = "Defines the pop2 instruction, which pops the top two values from the stack."
 }

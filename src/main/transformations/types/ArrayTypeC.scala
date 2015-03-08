@@ -10,12 +10,12 @@ object ArrayTypeC extends TypeInstance {
   override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty
 
   override def getByteCodeString(_type: MetaObject, state: TransformationState): String =
-    s"[${TypeC.getByteCodeString(state)(getArrayElementType(_type))}"
+    s"[${TypeSkeleton.getByteCodeString(state)(getArrayElementType(_type))}"
 
   def getArrayElementType(arrayType: MetaObject) = arrayType(ArrayElementType).asInstanceOf[MetaObject]
 
   override def getJavaGrammar(grammars: GrammarCatalogue)= {
-    val parseType = grammars.find(TypeC.TypeGrammar)
+    val parseType = grammars.find(TypeSkeleton.TypeGrammar)
      parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
   }
 
@@ -32,4 +32,5 @@ object ArrayTypeC extends TypeInstance {
 
   object ArrayElementType
 
+  override def description: String = "Defines the array type."
 }

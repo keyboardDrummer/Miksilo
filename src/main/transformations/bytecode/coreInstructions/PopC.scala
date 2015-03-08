@@ -22,4 +22,6 @@ object PopC extends InstructionC {
     assertSingleWord(state, input)
     InstructionSignature(Seq(input),Seq())
   }
+
+  override def description: String = "Defines the pop instruction, which pops the top value from the stack."
 }

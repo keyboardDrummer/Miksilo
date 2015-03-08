@@ -5,7 +5,7 @@ import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.classes._
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 
 object CallC extends ExpressionInstance {
 
@@ -17,8 +17,8 @@ object CallC extends ExpressionInstance {
 
   object CallArgumentsGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val core = grammars.find(ExpressionC.CoreGrammar)
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
+    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
+    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") <~ ")")
     val parseCall = expression ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
     core.addOption(parseCall)
@@ -43,7 +43,7 @@ object CallC extends ExpressionInstance {
   override val key: AnyRef = CallKey
 
   override def getType(call: MetaObject, state: TransformationState): MetaObject = {
-    val compiler = ClassC.getClassCompiler(state)
+    val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
     val returnType = MethodDescriptorConstant.getMethodDescriptorReturnType(methodInfo.descriptor)
@@ -51,14 +51,14 @@ object CallC extends ExpressionInstance {
   }
 
   override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val compiler = ClassC.getClassCompiler(state)
+    val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
     val methodKey: MethodId = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
-    val expressionToInstruction = ExpressionC.getToInstructions(compiler.state)
+    val expressionToInstruction = ExpressionSkeleton.getToInstructions(compiler.state)
     val calleeInstructions =
       if (!staticCall) expressionToInstruction(objectExpression)
       else Seq[MetaObject]()
@@ -80,4 +80,6 @@ object CallC extends ExpressionInstance {
     val member = SelectorC.getSelectorMember(callCallee)
     new MethodId(kind.info.getQualifiedName, member)
   }
+
+  override def description: String = "Enables calling static and virtual methods."
 }

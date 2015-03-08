@@ -4,13 +4,13 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 
 object SelectorC extends ExpressionInstance {
 
   override val key: AnyRef = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(ClassC, GetStaticC)
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC)
 
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
 
@@ -22,7 +22,7 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
-    val compiler = ClassC.getClassCompiler(state)
+    val compiler = JavaClassSkeleton.getClassCompiler(state)
     val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
     val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
@@ -35,7 +35,7 @@ object SelectorC extends ExpressionInstance {
   def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
   override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val compiler = ClassC.getClassCompiler(state)
+    val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
@@ -43,7 +43,7 @@ object SelectorC extends ExpressionInstance {
     else
     {
       val obj = getSelectorObject(selector)
-      val objInstructions = ExpressionC.getToInstructions(state)(obj)
+      val objInstructions = ExpressionSkeleton.getToInstructions(state)(obj)
       objInstructions ++ Seq(GetFieldC.construct(fieldRefIndex))
     }
   }
@@ -62,8 +62,8 @@ object SelectorC extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val core = grammars.find(ExpressionC.CoreGrammar)
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
+    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
+    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier ^^ parseMap(SelectorKey, SelectorObject, SelectorMember)
     core.addOption(grammars.create(SelectGrammar, selection))
   }
@@ -76,4 +76,5 @@ object SelectorC extends ExpressionInstance {
 
   object SelectorMember
 
+  override def description: String = "Enables using the . operator to select a member from a class."
 }

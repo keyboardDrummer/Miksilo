@@ -30,4 +30,6 @@ object MethodRefConstant extends ConstantEntry {
   def getMethodRefMethodNameIndex(methodRef: MetaObject) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
   def getGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+
+  override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 }

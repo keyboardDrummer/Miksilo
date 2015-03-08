@@ -6,11 +6,10 @@ import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import core.transformation.sillyCodePieces.Particle
-import org.jdesktop.swingx.JXList
 
 object SelectedParticlesPanel {
   def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
-    val compilerList = new JXList()
+    val compilerList = new ParticleList()
     compilerList.setTransferHandler(new SelectedParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)

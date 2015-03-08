@@ -1,30 +1,28 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{TransformationState, MetaObject}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
+object Duplicate2InstructionC extends InstructionC with Instruction {
 
+  object Duplicate2Key
+  def duplicate = instruction(Duplicate2Key, Seq.empty)
 
-object DuplicateInstructionC extends InstructionC with Instruction {
-
-  object DuplicateKey
-  def duplicate = instruction(DuplicateKey, Seq.empty)
-
-  override val key: AnyRef = DuplicateKey
+  override val key: AnyRef = Duplicate2Key
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    PrintByteCode.hexToBytes("59")
+    PrintByteCode.hexToBytes("5c")
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                           state: TransformationState): InstructionSignature = {
     val input: MetaObject = typeState.stackTypes.last
-    assertSingleWord(state, input)
+    assertDoubleWord(state, input)
     new InstructionSignature(Seq(input),Seq(input, input))
   }
 
-  override def description: String = "Defines the duplicate instruction, which duplicates the top stack value."
+  override def description: String = "Defines the duplicate2 instruction, which duplicates the top two stack values."
 }

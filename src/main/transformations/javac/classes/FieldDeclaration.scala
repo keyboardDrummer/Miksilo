@@ -4,8 +4,8 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.constants.FieldDescriptorConstant
-import transformations.bytecode.{ByteCodeField, ByteCodeSkeleton}
-import transformations.types.TypeC
+import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
+import transformations.types.TypeSkeleton
 
 object FieldDeclaration extends GrammarTransformation {
 
@@ -13,17 +13,17 @@ object FieldDeclaration extends GrammarTransformation {
   object FieldType
   object FieldName
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(ClassC, FieldDescriptorConstant)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, FieldDescriptorConstant)
 
   override def inject(state: TransformationState): Unit = {
     super.inject(state)
 
-    ClassC.getState(state).firstMemberPasses ::= (clazz => bindFields(state, clazz))
-    ClassC.getState(state).secondMemberPasses ::= (clazz => convertFields(state, clazz))
+    JavaClassSkeleton.getState(state).firstMemberPasses ::= (clazz => bindFields(state, clazz))
+    JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertFields(state, clazz))
   }
   
   def bindFields(state: TransformationState, clazz: MetaObject): Unit = {
-    val classCompiler = ClassC.getClassCompiler(state)
+    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
     val fields = getFields(clazz)
@@ -46,11 +46,11 @@ object FieldDeclaration extends GrammarTransformation {
   }
 
   def getFields(clazz: MetaObject): Seq[MetaObject] = {
-    ClassC.getMembers(clazz).filter(member => member.clazz == FieldKey)
+    JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == FieldKey)
   }
 
   def convertFields(state: TransformationState, clazz: MetaObject) = {
-    val classCompiler = ClassC.getClassCompiler(state)
+    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val fields = getFields(clazz)
     clazz(ByteCodeSkeleton.ClassFields) = fields.map(field => {
@@ -63,23 +63,25 @@ object FieldDeclaration extends GrammarTransformation {
     val constantPool = classCompiler.constantPool
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
-    field(ByteCodeField.NameIndex) = nameIndex
-    field.clazz = ByteCodeField.FieldKey
+    field(ByteCodeFieldInfo.NameIndex) = nameIndex
+    field.clazz = ByteCodeFieldInfo.FieldKey
 
     val fieldDescriptorIndex = constantPool.store(FieldDescriptorConstant.constructor(getFieldType(field)))
-    field(ByteCodeField.DescriptorIndex) = fieldDescriptorIndex
-    field(ByteCodeField.AccessFlagsKey) = Set.empty
-    field(ByteCodeField.FieldAttributes) = Seq.empty
+    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptorIndex
+    field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
+    field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
 
     field.data.remove(FieldName)
     field.data.remove(FieldType)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val memberGrammar = grammars.find(ClassC.ClassMemberGrammar)
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
+    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
 
     val fieldGrammar = typeGrammar ~~ identifier <~ ";" ^^ parseMap(FieldKey, FieldType, FieldName)
     memberGrammar.addOption(fieldGrammar)
   }
+
+  override def description: String = "Enables adding a field declaration without an initializer to a Java class."
 }

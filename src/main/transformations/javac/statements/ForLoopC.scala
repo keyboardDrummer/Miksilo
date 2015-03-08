@@ -1,10 +1,9 @@
 package transformations.javac.statements
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends StatementInstance {
-
 
   def getInitializer(forLoop: MetaObject) = forLoop(InitializerKey).asInstanceOf[MetaObject]
 
@@ -17,8 +16,8 @@ object ForLoopC extends StatementInstance {
   override def dependencies: Set[Contract] = Set(WhileC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val statementGrammar = grammars.find(StatementC.StatementGrammar)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
       parseMap(ForLoopKey, InitializerKey, ConditionKey, IncrementKey, BodyKey)
@@ -47,7 +46,9 @@ object ForLoopC extends StatementInstance {
     val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
     val _while = WhileC._while(condition, whileBody)
 
-    val toInstructions = StatementC.getToInstructions(state)
+    val toInstructions = StatementSkeleton.getToInstructions(state)
     toInstructions(initializer) ++ toInstructions(_while) //TODO maybe translate to statements instead of bytecode.
   }
+
+  override def description: String = "Enables using the non-iterator for loop."
 }

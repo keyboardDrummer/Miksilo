@@ -9,7 +9,7 @@ import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.{ObjectTypeC, TypeC}
+import transformations.types.{ObjectTypeC, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[MetaObject], outputs: Seq[MetaObject])
 
@@ -33,13 +33,13 @@ trait InstructionC extends GrammarTransformation {
   }
 
   def assertDoubleWord(state: TransformationState, input: MetaObject): Unit = {
-    if (TypeC.getTypeSize(input, state) != 2) {
+    if (TypeSkeleton.getTypeSize(input, state) != 2) {
       throw new ByteCodeTypeException("expected double word input")
     }
   }
 
   def assertSingleWord(state: TransformationState, input: MetaObject): Unit = {
-    if (TypeC.getTypeSize(input, state) != 1) {
+    if (TypeSkeleton.getTypeSize(input, state) != 1) {
       throw new ByteCodeTypeException("expected single word input")
     }
   }
@@ -68,4 +68,6 @@ trait InstructionC extends GrammarTransformation {
   }
 
   protected def binary(_type: MetaObject) = InstructionSignature(Seq(_type, _type), Seq(_type))
+
+  override def description: String = s"Defines the $name instruction."
 }

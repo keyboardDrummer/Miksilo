@@ -20,4 +20,5 @@ object BooleanTypeC extends TypeInstance {
 
   object BooleanTypeKey
 
+  override def description: String = "Defines the boolean type."
 }

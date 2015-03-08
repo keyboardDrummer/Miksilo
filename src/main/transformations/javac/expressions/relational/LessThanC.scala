@@ -4,8 +4,8 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.{BooleanTypeC, IntTypeC, TypeC}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.types.{BooleanTypeC, IntTypeC, TypeSkeleton}
 
 object LessThanC extends ExpressionInstance {
 
@@ -14,7 +14,7 @@ object LessThanC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC, LessThanInstructionC)
 
   override def toByteCode(lessThan: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val toInstructions = ExpressionC.getToInstructions(state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
@@ -25,11 +25,11 @@ object LessThanC extends ExpressionInstance {
   def getSecond(lessThan: MetaObject) = lessThan(LessThanSecond).asInstanceOf[MetaObject]
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
-    val getType = ExpressionC.getType(state)
+    val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeC.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
     BooleanTypeC.booleanType
   }
 
@@ -47,4 +47,5 @@ object LessThanC extends ExpressionInstance {
 
   object LessThanSecond
 
+  override def description: String = "Adds the < operator."
 }

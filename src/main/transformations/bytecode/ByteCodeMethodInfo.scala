@@ -69,4 +69,6 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
+
+  override def description: String = "Adds method members to bytecode."
 }

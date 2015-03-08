@@ -6,13 +6,13 @@ import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.javac.methods.MethodC
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 import scala.collection.mutable
 
-object AssignmentC extends ExpressionInstance {
+object AssignmentSkeleton extends ExpressionInstance {
 
   def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[MetaObject]
 
@@ -22,7 +22,7 @@ object AssignmentC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val assignmentGrammar = (targetGrammar <~~ "=") ~~ expressionGrammar ^^ parseMap(AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.addOption(assignmentGrammar)
   }
@@ -41,7 +41,7 @@ object AssignmentC extends ExpressionInstance {
 
   override def getType(assignment: MetaObject, state: TransformationState): MetaObject = {
     val target = getAssignmentTarget(assignment)
-    ExpressionC.getType(state)(target)
+    ExpressionSkeleton.getType(state)(target)
   }
 
   def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
@@ -52,15 +52,17 @@ object AssignmentC extends ExpressionInstance {
 
   override def toByteCode(assignment: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val value = getAssignmentValue(assignment)
-    val valueInstructions = ExpressionC.getToInstructions(state)(value)
+    val valueInstructions = ExpressionSkeleton.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)
     val assignInstructions = getState(state).assignFromStackByteCodeRegistry(target.clazz)(target)
-    val valueType = ExpressionC.getType(state)(value)
-    val duplicateInstruction = TypeC.getTypeSize(valueType, state) match
+    val valueType = ExpressionSkeleton.getType(state)(value)
+    val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, state) match
     {
       case 1 => DuplicateInstructionC.duplicate
       case 2 =>  Duplicate2InstructionC.duplicate
     }
     valueInstructions ++ Seq(duplicateInstruction) ++ assignInstructions
   }
+
+  override def description: String = "Enables assignment to an abstract target using the = operator."
 }

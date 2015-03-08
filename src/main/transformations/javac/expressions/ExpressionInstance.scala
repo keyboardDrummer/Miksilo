@@ -7,8 +7,8 @@ trait ExpressionInstance extends GrammarTransformation {
   val key: AnyRef
 
   override def inject(state: TransformationState): Unit = {
-    ExpressionC.getExpressionToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
-    ExpressionC.getGetTypeRegistry(state).put(key, (expression: MetaObject) => getType(expression, state))
+    ExpressionSkeleton.getExpressionToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
+    ExpressionSkeleton.getGetTypeRegistry(state).put(key, (expression: MetaObject) => getType(expression, state))
     super.inject(state)
   }
 
@@ -16,5 +16,5 @@ trait ExpressionInstance extends GrammarTransformation {
 
   def getType(expression: MetaObject, state: TransformationState): MetaObject
 
-  override def dependencies: Set[Contract] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 }

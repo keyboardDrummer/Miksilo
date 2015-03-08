@@ -20,4 +20,6 @@ object SwapInstruction extends InstructionC {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }
+
+  override def description: String = "Defines the swap instruction, which swap the top two values on the stack."
 }

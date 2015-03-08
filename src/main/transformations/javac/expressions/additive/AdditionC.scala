@@ -4,26 +4,26 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.{IntTypeC, TypeC}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.types.{IntTypeC, TypeSkeleton}
 
 object AdditionC extends GrammarTransformation with ExpressionInstance {
 
   val key = AdditionClazz
 
   override def toByteCode(addition: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val toInstructions = ExpressionC.getToInstructions(state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
-    val getType = ExpressionC.getType(state)
+    val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeC.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeC.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
     IntTypeC.intType
   }
 
@@ -52,4 +52,5 @@ object AdditionC extends GrammarTransformation with ExpressionInstance {
 
   object SecondKey
 
+  override def description: String = "Adds the + operator."
 }

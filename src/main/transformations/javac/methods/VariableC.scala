@@ -5,7 +5,7 @@ import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.{ObjectTypeC, BooleanTypeC, IntTypeC, LongTypeC}
 
 
@@ -16,7 +16,7 @@ object VariableC extends ExpressionInstance {
   def getVariableName(variable: MetaObject) = variable(VariableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val core = grammars.find(ExpressionC.CoreGrammar)
+    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val variableGrammar = grammars.create(VariableGrammar, identifier ^^ parseMap(VariableKey, VariableNameKey))
     core.addOption(variableGrammar)
   }
@@ -49,4 +49,6 @@ object VariableC extends ExpressionInstance {
       case ObjectTypeC.ObjectTypeKey => LoadAddressC.addressLoad(variableAddress)
     })
   }
+
+  override def description: String = "Enables referencing a variable."
 }

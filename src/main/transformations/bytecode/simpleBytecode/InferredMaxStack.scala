@@ -6,7 +6,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object InferredMaxStack extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(LabelledTargets)
@@ -18,7 +18,7 @@ object InferredMaxStack extends ParticleWithPhase {
       val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, method)
 
       val maxStack = stackLayoutAnalysis.typeStatePerInstruction.values.map(
-        stackLayout => stackLayout.stackTypes.map(_type => TypeC.getTypeSize(_type,state)).sum).max
+        stackLayout => stackLayout.stackTypes.map(_type => TypeSkeleton.getTypeSize(_type,state)).sum).max
       maxStack
     }
 
@@ -32,4 +32,6 @@ object InferredMaxStack extends ParticleWithPhase {
     instruction.clazz match {
       case LabelKey => 0
     }
+
+  override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."
 }

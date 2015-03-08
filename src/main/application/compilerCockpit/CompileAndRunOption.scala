@@ -19,6 +19,8 @@ object RunWithJVM extends Particle
       state.output = TestUtils.runByteCode(className, clazz)
     })
   }
+
+  override def description: String = "Takes the bytecode program and runs it using the JVM."
 }
 
 object CompileAndRunOption extends CompileOption {

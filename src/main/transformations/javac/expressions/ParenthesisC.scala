@@ -6,12 +6,14 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 
 object ParenthesisC extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val core = grammars.find(ExpressionC.CoreGrammar)
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
+    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
+    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseParenthesis = "(" ~> expression <~ ")"
     core.addOption(parseParenthesis)
   }
+
+  override def description: String = "Allows wrapping an expression in parenthesis to control operator precedence."
 }

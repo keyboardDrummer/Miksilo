@@ -21,7 +21,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   def testBasicClass() {
     val input = "package bla; class Help {}"
     val result = TestGrammarUtils.getGrammarResult(input)
-    val expectation = ClassC.clazz(Seq("bla"), "Help")
+    val expectation = JavaClassSkeleton.clazz(Seq("bla"), "Help")
     Assert.assertEquals(expectation, result)
   }
 
@@ -71,7 +71,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = TestGrammarUtils.getGrammarResult(input, ExpressionC.ExpressionGrammar)
+    val result: Any = TestGrammarUtils.getGrammarResult(input, ExpressionSkeleton.ExpressionGrammar)
     result
   }
 
@@ -130,7 +130,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val input = File(inputFile).slurp()
 
     val result = TestGrammarUtils.getGrammarResult(input)
-    val expectation = ClassC.clazz(Seq(), "Fibonacci", List(getMainMethod, getFibonacciMethod))
+    val expectation = JavaClassSkeleton.clazz(Seq(), "Fibonacci", List(getMainMethod, getFibonacciMethod))
     Assert.assertEquals(expectation, result)
   }
 

@@ -2,8 +2,8 @@ package transformations.javac.constructor
 
 import core.transformation.{Contract, TransformationState, MetaObject}
 import core.transformation.grammars.GrammarCatalogue
-import transformations.javac.classes.ClassC
-import transformations.javac.expressions.{ExpressionInstance, ExpressionC}
+import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.CallC
 import transformations.types.VoidTypeC
 
@@ -20,18 +20,20 @@ object ThisCallExpression extends ExpressionInstance {
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = VoidTypeC.voidType
 
   override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val classCompiler = ClassC.getClassCompiler(state)
+    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     transformThisCall(classCompiler.currentClass, call, state)
   }
 
   def transformThisCall(clazz: MetaObject, call: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    SuperCallExpression.transformToByteCode(call, state, ClassC.getClassName(clazz))
+    SuperCallExpression.transformToByteCode(call, state, JavaClassSkeleton.getClassName(clazz))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments ^^ parseMap(ThisCall, CallC.CallArguments)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(thisCallGrammar)
   }
+
+  override def description: String = "Enables calling a different constructor using 'this'"
 }

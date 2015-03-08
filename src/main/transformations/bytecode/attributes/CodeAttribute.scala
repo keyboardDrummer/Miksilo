@@ -1,11 +1,11 @@
 package transformations.bytecode.attributes
 
-import core.grammarDocument.{BiGrammar, ManyVertical, MapGrammar}
+import core.grammarDocument.{BiGrammar, ManyVertical}
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{TransformationState, Contract, MetaObject}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InstructionArgumentsKey
 
@@ -96,9 +96,9 @@ object CodeAttribute extends GrammarTransformation with Instruction {
   object CodeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
+    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val attributesGrammar: MapGrammar = "attributes:" %> new ManyVertical(attributeGrammar).indent()
     val header: BiGrammar = Seq("code: nameIndex:" ~> integer, "maxStack:" ~> integer, "maxLocal:" ~> integer).reduce((l, r) => (l <~ ",") ~~ r)
     val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
     val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
@@ -107,4 +107,6 @@ object CodeAttribute extends GrammarTransformation with Instruction {
 
     attributeGrammar.addOption(grammars.create(CodeGrammar, codeAttributeGrammar))
   }
+
+  override def description: String = "Adds a new bytecode attribute named code. Its main content is a list of instructions."
 }

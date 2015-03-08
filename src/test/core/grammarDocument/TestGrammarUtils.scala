@@ -57,6 +57,8 @@ object TestGrammarUtils {
     }
 
     override def dependencies: Set[Contract] = Set.empty
+
+    override def description: String = "Sets the program grammar to a specific grammar from the grammar catalogue."
   }
 
 }

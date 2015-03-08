@@ -3,7 +3,7 @@ package transformations.javac.expressions.postfix
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.javac.methods.MethodC
 import transformations.types.IntTypeC
 
@@ -11,7 +11,7 @@ object PostFixIncrementC extends ExpressionInstance {
 
   override val key: AnyRef = PostfixIncrementKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionC, MethodC, IncrementIntegerC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodC, IncrementIntegerC)
 
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
 
@@ -23,7 +23,7 @@ object PostFixIncrementC extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val coreGrammar = grammars.find(ExpressionC.CoreGrammar)
+    val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     val postFixIncrement = identifier <~ "++" ^^ parseMap(PostfixIncrementKey, VariableKey)
     coreGrammar.addOption(postFixIncrement)
   }
@@ -31,4 +31,6 @@ object PostFixIncrementC extends ExpressionInstance {
   object PostfixIncrementKey
 
   object VariableKey
+
+  override def description: String = "Adds the postfix ++ operator."
 }

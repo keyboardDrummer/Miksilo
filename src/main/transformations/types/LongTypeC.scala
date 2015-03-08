@@ -21,4 +21,5 @@ object LongTypeC extends TypeInstance {
 
   object LongTypeKey
 
+  override def description: String = "Defines the long type."
 }

@@ -16,4 +16,6 @@ object ThisVariable extends GrammarTransformation
   }
 
   override def dependencies: Set[Contract] = Set(VariableC) ++ super.dependencies
+
+  override def description: String = "Enables using the 'this' qualifier to refer to the current instance."
 }

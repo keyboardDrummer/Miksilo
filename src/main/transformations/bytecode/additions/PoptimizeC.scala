@@ -6,15 +6,15 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object PoptimizeC extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopC)
 
   private def getSignatureInOutLengths(state: TransformationState, signature: InstructionSignature): (Int, Int) = {
-    val inputLength = signature.inputs.map(_type => TypeC.getTypeSize(_type, state)).sum
-    val outputLength = signature.outputs.map(_type => TypeC.getTypeSize(_type, state)).sum
+    val inputLength = signature.inputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
+    val outputLength = signature.outputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     (inputLength, outputLength)
   }
 
@@ -79,4 +79,6 @@ object PoptimizeC extends ParticleWithPhase {
   def guessIfInstructionHasSideEffect(out: Int): Boolean = {
     out == 0 //dangerous assumption :D
   }
+
+  override def description: String = "Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop."
 }

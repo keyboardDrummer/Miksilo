@@ -126,7 +126,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val errorMessage: String = s"Output comparison failed with message: \n$originalMessage \n\n" +
       s"javac byteCode was: \n\n$expectedByteCodeAccordingToJavap \n\n" +
       s"actual byteCode according to javap was: \n$actualByteCodeAccordingToJavap \n\n" +
-      s" actual byteCode according to prettyPrint was: \n${prettyPrintActualByteCode}"
+      s" actual byteCode according to prettyPrint was: \n$prettyPrintActualByteCode"
     (rootOutput / "outputLog.txt").createFile().writeAll(errorMessage)
     errorMessage
   }
@@ -179,6 +179,8 @@ class TestUtils(val compiler: CompilerFromParticles) {
     override def transform(program: MetaObject, state: TransformationState): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }
+
+    override def description: String = "Writes the current program as JVM class file bytes to a function."
   }
 
 }

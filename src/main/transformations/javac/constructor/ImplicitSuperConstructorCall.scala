@@ -26,4 +26,6 @@ object ImplicitSuperConstructorCall extends ParticleWithPhase {
         constructor(MethodC.MethodBodyKey) = Seq(ExpressionAsStatementC.asStatement(SuperCallExpression.superCall())) ++ statements
     }
   }
+
+  override def description: String = "At the start of a constructor body, if no call to a super constructor is present, such a call is added."
 }

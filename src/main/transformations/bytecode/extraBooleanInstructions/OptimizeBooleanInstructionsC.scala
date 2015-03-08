@@ -98,4 +98,7 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
       case _ => None
     }
   }
+
+  override def description: String = "Combines instructions to reduce the instruction count. " +
+    "Applies mostly to custom instructions related to comparison operations, followed by a jumps."
 }

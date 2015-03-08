@@ -5,7 +5,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
-object ByteCodeField extends GrammarTransformation with AccessFlags {
+object ByteCodeFieldInfo extends GrammarTransformation with AccessFlags {
   object FieldKey
   object NameIndex
   object DescriptorIndex
@@ -19,9 +19,9 @@ object ByteCodeField extends GrammarTransformation with AccessFlags {
 
   def emitField(field: MetaObject, state: TransformationState): Seq[Byte] = {
       getAccessFlagsByteCode(field) ++
-        PrintByteCode.shortToBytes(field(ByteCodeField.NameIndex).asInstanceOf[Int]) ++
-        PrintByteCode.shortToBytes(field(ByteCodeField.DescriptorIndex).asInstanceOf[Int]) ++
-        PrintByteCode.getAttributesByteCode(state, field(ByteCodeField.FieldAttributes).asInstanceOf[Seq[MetaObject]])
+        PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]) ++
+        PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.DescriptorIndex).asInstanceOf[Int]) ++
+        PrintByteCode.getAttributesByteCode(state, field(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[MetaObject]])
     }
 
   override def inject(state: TransformationState): Unit = {
@@ -38,4 +38,6 @@ object ByteCodeField extends GrammarTransformation with AccessFlags {
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~ membersGrammar.inner ^^ parseMap(ClassFileKey, ClassFields, PartialSelf)
   }
+  
+  override def description: String = "Adds field members to bytecode."
 }

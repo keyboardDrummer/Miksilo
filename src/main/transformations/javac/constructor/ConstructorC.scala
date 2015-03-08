@@ -19,7 +19,7 @@ object ConstructorC extends GrammarTransformation with ParticleWithPhase {
   case class BadConstructorNameException(clazz: MetaObject, constructor: MetaObject) extends BadInputException
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
-    val className = ClassC.getClassName(clazz)
+    val className = JavaClassSkeleton.getClassName(clazz)
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
       if (!constructorClassName.equals(className))
@@ -34,7 +34,7 @@ object ConstructorC extends GrammarTransformation with ParticleWithPhase {
   }
 
   def getConstructors(clazz: MetaObject): Seq[MetaObject] = {
-    ClassC.getMembers(clazz).filter(member => member.clazz == ConstructorKey)
+    JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == ConstructorKey)
   }
 
   def constructor(className: String, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
@@ -48,7 +48,7 @@ object ConstructorC extends GrammarTransformation with ParticleWithPhase {
   object ConstructorClassNameKey
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val memberGrammar = grammars.find(ClassC.ClassMemberGrammar)
+    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)
     val block = grammars.find(BlockC.BlockGrammar)
@@ -56,4 +56,6 @@ object ConstructorC extends GrammarTransformation with ParticleWithPhase {
       parseMap(ConstructorKey, VisibilityKey, ConstructorClassNameKey, MethodParametersKey, MethodBodyKey)
     memberGrammar.addOption(constructorGrammar)
   }
+
+  override def description: String = "Introduces constructors."
 }

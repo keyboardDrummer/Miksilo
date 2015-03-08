@@ -27,4 +27,7 @@ object NotInstructionC extends ExpandInstruction {
       IntegerConstantC.integerConstant(1),
       InferredStackFrames.label(endLabel))
   }
+
+  override def description: String = "Defines a custom instruction which applies a boolean not operation to the top stack value. " +
+    "More explicitly: zero becomes one and other numbers become zero."
 }

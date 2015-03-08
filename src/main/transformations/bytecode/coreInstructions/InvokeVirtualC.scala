@@ -24,4 +24,5 @@ object InvokeVirtualC extends InvokeC {
 
   object InvokeVirtual
 
+  override def description: String = "Defines the invoke virtual instruction, which can be used to call virtual methods."
 }

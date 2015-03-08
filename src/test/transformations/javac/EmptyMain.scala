@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.transformation.MetaObject
 import org.junit.Test
-import transformations.javac.classes.ClassC._
+import transformations.javac.classes.JavaClassSkeleton._
 import transformations.javac.classes.QualifiedClassName
 import transformations.javac.methods.MethodC._
 import transformations.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}

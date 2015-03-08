@@ -28,4 +28,5 @@ object IntegerEqualsInstructionC extends ExpandInstruction {
 
   object IntegerEqualsInstructionKey
 
+  override def description: String = "Defines a custom instruction which applies == to the top stack values."
 }

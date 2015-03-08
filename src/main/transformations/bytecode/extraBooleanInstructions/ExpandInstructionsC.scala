@@ -67,4 +67,5 @@ object ExpandInstructionsC extends ParticleWithPhase {
 
   object LessThanInstructionKey
 
+  override def description: String = "Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions."
 }

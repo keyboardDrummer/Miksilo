@@ -17,9 +17,9 @@ object WildcardImportC extends GrammarTransformation {
   }
 
   override def inject(state: TransformationState): Unit = {
-    ClassC.getState(state).importToClassMap.put(WildcardImportKey, wildcardImport => {
+    JavaClassSkeleton.getState(state).importToClassMap.put(WildcardImportKey, wildcardImport => {
       val packageParts = getParts(wildcardImport)
-      val classCompiler = ClassC.getState(state).classCompiler
+      val classCompiler = JavaClassSkeleton.getState(state).classCompiler
       val compiler = classCompiler.compiler
       val finalPackage = compiler.find(packageParts).asInstanceOf[PackageInfo]
 
@@ -33,4 +33,6 @@ object WildcardImportC extends GrammarTransformation {
   }
 
   override def dependencies: Set[Contract] = Set(BasicImportC)
+
+  override def description: String = "Enables importing all classes from a package using a wildcard."
 }

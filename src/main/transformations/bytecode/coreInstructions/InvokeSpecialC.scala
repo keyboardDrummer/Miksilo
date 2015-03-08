@@ -23,4 +23,5 @@ object InvokeSpecialC extends InvokeC {
 
   object InvokeSpecialKey
 
+  override def description: String = "Defines the invoke special method, which can be used to call constructors."
 }

@@ -6,7 +6,7 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 trait StatementInstance extends GrammarTransformation {
 
   override def inject(state: TransformationState): Unit = {
-    StatementC.getStatementToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
+    StatementSkeleton.getStatementToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
     super.inject(state)
   }
 
@@ -14,5 +14,5 @@ trait StatementInstance extends GrammarTransformation {
 
   def toByteCode(statement: MetaObject, state: TransformationState): Seq[MetaObject]
 
-  override def dependencies: Set[Contract] = Set(StatementC) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
 }

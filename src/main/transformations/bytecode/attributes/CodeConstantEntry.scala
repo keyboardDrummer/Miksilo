@@ -19,4 +19,6 @@ object CodeConstantEntry extends ConstantEntry
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "Code" ~> produce(entry)
+
+  override def description: String = "Adds a constant entry used by the code attribute to identity itself."
 }

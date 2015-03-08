@@ -5,16 +5,16 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.ExpressionSkeleton
 
 object WhileC extends StatementInstance {
 
   override val key: AnyRef = WhileKey
 
   override def toByteCode(_while: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val conditionInstructions = ExpressionC.getToInstructions(state)(getCondition(_while))
+    val conditionInstructions = ExpressionSkeleton.getToInstructions(state)(getCondition(_while))
     val body = getBody(_while)
-    val bodyInstructions = body.flatMap(statement => StatementC.getToInstructions(state)(statement))
+    val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(state)(statement))
 
     val startLabel = state.getUniqueLabel("start")
     val endLabel = state.getUniqueLabel("end")
@@ -32,8 +32,8 @@ object WhileC extends StatementInstance {
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val statementGrammar = grammars.find(StatementC.StatementGrammar)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") % blockGrammar ^^
       parseMap(WhileKey, WhileCondition, WhileBody)
@@ -49,4 +49,5 @@ object WhileC extends StatementInstance {
 
   object WhileBody
 
+  override def description: String = "Enables using the while construct."
 }

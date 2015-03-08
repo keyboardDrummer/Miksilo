@@ -25,4 +25,5 @@ object GotoC extends InstructionC {
 
   object GoToKey
 
+  override def description: String = "Defines the goto instruction, which jumps to a target instruction."
 }

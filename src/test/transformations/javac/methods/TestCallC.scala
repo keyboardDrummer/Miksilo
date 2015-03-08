@@ -2,15 +2,15 @@ package transformations.javac.methods
 
 import core.transformation.TransformationState
 import org.junit.{Assert, Test}
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.ExpressionSkeleton
 
 class TestCallC {
 
   @Test
   def test() {
     val state = new TransformationState()
-    ExpressionC.inject(state)
+    ExpressionSkeleton.inject(state)
     CallC.inject(state)
-    Assert.assertTrue(ExpressionC.getExpressionToLines(state).get(CallC.CallKey).nonEmpty)
+    Assert.assertTrue(ExpressionSkeleton.getExpressionToLines(state).get(CallC.CallKey).nonEmpty)
   }
 }

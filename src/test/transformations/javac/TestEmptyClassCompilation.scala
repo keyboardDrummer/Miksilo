@@ -7,12 +7,12 @@ import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorCon
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.{ClassC, ConstantPool, QualifiedClassName}
+import transformations.javac.classes.{JavaClassSkeleton, ConstantPool, QualifiedClassName}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.types.VoidTypeC
 import util.TestUtils
 
-class EmptyClassCompilation {
+class TestEmptyClassCompilation {
   val className: String = "EmptyClass"
   val classPackage: Seq[String] = Seq("transformations", "java", "testing")
 
@@ -51,6 +51,6 @@ class EmptyClassCompilation {
   }
 
   def getEmptyClass: MetaObject = {
-    ClassC.clazz(classPackage, className, members = Seq[MetaObject]())
+    JavaClassSkeleton.clazz(classPackage, className, members = Seq[MetaObject]())
   }
 }

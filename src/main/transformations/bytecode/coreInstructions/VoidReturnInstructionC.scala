@@ -23,4 +23,5 @@ object VoidReturnInstructionC extends InstructionC {
 
   object VoidReturn
 
+  override def description: String = "Defines the void return instruction, which returns from the current method."
 }

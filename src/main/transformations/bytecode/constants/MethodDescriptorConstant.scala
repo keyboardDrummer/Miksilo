@@ -4,7 +4,7 @@ import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.PrintByteCode._
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object MethodDescriptorConstant extends ConstantEntry {
 
@@ -28,7 +28,7 @@ object MethodDescriptorConstant extends ConstantEntry {
   override def key: Any = MethodDescriptor
 
   override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
-    def javaTypeToString(_type: MetaObject): String = TypeC.getByteCodeString(state)(_type)
+    def javaTypeToString(_type: MetaObject): String = TypeSkeleton.getByteCodeString(state)(_type)
 
     val returnString = javaTypeToString(getMethodDescriptorReturnType(constant))
     val parametersString = s"(${
@@ -38,8 +38,10 @@ object MethodDescriptorConstant extends ConstantEntry {
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
     (typeGrammar ~~ typeGrammar.manySeparated(";").inParenthesis) ^^
       parseMap(MethodDescriptor, MethodReturnType, MethodDescriptorParameters)
   }
+
+  override def description: String = "Defines the method descriptor constant, which contains the type signature of the method."
 }

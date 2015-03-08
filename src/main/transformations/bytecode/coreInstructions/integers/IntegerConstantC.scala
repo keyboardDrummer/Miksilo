@@ -30,4 +30,5 @@ object IntegerConstantC extends InstructionC {
 
   private object IntegerConstantKey
 
+  override def description: String = "Defines the integer constant instruction, which places an integer between -1 and 5 on the stack."
 }

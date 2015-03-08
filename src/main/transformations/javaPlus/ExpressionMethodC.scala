@@ -3,14 +3,14 @@ package transformations.javaPlus
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import core.transformation.{Contract, MetaObject, TransformationState}
-import transformations.javac.classes.ClassC
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}
 
 object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
 
-  override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, ClassC) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, JavaClassSkeleton) ++ super.dependencies
 
   object ExpressionMethodKey
   object ExpressionMethodExpression
@@ -20,7 +20,7 @@ object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
     val parseStatic = grammars.find(MethodC.StaticGrammar)
     val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val expressionMethodGrammar = visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
       identifier ~ parseParameters ~~ ("=" ~~> expressionGrammar) ^^
       parseMap(ExpressionMethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey,
@@ -30,11 +30,13 @@ object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
   }
 
   override def transform(clazz: MetaObject, state: TransformationState): Unit = {
-    for(expressionMethod <- ClassC.getMembers(clazz).filter(method => method.clazz == ExpressionMethodKey))
+    for(expressionMethod <- JavaClassSkeleton.getMembers(clazz).filter(method => method.clazz == ExpressionMethodKey))
     {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[MetaObject]
       expressionMethod.clazz = MethodC.MethodKey
       expressionMethod(MethodC.MethodBodyKey) = Seq(ReturnExpressionC._return(expression))
     }
   }
+
+  override def description: String = "Allows method bodies to be defined using only an expression."
 }

@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.exceptions.BadInputException
 import core.transformation.{MetaObject, TransformationState}
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 import scala.collection.mutable
 
@@ -26,7 +26,7 @@ class VariablePool(state: TransformationState) {
 
   def add(variable: String, _type: MetaObject) {
     variables(variable) = new VariableInfo(offset, _type)
-    offset += TypeC.getTypeSize(_type, state)
+    offset += TypeSkeleton.getTypeSize(_type, state)
   }
 }
 

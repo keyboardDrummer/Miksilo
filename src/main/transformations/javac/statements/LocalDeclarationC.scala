@@ -3,9 +3,9 @@ package transformations.javac.statements
 import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.javac.classes.ClassC
+import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.{VariablePool, MethodC}
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object LocalDeclarationC extends StatementInstance {
 
@@ -13,11 +13,11 @@ object LocalDeclarationC extends StatementInstance {
 
   def getDeclarationName(declaration: MetaObject) = declaration(DeclarationName).asInstanceOf[String]
 
-  override def dependencies: Set[Contract] = Set(StatementC)
+  override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val statement = grammars.find(StatementC.StatementGrammar)
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
+    val statement = grammars.find(StatementSkeleton.StatementGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
     val parseDeclaration = typeGrammar ~~ identifier <~ ";" ^^ parseMap(DeclarationKey, DeclarationType, DeclarationName)
     statement.addOption(parseDeclaration)
   }
@@ -48,8 +48,10 @@ object LocalDeclarationC extends StatementInstance {
       throw new VariableAlreadyDefined(name)
 
     val declarationType: MetaObject = getDeclarationType(declaration)
-    ClassC.fullyQualify(declarationType, ClassC.getClassCompiler(state))
+    JavaClassSkeleton.fullyQualify(declarationType, JavaClassSkeleton.getClassCompiler(state))
     variables.add(name, declarationType)
     Seq.empty[MetaObject]
   }
+
+  override def description: String = "Enables declaring a local variable."
 }

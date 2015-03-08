@@ -11,18 +11,18 @@ import transformations.types.ArrayTypeC.ArrayTypeKey
 import transformations.types.IntTypeC.IntTypeKey
 import transformations.types.LongTypeC.LongTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeKey
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object AssignToVariable extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(AssignmentC, VariableC)
+  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
   override def inject(state: TransformationState): Unit = {
-    AssignmentC.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObject) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObject) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
       val variableInfo = methodCompiler.variables(target)
-      val byteCodeType = TypeC.toStackType(variableInfo._type, state)
+      val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, state)
       Seq(getStoreInstruction(variableInfo, byteCodeType))
     })
     super.inject(state)
@@ -38,8 +38,10 @@ object AssignToVariable extends GrammarTransformation {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val targetGrammar = grammars.find(AssignmentC.AssignmentTargetGrammar)
+    val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
     targetGrammar.addOption(variableGrammar)
   }
+
+  override def description: String = "Enables assigning to a variable."
 }

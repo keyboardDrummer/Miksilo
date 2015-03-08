@@ -15,7 +15,7 @@ object MissingParticlesPanel {
 
   def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
     val dependentItems = new DefaultListModel[Particle]()
-    val dependentList = new JXList()
+    val dependentList = new ParticleList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
     dependentList.setTransferHandler(new ParticleProviderTransferHandler(dependentList))

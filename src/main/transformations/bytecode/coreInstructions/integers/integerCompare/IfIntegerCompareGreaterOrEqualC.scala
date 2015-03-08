@@ -23,7 +23,5 @@ object IfIntegerCompareGreaterOrEqualC extends JumpInstruction {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
-
   object IfIntegerCompareGreaterKey
-
 }

@@ -64,7 +64,11 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
   def getAvailableScrollPane = {
     val availableItems: Seq[Particle] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
-    val availableList = new JXList(availableItems.toArray.asInstanceOf[Array[Object]])
+    val availableList = new ParticleList()
+    availableList.setModel(new AbstractListModel[Particle] {
+      def getSize: Int = availableItems.length
+      def getElementAt(i: Int): Particle = availableItems(i)
+    })
 
     availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))
     availableList.setDragEnabled(true)

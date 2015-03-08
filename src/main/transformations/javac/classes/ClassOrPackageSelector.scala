@@ -5,11 +5,11 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import SelectorC.SelectorKey
 
 object ClassOrPackageSelector extends Particle {
-  override def dependencies: Set[Contract] = Set(SelectorC, ClassC)
+  override def dependencies: Set[Contract] = Set(SelectorC, JavaClassSkeleton)
 
   override def inject(state: TransformationState): Unit = {
-    ClassC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val compiler = ClassC.getClassCompiler(state)
+    JavaClassSkeleton.getReferenceKindRegistry(state).put(SelectorKey, selector => {
+      val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(selector, compiler)
     })
   }
@@ -28,4 +28,6 @@ object ClassOrPackageSelector extends Particle {
         new ClassOrObjectReference(fieldClassType, false)
     }
   }
+
+  override def description: String = "Enables recognizing the kind of a selection, whether is a class, package or object."
 }

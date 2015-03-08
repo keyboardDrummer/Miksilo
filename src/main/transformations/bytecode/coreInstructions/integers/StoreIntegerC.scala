@@ -33,4 +33,5 @@ object StoreIntegerC extends InstructionC {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
+  override def description: String = "Defines the integer store instruction, which stores the top stack integer in a variable."
 }

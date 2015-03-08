@@ -26,4 +26,5 @@ object IntegerReturnInstructionC extends InstructionC {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
+  override def description: String = "Defines the integer return instruction, which returns an integer from the current method."
 }

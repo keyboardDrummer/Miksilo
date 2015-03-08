@@ -4,7 +4,7 @@ import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{TransformationState, MetaObject}
 import transformations.bytecode.PrintByteCode
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object FieldDescriptorConstant extends ConstantEntry {
   object Key
@@ -16,12 +16,14 @@ object FieldDescriptorConstant extends ConstantEntry {
 
   override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
     val _type: MetaObject = constant(Type).asInstanceOf[MetaObject]
-    val typeString = TypeC.getByteCodeString(state)(_type)
+    val typeString = TypeSkeleton.getByteCodeString(state)(_type)
     PrintByteCode.toUTF8ConstantEntry(typeString)
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeC.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
     "field:" ~> typeGrammar ^^ parseMap(Key, Type)
   }
+
+  override def description: String = "Adds the field descriptor constant. It contains the type of a field."
 }

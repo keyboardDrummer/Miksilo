@@ -25,4 +25,5 @@ object IfIntegerCompareEqualC extends JumpInstruction {
 
   object IfIntegerCompareEqualKey
 
+  override def description: String = "Defines the if-integer-compare-equal instruction, which will to a target instruction if the two top stack integers are equal."
 }

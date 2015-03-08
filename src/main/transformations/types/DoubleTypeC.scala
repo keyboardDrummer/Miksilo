@@ -21,4 +21,5 @@ object DoubleTypeC extends TypeInstance {
 
   object DoubleTypeKey
 
+  override def description: String = "Defines the double type."
 }

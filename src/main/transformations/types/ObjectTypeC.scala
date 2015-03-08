@@ -52,4 +52,6 @@ object ObjectTypeC extends TypeInstance {
   object ObjectTypeName
 
   object ObjectTypeKey
+
+  override def description: String = "Defines the object type."
 }

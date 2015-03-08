@@ -21,4 +21,5 @@ object IntTypeC extends TypeInstance {
 
   object IntTypeKey
 
+  override def description: String = "Defines the integer type."
 }

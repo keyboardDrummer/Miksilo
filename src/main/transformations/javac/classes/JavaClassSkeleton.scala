@@ -14,9 +14,9 @@ import transformations.types.{ArrayTypeC, ObjectTypeC}
 import scala.collection.mutable
 
 
-object ClassC extends GrammarTransformation with ParticleWithPhase {
+object JavaClassSkeleton extends GrammarTransformation with ParticleWithPhase {
 
-  def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry
+  def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry //TODO move this registry to SelectorC.
 
   override def transform(program: MetaObject, state: TransformationState): Unit = {
     transformClass(program)
@@ -126,4 +126,5 @@ object ClassC extends GrammarTransformation with ParticleWithPhase {
 
   object ClassName
 
+  override def description: String = "Defines a skeleton for the Java class."
 }

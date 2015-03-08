@@ -43,4 +43,7 @@ object LineNumberTable extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
   }
+
+  override def description: String = "Defines the line number table attribute. " +
+    "This table explains which source code line a particular instruction came from, and can be used to aid in debugging."
 }

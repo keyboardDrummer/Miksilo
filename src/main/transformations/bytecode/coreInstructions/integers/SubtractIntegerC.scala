@@ -22,4 +22,5 @@ object SubtractIntegerC extends InstructionC {
   object SubtractIntegerKey
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
+  override def description: String = "Defines the subtract integer instruction, which subtracts the top two integer on the stack and places the result on the stack."
 }

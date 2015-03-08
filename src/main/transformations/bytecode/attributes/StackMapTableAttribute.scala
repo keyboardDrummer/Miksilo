@@ -6,7 +6,7 @@ import core.transformation.sillyCodePieces.GrammarTransformation
 import core.transformation.{TransformationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object StackMapTableAttribute extends GrammarTransformation {
 
@@ -75,7 +75,7 @@ object StackMapTableAttribute extends GrammarTransformation {
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
-    val parseType : BiGrammar = grammars.find(TypeC.TypeGrammar)
+    val parseType : BiGrammar = grammars.find(TypeSkeleton.TypeGrammar)
     val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> integer % parseType.indent() ^^
       parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
     val appendFrameGrammar = "append frame, delta:" ~> integer % parseType.manyVertical.indent() ^^
@@ -107,14 +107,14 @@ object StackMapTableAttribute extends GrammarTransformation {
         case StackMapTableAttribute.AppendFrame =>
           val localVerificationTypes = StackMapTableAttribute.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
-            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeC.getVerificationInfoBytes(info, state))
+            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeSkeleton.getVerificationInfoBytes(info, state))
         case StackMapTableAttribute.SameLocals1StackItem =>
           val _type = StackMapTableAttribute.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
-            byteToBytes(code) ++ TypeC.getVerificationInfoBytes(_type, state)
+            byteToBytes(code) ++ TypeSkeleton.getVerificationInfoBytes(_type, state)
           } else {
-            byteToBytes(247) ++ shortToBytes(offset) ++ TypeC.getVerificationInfoBytes(_type, state)
+            byteToBytes(247) ++ shortToBytes(offset) ++ TypeSkeleton.getVerificationInfoBytes(_type, state)
           }
       }
     }
@@ -122,4 +122,9 @@ object StackMapTableAttribute extends GrammarTransformation {
     val entries = StackMapTableAttribute.getStackMapTableEntries(attribute)
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
+
+  override def description: String = "Defines the stack map table attribute. Some points in a code attribute instruction list may be jump targets." +
+    "For these targets, the stack map table specifies a stack frame." +
+    "Each stack from provides information on the current types on the stack and in the local registers." +
+    "Given a frame at and the frames before it, all stack and local types are fully defined at the location of that frame."
 }

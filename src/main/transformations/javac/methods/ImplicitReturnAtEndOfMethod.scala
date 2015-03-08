@@ -18,4 +18,6 @@ object ImplicitReturnAtEndOfMethod extends ParticleWithPhase {
       }
     }
   }
+
+  override def description: String = "Adds an implicit return at the end of a method if none is present."
 }

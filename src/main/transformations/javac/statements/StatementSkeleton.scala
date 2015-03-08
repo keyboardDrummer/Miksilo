@@ -3,15 +3,15 @@ package transformations.javac.statements
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.javac.expressions.ExpressionC
-import transformations.javac.expressions.ExpressionC.MissingToInstructionsFor
+import transformations.javac.expressions.ExpressionSkeleton
+import transformations.javac.expressions.ExpressionSkeleton.MissingToInstructionsFor
 
 import scala.collection.mutable
 
 
-object StatementC extends GrammarTransformation {
+object StatementSkeleton extends GrammarTransformation {
 
-  override def dependencies: Set[Contract] = Set(ExpressionC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
     statement => {
@@ -32,4 +32,5 @@ object StatementC extends GrammarTransformation {
 
   object StatementGrammar
 
+  override def description: String = "Defines the concept of a statement."
 }

@@ -150,6 +150,8 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
       ClassConstantEntryContent -> p._1)))
     ( removeIndexForParsing, addIndexForPrinting )
   }
+
+  override def description: String = "Defines a skeleton for bytecode."
 }
 
 

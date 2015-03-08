@@ -27,4 +27,5 @@ object IncrementIntegerC extends InstructionC {
 
   object IntegerIncrementKey
 
+  override def description: String = "Defines the increment integer instruction, which increments an integer variable by a specific amount."
 }

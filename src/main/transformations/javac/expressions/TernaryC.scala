@@ -4,7 +4,7 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.types.{BooleanTypeC, TypeC}
+import transformations.types.{BooleanTypeC, TypeSkeleton}
 
 object TernaryC extends ExpressionInstance {
   def falseBranch(metaObject: MetaObject) = metaObject(FalseKey).asInstanceOf[MetaObject]
@@ -15,10 +15,10 @@ object TernaryC extends ExpressionInstance {
     metaObject(ConditionKey).asInstanceOf[MetaObject]
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionC, LabelledTargets)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledTargets)
 
   override def transformGrammars(grammars: GrammarCatalogue) {
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseTernary = (expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar ^^
       parseMap(TernaryKey, ConditionKey, TrueKey, FalseKey)
     val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
@@ -44,15 +44,15 @@ object TernaryC extends ExpressionInstance {
   override val key: AnyRef = TernaryKey
 
   override def getType(_ternary: MetaObject, state: TransformationState): MetaObject = {
-    val getExpressionType = ExpressionC.getType(state)
+    val getExpressionType = ExpressionSkeleton.getType(state)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
-    TypeC.checkAssignableTo(state)(BooleanTypeC.booleanType, getExpressionType(condition))
+    TypeSkeleton.checkAssignableTo(state)(BooleanTypeC.booleanType, getExpressionType(condition))
 
     val trueType = getExpressionType(truePath)
     val falseType = getExpressionType(falsePath)
-    TypeC.union(state)(trueType, falseType)
+    TypeSkeleton.union(state)(trueType, falseType)
   }
 
   override def toByteCode(_ternary: MetaObject, state: TransformationState): Seq[MetaObject] = {
@@ -65,7 +65,7 @@ object TernaryC extends ExpressionInstance {
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledTargets.goTo(endLabelName)
-    val toInstructions = ExpressionC.getToInstructions(state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(state)
     toInstructions(condition) ++
       Seq(conditionalBranch) ++
       toInstructions(truePath) ++
@@ -73,4 +73,6 @@ object TernaryC extends ExpressionInstance {
       toInstructions(falsePath) ++
       Seq(end)
   }
+
+  override def description: String = "Adds the ternary operator."
 }

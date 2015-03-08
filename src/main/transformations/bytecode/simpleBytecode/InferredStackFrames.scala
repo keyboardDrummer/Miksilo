@@ -6,7 +6,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 object InferredStackFrames extends ParticleWithPhase {
 
@@ -43,7 +43,7 @@ object InferredStackFrames extends ParticleWithPhase {
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 
-    def toStackType(_type: MetaObject) = TypeC.toStackType(constantPool, _type)
+    def toStackType(_type: MetaObject) = TypeSkeleton.toStackType(constantPool, _type)
 
     def getStackMap(previousStack: Seq[MetaObject], stack: Seq[MetaObject], previousLocals: Seq[MetaObject], locals: Seq[MetaObject]) = {
       getStackMapHelper(previousStack.map(toStackType), stack.map(toStackType), previousLocals.map(toStackType), locals.map(toStackType))
@@ -79,5 +79,6 @@ object InferredStackFrames extends ParticleWithPhase {
     }
   }
 
-
+  override def description: String = "Generates a stack frame for each label instruction. " +
+    "Stack frames can be used to determine the stack and variable types at a particular instruction."
 }

@@ -3,23 +3,23 @@ package transformations.javac.methods
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
-import transformations.javac.expressions.ExpressionC
-import transformations.javac.statements.{StatementC, StatementInstance}
+import transformations.javac.expressions.ExpressionSkeleton
+import transformations.javac.statements.{StatementSkeleton, StatementInstance}
 
 object ReturnExpressionC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionC)
 
   def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
-    val returnValueInstructions = ExpressionC.getToInstructions(compiler.transformationState)(getReturnValue(_return))
+    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.transformationState)(getReturnValue(_return))
     returnValueInstructions ++ Seq(IntegerReturnInstructionC.integerReturn)
   }
 
   def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[MetaObject]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val expression = grammars.find(ExpressionC.ExpressionGrammar)
-    val statement = grammars.find(StatementC.StatementGrammar)
+    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = "return" ~~> expression <~ ";" ^^ parseMap(ReturnInteger, ReturnValue)
     statement.inner = statement.inner | returnExpression
@@ -37,4 +37,6 @@ object ReturnExpressionC extends StatementInstance {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }
+
+  override def description: String = "Allows returning a value using an expression."
 }

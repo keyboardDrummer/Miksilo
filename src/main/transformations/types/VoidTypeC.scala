@@ -21,4 +21,5 @@ object VoidTypeC extends TypeInstance {
 
   object VoidTypeKey
 
+  override def description: String = "Defines the void type."
 }

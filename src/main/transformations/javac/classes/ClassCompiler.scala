@@ -3,7 +3,7 @@ package transformations.javac.classes
 import core.transformation.{MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType, ClassRefConstant, MethodRefConstant}
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.ExpressionSkeleton
 import transformations.types.ObjectTypeC
 
 object ClassCompiler {
@@ -19,15 +19,15 @@ case class MethodId(className: QualifiedClassName, methodName: String)
 
 case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   val compiler = new MyCompiler()
-  val myPackage = compiler.getPackage(ClassC.getPackage(currentClass).toList)
-  val className = ClassC.getClassName(currentClass)
+  val myPackage = compiler.getPackage(JavaClassSkeleton.getPackage(currentClass).toList)
+  val className = JavaClassSkeleton.getClassName(currentClass)
   val currentClassInfo = myPackage.newClassInfo(className)
 
   ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()
 
   def constantPool = ByteCodeSkeleton.getState(state).constantPool
 
-  lazy val classNames = getClassMapFromImports(ClassC.getImports(currentClass))
+  lazy val classNames = getClassMapFromImports(JavaClassSkeleton.getImports(currentClass))
 
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassInfo]
 
@@ -79,14 +79,14 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
   }
 
   def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = ClassC.getReferenceKindRegistry(state).get(expression.clazz)
+    val getReferenceKindOption = JavaClassSkeleton.getReferenceKindRegistry(state).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(expression)
     })(implementation => implementation(expression))
   }
 
   def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
-    val classInfo: ClassInfo = findClass(ExpressionC.getType(state)(expression))
+    val classInfo: ClassInfo = findClass(ExpressionSkeleton.getType(state)(expression))
     new ClassOrObjectReference(classInfo, false)
   }
 
@@ -100,7 +100,7 @@ case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
 
   private def getClassMapFromImports(imports: Seq[MetaObject]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
-      ClassC.getState(state).importToClassMap(_import.clazz)(_import)
-    }).toMap ++ Map(className -> ClassC.getQualifiedClassName(currentClass))
+      JavaClassSkeleton.getState(state).importToClassMap(_import.clazz)(_import)
+    }).toMap ++ Map(className -> JavaClassSkeleton.getQualifiedClassName(currentClass))
   }
 }

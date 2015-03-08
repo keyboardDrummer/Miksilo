@@ -133,6 +133,8 @@ object LabelledTargets extends ParticleWithPhase {
     InstructionSignature = new InstructionSignature(Seq.empty, Seq.empty)
 
     override def getInstructionSize(instruction: MetaObject): Int = 0
+
+    override def description: String = "Used to mark a specific point in an instruction list."
   }
 
   object LabelKey
@@ -140,5 +142,8 @@ object LabelledTargets extends ParticleWithPhase {
   object LabelNameKey
 
   object LabelStackFrame
+
+  override def description: String = "Replaces the jump instructions from bytecode. " +
+    "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
 }

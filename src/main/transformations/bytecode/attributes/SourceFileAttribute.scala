@@ -39,4 +39,6 @@ object SourceFileAttribute extends GrammarTransformation {
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
+
+  override def description: String = "Defines the source file attribute. It identifies which source file a particular class file was compiled from."
 }

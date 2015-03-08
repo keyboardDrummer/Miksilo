@@ -3,7 +3,7 @@ package transformations.javac.expressions.additive
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 
 object SubtractionC extends ExpressionInstance {
   object SubtractionKey
@@ -34,9 +34,11 @@ object SubtractionC extends ExpressionInstance {
   override def getType(expression: MetaObject, state: TransformationState): MetaObject = ???
 
   override def toByteCode(subtraction: MetaObject, state: TransformationState): Seq[MetaObject] = {
-    val toInstructions = ExpressionC.getToInstructions(state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
     firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerC.subtractInteger)
   }
+
+  override def description: String = "Adds the - operator."
 }

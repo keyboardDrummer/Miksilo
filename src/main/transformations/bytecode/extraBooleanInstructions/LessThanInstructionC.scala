@@ -28,4 +28,5 @@ object LessThanInstructionC extends ExpandInstruction {
 
   object LessThanInstructionKey
 
+  override def description: String = "Defines a custom instruction which applies < to the top stack values."
 }

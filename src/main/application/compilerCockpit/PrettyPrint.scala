@@ -27,6 +27,8 @@ case class PrettyPrint(recover: Boolean = false) extends Particle
       state.output = document.renderString()
     })
   }
+
+  override def description: String = "Prints the program by generating a pretty printer from its grammar."
 }
 
 object PrettyPrintOption extends CompileOption {

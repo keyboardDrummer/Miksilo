@@ -6,20 +6,20 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.longs.LongConstantC
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.LongTypeC
 
 object LongLiteralC extends ExpressionInstance {
   val key = LongLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionC, IntegerConstantC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, IntegerConstantC)
 
   def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
     val longGrammar : BiGrammar = (new RegexG("""-?\d+l""".r) : BiGrammar) ^^
       (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) ^^ parseMap(LongLiteralKey, ValueKey)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(longGrammar)
   }
 
@@ -36,4 +36,6 @@ object LongLiteralC extends ExpressionInstance {
   object LongLiteralKey
 
   object ValueKey
+
+  override def description: String = "Adds the usage of long literals by putting an l after the number."
 }

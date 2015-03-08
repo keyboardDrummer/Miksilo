@@ -5,10 +5,10 @@ import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.VariableKey
 
-object ClassOrPackageReference extends Particle {
+object GetIdentifierKind extends Particle {
   override def inject(state: TransformationState): Unit = {
-    ClassC.getReferenceKindRegistry(state).put(VariableKey, variable => {
-      val compiler = ClassC.getClassCompiler(state)
+    JavaClassSkeleton.getReferenceKindRegistry(state).put(VariableKey, variable => {
+      val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(variable, compiler)
     })
   }
@@ -29,5 +29,7 @@ object ClassOrPackageReference extends Particle {
     }
   }
 
-  override def dependencies: Set[Contract] = Set(VariableC, ClassC)
+  override def dependencies: Set[Contract] = Set(VariableC, JavaClassSkeleton)
+
+  override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 }

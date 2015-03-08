@@ -31,4 +31,6 @@ object NameAndType extends ConstantEntry {
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "name and type:" ~~> (integer <~ ":") ~ integer ^^
     parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
+
+  override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."
 }

@@ -4,8 +4,8 @@ import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
-import transformations.javac.expressions.{ExpressionC, ExpressionInstance}
-import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeC}
+import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeSkeleton}
 
 object EqualityC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
@@ -34,18 +34,20 @@ object EqualityC extends ExpressionInstance {
 
   def getInputType(equality: MetaObject, state: TransformationState)  = {
     val first = getFirst(equality)
-    ExpressionC.getType(state)(first)
+    ExpressionSkeleton.getType(state)(first)
   }
 
   override def toByteCode(equality: MetaObject, state: TransformationState): Seq[MetaObject] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
-    val toInstructions = ExpressionC.getToInstructions(state)
-    val inputType = TypeC.toStackType(getInputType(equality,state),state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+    val inputType = TypeSkeleton.toStackType(getInputType(equality,state),state)
     val equalityInstructions: Seq[MetaObject] = inputType.clazz match {
       case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions
   }
+
+  override def description: String = "Adds the == operator."
 }

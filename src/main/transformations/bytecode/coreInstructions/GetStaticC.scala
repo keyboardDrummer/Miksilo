@@ -7,7 +7,6 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.ObjectTypeC
 
 
 
@@ -37,4 +36,5 @@ object GetStaticC extends InstructionC {
 
   object GetStaticKey
 
+  override def description: String = "Defines the getStatic instruction, which retrieves a value from a static field."
 }

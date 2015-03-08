@@ -18,4 +18,5 @@ object InvokeStaticC extends InvokeC {
 
   object InvokeStaticKey
 
+  override def description: String = "Defines the invoke static instruction, which can be used to call static methods."
 }

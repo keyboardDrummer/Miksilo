@@ -2,10 +2,8 @@ package transformations.bytecode.coreInstructions.integers
 
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.PrintByteCode
-import PrintByteCode._
-import transformations.bytecode.PrintByteCode
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
@@ -24,4 +22,6 @@ object AddIntegersC extends InstructionC {
   object AddIntegersKey
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
+
+  override def description: String = "Defines the add integers instruction, which adds the top two stack values together and places the result on the stack."
 }

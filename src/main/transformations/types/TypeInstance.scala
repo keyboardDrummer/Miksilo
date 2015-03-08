@@ -12,9 +12,9 @@ trait TypeInstance extends GrammarTransformation with ConstantEntry  {
   val key: AnyRef
 
   override def inject(state: TransformationState): Unit = {
-    TypeC.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
-    TypeC.getState(state).toByteCodeString.put(key, _type => getByteCodeString(_type, state))
-    TypeC.getState(state).stackSize.put(key, getStackSize)
+    TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
+    TypeSkeleton.getState(state).toByteCodeString.put(key, _type => getByteCodeString(_type, state))
+    TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
     super.inject(state)
   }
 
@@ -26,7 +26,7 @@ trait TypeInstance extends GrammarTransformation with ConstantEntry  {
 
   def getStackSize: Int
 
-  override def dependencies: Set[Contract] = Set(TypeC, ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
   override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry(getByteCodeString(constant, state))
@@ -35,7 +35,7 @@ trait TypeInstance extends GrammarTransformation with ConstantEntry  {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)
-    val parseType = grammars.find(TypeC.TypeGrammar)
+    val parseType = grammars.find(TypeSkeleton.TypeGrammar)
     parseType.addOption(javaGrammar)
     super.transformGrammars(grammars)
   }

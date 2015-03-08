@@ -16,13 +16,13 @@ object BasicImportC extends GrammarTransformation {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".") ^^ parseMap(ImportKey, ElementsKey))
     val basicImport = "import" ~~> importPath <~ ";"
-    grammars.find(ClassC.ImportGrammar).addOption(basicImport)
+    grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
   }
 
   def getParts(_import: MetaObject) = _import(ElementsKey).asInstanceOf[Seq[String]]
 
   override def inject(state: TransformationState): Unit = {
-    ClassC.getState(state).importToClassMap.put(ImportKey, _import => {
+    JavaClassSkeleton.getState(state).importToClassMap.put(ImportKey, _import => {
       val elements = getParts(_import)
       val packageParts = elements.dropRight(1)
       val importedClassName = elements.last
@@ -34,5 +34,7 @@ object BasicImportC extends GrammarTransformation {
     super.inject(state)
   }
 
-  override def dependencies: Set[Contract] = Set(ClassC)
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
+
+  override def description: String = "Allows importing a single class using an import statement."
 }

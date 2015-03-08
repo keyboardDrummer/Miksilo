@@ -4,7 +4,7 @@ import core.transformation.grammars.GrammarCatalogue
 import core.transformation.{Contract, MetaObject, TransformationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.javac.expressions.ExpressionC
+import transformations.javac.expressions.ExpressionSkeleton
 
 object IfThenC extends StatementInstance {
 
@@ -25,8 +25,8 @@ object IfThenC extends StatementInstance {
     val body = ifThen(ThenKey).asInstanceOf[Seq[MetaObject]]
 
     val conditionalBranch = LabelledTargets.ifZero(endLabelName)
-    val toInstructionsExpr = ExpressionC.getToInstructions(state)
-    val toInstructionsStatement = StatementC.getToInstructions(state)
+    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
+    val toInstructionsStatement = StatementSkeleton.getToInstructions(state)
     toInstructionsExpr(condition) ++
       Seq(conditionalBranch) ++
       body.flatMap(toInstructionsStatement) ++
@@ -34,10 +34,12 @@ object IfThenC extends StatementInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val statementGrammar = grammars.find(StatementC.StatementGrammar)
-    val expressionGrammar = grammars.find(ExpressionC.ExpressionGrammar)
+    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockGrammar) | (statementGrammar ^^ (statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]](0))))
     val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^ parseMap(IfThenKey, ConditionKey, ThenKey)
     statementGrammar.addOption(ifThenGrammar)
   }
+
+  override def description: String = "Enables using the if-then (no else) construct."
 }

@@ -4,7 +4,7 @@ import core.exceptions.CompilerException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
 import core.transformation.sillyCodePieces.GrammarTransformation
-import transformations.types.TypeC
+import transformations.types.TypeSkeleton
 
 import scala.collection.mutable
 import scala.util.Try
@@ -13,13 +13,13 @@ case class GetTypeNotFound(key: Any) extends CompilerException {
   override def toString = s"'get type' method not found for class ${MetaObject.classDebugRepresentation(key)}"
 }
 
-object ExpressionC extends GrammarTransformation {
+object ExpressionSkeleton extends GrammarTransformation {
 
   case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
     override def toString = s"missing transformation for ${clazz.getClass.getSimpleName}"
   }
 
-  override def dependencies: Set[Contract] = Set(TypeC)
+  override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
   def getType(state: TransformationState): MetaObject => MetaObject = expression => {
     val getTypeMethod = Try(getGetTypeRegistry(state)(expression.clazz)).
@@ -59,4 +59,5 @@ object ExpressionC extends GrammarTransformation {
   object CoreGrammar
   object ExpressionGrammar
 
+  override def description: String = "Introduces the concept of an expression."
 }
