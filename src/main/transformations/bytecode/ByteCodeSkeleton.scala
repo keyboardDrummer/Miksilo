@@ -57,7 +57,6 @@ object ByteCodeSkeleton extends ParticleWithGrammar with Instruction {
 
   class State {
     var constantPool: ConstantPool = null
-    val getInstructionStackSizeModificationRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject) => Int]
     val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
     val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
     val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
