@@ -1,7 +1,6 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.{JavaClassSkeleton, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends ParticleWithPhase {
@@ -11,7 +10,7 @@ object ImplicitObjectSuperClass extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
     if (JavaClassSkeleton.getParent(program).isEmpty) {
       program(JavaClassSkeleton.ClassParent) = Some(objectName)
     }

@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType, ClassRefConstant, MethodRefConstant}
 import transformations.javac.expressions.ExpressionSkeleton
@@ -17,7 +17,7 @@ case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMem
 
 case class MethodId(className: QualifiedClassName, methodName: String)
 
-case class ClassCompiler(currentClass: MetaObject, state: TransformationState) {
+case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
   val compiler = new MyCompiler()
   val myPackage = compiler.getPackage(JavaClassSkeleton.getPackage(currentClass).toList)
   val className = JavaClassSkeleton.getClassName(currentClass)

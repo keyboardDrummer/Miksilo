@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
@@ -19,7 +19,7 @@ object GotoC extends InstructionC {
 
   override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, true)
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = InstructionSignature(Seq(), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize(instruction: MetaObject): Int = 3
 

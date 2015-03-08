@@ -1,15 +1,15 @@
 package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 
 object VoidTypeC extends TypeInstance {
 
   override val key: AnyRef = VoidTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = ???
+  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = ???
 
-  override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "V"
+  override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "V"
 
   override def getStackSize: Int = 0
 

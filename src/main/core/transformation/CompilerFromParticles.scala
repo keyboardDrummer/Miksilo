@@ -2,8 +2,8 @@ package core.transformation
 
 import core.exceptions.ParticleDependencyViolation
 import core.grammarDocument.Labelled
+import core.transformation.Particle
 import core.transformation.grammars.ProgramGrammar
-import core.transformation.sillyCodePieces.Particle
 
 import scala.reflect.io.{Directory, File}
 
@@ -16,26 +16,26 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
     state.grammarCatalogue.find(ProgramGrammar)
   }
 
-  def parseAndTransform(input: File): TransformationState = {
+  def parseAndTransform(input: File): CompilationState = {
     val inputStream = File(input).slurp()
-    val state: TransformationState = parseAndTransform(inputStream)
+    val state: CompilationState = parseAndTransform(inputStream)
     state
   }
 
-  def compile(input: File, outputDirectory: Directory): TransformationState = {
+  def compile(input: File, outputDirectory: Directory): CompilationState = {
     val inputStream = File(input).slurp()
-    val state: TransformationState = parseAndTransform(inputStream)
+    val state: CompilationState = parseAndTransform(inputStream)
 
     PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
     state
   }
 
   def transform(program: MetaObject): MetaObject = {
-    val state: TransformationState = transformReturnState(program)
+    val state: CompilationState = transformReturnState(program)
     state.program
   }
 
-  def transformReturnState(program: MetaObject): TransformationState = {
+  def transformReturnState(program: MetaObject): CompilationState = {
     val state = buildState
     state.program = program
     state.runPhases()
@@ -48,15 +48,15 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
     state.program
   }
 
-  def parseAndTransform(input: String): TransformationState = {
+  def parseAndTransform(input: String): CompilationState = {
     val state = buildState
     state.parseString(input)
     state.runPhases()
     state
   }
 
-  def buildState: TransformationState = {
-    val state = new TransformationState()
+  def buildState: CompilationState = {
+    val state = new CompilationState()
     for(particle <- particles.reverse)
     {
       particle.inject(state)

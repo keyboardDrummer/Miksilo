@@ -1,7 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey
@@ -11,7 +10,7 @@ import transformations.types.TypeSkeleton
 object InferredMaxStack extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
     val clazz = program
 
     def getMaxStack(method: MetaObject): Integer = {

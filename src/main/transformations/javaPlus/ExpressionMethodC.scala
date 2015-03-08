@@ -1,14 +1,13 @@
 package transformations.javaPlus
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation._
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}
 
-object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
+object ExpressionMethodC extends ParticleWithGrammar with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, JavaClassSkeleton) ++ super.dependencies
 
@@ -29,7 +28,7 @@ object ExpressionMethodC extends GrammarTransformation with ParticleWithPhase {
     methodGrammar.addOption(expressionMethodGrammar)
   }
 
-  override def transform(clazz: MetaObject, state: TransformationState): Unit = {
+  override def transform(clazz: MetaObject, state: CompilationState): Unit = {
     for(expressionMethod <- JavaClassSkeleton.getMembers(clazz).filter(method => method.clazz == ExpressionMethodKey))
     {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[MetaObject]

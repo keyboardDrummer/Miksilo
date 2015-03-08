@@ -4,7 +4,6 @@ import core.document.BlankLine
 import core.grammarDocument.{BiGrammar, MapGrammar}
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -14,11 +13,11 @@ import transformations.types.{ArrayTypeC, ObjectTypeC}
 import scala.collection.mutable
 
 
-object JavaClassSkeleton extends GrammarTransformation with ParticleWithPhase {
+object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase {
 
-  def getReferenceKindRegistry(state: TransformationState) = getState(state).referenceKindRegistry //TODO move this registry to SelectorC.
+  def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry //TODO move this registry to SelectorC.
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
@@ -56,9 +55,9 @@ object JavaClassSkeleton extends GrammarTransformation with ParticleWithPhase {
 
   def getParent(clazz: MetaObject): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
 
-  def getClassCompiler(state: TransformationState) = getState(state).classCompiler
+  def getClassCompiler(state: CompilationState) = getState(state).classCompiler
 
-  def getState(state: TransformationState): State = {
+  def getState(state: CompilationState): State = {
     state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   }
 

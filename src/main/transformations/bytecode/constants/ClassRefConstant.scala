@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 
 object ClassRefConstant extends ConstantEntry {
@@ -19,7 +19,7 @@ object ClassRefConstant extends ConstantEntry {
 
   override def key: Any = ClassRefKey
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
   }
 

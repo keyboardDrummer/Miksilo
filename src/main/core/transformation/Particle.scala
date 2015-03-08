@@ -1,10 +1,8 @@
-package core.transformation.sillyCodePieces
-
-import core.transformation.{Contract, TransformationState}
+package core.transformation
 
 trait Particle extends Contract {
 
-  def inject(state: TransformationState) = {
+  def inject(state: CompilationState) = {
 
   }
 

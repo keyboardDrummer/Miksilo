@@ -1,12 +1,11 @@
 package transformations.javac.classes
 
-import core.transformation.sillyCodePieces.Particle
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Particle, Contract, MetaObject, CompilationState}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.VariableKey
 
 object GetIdentifierKind extends Particle {
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     JavaClassSkeleton.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(variable, compiler)

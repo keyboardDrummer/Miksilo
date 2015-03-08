@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -18,7 +18,7 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(ifThen: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val condition = ifThen(ConditionKey).asInstanceOf[MetaObject]
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)

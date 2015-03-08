@@ -30,14 +30,14 @@ object EqualityC extends ExpressionInstance {
 
   override val key: AnyRef = EqualityKey
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = BooleanTypeC.booleanType
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = BooleanTypeC.booleanType
 
-  def getInputType(equality: MetaObject, state: TransformationState)  = {
+  def getInputType(equality: MetaObject, state: CompilationState)  = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(state)(first)
   }
 
-  override def toByteCode(equality: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(equality: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)

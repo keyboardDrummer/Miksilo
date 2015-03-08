@@ -1,8 +1,7 @@
 package transformations.javac.methods
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -13,16 +12,16 @@ import transformations.javac.classes.{MethodInfo, JavaClassSkeleton, ClassCompil
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
 
-object MethodC extends GrammarTransformation {
+object MethodC extends ParticleWithGrammar {
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
 
     JavaClassSkeleton.getState(state).firstMemberPasses ::= (clazz => bindMethods(state, clazz))
     JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertMethods(state, clazz))
   }
 
-  def convertMethods(state: TransformationState, clazz: MetaObject) = {
+  def convertMethods(state: CompilationState, clazz: MetaObject) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -32,7 +31,7 @@ object MethodC extends GrammarTransformation {
     })
   }
 
-  def bindMethods(state: TransformationState, clazz: MetaObject): Unit = {
+  def bindMethods(state: CompilationState, clazz: MetaObject): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
@@ -61,7 +60,7 @@ object MethodC extends GrammarTransformation {
     MethodDescriptorConstant.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
   }
 
-  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: TransformationState): Unit = {
+  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: CompilationState): Unit = {
     val constantPool = ByteCodeSkeleton.getState(state).constantPool
     def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
@@ -133,9 +132,9 @@ object MethodC extends GrammarTransformation {
 
   def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
 
-  def getMethodCompiler(state: TransformationState) = getState(state).methodCompiler
+  def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  private def getState(state: TransformationState): State = {
+  private def getState(state: CompilationState): State = {
     state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   }
 

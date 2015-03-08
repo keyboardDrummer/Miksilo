@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -11,7 +11,7 @@ object WhileC extends StatementInstance {
 
   override val key: AnyRef = WhileKey
 
-  override def toByteCode(_while: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(_while: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val conditionInstructions = ExpressionSkeleton.getToInstructions(state)(getCondition(_while))
     val body = getBody(_while)
     val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(state)(statement))

@@ -1,11 +1,10 @@
 package transformations.javac.methods.assignment
 
-import core.transformation.Contract
+import core.transformation.{ParticleWithGrammar, Contract}
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.expressions.ExpressionSkeleton
 
-object AssignmentPrecedence extends GrammarTransformation {
+object AssignmentPrecedence extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 

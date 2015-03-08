@@ -3,7 +3,6 @@ package transformations.javac.expressions
 import core.exceptions.CompilerException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.types.TypeSkeleton
 
 import scala.collection.mutable
@@ -13,7 +12,7 @@ case class GetTypeNotFound(key: Any) extends CompilerException {
   override def toString = s"'get type' method not found for class ${MetaObject.classDebugRepresentation(key)}"
 }
 
-object ExpressionSkeleton extends GrammarTransformation {
+object ExpressionSkeleton extends ParticleWithGrammar {
 
   case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
     override def toString = s"missing transformation for ${clazz.getClass.getSimpleName}"
@@ -21,26 +20,26 @@ object ExpressionSkeleton extends GrammarTransformation {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
-  def getType(state: TransformationState): MetaObject => MetaObject = expression => {
+  def getType(state: CompilationState): MetaObject => MetaObject = expression => {
     val getTypeMethod = Try(getGetTypeRegistry(state)(expression.clazz)).
       recover({case e: NoSuchElementException => throw new GetTypeNotFound(expression.clazz)}).get
     getTypeMethod(expression)
   }
 
-  def getGetTypeRegistry(state: TransformationState) = getState(state).getTypeRegistry
+  def getGetTypeRegistry(state: CompilationState) = getState(state).getTypeRegistry
 
-  private def getState(state: TransformationState): State = {
+  private def getState(state: CompilationState): State = {
     state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   }
 
-  def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): MetaObject => Seq[MetaObject] = {
     expression => {
       val implementation = getExpressionToLines(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
       implementation(expression)
     }
   }
 
-  def getExpressionToLines(state: TransformationState): ToInstructionsRegistry = getState(state).transformations
+  def getExpressionToLines(state: CompilationState): ToInstructionsRegistry = getState(state).transformations
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val core = grammars.create(CoreGrammar)

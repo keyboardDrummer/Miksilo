@@ -21,9 +21,9 @@ object NullC extends ExpressionInstance {
 
   override val key: AnyRef = NullKey
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = ???
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = ???
 
-  override def toByteCode(expression: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(expression: MetaObject, state: CompilationState): Seq[MetaObject] = {
     Seq(PushNullC.pushNull)
   }
 

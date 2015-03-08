@@ -42,7 +42,7 @@ object CallC extends ExpressionInstance {
 
   override val key: AnyRef = CallKey
 
-  override def getType(call: MetaObject, state: TransformationState): MetaObject = {
+  override def getType(call: MetaObject, state: CompilationState): MetaObject = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
@@ -50,7 +50,7 @@ object CallC extends ExpressionInstance {
     returnType
   }
 
-  override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(call: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val callCallee = getCallCallee(call)

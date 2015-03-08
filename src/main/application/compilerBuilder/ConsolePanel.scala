@@ -6,8 +6,7 @@ import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
 
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
-import core.transformation.Contract
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.{Particle, Contract}
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 

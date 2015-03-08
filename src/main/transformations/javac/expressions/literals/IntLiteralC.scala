@@ -19,13 +19,13 @@ object IntLiteralC extends ExpressionInstance {
 
   def literal(value: Int) = new MetaObject(IntLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(literal: MetaObject, state: CompilationState): Seq[MetaObject] = {
     Seq(IntegerConstantC.integerConstant(getValue(literal)))
   }
 
   def getValue(literal: MetaObject) = literal(ValueKey).asInstanceOf[Int]
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = IntTypeC.intType
 
   object IntLiteralKey
 

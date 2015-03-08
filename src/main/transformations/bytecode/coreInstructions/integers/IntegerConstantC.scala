@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
@@ -23,7 +23,7 @@ object IntegerConstantC extends InstructionC {
     byteToBytes(3 + ByteCodeSkeleton.getInstructionArguments(instruction)(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(instruction: MetaObject): Int = 1

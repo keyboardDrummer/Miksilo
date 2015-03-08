@@ -2,7 +2,6 @@ package transformations.javac
 
 import application.compilerCockpit.PrettyPrint
 import core.transformation._
-import core.transformation.sillyCodePieces.Particle
 import transformations.bytecode._
 import transformations.bytecode.additions.{LabelledTargets, PoptimizeC}
 import transformations.bytecode.attributes._

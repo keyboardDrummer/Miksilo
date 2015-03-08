@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import PrintByteCode._
@@ -20,7 +20,7 @@ object IncrementIntegerC extends InstructionC {
       byteToBytes(arguments(1))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq.empty, Seq.empty)
 
   override def getInstructionSize(instruction: MetaObject): Int = 3

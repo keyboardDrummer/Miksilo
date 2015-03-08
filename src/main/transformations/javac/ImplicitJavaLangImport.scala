@@ -1,13 +1,12 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.{JavaClassSkeleton, WildcardImportC}
 
 object ImplicitJavaLangImport extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, WildcardImportC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
     val clazz = program
     val imports = JavaClassSkeleton.getImports(clazz)
     val implicitImport = WildcardImportC.wildCardImport(Seq(JavaLang.javaPackageName, JavaLang.langPackageName))

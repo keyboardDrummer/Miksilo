@@ -5,7 +5,7 @@ import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader._
 
-class ToPackrat extends JavaTokenParsers with PackratParsers {
+class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
 
   var keywords: Set[String] = Set.empty
 

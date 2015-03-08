@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
@@ -20,7 +20,7 @@ object IfIntegerCompareLessC extends JumpInstruction {
     hexToBytes("a1") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   object IfIntegerCompareLessKey

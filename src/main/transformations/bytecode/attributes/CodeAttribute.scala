@@ -2,8 +2,7 @@ package transformations.bytecode.attributes
 
 import core.grammarDocument.{BiGrammar, ManyVertical}
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
@@ -22,7 +21,7 @@ trait Instruction {
   }
 }
 
-object CodeAttribute extends GrammarTransformation with Instruction {
+object CodeAttribute extends ParticleWithGrammar with Instruction {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, CodeConstantEntry)
 
@@ -41,12 +40,12 @@ object CodeAttribute extends GrammarTransformation with Instruction {
   }
 
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
   }
 
-  def getCodeAttributeBytes(attribute: MetaObject, state: TransformationState): Seq[Byte] = {
+  def getCodeAttributeBytes(attribute: MetaObject, state: CompilationState): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
       ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)

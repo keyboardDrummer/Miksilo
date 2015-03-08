@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
@@ -16,7 +16,7 @@ object SwapInstruction extends InstructionC {
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: TransformationState): InstructionSignature = {
+                                          state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }

@@ -9,7 +9,7 @@ import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.transformation.sillyCodePieces.{ParticleWithPhase, GrammarTransformation}
+import core.transformation.{ParticleWithPhase, ParticleWithGrammar}
 import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
@@ -94,7 +94,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
       case _: ParticleWithPhase =>
         cell.setStyle("TRANSFORMATION")
 
-      case _: GrammarTransformation =>
+      case _: ParticleWithGrammar =>
         cell.setStyle("GRAMMAR")
 
       case _ =>

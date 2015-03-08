@@ -26,7 +26,7 @@ object ReturnVoidC extends StatementInstance {
 
   override val key: AnyRef = ReturnVoidKey
 
-  override def toByteCode(_return: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(_return: MetaObject, state: CompilationState): Seq[MetaObject] = {
     Seq(VoidReturnInstructionC.voidReturn)
   }
 

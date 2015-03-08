@@ -1,8 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
@@ -13,11 +12,11 @@ import transformations.types.LongTypeC.LongTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeKey
 import transformations.types.TypeSkeleton
 
-object AssignToVariable extends GrammarTransformation {
+object AssignToVariable extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObject) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)

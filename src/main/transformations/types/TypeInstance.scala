@@ -2,33 +2,32 @@ package transformations.types
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.bytecode.constants.ConstantEntry
 
-trait TypeInstance extends GrammarTransformation with ConstantEntry  {
+trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
 
   val key: AnyRef
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
     TypeSkeleton.getState(state).toByteCodeString.put(key, _type => getByteCodeString(_type, state))
     TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
     super.inject(state)
   }
 
-  def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject]
+  def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject]
 
   def getStackType(_type: MetaObject) = _type
 
-  def getByteCodeString(_type: MetaObject, state: TransformationState): String
+  def getByteCodeString(_type: MetaObject, state: CompilationState): String
 
   def getStackSize: Int
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry(getByteCodeString(constant, state))
   }
 

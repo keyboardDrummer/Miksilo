@@ -1,8 +1,7 @@
 package core.grammarDocument
 
 import application.compilerCockpit._
-import core.transformation.CompilerFromParticles
-import core.transformation.sillyCodePieces.{GrammarTransformation, Particle}
+import core.transformation.{Particle, ParticleWithGrammar, CompilerFromParticles}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -83,7 +82,7 @@ class TestDocumentGrammarWithJavaExamples {
   def testPrettyPrintAndParseByteCode() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
 
-    val byteCodeTransformations: Seq[GrammarTransformation] = JavaCompiler.byteCodeTransformations
+    val byteCodeTransformations: Seq[ParticleWithGrammar] = JavaCompiler.byteCodeTransformations
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)

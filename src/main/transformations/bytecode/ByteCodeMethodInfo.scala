@@ -2,12 +2,11 @@ package transformations.bytecode
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
-object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
+object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
 
   object MethodInfoKey
 
@@ -33,12 +32,12 @@ object ByteCodeMethodInfo extends GrammarTransformation with AccessFlags {
 
   def getMethodDescriptorIndex(methodInfo: MetaObject) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
   }
 
-  def getMethodByteCode(methodInfo: MetaObject, state: TransformationState) = {
+  def getMethodByteCode(methodInfo: MetaObject, state: CompilationState) = {
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(getMethodNameIndex(methodInfo)) ++
         shortToBytes(getMethodDescriptorIndex(methodInfo)) ++

@@ -1,11 +1,10 @@
 package transformations.bytecode
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
-object ByteCodeFieldInfo extends GrammarTransformation with AccessFlags {
+object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
   object FieldKey
   object NameIndex
   object DescriptorIndex
@@ -17,14 +16,14 @@ object ByteCodeFieldInfo extends GrammarTransformation with AccessFlags {
     new MetaObject(FieldKey, NameIndex -> nameIndex, DescriptorIndex -> descriptorIndex, FieldAttributes -> attributes)
   }
 
-  def emitField(field: MetaObject, state: TransformationState): Seq[Byte] = {
+  def emitField(field: MetaObject, state: CompilationState): Seq[Byte] = {
       getAccessFlagsByteCode(field) ++
         PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]) ++
         PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.DescriptorIndex).asInstanceOf[Int]) ++
         PrintByteCode.getAttributesByteCode(state, field(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[MetaObject]])
     }
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(FieldKey) = field => emitField(field, state)
   }

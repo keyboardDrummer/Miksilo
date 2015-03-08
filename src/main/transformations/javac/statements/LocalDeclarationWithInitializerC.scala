@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
@@ -32,7 +32,7 @@ object LocalDeclarationWithInitializerC extends StatementInstance {
 
   override val key: AnyRef = DeclarationWithInitializerKey
 
-  override def toByteCode(declarationWithInitializer: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(declarationWithInitializer: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
     val declaration = LocalDeclarationC.declaration(name, _type)

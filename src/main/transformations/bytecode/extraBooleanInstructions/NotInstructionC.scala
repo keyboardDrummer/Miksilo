@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
@@ -17,7 +17,7 @@ object NotInstructionC extends ExpandInstruction {
 
   override def key: Any = NotInstructionKey
 
-  override def expand(instruction: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def expand(instruction: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val falseStartLabel = state.getUniqueLabel("falseStart")
     val endLabel = state.getUniqueLabel("end")
     Seq(LabelledTargets.ifZero(falseStartLabel),

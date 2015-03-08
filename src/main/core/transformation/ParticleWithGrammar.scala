@@ -1,14 +1,13 @@
-package core.transformation.sillyCodePieces
+package core.transformation
 
 import core.grammar.~
 import core.grammarDocument.GrammarDocumentWriter
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
 
-trait GrammarTransformation extends Particle with GrammarDocumentWriter {
+trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     transformGrammars(state.grammarCatalogue)
   }

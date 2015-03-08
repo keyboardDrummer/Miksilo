@@ -1,11 +1,10 @@
 package transformations.javac.classes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.BasicImportC._
 
-object WildcardImportC extends GrammarTransformation {
+object WildcardImportC extends ParticleWithGrammar {
 
   object WildcardImportKey
 
@@ -16,7 +15,7 @@ object WildcardImportC extends GrammarTransformation {
     importPath.addOption((identifier.someSeparated(".") <~ ".*") ^^ parseMap(WildcardImportKey, ElementsKey))
   }
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     JavaClassSkeleton.getState(state).importToClassMap.put(WildcardImportKey, wildcardImport => {
       val packageParts = getParts(wildcardImport)
       val classCompiler = JavaClassSkeleton.getState(state).classCompiler

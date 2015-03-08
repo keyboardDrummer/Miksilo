@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
@@ -23,7 +23,7 @@ object NewByteCodeC extends InstructionC {
     PrintByteCode.hexToBytes("bb") ++ PrintByteCode.shortToBytes(location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
     val classRef = constantPool.getValue(location).asInstanceOf[MetaObject]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]

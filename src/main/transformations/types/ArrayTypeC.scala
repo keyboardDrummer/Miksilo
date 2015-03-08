@@ -2,14 +2,14 @@ package transformations.types
 
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 
 object ArrayTypeC extends TypeInstance {
   override val key: AnyRef = ArrayTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty
+  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = Seq.empty
 
-  override def getByteCodeString(_type: MetaObject, state: TransformationState): String =
+  override def getByteCodeString(_type: MetaObject, state: CompilationState): String =
     s"[${TypeSkeleton.getByteCodeString(state)(getArrayElementType(_type))}"
 
   def getArrayElementType(arrayType: MetaObject) = arrayType(ArrayElementType).asInstanceOf[MetaObject]

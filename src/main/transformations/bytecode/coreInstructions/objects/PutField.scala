@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.{ByteCodeTypeException, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
@@ -19,7 +19,7 @@ object PutField extends InstructionC {
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: TransformationState): InstructionSignature = {
+                                          state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
 
     if (stackTop.size != 2)

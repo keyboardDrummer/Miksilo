@@ -1,14 +1,14 @@
 package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 
 object BooleanTypeC extends TypeInstance {
   override val key: AnyRef = BooleanTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty
+  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = Seq.empty
 
-  override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "Z"
+  override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "Z"
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
     "boolean" ~> produce(booleanType)

@@ -2,14 +2,14 @@ package transformations.types
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.javac.classes.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance {
   override val key: AnyRef = ObjectTypeKey
   val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
 
-  override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = {
     Seq.empty //TODO extend
   }
 
@@ -42,7 +42,7 @@ object ObjectTypeC extends TypeInstance {
     data.put(ObjectTypeName, Left(className))
   }
 
-  override def getByteCodeString(_type: MetaObject, state: TransformationState): String =
+  override def getByteCodeString(_type: MetaObject, state: CompilationState): String =
     s"L${getObjectTypeName(_type).right.get.parts.mkString("/")};"
 
   def getObjectTypeName(objectType: MetaObject): Either[String, QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String, QualifiedClassName]]

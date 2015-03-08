@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 
 object MethodRefConstant extends ConstantEntry {
@@ -12,7 +12,7 @@ object MethodRefConstant extends ConstantEntry {
 
   object MethodRefMethodName
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
       shortToBytes(getMethodRefMethodNameIndex(constant))

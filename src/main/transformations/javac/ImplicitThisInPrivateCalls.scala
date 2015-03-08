@@ -1,7 +1,6 @@
 package transformations.javac
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.{SelectorC, JavaClassSkeleton}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{CallC, VariableC}
@@ -11,7 +10,7 @@ object ImplicitThisInPrivateCalls extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(CallC, VariableC, JavaClassSkeleton)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
     val original = ExpressionSkeleton.getExpressionToLines(state)(CallC.CallKey)
     ExpressionSkeleton.getExpressionToLines(state).put(CallC.CallKey, (call: MetaObject) => {
       val callCallee = CallC.getCallCallee(call)

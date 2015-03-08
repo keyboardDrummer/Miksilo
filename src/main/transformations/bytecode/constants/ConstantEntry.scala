@@ -2,16 +2,15 @@ package transformations.bytecode.constants
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, TransformationState, MetaObject}
-import core.transformation.sillyCodePieces.GrammarTransformation
+import core.transformation.{ParticleWithGrammar, Contract, CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
-trait ConstantEntry extends GrammarTransformation {
+trait ConstantEntry extends ParticleWithGrammar {
   def key: Any
-  def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte]
+  def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte]
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: MetaObject) => getByteCode(constant, state))
   }

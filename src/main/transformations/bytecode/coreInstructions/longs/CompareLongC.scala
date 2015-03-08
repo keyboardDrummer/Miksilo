@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -19,6 +19,6 @@ object CompareLongC extends InstructionC {
     PrintByteCode.hexToBytes("94")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(LongTypeC.longType, LongTypeC.longType), Seq(IntTypeC.intType))
 }

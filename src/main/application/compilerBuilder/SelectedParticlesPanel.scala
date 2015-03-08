@@ -5,7 +5,7 @@ import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.Particle
 
 object SelectedParticlesPanel {
   def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
@@ -21,6 +21,7 @@ object SelectedParticlesPanel {
     compilerList.addListSelectionListener(new ListSelectionListener {
       override def valueChanged(e: ListSelectionEvent): Unit = removeButton.setEnabled(compilerList.getSelectedValues.nonEmpty)
     })
+
     removeButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         for (selectedValue <- compilerList.getSelectedValues)

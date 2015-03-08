@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.{Pop2C, PopC}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.types.TypeSkeleton
@@ -16,7 +16,7 @@ object ExpressionAsStatementC extends StatementInstance {
 
   override val key: AnyRef = ExpressionAsStatementKey
 
-  override def toByteCode(statement: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(statement: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val expression = statement(ExpressionKey).asInstanceOf[MetaObject]
     val _type = ExpressionSkeleton.getType(state)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, state) match {

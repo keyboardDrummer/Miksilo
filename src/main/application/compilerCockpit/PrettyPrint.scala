@@ -2,15 +2,14 @@ package application.compilerCockpit
 
 import core.grammarDocument.{BiGrammar, BiGrammarToDocument, PrintFailure}
 import core.responsiveDocument.ResponsiveDocument
-import core.transformation.{TransformationState, CompilerFromParticles}
+import core.transformation.{Particle, CompilationState, CompilerFromParticles}
 import core.transformation.grammars.ProgramGrammar
-import core.transformation.sillyCodePieces.Particle
 
 import scala.util.Try
 
 case class PrettyPrint(recover: Boolean = false) extends Particle
 {
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     val foundGrammar = state.grammarCatalogue.find(ProgramGrammar)
     state.data(this) = foundGrammar.deepClone
 

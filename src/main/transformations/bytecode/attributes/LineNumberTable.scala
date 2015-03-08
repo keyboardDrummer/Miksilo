@@ -1,14 +1,13 @@
 package transformations.bytecode.attributes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{TransformationState, Contract, MetaObject}
+import core.transformation.{ParticleWithGrammar, CompilationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 
 case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 
-object LineNumberTable extends GrammarTransformation {
+object LineNumberTable extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def lineNumberTable(nameIndex: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberTableKey) {
@@ -16,7 +15,7 @@ object LineNumberTable extends GrammarTransformation {
     data.put(LineNumberTableLines, lines)
   }
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
     ByteCodeSkeleton.getState(state).getBytes(LineNumberTableId) = _ => toUTF8ConstantEntry("LineNumberTable")

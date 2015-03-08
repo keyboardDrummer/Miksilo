@@ -3,7 +3,6 @@ package transformations.types
 import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import PrintByteCode._
 import transformations.javac.classes.ConstantPool
@@ -20,8 +19,8 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
-object TypeSkeleton extends GrammarTransformation { //TODO move some specific type code to the respective type.
-  def getVerificationInfoBytes(_type: MetaObject, state: TransformationState): Seq[Byte] = {
+object TypeSkeleton extends ParticleWithGrammar { //TODO move some specific type code to the respective type.
+  def getVerificationInfoBytes(_type: MetaObject, state: CompilationState): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
       case LongTypeC.LongTypeKey => hexToBytes("04")
@@ -29,7 +28,7 @@ object TypeSkeleton extends GrammarTransformation { //TODO move some specific ty
     }
   }
 
-  def toStackType(_type: MetaObject, state: TransformationState) : MetaObject = {
+  def toStackType(_type: MetaObject, state: CompilationState) : MetaObject = {
     toStackType(ByteCodeSkeleton.getState(state).constantPool, _type)
   }
 
@@ -41,19 +40,19 @@ object TypeSkeleton extends GrammarTransformation { //TODO move some specific ty
     }
   }
 
-  def getTypeSize(_type: MetaObject, state: TransformationState): Int = getState(state).stackSize(_type.clazz)
+  def getTypeSize(_type: MetaObject, state: CompilationState): Int = getState(state).stackSize(_type.clazz)
 
-  def getByteCodeString(state: TransformationState): MetaObject => String =
+  def getByteCodeString(state: CompilationState): MetaObject => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def checkAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject) = {
+  def checkAssignableTo(state: CompilationState)(to: MetaObject, from: MetaObject) = {
     if (!isAssignableTo(state)(to, from))
       throw new TypeMismatchException(to, from)
   }
 
-  def isAssignableTo(state: TransformationState)(to: MetaObject, from: MetaObject): Boolean = {
+  def isAssignableTo(state: CompilationState)(to: MetaObject, from: MetaObject): Boolean = {
     val fromSuperTypes = getSuperTypes(state)(from)
     if (to.equals(from))
       return true
@@ -61,13 +60,13 @@ object TypeSkeleton extends GrammarTransformation { //TODO move some specific ty
     fromSuperTypes.exists(_type => _type.equals(to))
   }
 
-  def getSuperTypes(state: TransformationState)(_type: MetaObject) = getSuperTypesRegistry(state)(_type.clazz)(_type)
+  def getSuperTypes(state: CompilationState)(_type: MetaObject) = getSuperTypesRegistry(state)(_type.clazz)(_type)
 
-  def getSuperTypesRegistry(state: TransformationState) = {
+  def getSuperTypesRegistry(state: CompilationState) = {
     getState(state).superTypes
   }
 
-  def union(state: TransformationState)(first: MetaObject, second: MetaObject): MetaObject = {
+  def union(state: CompilationState)(first: MetaObject, second: MetaObject): MetaObject = {
     val filteredDepths = getAllSuperTypes(state)(first).map(depthTypes => depthTypes.filter(_type => isAssignableTo(state)(_type, second)))
     val resultDepth = filteredDepths.find(depth => depth.nonEmpty).getOrElse(throw new NoCommonSuperTypeException(first, second))
     if (resultDepth.size > 1)
@@ -76,7 +75,7 @@ object TypeSkeleton extends GrammarTransformation { //TODO move some specific ty
     resultDepth.head
   }
 
-  def getAllSuperTypes(state: TransformationState)(_type: MetaObject): Stream[Set[MetaObject]] = {
+  def getAllSuperTypes(state: CompilationState)(_type: MetaObject): Stream[Set[MetaObject]] = {
     var returnedTypes = Set.empty[MetaObject]
     Stream.iterate(Set(_type))(previousDepthTypes => {
       val result = previousDepthTypes.flatMap(_type => getSuperTypes(state)(_type)).filter(_type => !returnedTypes.contains(_type))
@@ -89,7 +88,7 @@ object TypeSkeleton extends GrammarTransformation { //TODO move some specific ty
     grammars.create(TypeGrammar)
   }
 
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {
     val superTypes = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()
     val toByteCodeString = new mutable.HashMap[Any, MetaObject => String]()

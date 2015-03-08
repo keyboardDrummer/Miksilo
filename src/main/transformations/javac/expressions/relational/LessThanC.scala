@@ -13,7 +13,7 @@ object LessThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC, LessThanInstructionC)
 
-  override def toByteCode(lessThan: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(lessThan: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
@@ -24,7 +24,7 @@ object LessThanC extends ExpressionInstance {
 
   def getSecond(lessThan: MetaObject) = lessThan(LessThanSecond).asInstanceOf[MetaObject]
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))

@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.types.TypeSkeleton
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ case class VariableDoesNotExist(name: String) extends BadInputException {
 
 case class VariableInfo(offset: Integer, _type: MetaObject)
 
-class VariablePool(state: TransformationState) {
+class VariablePool(state: CompilationState) {
   private val variables = mutable.Map[String, VariableInfo]()
   var offset = 0
 
@@ -30,6 +30,6 @@ class VariablePool(state: TransformationState) {
   }
 }
 
-case class MethodCompiler(transformationState: TransformationState) {
+case class MethodCompiler(transformationState: CompilationState) {
   val variables = new VariablePool(transformationState)
 }

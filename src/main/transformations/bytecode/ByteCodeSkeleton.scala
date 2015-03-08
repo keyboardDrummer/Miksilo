@@ -4,8 +4,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -13,13 +12,13 @@ import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
 import scala.collection.mutable
 
-object ByteCodeSkeleton extends GrammarTransformation with Instruction {
+object ByteCodeSkeleton extends ParticleWithGrammar with Instruction {
 
-  def getInstructionSizeRegistry(state: TransformationState) = getState(state).getInstructionSizeRegistry
+  def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
 
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
-  def getInstructionSignatureRegistry(state: TransformationState) = getState(state).getInstructionSignatureRegistry
+  def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
@@ -54,7 +53,7 @@ object ByteCodeSkeleton extends GrammarTransformation with Instruction {
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
 
-  def getConstantPool(state: TransformationState) = getState(state).constantPool
+  def getConstantPool(state: CompilationState) = getState(state).constantPool
 
   class State {
     var constantPool: ConstantPool = null

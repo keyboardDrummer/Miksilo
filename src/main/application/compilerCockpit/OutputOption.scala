@@ -1,14 +1,14 @@
 package application.compilerCockpit
 
-import core.transformation.TransformationState
+import core.transformation.CompilationState
 
 object OutputOption {
 
   object Output
 
-  def getOutput(state: TransformationState) = state.data.get(Output).collect({ case x: String => x})
+  def getOutput(state: CompilationState) = state.data.get(Output).collect({ case x: String => x})
 
-  def setOutput(state: TransformationState, value: String) = state.data(Output) = value
+  def setOutput(state: CompilationState, value: String) = state.data(Output) = value
 }
 
 trait OutputOption {

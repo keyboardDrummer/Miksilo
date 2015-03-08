@@ -1,7 +1,6 @@
 package application.compilerCockpit
 
-import core.transformation.{CompilerFromParticles, TransformationState, MetaObject}
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.{Particle, CompilerFromParticles, CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.javac.classes.QualifiedClassName
@@ -9,7 +8,7 @@ import util.TestUtils
 
 object RunWithJVM extends Particle
 {
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     state.compilerPhases ::= (() => {
       val clazz: MetaObject = state.program
       val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)

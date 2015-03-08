@@ -1,7 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
@@ -19,7 +18,7 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
     NotInstructionC, IntegerEqualsInstructionC)
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)

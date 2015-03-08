@@ -2,8 +2,7 @@ package transformations.javac.constructor
 
 import core.exceptions.BadInputException
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.{GrammarTransformation, ParticleWithPhase}
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation._
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
@@ -12,13 +11,13 @@ import transformations.javac.methods.{CallC, MethodC}
 import transformations.javac.statements.BlockC
 import transformations.types.VoidTypeC
 
-object ConstructorC extends GrammarTransformation with ParticleWithPhase {
+object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(MethodC, CallC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: MetaObject, constructor: MetaObject) extends BadInputException
 
-  override def transform(clazz: MetaObject, state: TransformationState): Unit = {
+  override def transform(clazz: MetaObject, state: CompilationState): Unit = {
     val className = JavaClassSkeleton.getClassName(clazz)
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]

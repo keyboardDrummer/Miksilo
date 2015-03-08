@@ -1,7 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
@@ -17,12 +16,12 @@ object ExpandInstructionsC extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def getState(state: TransformationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {
     val expandInstruction = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()
   }
 
-  override def transform(program: MetaObject, state: TransformationState): Unit = {
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)

@@ -1,8 +1,7 @@
 package transformations.javac.classes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectorC._
@@ -10,11 +9,11 @@ import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
 
-object AssignToMember extends GrammarTransformation {
+object AssignToMember extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectorC)
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(SelectorC.SelectorKey, (selector: MetaObject) => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       val classOrObjectReference = getClassOrObjectReference(selector, compiler)

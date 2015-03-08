@@ -21,7 +21,7 @@ object SelectorC extends ExpressionInstance {
     }
   }
 
-  override def getType(selector: MetaObject, state: TransformationState): MetaObject = {
+  override def getType(selector: MetaObject, state: CompilationState): MetaObject = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
@@ -34,7 +34,7 @@ object SelectorC extends ExpressionInstance {
 
   def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
-  override def toByteCode(selector: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(selector: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)

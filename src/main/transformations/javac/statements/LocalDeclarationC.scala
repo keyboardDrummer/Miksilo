@@ -39,7 +39,7 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key: AnyRef = DeclarationKey
 
-  override def toByteCode(declaration: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(declaration: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     val variables: VariablePool = methodCompiler.variables
     val name: String = getDeclarationName(declaration)

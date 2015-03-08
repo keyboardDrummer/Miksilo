@@ -1,15 +1,15 @@
 package transformations.types
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 
 object IntTypeC extends TypeInstance {
 
   override val key: AnyRef = IntTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: TransformationState): Seq[MetaObject] = Seq.empty //TODO extend. long ?
+  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = Seq.empty //TODO extend. long ?
 
-  override def getByteCodeString(_type: MetaObject, state: TransformationState): String = "I"
+  override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "I"
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
     "int" ~> produce(IntTypeC.intType)

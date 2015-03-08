@@ -1,18 +1,17 @@
 package transformations.javac.statements
 
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 
-trait StatementInstance extends GrammarTransformation {
+trait StatementInstance extends ParticleWithGrammar {
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     StatementSkeleton.getStatementToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
     super.inject(state)
   }
 
   val key: AnyRef
 
-  def toByteCode(statement: MetaObject, state: TransformationState): Seq[MetaObject]
+  def toByteCode(statement: MetaObject, state: CompilationState): Seq[MetaObject]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
 }

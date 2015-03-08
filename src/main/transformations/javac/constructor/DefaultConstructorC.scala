@@ -1,14 +1,13 @@
 package transformations.javac.constructor
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.MethodC.PublicVisibility
 
 object DefaultConstructorC extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
-  def transform(clazz: MetaObject, state: TransformationState): Unit = {
+  def transform(clazz: MetaObject, state: CompilationState): Unit = {
     val className = JavaClassSkeleton.getClassName(clazz)
     val members = JavaClassSkeleton.getMembers(clazz)
     val constructor = ConstructorC.constructor(className, Seq(), Seq(), PublicVisibility)

@@ -33,7 +33,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key: AnyRef = ReturnInteger
 
-  override def toByteCode(_return: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(_return: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }

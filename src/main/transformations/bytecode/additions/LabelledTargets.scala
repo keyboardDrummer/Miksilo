@@ -1,7 +1,6 @@
 package transformations.bytecode.additions
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
@@ -30,12 +29,12 @@ object LabelledTargets extends ParticleWithPhase {
     data.put(LabelStackFrame, stackFrame)
   }
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     LabelC.inject(state)
   }
 
-  def transform(program: MetaObject, state: TransformationState): Unit = {
+  def transform(program: MetaObject, state: CompilationState): Unit = {
 
     val jumpRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
     def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)(instruction)
@@ -129,7 +128,7 @@ object LabelledTargets extends ParticleWithPhase {
 
     override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState):
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState):
     InstructionSignature = new InstructionSignature(Seq.empty, Seq.empty)
 
     override def getInstructionSize(instruction: MetaObject): Int = 0

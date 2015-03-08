@@ -3,7 +3,7 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import akka.util.Convert
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.{ObjectTypeC, TypeSkeleton}
 
@@ -38,7 +38,7 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
 
   def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
 
-  def getAttributesByteCode(state: TransformationState, attributes: Seq[MetaObject]): Seq[Byte] = {
+  def getAttributesByteCode(state: CompilationState, attributes: Seq[MetaObject]): Seq[Byte] = {
 
     def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
@@ -78,7 +78,7 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
 
   def valueOf(buf: Iterable[Byte]): String = buf.map("%02X" format _).mkString
 
-  def getBytes(byteCode: MetaObject, state: TransformationState): Seq[Byte] = {
+  def getBytes(byteCode: MetaObject, state: CompilationState): Seq[Byte] = {
 
     val clazz = byteCode
     def getBytes(byteCode: MetaObject): Seq[Byte] = {

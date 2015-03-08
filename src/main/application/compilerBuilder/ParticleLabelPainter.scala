@@ -1,8 +1,7 @@
 package application.compilerBuilder
 
 import javax.swing.JPanel
-
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.Particle
 import util.Cache
 
 import scala.collection.mutable

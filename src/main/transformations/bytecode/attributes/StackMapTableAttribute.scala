@@ -2,13 +2,12 @@ package transformations.bytecode.attributes
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{TransformationState, Contract, MetaObject}
+import core.transformation.{ParticleWithGrammar, CompilationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.types.TypeSkeleton
 
-object StackMapTableAttribute extends GrammarTransformation {
+object StackMapTableAttribute extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -88,13 +87,13 @@ object StackMapTableAttribute extends GrammarTransformation {
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammars.create(StackMapTableGrammar, stackMapTableGrammar))
   }
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: MetaObject) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableId) = _ => toUTF8ConstantEntry("StackMapTable")
   }
 
-  def getStackMapTableBytes(attribute: MetaObject, state: TransformationState): Seq[Byte] = {
+  def getStackMapTableBytes(attribute: MetaObject, state: CompilationState): Seq[Byte] = {
 
     def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)

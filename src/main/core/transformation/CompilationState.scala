@@ -7,7 +7,7 @@ import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
 import scala.collection.mutable
 import scala.util.Random
 
-class TransformationState {
+class CompilationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
@@ -21,7 +21,7 @@ class TransformationState {
 
 
   def parseString(input: String): Unit = {
-    val manager = new TransformationsToPackrat()
+    val manager = new ParticlesToParserConverter()
     val parser = manager.buildParser(grammarCatalogue)
 
     val parseResult = parser(input)

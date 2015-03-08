@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 
@@ -14,7 +14,7 @@ object CodeConstantEntry extends ConstantEntry
 
   override def key: Any = CodeAttributeId
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry("Code")
   }
 

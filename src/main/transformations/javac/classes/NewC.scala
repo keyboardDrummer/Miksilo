@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
 import transformations.javac.constructor.SuperCallExpression
@@ -27,11 +27,11 @@ object NewC extends ExpressionInstance {
 
   override val key: AnyRef = NewCallKey
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = {
     expression(NewObject).asInstanceOf[MetaObject]
   }
 
-  override def toByteCode(expression: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(expression: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val objectType = expression(NewObject).asInstanceOf[MetaObject]

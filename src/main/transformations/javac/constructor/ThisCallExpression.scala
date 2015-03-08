@@ -1,6 +1,6 @@
 package transformations.javac.constructor
 
-import core.transformation.{Contract, TransformationState, MetaObject}
+import core.transformation.{Contract, CompilationState, MetaObject}
 import core.transformation.grammars.GrammarCatalogue
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -17,14 +17,14 @@ object ThisCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = VoidTypeC.voidType
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = VoidTypeC.voidType
 
-  override def toByteCode(call: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(call: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     transformThisCall(classCompiler.currentClass, call, state)
   }
 
-  def transformThisCall(clazz: MetaObject, call: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  def transformThisCall(clazz: MetaObject, call: MetaObject, state: CompilationState): Seq[MetaObject] = {
     SuperCallExpression.transformToByteCode(call, state, JavaClassSkeleton.getClassName(clazz))
   }
 

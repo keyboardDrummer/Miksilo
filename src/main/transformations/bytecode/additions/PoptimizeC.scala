@@ -1,7 +1,6 @@
 package transformations.bytecode.additions
 
-import core.transformation.sillyCodePieces.ParticleWithPhase
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
@@ -12,13 +11,13 @@ object PoptimizeC extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopC)
 
-  private def getSignatureInOutLengths(state: TransformationState, signature: InstructionSignature): (Int, Int) = {
+  private def getSignatureInOutLengths(state: CompilationState, signature: InstructionSignature): (Int, Int) = {
     val inputLength = signature.inputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     val outputLength = signature.outputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     (inputLength, outputLength)
   }
 
-  override def transform(clazz: MetaObject, state: TransformationState): Unit = {
+  override def transform(clazz: MetaObject, state: CompilationState): Unit = {
 
     val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {

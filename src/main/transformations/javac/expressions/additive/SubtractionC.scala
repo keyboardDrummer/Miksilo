@@ -31,9 +31,9 @@ object SubtractionC extends ExpressionInstance {
 
   override val key: AnyRef = SubtractionKey
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = ???
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = ???
 
-  override def toByteCode(subtraction: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(subtraction: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))

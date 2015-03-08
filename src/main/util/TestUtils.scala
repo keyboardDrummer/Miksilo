@@ -4,7 +4,6 @@ import java.io
 
 import application.compilerCockpit.PrettyPrint
 import core.transformation._
-import core.transformation.sillyCodePieces.{Particle, ParticleWithPhase}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, PrintByteCode, ByteCodeSkeleton}
@@ -113,7 +112,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     }
   }
 
-  def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: TransformationState, e: AssertionError): String = {
+  def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: CompilationState, e: AssertionError): String = {
     val relativeClassPath = inputDirectory / (className + ".class")
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
@@ -176,7 +175,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends ParticleWithPhase {
-    override def transform(program: MetaObject, state: TransformationState): Unit = {
+    override def transform(program: MetaObject, state: CompilationState): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }
 

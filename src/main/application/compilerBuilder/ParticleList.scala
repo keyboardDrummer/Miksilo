@@ -2,7 +2,7 @@ package application.compilerBuilder
 
 import java.awt.event.MouseEvent
 
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.Particle
 import org.jdesktop.swingx.JXList
 
 class ParticleList() extends JXList() {

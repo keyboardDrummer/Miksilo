@@ -1,6 +1,6 @@
 package application.graphing.model
 
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.Particle
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 
 class GraphFromTransformations(transformations: Seq[Particle])

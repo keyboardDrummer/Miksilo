@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -9,7 +9,7 @@ import transformations.types.{ObjectTypeC, TypeSkeleton}
 
 abstract class InvokeC extends InstructionC {
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: TransformationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
@@ -17,7 +17,7 @@ abstract class InvokeC extends InstructionC {
   }
 
   def getInstanceInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: TransformationState): InstructionSignature = {
+                                          state: CompilationState): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val classRef = constantPool.getValue(MethodRefConstant.getMethodRefClassRefIndex(methodRef)).asInstanceOf[MetaObject]
@@ -28,7 +28,7 @@ abstract class InvokeC extends InstructionC {
     InstructionSignature(Seq(classType) ++ ins, outs)
   }
 
-  def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool, state: TransformationState): InstructionSignature = {
+  def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool, state: CompilationState): InstructionSignature = {
     val ins = MethodDescriptorConstant.getMethodDescriptorParameters(descriptor).map(_type => TypeSkeleton.toStackType(constantPool, _type))
     val outs = Seq(TypeSkeleton.toStackType(constantPool, MethodDescriptorConstant.getMethodDescriptorReturnType(descriptor)))
     InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))

@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.{MetaObject, TransformationState}
+import core.transformation.{MetaObject, CompilationState}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.attributes.CodeAttribute
@@ -8,7 +8,7 @@ import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorCon
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.ObjectTypeC
 
-class InstructionTypeAnalysisFromState(state: TransformationState, method: MetaObject) {
+class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObject) {
   val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
 
   val typeAnalysis = getTypeAnalysis

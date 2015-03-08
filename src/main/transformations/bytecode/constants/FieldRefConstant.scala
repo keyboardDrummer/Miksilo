@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 
 object FieldRefConstant extends ConstantEntry {
@@ -18,7 +18,7 @@ object FieldRefConstant extends ConstantEntry {
     data.put(FieldRefNameAndTypeIndex, nameAndTypeIndex)
   }
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     byteToBytes(9) ++
       shortToBytes(getFieldRefClassIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))

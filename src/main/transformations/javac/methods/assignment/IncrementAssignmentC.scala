@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.javac.expressions.additive.AdditionC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.IntTypeC
@@ -28,9 +28,9 @@ object IncrementAssignmentC extends ExpressionInstance {
 
   override val key: AnyRef = IncrementAssignmentKey
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = IntTypeC.intType
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = IntTypeC.intType
 
-  override def toByteCode(incrementAssignment: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(incrementAssignment: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val target = incrementAssignment(TargetKey).asInstanceOf[MetaObject]
     val value = incrementAssignment(ValueKey).asInstanceOf[MetaObject]
     val newValue = AdditionC.addition(value, target)

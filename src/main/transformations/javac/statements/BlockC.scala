@@ -2,9 +2,8 @@ package transformations.javac.statements
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 
-object BlockC extends GrammarTransformation {
+object BlockC extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 

@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{TransformationState, MetaObject}
+import core.transformation.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode
 import transformations.types.TypeSkeleton
 
@@ -14,7 +14,7 @@ object FieldDescriptorConstant extends ConstantEntry {
 
   override def key: Any = Key
 
-  override def getByteCode(constant: MetaObject, state: TransformationState): Seq[Byte] = {
+  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     val _type: MetaObject = constant(Type).asInstanceOf[MetaObject]
     val typeString = TypeSkeleton.getByteCodeString(state)(_type)
     PrintByteCode.toUTF8ConstantEntry(typeString)

@@ -1,14 +1,13 @@
 package core.transformation
 
-import core.grammar.ToPackrat
+import core.grammar.GrammarToParserConverter
 import core.grammarDocument.{BiGrammarToGrammar, Labelled}
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.sillyCodePieces.GrammarTransformation
 
 import scala.util.parsing.input.CharArrayReader
 
-class TransformationsToPackrat extends ToPackrat {
-  def buildParser(transformations: Seq[GrammarTransformation]): String => ParseResult[Any] = {
+class ParticlesToParserConverter extends GrammarToParserConverter {
+  def buildParser(transformations: Seq[ParticleWithGrammar]): String => ParseResult[Any] = {
     val programGrammar: Labelled = new CompilerFromParticles(transformations).getGrammar
     buildParser(programGrammar)
   }

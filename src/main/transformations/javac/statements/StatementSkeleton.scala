@@ -2,18 +2,17 @@ package transformations.javac.statements
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.MissingToInstructionsFor
 
 import scala.collection.mutable
 
 
-object StatementSkeleton extends GrammarTransformation {
+object StatementSkeleton extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(state: TransformationState): MetaObject => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): MetaObject => Seq[MetaObject] = {
     statement => {
       val statementTransformation = getStatementToLines(state).get(statement.clazz)
       val transformation = statementTransformation.getOrElse(throw new MissingToInstructionsFor(statement.clazz))
@@ -21,7 +20,7 @@ object StatementSkeleton extends GrammarTransformation {
     }
   }
 
-  def getStatementToLines(state: TransformationState): StatementTransformations =
+  def getStatementToLines(state: CompilationState): StatementTransformations =
     state.data.getOrElseUpdate(this, new StatementTransformations()).asInstanceOf[StatementTransformations]
 
   override def transformGrammars(grammars: GrammarCatalogue) {

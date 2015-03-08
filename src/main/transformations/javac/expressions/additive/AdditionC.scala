@@ -2,23 +2,22 @@ package transformations.javac.expressions.additive
 
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.{IntTypeC, TypeSkeleton}
 
-object AdditionC extends GrammarTransformation with ExpressionInstance {
+object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(addition: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = {
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))

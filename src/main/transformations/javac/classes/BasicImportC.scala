@@ -1,10 +1,9 @@
 package transformations.javac.classes
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.sillyCodePieces.GrammarTransformation
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 
-object BasicImportC extends GrammarTransformation {
+object BasicImportC extends ParticleWithGrammar {
 
   object ImportKey
   object ElementsKey
@@ -21,7 +20,7 @@ object BasicImportC extends GrammarTransformation {
 
   def getParts(_import: MetaObject) = _import(ElementsKey).asInstanceOf[Seq[String]]
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     JavaClassSkeleton.getState(state).importToClassMap.put(ImportKey, _import => {
       val elements = getParts(_import)
       val packageParts = elements.dropRight(1)

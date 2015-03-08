@@ -1,6 +1,6 @@
 package transformations.javac.statements
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Contract, MetaObject, CompilationState}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends StatementInstance {
@@ -39,7 +39,7 @@ object ForLoopC extends StatementInstance {
 
   override val key: AnyRef = ForLoopKey
 
-  override def toByteCode(forLoop: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(forLoop: MetaObject, state: CompilationState): Seq[MetaObject] = {
     val initializer = getInitializer(forLoop)
     val condition = getCondition(forLoop)
     val forBody = getBody(forLoop)

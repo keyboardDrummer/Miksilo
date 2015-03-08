@@ -1,9 +1,8 @@
 package core.grammarDocument
 
-import core.grammar.{Grammar, ToPackrat}
+import core.grammar.{Grammar, GrammarToParserConverter}
 import core.transformation._
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.sillyCodePieces.GrammarTransformation
 import org.junit.Assert
 import transformations.javac.JavaCompiler
 
@@ -14,7 +13,7 @@ object TestGrammarUtils {
   def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar) {
     val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
 
-    val packrat: ToPackrat = new ToPackrat()
+    val packrat: GrammarToParserConverter = new GrammarToParserConverter()
     val packratParser = packrat.convert(grammar)
     val parseResult = packratParser(new CharArrayReader(example.toCharArray))
     if (parseResult.isEmpty)
@@ -51,7 +50,7 @@ object TestGrammarUtils {
     Seq(new SelectorTransformation(key)) ++ JavaCompiler.javaCompilerTransformations
   }
 
-  class SelectorTransformation(key: Any) extends GrammarTransformation {
+  class SelectorTransformation(key: Any) extends ParticleWithGrammar {
     override def transformGrammars(grammars: GrammarCatalogue) {
       grammars.find(ProgramGrammar).inner = grammars.find(key).inner
     }

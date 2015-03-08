@@ -4,7 +4,7 @@ import java.awt.dnd.DnDConstants
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.{DefaultListModel, JComponent, JList}
 
-import core.transformation.sillyCodePieces.Particle
+import core.transformation.Particle
 
 class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[Particle]) extends ParticleProviderTransferHandler(availableList) {
   override def canImport(support: TransferSupport): Boolean = {

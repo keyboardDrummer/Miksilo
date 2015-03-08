@@ -1,13 +1,12 @@
 package transformations.javac.classes
 
-import core.transformation.sillyCodePieces.Particle
-import core.transformation.{Contract, MetaObject, TransformationState}
+import core.transformation.{Particle, Contract, MetaObject, CompilationState}
 import SelectorC.SelectorKey
 
 object ClassOrPackageSelector extends Particle {
   override def dependencies: Set[Contract] = Set(SelectorC, JavaClassSkeleton)
 
-  override def inject(state: TransformationState): Unit = {
+  override def inject(state: CompilationState): Unit = {
     JavaClassSkeleton.getReferenceKindRegistry(state).put(SelectorKey, selector => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(selector, compiler)

@@ -19,13 +19,13 @@ object BooleanLiteralC extends ExpressionInstance {
 
   def literal(value: Boolean) = new MetaObject(LiteralBooleanKey, ValueKey -> value)
 
-  override def toByteCode(literal: MetaObject, state: TransformationState): Seq[MetaObject] = {
+  override def toByteCode(literal: MetaObject, state: CompilationState): Seq[MetaObject] = {
     Seq(IntegerConstantC.integerConstant(if (getValue(literal)) 1 else 0))
   }
 
   def getValue(literal: MetaObject) = literal(ValueKey).asInstanceOf[Boolean]
 
-  override def getType(expression: MetaObject, state: TransformationState): MetaObject = BooleanTypeC.booleanType
+  override def getType(expression: MetaObject, state: CompilationState): MetaObject = BooleanTypeC.booleanType
 
   object LiteralBooleanKey
 
