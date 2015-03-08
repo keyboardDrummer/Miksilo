@@ -4,19 +4,16 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.grammarDocument.BiGrammar
 import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.transformation._
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
-import scala.collection.mutable
 
-object ByteCodeSkeleton extends ParticleWithGrammar with Instruction {
+object ByteCodeSkeleton extends ParticleWithGrammar with Instruction with ParticleWithState {
 
   def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
-
-  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
 
   def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
 
@@ -25,6 +22,8 @@ object ByteCodeSkeleton extends ParticleWithGrammar with Instruction {
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
 
   def getAttributeNameIndex(attribute: MetaObject) = attribute(AttributeNameKey).asInstanceOf[Int]
+
+  def createState = new State()
 
   def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
             classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey) {
@@ -57,11 +56,11 @@ object ByteCodeSkeleton extends ParticleWithGrammar with Instruction {
 
   class State {
     var constantPool: ConstantPool = null
-    val getInstructionSignatureRegistry = new mutable.HashMap[Any, (ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
-    val getInstructionSizeRegistry = new mutable.HashMap[Any, MetaObject => Int]
-    val jumpBehaviorRegistry = new mutable.HashMap[Any, JumpBehavior]
-    val localUpdates = new mutable.HashMap[Any, (MetaObject, ProgramTypeState) => Map[Int, MetaObject]]
-    val getBytes = new mutable.HashMap[Any, MetaObject => Seq[Byte]]
+    val getInstructionSignatureRegistry = new ClassRegistry[(ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
+    val getInstructionSizeRegistry = new ClassRegistry[MetaObject => Int]
+    val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
+    val localUpdates = new ClassRegistry[(MetaObject, ProgramTypeState) => Map[Int, MetaObject]]
+    val getBytes = new ClassRegistry[MetaObject => Seq[Byte]]
   }
 
   object AttributeKey

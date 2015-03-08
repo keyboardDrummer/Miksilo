@@ -3,16 +3,14 @@ package transformations.javac.methods.assignment
 import core.grammarDocument.BiFailure
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MethodC
 import transformations.types.TypeSkeleton
 
-import scala.collection.mutable
-
-object AssignmentSkeleton extends ExpressionInstance {
+object AssignmentSkeleton extends ExpressionInstance with ParticleWithState {
 
   def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[MetaObject]
 
@@ -44,10 +42,9 @@ object AssignmentSkeleton extends ExpressionInstance {
     ExpressionSkeleton.getType(state)(target)
   }
 
-  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-
+  def createState = new State()
   class State {
-    val assignFromStackByteCodeRegistry = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]
+    val assignFromStackByteCodeRegistry = new ClassRegistry[MetaObject => Seq[MetaObject]]
   }
 
   override def toByteCode(assignment: MetaObject, state: CompilationState): Seq[MetaObject] = {

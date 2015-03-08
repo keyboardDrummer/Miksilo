@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.transformation._
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
@@ -10,15 +10,14 @@ import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 
-object ExpandInstructionsC extends ParticleWithPhase {
+object ExpandInstructionsC extends ParticleWithPhase with ParticleWithState {
 
   def lessThanInstruction = instruction(LessThanInstructionKey)
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
   class State {
-    val expandInstruction = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()
+    val expandInstruction = new ClassRegistry[MetaObject => Seq[MetaObject]]()
   }
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
@@ -67,4 +66,6 @@ object ExpandInstructionsC extends ParticleWithPhase {
   object LessThanInstructionKey
 
   override def description: String = "Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions."
+
+  override def createState: State = new State()
 }

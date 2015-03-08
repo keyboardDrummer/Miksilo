@@ -10,10 +10,8 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.javac.statements.BlockC
 import transformations.types.{ArrayTypeC, ObjectTypeC}
 
-import scala.collection.mutable
 
-
-object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase {
+object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with ParticleWithState {
 
   def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry //TODO move this registry to SelectorC.
 
@@ -57,10 +55,6 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase {
 
   def getClassCompiler(state: CompilationState) = getState(state).classCompiler
 
-  def getState(state: CompilationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
-
   def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
     val className = getClassName(clazz)
     new QualifiedClassName(getPackage(clazz) ++ Seq(className))
@@ -101,17 +95,16 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase {
 
   def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[Seq[MetaObject]]
 
+  def createState = new State()
   class State() {
-    val referenceKindRegistry = new GetReferenceKindRegistry()
+    val referenceKindRegistry = new ClassRegistry[MetaObject => ReferenceKind]()
     var classCompiler: ClassCompiler = null
-    val importToClassMap = new mutable.HashMap[AnyRef, MetaObject => Map[String, QualifiedClassName]]()
+    val importToClassMap = new ClassRegistry[MetaObject => Map[String, QualifiedClassName]]()
     var firstMemberPasses = List.empty[MetaObject => Unit]
     var secondMemberPasses = List.empty[MetaObject => Unit]
   }
 
   def getMembers(clazz: MetaObject) = clazz(Members).asInstanceOf[Seq[MetaObject]]
-
-  class GetReferenceKindRegistry extends mutable.HashMap[AnyRef, MetaObject => ReferenceKind]
 
   object ClassGrammar
 

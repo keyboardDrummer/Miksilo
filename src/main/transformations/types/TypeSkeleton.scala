@@ -3,13 +3,11 @@ package transformations.types
 import core.exceptions.BadInputException
 import core.transformation._
 import core.transformation.grammars.GrammarCatalogue
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
-import PrintByteCode._
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool
 import transformations.types.BooleanTypeC.BooleanTypeKey
 import transformations.types.ObjectTypeC.ObjectTypeName
-
-import scala.collection.mutable
 
 class TypeMismatchException(to: MetaObject, from: MetaObject) extends BadInputException {
   override def toString = s"cannot assign: $to = $from"
@@ -19,7 +17,7 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
-object TypeSkeleton extends ParticleWithGrammar { //TODO move some specific type code to the respective type.
+object TypeSkeleton extends ParticleWithGrammar with ParticleWithState { //TODO move some specific type code to the respective type.
   def getVerificationInfoBytes(_type: MetaObject, state: CompilationState): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
@@ -88,11 +86,11 @@ object TypeSkeleton extends ParticleWithGrammar { //TODO move some specific type
     grammars.create(TypeGrammar)
   }
 
-  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
+  def createState = new State
   class State {
-    val superTypes = new mutable.HashMap[Any, MetaObject => Seq[MetaObject]]()
-    val toByteCodeString = new mutable.HashMap[Any, MetaObject => String]()
-    val stackSize = new mutable.HashMap[Any, Int]()
+    val superTypes = new ClassRegistry[MetaObject => Seq[MetaObject]]()
+    val toByteCodeString = new ClassRegistry[MetaObject => String]()
+    val stackSize = new ClassRegistry[Int]()
   }
 
   object TypeGrammar

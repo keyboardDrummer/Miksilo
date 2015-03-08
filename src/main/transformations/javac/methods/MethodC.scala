@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.transformation._
 import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -12,7 +12,7 @@ import transformations.javac.classes.{MethodInfo, JavaClassSkeleton, ClassCompil
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
 
-object MethodC extends ParticleWithGrammar {
+object MethodC extends ParticleWithGrammar with ParticleWithState {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -134,10 +134,6 @@ object MethodC extends ParticleWithGrammar {
 
   def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  private def getState(state: CompilationState): State = {
-    state.data.getOrElseUpdate(this, new State()).asInstanceOf[State]
-  }
-
   def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
 
   def getMethodName(method: MetaObject) = {
@@ -196,6 +192,7 @@ object MethodC extends ParticleWithGrammar {
     }
   }
 
+  def createState = new State()
   class State() {
     var methodCompiler: MethodCompiler = null
   }
