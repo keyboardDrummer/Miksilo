@@ -5,9 +5,11 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import util.DataFlowAnalysis
 
-abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject], getJumpBehavior: Any => JumpBehavior)
+abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject])
   extends DataFlowAnalysis[Int, State] {
 
+  def getJumpBehavior(instructionClazz: Any): JumpBehavior
+  
   val labelIndices = instructions.zipWithIndex.
     filter(indexedInstruction => indexedInstruction._1.clazz == LabelledTargets.LabelKey).
     map(indexedInstruction => (LabelledTargets.getLabelName(indexedInstruction._1), indexedInstruction._2)).toMap

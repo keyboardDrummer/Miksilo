@@ -2,18 +2,22 @@ package transformations.bytecode.simpleBytecode
 
 import core.exceptions.BadInputException
 import core.transformation.MetaObject
-import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.types.ObjectTypeC
 
 case class ProgramTypeState(stackTypes: Seq[MetaObject], variableTypes: Map[Int, MetaObject])
 
-class InstructionTypeAnalysis(instructions: Seq[MetaObject],
-                          getVariableUpdates: (MetaObject, ProgramTypeState) => Map[Int, MetaObject],
-                          getSignature: (ProgramTypeState, MetaObject) => InstructionSignature,
-                          getJumpBehavior: Any => JumpBehavior)
-  extends InstructionFlowAnalysis[ProgramTypeState](instructions, getJumpBehavior) {
+object InstructionTypeAnalysis {
+  type InstructionSideEffects = Map[Int, MetaObject]  
+}
 
+abstract class InstructionTypeAnalysis(instructions: Seq[MetaObject])
+  extends InstructionFlowAnalysis[ProgramTypeState](instructions) {
+
+  def getSideEffects(typeState: ProgramTypeState, instruction: MetaObject): InstructionSideEffects
+  def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature
+  
   case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
     override def toString = s"StackDoesNotFitInstructionInput: instruction= $instruction; inputTypes= $inputTypes; stack= $stack"
   }
@@ -47,7 +51,7 @@ class InstructionTypeAnalysis(instructions: Seq[MetaObject],
       val remainingStack = stateStack.dropRight(input.length)
       val newStack = remainingStack ++ signature.outputs
 
-      val updates = getVariableUpdates(instruction, state)
+      val updates = getSideEffects(state, instruction)
       val newVariables = updates ++ state.variableTypes
       ProgramTypeState(newStack, newVariables)
     }

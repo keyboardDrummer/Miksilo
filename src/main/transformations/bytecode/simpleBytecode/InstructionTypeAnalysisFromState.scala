@@ -1,6 +1,8 @@
 package transformations.bytecode.simpleBytecode
 
 import core.transformation.{MetaObject, CompilationState}
+import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.attributes.CodeAttribute
@@ -21,15 +23,19 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
   private def getTypeAnalysis = {
     val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
     val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
-    val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
-    val jumpBehaviorRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
-    val getJumpBehavior: (Any) => JumpBehavior = clazz => jumpBehaviorRegistry(clazz)
-    val getInstructionSignature = (inputTypes: ProgramTypeState, instruction: MetaObject) =>
-      instructionSignatureRegistry(instruction.clazz)(constantPool, instruction, inputTypes)
-    val instructionVariableUpdateRegistry = ByteCodeSkeleton.getState(state).localUpdates
-    val getVariableUpdates: (MetaObject, ProgramTypeState) => Map[Int, MetaObject] =
-      (instruction, typeState) => instructionVariableUpdateRegistry(instruction.clazz)(instruction, typeState)
-    new InstructionTypeAnalysis(instructions, getVariableUpdates, getInstructionSignature, getJumpBehavior)
+
+    new InstructionTypeAnalysis(instructions) {
+      val instructionVariableUpdateRegistry = ByteCodeSkeleton.getState(state).localUpdates
+      override def getSideEffects(typeState: ProgramTypeState, instruction: MetaObject): InstructionSideEffects =
+        instructionVariableUpdateRegistry(instruction.clazz)(instruction, typeState)
+
+      val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
+      override def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature =
+        instructionSignatureRegistry(instruction.clazz)(constantPool, instruction, typeState)
+
+      val jumpBehaviorRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
+      override def getJumpBehavior(instructionClazz: Any): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
+    }
   }
   
   private def getMethodParameters = {
