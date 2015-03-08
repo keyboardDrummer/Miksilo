@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 
 object ImplicitReturnAtEndOfMethod extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)

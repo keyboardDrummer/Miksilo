@@ -1,9 +1,9 @@
 package transformations.javac.expressions.literals
 
 import core.grammar.RegexG
-import core.grammarDocument.BiGrammar
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.biGrammar.BiGrammar
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}

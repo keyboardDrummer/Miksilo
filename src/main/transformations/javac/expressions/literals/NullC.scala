@@ -1,7 +1,7 @@
 package transformations.javac.expressions.literals
 
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.objects.PushNullC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 

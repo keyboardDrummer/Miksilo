@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.transformation.{CompilationState, MetaObject}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.additions.LabelledTargets
 import LabelledTargets.LabelKey
 import transformations.javac.classes.ConstantPool

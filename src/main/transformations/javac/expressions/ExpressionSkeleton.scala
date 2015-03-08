@@ -1,8 +1,8 @@
 package transformations.javac.expressions
 
 import core.exceptions.CompilerException
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.types.TypeSkeleton
 
 import scala.util.Try

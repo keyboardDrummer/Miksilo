@@ -4,7 +4,7 @@ import javax.swing.RowFilter.Entry
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.Document
 import javax.swing.{ListModel, RowFilter}
-import core.transformation.Particle
+import core.particles.Particle
 import org.jdesktop.swingx.JXList
 
 

@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.javac._
 import transformations.javac.classes.{GetIdentifierKind, ClassOrPackageSelector}
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}

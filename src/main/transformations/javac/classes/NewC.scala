@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
 import transformations.javac.constructor.SuperCallExpression

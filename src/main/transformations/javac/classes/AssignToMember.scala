@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectorC._

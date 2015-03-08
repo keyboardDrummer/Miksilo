@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC

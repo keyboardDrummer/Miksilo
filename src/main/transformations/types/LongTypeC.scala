@@ -1,7 +1,7 @@
 package transformations.types
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{MetaObject, CompilationState}
 
 object LongTypeC extends TypeInstance {
 

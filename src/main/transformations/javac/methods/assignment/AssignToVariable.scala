@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC

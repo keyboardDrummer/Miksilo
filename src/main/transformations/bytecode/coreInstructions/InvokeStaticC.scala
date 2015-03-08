@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.MetaObject
+import core.particles.MetaObject
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import PrintByteCode._

@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.transformation.CompilationState
+import core.particles.CompilationState
 
 object OutputOption {
 

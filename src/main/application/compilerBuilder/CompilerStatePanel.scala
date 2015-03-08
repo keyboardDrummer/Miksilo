@@ -6,7 +6,7 @@ import javax.swing._
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
-import core.transformation.Particle
+import core.particles.Particle
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 

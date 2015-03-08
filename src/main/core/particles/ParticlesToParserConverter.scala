@@ -1,8 +1,8 @@
-package core.transformation
+package core.particles
 
 import core.grammar.GrammarToParserConverter
-import core.grammarDocument.{BiGrammarToGrammar, Labelled}
-import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.biGrammar.{BiGrammarToGrammar, Labelled}
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.util.parsing.input.CharArrayReader
 

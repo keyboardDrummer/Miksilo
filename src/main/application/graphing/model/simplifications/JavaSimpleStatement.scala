@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.assignment.AssignmentPrecedence
 import transformations.javac.statements._

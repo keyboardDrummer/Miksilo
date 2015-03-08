@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState

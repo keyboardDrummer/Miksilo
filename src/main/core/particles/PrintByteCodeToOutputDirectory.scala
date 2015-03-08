@@ -1,4 +1,4 @@
-package core.transformation
+package core.particles
 
 import transformations.bytecode.PrintByteCode
 import util.FileNameUtils

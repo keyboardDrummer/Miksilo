@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions
 
-import core.grammarDocument.BiGrammar
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.biGrammar.BiGrammar
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}

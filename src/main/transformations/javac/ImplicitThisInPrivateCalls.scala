@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.javac.classes.{SelectorC, JavaClassSkeleton}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{CallC, VariableC}

@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.javac.expressions.additive.AdditionC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.IntTypeC

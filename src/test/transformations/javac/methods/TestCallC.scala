@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.transformation.CompilationState
+import core.particles.CompilationState
 import org.junit.{Assert, Test}
 import transformations.javac.expressions.ExpressionSkeleton
 

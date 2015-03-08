@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.types._
 
 object ByteCodeWithTypes extends TransformationGroup {

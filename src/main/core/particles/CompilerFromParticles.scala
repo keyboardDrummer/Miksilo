@@ -1,9 +1,8 @@
-package core.transformation
+package core.particles
 
+import core.biGrammar.Labelled
 import core.exceptions.ParticleDependencyViolation
-import core.grammarDocument.Labelled
-import core.transformation.Particle
-import core.transformation.grammars.ProgramGrammar
+import core.particles.grammars.ProgramGrammar
 
 import scala.reflect.io.{Directory, File}
 

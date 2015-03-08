@@ -1,8 +1,8 @@
 package transformations.types
 
 import core.exceptions.BadInputException
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.javac.classes.ConstantPool

@@ -1,4 +1,4 @@
-package core.grammarDocument
+package core.biGrammar
 
 import org.junit.{Assert, Test}
 

@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey

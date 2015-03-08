@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.{ByteCodeTypeException, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}

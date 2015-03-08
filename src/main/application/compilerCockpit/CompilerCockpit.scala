@@ -8,7 +8,7 @@ import javax.swing.text.{DefaultCaret, PlainDocument}
 import application.StyleSheet
 import core.exceptions.CompileException
 import core.layouts.SwingEquationLayout
-import core.transformation.{Particle, CompilerFromParticles}
+import core.particles.{Particle, CompilerFromParticles}
 import transformations.bytecode.ByteCodeSkeleton
 
 import scala.swing.{Component, Frame}

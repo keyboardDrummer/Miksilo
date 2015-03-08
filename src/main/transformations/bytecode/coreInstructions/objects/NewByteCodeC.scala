@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}

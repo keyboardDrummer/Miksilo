@@ -1,4 +1,4 @@
-package core.transformation
+package core.particles
 
 trait Contract {
   def dependencies: Set[Contract] = Set.empty

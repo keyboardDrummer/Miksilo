@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.transformation.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC

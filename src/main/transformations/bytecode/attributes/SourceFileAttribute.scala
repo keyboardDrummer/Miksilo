@@ -1,7 +1,7 @@
 package transformations.bytecode.attributes
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{ParticleWithGrammar, Contract, CompilationState, MetaObject}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract, CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
 import transformations.bytecode.PrintByteCode._

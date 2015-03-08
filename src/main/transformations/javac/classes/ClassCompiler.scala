@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType, ClassRefConstant, MethodRefConstant}
 import transformations.javac.expressions.ExpressionSkeleton

@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton

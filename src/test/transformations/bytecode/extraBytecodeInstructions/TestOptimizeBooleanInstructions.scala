@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBytecodeInstructions
 
-import core.transformation.{CompilerFromParticles, MetaObject}
+import core.particles.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.CodeAttribute

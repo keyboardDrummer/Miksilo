@@ -1,4 +1,4 @@
-package core.grammarDocument
+package core.biGrammar
 
 import java.util.Objects
 

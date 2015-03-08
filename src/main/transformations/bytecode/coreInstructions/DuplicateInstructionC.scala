@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.simpleBytecode.ProgramTypeState

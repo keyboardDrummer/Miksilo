@@ -9,7 +9,7 @@ import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.transformation.{ParticleWithPhase, ParticleWithGrammar}
+import core.particles.{ParticleWithPhase, ParticleWithGrammar}
 import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}

@@ -1,8 +1,8 @@
 package transformations.javac.statements
 
 import core.exceptions.BadInputException
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.{VariablePool, MethodC}
 import transformations.types.TypeSkeleton

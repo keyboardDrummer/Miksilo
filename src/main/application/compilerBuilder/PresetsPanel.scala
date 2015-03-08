@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.transformation.Particle
+import core.particles.Particle
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod

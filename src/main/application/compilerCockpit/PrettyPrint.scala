@@ -1,9 +1,9 @@
 package application.compilerCockpit
 
-import core.grammarDocument.{BiGrammar, BiGrammarToDocument, PrintFailure}
+import core.biGrammar.{BiGrammar, BiGrammarToDocument, PrintFailure}
 import core.responsiveDocument.ResponsiveDocument
-import core.transformation.{Particle, CompilationState, CompilerFromParticles}
-import core.transformation.grammars.ProgramGrammar
+import core.particles.{Particle, CompilationState, CompilerFromParticles}
+import core.particles.grammars.ProgramGrammar
 
 import scala.util.Try
 

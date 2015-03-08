@@ -4,7 +4,7 @@ import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 import javax.swing.{JComponent, JList, TransferHandler}
 
-import core.transformation.Particle
+import core.particles.Particle
 
 import scala.collection.convert.Wrappers.JListWrapper
 

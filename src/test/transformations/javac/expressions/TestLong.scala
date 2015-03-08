@@ -1,6 +1,6 @@
 package transformations.javac.expressions
 
-import core.transformation.CompilerFromParticles
+import core.particles.CompilerFromParticles
 import org.junit.Test
 import transformations.bytecode.additions.PoptimizeC
 import transformations.javac.JavaCompiler

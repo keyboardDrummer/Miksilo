@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}

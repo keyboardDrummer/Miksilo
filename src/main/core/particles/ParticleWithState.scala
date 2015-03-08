@@ -1,4 +1,6 @@
-package core.transformation
+package core.particles
+
+import scala.collection.mutable
 
 trait ParticleWithState {
   type State

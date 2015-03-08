@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.exceptions.BadInputException
-import core.transformation.MetaObject
+import core.particles.MetaObject
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.types.ObjectTypeC

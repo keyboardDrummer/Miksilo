@@ -1,7 +1,7 @@
 package transformations.javac.expressions.additive
 
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.{IntTypeC, TypeSkeleton}

@@ -5,7 +5,7 @@ import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import core.transformation.Particle
+import core.particles.Particle
 
 object SelectedParticlesPanel {
   def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {

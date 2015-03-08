@@ -1,4 +1,4 @@
-package core.transformation
+package core.particles
 
 import org.junit.{Assert, Test}
 import transformations.javac.classes.SelectorC

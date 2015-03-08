@@ -1,7 +1,7 @@
 package transformations.javac.expressions.prefix
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.types.BooleanTypeC

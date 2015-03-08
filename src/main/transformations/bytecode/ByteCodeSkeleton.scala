@@ -2,9 +2,9 @@ package transformations.bytecode
 
 import core.document.Empty
 import core.grammar.StringLiteral
-import core.grammarDocument.BiGrammar
-import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.transformation._
+import core.biGrammar.BiGrammar
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles._
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState

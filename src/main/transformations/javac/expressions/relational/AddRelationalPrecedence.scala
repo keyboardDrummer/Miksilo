@@ -1,7 +1,7 @@
 package transformations.javac.expressions.relational
 
-import core.transformation.{ParticleWithGrammar, Contract}
-import core.transformation.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract}
+import core.particles.grammars.GrammarCatalogue
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddRelationalPrecedence extends ParticleWithGrammar {

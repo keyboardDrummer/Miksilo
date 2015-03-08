@@ -1,4 +1,4 @@
-package core.transformation
+package core.particles
 
 trait ParticleWithPhase extends Particle {
   def transform(program: MetaObject, state: CompilationState)

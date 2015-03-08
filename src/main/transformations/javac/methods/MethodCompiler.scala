@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.types.TypeSkeleton
 
 import scala.collection.mutable

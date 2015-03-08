@@ -1,7 +1,7 @@
 package core.grammar
 
-import core.grammarDocument.TestGrammarUtils
-import core.transformation._
+import core.biGrammar.TestGrammarUtils
+import core.particles._
 import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._

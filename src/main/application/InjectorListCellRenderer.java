@@ -1,7 +1,7 @@
 package application;
 
 import application.compilerBuilder.ParticleLabelPainter;
-import core.transformation.Particle;
+import core.particles.Particle;
 
 import javax.swing.*;
 import java.awt.*;

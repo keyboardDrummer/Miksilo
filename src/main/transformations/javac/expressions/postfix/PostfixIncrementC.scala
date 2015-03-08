@@ -1,7 +1,7 @@
 package transformations.javac.expressions.postfix
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
 import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
 import transformations.javac.methods.MethodC

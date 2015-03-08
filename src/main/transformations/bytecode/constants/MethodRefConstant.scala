@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{CompilationState, MetaObject}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 
 object MethodRefConstant extends ConstantEntry {

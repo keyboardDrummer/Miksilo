@@ -1,6 +1,6 @@
 package application.graphing.model
 
-import core.transformation.Contract
+import core.particles.Contract
 
 object TransformationVertex {
   implicit def fromTransformation(transformation: Contract) = new TransformationVertex(transformation)

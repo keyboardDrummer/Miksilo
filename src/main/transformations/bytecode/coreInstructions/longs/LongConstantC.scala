@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._

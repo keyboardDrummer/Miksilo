@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.EqualityC

@@ -1,8 +1,8 @@
-package core.grammarDocument
+package core.biGrammar
 
 import core.grammar.{Grammar, GrammarToParserConverter}
-import core.transformation._
-import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles._
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import org.junit.Assert
 import transformations.javac.JavaCompiler
 

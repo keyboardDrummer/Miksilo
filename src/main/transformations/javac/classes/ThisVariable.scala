@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
-import core.transformation.{ParticleWithGrammar, Contract}
-import core.transformation.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract}
+import core.particles.grammars.GrammarCatalogue
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.{VariableKey, VariableNameKey}
 

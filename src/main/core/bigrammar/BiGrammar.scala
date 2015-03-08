@@ -1,9 +1,9 @@
-package core.grammarDocument
+package core.biGrammar
 
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Grammar, Identifier, NumberG, PrintGrammar, ~}
 import core.responsiveDocument.ResponsiveDocument
-import core.transformation.MetaObject
+import core.particles.MetaObject
 
 trait GrammarDocumentWriter {
 

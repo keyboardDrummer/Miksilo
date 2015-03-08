@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
 import transformations.bytecode.additions.PoptimizeC
 import transformations.javac.expressions.ExpressionSkeleton

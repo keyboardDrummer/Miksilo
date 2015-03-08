@@ -1,8 +1,8 @@
-package core.transformation.grammars
+package core.particles.grammars
 
 import java.util.NoSuchElementException
 
-import core.grammarDocument._
+import core.biGrammar._
 
 class GrammarCatalogue {
 

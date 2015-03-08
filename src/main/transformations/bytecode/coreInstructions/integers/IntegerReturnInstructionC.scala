@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.transformation.{Contract, MetaObject, CompilationState}
+import core.particles.{Contract, MetaObject, CompilationState}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.bytecode.simpleBytecode.ProgramTypeState

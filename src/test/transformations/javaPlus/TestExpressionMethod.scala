@@ -1,6 +1,6 @@
 package transformations.javaPlus
 
-import core.transformation.CompilerFromParticles
+import core.particles.CompilerFromParticles
 import org.junit.{Assert, Test}
 import transformations.javac.JavaCompiler
 import util.TestUtils

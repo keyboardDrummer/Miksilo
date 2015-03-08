@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.transformation.{CompilationState, MetaObject}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}

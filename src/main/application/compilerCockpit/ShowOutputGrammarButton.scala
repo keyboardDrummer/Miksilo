@@ -4,7 +4,7 @@ import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.JButton
 
 import core.grammar.PrintGrammar
-import core.transformation.CompilerFromParticles
+import core.particles.CompilerFromParticles
 
 class ShowOutputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show output grammar") {
   addActionListener(new ActionListener {

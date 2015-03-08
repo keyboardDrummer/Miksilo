@@ -1,9 +1,9 @@
 package transformations.javac.classes
 
 import core.document.BlankLine
-import core.grammarDocument.{BiGrammar, MapGrammar}
-import core.transformation._
-import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.biGrammar.{BiGrammar, MapGrammar}
+import core.particles._
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}

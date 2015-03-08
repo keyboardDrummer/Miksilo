@@ -6,7 +6,7 @@ import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
 
 import application.graphing.model.DepthFirstTraversal
-import core.transformation.Particle
+import core.particles.Particle
 import org.jdesktop.swingx.JXList
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper

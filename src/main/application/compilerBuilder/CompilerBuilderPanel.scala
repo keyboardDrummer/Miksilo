@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
-import core.transformation.Particle
+import core.particles.Particle
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 

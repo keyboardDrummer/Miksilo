@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.transformation.MetaObject
+import core.particles.MetaObject
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.coreInstructions.InstructionC
 

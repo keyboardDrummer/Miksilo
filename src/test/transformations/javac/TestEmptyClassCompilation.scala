@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.transformation.MetaObject
+import core.particles.MetaObject
 import org.junit.Test
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}

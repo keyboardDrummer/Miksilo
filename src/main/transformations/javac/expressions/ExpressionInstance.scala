@@ -1,6 +1,6 @@
 package transformations.javac.expressions
 
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 
 trait ExpressionInstance extends ParticleWithGrammar {
   val key: AnyRef

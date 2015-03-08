@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.transformation.MetaObject
+import core.particles.MetaObject
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import util.DataFlowAnalysis

@@ -1,8 +1,8 @@
-package core.transformation
+package core.particles
 
 import core.grammar.~
-import core.grammarDocument.GrammarDocumentWriter
-import core.transformation.grammars.GrammarCatalogue
+import core.biGrammar.GrammarDocumentWriter
+import core.particles.grammars.GrammarCatalogue
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)

@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.transformation.{MetaObject, CompilationState}
+import core.particles.{MetaObject, CompilationState}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
 import transformations.bytecode.simpleBytecode.ProgramTypeState

@@ -1,8 +1,8 @@
-package core.transformation
+package core.particles
 
 import core.grammar.ParseException
-import core.grammarDocument.BiFailure
-import core.transformation.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.biGrammar.BiFailure
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.collection.mutable
 import scala.util.Random

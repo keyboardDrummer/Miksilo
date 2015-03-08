@@ -1,8 +1,8 @@
 package transformations.bytecode.attributes
 
-import core.grammarDocument.{BiGrammar, ManyVertical}
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.biGrammar.{BiGrammar, ManyVertical}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 

@@ -1,8 +1,8 @@
 package transformations.javac.methods.assignment
 
-import core.grammarDocument.BiFailure
-import core.transformation._
-import core.transformation.grammars.GrammarCatalogue
+import core.biGrammar.BiFailure
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}

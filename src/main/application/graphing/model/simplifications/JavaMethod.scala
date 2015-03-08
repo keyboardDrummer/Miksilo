@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod

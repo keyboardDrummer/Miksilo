@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
-import core.transformation.grammars.GrammarCatalogue
-import core.transformation._
+import core.particles.grammars.GrammarCatalogue
+import core.particles._
 import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
 import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}

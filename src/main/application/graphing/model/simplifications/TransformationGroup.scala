@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.transformation.Contract
+import core.particles.Contract
 
 trait TransformationGroup extends Contract {
   def dependants: Set[Contract]
