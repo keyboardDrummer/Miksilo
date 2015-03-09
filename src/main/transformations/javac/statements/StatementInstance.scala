@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
 
 trait StatementInstance extends ParticleWithGrammar {
 

@@ -1,6 +1,6 @@
 package core.grammar
 
-import org.junit.{Ignore, Assert, Test}
+import org.junit.{Assert, Ignore, Test}
 
 import scala.util.parsing.combinator.PackratParsers
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers

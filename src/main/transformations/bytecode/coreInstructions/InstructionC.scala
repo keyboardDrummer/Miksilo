@@ -3,7 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.biGrammar.BiGrammar
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
+import transformations.bytecode.ByteCodeSkeleton.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode._
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -14,16 +14,15 @@ case class InstructionSignature(inputs: Seq[MetaObject], outputs: Seq[MetaObject
 
 class ByteCodeTypeException(message: String) extends Exception(message)
 
-trait InstructionC extends ParticleWithGrammar {
+trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider with InstructionSideEffectProvider {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, (constantPool,instruction, stackTypes) => 
-      getInstructionInAndOutputs(constantPool, instruction, stackTypes, state))
+    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, this)
     ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
     ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
-    ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, getJumpBehavior)
-    ByteCodeSkeleton.getState(state).localUpdates.put(key, (instruction: MetaObject, stackTypes) => getVariableUpdates(instruction, stackTypes))
+    ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, jumpBehavior)
+    ByteCodeSkeleton.getState(state).localUpdates.put(key, this)
   }
 
   def assertObjectTypeStackTop(stackTop: MetaObject, name: String): Unit = {
@@ -48,13 +47,12 @@ trait InstructionC extends ParticleWithGrammar {
   val key: AnyRef
 
   def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject] = Map.empty
+  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                 state: CompilationState): InstructionSignature
 
-  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature
+  def jumpBehavior: JumpBehavior = new JumpBehavior(true, false)
 
-  def getInstructionSize(instruction: MetaObject): Int = getInstructionByteCode(instruction).size
-
-  def getJumpBehavior: JumpBehavior = new JumpBehavior(true, false)
-
+  def getInstructionSize: Int = getInstructionByteCode(new MetaObject(key, InstructionArgumentsKey -> List.range(0,10))).size
   def getInstructionByteCode(instruction: MetaObject): Seq[Byte]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

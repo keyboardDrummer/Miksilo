@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SelectorC extends ExpressionInstance {
 

@@ -1,7 +1,7 @@
 package transformations.types
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 
 object BooleanTypeC extends TypeInstance {
   override val key: AnyRef = BooleanTypeKey

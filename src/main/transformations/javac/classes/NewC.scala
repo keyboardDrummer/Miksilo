@@ -1,11 +1,11 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
 import transformations.javac.constructor.SuperCallExpression
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.CallC
 import transformations.types.ObjectTypeC
 

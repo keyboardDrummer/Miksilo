@@ -3,7 +3,7 @@ package transformations.javac.expressions.additive
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SubtractionC extends ExpressionInstance {
   object SubtractionKey

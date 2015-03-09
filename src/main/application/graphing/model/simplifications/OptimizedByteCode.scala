@@ -1,8 +1,8 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
 import transformations.bytecode.additions.PoptimizeC
+import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
 import transformations.javac.expressions.ExpressionSkeleton
 
 object OptimizedByteCode extends TransformationGroup {

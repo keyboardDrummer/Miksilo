@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{MetaObject, CompilationState}
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object PopC extends InstructionC {
@@ -16,8 +16,7 @@ object PopC extends InstructionC {
     PrintByteCode.hexToBytes("57")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val input: MetaObject = typeState.stackTypes.last
     assertSingleWord(state, input)
     InstructionSignature(Seq(input),Seq())

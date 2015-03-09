@@ -1,10 +1,10 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
-import PrintByteCode._
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 

@@ -1,14 +1,14 @@
 package transformations.javac.methods
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import transformations.bytecode.attributes.{CodeConstantEntry, CodeAttribute}
-import CodeAttribute.{CodeMaxLocalsKey, CodeExceptionTableKey, CodeAttributesKey, CodeInstructionsKey}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
+import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.javac.classes.{MethodInfo, JavaClassSkeleton, ClassCompiler}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
 

@@ -1,7 +1,7 @@
 package transformations.javac.expressions.additive
 
-import core.particles.{ParticleWithGrammar, Contract}
 import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, ParticleWithGrammar}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddAdditivePrecedence extends ParticleWithGrammar {

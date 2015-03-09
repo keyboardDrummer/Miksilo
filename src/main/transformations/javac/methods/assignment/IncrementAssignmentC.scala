@@ -1,9 +1,9 @@
 package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.javac.expressions.additive.AdditionC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.IntTypeC
 
 object IncrementAssignmentC extends ExpressionInstance {

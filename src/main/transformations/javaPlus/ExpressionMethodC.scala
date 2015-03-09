@@ -1,7 +1,7 @@
 package transformations.javaPlus
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._

@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
-import core.particles.{Contract, CompilationState, MetaObject}
 import core.particles.grammars.GrammarCatalogue
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.CallC

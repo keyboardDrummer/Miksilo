@@ -2,7 +2,7 @@ package transformations.types
 
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 
 object ArrayTypeC extends TypeInstance {
   override val key: AnyRef = ArrayTypeKey

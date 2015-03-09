@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
@@ -21,7 +21,8 @@ object GetStaticC extends InstructionC {
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                          state: CompilationState): InstructionSignature =
     new InstructionSignature(Seq(), Seq(getReturnType(constantPool, instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
@@ -32,7 +33,7 @@ object GetStaticC extends InstructionC {
     fieldType
   }
 
-  override def getInstructionSize(instruction: MetaObject): Int = 3
+  override def getInstructionSize: Int = 3
 
   object GetStaticKey
 

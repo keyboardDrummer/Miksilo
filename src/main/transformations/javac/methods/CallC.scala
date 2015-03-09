@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
 import transformations.javac.classes._
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object CallC extends ExpressionInstance {
 

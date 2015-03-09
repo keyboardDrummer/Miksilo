@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
@@ -21,8 +21,7 @@ object StoreAddressC extends InstructionC {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "StoreAddress")
     InstructionSignature(Seq(stackTop), Seq())

@@ -1,10 +1,10 @@
 package transformations.bytecode
 
+import core.biGrammar.BiGrammar
 import core.document.Empty
 import core.grammar.StringLiteral
-import core.biGrammar.BiGrammar
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles._
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import transformations.bytecode.attributes.Instruction
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -54,12 +54,22 @@ object ByteCodeSkeleton extends ParticleWithGrammar with Instruction with Partic
 
   def getConstantPool(state: CompilationState) = getState(state).constantPool
 
+  trait InstructionSignatureProvider
+  {
+    def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+  }
+
+  trait InstructionSideEffectProvider
+  {
+    def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject]
+  }
+
   class State {
     var constantPool: ConstantPool = null
-    val getInstructionSignatureRegistry = new ClassRegistry[(ConstantPool, MetaObject, ProgramTypeState) => InstructionSignature]
-    val getInstructionSizeRegistry = new ClassRegistry[MetaObject => Int]
+    val getInstructionSignatureRegistry = new ClassRegistry[InstructionSignatureProvider]
+    val getInstructionSizeRegistry = new ClassRegistry[Int]
     val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
-    val localUpdates = new ClassRegistry[(MetaObject, ProgramTypeState) => Map[Int, MetaObject]]
+    val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
     val getBytes = new ClassRegistry[MetaObject => Seq[Byte]]
   }
 

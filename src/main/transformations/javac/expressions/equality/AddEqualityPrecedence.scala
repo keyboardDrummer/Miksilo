@@ -1,7 +1,7 @@
 package transformations.javac.expressions.equality
 
-import core.particles.{ParticleWithGrammar, Contract}
 import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, ParticleWithGrammar}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddEqualityPrecedence extends ParticleWithGrammar {

@@ -1,6 +1,6 @@
 package core.responsiveDocument
 
-import core.document.{TopBottom, Document}
+import core.document.{Document, TopBottom}
 
 case class ResponsiveTopBottom(top: ResponsiveDocument, bottom: ResponsiveDocument)
   extends ResponsiveDocument {

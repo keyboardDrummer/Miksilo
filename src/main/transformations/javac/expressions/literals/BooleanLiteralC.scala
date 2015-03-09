@@ -3,7 +3,7 @@ package transformations.javac.expressions.literals
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.BooleanTypeC
 
 object BooleanLiteralC extends ExpressionInstance {

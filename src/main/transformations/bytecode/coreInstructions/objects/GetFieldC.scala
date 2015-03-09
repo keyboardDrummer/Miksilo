@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
@@ -20,8 +20,7 @@ object GetFieldC extends InstructionC {
     hexToBytes("b4") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
     new InstructionSignature(Seq(stackTop), Seq(getReturnType(constantPool, instruction)))
@@ -35,7 +34,7 @@ object GetFieldC extends InstructionC {
     fieldType
   }
 
-  override def getInstructionSize(instruction: MetaObject): Int = 3
+  override def getInstructionSize(): Int = 3
 
   object GetFieldKey
 }

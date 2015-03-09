@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.{Particle, Contract, CompilationState, MetaObject}
+import core.particles.{CompilationState, Contract, MetaObject, Particle}
 
 trait ExpandInstruction extends Particle {
   def key: Any

@@ -1,6 +1,6 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends StatementInstance {

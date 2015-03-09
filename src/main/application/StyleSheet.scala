@@ -1,8 +1,8 @@
 package application
 
-import java.awt.{Insets, Font}
-import javax.swing.border.TitledBorder
+import java.awt.{Font, Insets}
 import javax.swing._
+import javax.swing.border.TitledBorder
 
 object StyleSheet {
 

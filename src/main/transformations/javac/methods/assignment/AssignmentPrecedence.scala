@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
-import core.particles.{ParticleWithGrammar, Contract}
 import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, ParticleWithGrammar}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AssignmentPrecedence extends ParticleWithGrammar {

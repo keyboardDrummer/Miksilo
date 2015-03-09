@@ -4,7 +4,7 @@ import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.javac.classes.JavaClassSkeleton
-import transformations.javac.methods.{VariablePool, MethodC}
+import transformations.javac.methods.{MethodC, VariablePool}
 import transformations.types.TypeSkeleton
 
 object LocalDeclarationC extends StatementInstance {

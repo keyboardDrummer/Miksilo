@@ -1,12 +1,12 @@
 package transformations.bytecode.additions
 
-import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
-import transformations.bytecode.coreInstructions.{InstructionSignature, GotoC, InstructionC}
+import transformations.bytecode.coreInstructions.{GotoC, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
@@ -37,7 +37,7 @@ object LabelledTargets extends ParticleWithPhase {
   def transform(program: MetaObject, state: CompilationState): Unit = {
 
     val jumpRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
-    def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)(instruction)
+    def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)
 
     def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
       var newInstructions = mutable.ArrayBuffer[MetaObject]()
@@ -128,10 +128,11 @@ object LabelledTargets extends ParticleWithPhase {
 
     override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState):
-    InstructionSignature = new InstructionSignature(Seq.empty, Seq.empty)
+    override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+      new InstructionSignature(Seq.empty, Seq.empty)
+    }
 
-    override def getInstructionSize(instruction: MetaObject): Int = 0
+    override def getInstructionSize(): Int = 0
 
     override def description: String = "Used to mark a specific point in an instruction list."
   }

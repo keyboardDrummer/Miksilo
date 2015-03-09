@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
@@ -17,7 +17,7 @@ object SubtractIntegerC extends InstructionC {
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(IntTypeC.intType)
 
-  override def getInstructionSize(instruction: MetaObject): Int = 1
+  override def getInstructionSize(): Int = 1
 
   object SubtractIntegerKey
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)

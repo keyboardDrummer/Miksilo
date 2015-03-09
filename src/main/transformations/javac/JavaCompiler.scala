@@ -24,7 +24,7 @@ import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.prefix.NotC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
-import transformations.javac.methods.assignment.{AssignToVariable, AssignmentSkeleton, AssignmentPrecedence, IncrementAssignmentC}
+import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentC}
 import transformations.javac.statements._
 import transformations.types._
 

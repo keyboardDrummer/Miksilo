@@ -1,6 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
@@ -9,7 +10,6 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC
 import transformations.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
-import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 

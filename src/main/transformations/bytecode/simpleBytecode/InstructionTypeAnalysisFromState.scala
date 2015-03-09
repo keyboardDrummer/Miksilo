@@ -1,12 +1,12 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.{MetaObject, CompilationState}
-import transformations.bytecode.coreInstructions.InstructionSignature
-import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant}
+import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.ObjectTypeC
 
@@ -27,11 +27,11 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
     new InstructionTypeAnalysis(instructions) {
       val instructionVariableUpdateRegistry = ByteCodeSkeleton.getState(state).localUpdates
       override def getSideEffects(typeState: ProgramTypeState, instruction: MetaObject): InstructionSideEffects =
-        instructionVariableUpdateRegistry(instruction.clazz)(instruction, typeState)
+        instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)
 
       val instructionSignatureRegistry = ByteCodeSkeleton.getInstructionSignatureRegistry(state)
       override def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature =
-        instructionSignatureRegistry(instruction.clazz)(constantPool, instruction, typeState)
+        instructionSignatureRegistry(instruction.clazz).getInstructionInAndOutputs(constantPool, instruction, typeState, state)
 
       val jumpBehaviorRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
       override def getJumpBehavior(instructionClazz: Any): JumpBehavior = jumpBehaviorRegistry(instructionClazz)

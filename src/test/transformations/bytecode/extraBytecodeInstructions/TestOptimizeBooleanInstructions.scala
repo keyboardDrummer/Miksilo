@@ -2,9 +2,9 @@ package transformations.bytecode.extraBytecodeInstructions
 
 import core.particles.{CompilerFromParticles, MetaObject}
 import org.junit.{Assert, Test}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.JavaCompiler
 import util.TestUtils
 

@@ -2,7 +2,7 @@ package transformations.types
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.javac.classes.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance {

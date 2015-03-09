@@ -1,10 +1,10 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.types.TypeSkeleton
 
 object InferredStackFrames extends ParticleWithPhase {

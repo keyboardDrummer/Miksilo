@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 import transformations.types.TypeSkeleton
 

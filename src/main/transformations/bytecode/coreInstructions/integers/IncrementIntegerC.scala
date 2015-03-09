@@ -1,10 +1,10 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
-import PrintByteCode._
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object IncrementIntegerC extends InstructionC {
@@ -23,7 +23,7 @@ object IncrementIntegerC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq.empty, Seq.empty)
 
-  override def getInstructionSize(instruction: MetaObject): Int = 3
+  override def getInstructionSize(): Int = 3
 
   object IntegerIncrementKey
 

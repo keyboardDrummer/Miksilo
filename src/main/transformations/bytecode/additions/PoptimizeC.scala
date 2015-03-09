@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
@@ -27,8 +27,8 @@ object PoptimizeC extends ParticleWithPhase {
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val getSignature = ByteCodeSkeleton.getInstructionSignatureRegistry(state)(instruction.clazz)
-        val signature = getSignature(constantPool, instruction, typeAnalysis.typeStatePerInstruction(instructionIndex))
+        val signatureProvider = ByteCodeSkeleton.getInstructionSignatureRegistry(state)(instruction.clazz)
+        val signature = signatureProvider.getInstructionInAndOutputs(constantPool, instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
         getSignatureInOutLengths(state, signature)
       }
 

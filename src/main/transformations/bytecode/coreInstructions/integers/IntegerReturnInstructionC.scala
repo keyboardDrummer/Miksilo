@@ -1,10 +1,10 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
@@ -14,9 +14,9 @@ object IntegerReturnInstructionC extends InstructionC {
 
   def integerReturn: MetaObject = ByteCodeSkeleton.instruction(IntegerReturn)
 
-  override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, false)
+  override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
-  override def getInstructionSize(instruction: MetaObject): Int = 1
+  override def getInstructionSize(): Int = 1
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 

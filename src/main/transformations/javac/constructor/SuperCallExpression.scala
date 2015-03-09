@@ -1,11 +1,11 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, CompilationState, MetaObject}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.{MethodId, JavaClassSkeleton}
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.classes.{JavaClassSkeleton, MethodId}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.CallC
 import transformations.javac.statements.StatementSkeleton
 import transformations.types.VoidTypeC

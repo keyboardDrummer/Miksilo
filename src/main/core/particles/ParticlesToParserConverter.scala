@@ -1,7 +1,7 @@
 package core.particles
 
-import core.grammar.GrammarToParserConverter
 import core.biGrammar.{BiGrammarToGrammar, Labelled}
+import core.grammar.GrammarToParserConverter
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.util.parsing.input.CharArrayReader

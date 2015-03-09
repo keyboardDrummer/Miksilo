@@ -2,7 +2,7 @@ package application.graphing.model.simplifications
 
 import core.particles.Contract
 import transformations.javac._
-import transformations.javac.classes.{GetIdentifierKind, ClassOrPackageSelector}
+import transformations.javac.classes.{ClassOrPackageSelector, GetIdentifierKind}
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 
 object JavaC extends TransformationGroup {

@@ -1,6 +1,7 @@
 package application.compilerBuilder
 
 import javax.swing.JPanel
+
 import core.particles.Particle
 import util.Cache
 

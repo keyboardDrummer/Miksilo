@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.{ParticleWithPhase, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
 import transformations.javac.classes.{JavaClassSkeleton, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends ParticleWithPhase {

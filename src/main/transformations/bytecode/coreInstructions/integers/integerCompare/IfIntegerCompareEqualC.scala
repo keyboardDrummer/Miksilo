@@ -1,11 +1,11 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
-import transformations.bytecode.ByteCodeSkeleton._
-import PrintByteCode._
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 

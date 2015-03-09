@@ -1,9 +1,9 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.ClassRefConstant
-import transformations.bytecode.coreInstructions.{InstructionSignature, InstructionC}
+import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}

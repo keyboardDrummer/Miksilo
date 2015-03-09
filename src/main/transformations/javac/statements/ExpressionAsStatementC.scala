@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.coreInstructions.{Pop2C, PopC}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.types.TypeSkeleton

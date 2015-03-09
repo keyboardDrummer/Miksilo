@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.additions.LabelledTargets
-import LabelledTargets.LabelKey
+import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.javac.classes.ConstantPool
 
 object Instructions {

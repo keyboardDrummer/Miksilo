@@ -1,6 +1,6 @@
 package core.biGrammar
 
-import org.junit.{Ignore, Assert, Test}
+import org.junit.{Assert, Ignore, Test}
 
 class TestRecursion extends GrammarDocumentWriter {
 

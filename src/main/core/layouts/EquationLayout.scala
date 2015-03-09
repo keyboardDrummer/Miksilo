@@ -1,6 +1,6 @@
 package core.layouts
 
-import org.apache.commons.math3.linear.{DecompositionSolver, NonSquareMatrixException, LUDecomposition, MatrixUtils}
+import org.apache.commons.math3.linear.{DecompositionSolver, LUDecomposition, MatrixUtils, NonSquareMatrixException}
 
 import scala.util.Try
 

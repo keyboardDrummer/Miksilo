@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -39,5 +39,5 @@ abstract class InvokeC extends InstructionC {
     constantPool.getValue(location).asInstanceOf[MetaObject]
   }
 
-  override def getInstructionSize(instruction: MetaObject): Int = 3
+  override def getInstructionSize(): Int = 3
 }

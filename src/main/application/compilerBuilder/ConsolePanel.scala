@@ -5,8 +5,8 @@ import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
 
 import core.document.Empty
+import core.particles.{Contract, Particle}
 import core.responsiveDocument.ResponsiveDocument
-import core.particles.{Particle, Contract}
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 

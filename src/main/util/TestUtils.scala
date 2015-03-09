@@ -6,7 +6,7 @@ import application.compilerCockpit.PrettyPrint
 import core.particles._
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.{ByteCodeMethodInfo, PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}

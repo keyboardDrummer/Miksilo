@@ -1,7 +1,7 @@
 package core.particles
 
-import core.grammar.ParseException
 import core.biGrammar.BiFailure
+import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.collection.mutable

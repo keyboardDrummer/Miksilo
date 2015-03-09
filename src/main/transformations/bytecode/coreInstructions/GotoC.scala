@@ -1,9 +1,9 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{MetaObject, CompilationState}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object GotoC extends InstructionC {
@@ -17,11 +17,12 @@ object GotoC extends InstructionC {
     PrintByteCode.hexToBytes("a7") ++ PrintByteCode.shortToBytes(arguments(0))
   }
 
-  override def getJumpBehavior: JumpBehavior = new JumpBehavior(false, true)
+  override def jumpBehavior: JumpBehavior = new JumpBehavior(false, true)
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq())
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+                                          state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq())
 
-  override def getInstructionSize(instruction: MetaObject): Int = 3
+  override def getInstructionSize: Int = 3
 
   object GoToKey
 

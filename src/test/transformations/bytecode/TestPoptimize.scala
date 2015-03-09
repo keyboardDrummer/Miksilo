@@ -5,9 +5,9 @@ import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.MethodDescriptorConstant
-import transformations.bytecode.coreInstructions.longs.LongConstantC
-import transformations.bytecode.coreInstructions.{Pop2C, VoidReturnInstructionC, PopC}
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
+import transformations.bytecode.coreInstructions.longs.LongConstantC
+import transformations.bytecode.coreInstructions.{Pop2C, PopC, VoidReturnInstructionC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.types.VoidTypeC

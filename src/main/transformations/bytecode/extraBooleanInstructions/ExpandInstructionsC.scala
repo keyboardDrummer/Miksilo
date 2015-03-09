@@ -1,12 +1,12 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles._
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.bytecode.ByteCodeSkeleton
 
 import scala.collection.mutable
 

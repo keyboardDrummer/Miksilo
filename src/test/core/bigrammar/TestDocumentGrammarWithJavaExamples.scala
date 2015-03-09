@@ -1,7 +1,7 @@
 package core.biGrammar
 
 import application.compilerCockpit._
-import core.particles.{Particle, ParticleWithGrammar, CompilerFromParticles}
+import core.particles.{CompilerFromParticles, Particle, ParticleWithGrammar}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}

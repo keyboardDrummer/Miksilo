@@ -1,9 +1,9 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.MetaObject
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
-import PrintByteCode._
+import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 object InvokeStaticC extends InvokeC {
 

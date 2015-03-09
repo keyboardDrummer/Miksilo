@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
-import core.particles.{Particle, Contract, MetaObject, CompilationState}
-import SelectorC.SelectorKey
+import core.particles.{CompilationState, Contract, MetaObject, Particle}
+import transformations.javac.classes.SelectorC.SelectorKey
 
 object ClassOrPackageSelector extends Particle {
   override def dependencies: Set[Contract] = Set(SelectorC, JavaClassSkeleton)

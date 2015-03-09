@@ -1,6 +1,6 @@
 package core.responsiveDocument
 
-import core.document.{LeftRight, Document}
+import core.document.{Document, LeftRight}
 
 case class ResponsiveLeftRight(left: ResponsiveDocument, right: ResponsiveDocument) extends ResponsiveDocument {
   override def render(preferredWidth: Int): Document = {

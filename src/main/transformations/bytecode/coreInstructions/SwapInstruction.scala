@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.{PrintByteCode, ByteCodeSkeleton}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object SwapInstruction extends InstructionC {
@@ -15,8 +15,7 @@ object SwapInstruction extends InstructionC {
     PrintByteCode.hexToBytes("5f")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }

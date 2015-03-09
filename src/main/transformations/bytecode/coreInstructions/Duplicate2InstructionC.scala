@@ -17,8 +17,7 @@ object Duplicate2InstructionC extends InstructionC with Instruction {
     PrintByteCode.hexToBytes("5c")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val input: MetaObject = typeState.stackTypes.last
     assertDoubleWord(state, input)
     new InstructionSignature(Seq(input),Seq(input, input))

@@ -1,12 +1,12 @@
 package transformations.javac.expressions.literals
 
-import core.grammar.RegexG
 import core.biGrammar.BiGrammar
+import core.grammar.RegexG
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.longs.LongConstantC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.LongTypeC
 
 object LongLiteralC extends ExpressionInstance {

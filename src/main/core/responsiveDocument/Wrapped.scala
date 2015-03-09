@@ -1,6 +1,6 @@
 package core.responsiveDocument
 
-import core.document.{LeftRight, TopBottom, Empty, Document}
+import core.document.{Document, Empty, LeftRight, TopBottom}
 
 case class Wrapped(items: Seq[ResponsiveDocument]) extends ResponsiveDocument {
   override def render(preferredWidth: Int): Document = {

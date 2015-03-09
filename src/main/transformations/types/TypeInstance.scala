@@ -2,9 +2,9 @@ package transformations.types
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{ParticleWithGrammar, Contract, MetaObject, CompilationState}
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
 import transformations.bytecode.constants.ConstantEntry
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
 

@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
-import core.particles.{ParticleWithGrammar, Contract}
 import core.particles.grammars.GrammarCatalogue
+import core.particles.{Contract, ParticleWithGrammar}
 
 object ParenthesisC extends ParticleWithGrammar {
 

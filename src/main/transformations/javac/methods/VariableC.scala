@@ -5,8 +5,8 @@ import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
-import transformations.types.{ObjectTypeC, BooleanTypeC, IntTypeC, LongTypeC}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, ObjectTypeC}
 
 
 object VariableC extends ExpressionInstance {

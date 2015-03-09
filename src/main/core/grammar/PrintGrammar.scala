@@ -1,8 +1,8 @@
 package core.grammar
 
 import core.biGrammar.BiGrammarToGrammar
-import core.responsiveDocument.ResponsiveDocument
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons
 import scala.util.matching.Regex

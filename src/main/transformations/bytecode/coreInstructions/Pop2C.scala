@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{MetaObject, CompilationState}
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object Pop2C extends InstructionC {

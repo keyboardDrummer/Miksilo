@@ -1,7 +1,7 @@
 package core.particles
 
-import core.grammar.~
 import core.biGrammar.GrammarDocumentWriter
+import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {

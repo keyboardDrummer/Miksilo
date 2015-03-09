@@ -3,7 +3,7 @@ package transformations.javac.expressions.literals
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.coreInstructions.objects.PushNullC
-import transformations.javac.expressions.{ExpressionSkeleton, ExpressionInstance}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object NullC extends ExpressionInstance {
 

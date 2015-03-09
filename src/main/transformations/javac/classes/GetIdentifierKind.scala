@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.{Particle, Contract, MetaObject, CompilationState}
+import core.particles.{CompilationState, Contract, MetaObject, Particle}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.VariableKey
 

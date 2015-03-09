@@ -1,6 +1,6 @@
 package core.responsiveDocument
 
-import core.document.{WhiteSpace, BlankLine, Document}
+import core.document.{BlankLine, Document, WhiteSpace}
 
 object ResponsiveDocument {
   implicit def toResponsive(sized: Document) = new WrappedSizedDocument(sized)
