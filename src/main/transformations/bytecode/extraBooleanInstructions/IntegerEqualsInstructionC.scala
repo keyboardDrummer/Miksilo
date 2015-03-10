@@ -1,15 +1,15 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.{CompilationState, Contract, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareEqualC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 object IntegerEqualsInstructionC extends ExpandInstruction {
 
-  def equals = instruction(IntegerEqualsInstructionKey)
+  def equals = CodeAttribute.instruction(IntegerEqualsInstructionKey)
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfIntegerCompareEqualC)
 

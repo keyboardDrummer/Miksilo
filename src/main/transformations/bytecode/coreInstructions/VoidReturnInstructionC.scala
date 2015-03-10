@@ -1,16 +1,17 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object VoidReturnInstructionC extends InstructionC {
 
   override val key: AnyRef = VoidReturn
 
-  def voidReturn: MetaObject = ByteCodeSkeleton.instruction(VoidReturn)
+  def voidReturn: MetaObject = CodeAttribute.instruction(VoidReturn)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -19,7 +20,7 @@ object VoidReturnInstructionC extends InstructionC {
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq())
 
-  override def getInstructionSize(): Int = 1
+  override def getInstructionSize: Int = 1
 
   object VoidReturn
 

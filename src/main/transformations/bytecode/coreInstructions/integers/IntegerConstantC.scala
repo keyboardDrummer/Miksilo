@@ -1,11 +1,10 @@
 package transformations.bytecode.coreInstructions.integers
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
@@ -16,11 +15,11 @@ object IntegerConstantC extends InstructionC {
   def integerConstant(value: Int) = {
     require (value <= 5)
     require (value >= -1)
-    instruction(IntegerConstantKey, Seq(value))
+    CodeAttribute.instruction(IntegerConstantKey, Seq(value))
   }
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    byteToBytes(3 + ByteCodeSkeleton.getInstructionArguments(instruction)(0))
+    byteToBytes(3 + CodeAttribute.getInstructionArguments(instruction)(0))
   }
 
   override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =

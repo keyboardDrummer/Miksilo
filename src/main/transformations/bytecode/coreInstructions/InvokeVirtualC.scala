@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
@@ -10,10 +10,10 @@ object InvokeVirtualC extends InvokeC {
 
   override val key: AnyRef = InvokeVirtual
 
-  def invokeVirtual(methodRefIndex: Int) = ByteCodeSkeleton.instruction(InvokeVirtual, Seq(methodRefIndex))
+  def invokeVirtual(methodRefIndex: Int) = CodeAttribute.instruction(InvokeVirtual, Seq(methodRefIndex))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b6") ++ shortToBytes(arguments(0))
   }
 

@@ -1,11 +1,10 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
@@ -13,10 +12,10 @@ object IfNotZero extends JumpInstruction {
 
   override val key: AnyRef = IfNotZeroKey
 
-  def ifZero(target: Int) = instruction(IfNotZeroKey, Seq(target))
+  def ifZero(target: Int) = CodeAttribute.instruction(IfNotZeroKey, Seq(target))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("9a") ++ shortToBytes(arguments(0))
   }
 

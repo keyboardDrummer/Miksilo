@@ -2,7 +2,6 @@ package transformations.bytecode.additions
 
 import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -12,6 +11,7 @@ import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import CodeAttribute._
 
 object LabelledTargets extends ParticleWithPhase {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))

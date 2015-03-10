@@ -5,13 +5,9 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import transformations.bytecode.attributes.Instruction
-import transformations.bytecode.coreInstructions.InstructionSignature
-import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
-
-object ByteCodeSkeleton extends ParticleWithGrammar with Instruction with ParticleWithState {
+object ByteCodeSkeleton extends ParticleWithGrammar with ParticleWithState {
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 

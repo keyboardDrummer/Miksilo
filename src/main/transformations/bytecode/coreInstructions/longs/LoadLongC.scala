@@ -2,9 +2,9 @@ package transformations.bytecode.coreInstructions.longs
 
 import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 import transformations.types.LongTypeC
 
@@ -12,10 +12,10 @@ object LoadLongC extends InstructionC {
 
   override val key: AnyRef = LongLoad
 
-  def load(location: Integer) = ByteCodeSkeleton.instruction(LongLoad, Seq(location))
+  def load(location: Integer) = CodeAttribute.instruction(LongLoad, Seq(location))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
       hexToBytes("16") ++ byteToBytes(location)

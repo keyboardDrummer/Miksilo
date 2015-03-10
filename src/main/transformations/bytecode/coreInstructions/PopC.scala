@@ -1,8 +1,9 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object PopC extends InstructionC {
@@ -10,7 +11,7 @@ object PopC extends InstructionC {
   object PopKey
   override val key: AnyRef = PopKey
 
-  def pop = ByteCodeSkeleton.instruction(PopKey)
+  def pop = CodeAttribute.instruction(PopKey)
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
     PrintByteCode.hexToBytes("57")

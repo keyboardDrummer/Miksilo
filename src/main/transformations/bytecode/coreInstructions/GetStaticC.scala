@@ -1,9 +1,8 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
@@ -14,10 +13,10 @@ object GetStaticC extends InstructionC {
 
   override val key: AnyRef = GetStaticKey
 
-  def getStatic(fieldRefIndex: Int): MetaObject = instruction(GetStaticKey, Seq(fieldRefIndex))
+  def getStatic(fieldRefIndex: Int): MetaObject = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
@@ -26,7 +25,7 @@ object GetStaticC extends InstructionC {
     new InstructionSignature(Seq(), Seq(getReturnType(constantPool, instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
-    val location = ByteCodeSkeleton.getInstructionArguments(getStatic)(0)
+    val location = CodeAttribute.getInstructionArguments(getStatic)(0)
     val fieldRef = constantPool.getValue(location).asInstanceOf[MetaObject]
     val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
     val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]

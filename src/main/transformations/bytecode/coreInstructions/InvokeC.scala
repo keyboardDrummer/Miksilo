@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
@@ -35,9 +35,9 @@ abstract class InvokeC extends InstructionC {
   }
 
   def getInvokeTargetMethodRef(instruction: MetaObject, constantPool: ConstantPool) = {
-    val location = ByteCodeSkeleton.getInstructionArguments(instruction)(0)
+    val location = CodeAttribute.getInstructionArguments(instruction)(0)
     constantPool.getValue(location).asInstanceOf[MetaObject]
   }
 
-  override def getInstructionSize(): Int = 3
+  override def getInstructionSize: Int = 3
 }

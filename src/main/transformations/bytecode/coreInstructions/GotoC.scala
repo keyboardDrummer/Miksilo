@@ -1,19 +1,20 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object GotoC extends InstructionC {
 
   override val key: AnyRef = GoToKey
 
-  def goTo(target: Int): MetaObject = ByteCodeSkeleton.instruction(GoToKey, Seq(target))
+  def goTo(target: Int): MetaObject = CodeAttribute.instruction(GoToKey, Seq(target))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     PrintByteCode.hexToBytes("a7") ++ PrintByteCode.shortToBytes(arguments(0))
   }
 

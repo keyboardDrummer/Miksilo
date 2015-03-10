@@ -2,7 +2,6 @@ package transformations.bytecode.extraBooleanInstructions
 
 import core.particles._
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
@@ -12,7 +11,7 @@ import scala.collection.mutable
 
 object ExpandInstructionsC extends ParticleWithPhase with ParticleWithState {
 
-  def lessThanInstruction = instruction(LessThanInstructionKey)
+  def lessThanInstruction = CodeAttribute.instruction(LessThanInstructionKey)
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 

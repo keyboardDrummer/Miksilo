@@ -1,18 +1,17 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.MetaObject
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.attributes.CodeAttribute
 
 object InvokeStaticC extends InvokeC {
 
   override val key: AnyRef = InvokeStaticKey
 
-  def invokeStatic(constantIndex: Int): MetaObject = instruction(InvokeStaticKey, Seq(constantIndex))
+  def invokeStatic(constantIndex: Int): MetaObject = CodeAttribute.instruction(InvokeStaticKey, Seq(constantIndex))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b8") ++ shortToBytes(arguments(0))
   }
 

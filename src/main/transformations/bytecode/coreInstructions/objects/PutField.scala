@@ -1,9 +1,10 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{ByteCodeTypeException, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object PutField extends InstructionC {
@@ -11,10 +12,10 @@ object PutField extends InstructionC {
   object PutFieldKey
   override val key: AnyRef = PutFieldKey
 
-  def putField(index: Int) = ByteCodeSkeleton.instruction(PutFieldKey, Seq(index))
+  def putField(index: Int) = CodeAttribute.instruction(PutFieldKey, Seq(index))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(arguments(0))
   }
 

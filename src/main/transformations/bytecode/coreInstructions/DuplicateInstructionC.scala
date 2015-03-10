@@ -2,16 +2,16 @@ package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode
-import transformations.bytecode.attributes.Instruction
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
 
 
-object DuplicateInstructionC extends InstructionC with Instruction {
+object DuplicateInstructionC extends InstructionC {
 
   object DuplicateKey
-  def duplicate = instruction(DuplicateKey, Seq.empty)
+  def duplicate = CodeAttribute.instruction(DuplicateKey, Seq.empty)
 
   override val key: AnyRef = DuplicateKey
 

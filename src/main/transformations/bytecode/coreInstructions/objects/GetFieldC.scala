@@ -1,9 +1,8 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -13,10 +12,10 @@ object GetFieldC extends InstructionC {
 
   override val key: AnyRef = GetFieldKey
 
-  def construct(fieldRefIndex: Int): MetaObject = instruction(GetFieldKey, Seq(fieldRefIndex))
+  def construct(fieldRefIndex: Int): MetaObject = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
-    val arguments = ByteCodeSkeleton.getInstructionArguments(instruction)
+    val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b4") ++ shortToBytes(arguments(0))
   }
 
@@ -27,7 +26,7 @@ object GetFieldC extends InstructionC {
   }
 
   def getReturnType(constantPool: ConstantPool, getField: MetaObject): MetaObject = {
-    val fieldRefIndex = ByteCodeSkeleton.getInstructionArguments(getField)(0)
+    val fieldRefIndex = CodeAttribute.getInstructionArguments(getField)(0)
     val fieldRef = constantPool.getValue(fieldRefIndex).asInstanceOf[MetaObject]
     val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
     val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]

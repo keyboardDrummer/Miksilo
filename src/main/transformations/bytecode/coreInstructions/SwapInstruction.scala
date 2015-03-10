@@ -1,13 +1,14 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.PrintByteCode
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 object SwapInstruction extends InstructionC {
   object SwapKey
-  def swap = ByteCodeSkeleton.instruction(SwapKey)
+  def swap = CodeAttribute.instruction(SwapKey)
 
   override val key: AnyRef = SwapKey
 

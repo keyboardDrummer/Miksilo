@@ -11,7 +11,7 @@ import transformations.javac.classes.ConstantPool
 
 object InstructionArgumentsKey
 
-trait Instruction {
+object CodeAttribute extends ParticleWithGrammar with ParticleWithState {
 
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
     data.put(InstructionArgumentsKey, arguments)
@@ -22,9 +22,6 @@ trait Instruction {
   def setInstructionArguments(instruction: MetaObject, arguments: Seq[Any]) {
     instruction(InstructionArgumentsKey) = arguments
   }
-}
-
-object CodeAttribute extends ParticleWithGrammar with Instruction with ParticleWithState {
 
   def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
 
