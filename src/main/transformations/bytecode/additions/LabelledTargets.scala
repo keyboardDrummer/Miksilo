@@ -128,7 +128,7 @@ object LabelledTargets extends ParticleWithPhase {
 
     override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
       new InstructionSignature(Seq.empty, Seq.empty)
     }
 

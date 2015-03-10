@@ -23,7 +23,7 @@ object LoadLongC extends InstructionC {
       byteToBytes(hexToInt("1e") + location)
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   object LongLoad

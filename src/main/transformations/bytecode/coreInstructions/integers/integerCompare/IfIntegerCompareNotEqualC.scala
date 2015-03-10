@@ -19,7 +19,7 @@ object IfIntegerCompareNotEqualC extends JumpInstruction {
     hexToBytes("a0") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   object IfIntegerCompareNotEqualKey

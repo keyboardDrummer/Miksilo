@@ -4,7 +4,6 @@ import core.particles.{CompilationState, MetaObject}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object InvokeSpecialC extends InvokeC {
   override val key: AnyRef = InvokeSpecialKey
@@ -16,8 +15,8 @@ object InvokeSpecialC extends InvokeC {
     hexToBytes("b7") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-    getInstanceInstructionInAndOutputs(constantPool, instruction, typeState, state)
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    getInstanceInstructionInAndOutputs(instruction, typeState, state)
   }
 
   object InvokeSpecialKey

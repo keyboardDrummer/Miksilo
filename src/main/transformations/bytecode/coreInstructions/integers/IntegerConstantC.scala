@@ -22,7 +22,7 @@ object IntegerConstantC extends InstructionC {
     byteToBytes(3 + CodeAttribute.getInstructionArguments(instruction)(0))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(): Int = 1

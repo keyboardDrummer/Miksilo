@@ -20,7 +20,7 @@ object IncrementIntegerC extends InstructionC {
       byteToBytes(arguments(1))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq.empty, Seq.empty)
 
   override def getInstructionSize(): Int = 3

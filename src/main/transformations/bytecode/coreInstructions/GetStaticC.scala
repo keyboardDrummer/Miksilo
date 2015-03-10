@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
@@ -20,9 +21,8 @@ object GetStaticC extends InstructionC {
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature =
-    new InstructionSignature(Seq(), Seq(getReturnType(constantPool, instruction)))
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+    new InstructionSignature(Seq(), Seq(getReturnType(ByteCodeSkeleton.getConstantPool(state), instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
     val location = CodeAttribute.getInstructionArguments(getStatic)(0)

@@ -7,7 +7,6 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.ConstantPool
 
 object InstructionArgumentsKey
 
@@ -45,7 +44,7 @@ object CodeAttribute extends ParticleWithGrammar with ParticleWithState {
 
   trait InstructionSignatureProvider
   {
-    def getSignature(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+    def getSignature(instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
   }
 
   trait InstructionSideEffectProvider

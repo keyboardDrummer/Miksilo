@@ -19,7 +19,7 @@ object PutField extends InstructionC {
     PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(arguments(0))
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
 
     if (stackTop.size != 2)

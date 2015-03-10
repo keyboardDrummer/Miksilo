@@ -19,7 +19,7 @@ object DuplicateInstructionC extends InstructionC {
     PrintByteCode.hexToBytes("59")
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val input: MetaObject = typeState.stackTypes.last
     assertSingleWord(state, input)
     new InstructionSignature(Seq(input),Seq(input, input))

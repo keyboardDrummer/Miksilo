@@ -21,7 +21,7 @@ object StoreAddressC extends InstructionC {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "StoreAddress")
     InstructionSignature(Seq(stackTop), Seq())

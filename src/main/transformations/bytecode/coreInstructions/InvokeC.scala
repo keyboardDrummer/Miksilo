@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -9,15 +10,16 @@ import transformations.types.{ObjectTypeC, TypeSkeleton}
 
 abstract class InvokeC extends InstructionC {
 
-  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    val constantPool: ConstantPool = ByteCodeSkeleton.getConstantPool(state)
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
     getMethodStackModification(descriptor, constantPool, state)
   }
 
-  def getInstanceInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
-                                          state: CompilationState): InstructionSignature = {
+  def getInstanceInstructionInAndOutputs(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    val constantPool = ByteCodeSkeleton.getConstantPool(state)
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val classRef = constantPool.getValue(MethodRefConstant.getMethodRefClassRefIndex(methodRef)).asInstanceOf[MetaObject]
