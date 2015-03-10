@@ -18,7 +18,7 @@ abstract class InvokeC extends InstructionC {
     getMethodStackModification(descriptor, constantPool, state)
   }
 
-  def getInstanceInstructionInAndOutputs(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  def getInstanceInstructionSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val constantPool = ByteCodeSkeleton.getConstantPool(state)
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]

@@ -16,7 +16,7 @@ object InvokeSpecialC extends InvokeC {
   }
 
   override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-    getInstanceInstructionInAndOutputs(instruction, typeState, state)
+    getInstanceInstructionSignature(instruction, typeState, state)
   }
 
   object InvokeSpecialKey
