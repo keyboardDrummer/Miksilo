@@ -1,10 +1,13 @@
 package transformations.bytecode.attributes
 
 import core.biGrammar.{BiGrammar, ManyVertical}
+import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.ConstantPool
 
 object InstructionArgumentsKey
 
@@ -21,7 +24,11 @@ trait Instruction {
   }
 }
 
-object CodeAttribute extends ParticleWithGrammar with Instruction {
+object CodeAttribute extends ParticleWithGrammar with Instruction with ParticleWithState {
+
+  def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
+
+  def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, CodeConstantEntry)
 
@@ -39,6 +46,25 @@ object CodeAttribute extends ParticleWithGrammar with Instruction {
     }
   }
 
+  trait InstructionSignatureProvider
+  {
+    def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+  }
+
+  trait InstructionSideEffectProvider
+  {
+    def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject]
+  }
+
+  case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
+
+  def createState = new State()
+  class State {
+    val getInstructionSignatureRegistry = new ClassRegistry[InstructionSignatureProvider]
+    val getInstructionSizeRegistry = new ClassRegistry[Int]
+    val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
+    val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
+  }
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

@@ -13,10 +13,6 @@ import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
 object ByteCodeSkeleton extends ParticleWithGrammar with Instruction with ParticleWithState {
 
-  def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
-
-  def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
-
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
@@ -50,26 +46,10 @@ object ByteCodeSkeleton extends ParticleWithGrammar with Instruction with Partic
 
   override def dependencies: Set[Contract] = Set.empty
 
-  case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
-
   def getConstantPool(state: CompilationState) = getState(state).constantPool
-
-  trait InstructionSignatureProvider
-  {
-    def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
-  }
-
-  trait InstructionSideEffectProvider
-  {
-    def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject]
-  }
 
   class State {
     var constantPool: ConstantPool = null
-    val getInstructionSignatureRegistry = new ClassRegistry[InstructionSignatureProvider]
-    val getInstructionSizeRegistry = new ClassRegistry[Int]
-    val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
-    val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
     val getBytes = new ClassRegistry[MetaObject => Seq[Byte]]
   }
 

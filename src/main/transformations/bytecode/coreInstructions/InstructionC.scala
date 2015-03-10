@@ -3,8 +3,8 @@ package transformations.bytecode.coreInstructions
 import core.biGrammar.BiGrammar
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import transformations.bytecode.ByteCodeSkeleton.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode._
+import transformations.bytecode.attributes.CodeAttribute.{JumpBehavior, InstructionSignatureProvider, InstructionSideEffectProvider}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
@@ -18,11 +18,11 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getInstructionSignatureRegistry(state).put(key, this)
+    CodeAttribute.getInstructionSignatureRegistry(state).put(key, this)
     ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
-    ByteCodeSkeleton.getInstructionSizeRegistry(state).put(key, getInstructionSize)
-    ByteCodeSkeleton.getState(state).jumpBehaviorRegistry.put(key, jumpBehavior)
-    ByteCodeSkeleton.getState(state).localUpdates.put(key, this)
+    CodeAttribute.getInstructionSizeRegistry(state).put(key, getInstructionSize)
+    CodeAttribute.getState(state).jumpBehaviorRegistry.put(key, jumpBehavior)
+    CodeAttribute.getState(state).localUpdates.put(key, this)
   }
 
   def assertObjectTypeStackTop(stackTop: MetaObject, name: String): Unit = {

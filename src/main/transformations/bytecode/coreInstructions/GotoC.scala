@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.{CompilationState, MetaObject}
-import transformations.bytecode.ByteCodeSkeleton.JumpBehavior
+import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool

@@ -36,8 +36,8 @@ object LabelledTargets extends ParticleWithPhase {
 
   def transform(program: MetaObject, state: CompilationState): Unit = {
 
-    val jumpRegistry = ByteCodeSkeleton.getState(state).jumpBehaviorRegistry
-    def instructionSize(instruction: MetaObject) = ByteCodeSkeleton.getInstructionSizeRegistry(state)(instruction.clazz)
+    val jumpRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
+    def instructionSize(instruction: MetaObject) = CodeAttribute.getInstructionSizeRegistry(state)(instruction.clazz)
 
     def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
       var newInstructions = mutable.ArrayBuffer[MetaObject]()
