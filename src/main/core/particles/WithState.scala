@@ -2,7 +2,7 @@ package core.particles
 
 import scala.collection.mutable
 
-trait ParticleWithState {
+trait WithState {
   type State
   class ClassRegistry[Registration] extends mutable.HashMap[Any, Registration]
 

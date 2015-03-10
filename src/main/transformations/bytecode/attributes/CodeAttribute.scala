@@ -10,7 +10,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InstructionArgumentsKey
 
-object CodeAttribute extends ParticleWithGrammar with ParticleWithState {
+object CodeAttribute extends ParticleWithGrammar with WithState {
 
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
     data.put(InstructionArgumentsKey, arguments)

@@ -7,7 +7,7 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
-object ByteCodeSkeleton extends ParticleWithGrammar with ParticleWithState {
+object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
 

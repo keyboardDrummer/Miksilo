@@ -13,7 +13,7 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
-object TypeSkeleton extends ParticleWithGrammar with ParticleWithState {
+object TypeSkeleton extends ParticleWithGrammar with WithState {
 
   def toStackType(_type: MetaObject, state: CompilationState) : MetaObject = {
     getState(state).instances(_type.clazz).getStackType(_type, state)

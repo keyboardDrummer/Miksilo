@@ -11,7 +11,7 @@ case class GetTypeNotFound(key: Any) extends CompilerException {
   override def toString = s"'get type' method not found for class ${MetaObject.classDebugRepresentation(key)}"
 }
 
-object ExpressionSkeleton extends ParticleWithGrammar with ParticleWithState {
+object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   case class MissingToInstructionsFor(clazz: Any) extends CompilerException {
     override def toString = s"missing transformation for ${clazz.getClass.getSimpleName}"

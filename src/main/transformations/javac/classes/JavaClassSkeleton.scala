@@ -11,7 +11,7 @@ import transformations.javac.statements.BlockC
 import transformations.types.{ArrayTypeC, ObjectTypeC}
 
 
-object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with ParticleWithState {
+object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with WithState {
 
   def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry //TODO move this registry to SelectorC.
 

@@ -12,7 +12,7 @@ import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodIn
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
 
-object MethodC extends ParticleWithGrammar with ParticleWithState {
+object MethodC extends ParticleWithGrammar with WithState {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

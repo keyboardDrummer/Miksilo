@@ -10,7 +10,7 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 import transformations.javac.methods.MethodC
 import transformations.types.TypeSkeleton
 
-object AssignmentSkeleton extends ExpressionInstance with ParticleWithState {
+object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[MetaObject]
 
