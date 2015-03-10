@@ -3,6 +3,7 @@ package transformations.types
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.{CompilationState, MetaObject}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance {
@@ -52,6 +53,10 @@ object ObjectTypeC extends TypeInstance {
   object ObjectTypeName
 
   object ObjectTypeKey
+
+  override def getStackType(_type: MetaObject, state: CompilationState): MetaObject = {
+    ObjectTypeC.stackObjectType(ByteCodeSkeleton.getConstantPool(state).getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+  }
 
   override def description: String = "Defines the object type."
 }

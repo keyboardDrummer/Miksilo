@@ -10,6 +10,9 @@ object BooleanTypeC extends TypeInstance {
 
   override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "Z"
 
+
+  override def getStackType(_type: MetaObject, state: CompilationState): MetaObject = IntTypeC.intType
+
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
     "boolean" ~> produce(booleanType)
   }

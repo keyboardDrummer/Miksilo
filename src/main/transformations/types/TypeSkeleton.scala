@@ -4,10 +4,6 @@ import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.PrintByteCode._
-import transformations.javac.classes.ConstantPool
-import transformations.types.BooleanTypeC.BooleanTypeKey
-import transformations.types.ObjectTypeC.ObjectTypeName
 
 class TypeMismatchException(to: MetaObject, from: MetaObject) extends BadInputException {
   override def toString = s"cannot assign: $to = $from"
@@ -17,25 +13,10 @@ class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends 
 
 class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
 
-object TypeSkeleton extends ParticleWithGrammar with ParticleWithState { //TODO move some specific type code to the respective type.
-  def getVerificationInfoBytes(_type: MetaObject, state: CompilationState): Seq[Byte] = {
-    _type.clazz match {
-      case IntTypeC.IntTypeKey => hexToBytes("01")
-      case LongTypeC.LongTypeKey => hexToBytes("04")
-      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeName).asInstanceOf[Int])
-    }
-  }
+object TypeSkeleton extends ParticleWithGrammar with ParticleWithState {
 
   def toStackType(_type: MetaObject, state: CompilationState) : MetaObject = {
-    toStackType(ByteCodeSkeleton.getState(state).constantPool, _type)
-  }
-
-  def toStackType(constantPool: ConstantPool, _type: MetaObject) : MetaObject  = {
-    _type.clazz match {
-      case BooleanTypeKey => IntTypeC.intType
-      case ObjectTypeC.ObjectTypeKey => ObjectTypeC.stackObjectType(constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
-      case _ => _type
-    }
+    getState(state).instances(_type.clazz).getStackType(_type, state)
   }
 
   def getTypeSize(_type: MetaObject, state: CompilationState): Int = getState(state).stackSize(_type.clazz)
@@ -87,10 +68,12 @@ object TypeSkeleton extends ParticleWithGrammar with ParticleWithState { //TODO 
   }
 
   def createState = new State
+  
   class State {
     val superTypes = new ClassRegistry[MetaObject => Seq[MetaObject]]()
     val toByteCodeString = new ClassRegistry[MetaObject => String]()
     val stackSize = new ClassRegistry[Int]()
+    val instances = new ClassRegistry[TypeInstance]
   }
 
   object TypeGrammar

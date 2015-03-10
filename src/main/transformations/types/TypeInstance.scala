@@ -14,12 +14,13 @@ trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
     TypeSkeleton.getState(state).toByteCodeString.put(key, _type => getByteCodeString(_type, state))
     TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
+    TypeSkeleton.getState(state).instances.put(key, this)
     super.inject(state)
   }
 
   def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject]
 
-  def getStackType(_type: MetaObject) = _type
+  def getStackType(_type: MetaObject, state: CompilationState) = _type
 
   def getByteCodeString(_type: MetaObject, state: CompilationState): String
 

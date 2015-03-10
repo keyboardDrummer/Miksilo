@@ -42,7 +42,7 @@ object InferredStackFrames extends ParticleWithPhase {
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 
-    def toStackType(_type: MetaObject) = TypeSkeleton.toStackType(constantPool, _type)
+    def toStackType(_type: MetaObject) = TypeSkeleton.toStackType(_type, state)
 
     def getStackMap(previousStack: Seq[MetaObject], stack: Seq[MetaObject], previousLocals: Seq[MetaObject], locals: Seq[MetaObject]) = {
       getStackMapHelper(previousStack.map(toStackType), stack.map(toStackType), previousLocals.map(toStackType), locals.map(toStackType))

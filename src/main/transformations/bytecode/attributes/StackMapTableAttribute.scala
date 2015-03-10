@@ -5,7 +5,8 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.types.TypeSkeleton
+import transformations.types.ObjectTypeC.ObjectTypeName
+import transformations.types.{ObjectTypeC, LongTypeC, IntTypeC, TypeSkeleton}
 
 object StackMapTableAttribute extends ParticleWithGrammar {
 
@@ -106,20 +107,28 @@ object StackMapTableAttribute extends ParticleWithGrammar {
         case StackMapTableAttribute.AppendFrame =>
           val localVerificationTypes = StackMapTableAttribute.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
-            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => TypeSkeleton.getVerificationInfoBytes(info, state))
+            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info, state))
         case StackMapTableAttribute.SameLocals1StackItem =>
           val _type = StackMapTableAttribute.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
-            byteToBytes(code) ++ TypeSkeleton.getVerificationInfoBytes(_type, state)
+            byteToBytes(code) ++ getVerificationInfoBytes(_type, state)
           } else {
-            byteToBytes(247) ++ shortToBytes(offset) ++ TypeSkeleton.getVerificationInfoBytes(_type, state)
+            byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type, state)
           }
       }
     }
 
     val entries = StackMapTableAttribute.getStackMapTableEntries(attribute)
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
+  }
+
+  def getVerificationInfoBytes(_type: MetaObject, state: CompilationState): Seq[Byte] = {
+    _type.clazz match {
+      case IntTypeC.IntTypeKey => hexToBytes("01")
+      case LongTypeC.LongTypeKey => hexToBytes("04")
+      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeName).asInstanceOf[Int])
+    }
   }
 
   override def description: String = "Defines the stack map table attribute. Some points in a code attribute instruction list may be jump targets." +

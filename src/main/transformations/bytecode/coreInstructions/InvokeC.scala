@@ -29,8 +29,8 @@ abstract class InvokeC extends InstructionC {
   }
 
   def getMethodStackModification(descriptor: MetaObject, constantPool: ConstantPool, state: CompilationState): InstructionSignature = {
-    val ins = MethodDescriptorConstant.getMethodDescriptorParameters(descriptor).map(_type => TypeSkeleton.toStackType(constantPool, _type))
-    val outs = Seq(TypeSkeleton.toStackType(constantPool, MethodDescriptorConstant.getMethodDescriptorReturnType(descriptor)))
+    val ins = MethodDescriptorConstant.getMethodDescriptorParameters(descriptor).map(_type => TypeSkeleton.toStackType(_type, state))
+    val outs = Seq(TypeSkeleton.toStackType(MethodDescriptorConstant.getMethodDescriptorReturnType(descriptor), state))
     InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))
   }
 
