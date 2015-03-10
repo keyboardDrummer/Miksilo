@@ -16,7 +16,7 @@ object SwapInstruction extends InstructionC {
     PrintByteCode.hexToBytes("5f")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }

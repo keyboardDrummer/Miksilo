@@ -22,7 +22,7 @@ object LoadAddressC extends InstructionC {
       PrintByteCode.byteToBytes(PrintByteCode.hexToInt("2a") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
 

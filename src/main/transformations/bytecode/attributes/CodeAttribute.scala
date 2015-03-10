@@ -45,7 +45,7 @@ object CodeAttribute extends ParticleWithGrammar with ParticleWithState {
 
   trait InstructionSignatureProvider
   {
-    def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+    def getSignature(constantPool: ConstantPool, instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
   }
 
   trait InstructionSideEffectProvider

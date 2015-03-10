@@ -16,7 +16,7 @@ object InvokeSpecialC extends InvokeC {
     hexToBytes("b7") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     getInstanceInstructionInAndOutputs(constantPool, instruction, typeState, state)
   }
 

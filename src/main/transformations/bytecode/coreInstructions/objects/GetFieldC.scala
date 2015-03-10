@@ -19,7 +19,7 @@ object GetFieldC extends InstructionC {
     hexToBytes("b4") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
     new InstructionSignature(Seq(stackTop), Seq(getReturnType(constantPool, instruction)))

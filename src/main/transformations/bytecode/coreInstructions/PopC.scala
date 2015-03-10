@@ -17,7 +17,7 @@ object PopC extends InstructionC {
     PrintByteCode.hexToBytes("57")
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val input: MetaObject = typeState.stackTypes.last
     assertSingleWord(state, input)
     InstructionSignature(Seq(input),Seq())

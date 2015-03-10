@@ -20,7 +20,7 @@ object GotoC extends InstructionC {
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, true)
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                           state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize: Int = 3

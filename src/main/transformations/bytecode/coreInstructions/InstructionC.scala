@@ -47,7 +47,7 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
   val key: AnyRef
 
   def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject] = Map.empty
-  def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+  def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                  state: CompilationState): InstructionSignature
 
   def jumpBehavior: JumpBehavior = new JumpBehavior(true, false)

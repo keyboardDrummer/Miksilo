@@ -23,7 +23,7 @@ object StoreLongC  extends InstructionC {
       byteToBytes(hexToInt("3f") + location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
 
   override def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState ): Map[Int, MetaObject] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> LongTypeC.longType)

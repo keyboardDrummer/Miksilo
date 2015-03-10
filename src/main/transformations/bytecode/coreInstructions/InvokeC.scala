@@ -9,7 +9,7 @@ import transformations.types.{ObjectTypeC, TypeSkeleton}
 
 abstract class InvokeC extends InstructionC {
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[MetaObject]
     val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]

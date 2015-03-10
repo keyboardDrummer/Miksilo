@@ -28,7 +28,7 @@ object PoptimizeC extends ParticleWithPhase {
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
         val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state)(instruction.clazz)
-        val signature = signatureProvider.getInstructionInAndOutputs(constantPool, instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
+        val signature = signatureProvider.getSignature(constantPool, instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
         getSignatureInOutLengths(state, signature)
       }
 

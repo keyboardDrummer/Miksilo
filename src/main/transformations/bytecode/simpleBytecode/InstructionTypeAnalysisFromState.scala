@@ -31,7 +31,7 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
 
       val instructionSignatureRegistry = CodeAttribute.getInstructionSignatureRegistry(state)
       override def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature =
-        instructionSignatureRegistry(instruction.clazz).getInstructionInAndOutputs(constantPool, instruction, typeState, state)
+        instructionSignatureRegistry(instruction.clazz).getSignature(constantPool, instruction, typeState, state)
 
       val jumpBehaviorRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
       override def getJumpBehavior(instructionClazz: Any): JumpBehavior = jumpBehaviorRegistry(instructionClazz)

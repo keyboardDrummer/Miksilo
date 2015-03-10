@@ -21,7 +21,7 @@ object LongConstantC extends InstructionC {
     byteToBytes(9 + CodeAttribute.getInstructionArguments(instruction)(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq(LongTypeC.longType))
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   override def getInstructionSize(): Int = 1
 

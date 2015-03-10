@@ -20,7 +20,7 @@ object GetStaticC extends InstructionC {
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState,
                                           state: CompilationState): InstructionSignature =
     new InstructionSignature(Seq(), Seq(getReturnType(constantPool, instruction)))
 

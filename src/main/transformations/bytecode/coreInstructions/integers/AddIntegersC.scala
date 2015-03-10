@@ -15,7 +15,7 @@ object AddIntegersC extends InstructionC {
 
   override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = hexToBytes("60")
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(IntTypeC.intType)
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(IntTypeC.intType)
 
   override def getInstructionSize: Int = 1
 

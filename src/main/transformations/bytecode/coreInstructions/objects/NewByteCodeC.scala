@@ -23,7 +23,7 @@ object NewByteCodeC extends InstructionC {
     PrintByteCode.hexToBytes("bb") ++ PrintByteCode.shortToBytes(location)
   }
 
-  override def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(constantPool: ConstantPool, instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val location = CodeAttribute.getInstructionArguments(instruction)(0)
     val classRef = constantPool.getValue(location).asInstanceOf[MetaObject]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
