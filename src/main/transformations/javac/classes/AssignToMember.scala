@@ -4,22 +4,23 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
-import transformations.javac.classes.SelectorC._
+import transformations.javac.classes.SelectField._
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.VariableC
+import transformations.javac.methods.MemberSelector.{SelectorMember, SelectorObject, SelectorKey}
+import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 
 object AssignToMember extends ParticleWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectorC)
+  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: CompilationState): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(SelectorC.SelectorKey, (selector: MetaObject) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: MetaObject) => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
-      val classOrObjectReference = getClassOrObjectReference(selector, compiler)
+      val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
       val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
 
-      val _object = getSelectorObject(selector)
+      val _object = MemberSelector.getSelectorObject(selector)
       val objectInstructions = ExpressionSkeleton.getToInstructions(state)(_object)
       objectInstructions ++ Seq(SwapInstruction.swap, PutField.putField(fieldRefIndex))
     })

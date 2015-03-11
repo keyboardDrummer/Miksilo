@@ -1,9 +1,9 @@
 package transformations.javac
 
 import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
-import transformations.javac.classes.{JavaClassSkeleton, SelectorC}
+import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.{CallC, VariableC}
+import transformations.javac.methods.{CallC, MemberSelector, VariableC}
 
 object ImplicitThisInPrivateCalls extends ParticleWithPhase {
   val thisName: String = "this"
@@ -20,7 +20,7 @@ object ImplicitThisInPrivateCalls extends ParticleWithPhase {
         val currentClass = compiler.currentClassInfo
         val methodInfo = currentClass.getMethod(memberName)
         val selectee = VariableC.variable(if (methodInfo._static) currentClass.name else thisName)
-        call(CallC.CallCallee) = SelectorC.selector(selectee, memberName)
+        call(CallC.CallCallee) = MemberSelector.selector(selectee, memberName)
       }
       original(call)
     })

@@ -13,7 +13,7 @@ object CallC extends ExpressionInstance {
 
   def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
 
-  override def dependencies: Set[Contract] = Set(SelectorC, InvokeStaticC, InvokeVirtualC)
+  override def dependencies: Set[Contract] = Set(MemberSelector, InvokeStaticC, InvokeVirtualC)
 
   object CallArgumentsGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
@@ -54,7 +54,7 @@ object CallC extends ExpressionInstance {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val callCallee = getCallCallee(call)
-    val objectExpression = SelectorC.getSelectorObject(callCallee)
+    val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val methodKey: MethodId = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
@@ -74,10 +74,10 @@ object CallC extends ExpressionInstance {
 
   def getMethodKey(call: MetaObject, compiler: ClassCompiler) = {
     val callCallee = getCallCallee(call)
-    val objectExpression = SelectorC.getSelectorObject(callCallee)
-    val kind = SelectorC.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
+    val objectExpression = MemberSelector.getSelectorObject(callCallee)
+    val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
-    val member = SelectorC.getSelectorMember(callCallee)
+    val member = MemberSelector.getSelectorMember(callCallee)
     new MethodId(kind.info.getQualifiedName, member)
   }
 

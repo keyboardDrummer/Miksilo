@@ -44,7 +44,7 @@ object JavaCompiler {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, ReturnExpressionC, ReturnVoidC, CallC, SelectorC) ++ methodBlock
+  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, ReturnExpressionC, ReturnVoidC, CallC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationWithInitializerC, LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
