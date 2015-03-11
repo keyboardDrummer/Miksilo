@@ -6,7 +6,7 @@ import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
-object SelectorC extends ExpressionInstance {
+object SelectorC extends ExpressionInstance with WithState {
 
   override val key: AnyRef = SelectorKey
 
@@ -23,9 +23,8 @@ object SelectorC extends ExpressionInstance {
 
   override def getType(selector: MetaObject, state: CompilationState): MetaObject = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
-    val obj = getSelectorObject(selector)
     val member = getSelectorMember(selector)
-    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
+    val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldInfo = classOrObjectReference.info.getField(member)
     fieldInfo._type
   }
@@ -50,8 +49,7 @@ object SelectorC extends ExpressionInstance {
 
   def getClassOrObjectReference(selector: MetaObject, compiler: ClassCompiler): ClassOrObjectReference = {
     val obj = getSelectorObject(selector)
-    val classOrObjectReference = compiler.getReferenceKind(obj).asInstanceOf[ClassOrObjectReference]
-    classOrObjectReference
+    getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
   }
 
   def getFieldRefIndex(selector: MetaObject, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Int = {
@@ -77,4 +75,23 @@ object SelectorC extends ExpressionInstance {
   object SelectorMember
 
   override def description: String = "Enables using the . operator to select a member from a class."
+
+  def getReferenceKind(classCompiler: ClassCompiler, expression: MetaObject): ReferenceKind = {
+    val getReferenceKindOption = SelectorC.getReferenceKindRegistry(classCompiler.state).get(expression.clazz)
+    getReferenceKindOption.fold[ReferenceKind]({
+      getReferenceKindFromExpressionType(classCompiler, expression)
+    })(implementation => implementation(expression))
+  }
+
+  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: MetaObject): ClassOrObjectReference = {
+    val classInfo: ClassInfo = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
+    new ClassOrObjectReference(classInfo, false)
+  }
+
+  def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry
+  class State {
+    val referenceKindRegistry = new ClassRegistry[MetaObject => ReferenceKind]()
+  }
+
+  override def createState = new State()
 }

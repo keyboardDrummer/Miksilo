@@ -3,11 +3,11 @@ package transformations.javac.classes
 import core.particles.{CompilationState, Contract, MetaObject, Particle}
 import transformations.javac.classes.SelectorC.SelectorKey
 
-object ClassOrPackageSelector extends Particle {
+object SelectorReferenceKind extends Particle {
   override def dependencies: Set[Contract] = Set(SelectorC, JavaClassSkeleton)
 
   override def inject(state: CompilationState): Unit = {
-    JavaClassSkeleton.getReferenceKindRegistry(state).put(SelectorKey, selector => {
+    SelectorC.getReferenceKindRegistry(state).put(SelectorKey, selector => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(selector, compiler)
     })
@@ -16,7 +16,7 @@ object ClassOrPackageSelector extends Particle {
   def getReferenceKind(selector: MetaObject, compiler: ClassCompiler): ReferenceKind = {
     val obj = SelectorC.getSelectorObject(selector)
     val member = SelectorC.getSelectorMember(selector)
-    compiler.getReferenceKind(obj) match {
+    SelectorC.getReferenceKind(compiler, obj) match {
       case PackageReference(info) => info.content(member) match {
         case result: PackageInfo => new PackageReference(result)
         case result: ClassInfo => new ClassOrObjectReference(result, true)

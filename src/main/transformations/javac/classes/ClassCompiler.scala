@@ -78,18 +78,6 @@ case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
     constantPool.store(result)
   }
 
-  def getReferenceKind(expression: MetaObject): ReferenceKind = {
-    val getReferenceKindOption = JavaClassSkeleton.getReferenceKindRegistry(state).get(expression.clazz)
-    getReferenceKindOption.fold[ReferenceKind]({
-      getReferenceKindFromExpressionType(expression)
-    })(implementation => implementation(expression))
-  }
-
-  def getReferenceKindFromExpressionType(expression: MetaObject): ClassOrObjectReference = {
-    val classInfo: ClassInfo = findClass(ExpressionSkeleton.getType(state)(expression))
-    new ClassOrObjectReference(classInfo, false)
-  }
-
   def findClass(objectType: MetaObject): ClassInfo = {
     val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified

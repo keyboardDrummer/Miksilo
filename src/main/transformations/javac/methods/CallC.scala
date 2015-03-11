@@ -75,7 +75,7 @@ object CallC extends ExpressionInstance {
   def getMethodKey(call: MetaObject, compiler: ClassCompiler) = {
     val callCallee = getCallCallee(call)
     val objectExpression = SelectorC.getSelectorObject(callCallee)
-    val kind = compiler.getReferenceKind(objectExpression).asInstanceOf[ClassOrObjectReference]
+    val kind = SelectorC.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val member = SelectorC.getSelectorMember(callCallee)
     new MethodId(kind.info.getQualifiedName, member)

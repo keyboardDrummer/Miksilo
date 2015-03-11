@@ -12,6 +12,8 @@ import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodIn
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
 
+
+
 object MethodC extends ParticleWithGrammar with WithState {
 
   override def inject(state: CompilationState): Unit = {
@@ -94,7 +96,6 @@ object MethodC extends ParticleWithGrammar with WithState {
       method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)
     }
 
-    //TODO don't depend on classCompiler and don't get called directly from ClassC.
     def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
       val methodCompiler = new MethodCompiler(state)
       if (!getMethodStatic(method))

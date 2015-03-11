@@ -32,19 +32,21 @@ object JavaCompiler {
 
   def getCompiler = new CompilerFromParticles(javaCompilerTransformations)
 
-  def allTransformations = javaCompilerTransformations ++ Seq(ExpressionMethodC)
+  def allTransformations = javaCompilerTransformations ++ Seq(ExpressionMethodC, BlockCompilerC)
 
   def javaCompilerTransformations: Seq[Particle] = {
-    Seq(ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, ConstructorC, ClassOrPackageSelector, GetIdentifierKind, ImplicitThisInPrivateCalls) ++
-      Seq(ThisCallExpression, SuperCallExpression, AssignToMember, ThisVariable) ++
+    Seq(DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
+      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind, ImplicitThisInPrivateCalls) ++
+      Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
 
-  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, IncrementAssignmentC,
-    ReturnExpressionC, ReturnVoidC, CallC, SelectorC, LocalDeclarationWithInitializerC, AssignToVariable,
-    AssignmentSkeleton, AssignmentPrecedence, LocalDeclarationC, PostFixIncrementC, VariableC, WildcardImportC,
-    BasicImportC, MethodC, FieldDeclaration) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
+  def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
+  def fields = Seq(FieldDeclaration, AssignToMember)
+
+  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, ReturnExpressionC, ReturnVoidC, CallC, SelectorC) ++ methodBlock
+  def methodBlock = Seq(LocalDeclarationWithInitializerC, LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
+    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
@@ -68,7 +70,7 @@ object JavaCompiler {
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
   def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
-
+  
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,

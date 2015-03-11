@@ -63,6 +63,12 @@ object MetaObject {
 }
 
 class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
+  def replaceWith(metaObject: MetaObject): Unit = {
+    clazz = metaObject.clazz
+    data.clear()
+    data ++= metaObject.data
+  }
+
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   data ++= entries
 

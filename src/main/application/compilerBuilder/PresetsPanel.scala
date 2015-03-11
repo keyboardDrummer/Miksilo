@@ -9,9 +9,9 @@ import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.particles.Particle
 import transformations.javaPlus.ExpressionMethodC
+import transformations.javac._
 import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.methods.ImplicitReturnAtEndOfMethod
-import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
+import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
 
 class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel(new GridBagLayout()) {
 
@@ -57,6 +57,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     model.addElement(getAddImplicitsPreset)
     model.addElement(getPrettyPrintPreset)
     model.addElement(getFibonacciExpressionMethodPreset)
+    model.addElement(getBlockCompilerPreset)
     model
   }
 
@@ -74,6 +75,10 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
 
   def getFibonacciExpressionMethodPreset = {
     new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompiler)
+  }
+
+  def getBlockCompilerPreset = {
+    new Preset("Java block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations)
   }
 
   def getAddImplicitsPreset: Preset = {

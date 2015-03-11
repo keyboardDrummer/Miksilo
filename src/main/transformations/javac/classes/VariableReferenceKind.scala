@@ -4,9 +4,9 @@ import core.particles.{CompilationState, Contract, MetaObject, Particle}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.VariableKey
 
-object GetIdentifierKind extends Particle {
+object VariableReferenceKind extends Particle {
   override def inject(state: CompilationState): Unit = {
-    JavaClassSkeleton.getReferenceKindRegistry(state).put(VariableKey, variable => {
+    SelectorC.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(variable, compiler)
     })
@@ -23,7 +23,7 @@ object GetIdentifierKind extends Particle {
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageInfo])
       else {
-        classCompiler.getReferenceKindFromExpressionType(variable)
+        SelectorC.getReferenceKindFromExpressionType(classCompiler, variable)
       }
     }
   }
