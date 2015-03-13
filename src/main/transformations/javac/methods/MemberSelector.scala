@@ -1,8 +1,8 @@
 package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{WithState, CompilationState, MetaObject, ParticleWithGrammar}
-import transformations.javac.classes.{ClassInfo, ReferenceKind, ClassOrObjectReference, ClassCompiler}
+import core.particles._
+import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends ParticleWithGrammar with WithState {
@@ -60,4 +60,6 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   override def createState = new State()
 
   override def description: String = "Defines the selector grammar <expression>.<identifier>"
+
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
 }
