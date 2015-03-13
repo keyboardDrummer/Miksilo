@@ -7,8 +7,11 @@ import transformations.javac.methods.{MemberSelector, MethodC, VariableC}
 
 import scala.collection.mutable
 
-//TODO: the implementation for this class is rather extreme. It's probably slow as well.
-object ImplicitThisForMemberSelectors extends Particle {
+/* TODO: the implementation for this class is rather extreme. It's probably slow as well.
+// You can't do one big transformation here because when transforming a variable you need the complete scope.
+// Currently I've just shoved the transformation in front of all calls to getType and toInstructions, which works but seems dangerous.
+*/ 
+object ImplicitThisForPrivateMemberSelection extends Particle {
   val thisName: String = "this"
 
   override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)
@@ -31,7 +34,7 @@ object ImplicitThisForMemberSelectors extends Particle {
   }
 
   def transformToByteCodeInstructions(state: CompilationState, visited: mutable.HashSet[MetaObject]): Unit = {
-    val registry = ExpressionSkeleton.getExpressionToLines(state)
+    val registry = ExpressionSkeleton.expressionToLines(state)
     val transformed = registry.mapValues(original => (root: MetaObject) => {
       root.transform(visited, obj => transformMetaObject(state)(obj))
       original(root)

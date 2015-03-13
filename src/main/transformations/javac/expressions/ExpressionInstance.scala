@@ -6,7 +6,7 @@ trait ExpressionInstance extends ParticleWithGrammar {
   val key: AnyRef
 
   override def inject(state: CompilationState): Unit = {
-    ExpressionSkeleton.getExpressionToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
+    ExpressionSkeleton.expressionToLines(state).put(key, (expression: MetaObject) => toByteCode(expression, state))
     ExpressionSkeleton.getGetTypeRegistry(state).put(key, (expression: MetaObject) => getType(expression, state))
     super.inject(state)
   }
