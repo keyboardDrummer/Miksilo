@@ -8,7 +8,6 @@ import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, ObjectTypeC}
 
-
 object VariableC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerC)

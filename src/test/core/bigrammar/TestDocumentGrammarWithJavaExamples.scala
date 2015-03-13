@@ -8,7 +8,7 @@ import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, Imp
 import transformations.javac.expressions.TernaryC
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
 import transformations.javac.statements.BlockC
-import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, JavaCompiler}
+import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForMemberSelectors, JavaCompiler}
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -58,7 +58,7 @@ class TestDocumentGrammarWithJavaExamples {
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ConstructorC, ImplicitReturnAtEndOfMethod)
+      ImplicitObjectSuperClass, ImplicitThisForMemberSelectors, ConstructorC, ImplicitReturnAtEndOfMethod)
     val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)

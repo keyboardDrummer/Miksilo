@@ -8,6 +8,6 @@ class FieldAssignment {
     }
 
     void assignMyField() {
-        this.myField = 3;
+        myField = 3;
     }
 }

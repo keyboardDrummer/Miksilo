@@ -45,9 +45,7 @@ object SelectField extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val selection = (expression <~ ".") ~ identifier ^^ parseMap(SelectorKey, SelectorObject, SelectorMember)
-    core.addOption(grammars.create(SelectGrammar, selection))
+    core.addOption(grammars.find(SelectGrammar))
   }
 
   override def description: String = "Enables using the . operator to select a member from a class."

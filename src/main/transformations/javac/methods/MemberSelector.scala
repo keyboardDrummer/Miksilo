@@ -12,10 +12,9 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier ^^ parseMap(SelectorKey, SelectorObject, SelectorMember)
-    core.addOption(grammars.create(SelectGrammar, selection))
+    grammars.create(SelectGrammar, selection)
   }
 
   object SelectGrammar

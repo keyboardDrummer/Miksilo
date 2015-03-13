@@ -8,7 +8,7 @@ import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperCons
 object JavaC extends TransformationGroup {
   override def dependencies: Set[Contract] =
     Set(ImplicitSuperConstructorCall, DefaultConstructorC, ImplicitObjectSuperClass, VariableReferenceKind, SelectorReferenceKind,
-    ImplicitThisInPrivateCalls, ImplicitJavaLangImport)
+    ImplicitThisForMemberSelectors, ImplicitJavaLangImport)
 
   override def dependants: Set[Contract] = Set.empty
 }

@@ -63,6 +63,28 @@ object MetaObject {
 }
 
 class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
+  def transform(visited: mutable.Set[MetaObject], transformation: MetaObject => Unit) = {
+
+    transformNode(this)
+    def transformNode(metaObject: MetaObject): Unit = {
+      if (!visited.add(metaObject))
+        return
+
+      transformation(metaObject)
+
+      for(child <- metaObject.data.values)
+      {
+        child match {
+          case metaObject: MetaObject =>
+            transformNode(metaObject)
+          case sequence: Seq[_] =>
+            sequence.foreach({case metaObject: MetaObject => transformNode(metaObject) })
+          case _ =>
+        }
+      }
+    }
+  }
+
   def replaceWith(metaObject: MetaObject): Unit = {
     clazz = metaObject.clazz
     data.clear()

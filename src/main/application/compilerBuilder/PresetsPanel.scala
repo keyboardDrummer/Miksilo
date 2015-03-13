@@ -83,7 +83,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
 
   def getAddImplicitsPreset: Preset = {
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisInPrivateCalls, ImplicitReturnAtEndOfMethod)
+      ImplicitObjectSuperClass, ImplicitThisForMemberSelectors, ImplicitReturnAtEndOfMethod)
 
     new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }

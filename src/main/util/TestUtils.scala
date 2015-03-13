@@ -148,7 +148,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
       (o: String) => line += o,
       (e: String) => line += e)
     val exitValue = processBuilder ! logger
-    Assert.assertEquals(line, 0, exitValue)
+    Assert.assertEquals(s"Java compiler did not exit successfully.\nMessage was $line", 0, exitValue)
     line
   }
 

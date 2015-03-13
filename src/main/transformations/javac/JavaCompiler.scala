@@ -36,7 +36,7 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind, ImplicitThisInPrivateCalls) ++
+      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind, ImplicitThisForMemberSelectors) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
@@ -70,7 +70,7 @@ object JavaCompiler {
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
   def typeTransformations = Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
-  
+
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
