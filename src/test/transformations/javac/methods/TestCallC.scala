@@ -11,6 +11,6 @@ class TestCallC {
     val state = new CompilationState()
     ExpressionSkeleton.inject(state)
     CallC.inject(state)
-    Assert.assertTrue(ExpressionSkeleton.expressionToLines(state).get(CallC.CallKey).nonEmpty)
+    Assert.assertTrue(ExpressionSkeleton.getToInstructionsRegistry(state).get(CallC.CallKey).nonEmpty)
   }
 }

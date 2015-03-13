@@ -34,7 +34,7 @@ object ImplicitThisForPrivateMemberSelection extends Particle {
   }
 
   def transformToByteCodeInstructions(state: CompilationState, visited: mutable.HashSet[MetaObject]): Unit = {
-    val registry = ExpressionSkeleton.expressionToLines(state)
+    val registry = ExpressionSkeleton.getToInstructionsRegistry(state)
     val transformed = registry.mapValues(original => (root: MetaObject) => {
       root.transform(visited, obj => transformMetaObject(state)(obj))
       original(root)

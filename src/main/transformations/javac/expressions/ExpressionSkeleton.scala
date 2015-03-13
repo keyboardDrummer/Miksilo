@@ -29,12 +29,12 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   def getToInstructions(state: CompilationState): MetaObject => Seq[MetaObject] = {
     expression => {
-      val implementation = expressionToLines(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
+      val implementation = getToInstructionsRegistry(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
       implementation(expression)
     }
   }
 
-  def expressionToLines(state: CompilationState) = getState(state).expressionToInstructions
+  def getToInstructionsRegistry(state: CompilationState) = getState(state).expressionToInstructions
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val core = grammars.create(CoreGrammar)
