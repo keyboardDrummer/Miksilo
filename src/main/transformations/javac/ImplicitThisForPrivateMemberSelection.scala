@@ -10,6 +10,8 @@ import scala.collection.mutable
 /* TODO: the implementation for this class is rather extreme. It's probably slow as well.
 // You can't do one big transformation here because when transforming a variable you need the complete scope.
 // Currently I've just shoved the transformation in front of all calls to getType and toInstructions, which works but seems dangerous.
+// I think I'd prefer just going over the program once, with all the scope information, and transforming all the variables.
+// Currently LocalDeclaration adds scoping information in its toByteCode method which is a bit unexpected!
 */ 
 object ImplicitThisForPrivateMemberSelection extends Particle {
   val thisName: String = "this"
