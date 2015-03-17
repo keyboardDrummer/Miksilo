@@ -47,9 +47,8 @@ class TestByteCodeGoTo {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledTargets.label("start", new MetaObject(StackMapTableAttribute.AppendFrame) {
-        data.put(StackMapTableAttribute.AppendFrameTypes, Seq(IntTypeC.intType))
-      }),
+      LabelledTargets.label("start", new MetaObject(StackMapTableAttribute.AppendFrame,
+        StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
       LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),

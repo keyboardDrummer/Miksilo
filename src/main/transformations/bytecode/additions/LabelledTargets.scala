@@ -24,10 +24,9 @@ object LabelledTargets extends ParticleWithPhase {
   def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualC.key, Seq(target))
   def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualC.key, Seq(target))
 
-  def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey) {
-    data.put(LabelNameKey, name)
-    data.put(LabelStackFrame, stackFrame)
-  }
+  def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey,
+    LabelNameKey -> name,
+    LabelStackFrame -> stackFrame)
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

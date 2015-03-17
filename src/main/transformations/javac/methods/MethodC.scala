@@ -169,22 +169,20 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
-    new MetaObject(MethodKey) {
-      data.put(MethodNameKey, name)
-      data.put(ReturnTypeKey, _returnType)
-      data.put(MethodParametersKey, _parameters)
-      data.put(MethodBodyKey, _body)
-      data.put(StaticKey, static)
-      data.put(VisibilityKey, visibility)
-    }
+    new MetaObject(MethodKey,
+      MethodNameKey -> name,
+      ReturnTypeKey -> _returnType,
+      MethodParametersKey -> _parameters,
+      MethodBodyKey -> _body,
+      StaticKey -> static,
+      VisibilityKey -> visibility)
   }
 
   object ParameterKey
   def parameter(name: String, _type: Any) = {
-    new MetaObject(ParameterKey) {
-      data.put(ParameterNameKey, name)
-      data.put(ParameterTypeKey, _type)
-    }
+    new MetaObject(ParameterKey,
+      ParameterNameKey -> name,
+      ParameterTypeKey -> _type)
   }
 
   def createState = new State()

@@ -24,10 +24,9 @@ object SubtractionC extends ExpressionInstance {
 
   def subtraction(first: Any, second: Any): MetaObject = subtraction(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 
-  def subtraction(first: MetaObject, second: MetaObject) = new MetaObject(SubtractionKey) {
-    data.put(FirstKey, first)
-    data.put(SecondKey, second)
-  }
+  def subtraction(first: MetaObject, second: MetaObject) = new MetaObject(SubtractionKey,
+    FirstKey -> first,
+    SecondKey -> second)
 
   override val key: AnyRef = SubtractionKey
 

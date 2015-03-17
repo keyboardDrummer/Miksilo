@@ -8,12 +8,8 @@ class TestMetaObject {
 
   @Test
   def testEquals() {
-    val first = new MetaObject(ClazzKey) {
-      data.put(FieldKey, FieldValue)
-    }
-    val second = new MetaObject(ClazzKey) {
-      data.put(FieldKey, FieldValue)
-    }
+    val first = new MetaObject(ClazzKey, FieldKey -> FieldValue)
+    val second = new MetaObject(ClazzKey, FieldKey -> FieldValue)
     Assert.assertEquals(first, second)
   }
 

@@ -18,15 +18,15 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
   def createState = new State()
 
   def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
-            classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey) {
-    data.put(ClassMethodsKey, methods)
-    data.put(ClassNameIndexKey, name)
-    data.put(ClassParentIndex, parent)
-    data.put(ClassConstantPool, constantPool)
-    data.put(ClassInterfaces, interfaces)
-    data.put(ClassFields, classFields)
-    data.put(ClassAttributes, attributes)
-  }
+            classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey,
+    ClassMethodsKey ->  methods,
+    ClassNameIndexKey ->  name,
+    ClassParentIndex ->  parent,
+    ClassConstantPool ->  constantPool,
+    ClassInterfaces ->  interfaces,
+    ClassFields ->  classFields,
+    ClassAttributes ->  attributes
+  )
 
   def getParentIndex(clazz: MetaObject) = clazz(ClassParentIndex).asInstanceOf[Int]
 

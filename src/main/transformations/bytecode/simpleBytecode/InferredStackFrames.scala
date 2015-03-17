@@ -11,9 +11,7 @@ object InferredStackFrames extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
-  def label(name: String) = new MetaObject(LabelledTargets.LabelKey) {
-    data.put(LabelledTargets.LabelNameKey, name)
-  }
+  def label(name: String) = new MetaObject(LabelledTargets.LabelKey, LabelledTargets.LabelNameKey -> name)
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
     val clazz = program
@@ -57,19 +55,13 @@ object InferredStackFrames extends ParticleWithPhase {
         new MetaObject(StackMapTableAttribute.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new MetaObject(StackMapTableAttribute.SameLocals1StackItem) {
-          data.put(StackMapTableAttribute.SameLocals1StackItemType, stack(0))
-        }
+        new MetaObject(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack(0))
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
-        new MetaObject(StackMapTableAttribute.ChopFrame) {
-          data.put(StackMapTableAttribute.ChopFrameCount, removedLocals.length)
-        }
+        new MetaObject(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new MetaObject(StackMapTableAttribute.AppendFrame) {
-          data.put(StackMapTableAttribute.AppendFrameTypes, addedLocals.map(toStackType))
-        }
+        new MetaObject(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes -> addedLocals.map(toStackType))
       }
       else {
         new MetaObject(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)

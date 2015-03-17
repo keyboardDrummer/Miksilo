@@ -11,9 +11,7 @@ object ClassRefConstant extends ConstantEntry {
 
   object ClassRefName
 
-  def classRef(classRefNameIndex: Int): MetaObject = new MetaObject(ClassRefKey) {
-    data.put(ClassRefName, classRefNameIndex)
-  }
+  def classRef(classRefNameIndex: Int): MetaObject = new MetaObject(ClassRefKey, ClassRefName -> classRefNameIndex)
 
   def getNameIndex(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
 

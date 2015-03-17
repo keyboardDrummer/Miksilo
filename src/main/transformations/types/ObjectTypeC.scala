@@ -35,13 +35,11 @@ object ObjectTypeC extends TypeInstance {
     parseObjectType
   }
 
-  def objectType(name: QualifiedClassName) = new MetaObject(ObjectTypeKey) {
-    data.put(ObjectTypeName, Right(name))
-  }
+  def objectType(name: QualifiedClassName) = new MetaObject(ObjectTypeKey,
+    ObjectTypeName -> Right(name))
 
-  def objectType(className: String) = new MetaObject(ObjectTypeKey) {
-    data.put(ObjectTypeName, Left(className))
-  }
+  def objectType(className: String) = new MetaObject(ObjectTypeKey,
+    ObjectTypeName -> Left(className))
 
   override def getByteCodeString(_type: MetaObject, state: CompilationState): String =
     s"L${getObjectTypeName(_type).right.get.parts.mkString("/")};"

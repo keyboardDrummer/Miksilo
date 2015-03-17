@@ -11,9 +11,7 @@ object ThisCallExpression extends ExpressionInstance {
   override val key: AnyRef = ThisCall
   object ThisCall
 
-  def thisCall(arguments: Seq[MetaObject]) = new MetaObject(ThisCall) {
-    data.put(CallC.CallArguments, arguments)
-  }
+  def thisCall(arguments: Seq[MetaObject]) = new MetaObject(ThisCall, CallC.CallArguments -> arguments)
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 

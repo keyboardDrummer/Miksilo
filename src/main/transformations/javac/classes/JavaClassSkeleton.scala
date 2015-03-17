@@ -89,13 +89,12 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
   object ImportGrammar
 
   def clazz(_package: Seq[String], name: String, members: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
-    new MetaObject(ByteCodeSkeleton.ClassFileKey) {
-    data.put(Members, members)
-    data.put(ClassPackage, _package)
-    data.put(ClassName, name)
-    data.put(ClassImports, imports)
-    data.put(ClassParent, mbParent)
-  }
+    new MetaObject(ByteCodeSkeleton.ClassFileKey,
+    Members -> members,
+    ClassPackage -> _package,
+    ClassName -> name,
+    ClassImports -> imports,
+    ClassParent -> mbParent)
 
   def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[Seq[MetaObject]]
 

@@ -20,9 +20,7 @@ object ArrayTypeC extends TypeInstance {
   }
 
   def arrayType(elementType: MetaObject) = {
-    new MetaObject(ArrayTypeKey) {
-      data.put(ArrayElementType, elementType)
-    }
+    new MetaObject(ArrayTypeKey, ArrayElementType -> elementType)
   }
 
   override def getStackSize: Int = 1

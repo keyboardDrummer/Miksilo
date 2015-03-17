@@ -17,12 +17,11 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
   object MethodAttributes
 
   def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[MetaObject], flags: Set[MethodAccessFlag] = Set()) =
-    new MetaObject(MethodInfoKey) {
-      data.put(MethodAttributes, attributes)
-      data.put(MethodNameIndex, nameIndex)
-      data.put(MethodDescriptorIndex, descriptorIndex)
-      data.put(AccessFlagsKey, flags)
-    }
+    new MetaObject(MethodInfoKey,
+      MethodAttributes -> attributes,
+      MethodNameIndex -> nameIndex,
+      MethodDescriptorIndex -> descriptorIndex,
+      AccessFlagsKey -> flags)
 
   def getMethodAttributes(method: MetaObject) = method(MethodAttributes).asInstanceOf[Seq[MetaObject]]
 

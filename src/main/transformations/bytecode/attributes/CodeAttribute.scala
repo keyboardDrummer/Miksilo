@@ -12,9 +12,7 @@ object InstructionArgumentsKey
 
 object CodeAttribute extends ParticleWithGrammar with WithState {
 
-  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type) {
-    data.put(InstructionArgumentsKey, arguments)
-  }
+  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type, InstructionArgumentsKey -> arguments)
 
   def getInstructionArguments(instruction: MetaObject) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
@@ -32,14 +30,13 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
                     instructions: Seq[MetaObject],
                     exceptionTable: Seq[MetaObject],
                     attributes: Seq[MetaObject]) = {
-    new MetaObject(CodeKey) {
-      data.put(ByteCodeSkeleton.AttributeNameKey, nameIndex)
-      data.put(CodeMaxStackKey, maxStack)
-      data.put(CodeMaxLocalsKey, maxLocals)
-      data.put(CodeInstructionsKey, instructions)
-      data.put(CodeExceptionTableKey, exceptionTable)
-      data.put(CodeAttributesKey, attributes)
-    }
+    new MetaObject(CodeKey,
+      ByteCodeSkeleton.AttributeNameKey -> nameIndex,
+      CodeMaxStackKey -> maxStack,
+      CodeMaxLocalsKey -> maxLocals,
+      CodeInstructionsKey -> instructions,
+      CodeExceptionTableKey -> exceptionTable,
+      CodeAttributesKey -> attributes)
   }
 
   trait InstructionSignatureProvider

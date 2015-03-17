@@ -10,10 +10,9 @@ case class LineNumberRef(lineNumber: Int, startProgramCounter: Int)
 object LineNumberTable extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def lineNumberTable(nameIndex: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberTableKey) {
-    data.put(ByteCodeSkeleton.AttributeNameKey, nameIndex)
-    data.put(LineNumberTableLines, lines)
-  }
+  def lineNumberTable(nameIndex: Int, lines: Seq[LineNumberRef]) = new MetaObject(LineNumberTableKey,
+    ByteCodeSkeleton.AttributeNameKey -> nameIndex,
+    LineNumberTableLines -> lines)
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

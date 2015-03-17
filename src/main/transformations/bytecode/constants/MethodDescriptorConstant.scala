@@ -9,10 +9,9 @@ import transformations.types.TypeSkeleton
 object MethodDescriptorConstant extends ConstantEntry {
 
   def methodDescriptor(returnDescriptor: MetaObject, parameterDescriptors: Seq[MetaObject]) = {
-    new MetaObject(MethodDescriptor) {
-      data.put(MethodDescriptorParameters, parameterDescriptors)
-      data.put(MethodReturnType, returnDescriptor)
-    }
+    new MetaObject(MethodDescriptor,
+      MethodDescriptorParameters -> parameterDescriptors,
+      MethodReturnType -> returnDescriptor)
   }
 
   def getMethodDescriptorReturnType(descriptor: MetaObject) = descriptor(MethodReturnType).asInstanceOf[MetaObject]

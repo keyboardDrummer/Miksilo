@@ -42,32 +42,25 @@ object StackMapTableAttribute extends ParticleWithGrammar {
   
   private object StackMapTableId
 
-  def stackMapTable(nameIndex: Int, stackMaps: Seq[MetaObject]) = new MetaObject(StackMapTableKey) {
-    data.put(ByteCodeSkeleton.AttributeNameKey, nameIndex)
-    data.put(StackMapTableMaps, stackMaps)
-  }
+  def stackMapTable(nameIndex: Int, stackMaps: Seq[MetaObject]) = new MetaObject(StackMapTableKey,
+    ByteCodeSkeleton.AttributeNameKey -> nameIndex,
+    StackMapTableMaps -> stackMaps)
 
   def getStackMapTableEntries(stackMapTable: MetaObject) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[MetaObject]]
 
   def getFrameOffset(frame: MetaObject) = frame(OffsetDelta).asInstanceOf[Int]
 
-  def sameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem) {
-    data.put(OffsetDelta, offsetDelta)
-    data.put(SameLocals1StackItemType, _type)
-  }
+  def sameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem,
+    OffsetDelta -> offsetDelta,
+    SameLocals1StackItemType -> _type)
 
   def getSameLocals1StackItemType(sameLocals1StackItem: MetaObject) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[MetaObject]
 
-  def appendFrame(offset: Int, newLocalTypes: Seq[MetaObject]) = new MetaObject(AppendFrame) {
-    data.put(OffsetDelta, offset)
-    data.put(AppendFrameTypes, newLocalTypes)
-  }
+  def appendFrame(offset: Int, newLocalTypes: Seq[MetaObject]) = new MetaObject(AppendFrame, OffsetDelta -> offset, AppendFrameTypes -> newLocalTypes)
 
   def getAppendFrameTypes(appendFrame: MetaObject) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[MetaObject]]
 
-  def sameFrame(offset: Int) = new MetaObject(SameFrameKey) {
-    data.put(OffsetDelta, offset)
-  }
+  def sameFrame(offset: Int) = new MetaObject(SameFrameKey, OffsetDelta -> offset)
 
   object StackMapTableGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

@@ -16,10 +16,9 @@ object SourceFileAttribute extends ParticleWithGrammar {
 
   def sourceFileId = new MetaObject(SourceFileId)
 
-  def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttributeKey) {
-    data.put(SourceFileFileNameIndex, fileNameIndex)
-    data.put(AttributeNameKey, nameIndex)
-  }
+  def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttributeKey,
+    SourceFileFileNameIndex -> fileNameIndex,
+    AttributeNameKey -> nameIndex)
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

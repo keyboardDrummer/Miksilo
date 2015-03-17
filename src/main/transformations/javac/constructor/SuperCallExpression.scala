@@ -16,9 +16,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallC) ++ super.dependencies
 
-  def superCall(arguments: Seq[MetaObject] = Seq()) = new MetaObject(SuperCall) {
-    data.put(CallC.CallArguments, arguments)
-  }
+  def superCall(arguments: Seq[MetaObject] = Seq()) = new MetaObject(SuperCall, CallC.CallArguments -> arguments)
 
   override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = VoidTypeC.voidType
 

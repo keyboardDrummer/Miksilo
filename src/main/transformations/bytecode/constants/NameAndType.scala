@@ -13,10 +13,9 @@ object NameAndType extends ConstantEntry {
 
   object NameAndTypeType
 
-  def nameAndType(nameIndex: Int, typeIndex: Int): MetaObject = new MetaObject(NameAndTypeKey) {
-    data.put(NameAndTypeName, nameIndex)
-    data.put(NameAndTypeType, typeIndex)
-  }
+  def nameAndType(nameIndex: Int, typeIndex: Int): MetaObject = new MetaObject(NameAndTypeKey,
+    NameAndTypeName -> nameIndex,
+    NameAndTypeType -> typeIndex)
 
   def getNameAndTypeName(nameAndType: MetaObject) = nameAndType(NameAndTypeName).asInstanceOf[Int]
 

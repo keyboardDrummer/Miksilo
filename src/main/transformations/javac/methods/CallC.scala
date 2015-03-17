@@ -30,10 +30,7 @@ object CallC extends ExpressionInstance {
     call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
 
   def call(callee: MetaObject, arguments: Seq[MetaObject] = Seq()) = {
-    new MetaObject(CallKey) {
-      data.put(CallCallee, callee)
-      data.put(CallArguments, arguments)
-    }
+    new MetaObject(CallKey, CallCallee -> callee, CallArguments -> arguments)
   }
 
   object CallKey

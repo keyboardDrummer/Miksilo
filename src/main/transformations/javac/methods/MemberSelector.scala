@@ -28,10 +28,9 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
 
   def selector(_object: MetaObject, member: String): MetaObject = {
-    new MetaObject(SelectorKey) {
-      data.put(SelectorObject, _object)
-      data.put(SelectorMember, member)
-    }
+    new MetaObject(SelectorKey,
+      SelectorObject -> _object,
+      SelectorMember -> member)
   }
 
 

@@ -25,11 +25,10 @@ object TernaryC extends ExpressionInstance {
     expressionGrammar.inner = ternaryGrammar
   }
 
-  def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey) {
-    data.put(FalseKey, falseBranch)
-    data.put(TrueKey, trueBranch)
-    data.put(ConditionKey, condition)
-  }
+  def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey,
+    FalseKey -> falseBranch,
+    TrueKey -> trueBranch,
+    ConditionKey -> condition)
 
   object FalseKey
 

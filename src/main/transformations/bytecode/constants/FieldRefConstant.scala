@@ -13,10 +13,9 @@ object FieldRefConstant extends ConstantEntry {
 
   object FieldRefNameAndTypeIndex
 
-  def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new MetaObject(FieldRef) {
-    data.put(FieldRefClassIndex, classIndex)
-    data.put(FieldRefNameAndTypeIndex, nameAndTypeIndex)
-  }
+  def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new MetaObject(FieldRef,
+    FieldRefClassIndex -> classIndex,
+    FieldRefNameAndTypeIndex -> nameAndTypeIndex)
 
   override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
     byteToBytes(9) ++

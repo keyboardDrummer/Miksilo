@@ -20,10 +20,9 @@ object MethodRefConstant extends ConstantEntry {
 
   override def key: Any = MethodRefKey
 
-  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey) {
-    data.put(MethodRefClassName, classNameIndex)
-    data.put(MethodRefMethodName, methodNameAndTypeIndex)
-  }
+  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey,
+    MethodRefClassName -> classNameIndex,
+    MethodRefMethodName -> methodNameAndTypeIndex)
 
   def getMethodRefClassRefIndex(methodRef: MetaObject) = methodRef(MethodRefClassName).asInstanceOf[Int]
 
