@@ -10,14 +10,14 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(addition: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  override def getType(expression: MetaObject, state: CompilationState): MetaObject = {
+  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -26,9 +26,9 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
     IntTypeC.intType
   }
 
-  def getFirst(addition: MetaObject) = addition(FirstKey).asInstanceOf[MetaObject]
+  def getFirst[T <: MetaLike](addition: T) = addition(FirstKey).asInstanceOf[T]
 
-  def getSecond(addition: MetaObject) = addition(SecondKey).asInstanceOf[MetaObject]
+  def getSecond[T <: MetaLike](addition: T) = addition(SecondKey).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersC)
 
@@ -40,10 +40,7 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
   private def addition(first: Any, second: Any): MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
 
-  def addition(first: MetaObject, second: MetaObject) = new MetaObject(AdditionClazz) {
-    data.put(FirstKey, first)
-    data.put(SecondKey, second)
-  }
+  def addition(first: MetaObject, second: MetaObject) = new MetaObject(AdditionClazz, FirstKey -> first, SecondKey -> second)
 
   object AdditionClazz
 

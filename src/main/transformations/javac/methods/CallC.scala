@@ -9,9 +9,9 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 
 object CallC extends ExpressionInstance {
 
-  def getCallCallee(call: MetaObject) = call(CallCallee).asInstanceOf[MetaObject]
+  def getCallCallee[T <: MetaLike](call: T) = call(CallCallee).asInstanceOf[T]
 
-  def getCallArguments(call: MetaObject) = call(CallArguments).asInstanceOf[Seq[MetaObject]]
+  def getCallArguments[T <: MetaLike](call: T) = call(CallArguments).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = Set(MemberSelector, InvokeStaticC, InvokeVirtualC)
 
@@ -19,8 +19,10 @@ object CallC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)
+    val calleeGrammar = grammars.create(CallCallee, selectorGrammar)
     val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") <~ ")")
-    val parseCall = expression ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
+    val parseCall = calleeGrammar ~ callArguments ^^ parseMap(CallKey, CallCallee, CallArguments)
     core.addOption(parseCall)
   }
 
@@ -42,7 +44,7 @@ object CallC extends ExpressionInstance {
 
   override val key: AnyRef = CallKey
 
-  override def getType(call: MetaObject, state: CompilationState): MetaObject = {
+  override def getType(call: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
@@ -50,7 +52,7 @@ object CallC extends ExpressionInstance {
     returnType
   }
 
-  override def toByteCode(call: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(call: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val callCallee = getCallCallee(call)
@@ -72,7 +74,7 @@ object CallC extends ExpressionInstance {
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
-  def getMethodKey(call: MetaObject, compiler: ClassCompiler) = {
+  def getMethodKey(call: MetaObjectWithOrigin, compiler: ClassCompiler) = {
     val callCallee = getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]

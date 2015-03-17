@@ -10,9 +10,7 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.types.{ObjectTypeC, TypeSkeleton, VoidTypeC}
-
-
+import transformations.types.{TypeSkeleton, VoidTypeC}
 
 object MethodC extends ParticleWithGrammar with WithState {
 
@@ -73,37 +71,33 @@ object MethodC extends ParticleWithGrammar with WithState {
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptorIndex(method)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
-    addCodeAnnotation(method)
+    addCodeAnnotation(new MetaObjectWithOrigin(method))
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
 
-    def addCodeAnnotation(method: MetaObject) {
-      val parameters = getMethodParameters(method)
-      setMethodCompiler(method, parameters)
+    def addCodeAnnotation(method: MetaObjectWithOrigin) {
+      setMethodCompiler(method, state)
       val statements = getMethodBody(method)
-      method.data.remove(MethodBodyKey)
+      method.obj.data.remove(MethodBodyKey)
       val statementToInstructions = StatementSkeleton.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val codeIndex = constantPool.store(CodeConstantEntry.entry)
       val exceptionTable = Seq[MetaObject]()
       val codeAttributes = Seq[MetaObject]()
+      val maxLocalCount: Int = getMethodCompiler(state).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
       val codeAttribute = new MetaObject(CodeAttribute.CodeKey,
         AttributeNameKey -> codeIndex,
-        CodeMaxLocalsKey -> getMethodCompiler(state).variables.localCount,
+        CodeMaxLocalsKey -> maxLocalCount,
         CodeInstructionsKey -> instructions,
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
       method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)
     }
+  }
 
-    def setMethodCompiler(method: MetaObject, parameters: Seq[MetaObject]) {
-      val methodCompiler = new MethodCompiler(state)
-      if (!getMethodStatic(method))
-        methodCompiler.variables.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))
-      for (parameter <- parameters)
-        methodCompiler.variables.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
-      getState(state).methodCompiler = methodCompiler
-    }
+  def setMethodCompiler(method: MetaObject, state: CompilationState) {
+    val methodCompiler = new MethodCompiler(state, method)
+    getState(state).methodCompiler = methodCompiler
   }
 
   def getMethodReturnType(metaObject: MetaObject) = {
@@ -135,7 +129,7 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  def getMethodBody(metaObject: MetaObject) = metaObject(MethodBodyKey).asInstanceOf[Seq[MetaObject]]
+  def getMethodBody[T <: MetaLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
   def getMethodName(method: MetaObject) = {
     method(MethodNameKey).asInstanceOf[String]
@@ -198,13 +192,13 @@ object MethodC extends ParticleWithGrammar with WithState {
     var methodCompiler: MethodCompiler = null
   }
 
-  class Visibility
+  class Visibility extends Key
 
   object MethodKey
 
   object MethodGrammar
 
-  object MethodBodyKey
+  object MethodBodyKey extends Key
 
   object ParameterNameKey
 

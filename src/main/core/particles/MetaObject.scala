@@ -1,5 +1,6 @@
 package core.particles
 
+
 import scala.collection.mutable
 
 case class ComparisonOptions(compareIntegers: Boolean, takeAllLeftKeys: Boolean, takeAllRightKeys: Boolean)
@@ -62,28 +63,46 @@ object MetaObject {
   }
 }
 
-class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
-  def transform(visited: mutable.Set[MetaObject], transformation: MetaObject => Unit) = {
+trait MetaLike {
 
-    transformNode(this)
-    def transformNode(metaObject: MetaObject): Unit = {
+  def get(key: Any): Option[Any]
+  def apply(key: Any): Any
+  def clazz: Any
+  def data2: Map[Any, Any]
+
+  def transform[T <: MetaLike](transformation: T => Unit, visited: mutable.Set[T] = new mutable.HashSet[T]()) = {
+
+    transformNode(this.asInstanceOf[T])
+    def transformNode(metaObject: T): Unit = {
       if (!visited.add(metaObject))
         return
 
       transformation(metaObject)
 
-      for(child <- metaObject.data.values)
+      val children = metaObject.data2.values
+      for(child <- children)
       {
         child match {
-          case metaObject: MetaObject =>
+          case metaObject: T =>
             transformNode(metaObject)
           case sequence: Seq[_] =>
-            sequence.foreach({case metaObject: MetaObject => transformNode(metaObject) })
+            sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
+              case metaChild: T => transformNode(metaChild)
+              case _ =>
+            })
           case _ =>
         }
       }
     }
   }
+}
+
+trait Key
+{
+  override def toString = MetaObject.classDebugRepresentation(this)
+}
+
+class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLike {
 
   def replaceWith(metaObject: MetaObject): Unit = {
     clazz = metaObject.clazz
@@ -94,9 +113,25 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   data ++= entries
 
+  def data2 = data.toMap
+
   def apply(key: Any) = data(key)
 
-  def update(key: Any, value: Any) = data.put(key, value)
+  def update(key: Any, value: Any) = {
+    value match
+    {
+      case wrong: MetaObjectWithOrigin => throwInsertedWithOriginIntoRegularMetaObject()
+      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[MetaObjectWithOrigin]))
+        throwInsertedWithOriginIntoRegularMetaObject()
+      case _ =>
+    }
+
+    data.put(key, value)
+  }
+
+  def throwInsertedWithOriginIntoRegularMetaObject(): Unit = {
+    throw new scala.UnsupportedOperationException("Don't insert a MetaObjectWithOrigin into a regular MetaObject.")
+  }
 
   def selectDynamic(name: String) =
     data.getOrElse(name, sys.error("member not found"))
@@ -127,4 +162,8 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic {
     val state = Seq(data, clazz)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
+
+  override def get(key: Any): Option[Any] = data.get(key)
 }
+
+

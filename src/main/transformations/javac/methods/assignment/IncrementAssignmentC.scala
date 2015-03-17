@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles._
 import transformations.javac.expressions.additive.AdditionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.IntTypeC
@@ -28,16 +28,24 @@ object IncrementAssignmentC extends ExpressionInstance {
 
   override val key: AnyRef = IncrementAssignmentKey
 
-  override def getType(expression: MetaObject, state: CompilationState): MetaObject = IntTypeC.intType
+  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = IntTypeC.intType
 
-  override def toByteCode(incrementAssignment: MetaObject, state: CompilationState): Seq[MetaObject] = {
-    val target = incrementAssignment(TargetKey).asInstanceOf[MetaObject]
-    val value = incrementAssignment(ValueKey).asInstanceOf[MetaObject]
+  override def toByteCode(incrementAssignment: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+    val target = getTarget(incrementAssignment)
+    val value = getValue(incrementAssignment)
     val newValue = AdditionC.addition(value, target)
     val assignment = AssignmentSkeleton.assignment(target, newValue)
 
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
-    toInstructions(assignment)
+    toInstructions(new MetaObjectWithOrigin(assignment, incrementAssignment.origin))
+  }
+
+  def getValue[T <: MetaLike](incrementAssignment: T): T = {
+    incrementAssignment(ValueKey).asInstanceOf[T]
+  }
+
+  def getTarget[T <: MetaLike](incrementAssignment: T): T = {
+    incrementAssignment(TargetKey).asInstanceOf[T]
   }
 
   override def description: String = "Defines the += operator."

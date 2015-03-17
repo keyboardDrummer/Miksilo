@@ -10,9 +10,9 @@ object SubtractionC extends ExpressionInstance {
   object FirstKey
   object SecondKey
 
-  def getFirst(subtraction: MetaObject) = subtraction(FirstKey).asInstanceOf[MetaObject]
+  def getFirst[T <: MetaLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
 
-  def getSecond(subtraction: MetaObject) = subtraction(SecondKey).asInstanceOf[MetaObject]
+  def getSecond[T <: MetaLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerC)
 
@@ -31,9 +31,9 @@ object SubtractionC extends ExpressionInstance {
 
   override val key: AnyRef = SubtractionKey
 
-  override def getType(expression: MetaObject, state: CompilationState): MetaObject = ???
+  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = ???
 
-  override def toByteCode(subtraction: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(subtraction: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))

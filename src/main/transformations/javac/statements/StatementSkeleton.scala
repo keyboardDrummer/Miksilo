@@ -8,28 +8,29 @@ import transformations.javac.expressions.ExpressionSkeleton.MissingToInstruction
 import scala.collection.mutable
 
 
-object StatementSkeleton extends ParticleWithGrammar {
+object StatementSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(state: CompilationState): MetaObject => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): MetaObjectWithOrigin => Seq[MetaObject] = {
     statement => {
-      val statementTransformation = getStatementToLines(state).get(statement.clazz)
+      val statementTransformation = getState(state).instances.get(statement.clazz)
       val transformation = statementTransformation.getOrElse(throw new MissingToInstructionsFor(statement.clazz))
-      transformation(statement)
+      transformation.toByteCode(statement, state)
     }
   }
-
-  def getStatementToLines(state: CompilationState): StatementTransformations =
-    state.data.getOrElseUpdate(this, new StatementTransformations()).asInstanceOf[StatementTransformations]
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     grammars.create(StatementGrammar)
   }
 
-  class StatementTransformations extends mutable.HashMap[AnyRef, MetaObject => Seq[MetaObject]]
-
   object StatementGrammar
 
   override def description: String = "Defines the concept of a statement."
+
+  class State {
+    val instances = new ClassRegistry[StatementInstance]
+  }
+
+  override def createState: State = new State()
 }

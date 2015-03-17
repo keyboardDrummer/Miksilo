@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
+import core.particles._
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
@@ -17,10 +17,10 @@ object AssignToVariable extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
   override def inject(state: CompilationState): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObject) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: MetaObjectWithOrigin) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
-      val variableInfo = methodCompiler.variables(target)
+      val variableInfo = VariableC.getVariables(state, targetVariable)(target)
       val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, state)
       Seq(getStoreInstruction(variableInfo, byteCodeType))
     })

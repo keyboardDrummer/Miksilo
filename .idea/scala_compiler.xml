@@ -3,6 +3,7 @@
   <component name="ScalaCompilerConfiguration">
     <option name="dynamics" value="true" />
     <option name="postfixOps" value="true" />
+    <option name="implicitConversions" value="true" />
     <parameters>
       <parameter value="-usejavacp" />
     </parameters>

@@ -1,10 +1,10 @@
-package transformations.javac.statements
+package transformations.javac.statements.locals
 
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import transformations.javac.classes.JavaClassSkeleton
-import transformations.javac.methods.{MethodC, VariablePool}
+import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 import transformations.types.TypeSkeleton
 
 object LocalDeclarationC extends StatementInstance {
@@ -39,18 +39,15 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key: AnyRef = DeclarationKey
 
-  override def toByteCode(declaration: MetaObject, state: CompilationState): Seq[MetaObject] = {
-    val methodCompiler = MethodC.getMethodCompiler(state)
-    val variables: VariablePool = methodCompiler.variables
-    val name: String = getDeclarationName(declaration)
-
-    if (variables.contains(name))
-      throw new VariableAlreadyDefined(name)
-
-    val declarationType: MetaObject = getDeclarationType(declaration)
-    JavaClassSkeleton.fullyQualify(declarationType, JavaClassSkeleton.getClassCompiler(state))
-    variables.add(name, declarationType)
+  override def toByteCode(declaration: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     Seq.empty[MetaObject]
+  }
+
+  override def definedVariables(state: CompilationState, declaration: MetaObject): Map[String, MetaObject] = {
+    val _type = getDeclarationType(declaration)
+    JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(state))
+    val name: String = getDeclarationName(declaration)
+    Map(name -> _type)
   }
 
   override def description: String = "Enables declaring a local variable."

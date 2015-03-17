@@ -7,12 +7,12 @@ import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.types.{BooleanTypeC, TypeSkeleton}
 
 object TernaryC extends ExpressionInstance {
-  def falseBranch(metaObject: MetaObject) = metaObject(FalseKey).asInstanceOf[MetaObject]
+  def falseBranch[T <: MetaLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
 
-  def trueBranch(metaObject: MetaObject) = metaObject(TrueKey).asInstanceOf[MetaObject]
+  def trueBranch[T <: MetaLike](metaObject: T) = metaObject(TrueKey).asInstanceOf[T]
 
-  def getCondition(metaObject: MetaObject) = {
-    metaObject(ConditionKey).asInstanceOf[MetaObject]
+  def getCondition[T <: MetaLike](metaObject: T) = {
+    metaObject(ConditionKey).asInstanceOf[T]
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledTargets)
@@ -43,7 +43,7 @@ object TernaryC extends ExpressionInstance {
 
   override val key: AnyRef = TernaryKey
 
-  override def getType(_ternary: MetaObject, state: CompilationState): MetaObject = {
+  override def getType(_ternary: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
     val getExpressionType = ExpressionSkeleton.getType(state)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
@@ -55,7 +55,7 @@ object TernaryC extends ExpressionInstance {
     TypeSkeleton.union(state)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_ternary: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)

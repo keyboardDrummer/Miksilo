@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithGrammar}
+import core.particles._
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectField._
@@ -15,7 +15,7 @@ object AssignToMember extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: CompilationState): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: MetaObject) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: MetaObjectWithOrigin) => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
       val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)

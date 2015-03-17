@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.{CompilationState, Contract, MetaObject, Particle}
+import core.particles._
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.VariableC.VariableKey
 
@@ -12,7 +12,7 @@ object VariableReferenceKind extends Particle {
     })
   }
 
-  def getReferenceKind(variable: MetaObject, classCompiler: ClassCompiler): ReferenceKind = {
+  def getReferenceKind(variable: MetaObjectWithOrigin, classCompiler: ClassCompiler): ReferenceKind = {
 
     val name = VariableC.getVariableName(variable)
     val isClass = classCompiler.classNames.contains(name)

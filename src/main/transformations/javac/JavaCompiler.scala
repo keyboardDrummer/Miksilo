@@ -26,6 +26,7 @@ import transformations.javac.expressions.relational.{AddRelationalPrecedence, Le
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentC}
 import transformations.javac.statements._
+import transformations.javac.statements.locals.{LocalDeclarationWithInitializerC, LocalDeclarationC}
 import transformations.types._
 
 object JavaCompiler {
@@ -36,7 +37,7 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind, ImplicitThisForPrivateMemberSelection) ++
+      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
@@ -44,11 +45,12 @@ object JavaCompiler {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ImplicitReturnAtEndOfMethod, ReturnExpressionC, ReturnVoidC, CallC, SelectField, MemberSelector) ++ methodBlock
-  def methodBlock = Seq(LocalDeclarationWithInitializerC, LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
+  def javaMethod = Seq(ForLoopC, LocalDeclarationWithInitializerC) ++
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallC, SelectField, MemberSelector) ++ methodBlock
+  def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenC, ForLoopC, WhileC, BlockC,
+  def javaSimpleStatement = Seq(IfThenC, ContinueC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,

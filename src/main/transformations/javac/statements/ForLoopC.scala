@@ -1,17 +1,17 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles._
 import transformations.javac.expressions.ExpressionSkeleton
 
-object ForLoopC extends StatementInstance {
+object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
 
-  def getInitializer(forLoop: MetaObject) = forLoop(InitializerKey).asInstanceOf[MetaObject]
+  def getInitializer[T <: MetaLike](forLoop: T) = forLoop(InitializerKey).asInstanceOf[T]
 
-  def getCondition(forLoop: MetaObject) = forLoop(ConditionKey).asInstanceOf[MetaObject]
+  def getCondition[T <: MetaLike](forLoop: T) = forLoop(ConditionKey).asInstanceOf[T]
 
-  def getIncrement(forLoop: MetaObject) = forLoop(IncrementKey).asInstanceOf[MetaObject]
+  def getIncrement[T <: MetaLike](forLoop: T) = forLoop(IncrementKey).asInstanceOf[T]
 
-  def getBody(forLoop: MetaObject) = forLoop(BodyKey).asInstanceOf[Seq[MetaObject]]
+  def getBody[T <: MetaLike](forLoop: T) = forLoop(BodyKey).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = Set(WhileC)
 
@@ -37,17 +37,23 @@ object ForLoopC extends StatementInstance {
 
   object BodyKey
 
-  override val key: AnyRef = ForLoopKey
-
-  override def toByteCode(forLoop: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  def transformForLoop(forLoop: MetaObjectWithOrigin, state: CompilationState): Unit = {
     val initializer = getInitializer(forLoop)
     val condition = getCondition(forLoop)
-    val forBody = getBody(forLoop)
+    val forBody = getBody(forLoop.obj)
     val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
-    val _while = WhileC._while(condition, whileBody)
+    val _while = new MetaObjectWithOrigin(WhileC._while(condition.obj, whileBody), forLoop.origin)
 
-    val toInstructions = StatementSkeleton.getToInstructions(state)
-    toInstructions(initializer) ++ toInstructions(_while) //TODO maybe translate to statements instead of bytecode.
+    val newStatements = Seq(initializer.obj, _while.obj)
+    val originSequence = forLoop.origin.asInstanceOf[SequenceSelection]
+    originSequence.replaceWith(newStatements)
+  }
+
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
+    new MetaObjectWithOrigin(program).transform[MetaObjectWithOrigin](obj => obj.clazz match {
+      case ForLoopKey => transformForLoop(obj, state)
+      case _ =>
+    })
   }
 
   override def description: String = "Enables using the non-iterator for loop."

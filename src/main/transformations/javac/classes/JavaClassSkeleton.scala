@@ -18,9 +18,8 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     transformClass(program)
 
     def transformClass(clazz: MetaObject) {
-      val classCompiler = new ClassCompiler(clazz, state)
-      getState(state).classCompiler = classCompiler
-
+      val classCompiler: ClassCompiler = initializeClassCompiler(state, clazz)
+      
       val classInfo = classCompiler.currentClassInfo
       clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
 
@@ -32,14 +31,20 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
-      for(firstMemberPass <- getState(state).firstMemberPasses)
-        firstMemberPass(clazz)
-
       for(secondMemberPass <- getState(state).secondMemberPasses)
         secondMemberPass(clazz)
 
       clazz.data.remove(Members)
     }
+  }
+
+  def initializeClassCompiler(state: CompilationState, clazz: MetaObject): ClassCompiler = {
+    val classCompiler = new ClassCompiler(clazz, state)
+    getState(state).classCompiler = classCompiler
+
+    for (firstMemberPass <- getState(state).firstMemberPasses)
+      firstMemberPass(clazz)
+    classCompiler
   }
 
   def fullyQualify(_type: MetaObject, classCompiler: ClassCompiler): Unit =  _type.clazz match {

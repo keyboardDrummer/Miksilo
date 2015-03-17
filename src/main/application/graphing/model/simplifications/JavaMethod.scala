@@ -5,7 +5,7 @@ import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
 import transformations.javac.methods.assignment.{AssignToVariable, IncrementAssignmentC}
-import transformations.javac.statements.LocalDeclarationWithInitializerC
+import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object JavaMethod extends TransformationGroup {
 

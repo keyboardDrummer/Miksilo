@@ -12,9 +12,9 @@ import transformations.types.TypeSkeleton
 
 object AssignmentSkeleton extends ExpressionInstance with WithState {
 
-  def getAssignmentTarget(assignment: MetaObject) = assignment(AssignmentTarget).asInstanceOf[MetaObject]
+  def getAssignmentTarget[T <: MetaLike](assignment: T) = assignment(AssignmentTarget).asInstanceOf[T]
 
-  def getAssignmentValue(assignment: MetaObject) = assignment(AssignmentValue).asInstanceOf[MetaObject]
+  def getAssignmentValue[T <: MetaLike](assignment: T) = assignment(AssignmentValue).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC, AssignmentPrecedence)
 
@@ -37,17 +37,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   override val key: AnyRef = AssignmentKey
 
-  override def getType(assignment: MetaObject, state: CompilationState): MetaObject = {
+  override def getType(assignment: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(state)(target)
   }
 
   def createState = new State()
   class State {
-    val assignFromStackByteCodeRegistry = new ClassRegistry[MetaObject => Seq[MetaObject]]
+    val assignFromStackByteCodeRegistry = new ClassRegistry[MetaObjectWithOrigin => Seq[MetaObject]]
   }
 
-  override def toByteCode(assignment: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(assignment: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)

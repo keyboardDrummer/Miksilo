@@ -2,11 +2,11 @@ class Fibonacci
 {
     public static void main(java.lang.String[] args)
     {
-        System.out.print(fibonacci(5));
+        System.out.print(Fibonacci.fibonacci(5));
     }
 
     public static int fibonacci(int index)
     {
-        return index < 2 ? 1 : fibonacci(index - 1) + fibonacci(index - 2);
+        return index < 2 ? 1 : Fibonacci.fibonacci(index - 1) + Fibonacci.fibonacci(index - 2);
     }
 }

@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles._
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
 import transformations.javac.constructor.SuperCallExpression
@@ -27,14 +27,14 @@ object NewC extends ExpressionInstance {
 
   override val key: AnyRef = NewCallKey
 
-  override def getType(expression: MetaObject, state: CompilationState): MetaObject = {
-    expression(NewObject).asInstanceOf[MetaObject]
+  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
+    expression(NewObject).asInstanceOf[MetaObjectWithOrigin]
   }
 
-  override def toByteCode(expression: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(expression: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
-    val objectType = expression(NewObject).asInstanceOf[MetaObject]
+    val objectType = getNewObject(expression)
     val classInfo: ClassInfo = compiler.findClass(objectType)
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = CallC.getCallArguments(expression)
@@ -43,6 +43,10 @@ object NewC extends ExpressionInstance {
     val methodKey = new MethodId(classInfo.getQualifiedName, SuperCallExpression.constructorName)
     Seq(NewByteCodeC.newInstruction(classRef), DuplicateInstructionC.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
+  }
+
+  def getNewObject[T <: MetaLike](expression: T): T = {
+    expression(NewObject).asInstanceOf[T]
   }
 
   override def description: String = "Enables using the new keyword to create a new object."

@@ -7,6 +7,7 @@ abstract class DataFlowAnalysis[Node, State] {
 
   def updateState(state: State, node: Node): State
 
+  //Returns None if both states are equal.
   def combineState(first: State, second: State): Option[State]
 
   val states = mutable.Map[Node, State]()

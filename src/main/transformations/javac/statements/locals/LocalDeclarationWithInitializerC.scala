@@ -1,14 +1,15 @@
-package transformations.javac.statements
+package transformations.javac.statements.locals
 
+import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
-import transformations.javac.statements.LocalDeclarationC.{DeclarationName, DeclarationType}
+import transformations.javac.statements.locals.LocalDeclarationC.{DeclarationName, DeclarationType}
+import transformations.javac.statements.{ExpressionAsStatementC, StatementSkeleton}
 import transformations.types.TypeSkeleton
 
-object LocalDeclarationWithInitializerC extends StatementInstance {
+object LocalDeclarationWithInitializerC extends ParticleWithGrammar with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationC)
 
@@ -30,17 +31,23 @@ object LocalDeclarationWithInitializerC extends StatementInstance {
 
   object InitializerKey
 
-  override val key: AnyRef = DeclarationWithInitializerKey
+  override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  override def toByteCode(declarationWithInitializer: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  def transformDeclarationWithInitializer(declarationWithInitializer: MetaObjectWithOrigin, state: CompilationState): Unit = {
     val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
-    val declaration = LocalDeclarationC.declaration(name, _type)
+    val declaration = new MetaObjectWithOrigin(LocalDeclarationC.declaration(name, _type),declarationWithInitializer.origin)
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
-    val toInstructions = StatementSkeleton.getToInstructions(state)
-    toInstructions(declaration) ++ toInstructions(ExpressionAsStatementC.asStatement(assignment)) //TODO maybe translate to statements instead of bytecode.
+    val assignmentStatement = new MetaObjectWithOrigin(ExpressionAsStatementC.asStatement(assignment), declarationWithInitializer.origin)
+    val originSequence = declarationWithInitializer.origin.asInstanceOf[SequenceSelection]
+    originSequence.replaceWith(Seq(declaration.obj, assignmentStatement.obj))
   }
 
-  override def description: String = "Enables declaring a local and initializing it in one statement."
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
+    new MetaObjectWithOrigin(program).transform[MetaObjectWithOrigin](obj => obj.clazz match {
+      case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
+      case _ =>
+    })
+  }
 }

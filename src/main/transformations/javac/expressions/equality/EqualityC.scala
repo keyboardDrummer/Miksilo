@@ -10,9 +10,9 @@ import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeSkeleton}
 object EqualityC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
 
-  def getFirst(equality: MetaObject) = equality(FirstKey).asInstanceOf[MetaObject]
+  def getFirst[T <: MetaLike](equality: T) = equality(FirstKey).asInstanceOf[T]
 
-  def getSecond(equality: MetaObject) = equality(SecondKey).asInstanceOf[MetaObject]
+  def getSecond[T <: MetaLike](equality: T) = equality(SecondKey).asInstanceOf[T]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
@@ -30,14 +30,14 @@ object EqualityC extends ExpressionInstance {
 
   override val key: AnyRef = EqualityKey
 
-  override def getType(expression: MetaObject, state: CompilationState): MetaObject = BooleanTypeC.booleanType
+  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = BooleanTypeC.booleanType
 
-  def getInputType(equality: MetaObject, state: CompilationState)  = {
+  def getInputType(equality: MetaObjectWithOrigin, state: CompilationState)  = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(state)(first)
   }
 
-  override def toByteCode(equality: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(equality: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)

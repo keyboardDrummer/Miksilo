@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles._
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -18,11 +18,11 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: MetaObject, state: CompilationState): Seq[MetaObject] = {
-    val condition = ifThen(ConditionKey).asInstanceOf[MetaObject]
+  override def toByteCode(ifThen: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+    val condition = getCondition(ifThen)
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)
-    val body = ifThen(ThenKey).asInstanceOf[Seq[MetaObject]]
+    val body = getThenStatements(ifThen)
 
     val conditionalBranch = LabelledTargets.ifZero(endLabelName)
     val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
@@ -31,6 +31,14 @@ object IfThenC extends StatementInstance {
       Seq(conditionalBranch) ++
       body.flatMap(toInstructionsStatement) ++
       Seq(end)
+  }
+
+  def getCondition[T <: MetaLike](ifThen: T): T = {
+    ifThen(ConditionKey).asInstanceOf[T]
+  }
+
+  def getThenStatements[T <: MetaLike](ifThen: T): Seq[T] = {
+    ifThen(ThenKey).asInstanceOf[Seq[T]]
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
@@ -42,4 +50,15 @@ object IfThenC extends StatementInstance {
   }
 
   override def description: String = "Enables using the if-then (no else) construct."
+
+  override def getNextStatements(obj: MetaObjectWithOrigin, labels: Map[Any, MetaObjectWithOrigin]): Set[MetaObjectWithOrigin] = 
+  {
+    Set(getThenStatements(obj)(0)) ++ super.getNextStatements(obj, labels)
+  }
+
+  override def getLabels(obj: MetaObjectWithOrigin): Map[Any, MetaObjectWithOrigin] = {
+    val next = obj.origin.asInstanceOf[SequenceSelection].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
+    Map(IfThenC.getNextLabel(getThenStatements(obj).last) -> next) ++
+      super.getLabels(obj)
+  }
 }

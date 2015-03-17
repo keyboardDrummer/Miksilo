@@ -58,7 +58,7 @@ class TestDocumentGrammarWithJavaExamples {
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ConstructorC, ImplicitReturnAtEndOfMethod)
+      ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
     val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)

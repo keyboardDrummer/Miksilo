@@ -28,10 +28,23 @@ abstract class InstructionTypeAnalysis(instructions: Seq[MetaObject])
   }
 
   override def combineState(first: ProgramTypeState, second: ProgramTypeState): Option[ProgramTypeState] = {
-    if (first == second)
+    if (first.stackTypes != second.stackTypes)
+      throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
+
+    val firstVariables: Map[Int, MetaObject] = first.variableTypes
+    val secondVariables: Map[Int, MetaObject] = second.variableTypes
+    if (firstVariables == secondVariables)
       return None
 
-    throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
+    val sharedKeys: Set[Int] = firstVariables.keySet.intersect(secondVariables.keySet)
+    val newVariables: Map[Int, MetaObject] = sharedKeys.map(key => {
+      val firstValue: MetaObject = firstVariables(key)
+      if (firstValue != secondVariables(key))
+        throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
+
+      (key, firstValue)
+    }).toMap
+    Some(new ProgramTypeState(first.stackTypes, newVariables))
   }
 
   override def updateState(state: ProgramTypeState, instructionIndex: Int): ProgramTypeState = {

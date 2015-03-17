@@ -7,7 +7,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends ParticleWithGrammar with WithState {
 
-  def getSelectorObject(selector: MetaObject) = selector(SelectorObject).asInstanceOf[MetaObject]
+  def getSelectorObject[T <: MetaLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
 
   def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
 
@@ -35,26 +35,26 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   }
 
 
-  def getClassOrObjectReference(selector: MetaObject, compiler: ClassCompiler): ClassOrObjectReference = {
+  def getClassOrObjectReference(selector: MetaObjectWithOrigin, compiler: ClassCompiler): ClassOrObjectReference = {
     val obj = getSelectorObject(selector)
     getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
   }
 
-  def getReferenceKind(classCompiler: ClassCompiler, expression: MetaObject): ReferenceKind = {
+  def getReferenceKind(classCompiler: ClassCompiler, expression: MetaObjectWithOrigin): ReferenceKind = {
     val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.state).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(expression))
   }
 
-  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: MetaObject): ClassOrObjectReference = {
+  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: MetaObjectWithOrigin): ClassOrObjectReference = {
     val classInfo: ClassInfo = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
     new ClassOrObjectReference(classInfo, false)
   }
 
   def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry
   class State {
-    val referenceKindRegistry = new ClassRegistry[MetaObject => ReferenceKind]()
+    val referenceKindRegistry = new ClassRegistry[MetaObjectWithOrigin => ReferenceKind]()
   }
 
   override def createState = new State()

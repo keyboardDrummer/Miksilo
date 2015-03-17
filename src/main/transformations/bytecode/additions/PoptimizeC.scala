@@ -18,8 +18,6 @@ object PoptimizeC extends ParticleWithPhase {
   }
 
   override def transform(clazz: MetaObject, state: CompilationState): Unit = {
-
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get

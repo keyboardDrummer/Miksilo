@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.{CompilationState, Contract, MetaObject, Particle}
+import core.particles._
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.MemberSelector.SelectorKey
 
@@ -14,7 +14,7 @@ object SelectorReferenceKind extends Particle {
     })
   }
 
-  def getReferenceKind(selector: MetaObject, compiler: ClassCompiler): ReferenceKind = {
+  def getReferenceKind(selector: MetaObjectWithOrigin, compiler: ClassCompiler): ReferenceKind = {
     val obj = MemberSelector.getSelectorObject(selector)
     val member = MemberSelector.getSelectorMember(selector)
     MemberSelector.getReferenceKind(compiler, obj) match {

@@ -1,10 +1,10 @@
 package transformations.bytecode
 
-import core.particles.MetaObject
+import core.particles.{Key, MetaObject}
 import transformations.bytecode.PrintByteCode._
 
 trait AccessFlags {
-  trait MethodAccessFlag
+  trait MethodAccessFlag extends Key
 
   object PublicAccess extends MethodAccessFlag
 

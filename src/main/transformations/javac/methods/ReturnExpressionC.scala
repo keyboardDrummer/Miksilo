@@ -10,12 +10,14 @@ object ReturnExpressionC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionC)
 
-  def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
-    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.transformationState)(getReturnValue(_return))
+  override def getNextStatements(obj: MetaObjectWithOrigin, labels: Map[Any, MetaObjectWithOrigin]): Set[MetaObjectWithOrigin] = Set.empty
+
+  def returnToLines(_return: MetaObjectWithOrigin, compiler: MethodCompiler): Seq[MetaObject] = {
+    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.state)(getReturnValue(_return))
     returnValueInstructions ++ Seq(IntegerReturnInstructionC.integerReturn)
   }
 
-  def getReturnValue(_return: MetaObject) = _return(ReturnValue).asInstanceOf[MetaObject]
+  def getReturnValue[T <: MetaLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -33,7 +35,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key: AnyRef = ReturnInteger
 
-  override def toByteCode(_return: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_return: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }

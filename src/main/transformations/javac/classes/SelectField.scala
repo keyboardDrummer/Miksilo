@@ -14,7 +14,7 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC, MemberSelector)
 
-  override def getType(selector: MetaObject, state: CompilationState): MetaObject = {
+  override def getType(selector: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -22,7 +22,7 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(selector: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)

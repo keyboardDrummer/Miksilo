@@ -34,6 +34,7 @@ object ExpressionMethodC extends ParticleWithGrammar with ParticleWithPhase {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[MetaObject]
       expressionMethod.clazz = MethodC.MethodKey
       expressionMethod(MethodC.MethodBodyKey) = Seq(ReturnExpressionC._return(expression))
+      expressionMethod.data.remove(ExpressionMethodExpression)
     }
   }
 

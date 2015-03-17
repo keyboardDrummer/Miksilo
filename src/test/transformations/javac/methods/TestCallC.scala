@@ -10,6 +10,7 @@ class TestCallC {
   def test() {
     val state = new CompilationState()
     ExpressionSkeleton.inject(state)
+    MemberSelector.inject(state)
     CallC.inject(state)
     Assert.assertTrue(ExpressionSkeleton.getToInstructionsRegistry(state).get(CallC.CallKey).nonEmpty)
   }
