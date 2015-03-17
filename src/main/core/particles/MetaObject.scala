@@ -83,11 +83,11 @@ trait MetaLike {
       for(child <- children)
       {
         child match {
-          case metaObject: T =>
-            transformNode(metaObject)
+          case metaObject: MetaLike =>
+            transformNode(metaObject.asInstanceOf[T])
           case sequence: Seq[_] =>
             sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case metaChild: T => transformNode(metaChild)
+              case metaChild: MetaLike => transformNode(metaChild.asInstanceOf[T])
               case _ =>
             })
           case _ =>
