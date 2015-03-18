@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
@@ -18,7 +18,7 @@ object NotInstructionC extends ExpandInstruction {
 
   override def key: Any = NotInstructionKey
 
-  override def expand(instruction: MetaObject, state: CompilationState): Seq[MetaObject] = {
+  override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
     val falseStartLabel = state.getUniqueLabel("falseStart")
     val endLabel = state.getUniqueLabel("end")
     Seq(LabelledTargets.ifZero(falseStartLabel),

@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
@@ -25,7 +25,7 @@ object LabelledTargets extends ParticleWithPhase {
   def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualC.key, Seq(target))
   def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualC.key, Seq(target))
 
-  def label(name: String, stackFrame: MetaObject) = new MetaObject(LabelKey,
+  def label(name: String, stackFrame: Node) = new Node(LabelKey,
     LabelNameKey -> name,
     LabelStackFrame -> stackFrame)
 
@@ -34,13 +34,13 @@ object LabelledTargets extends ParticleWithPhase {
     LabelC.inject(state)
   }
 
-  def transform(program: MetaObject, state: CompilationState): Unit = {
+  def transform(program: Node, state: CompilationState): Unit = {
 
     val jumpRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
-    def instructionSize(instruction: MetaObject) = CodeAttribute.getInstructionSizeRegistry(state)(instruction.clazz)
+    def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(state)(instruction.clazz)
 
-    def getNewInstructions(instructions: Seq[MetaObject], targetLocations: Map[String, Int]): ArrayBuffer[MetaObject] = {
-      var newInstructions = mutable.ArrayBuffer[MetaObject]()
+    def getNewInstructions(instructions: Seq[Node], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
+      var newInstructions = mutable.ArrayBuffer[Node]()
       newInstructions.sizeHint(instructions.length)
 
       var location = 0
@@ -61,22 +61,22 @@ object LabelledTargets extends ParticleWithPhase {
 
     val clazz = program
     val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
-    val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
+    def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
 
-      val newInstructions: Seq[MetaObject] = getNewInstructions(instructions, targetLocations)
+      val newInstructions: Seq[Node] = getNewInstructions(instructions, targetLocations)
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
     }
 
-    def determineTargetLocations(instructions: Seq[MetaObject]): Map[String, Int] = {
+    def determineTargetLocations(instructions: Seq[Node]): Map[String, Int] = {
       val targetLocations = mutable.Map[String, Int]()
       var location = 0
       for (instruction <- instructions) {
@@ -91,14 +91,14 @@ object LabelledTargets extends ParticleWithPhase {
     }
   }
 
-  def getJumpInstructionLabel(instruction: MetaObject): String = {
+  def getJumpInstructionLabel(instruction: Node): String = {
     getInstructionArguments(instruction)(0).asInstanceOf[String]
   }
 
-  def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[MetaObject]): Seq[MetaObject] = {
+  def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
     val frameLocations = instructions.filter(i => i.clazz == LabelKey).map(i => (labelLocations(getLabelName(i)), getLabelStackFrame(i)))
     var adjustedZero = 0
-    var stackFrames = ArrayBuffer[MetaObject]()
+    var stackFrames = ArrayBuffer[Node]()
     stackFrames.sizeHint(frameLocations.size)
     for (framePair <- frameLocations) {
       val location = framePair._1
@@ -114,21 +114,21 @@ object LabelledTargets extends ParticleWithPhase {
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else
-      Seq[MetaObject]()
+      Seq[Node]()
   }
 
-  def getLabelStackFrame(label: MetaObject) = label(LabelStackFrame).asInstanceOf[MetaObject]
+  def getLabelStackFrame(label: Node) = label(LabelStackFrame).asInstanceOf[Node]
 
-  def getLabelName(label: MetaObject) = label(LabelNameKey).asInstanceOf[String]
+  def getLabelName(label: Node) = label(LabelNameKey).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
   object LabelC extends InstructionC {
     override val key: AnyRef = LabelKey
 
-    override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = throw new UnsupportedOperationException()
+    override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
       new InstructionSignature(Seq.empty, Seq.empty)
     }
 

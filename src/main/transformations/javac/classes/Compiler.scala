@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.javac.JavaLang
 
 import scala.collection.mutable
@@ -49,13 +49,13 @@ case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[Str
 
   def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.getQualifiedName.parts ++ Seq(name))
 
-  def newFieldInfo(name: String, _type: MetaObject, _static: Boolean = false) = {
+  def newFieldInfo(name: String, _type: Node, _static: Boolean = false) = {
     val result = new FieldInfo(this, name, _static, _type)
     content(name) = result
     result
   }
 
-  def newMethodInfo(name: String, descriptor: MetaObject, _static: Boolean) = {
+  def newMethodInfo(name: String, descriptor: Node, _static: Boolean) = {
     val result = new MethodInfo(descriptor, _static)
     content(name) = result
     result

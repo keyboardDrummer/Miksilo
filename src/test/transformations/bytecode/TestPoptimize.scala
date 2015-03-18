@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.particles.CompilerFromParticles
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
@@ -72,7 +72,7 @@ class TestPoptimize {
     Assert.assertEquals(instructions, newInstructions)
   }
 
-  def transformInstructions(instructions: Seq[MetaObject]) = {
+  def transformInstructions(instructions: Seq[Node]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.methodInfo(0, 1, Seq(codeAnnotation))
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)

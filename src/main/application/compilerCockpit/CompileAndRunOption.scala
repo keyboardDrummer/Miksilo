@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.ClassRefConstant
@@ -11,10 +11,10 @@ object RunWithJVM extends Particle
 {
   override def inject(state: CompilationState): Unit = {
     state.compilerPhases ::= (() => {
-      val clazz: MetaObject = state.program
+      val clazz: Node = state.program
       val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
       val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
-      val classNameIndex = ClassRefConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[MetaObject])
+      val classNameIndex = ClassRefConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[Node])
       val className = constantPool.getValue(classNameIndex).asInstanceOf[QualifiedClassName].toString
       state.output = TestUtils.runByteCode(className, clazz)
     })

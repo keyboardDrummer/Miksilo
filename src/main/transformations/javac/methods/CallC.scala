@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
@@ -28,11 +28,11 @@ object CallC extends ExpressionInstance {
     core.addOption(parseCall)
   }
 
-  def call(callee: Any, arguments: Any): MetaObject =
-    call(callee.asInstanceOf[MetaObject], arguments.asInstanceOf[Seq[MetaObject]])
+  def call(callee: Any, arguments: Any): Node =
+    call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
-  def call(callee: MetaObject, arguments: Seq[MetaObject] = Seq()) = {
-    new MetaObject(CallKey, CallCallee -> callee, CallArguments -> arguments)
+  def call(callee: Node, arguments: Seq[Node] = Seq()) = {
+    new Node(CallKey, CallCallee -> callee, CallArguments -> arguments)
   }
 
   object CallKey
@@ -43,7 +43,7 @@ object CallC extends ExpressionInstance {
 
   override val key: AnyRef = CallKey
 
-  override def getType(call: Path, state: CompilationState): MetaObject = {
+  override def getType(call: Path, state: CompilationState): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
@@ -51,7 +51,7 @@ object CallC extends ExpressionInstance {
     returnType
   }
 
-  override def toByteCode(call: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val callCallee = getCallCallee(call)
@@ -62,7 +62,7 @@ object CallC extends ExpressionInstance {
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compiler.state)
     val calleeInstructions =
       if (!staticCall) expressionToInstruction(objectExpression)
-      else Seq[MetaObject]()
+      else Seq[Node]()
     val callArguments = getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     val methodRefIndex = compiler.getMethodRefIndex(methodKey)

@@ -4,9 +4,7 @@ import core.particles.path.Path
 
 import scala.collection.mutable
 
-
-
-object MetaObject {
+object Node {
 
   def classDebugRepresentation(_clazz: Any): String = _clazz match {
     case string: String => string
@@ -19,12 +17,13 @@ object MetaObject {
   }
 }
 
-class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLikeGen[MetaObject] {
+class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLikeGen[Node] {
+  type Self = Node
 
-  def replaceWith(metaObject: MetaObject): Unit = {
-    clazz = metaObject.clazz
+  def replaceWith(node: Node): Unit = {
+    clazz = node.clazz
     data.clear()
-    data ++= metaObject.data
+    data ++= node.data
   }
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
@@ -38,7 +37,7 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
     value match //TODO maybe throw this check away.
     {
       case wrong: Path => throwInsertedWithOriginIntoRegularMetaObject()
-      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[Path]))
+      case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[Path]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }
@@ -58,14 +57,14 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
   }
 
   override def toString: String = {
-    val className = MetaObject.classDebugRepresentation(clazz)
+    val className = Node.classDebugRepresentation(clazz)
     if (data.isEmpty)
       return className
-    s"$className: ${data.map(kv => (MetaObject.classDebugRepresentation(kv._1), kv._2))}"
+    s"$className: ${data.map(kv => (Node.classDebugRepresentation(kv._1), kv._2))}"
   }
 
   override def equals(other: Any): Boolean = other match {
-    case that: MetaObject =>
+    case that: Node =>
       val dataEquals: Boolean = data == that.data
       (that canEqual this) &&
         dataEquals &&
@@ -73,7 +72,7 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
     case _ => false
   }
 
-  def canEqual(other: Any): Boolean = other.isInstanceOf[MetaObject]
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Node]
 
   override def hashCode(): Int = {
     val state = Seq(data, clazz)

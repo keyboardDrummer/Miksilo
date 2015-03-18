@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.JavaClassSkeleton
@@ -13,18 +13,18 @@ object ThisCallExpression extends ExpressionInstance {
   override val key: AnyRef = ThisCall
   object ThisCall
 
-  def thisCall(arguments: Seq[MetaObject]) = new MetaObject(ThisCall, CallC.CallArguments -> arguments)
+  def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallC.CallArguments -> arguments)
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = VoidTypeC.voidType
+  override def getType(expression: Path, state: CompilationState): Node = VoidTypeC.voidType
 
-  override def toByteCode(call: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     transformThisCall(classCompiler.currentClass, call, state)
   }
 
-  def transformThisCall(clazz: MetaObject, call: Path, state: CompilationState): Seq[MetaObject] = {
+  def transformThisCall(clazz: Node, call: Path, state: CompilationState): Seq[Node] = {
     SuperCallExpression.transformToByteCode(call, state, JavaClassSkeleton.getClassName(clazz))
   }
 

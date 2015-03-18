@@ -1,7 +1,7 @@
 package transformations.javac.expressions.postfix
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
@@ -15,9 +15,9 @@ object PostFixIncrementC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodC, IncrementIntegerC)
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = IntTypeC.intType
+  override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
 
-  override def toByteCode(plusPlus: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(plusPlus: Path, state: CompilationState): Seq[Node] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     val name: String = plusPlus(VariableKey).asInstanceOf[String]
     val variableAddress = getVariables(state, plusPlus)(name).offset

@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.particles.CompilerFromParticles
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.Test
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
@@ -15,7 +15,7 @@ import util.TestUtils
 
 class TestByteCodeGoTo {
 
-  def testMain(instructions: Seq[MetaObject]): MetaObject = {
+  def testMain(instructions: Seq[Node]): Node = {
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
@@ -28,7 +28,7 @@ class TestByteCodeGoTo {
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }
 
-  def getExpectedJumpWhile: MetaObject = {
+  def getExpectedJumpWhile: Node = {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
@@ -44,18 +44,18 @@ class TestByteCodeGoTo {
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.stackMapTableId)), Seq(method))
   }
 
-  def getLabelledJumpWhile: MetaObject = {
+  def getLabelledJumpWhile: Node = {
     val instructions = Seq(
       IntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledTargets.label("start", new MetaObject(StackMapTableAttribute.AppendFrame,
+      LabelledTargets.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
       LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
       LabelledTargets.goTo("start"),
-      LabelledTargets.label("end", new MetaObject(StackMapTableAttribute.SameFrameKey))
+      LabelledTargets.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )
 
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

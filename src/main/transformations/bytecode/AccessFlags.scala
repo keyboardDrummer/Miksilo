@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.node.{MetaObject, Key}
+import core.particles.node.{Node, Key}
 import transformations.bytecode.PrintByteCode._
 
 trait AccessFlags {
@@ -19,7 +19,7 @@ trait AccessFlags {
     StaticAccess -> "0008",
     PrivateAccess -> "0002").mapValues(s => hexToInt(s))
 
-  def getAccessFlagsByteCode(field: MetaObject): Seq[Byte] = {
+  def getAccessFlagsByteCode(field: Node): Seq[Byte] = {
     getAccessFlagsByteCode(getAccessFlags(field))
   }
 
@@ -27,7 +27,7 @@ trait AccessFlags {
     shortToBytes(accessFlags.map(flag => accessCodesToByteCode(flag)).sum)
   }
 
-  private def getAccessFlags(_object: MetaObject): Set[MethodAccessFlag] = {
+  private def getAccessFlags(_object: Node): Set[MethodAccessFlag] = {
     _object(AccessFlagsKey).asInstanceOf[Set[MethodAccessFlag]]
   }
 }

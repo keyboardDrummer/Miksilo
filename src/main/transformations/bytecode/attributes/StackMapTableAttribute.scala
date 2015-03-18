@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -39,29 +39,29 @@ object StackMapTableAttribute extends ParticleWithGrammar {
 
   object StackMapTableMaps
 
-  def stackMapTableId = new MetaObject(StackMapTableId)
+  def stackMapTableId = new Node(StackMapTableId)
   
   private object StackMapTableId
 
-  def stackMapTable(nameIndex: Int, stackMaps: Seq[MetaObject]) = new MetaObject(StackMapTableKey,
+  def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(StackMapTableKey,
     ByteCodeSkeleton.AttributeNameKey -> nameIndex,
     StackMapTableMaps -> stackMaps)
 
-  def getStackMapTableEntries(stackMapTable: MetaObject) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[MetaObject]]
+  def getStackMapTableEntries(stackMapTable: Node) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[Node]]
 
-  def getFrameOffset(frame: MetaObject) = frame(OffsetDelta).asInstanceOf[Int]
+  def getFrameOffset(frame: Node) = frame(OffsetDelta).asInstanceOf[Int]
 
-  def sameLocals1StackItem(offsetDelta: Int, _type: MetaObject) = new MetaObject(SameLocals1StackItem,
+  def sameLocals1StackItem(offsetDelta: Int, _type: Node) = new Node(SameLocals1StackItem,
     OffsetDelta -> offsetDelta,
     SameLocals1StackItemType -> _type)
 
-  def getSameLocals1StackItemType(sameLocals1StackItem: MetaObject) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[MetaObject]
+  def getSameLocals1StackItemType(sameLocals1StackItem: Node) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[Node]
 
-  def appendFrame(offset: Int, newLocalTypes: Seq[MetaObject]) = new MetaObject(AppendFrame, OffsetDelta -> offset, AppendFrameTypes -> newLocalTypes)
+  def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, OffsetDelta -> offset, AppendFrameTypes -> newLocalTypes)
 
-  def getAppendFrameTypes(appendFrame: MetaObject) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[MetaObject]]
+  def getAppendFrameTypes(appendFrame: Node) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[Node]]
 
-  def sameFrame(offset: Int) = new MetaObject(SameFrameKey, OffsetDelta -> offset)
+  def sameFrame(offset: Int) = new Node(SameFrameKey, OffsetDelta -> offset)
 
   object StackMapTableGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
@@ -84,13 +84,13 @@ object StackMapTableAttribute extends ParticleWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: MetaObject) => getStackMapTableBytes(attribute, state)
+    ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableId) = _ => toUTF8ConstantEntry("StackMapTable")
   }
 
-  def getStackMapTableBytes(attribute: MetaObject, state: CompilationState): Seq[Byte] = {
+  def getStackMapTableBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
 
-    def getFrameByteCode(frame: MetaObject): Seq[Byte] = {
+    def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)
       frame.clazz match {
         case StackMapTableAttribute.SameFrameKey =>
@@ -117,7 +117,7 @@ object StackMapTableAttribute extends ParticleWithGrammar {
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
-  def getVerificationInfoBytes(_type: MetaObject, state: CompilationState): Seq[Byte] = {
+  def getVerificationInfoBytes(_type: Node, state: CompilationState): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
       case LongTypeC.LongTypeKey => hexToBytes("04")

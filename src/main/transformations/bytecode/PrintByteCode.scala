@@ -4,7 +4,7 @@ import java.math.BigInteger
 
 import akka.util.Convert
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.TypeSkeleton
 
@@ -21,12 +21,12 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
     Convert.intToBytes(bytes.length) ++ bytes
   }
 
-  def getInterfacesByteCode(clazz: MetaObject): Seq[Byte] = {
+  def getInterfacesByteCode(clazz: Node): Seq[Byte] = {
     val interfaces = ByteCodeSkeleton.getClassInterfaces(clazz)
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
-  def getAccessFlagsByteCode(clazz: MetaObject): Seq[Byte] = {
+  def getAccessFlagsByteCode(clazz: Node): Seq[Byte] = {
     shortToBytes(classAccessFlags("super"))
   }
 
@@ -37,11 +37,11 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
     byteToBytes(1) ++ shortToBytes(bytes.length) ++ debugBytes(bytes)
   }
 
-  def getExceptionByteCode(exception: MetaObject): Seq[Byte] = ???
+  def getExceptionByteCode(exception: Node): Seq[Byte] = ???
 
-  def getAttributesByteCode(state: CompilationState, attributes: Seq[MetaObject]): Seq[Byte] = {
+  def getAttributesByteCode(state: CompilationState, attributes: Seq[Node]): Seq[Byte] = {
 
-    def getAttributeByteCode(attribute: MetaObject): Seq[Byte] = {
+    def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
         prefixWithIntLength(() => ByteCodeSkeleton.getState(state).getBytes(attribute.clazz)(attribute))
     }
@@ -79,10 +79,10 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
 
   def valueOf(buf: Iterable[Byte]): String = buf.map("%02X" format _).mkString
 
-  def getBytes(byteCode: MetaObject, state: CompilationState): Seq[Byte] = {
+  def getBytes(byteCode: Node, state: CompilationState): Seq[Byte] = {
 
     val clazz = byteCode
-    def getBytes(byteCode: MetaObject): Seq[Byte] = {
+    def getBytes(byteCode: Node): Seq[Byte] = {
       var result = List[Byte]()
 
       result ++= intToBytes(0xCAFEBABE)
@@ -103,14 +103,14 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
       result
     }
 
-    def getMethodsByteCode(clazz: MetaObject): Seq[Byte] = {
+    def getMethodsByteCode(clazz: Node): Seq[Byte] = {
       val methods = ByteCodeSkeleton.getMethods(clazz)
       shortToBytes(methods.length) ++ methods.flatMap(method => {
         ByteCodeSkeleton.getState(state).getBytes(method.clazz)(method)
       })
     }
 
-    def getFieldsByteCode(clazz: MetaObject): Seq[Byte] = {
+    def getFieldsByteCode(clazz: Node): Seq[Byte] = {
       val fields = ByteCodeSkeleton.getClassFields(clazz)
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
         ByteCodeSkeleton.getState(state).getBytes(field.clazz)(field)
@@ -119,13 +119,13 @@ object PrintByteCode { //TODO code uit deze classe naar byte code particles verp
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-        case metaEntry: MetaObject => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
+        case metaEntry: Node => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
       }
     }
 
-    def javaTypeToString(_type: MetaObject): String = TypeSkeleton.getByteCodeString(state)(_type)
+    def javaTypeToString(_type: Node): String = TypeSkeleton.getByteCodeString(state)(_type)
 
     getBytes(byteCode)
   }

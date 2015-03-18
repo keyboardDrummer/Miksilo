@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
@@ -14,15 +14,15 @@ object IntegerReturnInstructionC extends InstructionC {
 
   override val key: AnyRef = IntegerReturn
 
-  def integerReturn: MetaObject = CodeAttribute.instruction(IntegerReturn)
+  def integerReturn: Node = CodeAttribute.instruction(IntegerReturn)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
   override def getInstructionSize: Int = 1
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = PrintByteCode.hexToBytes("ac")
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ac")
 
   object IntegerReturn
 

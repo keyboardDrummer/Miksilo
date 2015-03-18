@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
@@ -19,31 +19,31 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
     NotInstructionC, IntegerEqualsInstructionC)
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
+  override def transform(program: Node, state: CompilationState): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[MetaObject] = CodeAttribute.getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: MetaObject): Option[Any] = {
+    def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
-      val newInstructions: Seq[MetaObject] = getNewInstructions(instructions)
+      val newInstructions: Seq[Node] = getNewInstructions(instructions)
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
     }
 
-    def getNewInstructions(instructions: Seq[MetaObject]) = {
+    def getNewInstructions(instructions: Seq[Node]) = {
 
-      var newInstructions = mutable.ArrayBuffer[MetaObject]()
+      var newInstructions = mutable.ArrayBuffer[Node]()
 
       var i = 0
       while (i < instructions.size - 1) {
         val first = instructions(i)
         val second = instructions(i + 1)
 
-        val replacementInstruction : Option[MetaObject] = first.clazz match {
+        val replacementInstruction : Option[Node] = first.clazz match {
           case LessThanInstructionKey => findLessThanReplacement(second)
           case NotInstructionKey => findNotReplacement(second)
           case IntegerEqualsInstructionKey => findIntegerEqualsReplacement(second)
@@ -63,7 +63,7 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
     }
   }
 
-  def findIntegerEqualsReplacement(second: MetaObject): Option[MetaObject] = {
+  def findIntegerEqualsReplacement(second: Node): Option[Node] = {
     second.clazz match {
       case IfZeroKey =>
         val target = LabelledTargets.getJumpInstructionLabel(second)
@@ -75,7 +75,7 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
     }
   }
 
-  def findNotReplacement(second: MetaObject): Option[MetaObject] = {
+  def findNotReplacement(second: Node): Option[Node] = {
     second.clazz match {
       case IfZeroKey =>
         val target = LabelledTargets.getJumpInstructionLabel(second)
@@ -87,7 +87,7 @@ object OptimizeBooleanInstructionsC extends ParticleWithPhase {
     }
   }
 
-  def findLessThanReplacement(second: MetaObject): Option[MetaObject] = {
+  def findLessThanReplacement(second: Node): Option[Node] = {
     second.clazz match {
       case IfZeroKey =>
         val target = LabelledTargets.getJumpInstructionLabel(second)

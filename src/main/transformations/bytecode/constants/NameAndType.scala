@@ -3,7 +3,7 @@ package transformations.bytecode.constants
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 
 object NameAndType extends ConstantEntry {
@@ -14,17 +14,17 @@ object NameAndType extends ConstantEntry {
 
   object NameAndTypeType
 
-  def nameAndType(nameIndex: Int, typeIndex: Int): MetaObject = new MetaObject(NameAndTypeKey,
+  def nameAndType(nameIndex: Int, typeIndex: Int): Node = new Node(NameAndTypeKey,
     NameAndTypeName -> nameIndex,
     NameAndTypeType -> typeIndex)
 
-  def getNameAndTypeName(nameAndType: MetaObject) = nameAndType(NameAndTypeName).asInstanceOf[Int]
+  def getNameAndTypeName(nameAndType: Node) = nameAndType(NameAndTypeName).asInstanceOf[Int]
 
-  def getTypeIndex(nameAndType: MetaObject) = nameAndType(NameAndTypeType).asInstanceOf[Int]
+  def getTypeIndex(nameAndType: Node) = nameAndType(NameAndTypeType).asInstanceOf[Int]
 
   override def key: Any = NameAndTypeKey
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(12) ++ shortToBytes(getNameAndTypeName(constant)) ++
       shortToBytes(getTypeIndex(constant))
   }

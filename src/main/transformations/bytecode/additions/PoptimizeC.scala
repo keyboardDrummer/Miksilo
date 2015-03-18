@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
@@ -18,7 +18,7 @@ object PoptimizeC extends ParticleWithPhase {
     (inputLength, outputLength)
   }
 
-  override def transform(clazz: MetaObject, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: CompilationState): Unit = {
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
@@ -31,7 +31,7 @@ object PoptimizeC extends ParticleWithPhase {
         getSignatureInOutLengths(state, signature)
       }
 
-      var newInstructions = List.empty[MetaObject]
+      var newInstructions = List.empty[Node]
       var consumptions = List.empty[Boolean]
 
       def processInstruction(instructionIndex: Int) {
@@ -60,7 +60,7 @@ object PoptimizeC extends ParticleWithPhase {
         val keepInstruction = outConsumption != 0 || hasSideEffect
         if (keepInstruction) {
           val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2C.pop2).toList
-          val pop1Instructions: ((Nothing) => Any) with Iterable[MetaObject] = if (outPop % 2 == 1) Seq(PopC.pop) else Set.empty
+          val pop1Instructions: ((Nothing) => Any) with Iterable[Node] = if (outPop % 2 == 1) Seq(PopC.pop) else Set.empty
           newInstructions = pop2Instructions ++ pop1Instructions ++ newInstructions
           consumptions = 0.until(in).map(_ => false).toList ++ consumptions
           newInstructions = instruction :: newInstructions

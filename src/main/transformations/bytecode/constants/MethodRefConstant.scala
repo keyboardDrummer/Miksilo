@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 
 object MethodRefConstant extends ConstantEntry {
@@ -13,7 +13,7 @@ object MethodRefConstant extends ConstantEntry {
 
   object MethodRefMethodName
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
       shortToBytes(getMethodRefMethodNameIndex(constant))
@@ -21,13 +21,13 @@ object MethodRefConstant extends ConstantEntry {
 
   override def key: Any = MethodRefKey
 
-  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new MetaObject(MethodRefKey,
+  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(MethodRefKey,
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
 
-  def getMethodRefClassRefIndex(methodRef: MetaObject) = methodRef(MethodRefClassName).asInstanceOf[Int]
+  def getMethodRefClassRefIndex(methodRef: Node) = methodRef(MethodRefClassName).asInstanceOf[Int]
 
-  def getMethodRefMethodNameIndex(methodRef: MetaObject) = methodRef(MethodRefMethodName).asInstanceOf[Int]
+  def getMethodRefMethodNameIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
   def getGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 

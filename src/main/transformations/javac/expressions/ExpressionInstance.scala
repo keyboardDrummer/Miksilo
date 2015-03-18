@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import core.particles._
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.StatementSkeleton
@@ -15,9 +15,9 @@ trait ExpressionInstance extends ParticleWithGrammar {
     super.inject(state)
   }
 
-  def toByteCode(expression: Path, state: CompilationState): Seq[MetaObject]
+  def toByteCode(expression: Path, state: CompilationState): Seq[Node]
 
-  def getType(expression: Path, state: CompilationState): MetaObject
+  def getType(expression: Path, state: CompilationState): Node
 
   def getVariables(state: CompilationState, obj: Path) = {
     val instances = StatementSkeleton.getState(state).instances

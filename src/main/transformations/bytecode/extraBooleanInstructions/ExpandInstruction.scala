@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, Particle}
 
 trait ExpandInstruction extends Particle {
@@ -8,7 +8,7 @@ trait ExpandInstruction extends Particle {
 
   override def dependencies: Set[Contract] = Set(ExpandInstructionsC)
 
-  def expand(instruction: MetaObject, state: CompilationState) : Seq[MetaObject]
+  def expand(instruction: Node, state: CompilationState) : Seq[Node]
 
   override def inject(state: CompilationState): Unit = {
     ExpandInstructionsC.getState(state).expandInstruction.put(key, i => expand(i, state))

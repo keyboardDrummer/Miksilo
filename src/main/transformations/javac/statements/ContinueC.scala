@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.additions.LabelledTargets
@@ -10,9 +10,9 @@ object ContinueC extends StatementInstance {
   override val key: AnyRef = ContinueKey
 
   object ContinueKey
-  def continue = new MetaObject(ContinueKey)
+  def continue = new Node(ContinueKey)
 
-  override def toByteCode(statement: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(statement: Path, state: CompilationState): Seq[Node] = {
     val startLabel = WhileC.getState(state).whileStartLabels(getWhileParent(statement))
     Seq(LabelledTargets.goTo(startLabel))
   }

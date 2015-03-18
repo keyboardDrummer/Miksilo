@@ -3,21 +3,21 @@ package transformations.bytecode.constants
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 import transformations.types.TypeSkeleton
 
 object MethodDescriptorConstant extends ConstantEntry {
 
-  def methodDescriptor(returnDescriptor: MetaObject, parameterDescriptors: Seq[MetaObject]) = {
-    new MetaObject(MethodDescriptor,
+  def methodDescriptor(returnDescriptor: Node, parameterDescriptors: Seq[Node]) = {
+    new Node(MethodDescriptor,
       MethodDescriptorParameters -> parameterDescriptors,
       MethodReturnType -> returnDescriptor)
   }
 
-  def getMethodDescriptorReturnType(descriptor: MetaObject) = descriptor(MethodReturnType).asInstanceOf[MetaObject]
+  def getMethodDescriptorReturnType(descriptor: Node) = descriptor(MethodReturnType).asInstanceOf[Node]
 
-  def getMethodDescriptorParameters(descriptor: MetaObject) = descriptor(MethodDescriptorParameters).asInstanceOf[Seq[MetaObject]]
+  def getMethodDescriptorParameters(descriptor: Node) = descriptor(MethodDescriptorParameters).asInstanceOf[Seq[Node]]
 
   object MethodDescriptor
 
@@ -27,8 +27,8 @@ object MethodDescriptorConstant extends ConstantEntry {
 
   override def key: Any = MethodDescriptor
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
-    def javaTypeToString(_type: MetaObject): String = TypeSkeleton.getByteCodeString(state)(_type)
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+    def javaTypeToString(_type: Node): String = TypeSkeleton.getByteCodeString(state)(_type)
 
     val returnString = javaTypeToString(getMethodDescriptorReturnType(constant))
     val parametersString = s"(${

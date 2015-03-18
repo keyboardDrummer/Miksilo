@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.javac.classes.BasicImportC._
 
@@ -9,7 +9,7 @@ object WildcardImportC extends ParticleWithGrammar {
 
   object WildcardImportKey
 
-  def wildCardImport(elements: Seq[String]) = new MetaObject(WildcardImportKey, ElementsKey -> elements)
+  def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val importPath = grammars.find(ImportPathGrammar)

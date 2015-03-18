@@ -1,8 +1,8 @@
 package core.particles.path
 
-import core.particles.node.{MetaObject, Key}
+import core.particles.node.{Node, Key}
 
-case class Root(current: MetaObject) extends Path with Key{
+case class Root(current: Node) extends Path with Key{
   override def parentOption: Option[Path] = None
 
   override def hashCode(): Int = 1 //obj.hashCode

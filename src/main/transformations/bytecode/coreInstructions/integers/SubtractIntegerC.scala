@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -14,9 +14,9 @@ object SubtractIntegerC extends InstructionC {
 
   def subtractInteger = CodeAttribute.instruction(SubtractIntegerKey)
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = hexToBytes("64")
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("64")
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(IntTypeC.intType)
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(IntTypeC.intType)
 
   override def getInstructionSize: Int = 1
 

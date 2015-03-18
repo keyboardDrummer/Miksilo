@@ -2,7 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
@@ -15,7 +15,7 @@ object LessThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC, LessThanInstructionC)
 
-  override def toByteCode(lessThan: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(lessThan: Path, state: CompilationState): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
@@ -26,7 +26,7 @@ object LessThanC extends ExpressionInstance {
 
   def getSecond[T <: MetaLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = {
+  override def getType(expression: Path, state: CompilationState): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -41,7 +41,7 @@ object LessThanC extends ExpressionInstance {
     relationalGrammar.addOption(parseLessThan)
   }
 
-  def lessThan(first: MetaObject, second: MetaObject) = new MetaObject(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
+  def lessThan(first: Node, second: Node) = new Node(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
 
   object LessThanKey
 

@@ -4,7 +4,7 @@ import core.biGrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -15,10 +15,10 @@ import transformations.types.{ArrayTypeC, ObjectTypeC}
 object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with WithState {
 
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
+  override def transform(program: Node, state: CompilationState): Unit = {
     transformClass(program)
 
-    def transformClass(clazz: MetaObject) {
+    def transformClass(clazz: Node) {
       val classCompiler: ClassCompiler = initializeClassCompiler(state, clazz)
       
       val classInfo = classCompiler.currentClassInfo
@@ -39,7 +39,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     }
   }
 
-  def initializeClassCompiler(state: CompilationState, clazz: MetaObject): ClassCompiler = {
+  def initializeClassCompiler(state: CompilationState, clazz: Node): ClassCompiler = {
     val classCompiler = new ClassCompiler(clazz, state)
     getState(state).classCompiler = classCompiler
 
@@ -48,7 +48,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     classCompiler
   }
 
-  def fullyQualify(_type: MetaObject, classCompiler: ClassCompiler): Unit =  _type.clazz match {
+  def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {
     case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
     case ObjectTypeC.ObjectTypeKey =>
       val newName = ObjectTypeC.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
@@ -56,18 +56,18 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     case _ =>
   }
 
-  def getParent(clazz: MetaObject): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
+  def getParent(clazz: Node): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
 
   def getClassCompiler(state: CompilationState) = getState(state).classCompiler
 
-  def getQualifiedClassName(clazz: MetaObject): QualifiedClassName = {
+  def getQualifiedClassName(clazz: Node): QualifiedClassName = {
     val className = getClassName(clazz)
     new QualifiedClassName(getPackage(clazz) ++ Seq(className))
   }
 
-  def getPackage(clazz: MetaObject): Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
+  def getPackage(clazz: Node): Seq[String] = clazz(ClassPackage).asInstanceOf[Seq[String]]
 
-  def getClassName(clazz: MetaObject) = clazz(ClassName).asInstanceOf[String]
+  def getClassName(clazz: Node) = clazz(ClassName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
@@ -89,25 +89,25 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
 
   object ImportGrammar
 
-  def clazz(_package: Seq[String], name: String, members: Seq[MetaObject] = Seq(), imports: List[MetaObject] = List(), mbParent: Option[String] = None) =
-    new MetaObject(ByteCodeSkeleton.ClassFileKey,
+  def clazz(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
+    new Node(ByteCodeSkeleton.ClassFileKey,
     Members -> members,
     ClassPackage -> _package,
     ClassName -> name,
     ClassImports -> imports,
     ClassParent -> mbParent)
 
-  def getImports(clazz: MetaObject) = clazz(ClassImports).asInstanceOf[Seq[MetaObject]]
+  def getImports(clazz: Node) = clazz(ClassImports).asInstanceOf[Seq[Node]]
 
   def createState = new State()
   class State() {
     var classCompiler: ClassCompiler = null
-    val importToClassMap = new ClassRegistry[MetaObject => Map[String, QualifiedClassName]]()
-    var firstMemberPasses = List.empty[MetaObject => Unit]
-    var secondMemberPasses = List.empty[MetaObject => Unit]
+    val importToClassMap = new ClassRegistry[Node => Map[String, QualifiedClassName]]()
+    var firstMemberPasses = List.empty[Node => Unit]
+    var secondMemberPasses = List.empty[Node => Unit]
   }
 
-  def getMembers(clazz: MetaObject) = clazz(Members).asInstanceOf[Seq[MetaObject]]
+  def getMembers(clazz: Node) = clazz(Members).asInstanceOf[Seq[Node]]
 
   object ClassGrammar
 

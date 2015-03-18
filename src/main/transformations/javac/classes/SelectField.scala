@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
@@ -16,7 +16,7 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC, MemberSelector)
 
-  override def getType(selector: Path, state: CompilationState): MetaObject = {
+  override def getType(selector: Path, state: CompilationState): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -24,7 +24,7 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(selector: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
@@ -38,7 +38,7 @@ object SelectField extends ExpressionInstance {
     }
   }
 
-  def getFieldRefIndex(selector: MetaObject, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Int = {
+  def getFieldRefIndex(selector: Node, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Int = {
     val member = getSelectorMember(selector)
     val fieldInfo = classOrObjectReference.info.getField(member)
     val fieldRef = compiler.getFieldRefIndex(fieldInfo)

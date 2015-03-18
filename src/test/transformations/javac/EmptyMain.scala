@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.Test
 import transformations.javac.classes.JavaClassSkeleton._
 import transformations.javac.classes.QualifiedClassName
@@ -15,22 +15,22 @@ class EmptyMain {
 
   @Test
   def runCompiledCode() {
-    val byteCode: MetaObject = getByteCode
+    val byteCode: Node = getByteCode
     TestUtils.runByteCode(className, byteCode)
   }
 
 
-  def getByteCode: MetaObject = {
+  def getByteCode: Node = {
     val java = getJava
     val byteCode = JavaCompiler.getCompiler.transform(java)
     byteCode
   }
 
-  def getJava: MetaObject = {
+  def getJava: Node = {
     clazz(defaultPackage, className, Seq(getMainMethodJava))
   }
 
-  def getMainMethodJava: MetaObject = {
+  def getMainMethodJava: Node = {
     val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
     method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)

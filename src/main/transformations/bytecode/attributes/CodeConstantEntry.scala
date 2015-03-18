@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 
@@ -11,11 +11,11 @@ object CodeConstantEntry extends ConstantEntry
 {
   object CodeAttributeId
 
-  def entry = new MetaObject(CodeAttributeId)
+  def entry = new Node(CodeAttributeId)
 
   override def key: Any = CodeAttributeId
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry("Code")
   }
 

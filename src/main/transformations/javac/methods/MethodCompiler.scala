@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.CompilationState
 import transformations.javac.classes.JavaClassSkeleton
@@ -12,9 +12,9 @@ case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
 }
 
-case class VariableInfo(offset: Integer, _type: MetaObject)
+case class VariableInfo(offset: Integer, _type: Node)
 
-case class VariablePool(state: CompilationState, typedVariables: Map[String, MetaObject] = Map.empty) {
+case class VariablePool(state: CompilationState, typedVariables: Map[String, Node] = Map.empty) {
   private var variables = Map.empty[String, VariableInfo]
   var offset = 0
   for(typedVariable <- typedVariables)
@@ -28,24 +28,24 @@ case class VariablePool(state: CompilationState, typedVariables: Map[String, Met
 
   def contains(name: String) = variables.contains(name)
 
-  private def privateAdd(variable: String, _type: MetaObject) {
+  private def privateAdd(variable: String, _type: Node) {
     variables = variables.updated(variable, new VariableInfo(offset, _type))
     offset += TypeSkeleton.getTypeSize(_type, state)
   }
 
-  def add(variable: String, _type: MetaObject): VariablePool = {
+  def add(variable: String, _type: Node): VariablePool = {
     new VariablePool(state, typedVariables.updated(variable, _type))
   }
 }
 
-case class MethodCompiler(state: CompilationState, method: MetaObject) {
+case class MethodCompiler(state: CompilationState, method: Node) {
   val parameters = getMethodParameters(method)
   val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody[Path](new Root(method))(0)
+  val firstInstruction = getMethodBody[Path](new Root(method)).head
   val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables = {

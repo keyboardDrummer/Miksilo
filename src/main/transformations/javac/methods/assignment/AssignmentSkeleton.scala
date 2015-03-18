@@ -3,7 +3,7 @@ package transformations.javac.methods.assignment
 import core.biGrammar.BiFailure
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
@@ -29,7 +29,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   object AssignmentTargetGrammar
 
-  def assignment(target: MetaObject, value: MetaObject) = new MetaObject(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
+  def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
   object AssignmentKey
 
@@ -39,17 +39,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   override val key: AnyRef = AssignmentKey
 
-  override def getType(assignment: Path, state: CompilationState): MetaObject = {
+  override def getType(assignment: Path, state: CompilationState): Node = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(state)(target)
   }
 
   def createState = new State()
   class State {
-    val assignFromStackByteCodeRegistry = new ClassRegistry[Path => Seq[MetaObject]]
+    val assignFromStackByteCodeRegistry = new ClassRegistry[Path => Seq[Node]]
   }
 
-  override def toByteCode(assignment: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(assignment: Path, state: CompilationState): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)

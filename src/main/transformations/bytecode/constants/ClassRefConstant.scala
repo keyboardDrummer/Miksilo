@@ -3,7 +3,7 @@ package transformations.bytecode.constants
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 
 object ClassRefConstant extends ConstantEntry {
@@ -12,13 +12,13 @@ object ClassRefConstant extends ConstantEntry {
 
   object ClassRefName
 
-  def classRef(classRefNameIndex: Int): MetaObject = new MetaObject(ClassRefKey, ClassRefName -> classRefNameIndex)
+  def classRef(classRefNameIndex: Int): Node = new Node(ClassRefKey, ClassRefName -> classRefNameIndex)
 
-  def getNameIndex(classRef: MetaObject) = classRef(ClassRefName).asInstanceOf[Int]
+  def getNameIndex(classRef: Node) = classRef(ClassRefName).asInstanceOf[Int]
 
   override def key: Any = ClassRefKey
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
   }
 

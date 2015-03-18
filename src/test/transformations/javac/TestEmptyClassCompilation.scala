@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.Test
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
@@ -19,7 +19,7 @@ class TestEmptyClassCompilation {
   @Test
   def testEquivalentConstantPool() {
     val expectedByteCode = getEmptyClassByteCode
-    val javaCode: MetaObject = getEmptyClass
+    val javaCode: Node = getEmptyClass
     val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
@@ -50,7 +50,7 @@ class TestEmptyClassCompilation {
     ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))
   }
 
-  def getEmptyClass: MetaObject = {
-    JavaClassSkeleton.clazz(classPackage, className, members = Seq[MetaObject]())
+  def getEmptyClass: Node = {
+    JavaClassSkeleton.clazz(classPackage, className, members = Seq[Node]())
   }
 }

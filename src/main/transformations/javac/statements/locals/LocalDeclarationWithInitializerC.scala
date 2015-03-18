@@ -2,7 +2,7 @@ package transformations.javac.statements.locals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.{Path, Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
@@ -15,7 +15,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationC)
 
-  def getInitializer(withInitializer: MetaObject) = withInitializer(InitializerKey).asInstanceOf[MetaObject]
+  def getInitializer(withInitializer: Node) = withInitializer(InitializerKey).asInstanceOf[Node]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
@@ -26,7 +26,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
     statement.addOption(parseDeclarationWithInitializer)
   }
 
-  def declarationWithInitializer(name: String, _type: MetaObject, initializer: MetaObject) = new MetaObject(DeclarationWithInitializerKey,
+  def declarationWithInitializer(name: String, _type: Node, initializer: Node) = new Node(DeclarationWithInitializerKey,
     DeclarationName -> name, DeclarationType -> _type, InitializerKey -> initializer)
 
   object DeclarationWithInitializerKey
@@ -46,8 +46,8 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new Root(program).transform[Path](obj => obj.clazz match {
+  override def transform(program: Node, state: CompilationState): Unit = {
+    new Root(program).transform(obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

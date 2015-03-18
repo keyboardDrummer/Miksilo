@@ -1,9 +1,9 @@
 package core.particles.path
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 case class Selection(parent: Path, field: Any) extends OriginWithParent {
-  val current = parent.current(field).asInstanceOf[MetaObject]
+  val current = parent.current(field).asInstanceOf[Node]
   override def parentOption: Option[Path] = Some(parent)
 
   override def hashCode(): Int = parent.hashCode() * field.hashCode()
@@ -13,5 +13,5 @@ case class Selection(parent: Path, field: Any) extends OriginWithParent {
     case _ => false
   }
 
-  override def replaceWith(replacement: MetaObject): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
+  override def replaceWith(replacement: Node): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 }

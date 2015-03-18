@@ -2,14 +2,14 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.PushNullC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object NullC extends ExpressionInstance {
 
-  val _null = new MetaObject(NullKey)
+  val _null = new Node(NullKey)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -23,9 +23,9 @@ object NullC extends ExpressionInstance {
 
   override val key: AnyRef = NullKey
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = ???
+  override def getType(expression: Path, state: CompilationState): Node = ???
 
-  override def toByteCode(expression: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = {
     Seq(PushNullC.pushNull)
   }
 

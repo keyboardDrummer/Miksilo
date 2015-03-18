@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, FieldRefConstant, MethodRefConstant, NameAndType}
 import transformations.javac.expressions.ExpressionSkeleton
@@ -11,14 +11,14 @@ object ClassCompiler {
 }
 
 
-case class FieldInfo(parent: ClassInfo, name: String, _static: Boolean, _type: MetaObject) extends ClassMember {
+case class FieldInfo(parent: ClassInfo, name: String, _static: Boolean, _type: Node) extends ClassMember {
 }
 
-case class MethodInfo(descriptor: MetaObject, _static: Boolean) extends ClassMember
+case class MethodInfo(descriptor: Node, _static: Boolean) extends ClassMember
 
 case class MethodId(className: QualifiedClassName, methodName: String)
 
-case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
+case class ClassCompiler(currentClass: Node, state: CompilationState) {
   val compiler = new MyCompiler()
   val myPackage = compiler.getPackage(JavaClassSkeleton.getPackage(currentClass).toList)
   val className = JavaClassSkeleton.getClassName(currentClass)
@@ -34,12 +34,12 @@ case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
 
   def fullyQualify(className: String): QualifiedClassName = classNames(className)
 
-  def findMethod(methodRef: MetaObject): MethodInfo = {
+  def findMethod(methodRef: Node): MethodInfo = {
     val classIndex = MethodRefConstant.getMethodRefClassRefIndex(methodRef)
-    val classRef = constantPool.getValue(classIndex).asInstanceOf[MetaObject]
+    val classRef = constantPool.getValue(classIndex).asInstanceOf[Node]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val nameAndTypeIndex = MethodRefConstant.getMethodRefMethodNameIndex(methodRef)
-    val nameAndType = constantPool.getValue(nameAndTypeIndex).asInstanceOf[MetaObject]
+    val nameAndType = constantPool.getValue(nameAndTypeIndex).asInstanceOf[Node]
     val methodName = constantPool.getValue(NameAndType.getNameAndTypeName(nameAndType)).asInstanceOf[String]
     val methodId = new MethodId(className, methodName)
     compiler.find(methodId)
@@ -54,7 +54,7 @@ case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
   def getMethodNameAndTypeIndex(methodKey: MethodId): Int = {
     val methodNameIndex = getNameIndex(methodKey.methodName)
     val descriptorIndex = constantPool.store(compiler.find(methodKey).descriptor)
-    val result: MetaObject = NameAndType.nameAndType(methodNameIndex, descriptorIndex)
+    val result: Node = NameAndType.nameAndType(methodNameIndex, descriptorIndex)
     constantPool.store(result)
   }
 
@@ -75,11 +75,11 @@ case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
   def getFieldNameAndTypeIndex(info: FieldInfo): Int = {
     val fieldNameIndex = constantPool.storeUtf8(info.name)
     val typeIndex =   constantPool.store(info._type)
-    val result: MetaObject = NameAndType.nameAndType(fieldNameIndex, typeIndex)
+    val result: Node = NameAndType.nameAndType(fieldNameIndex, typeIndex)
     constantPool.store(result)
   }
 
-  def findClass(objectType: MetaObject): ClassInfo = {
+  def findClass(objectType: Node): ClassInfo = {
     val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
@@ -87,7 +87,7 @@ case class ClassCompiler(currentClass: MetaObject, state: CompilationState) {
     compiler.find(qualifiedName.parts).asInstanceOf[ClassInfo]
   }
 
-  private def getClassMapFromImports(imports: Seq[MetaObject]): Map[String, QualifiedClassName] = {
+  private def getClassMapFromImports(imports: Seq[Node]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
       JavaClassSkeleton.getState(state).importToClassMap(_import.clazz)(_import)
     }).toMap ++ Map(className -> JavaClassSkeleton.getQualifiedClassName(currentClass))

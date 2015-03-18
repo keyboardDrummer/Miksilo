@@ -1,12 +1,12 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import util.DataFlowAnalysis
 
-abstract class InstructionFlowAnalysis[State](instructions: Seq[MetaObject])
+abstract class InstructionFlowAnalysis[State](instructions: Seq[Node])
   extends DataFlowAnalysis[Int, State] {
 
   def getJumpBehavior(instructionClazz: Any): JumpBehavior

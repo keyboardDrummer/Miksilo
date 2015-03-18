@@ -1,12 +1,12 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
 
-abstract class StatementFlowAnalysis[State](state: CompilationState, method: MetaObject)
+abstract class StatementFlowAnalysis[State](state: CompilationState, method: Node)
   extends DataFlowAnalysis[Path, State]
 {
   val instances = StatementSkeleton.getState(state).instances

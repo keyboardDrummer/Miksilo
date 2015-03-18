@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.{Path, Root}
 import transformations.javac.expressions.additive.AdditionC
 
@@ -11,8 +11,8 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AdditionC, AssignmentSkeleton)
 
-  def incrementAssignment(target: MetaObject, value: MetaObject) =
-    new MetaObject(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
+  def incrementAssignment(target: Node, value: Node) =
+    new Node(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
@@ -35,8 +35,8 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
     incrementAssignment.replaceWith(assignment)
   }
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new Root(program).transform[Path](obj => obj.clazz match {
+  override def transform(program: Node, state: CompilationState): Unit = {
+    new Root(program).transform(obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })

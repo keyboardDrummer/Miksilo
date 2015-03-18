@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
@@ -20,7 +20,7 @@ class TestPrintByteCodeWhile {
     Assert.assertEquals(expectedHex, TestUtils.printByteCode(getByteCode))
   }
 
-  def getByteCode: MetaObject = {
+  def getByteCode: Node = {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 12),
       ClassRefConstant.classRef(13),
       ClassRefConstant.classRef(14),
@@ -35,14 +35,14 @@ class TestPrintByteCodeWhile {
       NameAndType.nameAndType(4, 5),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
       new QualifiedClassName(Seq("java", "lang", "Object"))))
-    val constructor: MetaObject = getConstructor
-    val _while: MetaObject = getWhile
+    val constructor: Node = getConstructor
+    val _while: Node = getWhile
     val methods = Seq(constructor, _while)
     val classAttributes = Seq(SourceFileAttribute.sourceFile(10, 11))
     ByteCodeSkeleton.clazz(2, 3, constantPool, methods, attributes = classAttributes)
   }
 
-  def getConstructor: MetaObject = {
+  def getConstructor: Node = {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeMethodInfo.methodInfo(4, 5, Seq(
       CodeAttribute.codeAttribute(6, 1, 1, Seq(
@@ -53,7 +53,7 @@ class TestPrintByteCodeWhile {
     constructor
   }
 
-  def getWhile: MetaObject = {
+  def getWhile: Node = {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(
       new LineNumberRef(5, 0),
       new LineNumberRef(6, 2),

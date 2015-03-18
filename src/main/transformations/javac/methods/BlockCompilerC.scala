@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
 import core.particles._
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.javac.ImplicitObjectSuperClass
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton
@@ -18,9 +18,9 @@ object BlockCompilerC extends ParticleWithGrammar with ParticleWithPhase
     grammars.find(ProgramGrammar).inner = statements
   }
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
-    val statements = program(ProgramStatements).asInstanceOf[Seq[MetaObject]]
-    val mainArgument: MetaObject = MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType("String")))
+  override def transform(program: Node, state: CompilationState): Unit = {
+    val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
+    val mainArgument: Node = MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType("String")))
     val method = MethodC.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true,MethodC.PublicVisibility)
     val clazz = JavaClassSkeleton.clazz(Seq.empty,"Block",Seq(method))
     program.replaceWith(clazz)

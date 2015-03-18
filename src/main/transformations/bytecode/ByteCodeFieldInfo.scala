@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
@@ -13,15 +13,15 @@ object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def field(nameIndex: Int, descriptorIndex: Int, attributes: Seq[MetaObject]) = {
-    new MetaObject(FieldKey, NameIndex -> nameIndex, DescriptorIndex -> descriptorIndex, FieldAttributes -> attributes)
+  def field(nameIndex: Int, descriptorIndex: Int, attributes: Seq[Node]) = {
+    new Node(FieldKey, NameIndex -> nameIndex, DescriptorIndex -> descriptorIndex, FieldAttributes -> attributes)
   }
 
-  def emitField(field: MetaObject, state: CompilationState): Seq[Byte] = {
+  def emitField(field: Node, state: CompilationState): Seq[Byte] = {
       getAccessFlagsByteCode(field) ++
         PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]) ++
         PrintByteCode.shortToBytes(field(ByteCodeFieldInfo.DescriptorIndex).asInstanceOf[Int]) ++
-        PrintByteCode.getAttributesByteCode(state, field(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[MetaObject]])
+        PrintByteCode.getAttributesByteCode(state, field(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[Node]])
     }
 
   override def inject(state: CompilationState): Unit = {

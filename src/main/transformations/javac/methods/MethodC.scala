@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLikeGen, Key}
+import core.particles.node.{Key, MetaLike, Node}
 import core.particles.path.{Path, Root}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
@@ -23,7 +23,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertMethods(state, clazz))
   }
 
-  def convertMethods(state: CompilationState, clazz: MetaObject) = {
+  def convertMethods(state: CompilationState, clazz: Node) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -33,7 +33,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     })
   }
 
-  def bindMethods(state: CompilationState, clazz: MetaObject): Unit = {
+  def bindMethods(state: CompilationState, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
@@ -41,7 +41,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     for (method <- methods)
       bindMethod(method)
 
-    def bindMethod(method: MetaObject) = {
+    def bindMethod(method: Node) = {
       val methodName: String = MethodC.getMethodName(method)
       val descriptor = MethodC.getMethodDescriptor(method, classCompiler)
       classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
@@ -50,21 +50,21 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
 
-  def getParameterType(metaObject: MetaObject, classCompiler: ClassCompiler) = {
-    val result = metaObject(ParameterTypeKey).asInstanceOf[MetaObject]
+  def getParameterType(metaObject: Node, classCompiler: ClassCompiler) = {
+    val result = metaObject(ParameterTypeKey).asInstanceOf[Node]
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
 
-  def getMethodDescriptor(method: MetaObject, classCompiler: ClassCompiler): MetaObject = {
+  def getMethodDescriptor(method: Node, classCompiler: ClassCompiler): Node = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)
     MethodDescriptorConstant.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
   }
 
-  def convertMethod(method: MetaObject, classCompiler: ClassCompiler, state: CompilationState): Unit = {
+  def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
     val constantPool = ByteCodeSkeleton.getState(state).constantPool
-    def getMethodDescriptorIndex(method: MetaObject): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
+    def getMethodDescriptorIndex(method: Node): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
@@ -84,10 +84,10 @@ object MethodC extends ParticleWithGrammar with WithState {
       val statementToInstructions = StatementSkeleton.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val codeIndex = constantPool.store(CodeConstantEntry.entry)
-      val exceptionTable = Seq[MetaObject]()
-      val codeAttributes = Seq[MetaObject]()
+      val exceptionTable = Seq[Node]()
+      val codeAttributes = Seq[Node]()
       val maxLocalCount: Int = getMethodCompiler(state).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
-      val codeAttribute = new MetaObject(CodeAttribute.CodeKey,
+      val codeAttribute = new Node(CodeAttribute.CodeKey,
         AttributeNameKey -> codeIndex,
         CodeMaxLocalsKey -> maxLocalCount,
         CodeInstructionsKey -> instructions,
@@ -97,21 +97,21 @@ object MethodC extends ParticleWithGrammar with WithState {
     }
   }
 
-  def setMethodCompiler(method: MetaObject, state: CompilationState) {
+  def setMethodCompiler(method: Node, state: CompilationState) {
     val methodCompiler = new MethodCompiler(state, method)
     getState(state).methodCompiler = methodCompiler
   }
 
-  def getMethodReturnType(metaObject: MetaObject) = {
-    metaObject(ReturnTypeKey).asInstanceOf[MetaObject]
+  def getMethodReturnType(metaObject: Node) = {
+    metaObject(ReturnTypeKey).asInstanceOf[Node]
   }
 
-  def getMethodParameters(metaObject: MetaObject) = {
-    metaObject(MethodParametersKey).asInstanceOf[Seq[MetaObject]]
+  def getMethodParameters(metaObject: Node) = {
+    metaObject(MethodParametersKey).asInstanceOf[Seq[Node]]
   }
 
 
-  def addMethodFlags(method: MetaObject) = {
+  def addMethodFlags(method: Node) = {
     var flags = Set[ByteCodeMethodInfo.MethodAccessFlag]()
     if (getMethodStatic(method))
       flags += ByteCodeMethodInfo.StaticAccess
@@ -125,21 +125,21 @@ object MethodC extends ParticleWithGrammar with WithState {
     method(ByteCodeMethodInfo.AccessFlagsKey) = flags
   }
 
-  def getMethodVisibility(method: MetaObject) = method(VisibilityKey).asInstanceOf[Visibility]
+  def getMethodVisibility(method: Node) = method(VisibilityKey).asInstanceOf[Visibility]
 
-  def getMethodStatic(method: MetaObject) = method(StaticKey).asInstanceOf[Boolean]
+  def getMethodStatic(method: Node) = method(StaticKey).asInstanceOf[Boolean]
 
   def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  def getMethodBody[T <: MetaLikeGen[T]](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
+  def getMethodBody[T <: MetaLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
-  def getMethodName(method: MetaObject) = {
+  def getMethodName(method: Node) = {
     method(MethodNameKey).asInstanceOf[String]
   }
 
-  def getMethods(clazz: MetaObject) = JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == MethodKey)
+  def getMethods(clazz: Node) = JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == MethodKey)
 
-  def getParameterName(metaObject: MetaObject) = metaObject(ParameterNameKey).asInstanceOf[String]
+  def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 
   object ParametersGrammar
   object VisibilityGrammar
@@ -169,9 +169,9 @@ object MethodC extends ParticleWithGrammar with WithState {
     memberGrammar.addOption(methodGrammar)
   }
 
-  def method(name: String, _returnType: Any, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
+  def method(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],
              static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
-    new MetaObject(MethodKey,
+    new Node(MethodKey,
       MethodNameKey -> name,
       ReturnTypeKey -> _returnType,
       MethodParametersKey -> _parameters,
@@ -182,7 +182,7 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   object ParameterKey
   def parameter(name: String, _type: Any) = {
-    new MetaObject(ParameterKey,
+    new Node(ParameterKey,
       ParameterNameKey -> name,
       ParameterTypeKey -> _type)
   }

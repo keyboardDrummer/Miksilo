@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -14,24 +14,24 @@ object GetFieldC extends InstructionC {
 
   override val key: AnyRef = GetFieldKey
 
-  def construct(fieldRefIndex: Int): MetaObject = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
+  def construct(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b4") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
     new InstructionSignature(Seq(stackTop), Seq(getReturnType(ByteCodeSkeleton.getConstantPool(state), instruction)))
   }
 
-  def getReturnType(constantPool: ConstantPool, getField: MetaObject): MetaObject = {
+  def getReturnType(constantPool: ConstantPool, getField: Node): Node = {
     val fieldRefIndex = CodeAttribute.getInstructionArguments(getField)(0)
-    val fieldRef = constantPool.getValue(fieldRefIndex).asInstanceOf[MetaObject]
-    val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
-    val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
+    val fieldRef = constantPool.getValue(fieldRefIndex).asInstanceOf[Node]
+    val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[Node]
+    val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]
     fieldType
   }
 

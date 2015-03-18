@@ -1,6 +1,6 @@
 package core.particles
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.methods.{CallC, MemberSelector, VariableC}
@@ -9,8 +9,8 @@ class TestMetaObject {
 
   @Test
   def testEquals() {
-    val first = new MetaObject(ClazzKey, FieldKey -> FieldValue)
-    val second = new MetaObject(ClazzKey, FieldKey -> FieldValue)
+    val first = new Node(ClazzKey, FieldKey -> FieldValue)
+    val second = new Node(ClazzKey, FieldKey -> FieldValue)
     Assert.assertEquals(first, second)
   }
 

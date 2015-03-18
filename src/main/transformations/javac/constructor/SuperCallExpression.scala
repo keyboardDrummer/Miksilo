@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
@@ -18,20 +18,20 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallC) ++ super.dependencies
 
-  def superCall(arguments: Seq[MetaObject] = Seq()) = new MetaObject(SuperCall, CallC.CallArguments -> arguments)
+  def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallC.CallArguments -> arguments)
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = VoidTypeC.voidType
+  override def getType(expression: Path, state: CompilationState): Node = VoidTypeC.voidType
 
-  override def toByteCode(call: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     transformSuperCall(classCompiler.currentClass, call, state)
   }
 
-  def transformSuperCall(clazz: MetaObject, call: Path, state: CompilationState): Seq[MetaObject] = {
+  def transformSuperCall(clazz: Node, call: Path, state: CompilationState): Seq[Node] = {
     transformToByteCode(call, state, JavaClassSkeleton.getParent(clazz).get)
   }
 
-  def transformToByteCode(call: Path, state: CompilationState, className: String): Seq[MetaObject] = {
+  def transformToByteCode(call: Path, state: CompilationState, className: String): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val callArguments = CallC.getCallArguments(call)
     val qualifiedName = compiler.fullyQualify(className)

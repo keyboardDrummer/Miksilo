@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
@@ -14,7 +14,7 @@ object VariableC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerC)
 
-  def getVariableName(variable: MetaObject) = variable(VariableNameKey).asInstanceOf[String]
+  def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
@@ -24,7 +24,7 @@ object VariableC extends ExpressionInstance {
 
   object VariableGrammar
 
-  def variable(name: String) = new MetaObject(VariableKey, VariableNameKey -> name)
+  def variable(name: String) = new Node(VariableKey, VariableNameKey -> name)
 
   object VariableNameKey
 
@@ -32,7 +32,7 @@ object VariableC extends ExpressionInstance {
 
   override val key: AnyRef = VariableKey
 
-  override def getType(variable: Path, state: CompilationState): MetaObject = {
+  override def getType(variable: Path, state: CompilationState): Node = {
     getVariableInfo(variable, state)._type
   }
 
@@ -40,7 +40,7 @@ object VariableC extends ExpressionInstance {
     getVariables(state, variable)(VariableC.getVariableName(variable))
   }
 
-  override def toByteCode(variable: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(variable: Path, state: CompilationState): Seq[Node] = {
     val variableInfo: VariableInfo = getVariableInfo(variable, state)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type

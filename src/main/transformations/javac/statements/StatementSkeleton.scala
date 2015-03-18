@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.MissingToInstructionsFor
@@ -14,7 +14,7 @@ object StatementSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(state: CompilationState): Path => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): Path => Seq[Node] = {
     statement => {
       val statementTransformation = getState(state).instances.get(statement.clazz)
       val transformation = statementTransformation.getOrElse(throw new MissingToInstructionsFor(statement.clazz))

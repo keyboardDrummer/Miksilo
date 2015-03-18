@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -19,15 +19,15 @@ object IntLiteralC extends ExpressionInstance {
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
 
-  def literal(value: Int) = new MetaObject(IntLiteralKey, ValueKey -> value)
+  def literal(value: Int) = new Node(IntLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
     Seq(IntegerConstantC.integerConstant(getValue(literal)))
   }
 
-  def getValue(literal: MetaObject) = literal(ValueKey).asInstanceOf[Int]
+  def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Int]
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = IntTypeC.intType
+  override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
 
   object IntLiteralKey
 

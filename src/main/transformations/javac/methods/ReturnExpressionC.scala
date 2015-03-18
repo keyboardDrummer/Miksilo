@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
 import transformations.javac.expressions.ExpressionSkeleton
@@ -14,7 +14,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
-  def returnToLines(_return: Path, compiler: MethodCompiler): Seq[MetaObject] = {
+  def returnToLines(_return: Path, compiler: MethodCompiler): Seq[Node] = {
     val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.state)(getReturnValue(_return))
     returnValueInstructions ++ Seq(IntegerReturnInstructionC.integerReturn)
   }
@@ -29,7 +29,7 @@ object ReturnExpressionC extends StatementInstance {
     statement.inner = statement.inner | returnExpression
   }
 
-  def _return(value: MetaObject): MetaObject = new MetaObject(ReturnInteger, ReturnValue -> value)
+  def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
 
   object ReturnInteger
 
@@ -37,7 +37,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key: AnyRef = ReturnInteger
 
-  override def toByteCode(_return: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_return: Path, state: CompilationState): Seq[Node] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }

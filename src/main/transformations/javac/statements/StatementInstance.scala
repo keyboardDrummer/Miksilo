@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.{Path, SequenceSelection}
 
 trait StatementInstance extends ParticleWithGrammar {
@@ -13,11 +13,11 @@ trait StatementInstance extends ParticleWithGrammar {
 
   val key: AnyRef
 
-  def toByteCode(statement: Path, state: CompilationState): Seq[MetaObject]
+  def toByteCode(statement: Path, state: CompilationState): Seq[Node]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
 
-  case class SequenceDoesNotEndInJump(sequence: Seq[MetaObject]) extends Exception
+  case class SequenceDoesNotEndInJump(sequence: Seq[Node]) extends Exception
   {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
@@ -32,10 +32,10 @@ trait StatementInstance extends ParticleWithGrammar {
     if (nextOption.nonEmpty)
       return Set(nextOption.get)
 
-    throw SequenceDoesNotEndInJump(selection.parent.current(selection.field).asInstanceOf[Seq[MetaObject]])
+    throw SequenceDoesNotEndInJump(selection.parent.current(selection.field).asInstanceOf[Seq[Node]])
   }
 
   def getLabels(obj: Path): Map[Any, Path] = Map.empty
 
-  def definedVariables(state: CompilationState, obj: MetaObject): Map[String, MetaObject] = Map.empty
+  def definedVariables(state: CompilationState, obj: Node): Map[String, Node] = Map.empty
 }

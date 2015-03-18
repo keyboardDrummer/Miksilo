@@ -4,7 +4,7 @@ import java.io
 
 import application.compilerCockpit.PrettyPrint
 import core.particles._
-import core.particles.node.{MetaObject, ComparisonOptions}
+import core.particles.node.{Node, ComparisonOptions}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
@@ -22,33 +22,33 @@ class TestUtils(val compiler: CompilerFromParticles) {
   def actualOutputDirectory = rootOutput / "actual"
   def testResources = currentDir / Path("testResources")
 
-  def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
+  def testInstructionEquivalence(expectedByteCode: Node, compiledCode: Node) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
       Assert.assertTrue(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1),
         getMethodInstructions(methodPair._2)))
     }
   }
 
-  def getMethodInstructions(method: MetaObject) =
+  def getMethodInstructions(method: Node) =
     CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method)(0))
 
-  def printByteCode(byteCode: MetaObject): String = {
+  def printByteCode(byteCode: Node): String = {
     PrintByteCode.printBytes(getBytes(byteCode))
   }
 
-  def getBytes(byteCode: MetaObject): Seq[Byte] = {
+  def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
     val particles: Seq[Particle] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
     new CompilerFromParticles(particles).transform(byteCode)
     output
   }
 
-  def runByteCode(className: String, code: MetaObject, expectedResult: Int) {
+  def runByteCode(className: String, code: Node, expectedResult: Int) {
     val line = runByteCode(className, code)
     Assert.assertEquals(expectedResult, Integer.parseInt(line))
   }
 
-  def runByteCode(className: String, code: MetaObject) : String = {
+  def runByteCode(className: String, code: Node) : String = {
     val bytes = getBytes(code).toArray
     val currentDir = new File(new java.io.File("."))
     val testDirectory = currentDir / Path("testOutput")
@@ -61,7 +61,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     runJavaClass(className, testDirectory)
   }
 
-  def parseAndTransform(className: String, inputDirectory: Path): MetaObject = {
+  def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: File = getJavaTestFile(className, inputDirectory)
     compiler.parseAndTransform(input).program
   }
@@ -163,7 +163,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     line
   }
 
-  def compareConstantPools(expectedByteCode: MetaObject, compiledCode: MetaObject) {
+  def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
     val expectedConstantPoolSet = ByteCodeSkeleton.getConstantPool(expectedByteCode).constants
     val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode).constants
     Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
@@ -174,7 +174,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends ParticleWithPhase {
-    override def transform(program: MetaObject, state: CompilationState): Unit = {
+    override def transform(program: Node, state: CompilationState): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }
 

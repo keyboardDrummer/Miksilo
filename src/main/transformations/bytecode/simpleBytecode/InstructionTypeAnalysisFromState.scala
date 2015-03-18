@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant}
@@ -11,13 +11,13 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.ObjectTypeC
 
-class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObject) {
+class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
 
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters
   val initialVariables = parameters.zipWithIndex.map(p => p._2 -> p._1).toMap
-  val initialStack = Seq[MetaObject]()
+  val initialStack = Seq[Node]()
   val initialProgramTypeState: ProgramTypeState = ProgramTypeState(initialStack, initialVariables)
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
@@ -27,11 +27,11 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
 
     new InstructionTypeAnalysis(instructions) {
       val instructionVariableUpdateRegistry = CodeAttribute.getState(state).localUpdates
-      override def getSideEffects(typeState: ProgramTypeState, instruction: MetaObject): InstructionSideEffects =
+      override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
         instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)
 
       val instructionSignatureRegistry = CodeAttribute.getInstructionSignatureRegistry(state)
-      override def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature =
+      override def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature =
         instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, state)
 
       val jumpBehaviorRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
@@ -41,7 +41,7 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
   
   private def getMethodParameters = {
     val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
-    val methodDescriptor = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[MetaObject]
+    val methodDescriptor = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node]
     val methodParameters = MethodDescriptorConstant.getMethodDescriptorParameters(methodDescriptor)
     if (methodIsStatic) {
       methodParameters
@@ -49,7 +49,7 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: MetaObje
     else {
       val clazz = state.program
       val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
-      val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[MetaObject]
+      val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[Node]
       val className = constantPool.getValue(ClassRefConstant.getNameIndex(clazzRef)).asInstanceOf[QualifiedClassName]
       Seq(ObjectTypeC.objectType(className)) ++ methodParameters
     }

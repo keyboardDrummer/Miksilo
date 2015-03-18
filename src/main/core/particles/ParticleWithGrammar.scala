@@ -3,7 +3,7 @@ package core.particles
 import core.biGrammar.GrammarDocumentWriter
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)
@@ -29,10 +29,10 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   }
 
   def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
-    if (!value.isInstanceOf[MetaObject])
+    if (!value.isInstanceOf[Node])
       return None
 
-    val metaObject = value.asInstanceOf[MetaObject]
+    val metaObject = value.asInstanceOf[Node]
 
     if (metaObject.clazz == key) {
       val first :: rest = fields
@@ -46,7 +46,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     }
   }
 
-  def getWithPartial(meta: MetaObject, key: Any): Any = {
+  def getWithPartial(meta: Node, key: Any): Any = {
     if (key == PartialSelf) meta else meta(key)
   }
 
@@ -56,7 +56,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   }
 
   def construct(value: Any, key: AnyRef, fields: List[Any]) = {
-    val result = new MetaObject(key)
+    val result = new Node(key)
     val values = tildeValuesToSeq(value)
     fields.zip(values).foreach(pair => {
       val field: Any = pair._1
@@ -64,8 +64,8 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
       if (field == PartialSelf)
       {
         fieldValue match {
-          case metaFieldValue: MetaObject =>
-            result.data ++= fieldValue.asInstanceOf[MetaObject].data
+          case metaFieldValue: Node =>
+            result.data ++= fieldValue.asInstanceOf[Node].data
           case _ =>
         }
       }

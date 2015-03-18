@@ -2,7 +2,7 @@ package transformations.javac.expressions
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -27,7 +27,7 @@ object TernaryC extends ExpressionInstance {
     expressionGrammar.inner = ternaryGrammar
   }
 
-  def ternary(condition: MetaObject, trueBranch: MetaObject, falseBranch: MetaObject) = new MetaObject(TernaryKey,
+  def ternary(condition: Node, trueBranch: Node, falseBranch: Node) = new Node(TernaryKey,
     FalseKey -> falseBranch,
     TrueKey -> trueBranch,
     ConditionKey -> condition)
@@ -44,7 +44,7 @@ object TernaryC extends ExpressionInstance {
 
   override val key: AnyRef = TernaryKey
 
-  override def getType(_ternary: Path, state: CompilationState): MetaObject = {
+  override def getType(_ternary: Path, state: CompilationState): Node = {
     val getExpressionType = ExpressionSkeleton.getType(state)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
@@ -56,7 +56,7 @@ object TernaryC extends ExpressionInstance {
     TypeSkeleton.union(state)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_ternary: Path, state: CompilationState): Seq[Node] = {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)

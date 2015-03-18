@@ -3,14 +3,14 @@ package transformations.javac.expressions
 import core.exceptions.CompilerException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.types.TypeSkeleton
 
 import scala.util.Try
 
 case class GetTypeNotFound(key: Any) extends CompilerException {
-  override def toString = s"'get type' method not found for class ${MetaObject.classDebugRepresentation(key)}"
+  override def toString = s"'get type' method not found for class ${Node.classDebugRepresentation(key)}"
 }
 
 object ExpressionSkeleton extends ParticleWithGrammar with WithState {
@@ -21,7 +21,7 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
-  def getType(state: CompilationState): Path => MetaObject = expression => {
+  def getType(state: CompilationState): Path => Node = expression => {
     val getTypeMethod = Try(getGetTypeRegistry(state)(expression.clazz)).
       recover({case e: NoSuchElementException => throw new GetTypeNotFound(expression.clazz)}).get
     getTypeMethod(expression)
@@ -29,7 +29,7 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   def getGetTypeRegistry(state: CompilationState) = getState(state).getTypeRegistry
 
-  def getToInstructions(state: CompilationState): Path => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): Path => Seq[Node] = {
     expression => {
       val implementation = getToInstructionsRegistry(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
       implementation(expression)
@@ -45,8 +45,8 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   def createState = new State()
   class State {
-    val expressionToInstructions = new ClassRegistry[Path => Seq[MetaObject]]
-    val getTypeRegistry = new ClassRegistry[Path => MetaObject]
+    val expressionToInstructions = new ClassRegistry[Path => Seq[Node]]
+    val getTypeRegistry = new ClassRegistry[Path => Node]
   }
 
   object CoreGrammar

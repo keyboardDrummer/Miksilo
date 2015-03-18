@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
@@ -22,7 +22,7 @@ object FieldDeclaration extends ParticleWithGrammar {
     JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertFields(state, clazz))
   }
   
-  def bindFields(state: CompilationState, clazz: MetaObject): Unit = {
+  def bindFields(state: CompilationState, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
@@ -30,26 +30,26 @@ object FieldDeclaration extends ParticleWithGrammar {
     for (field <- fields)
       bindField(field)
 
-    def bindField(field: MetaObject) = {
+    def bindField(field: Node) = {
       val name: String = getFieldName(field)
       val _type = getFieldType(field)
       classInfo.newFieldInfo(name, _type)
     }
   }
 
-  def getFieldType(field: MetaObject): MetaObject = {
-    field(FieldType).asInstanceOf[MetaObject]
+  def getFieldType(field: Node): Node = {
+    field(FieldType).asInstanceOf[Node]
   }
 
-  def getFieldName(field: MetaObject): String = {
+  def getFieldName(field: Node): String = {
     field(FieldName).asInstanceOf[String]
   }
 
-  def getFields(clazz: MetaObject): Seq[MetaObject] = {
+  def getFields(clazz: Node): Seq[Node] = {
     JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == FieldKey)
   }
 
-  def convertFields(state: CompilationState, clazz: MetaObject) = {
+  def convertFields(state: CompilationState, clazz: Node) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val fields = getFields(clazz)
@@ -59,7 +59,7 @@ object FieldDeclaration extends ParticleWithGrammar {
     })
   }
   
-  def convertField(field: MetaObject, classCompiler: ClassCompiler, state: CompilationState) {
+  def convertField(field: Node, classCompiler: ClassCompiler, state: CompilationState) {
     val constantPool = classCompiler.constantPool
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 

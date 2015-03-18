@@ -2,7 +2,7 @@ package transformations.types
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.ConstantEntry
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
@@ -19,17 +19,17 @@ trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
     super.inject(state)
   }
 
-  def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject]
+  def getSuperTypes(_type: Node, state: CompilationState): Seq[Node]
 
-  def getStackType(_type: MetaObject, state: CompilationState) = _type
+  def getStackType(_type: Node, state: CompilationState) = _type
 
-  def getByteCodeString(_type: MetaObject, state: CompilationState): String
+  def getByteCodeString(_type: Node, state: CompilationState): String
 
   def getStackSize: Int
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry(getByteCodeString(constant, state))
   }
 

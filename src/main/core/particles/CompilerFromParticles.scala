@@ -3,7 +3,7 @@ package core.particles
 import core.biGrammar.Labelled
 import core.exceptions.ParticleDependencyViolation
 import core.particles.grammars.ProgramGrammar
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
 
@@ -30,19 +30,19 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
     state
   }
 
-  def transform(program: MetaObject): MetaObject = {
+  def transform(program: Node): Node = {
     val state: CompilationState = transformReturnState(program)
     state.program
   }
 
-  def transformReturnState(program: MetaObject): CompilationState = {
+  def transformReturnState(program: Node): CompilationState = {
     val state = buildState
     state.program = program
     state.runPhases()
     state
   }
 
-  def parse(input: String): MetaObject = {
+  def parse(input: String): Node = {
     val state = buildState
     state.parseString(input)
     state.program

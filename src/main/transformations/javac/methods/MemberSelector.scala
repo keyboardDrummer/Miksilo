@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionSkeleton
@@ -11,7 +11,7 @@ object MemberSelector extends ParticleWithGrammar with WithState {
 
   def getSelectorObject[T <: MetaLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
 
-  def getSelectorMember(selector: MetaObject) = selector(SelectorMember).asInstanceOf[String]
+  def getSelectorMember(selector: Node) = selector(SelectorMember).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -27,10 +27,10 @@ object MemberSelector extends ParticleWithGrammar with WithState {
 
   object SelectorMember
 
-  def selector(_object: Any, member: Any): MetaObject = selector(_object.asInstanceOf[MetaObject], member.asInstanceOf[String])
+  def selector(_object: Any, member: Any): Node = selector(_object.asInstanceOf[Node], member.asInstanceOf[String])
 
-  def selector(_object: MetaObject, member: String): MetaObject = {
-    new MetaObject(SelectorKey,
+  def selector(_object: Node, member: String): Node = {
+    new Node(SelectorKey,
       SelectorObject -> _object,
       SelectorMember -> member)
   }

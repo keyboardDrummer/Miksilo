@@ -1,9 +1,9 @@
 package core.particles
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 trait ParticleWithPhase extends Particle {
-  def transform(program: MetaObject, state: CompilationState)
+  def transform(program: Node, state: CompilationState)
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)

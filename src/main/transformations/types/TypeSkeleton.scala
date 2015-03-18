@@ -3,36 +3,36 @@ package transformations.types
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 
-class TypeMismatchException(to: MetaObject, from: MetaObject) extends BadInputException {
+class TypeMismatchException(to: Node, from: Node) extends BadInputException {
   override def toString = s"cannot assign: $to = $from"
 }
 
-class NoCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
+class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
-class AmbiguousCommonSuperTypeException(first: MetaObject, second: MetaObject) extends BadInputException
+class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 object TypeSkeleton extends ParticleWithGrammar with WithState {
 
-  def toStackType(_type: MetaObject, state: CompilationState) : MetaObject = {
+  def toStackType(_type: Node, state: CompilationState) : Node = {
     getState(state).instances(_type.clazz).getStackType(_type, state)
   }
 
-  def getTypeSize(_type: MetaObject, state: CompilationState): Int = getState(state).stackSize(_type.clazz)
+  def getTypeSize(_type: Node, state: CompilationState): Int = getState(state).stackSize(_type.clazz)
 
-  def getByteCodeString(state: CompilationState): MetaObject => String =
+  def getByteCodeString(state: CompilationState): Node => String =
     _type => getState(state).toByteCodeString(_type.clazz)(_type)
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def checkAssignableTo(state: CompilationState)(to: MetaObject, from: MetaObject) = {
+  def checkAssignableTo(state: CompilationState)(to: Node, from: Node) = {
     if (!isAssignableTo(state)(to, from))
       throw new TypeMismatchException(to, from)
   }
 
-  def isAssignableTo(state: CompilationState)(to: MetaObject, from: MetaObject): Boolean = {
+  def isAssignableTo(state: CompilationState)(to: Node, from: Node): Boolean = {
     val fromSuperTypes = getSuperTypes(state)(from)
     if (to.equals(from))
       return true
@@ -40,13 +40,13 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
     fromSuperTypes.exists(_type => _type.equals(to))
   }
 
-  def getSuperTypes(state: CompilationState)(_type: MetaObject) = getSuperTypesRegistry(state)(_type.clazz)(_type)
+  def getSuperTypes(state: CompilationState)(_type: Node) = getSuperTypesRegistry(state)(_type.clazz)(_type)
 
   def getSuperTypesRegistry(state: CompilationState) = {
     getState(state).superTypes
   }
 
-  def union(state: CompilationState)(first: MetaObject, second: MetaObject): MetaObject = {
+  def union(state: CompilationState)(first: Node, second: Node): Node = {
     val filteredDepths = getAllSuperTypes(state)(first).map(depthTypes => depthTypes.filter(_type => isAssignableTo(state)(_type, second)))
     val resultDepth = filteredDepths.find(depth => depth.nonEmpty).getOrElse(throw new NoCommonSuperTypeException(first, second))
     if (resultDepth.size > 1)
@@ -55,8 +55,8 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
     resultDepth.head
   }
 
-  def getAllSuperTypes(state: CompilationState)(_type: MetaObject): Stream[Set[MetaObject]] = {
-    var returnedTypes = Set.empty[MetaObject]
+  def getAllSuperTypes(state: CompilationState)(_type: Node): Stream[Set[Node]] = {
+    var returnedTypes = Set.empty[Node]
     Stream.iterate(Set(_type))(previousDepthTypes => {
       val result = previousDepthTypes.flatMap(_type => getSuperTypes(state)(_type)).filter(_type => !returnedTypes.contains(_type))
       returnedTypes ++= result
@@ -71,8 +71,8 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
   def createState = new State
   
   class State {
-    val superTypes = new ClassRegistry[MetaObject => Seq[MetaObject]]()
-    val toByteCodeString = new ClassRegistry[MetaObject => String]()
+    val superTypes = new ClassRegistry[Node => Seq[Node]]()
+    val toByteCodeString = new ClassRegistry[Node => String]()
     val stackSize = new ClassRegistry[Int]()
     val instances = new ClassRegistry[TypeInstance]
   }

@@ -3,16 +3,16 @@ package core.particles.node
 import scala.collection.mutable
 
 trait MetaLike {
-
+  type Self <: MetaLike
   def get(key: Any): Option[Any]
   def apply(key: Any): Any
   def clazz: Any
   def dataView: Map[Any, Any]
 
-  def transform[T <: MetaLike](transformation: T => Unit, visited: mutable.Set[T] = new mutable.HashSet[T]()) = {
+  def transform(transformation: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
 
-    transformNode(this.asInstanceOf[T])
-    def transformNode(metaObject: T): Unit = {
+    transformNode(this.asInstanceOf[Self])
+    def transformNode(metaObject: Self): Unit = {
       if (!visited.add(metaObject))
         return
 
@@ -23,10 +23,10 @@ trait MetaLike {
       {
         child match {
           case metaObject: MetaLike =>
-            transformNode(metaObject.asInstanceOf[T])
+            transformNode(metaObject.asInstanceOf[Self])
           case sequence: Seq[_] =>
             sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case metaChild: MetaLike => transformNode(metaChild.asInstanceOf[T])
+              case metaChild: MetaLike => transformNode(metaChild.asInstanceOf[Self])
               case _ =>
             })
           case _ =>

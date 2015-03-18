@@ -1,7 +1,7 @@
 package transformations.bytecode.attributes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
@@ -15,9 +15,9 @@ object SourceFileAttribute extends ParticleWithGrammar {
 
   private object SourceFileId
 
-  def sourceFileId = new MetaObject(SourceFileId)
+  def sourceFileId = new Node(SourceFileId)
 
-  def sourceFile(nameIndex: Int, fileNameIndex: Int): MetaObject = new MetaObject(SourceFileAttributeKey,
+  def sourceFile(nameIndex: Int, fileNameIndex: Int): Node = new Node(SourceFileAttributeKey,
     SourceFileFileNameIndex -> fileNameIndex,
     AttributeNameKey -> nameIndex)
 
@@ -27,11 +27,11 @@ object SourceFileAttribute extends ParticleWithGrammar {
     ByteCodeSkeleton.getState(state).getBytes(SourceFileId) = _ => toUTF8ConstantEntry("SourceFile")
   }
 
-  def getSourceFileBytes(sourceFile: MetaObject) = {
+  def getSourceFileBytes(sourceFile: Node) = {
     shortToBytes(getSourceFileFileNameIndex(sourceFile))
   }
 
-  def getSourceFileFileNameIndex(sourceFile: MetaObject) = sourceFile(SourceFileFileNameIndex).asInstanceOf[Int]
+  def getSourceFileFileNameIndex(sourceFile: Node) = sourceFile(SourceFileFileNameIndex).asInstanceOf[Int]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 

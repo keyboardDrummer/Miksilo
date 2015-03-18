@@ -6,7 +6,7 @@ case class ComparisonOptions(compareIntegers: Boolean = true, takeAllLeftKeys: B
 {
   def deepEquality(first: Any, second: Any): Boolean = {
 
-    def deepEquality(first: Any, second: Any, closed: mutable.Set[(MetaObject, MetaObject)]): Boolean = {
+    def deepEquality(first: Any, second: Any, closed: mutable.Set[(Node, Node)]): Boolean = {
       if (first == second)
         return true
 
@@ -19,13 +19,13 @@ case class ComparisonOptions(compareIntegers: Boolean = true, takeAllLeftKeys: B
           if (seq1.length != seq2.length)
             return false
           seq1.zip(seq2).forall(p => deepEquality(p._1, p._2, closed))
-        case (meta1: MetaObject, meta2: MetaObject) => deepEqualityMeta(meta1, meta2, closed)
+        case (meta1: Node, meta2: Node) => deepEqualityMeta(meta1, meta2, closed)
         case (int1: Integer, int2: Integer) => if (compareIntegers) first == second else true
         case _ => first == second
       }
     }
 
-    def deepEqualityMeta(first: MetaObject, second: MetaObject, closed: mutable.Set[(MetaObject, MetaObject)]): Boolean = {
+    def deepEqualityMeta(first: Node, second: Node, closed: mutable.Set[(Node, Node)]): Boolean = {
       val key = (first, second)
       if (!closed.add(key))
         return true
@@ -45,6 +45,6 @@ case class ComparisonOptions(compareIntegers: Boolean = true, takeAllLeftKeys: B
       })
     }
 
-    deepEquality(first, second, mutable.Set[(MetaObject, MetaObject)]())
+    deepEquality(first, second, mutable.Set[(Node, Node)]())
   }
 }

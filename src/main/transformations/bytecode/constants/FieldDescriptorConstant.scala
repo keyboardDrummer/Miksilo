@@ -3,7 +3,7 @@ package transformations.bytecode.constants
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
 import transformations.types.TypeSkeleton
 
@@ -11,12 +11,12 @@ object FieldDescriptorConstant extends ConstantEntry {
   object Key
   object Type
 
-  def constructor(_type: MetaObject) = new MetaObject(Key, Type -> _type)
+  def constructor(_type: Node) = new Node(Key, Type -> _type)
 
   override def key: Any = Key
 
-  override def getByteCode(constant: MetaObject, state: CompilationState): Seq[Byte] = {
-    val _type: MetaObject = constant(Type).asInstanceOf[MetaObject]
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+    val _type: Node = constant(Type).asInstanceOf[Node]
     val typeString = TypeSkeleton.getByteCodeString(state)(_type)
     PrintByteCode.toUTF8ConstantEntry(typeString)
   }

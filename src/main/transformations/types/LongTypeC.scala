@@ -2,15 +2,15 @@ package transformations.types
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 object LongTypeC extends TypeInstance {
 
   override val key: AnyRef = LongTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = ???
+  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "J"
+  override def getByteCodeString(_type: Node, state: CompilationState): String = "J"
 
   override def getStackSize: Int = 2
 
@@ -18,7 +18,7 @@ object LongTypeC extends TypeInstance {
     "long" ~> produce(longType)
   }
 
-  def longType = new MetaObject(LongTypeKey)
+  def longType = new Node(LongTypeKey)
 
   object LongTypeKey
 

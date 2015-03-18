@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.Test
 import transformations.javac.classes.JavaClassSkeleton._
 import transformations.javac.expressions._
@@ -26,11 +26,11 @@ class FibonacciWithoutMain {
     TestUtils.printByteCode(byteCode)
   }
 
-  def getJavaFibonacciWithoutMain: MetaObject = {
+  def getJavaFibonacciWithoutMain: Node = {
     clazz(defaultPackage, className, Seq(getFibonacciMethodJava))
   }
 
-  def getFibonacciMethodJava: MetaObject = {
+  def getFibonacciMethodJava: Node = {
     val parameters = Seq(parameter("i", IntTypeC.intType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralC.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralC.literal(2))))

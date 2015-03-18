@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -20,7 +20,7 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(ifThen: Path, state: CompilationState): Seq[Node] = {
     val condition = getCondition(ifThen)
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)

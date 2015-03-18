@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
@@ -26,9 +26,9 @@ class TestPrintByteCodeFibonacciWithMain {
     Assert.assertEquals(expectedHex, TestUtils.printByteCode(getByteCode))
   }
 
-  def getByteCode: MetaObject = {
+  def getByteCode: Node = {
     val classAttributes = Seq(SourceFileAttribute.sourceFile(16, 17))
-    ByteCodeSkeleton.clazz(5, 6, getConstantPool, Seq[MetaObject](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
+    ByteCodeSkeleton.clazz(5, 6, getConstantPool, Seq[Node](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
   }
 
   @Test
@@ -38,14 +38,14 @@ class TestPrintByteCodeFibonacciWithMain {
     TestUtils.runByteCode(className, code, expectedResult)
   }
 
-  def getExpectedUnoptimizedFibonacciWithoutMainByteCode: MetaObject = {
+  def getExpectedUnoptimizedFibonacciWithoutMainByteCode: Node = {
     val constantPool = getConstantPool
-    val method: MetaObject = getFibonacciMethod
+    val method: Node = getFibonacciMethod
     val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
     nativeClass
   }
 
-  def getFibonacciMethod: MetaObject = {
+  def getFibonacciMethod: Node = {
     val instructions = Seq(
       LoadIntegerC.load(0),
       IntegerConstantC.integerConstant(2),
@@ -108,7 +108,7 @@ class TestPrintByteCodeFibonacciWithMain {
     new ConstantPool(constantPool)
   }
 
-  def getConstructorByteCode: MetaObject = {
+  def getConstructorByteCode: Node = {
     val instructions = Seq(LoadAddressC.addressLoad(0),
       InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
@@ -116,7 +116,7 @@ class TestPrintByteCodeFibonacciWithMain {
     ByteCodeMethodInfo.methodInfo(7, 8, codeAttribute, Set())
   }
 
-  def getMainByteCode: MetaObject = {
+  def getMainByteCode: Node = {
     val instructions = Seq(GetStaticC.getStatic(2),
       IntegerConstantC.integerConstant(5),
       InvokeStaticC.invokeStatic(3),

@@ -2,7 +2,7 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -24,17 +24,17 @@ object SubtractionC extends ExpressionInstance {
     additiveGrammar.addOption(parseSubtraction)
   }
 
-  def subtraction(first: Any, second: Any): MetaObject = subtraction(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
+  def subtraction(first: Any, second: Any): Node = subtraction(first.asInstanceOf[Node], second.asInstanceOf[Node])
 
-  def subtraction(first: MetaObject, second: MetaObject) = new MetaObject(SubtractionKey,
+  def subtraction(first: Node, second: Node) = new Node(SubtractionKey,
     FirstKey -> first,
     SecondKey -> second)
 
   override val key: AnyRef = SubtractionKey
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = ???
+  override def getType(expression: Path, state: CompilationState): Node = ???
 
-  override def toByteCode(subtraction: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(subtraction: Path, state: CompilationState): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))

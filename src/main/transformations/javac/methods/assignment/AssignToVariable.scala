@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
@@ -29,7 +29,7 @@ object AssignToVariable extends ParticleWithGrammar {
     super.inject(state)
   }
 
-  def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: MetaObject): MetaObject = {
+  def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.clazz match {
       case IntTypeKey => StoreIntegerC.integerStore(variableInfo.offset)
       case ObjectTypeKey => StoreAddressC.addressStore(variableInfo.offset)

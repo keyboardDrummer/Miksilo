@@ -1,22 +1,22 @@
 package transformations.bytecode.simpleBytecode
 
 import core.exceptions.BadInputException
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.types.ObjectTypeC
 
-case class ProgramTypeState(stackTypes: Seq[MetaObject], variableTypes: Map[Int, MetaObject])
+case class ProgramTypeState(stackTypes: Seq[Node], variableTypes: Map[Int, Node])
 
 object InstructionTypeAnalysis {
-  type InstructionSideEffects = Map[Int, MetaObject]  
+  type InstructionSideEffects = Map[Int, Node]
 }
 
-abstract class InstructionTypeAnalysis(instructions: Seq[MetaObject])
+abstract class InstructionTypeAnalysis(instructions: Seq[Node])
   extends InstructionFlowAnalysis[ProgramTypeState](instructions) {
 
-  def getSideEffects(typeState: ProgramTypeState, instruction: MetaObject): InstructionSideEffects
-  def getSignature(typeState: ProgramTypeState, instruction: MetaObject): InstructionSignature
+  def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects
+  def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature
   
   case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
     override def toString = s"StackDoesNotFitInstructionInput: instruction= $instruction; inputTypes= $inputTypes; stack= $stack"
@@ -31,14 +31,14 @@ abstract class InstructionTypeAnalysis(instructions: Seq[MetaObject])
     if (first.stackTypes != second.stackTypes)
       throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
 
-    val firstVariables: Map[Int, MetaObject] = first.variableTypes
-    val secondVariables: Map[Int, MetaObject] = second.variableTypes
+    val firstVariables: Map[Int, Node] = first.variableTypes
+    val secondVariables: Map[Int, Node] = second.variableTypes
     if (firstVariables == secondVariables)
       return None
 
     val sharedKeys: Set[Int] = firstVariables.keySet.intersect(secondVariables.keySet)
-    val newVariables: Map[Int, MetaObject] = sharedKeys.map(key => {
-      val firstValue: MetaObject = firstVariables(key)
+    val newVariables: Map[Int, Node] = sharedKeys.map(key => {
+      val firstValue: Node = firstVariables(key)
       if (firstValue != secondVariables(key))
         throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
 
@@ -73,7 +73,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[MetaObject])
     }
   }
 
-  def convertObjectTypesToObjectKey(input: Seq[MetaObject]): Seq[Object] = {
+  def convertObjectTypesToObjectKey(input: Seq[Node]): Seq[Object] = {
     input.map(_type => _type.clazz match {
       case ObjectTypeC.ObjectTypeKey => ObjectTypeC.ObjectTypeKey
       case _ => _type

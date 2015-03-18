@@ -1,7 +1,7 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.{Path, Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
@@ -26,8 +26,8 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 
-  def forLoop(initializer: MetaObject, condition: MetaObject, increment: MetaObject, body: Seq[MetaObject]) =
-    new MetaObject(ForLoopKey, InitializerKey -> initializer, ConditionKey -> condition, IncrementKey -> increment, BodyKey -> body)
+  def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
+    new Node(ForLoopKey, InitializerKey -> initializer, ConditionKey -> condition, IncrementKey -> increment, BodyKey -> body)
 
   object ForLoopKey
 
@@ -51,8 +51,8 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
     originSequence.replaceWith(newStatements)
   }
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new Root(program).transform[Path](obj => obj.clazz match {
+  override def transform(program: Node, state: CompilationState): Unit = {
+    new Root(program).transform(obj => obj.clazz match {
       case ForLoopKey => transformForLoop(obj, state)
       case _ =>
     })

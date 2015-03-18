@@ -2,7 +2,7 @@ package transformations.javac.expressions.equality
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
@@ -22,7 +22,7 @@ object EqualityC extends ExpressionInstance {
     equalityGrammar.addOption(parseEquality)
   }
 
-  def equality(first: MetaObject, second: MetaObject) = new MetaObject(EqualityKey, FirstKey -> first, SecondKey -> second)
+  def equality(first: Node, second: Node) = new Node(EqualityKey, FirstKey -> first, SecondKey -> second)
 
   object EqualityKey
 
@@ -32,19 +32,19 @@ object EqualityC extends ExpressionInstance {
 
   override val key: AnyRef = EqualityKey
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = BooleanTypeC.booleanType
+  override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
 
   def getInputType(equality: Path, state: CompilationState)  = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(state)(first)
   }
 
-  override def toByteCode(equality: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(equality: Path, state: CompilationState): Seq[Node] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val inputType = TypeSkeleton.toStackType(getInputType(equality,state),state)
-    val equalityInstructions: Seq[MetaObject] = inputType.clazz match {
+    val equalityInstructions: Seq[Node] = inputType.clazz match {
       case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
     }

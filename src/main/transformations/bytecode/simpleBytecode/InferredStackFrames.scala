@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
@@ -12,9 +12,9 @@ object InferredStackFrames extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
-  def label(name: String) = new MetaObject(LabelledTargets.LabelKey, LabelledTargets.LabelNameKey -> name)
+  def label(name: String) = new Node(LabelledTargets.LabelKey, LabelledTargets.LabelNameKey -> name)
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
+  override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program
     val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
@@ -36,36 +36,36 @@ object InferredStackFrames extends ParticleWithPhase {
       }
     }
 
-    def getLocalTypesSequenceFromMap(localTypes: Map[Int, MetaObject]): Seq[MetaObject] = {
+    def getLocalTypesSequenceFromMap(localTypes: Map[Int, Node]): Seq[Node] = {
       val max = localTypes.keys.max
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 
-    def toStackType(_type: MetaObject) = TypeSkeleton.toStackType(_type, state)
+    def toStackType(_type: Node) = TypeSkeleton.toStackType(_type, state)
 
-    def getStackMap(previousStack: Seq[MetaObject], stack: Seq[MetaObject], previousLocals: Seq[MetaObject], locals: Seq[MetaObject]) = {
+    def getStackMap(previousStack: Seq[Node], stack: Seq[Node], previousLocals: Seq[Node], locals: Seq[Node]) = {
       getStackMapHelper(previousStack.map(toStackType), stack.map(toStackType), previousLocals.map(toStackType), locals.map(toStackType))
     }
 
-    def getStackMapHelper(previousStack: Seq[MetaObject], stack: Seq[MetaObject], previousLocals: Seq[MetaObject], locals: Seq[MetaObject]) = {
+    def getStackMapHelper(previousStack: Seq[Node], stack: Seq[Node], previousLocals: Seq[Node], locals: Seq[Node]) = {
       val sameLocalsPrefix = previousLocals.zip(locals).filter(p => p._1 == p._2)
       val removedLocals = previousLocals.drop(sameLocalsPrefix.length)
       val addedLocals = locals.drop(sameLocalsPrefix.length)
       val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
       if (unchangedLocals && stack.isEmpty) {
-        new MetaObject(StackMapTableAttribute.SameFrameKey)
+        new Node(StackMapTableAttribute.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new MetaObject(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack(0))
+        new Node(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack(0))
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
-        new MetaObject(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
+        new Node(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new MetaObject(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes -> addedLocals.map(toStackType))
+        new Node(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes -> addedLocals.map(toStackType))
       }
       else {
-        new MetaObject(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+        new Node(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
       }
 
     }

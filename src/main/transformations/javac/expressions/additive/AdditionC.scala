@@ -2,7 +2,7 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{MetaObject, MetaLike}
+import core.particles.node.{Node, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -12,14 +12,14 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: Path, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(addition: Path, state: CompilationState): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  override def getType(expression: Path, state: CompilationState): MetaObject = {
+  override def getType(expression: Path, state: CompilationState): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -40,9 +40,9 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
   }
 
-  private def addition(first: Any, second: Any): MetaObject = addition(first.asInstanceOf[MetaObject], second.asInstanceOf[MetaObject])
+  private def addition(first: Any, second: Any): Node = addition(first.asInstanceOf[Node], second.asInstanceOf[Node])
 
-  def addition(first: MetaObject, second: MetaObject) = new MetaObject(AdditionClazz, FirstKey -> first, SecondKey -> second)
+  def addition(first: Node, second: Node) = new Node(AdditionClazz, FirstKey -> first, SecondKey -> second)
 
   object AdditionClazz
 

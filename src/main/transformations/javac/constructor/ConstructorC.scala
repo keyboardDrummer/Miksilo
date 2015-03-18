@@ -3,7 +3,7 @@ package transformations.javac.constructor
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
@@ -16,9 +16,9 @@ object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(MethodC, CallC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
 
-  case class BadConstructorNameException(clazz: MetaObject, constructor: MetaObject) extends BadInputException
+  case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
-  override def transform(clazz: MetaObject, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: CompilationState): Unit = {
     val className = JavaClassSkeleton.getClassName(clazz)
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
@@ -33,12 +33,12 @@ object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
     }
   }
 
-  def getConstructors(clazz: MetaObject): Seq[MetaObject] = {
+  def getConstructors(clazz: Node): Seq[Node] = {
     JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == ConstructorKey)
   }
 
-  def constructor(className: String, _parameters: Seq[MetaObject], _body: Seq[MetaObject],
-                  visibility: Visibility = PublicVisibility) = new MetaObject(ConstructorKey,
+  def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],
+                  visibility: Visibility = PublicVisibility) = new Node(ConstructorKey,
     MethodParametersKey -> _parameters, MethodBodyKey -> _body, VisibilityKey -> visibility,
     ConstructorClassNameKey -> className)
 

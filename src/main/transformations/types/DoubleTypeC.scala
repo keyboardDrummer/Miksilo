@@ -2,15 +2,15 @@ package transformations.types
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 
 object DoubleTypeC extends TypeInstance {
 
   override val key: AnyRef = DoubleTypeKey
 
-  override def getSuperTypes(_type: MetaObject, state: CompilationState): Seq[MetaObject] = ???
+  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeString(_type: MetaObject, state: CompilationState): String = "D"
+  override def getByteCodeString(_type: Node, state: CompilationState): String = "D"
 
   override def getStackSize: Int = 2
 
@@ -18,7 +18,7 @@ object DoubleTypeC extends TypeInstance {
     "double" ~> produce(doubleType)
   }
 
-  val doubleType = new MetaObject(key)
+  val doubleType = new Node(key)
 
   object DoubleTypeKey
 

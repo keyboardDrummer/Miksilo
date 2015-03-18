@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
@@ -15,7 +15,7 @@ object LoadLongC extends InstructionC {
 
   def load(location: Integer) = CodeAttribute.instruction(LongLoad, Seq(location))
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
@@ -24,7 +24,7 @@ object LoadLongC extends InstructionC {
       byteToBytes(hexToInt("1e") + location)
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   object LongLoad

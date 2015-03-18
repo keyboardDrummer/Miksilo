@@ -2,7 +2,7 @@ package core.biGrammar
 
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Grammar, Identifier, NumberG, PrintGrammar, ~}
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.responsiveDocument.ResponsiveDocument
 
 trait GrammarDocumentWriter {
@@ -57,7 +57,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manyVertical = new ManyVertical(this)
 
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[MetaObject])
+  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[Node])
 
   def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ separatedMap
 

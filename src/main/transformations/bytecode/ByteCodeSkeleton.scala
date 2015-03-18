@@ -5,21 +5,21 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.MetaObject
+import core.particles.node.{Node}
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
 object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
-  def getMethods(clazz: MetaObject) = clazz(ClassMethodsKey).asInstanceOf[Seq[MetaObject]]
+  def getMethods(clazz: Node) = clazz(ClassMethodsKey).asInstanceOf[Seq[Node]]
 
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
 
-  def getAttributeNameIndex(attribute: MetaObject) = attribute(AttributeNameKey).asInstanceOf[Int]
+  def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]
 
   def createState = new State()
 
-  def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[MetaObject], interfaces: Seq[Int] = Seq(),
-            classFields: Seq[MetaObject] = Seq(), attributes: Seq[MetaObject] = Seq()) = new MetaObject(ClassFileKey,
+  def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
+            classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(ClassFileKey,
     ClassMethodsKey ->  methods,
     ClassNameIndexKey ->  name,
     ClassParentIndex ->  parent,
@@ -29,17 +29,17 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
     ClassAttributes ->  attributes
   )
 
-  def getParentIndex(clazz: MetaObject) = clazz(ClassParentIndex).asInstanceOf[Int]
+  def getParentIndex(clazz: Node) = clazz(ClassParentIndex).asInstanceOf[Int]
 
-  def getConstantPool(clazz: MetaObject): ConstantPool = clazz(ClassConstantPool).asInstanceOf[ConstantPool]
+  def getConstantPool(clazz: Node): ConstantPool = clazz(ClassConstantPool).asInstanceOf[ConstantPool]
 
-  def getClassNameIndex(clazz: MetaObject) = clazz(ClassNameIndexKey).asInstanceOf[Int]
+  def getClassNameIndex(clazz: Node) = clazz(ClassNameIndexKey).asInstanceOf[Int]
 
-  def getClassInterfaces(clazz: MetaObject) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
+  def getClassInterfaces(clazz: Node) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
 
-  def getClassFields(clazz: MetaObject) = clazz(ClassFields).asInstanceOf[Seq[MetaObject]]
+  def getClassFields(clazz: Node) = clazz(ClassFields).asInstanceOf[Seq[Node]]
 
-  def getClassAttributes(clazz: MetaObject) = clazz(ClassAttributes).asInstanceOf[Seq[MetaObject]]
+  def getClassAttributes(clazz: Node) = clazz(ClassAttributes).asInstanceOf[Seq[Node]]
 
   override def dependencies: Set[Contract] = Set.empty
 
@@ -47,7 +47,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   class State {
     var constantPool: ConstantPool = null
-    val getBytes = new ClassRegistry[MetaObject => Seq[Byte]]
+    val getBytes = new ClassRegistry[Node => Seq[Byte]]
   }
 
   object AttributeKey
@@ -128,8 +128,8 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
   }
 
   def biMapClassConstantEntryEnrichment = {
-    val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[MetaObject]].map(i => i(ClassConstantEntryContent))
-    val addIndexForPrinting: (Any) => Some[Seq[MetaObject]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map(p => new MetaObject(EnrichedClassConstantEntry,
+    val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[Node]].map(i => i(ClassConstantEntryContent))
+    val addIndexForPrinting: (Any) => Some[Seq[Node]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map(p => new Node(EnrichedClassConstantEntry,
       ClassConstantEntryIndex -> (p._2.asInstanceOf[Int] + 1),
       ClassConstantEntryContent -> p._1)))
     ( removeIndexForParsing, addIndexForPrinting )

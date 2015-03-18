@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -15,7 +15,7 @@ object StoreIntegerC extends InstructionC {
 
   def integerStore(location: Int) = CodeAttribute.instruction(IntegerStore, Seq(location))
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
@@ -24,10 +24,10 @@ object StoreIntegerC extends InstructionC {
       byteToBytes(hexToInt("3b") + location)
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType), Seq())
 
-  override def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState ): Map[Int, MetaObject] =
+  override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 
   object IntegerStore

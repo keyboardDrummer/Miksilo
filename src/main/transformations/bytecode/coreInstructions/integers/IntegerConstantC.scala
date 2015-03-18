@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
@@ -19,11 +19,11 @@ object IntegerConstantC extends InstructionC {
     CodeAttribute.instruction(IntegerConstantKey, Seq(value))
   }
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     byteToBytes(3 + CodeAttribute.getInstructionArguments(instruction)(0))
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize(): Int = 1

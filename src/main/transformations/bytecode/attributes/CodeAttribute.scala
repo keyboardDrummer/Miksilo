@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.biGrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -13,11 +13,11 @@ object InstructionArgumentsKey
 
 object CodeAttribute extends ParticleWithGrammar with WithState {
 
-  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new MetaObject(_type, InstructionArgumentsKey -> arguments)
+  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
-  def getInstructionArguments(instruction: MetaObject) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
+  def getInstructionArguments(instruction: Node) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
-  def setInstructionArguments(instruction: MetaObject, arguments: Seq[Any]) {
+  def setInstructionArguments(instruction: Node, arguments: Seq[Any]) {
     instruction(InstructionArgumentsKey) = arguments
   }
 
@@ -28,10 +28,10 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, CodeConstantEntry)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
-                    instructions: Seq[MetaObject],
-                    exceptionTable: Seq[MetaObject],
-                    attributes: Seq[MetaObject]) = {
-    new MetaObject(CodeKey,
+                    instructions: Seq[Node],
+                    exceptionTable: Seq[Node],
+                    attributes: Seq[Node]) = {
+    new Node(CodeKey,
       ByteCodeSkeleton.AttributeNameKey -> nameIndex,
       CodeMaxStackKey -> maxStack,
       CodeMaxLocalsKey -> maxLocals,
@@ -42,12 +42,12 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
 
   trait InstructionSignatureProvider
   {
-    def getSignature(instruction: MetaObject, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
   }
 
   trait InstructionSideEffectProvider
   {
-    def getVariableUpdates(instruction: MetaObject, typeState: ProgramTypeState): Map[Int, MetaObject]
+    def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node]
   }
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
@@ -65,9 +65,9 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
   }
 
-  def getCodeAttributeBytes(attribute: MetaObject, state: CompilationState): Seq[Byte] = {
+  def getCodeAttributeBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
 
-    def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+    def getInstructionByteCode(instruction: Node): Seq[Byte] = {
       ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
     }
 
@@ -81,21 +81,21 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
   }
 
 
-  def getCodeAnnotations(clazz: MetaObject): Seq[MetaObject] = {
+  def getCodeAnnotations(clazz: Node): Seq[Node] = {
     ByteCodeSkeleton.getMethods(clazz)
       .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
   }
 
-  def getCodeMaxStack(code: MetaObject) = code(CodeMaxStackKey).asInstanceOf[Int]
+  def getCodeMaxStack(code: Node) = code(CodeMaxStackKey).asInstanceOf[Int]
 
-  def getCodeMaxLocals(code: MetaObject) = code(CodeMaxLocalsKey).asInstanceOf[Int]
+  def getCodeMaxLocals(code: Node) = code(CodeMaxLocalsKey).asInstanceOf[Int]
 
-  def getCodeExceptionTable(code: MetaObject) = code(CodeExceptionTableKey).asInstanceOf[Seq[MetaObject]]
+  def getCodeExceptionTable(code: Node) = code(CodeExceptionTableKey).asInstanceOf[Seq[Node]]
 
-  def getCodeAttributes(code: MetaObject) = code(CodeAttributesKey).asInstanceOf[Seq[MetaObject]]
+  def getCodeAttributes(code: Node) = code(CodeAttributesKey).asInstanceOf[Seq[Node]]
 
-  def getCodeInstructions(code: MetaObject) = code(CodeInstructionsKey).asInstanceOf[Seq[MetaObject]]
+  def getCodeInstructions(code: Node) = code(CodeInstructionsKey).asInstanceOf[Seq[Node]]
 
 
   object CodeKey

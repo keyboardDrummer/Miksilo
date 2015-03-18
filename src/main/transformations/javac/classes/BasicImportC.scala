@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 
 object BasicImportC extends ParticleWithGrammar {
@@ -11,7 +11,7 @@ object BasicImportC extends ParticleWithGrammar {
 
   object ImportPathGrammar
 
-  def _import(elements: Seq[String]) = new MetaObject(ImportKey, ElementsKey -> elements)
+  def _import(elements: Seq[String]) = new Node(ImportKey, ElementsKey -> elements)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".") ^^ parseMap(ImportKey, ElementsKey))
@@ -19,7 +19,7 @@ object BasicImportC extends ParticleWithGrammar {
     grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
   }
 
-  def getParts(_import: MetaObject) = _import(ElementsKey).asInstanceOf[Seq[String]]
+  def getParts(_import: Node) = _import(ElementsKey).asInstanceOf[Seq[String]]
 
   override def inject(state: CompilationState): Unit = {
     JavaClassSkeleton.getState(state).importToClassMap.put(ImportKey, _import => {

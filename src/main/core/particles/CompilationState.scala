@@ -3,7 +3,7 @@ package core.particles
 import core.biGrammar.BiFailure
 import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.MetaObject
+import core.particles.node.{Node, Node$}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -13,7 +13,7 @@ class CompilationState {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
   grammarCatalogue.create(ProgramGrammar, BiFailure)
-  var program: MetaObject = null
+  var program: Node = null
   var compilerPhases: List[() => Unit] = List.empty
 
   def getUniqueLabel(prefix: String) = prefix + getGUID
@@ -32,7 +32,7 @@ class CompilationState {
     if(!parseResult.next.atEnd)
       throw new ParseException("Did not parse until end.")
 
-    program = parseResult.get.asInstanceOf[MetaObject]
+    program = parseResult.get.asInstanceOf[Node]
   }
 
   def runPhases() = {

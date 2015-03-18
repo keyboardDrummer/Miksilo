@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.{Path, Root, SequenceSelection, Selection}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.JavaClassSkeleton
@@ -41,9 +41,9 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def transform(program: MetaObject, state: CompilationState): Unit = {
+  override def transform(program: Node, state: CompilationState): Unit = {
     val programWithOrigin = new Root(program)
-    programWithOrigin.transform[Path](obj => obj.clazz match {
+    programWithOrigin.transform(obj => obj.clazz match {
       case ByteCodeSkeleton.ClassFileKey => JavaClassSkeleton.initializeClassCompiler(state, program)
       case MethodC.MethodKey => MethodC.setMethodCompiler(obj, state)
       case VariableC.VariableKey => addThisToVariable(state, obj)

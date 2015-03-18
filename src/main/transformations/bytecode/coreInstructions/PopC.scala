@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -14,12 +14,12 @@ object PopC extends InstructionC {
 
   def pop = CodeAttribute.instruction(PopKey)
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("57")
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-    val input: MetaObject = typeState.stackTypes.last
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    val input: Node = typeState.stackTypes.last
     assertSingleWord(state, input)
     InstructionSignature(Seq(input),Seq())
   }

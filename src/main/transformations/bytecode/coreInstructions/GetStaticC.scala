@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -15,21 +15,21 @@ object GetStaticC extends InstructionC {
 
   override val key: AnyRef = GetStaticKey
 
-  def getStatic(fieldRefIndex: Int): MetaObject = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
+  def getStatic(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
 
-  override def getInstructionByteCode(instruction: MetaObject): Seq[Byte] = {
+  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     hexToBytes("b2") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(instruction: MetaObject, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     new InstructionSignature(Seq(), Seq(getReturnType(ByteCodeSkeleton.getConstantPool(state), instruction)))
 
-  def getReturnType(constantPool: ConstantPool, getStatic: MetaObject): MetaObject = {
+  def getReturnType(constantPool: ConstantPool, getStatic: Node): Node = {
     val location = CodeAttribute.getInstructionArguments(getStatic)(0)
-    val fieldRef = constantPool.getValue(location).asInstanceOf[MetaObject]
-    val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[MetaObject]
-    val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[MetaObject]
+    val fieldRef = constantPool.getValue(location).asInstanceOf[Node]
+    val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[Node]
+    val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]
     fieldType
   }
 

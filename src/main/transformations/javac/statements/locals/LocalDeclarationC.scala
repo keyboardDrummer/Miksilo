@@ -3,7 +3,7 @@ package transformations.javac.statements.locals
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.MetaObject
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
@@ -11,9 +11,9 @@ import transformations.types.TypeSkeleton
 
 object LocalDeclarationC extends StatementInstance {
 
-  def getDeclarationType(declaration: MetaObject) = declaration(DeclarationType).asInstanceOf[MetaObject]
+  def getDeclarationType(declaration: Node) = declaration(DeclarationType).asInstanceOf[Node]
 
-  def getDeclarationName(declaration: MetaObject) = declaration(DeclarationName).asInstanceOf[String]
+  def getDeclarationName(declaration: Node) = declaration(DeclarationName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
@@ -24,8 +24,8 @@ object LocalDeclarationC extends StatementInstance {
     statement.addOption(parseDeclaration)
   }
 
-  def declaration(name: String, _type: MetaObject): MetaObject = {
-    new MetaObject(DeclarationKey, DeclarationName -> name, DeclarationType -> _type)
+  def declaration(name: String, _type: Node): Node = {
+    new Node(DeclarationKey, DeclarationName -> name, DeclarationType -> _type)
   }
 
   case class VariableAlreadyDefined(variable: String) extends BadInputException
@@ -41,11 +41,11 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key: AnyRef = DeclarationKey
 
-  override def toByteCode(declaration: Path, state: CompilationState): Seq[MetaObject] = {
-    Seq.empty[MetaObject]
+  override def toByteCode(declaration: Path, state: CompilationState): Seq[Node] = {
+    Seq.empty[Node]
   }
 
-  override def definedVariables(state: CompilationState, declaration: MetaObject): Map[String, MetaObject] = {
+  override def definedVariables(state: CompilationState, declaration: Node): Map[String, Node] = {
     val _type = getDeclarationType(declaration)
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(state))
     val name: String = getDeclarationName(declaration)
