@@ -24,9 +24,8 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def testInstructionEquivalence(expectedByteCode: MetaObject, compiledCode: MetaObject) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
-      Assert.assertTrue(MetaObject.deepEquality(getMethodInstructions(methodPair._1),
-        getMethodInstructions(methodPair._2),
-        new ComparisonOptions(false, true, false)))
+      Assert.assertTrue(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1),
+        getMethodInstructions(methodPair._2)))
     }
   }
 
@@ -169,8 +168,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode).constants
     Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
     Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem => {
-      val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => MetaObject.deepEquality(compiledItem, expectedItem,
-        new ComparisonOptions(false, false, true)))
+      val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => ComparisonOptions(false,false,true).deepEquality(compiledItem, expectedItem))
       hasEquivalent
     }))
   }
