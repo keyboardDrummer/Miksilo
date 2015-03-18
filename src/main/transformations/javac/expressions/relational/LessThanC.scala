@@ -2,7 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
@@ -22,9 +22,9 @@ object LessThanC extends ExpressionInstance {
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
   }
 
-  def getFirst[T <: MetaLike](lessThan: T) = lessThan(LessThanFirst).asInstanceOf[T]
+  def getFirst[T <: NodeLike](lessThan: T) = lessThan(LessThanFirst).asInstanceOf[T]
 
-  def getSecond[T <: MetaLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
+  def getSecond[T <: NodeLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
 
   override def getType(expression: Path, state: CompilationState): Node = {
     val getType = ExpressionSkeleton.getType(state)

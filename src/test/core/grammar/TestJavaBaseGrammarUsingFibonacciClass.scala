@@ -1,9 +1,8 @@
 package core.grammar
 
 import core.biGrammar.TestGrammarUtils
-import core.particles._
 import core.particles.node.Node
-import org.junit.{Ignore, Assert, Test}
+import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
@@ -13,8 +12,6 @@ import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
-
-import scala.reflect.io.{File, Path}
 
 class TestJavaBaseGrammarUsingFibonacciClass {
 
@@ -121,18 +118,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val result: Any = getMethodGrammarResult(input)
 
     val expectation = getFibonacciMethod
-    Assert.assertEquals(expectation, result)
-  }
-
-  @Ignore //TODO this test is broken. Remove it.
-  @Test
-  def testFibonacci() {
-    val inputFile = Path("testResources") / "Fibonacci.java"
-
-    val input = File(inputFile).slurp()
-
-    val result = TestGrammarUtils.getGrammarResult(input)
-    val expectation = JavaClassSkeleton.clazz(Seq(), "Fibonacci", List(getMainMethod, getFibonacciMethod))
     Assert.assertEquals(expectation, result)
   }
 

@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.coreInstructions.{Pop2C, PopC}
@@ -29,7 +29,7 @@ object ExpressionAsStatementC extends StatementInstance {
     ExpressionSkeleton.getToInstructions(state)(expression) ++ extra
   }
 
-  def getExpression[T <: MetaLike](statement: T): T = {
+  def getExpression[T <: NodeLike](statement: T): T = {
     statement(ExpressionKey).asInstanceOf[T]
   }
 

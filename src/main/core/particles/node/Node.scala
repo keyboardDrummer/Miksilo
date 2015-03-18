@@ -17,7 +17,7 @@ object Node {
   }
 }
 
-class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLike {
+class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLike {
   type Self = Node
 
   def replaceWith(node: Node): Unit = {

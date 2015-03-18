@@ -2,7 +2,7 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -28,9 +28,9 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
     IntTypeC.intType
   }
 
-  def getFirst[T <: MetaLike](addition: T) = addition(FirstKey).asInstanceOf[T]
+  def getFirst[T <: NodeLike](addition: T) = addition(FirstKey).asInstanceOf[T]
 
-  def getSecond[T <: MetaLike](addition: T) = addition(SecondKey).asInstanceOf[T]
+  def getSecond[T <: NodeLike](addition: T) = addition(SecondKey).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersC)
 

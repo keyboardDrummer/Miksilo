@@ -2,7 +2,7 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -12,9 +12,9 @@ object SubtractionC extends ExpressionInstance {
   object FirstKey
   object SecondKey
 
-  def getFirst[T <: MetaLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
+  def getFirst[T <: NodeLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
 
-  def getSecond[T <: MetaLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
+  def getSecond[T <: NodeLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerC)
 

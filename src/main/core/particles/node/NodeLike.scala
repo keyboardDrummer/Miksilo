@@ -2,8 +2,8 @@ package core.particles.node
 
 import scala.collection.mutable
 
-trait MetaLike {
-  type Self <: MetaLike
+trait NodeLike {
+  type Self <: NodeLike
   def get(key: Any): Option[Any]
   def apply(key: Any): Any
   def clazz: Any
@@ -22,11 +22,11 @@ trait MetaLike {
       for(child <- children)
       {
         child match {
-          case metaObject: MetaLike =>
+          case metaObject: NodeLike =>
             transformNode(metaObject.asInstanceOf[Self])
           case sequence: Seq[_] =>
             sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case metaChild: MetaLike => transformNode(metaChild.asInstanceOf[Self])
+              case metaChild: NodeLike => transformNode(metaChild.asInstanceOf[Self])
               case _ =>
             })
           case _ =>

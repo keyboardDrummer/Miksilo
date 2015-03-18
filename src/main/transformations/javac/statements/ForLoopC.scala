@@ -1,19 +1,19 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.{Path, Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
 
-  def getInitializer[T <: MetaLike](forLoop: T) = forLoop(InitializerKey).asInstanceOf[T]
+  def getInitializer[T <: NodeLike](forLoop: T) = forLoop(InitializerKey).asInstanceOf[T]
 
-  def getCondition[T <: MetaLike](forLoop: T) = forLoop(ConditionKey).asInstanceOf[T]
+  def getCondition[T <: NodeLike](forLoop: T) = forLoop(ConditionKey).asInstanceOf[T]
 
-  def getIncrement[T <: MetaLike](forLoop: T) = forLoop(IncrementKey).asInstanceOf[T]
+  def getIncrement[T <: NodeLike](forLoop: T) = forLoop(IncrementKey).asInstanceOf[T]
 
-  def getBody[T <: MetaLike](forLoop: T) = forLoop(BodyKey).asInstanceOf[Seq[T]]
+  def getBody[T <: NodeLike](forLoop: T) = forLoop(BodyKey).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = Set(WhileC)
 

@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, MetaLike, Node}
+import core.particles.node.{Key, NodeLike, Node}
 import core.particles.path.{Path, Root}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
@@ -131,7 +131,7 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  def getMethodBody[T <: MetaLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
+  def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
   def getMethodName(method: Node) = {
     method(MethodNameKey).asInstanceOf[String]

@@ -2,14 +2,14 @@ package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends ParticleWithGrammar with WithState {
 
-  def getSelectorObject[T <: MetaLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
+  def getSelectorObject[T <: NodeLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
 
   def getSelectorMember(selector: Node) = selector(SelectorMember).asInstanceOf[String]
 

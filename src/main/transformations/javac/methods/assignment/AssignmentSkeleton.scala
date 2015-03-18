@@ -3,7 +3,7 @@ package transformations.javac.methods.assignment
 import core.biGrammar.BiFailure
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
@@ -14,9 +14,9 @@ import transformations.types.TypeSkeleton
 
 object AssignmentSkeleton extends ExpressionInstance with WithState {
 
-  def getAssignmentTarget[T <: MetaLike](assignment: T) = assignment(AssignmentTarget).asInstanceOf[T]
+  def getAssignmentTarget[T <: NodeLike](assignment: T) = assignment(AssignmentTarget).asInstanceOf[T]
 
-  def getAssignmentValue[T <: MetaLike](assignment: T) = assignment(AssignmentValue).asInstanceOf[T]
+  def getAssignmentValue[T <: NodeLike](assignment: T) = assignment(AssignmentValue).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressC, StoreIntegerC, AssignmentPrecedence)
 

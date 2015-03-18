@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
@@ -47,7 +47,7 @@ object NewC extends ExpressionInstance {
       Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }
 
-  def getNewObject[T <: MetaLike](expression: T): T = {
+  def getNewObject[T <: NodeLike](expression: T): T = {
     expression(NewObject).asInstanceOf[T]
   }
 

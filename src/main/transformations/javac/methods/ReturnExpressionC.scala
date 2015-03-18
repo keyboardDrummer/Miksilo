@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
 import transformations.javac.expressions.ExpressionSkeleton
@@ -19,7 +19,7 @@ object ReturnExpressionC extends StatementInstance {
     returnValueInstructions ++ Seq(IntegerReturnInstructionC.integerReturn)
   }
 
-  def getReturnValue[T <: MetaLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
+  def getReturnValue[T <: NodeLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)

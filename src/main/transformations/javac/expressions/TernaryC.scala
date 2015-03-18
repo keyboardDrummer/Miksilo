@@ -2,18 +2,18 @@ package transformations.javac.expressions
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.types.{BooleanTypeC, TypeSkeleton}
 
 object TernaryC extends ExpressionInstance {
-  def falseBranch[T <: MetaLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
+  def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
 
-  def trueBranch[T <: MetaLike](metaObject: T) = metaObject(TrueKey).asInstanceOf[T]
+  def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueKey).asInstanceOf[T]
 
-  def getCondition[T <: MetaLike](metaObject: T) = {
+  def getCondition[T <: NodeLike](metaObject: T) = {
     metaObject(ConditionKey).asInstanceOf[T]
   }
 

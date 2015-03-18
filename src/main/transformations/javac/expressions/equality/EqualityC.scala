@@ -2,7 +2,7 @@ package transformations.javac.expressions.equality
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
@@ -12,9 +12,9 @@ import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeSkeleton}
 object EqualityC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
 
-  def getFirst[T <: MetaLike](equality: T) = equality(FirstKey).asInstanceOf[T]
+  def getFirst[T <: NodeLike](equality: T) = equality(FirstKey).asInstanceOf[T]
 
-  def getSecond[T <: MetaLike](equality: T) = equality(SecondKey).asInstanceOf[T]
+  def getSecond[T <: NodeLike](equality: T) = equality(SecondKey).asInstanceOf[T]
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)

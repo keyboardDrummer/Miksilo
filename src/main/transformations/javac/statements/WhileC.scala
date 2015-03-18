@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -28,9 +28,9 @@ object WhileC extends StatementInstance with WithState {
       bodyInstructions ++ Seq(LabelledTargets.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
 
-  def getCondition[T <: MetaLike](_while: T) = _while(WhileCondition).asInstanceOf[T]
+  def getCondition[T <: NodeLike](_while: T) = _while(WhileCondition).asInstanceOf[T]
 
-  def getBody[T <: MetaLike](_while: T) = _while(WhileBody).asInstanceOf[Seq[T]]
+  def getBody[T <: NodeLike](_while: T) = _while(WhileBody).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
@@ -53,8 +53,8 @@ object WhileC extends StatementInstance with WithState {
 
   override def description: String = "Enables using the while construct."
 
-  def startKey(_while: MetaLike) = (_while,"start")
-  def endKey(_while: MetaLike) = (_while,"end")
+  def startKey(_while: NodeLike) = (_while,"start")
+  def endKey(_while: NodeLike) = (_while,"end")
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     super.getNextStatements(obj, labels) ++ getBody(obj).take(1)
   }

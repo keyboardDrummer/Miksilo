@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.{Path, Root}
 import transformations.javac.expressions.additive.AdditionC
 
@@ -42,11 +42,11 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
     })
   }
 
-  def getValue[T <: MetaLike](incrementAssignment: T): T = {
+  def getValue[T <: NodeLike](incrementAssignment: T): T = {
     incrementAssignment(ValueKey).asInstanceOf[T]
   }
 
-  def getTarget[T <: MetaLike](incrementAssignment: T): T = {
+  def getTarget[T <: NodeLike](incrementAssignment: T): T = {
     incrementAssignment(TargetKey).asInstanceOf[T]
   }
 

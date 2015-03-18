@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.coreInstructions.{InvokeStaticC, InvokeVirtualC}
@@ -11,9 +11,9 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 
 object CallC extends ExpressionInstance {
 
-  def getCallCallee[T <: MetaLike](call: T) = call(CallCallee).asInstanceOf[T]
+  def getCallCallee[T <: NodeLike](call: T) = call(CallCallee).asInstanceOf[T]
 
-  def getCallArguments[T <: MetaLike](call: T) = call(CallArguments).asInstanceOf[Seq[T]]
+  def getCallArguments[T <: NodeLike](call: T) = call(CallArguments).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = Set(MemberSelector, InvokeStaticC, InvokeVirtualC)
 

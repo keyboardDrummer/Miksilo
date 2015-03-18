@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, MetaLike}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -35,11 +35,11 @@ object IfThenC extends StatementInstance {
       Seq(end)
   }
 
-  def getCondition[T <: MetaLike](ifThen: T): T = {
+  def getCondition[T <: NodeLike](ifThen: T): T = {
     ifThen(ConditionKey).asInstanceOf[T]
   }
 
-  def getThenStatements[T <: MetaLike](ifThen: T): Seq[T] = {
+  def getThenStatements[T <: NodeLike](ifThen: T): Seq[T] = {
     ifThen(ThenKey).asInstanceOf[Seq[T]]
   }
 
