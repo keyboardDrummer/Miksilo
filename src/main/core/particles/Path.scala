@@ -1,11 +1,10 @@
 package core.particles
 
-//Rename to Path.
-trait Origin extends MetaLikeGen[Origin] {
+trait Path extends MetaLikeGen[Path] {
   val obj: MetaObject //TODO rename to current
   
-  def parentOption: Option[Origin]
-  def ancestors: Stream[Origin] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
+  def parentOption: Option[Path]
+  def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
   def clazz = obj.clazz
   def apply(key: Any) = get(key).get
   def get(key: Any): Option[Any] = obj.data.get(key).map {
@@ -23,22 +22,22 @@ trait Origin extends MetaLikeGen[Origin] {
   override def data2: Map[Any, Any] = obj.data.keys.map(key => (key,apply(key))).toMap
 }
 
-trait OriginWithParent extends Origin {
-  def parent: Origin
+trait OriginWithParent extends Path {
+  def parent: Path
   def replaceWith(replacement: MetaObject)
 }
 
-case class Root(obj: MetaObject) extends Origin with Key{
-  override def parentOption: Option[Origin] = None
+case class Root(obj: MetaObject) extends Path with Key{
+  override def parentOption: Option[Path] = None
 
   override def hashCode(): Int = 1 //obj.hashCode
 
   override def equals(obj: Any): Boolean = obj.isInstanceOf[Root] //&& obj.equals..
 }
 
-case class Selection(parent: Origin, field: Any) extends OriginWithParent {
+case class Selection(parent: Path, field: Any) extends OriginWithParent {
   val obj = parent.obj(field).asInstanceOf[MetaObject]
-  override def parentOption: Option[Origin] = Some(parent)
+  override def parentOption: Option[Path] = Some(parent)
 
   override def hashCode(): Int = parent.hashCode() * field.hashCode()
 
@@ -50,20 +49,20 @@ case class Selection(parent: Origin, field: Any) extends OriginWithParent {
   override def replaceWith(replacement: MetaObject): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 }
 
-case class SequenceSelection(parent: Origin, field: Any, index: Int) extends OriginWithParent
+case class SequenceSelection(parent: Path, field: Any, index: Int) extends OriginWithParent
 {
   val obj = parent.obj(field).asInstanceOf[Seq[MetaObject]](index)
-  def sequence: Seq[Origin] = parent(field).asInstanceOf[Seq[Origin]]
+  def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]
   def next = sequence(index + 1)
   def hasNext = sequence.length > (index + 1)
   def current = sequence(index)
   def replaceWith(replacements: Seq[MetaObject]) = {
-    val originalSequence = parent.obj.data(field).asInstanceOf[Seq[Origin]]
+    val originalSequence = parent.obj.data(field).asInstanceOf[Seq[Path]]
     val newSequence = originalSequence.take(index) ++ replacements ++ originalSequence.drop(index + 1)
     parent.obj.data(field) = newSequence
   }
 
-  override def parentOption: Option[Origin] = Some(parent)
+  override def parentOption: Option[Path] = Some(parent)
 
   override def hashCode(): Int = parent.hashCode() * field.hashCode() * index
 
@@ -76,6 +75,6 @@ case class SequenceSelection(parent: Origin, field: Any, index: Int) extends Ori
   override def replaceWith(replacement: MetaObject): Unit = replaceWith(Seq(replacement))
 }
 
-object Origin {
-  implicit def toSimpleObject(withOrigin: Origin): MetaObject = withOrigin.obj
+object Path {
+  implicit def toSimpleObject(withOrigin: Path): MetaObject = withOrigin.obj
 }

@@ -10,9 +10,9 @@ object ReturnExpressionC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionC)
 
-  override def getNextStatements(obj: Origin, labels: Map[Any, Origin]): Set[Origin] = Set.empty
+  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
-  def returnToLines(_return: Origin, compiler: MethodCompiler): Seq[MetaObject] = {
+  def returnToLines(_return: Path, compiler: MethodCompiler): Seq[MetaObject] = {
     val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.state)(getReturnValue(_return))
     returnValueInstructions ++ Seq(IntegerReturnInstructionC.integerReturn)
   }
@@ -35,7 +35,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key: AnyRef = ReturnInteger
 
-  override def toByteCode(_return: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_return: Path, state: CompilationState): Seq[MetaObject] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }

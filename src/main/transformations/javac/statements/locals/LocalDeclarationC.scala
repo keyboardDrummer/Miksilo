@@ -39,7 +39,7 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key: AnyRef = DeclarationKey
 
-  override def toByteCode(declaration: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(declaration: Path, state: CompilationState): Seq[MetaObject] = {
     Seq.empty[MetaObject]
   }
 

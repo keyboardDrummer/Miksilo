@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
-import core.particles.{Origin, CompilationState, MetaObject, Root}
+import core.particles.{Path$, CompilationState, MetaObject, Root}
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.locals.LocalsAnalysis
@@ -43,7 +43,7 @@ case class MethodCompiler(state: CompilationState, method: MetaObject) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody[Origin](new Root(method))(0)
+  val firstInstruction = getMethodBody[Path](new Root(method))(0)
   val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables = {

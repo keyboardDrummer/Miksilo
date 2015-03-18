@@ -9,7 +9,7 @@ object ReturnVoidC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodC, VoidReturnInstructionC)
 
-  override def getNextStatements(obj: Origin, labels: Map[Any, Origin]): Set[Origin] = Set.empty
+  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
   def returnToLines(_return: MetaObject, compiler: MethodCompiler): Seq[MetaObject] = {
     Seq(VoidReturnInstructionC.voidReturn)
@@ -28,7 +28,7 @@ object ReturnVoidC extends StatementInstance {
 
   override val key: AnyRef = ReturnVoidKey
 
-  override def toByteCode(_return: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_return: Path, state: CompilationState): Seq[MetaObject] = {
     Seq(VoidReturnInstructionC.voidReturn)
   }
 

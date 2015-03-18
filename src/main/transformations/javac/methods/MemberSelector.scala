@@ -34,26 +34,26 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   }
 
 
-  def getClassOrObjectReference(selector: Origin, compiler: ClassCompiler): ClassOrObjectReference = {
+  def getClassOrObjectReference(selector: Path, compiler: ClassCompiler): ClassOrObjectReference = {
     val obj = getSelectorObject(selector)
     getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
   }
 
-  def getReferenceKind(classCompiler: ClassCompiler, expression: Origin): ReferenceKind = {
+  def getReferenceKind(classCompiler: ClassCompiler, expression: Path): ReferenceKind = {
     val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.state).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(expression))
   }
 
-  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: Origin): ClassOrObjectReference = {
+  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: Path): ClassOrObjectReference = {
     val classInfo: ClassInfo = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
     new ClassOrObjectReference(classInfo, false)
   }
 
   def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry
   class State {
-    val referenceKindRegistry = new ClassRegistry[Origin => ReferenceKind]()
+    val referenceKindRegistry = new ClassRegistry[Path => ReferenceKind]()
   }
 
   override def createState = new State()

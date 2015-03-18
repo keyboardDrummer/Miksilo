@@ -42,7 +42,7 @@ object TernaryC extends ExpressionInstance {
 
   override val key: AnyRef = TernaryKey
 
-  override def getType(_ternary: Origin, state: CompilationState): MetaObject = {
+  override def getType(_ternary: Path, state: CompilationState): MetaObject = {
     val getExpressionType = ExpressionSkeleton.getType(state)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
@@ -54,7 +54,7 @@ object TernaryC extends ExpressionInstance {
     TypeSkeleton.union(state)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_ternary: Path, state: CompilationState): Seq[MetaObject] = {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)

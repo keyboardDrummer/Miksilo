@@ -33,7 +33,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(declarationWithInitializer: Origin, state: CompilationState): Unit = {
+  def transformDeclarationWithInitializer(declarationWithInitializer: Path, state: CompilationState): Unit = {
     val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
     val declaration = LocalDeclarationC.declaration(name, _type)
@@ -45,7 +45,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
   }
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new Root(program).transform[Origin](obj => obj.clazz match {
+    new Root(program).transform[Path](obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

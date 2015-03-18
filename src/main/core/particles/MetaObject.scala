@@ -124,8 +124,8 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
   def update(key: Any, value: Any) = {
     value match //TODO maybe throw this check away.
     {
-      case wrong: Origin => throwInsertedWithOriginIntoRegularMetaObject()
-      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[Origin]))
+      case wrong: Path => throwInsertedWithOriginIntoRegularMetaObject()
+      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[Path]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }

@@ -75,7 +75,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
 
-    def addCodeAnnotation(method: Origin) {
+    def addCodeAnnotation(method: Path) {
       setMethodCompiler(method, state)
       val statements = getMethodBody(method)
       method.obj.data.remove(MethodBodyKey)

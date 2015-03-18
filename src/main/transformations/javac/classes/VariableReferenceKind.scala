@@ -12,7 +12,7 @@ object VariableReferenceKind extends Particle {
     })
   }
 
-  def getReferenceKind(variable: Origin, classCompiler: ClassCompiler): ReferenceKind = {
+  def getReferenceKind(variable: Path, classCompiler: ClassCompiler): ReferenceKind = {
 
     val name = VariableC.getVariableName(variable)
     val isClass = classCompiler.classNames.contains(name)

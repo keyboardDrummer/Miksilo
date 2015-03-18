@@ -37,17 +37,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   override val key: AnyRef = AssignmentKey
 
-  override def getType(assignment: Origin, state: CompilationState): MetaObject = {
+  override def getType(assignment: Path, state: CompilationState): MetaObject = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(state)(target)
   }
 
   def createState = new State()
   class State {
-    val assignFromStackByteCodeRegistry = new ClassRegistry[Origin => Seq[MetaObject]]
+    val assignFromStackByteCodeRegistry = new ClassRegistry[Path => Seq[MetaObject]]
   }
 
-  override def toByteCode(assignment: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(assignment: Path, state: CompilationState): Seq[MetaObject] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)

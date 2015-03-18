@@ -17,7 +17,7 @@ object AssignToVariable extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
   override def inject(state: CompilationState): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Origin) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Path) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
       val variableInfo = VariableC.getVariables(state, targetVariable)(target)

@@ -10,14 +10,14 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(addition: Path, state: CompilationState): Seq[MetaObject] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
   }
 
-  override def getType(expression: Origin, state: CompilationState): MetaObject = {
+  override def getType(expression: Path, state: CompilationState): MetaObject = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))

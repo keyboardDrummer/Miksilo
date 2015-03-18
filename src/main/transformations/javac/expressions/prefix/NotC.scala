@@ -1,7 +1,7 @@
 package transformations.javac.expressions.prefix
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Origin, CompilationState, MetaObject}
+import core.particles.{Path$, CompilationState, MetaObject}
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.BooleanTypeC
@@ -14,10 +14,10 @@ object NotC extends ExpressionInstance {
 
   override val key: AnyRef = NotKey
 
-  override def getType(expression: Origin, state: CompilationState): MetaObject = BooleanTypeC.booleanType
+  override def getType(expression: Path, state: CompilationState): MetaObject = BooleanTypeC.booleanType
 
-  override def toByteCode(expression: Origin, state: CompilationState): Seq[MetaObject] = {
-    ExpressionSkeleton.getToInstructions(state)(expression(NotExpression).asInstanceOf[Origin]) ++ Seq(NotInstructionC.not)
+  override def toByteCode(expression: Path, state: CompilationState): Seq[MetaObject] = {
+    ExpressionSkeleton.getToInstructions(state)(expression(NotExpression).asInstanceOf[Path]) ++ Seq(NotInstructionC.not)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

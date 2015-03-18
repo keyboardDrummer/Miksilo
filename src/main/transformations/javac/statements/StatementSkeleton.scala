@@ -12,7 +12,7 @@ object StatementSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(state: CompilationState): Origin => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): Path => Seq[MetaObject] = {
     statement => {
       val statementTransformation = getState(state).instances.get(statement.clazz)
       val transformation = statementTransformation.getOrElse(throw new MissingToInstructionsFor(statement.clazz))

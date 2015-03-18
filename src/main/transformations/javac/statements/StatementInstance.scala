@@ -11,7 +11,7 @@ trait StatementInstance extends ParticleWithGrammar {
 
   val key: AnyRef
 
-  def toByteCode(statement: Origin, state: CompilationState): Seq[MetaObject]
+  def toByteCode(statement: Path, state: CompilationState): Seq[MetaObject]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
 
@@ -20,8 +20,8 @@ trait StatementInstance extends ParticleWithGrammar {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
 
-  def getNextLabel(statement: Origin) = (statement,"next")
-  def getNextStatements(obj: Origin, labels: Map[Any, Origin]): Set[Origin] = {
+  def getNextLabel(statement: Path) = (statement,"next")
+  def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     val selection = obj.asInstanceOf[SequenceSelection]
     if (selection.hasNext)
       return Set(selection.next)
@@ -33,7 +33,7 @@ trait StatementInstance extends ParticleWithGrammar {
     throw SequenceDoesNotEndInJump(selection.parent.obj(selection.field).asInstanceOf[Seq[MetaObject]])
   }
 
-  def getLabels(obj: Origin): Map[Any, Origin] = Map.empty
+  def getLabels(obj: Path): Map[Any, Path] = Map.empty
 
   def definedVariables(state: CompilationState, obj: MetaObject): Map[String, MetaObject] = Map.empty
 }

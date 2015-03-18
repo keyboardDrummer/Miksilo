@@ -25,7 +25,7 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
 
   object ValueKey
 
-  def transformIncrementAssignment(incrementAssignment: Origin, state: CompilationState): Unit = {
+  def transformIncrementAssignment(incrementAssignment: Path, state: CompilationState): Unit = {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
     val newValue = AdditionC.addition(value, target)
@@ -34,7 +34,7 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new Root(program).transform[Origin](obj => obj.clazz match {
+    new Root(program).transform[Path](obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })

@@ -12,11 +12,11 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)
 
-  def addThisToVariable(state: CompilationState, variable: Origin) {
+  def addThisToVariable(state: CompilationState, variable: Path) {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val name = VariableC.getVariableName(variable)
-    val variableWithCorrectPath: Origin = getVariableWithCorrectPath(variable)
+    val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
     if (!VariableC.getVariables(state, variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
       currentClass.content.get(name).foreach(classMember => {
@@ -27,7 +27,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
     }
   }
 
-  def getVariableWithCorrectPath(obj: Origin): Origin = {
+  def getVariableWithCorrectPath(obj: Path): Path = {
     if (obj.clazz == MethodC.MethodKey)
       return new Root(obj.obj)
 
@@ -41,7 +41,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
     val programWithOrigin = new Root(program)
-    programWithOrigin.transform[Origin](obj => obj.clazz match {
+    programWithOrigin.transform[Path](obj => obj.clazz match {
       case ByteCodeSkeleton.ClassFileKey => JavaClassSkeleton.initializeClassCompiler(state, program)
       case MethodC.MethodKey => MethodC.setMethodCompiler(obj, state)
       case VariableC.VariableKey => addThisToVariable(state, obj)

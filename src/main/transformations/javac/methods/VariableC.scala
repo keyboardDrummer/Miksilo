@@ -30,15 +30,15 @@ object VariableC extends ExpressionInstance {
 
   override val key: AnyRef = VariableKey
 
-  override def getType(variable: Origin, state: CompilationState): MetaObject = {
+  override def getType(variable: Path, state: CompilationState): MetaObject = {
     getVariableInfo(variable, state)._type
   }
 
-  def getVariableInfo(variable: Origin, state: CompilationState): VariableInfo = {
+  def getVariableInfo(variable: Path, state: CompilationState): VariableInfo = {
     getVariables(state, variable)(VariableC.getVariableName(variable))
   }
 
-  override def toByteCode(variable: Origin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(variable: Path, state: CompilationState): Seq[MetaObject] = {
     val variableInfo: VariableInfo = getVariableInfo(variable, state)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
