@@ -2,6 +2,7 @@ package transformations.javac
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.{Root, SequenceSelection, Selection}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton

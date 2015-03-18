@@ -1,6 +1,7 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.path.{Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {

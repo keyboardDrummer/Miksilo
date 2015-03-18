@@ -2,6 +2,7 @@ package transformations.javac.statements.locals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.{Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton

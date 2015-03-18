@@ -1,6 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
+import core.particles.path.Root
 import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
 
