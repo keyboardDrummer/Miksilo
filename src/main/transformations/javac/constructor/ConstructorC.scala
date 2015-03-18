@@ -3,6 +3,7 @@ package transformations.javac.constructor
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._

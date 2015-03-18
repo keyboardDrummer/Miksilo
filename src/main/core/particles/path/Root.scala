@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.{Key, MetaObject}
+import core.particles.node.{MetaObject, Key}
 
 case class Root(current: MetaObject) extends Path with Key{
   override def parentOption: Option[Path] = None

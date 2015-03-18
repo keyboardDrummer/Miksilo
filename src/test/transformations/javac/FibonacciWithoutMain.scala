@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import org.junit.Test
 import transformations.javac.classes.JavaClassSkeleton._
 import transformations.javac.expressions._

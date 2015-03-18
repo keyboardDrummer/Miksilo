@@ -2,6 +2,7 @@ package core.grammar
 
 import core.biGrammar.TestGrammarUtils
 import core.particles._
+import core.particles.node.MetaObject
 import org.junit.{Ignore, Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.expressions._

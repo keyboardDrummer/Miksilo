@@ -3,6 +3,7 @@ package core.particles
 import core.biGrammar.BiFailure
 import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.node.MetaObject
 
 import scala.collection.mutable
 import scala.util.Random

@@ -1,6 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}

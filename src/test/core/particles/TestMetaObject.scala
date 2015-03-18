@@ -1,5 +1,6 @@
 package core.particles
 
+import core.particles.node.MetaObject
 import org.junit.{Assert, Test}
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.methods.{CallC, MemberSelector, VariableC}

@@ -2,6 +2,7 @@ package transformations.javac.expressions
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames

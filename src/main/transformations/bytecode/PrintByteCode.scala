@@ -3,7 +3,8 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import akka.util.Convert
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
+import core.particles.node.MetaObject
 import transformations.javac.classes.QualifiedClassName
 import transformations.types.TypeSkeleton
 

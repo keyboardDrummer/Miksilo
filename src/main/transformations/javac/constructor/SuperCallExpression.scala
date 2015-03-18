@@ -1,8 +1,9 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{JavaClassSkeleton, MethodId}

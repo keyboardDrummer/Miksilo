@@ -1,8 +1,9 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
 import transformations.bytecode.additions.LabelledTargets
 
 object ContinueC extends StatementInstance {

@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 

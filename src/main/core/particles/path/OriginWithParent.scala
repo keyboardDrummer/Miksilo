@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 
 trait OriginWithParent extends Path {
   def parent: Path

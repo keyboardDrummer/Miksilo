@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{CompilationState, Contract, MetaObject}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}

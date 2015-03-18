@@ -1,8 +1,9 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
+import core.particles.node.MetaObject
 import core.particles.path.{Path, Root}
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.locals.LocalsAnalysis

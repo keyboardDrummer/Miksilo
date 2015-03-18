@@ -3,6 +3,7 @@ package transformations.bytecode.coreInstructions
 import core.biGrammar.BiGrammar
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import transformations.bytecode._
 import transformations.bytecode.attributes.CodeAttribute.{JumpBehavior, InstructionSignatureProvider, InstructionSideEffectProvider}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}

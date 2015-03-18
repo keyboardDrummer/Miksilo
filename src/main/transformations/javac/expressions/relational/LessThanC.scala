@@ -2,6 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC

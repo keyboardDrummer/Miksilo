@@ -1,6 +1,7 @@
 package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.{Path, Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 

@@ -3,6 +3,7 @@ package transformations.types
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import transformations.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: MetaObject, from: MetaObject) extends BadInputException {

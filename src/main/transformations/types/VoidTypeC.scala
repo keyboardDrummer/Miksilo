@@ -1,7 +1,8 @@
 package transformations.types
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
+import core.particles.node.MetaObject
 
 object VoidTypeC extends TypeInstance {
 

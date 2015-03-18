@@ -1,8 +1,9 @@
 package transformations.javac.expressions.prefix
 
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.types.BooleanTypeC

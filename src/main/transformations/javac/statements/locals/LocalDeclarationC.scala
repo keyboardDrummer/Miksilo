@@ -3,6 +3,7 @@ package transformations.javac.statements.locals
 import core.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}

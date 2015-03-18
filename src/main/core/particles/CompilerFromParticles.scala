@@ -3,6 +3,7 @@ package core.particles
 import core.biGrammar.Labelled
 import core.exceptions.ParticleDependencyViolation
 import core.particles.grammars.ProgramGrammar
+import core.particles.node.MetaObject
 
 import scala.reflect.io.{Directory, File}
 

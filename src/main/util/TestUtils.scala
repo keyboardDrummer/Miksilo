@@ -4,6 +4,7 @@ import java.io
 
 import application.compilerCockpit.PrettyPrint
 import core.particles._
+import core.particles.node.{MetaObject, ComparisonOptions}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}

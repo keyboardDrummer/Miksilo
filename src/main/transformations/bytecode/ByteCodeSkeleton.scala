@@ -5,6 +5,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.node.MetaObject
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
 object ByteCodeSkeleton extends ParticleWithGrammar with WithState {

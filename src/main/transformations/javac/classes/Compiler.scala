@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import transformations.javac.JavaLang
 
 import scala.collection.mutable

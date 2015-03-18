@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.{Key, MetaObject}
+import core.particles.node.{MetaObject, Key}
 import transformations.bytecode.PrintByteCode._
 
 trait AccessFlags {

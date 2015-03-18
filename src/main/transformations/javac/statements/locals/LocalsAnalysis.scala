@@ -1,7 +1,8 @@
 package transformations.javac.statements.locals
 
+import core.particles.node.MetaObject
 import core.particles.path.Path
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
 import transformations.javac.methods.VariablePool
 import transformations.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 

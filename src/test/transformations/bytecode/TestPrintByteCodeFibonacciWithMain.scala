@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._

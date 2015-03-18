@@ -2,6 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.PushNullC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

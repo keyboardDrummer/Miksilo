@@ -1,6 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
+import core.particles.node.MetaObject
 import core.particles.path.{Path, SequenceSelection}
 
 trait StatementInstance extends ParticleWithGrammar {

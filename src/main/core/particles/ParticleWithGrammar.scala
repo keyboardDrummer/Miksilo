@@ -3,6 +3,7 @@ package core.particles
 import core.biGrammar.GrammarDocumentWriter
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)

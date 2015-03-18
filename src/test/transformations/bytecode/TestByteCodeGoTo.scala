@@ -1,6 +1,7 @@
 package transformations.bytecode
 
-import core.particles.{CompilerFromParticles, MetaObject}
+import core.particles.CompilerFromParticles
+import core.particles.node.MetaObject
 import org.junit.Test
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}

@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 
 case class Selection(parent: Path, field: Any) extends OriginWithParent {
   val current = parent.current(field).asInstanceOf[MetaObject]

@@ -1,11 +1,10 @@
-package core.particles
-
+package core.particles.node
 
 import core.particles.path.Path
 
 import scala.collection.mutable
 
-case class ComparisonOptions(compareIntegers: Boolean, takeAllLeftKeys: Boolean, takeAllRightKeys: Boolean)
+
 
 object MetaObject {
 
@@ -65,48 +64,11 @@ object MetaObject {
   }
 }
 
-trait MetaLikeGen[T] extends MetaLike {
 
-}
 
-trait MetaLike {
 
-  def get(key: Any): Option[Any]
-  def apply(key: Any): Any
-  def clazz: Any
-  def dataView: Map[Any, Any]
 
-  def transform[T <: MetaLike](transformation: T => Unit, visited: mutable.Set[T] = new mutable.HashSet[T]()) = {
 
-    transformNode(this.asInstanceOf[T])
-    def transformNode(metaObject: T): Unit = {
-      if (!visited.add(metaObject))
-        return
-
-      transformation(metaObject)
-
-      val children = metaObject.dataView.values
-      for(child <- children)
-      {
-        child match {
-          case metaObject: MetaLike =>
-            transformNode(metaObject.asInstanceOf[T])
-          case sequence: Seq[_] =>
-            sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case metaChild: MetaLike => transformNode(metaChild.asInstanceOf[T])
-              case _ =>
-            })
-          case _ =>
-        }
-      }
-    }
-  }
-}
-
-trait Key
-{
-  override def toString = MetaObject.classDebugRepresentation(this)
-}
 
 class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLikeGen[MetaObject] {
 

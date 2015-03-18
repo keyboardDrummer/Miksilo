@@ -1,6 +1,7 @@
 package transformations.bytecode
 
-import core.particles.{CompilerFromParticles, MetaObject}
+import core.particles.CompilerFromParticles
+import core.particles.node.MetaObject
 import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute

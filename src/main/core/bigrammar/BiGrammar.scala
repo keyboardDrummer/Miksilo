@@ -2,7 +2,7 @@ package core.biGrammar
 
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Grammar, Identifier, NumberG, PrintGrammar, ~}
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import core.responsiveDocument.ResponsiveDocument
 
 trait GrammarDocumentWriter {

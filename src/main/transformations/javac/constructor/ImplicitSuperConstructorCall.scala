@@ -1,6 +1,7 @@
 package transformations.javac.constructor
 
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.ExpressionAsStatementC
 

@@ -2,6 +2,7 @@ package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.Path
 import transformations.javac.classes._
 import transformations.javac.expressions.ExpressionSkeleton

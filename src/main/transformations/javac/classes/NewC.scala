@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}

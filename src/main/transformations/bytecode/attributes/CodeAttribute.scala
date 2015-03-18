@@ -3,6 +3,7 @@ package transformations.bytecode.attributes
 import core.biGrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState

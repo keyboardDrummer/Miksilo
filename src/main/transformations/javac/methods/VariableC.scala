@@ -2,6 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.MetaObject
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC

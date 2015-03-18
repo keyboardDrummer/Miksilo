@@ -2,7 +2,8 @@ package transformations.bytecode.attributes
 
 import core.biGrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilationState, MetaObject}
+import core.particles.CompilationState
+import core.particles.node.MetaObject
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 

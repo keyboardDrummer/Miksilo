@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 
 case class SequenceSelection(parent: Path, field: Any, index: Int) extends OriginWithParent
 {

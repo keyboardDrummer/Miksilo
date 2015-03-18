@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.{MetaObject, MetaLikeGen}
+import core.particles.node.{MetaObject, MetaLikeGen}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): MetaObject = withOrigin.current

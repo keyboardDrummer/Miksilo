@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.MetaObject
+import core.particles.node.MetaObject
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior

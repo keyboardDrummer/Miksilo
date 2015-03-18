@@ -1,6 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute

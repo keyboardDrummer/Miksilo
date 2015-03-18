@@ -1,6 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles._
+import core.particles.node.MetaObject
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute

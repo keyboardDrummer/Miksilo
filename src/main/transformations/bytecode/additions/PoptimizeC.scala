@@ -1,6 +1,7 @@
 package transformations.bytecode.additions
 
-import core.particles.{CompilationState, Contract, MetaObject, ParticleWithPhase}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState

@@ -2,6 +2,7 @@ package transformations.javac.methods
 
 import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
 import core.particles._
+import core.particles.node.MetaObject
 import transformations.javac.ImplicitObjectSuperClass
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton

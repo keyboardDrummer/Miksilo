@@ -1,6 +1,7 @@
 package application.compilerCockpit
 
-import core.particles.{CompilationState, CompilerFromParticles, MetaObject, Particle}
+import core.particles.node.MetaObject
+import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.javac.classes.QualifiedClassName

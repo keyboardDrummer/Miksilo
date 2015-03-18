@@ -2,6 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{MetaObject, MetaLike}
 import core.particles.path.{Path, Root}
 import transformations.javac.expressions.additive.AdditionC
 
