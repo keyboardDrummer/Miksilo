@@ -1,12 +1,12 @@
 package core.particles.path
 
-import core.particles.node.{Node, MetaLikeGen}
+import core.particles.node.{MetaLike, Node}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
 }
 
-trait Path extends MetaLikeGen[Path] {
+trait Path extends MetaLike {
   type Self = Path
   val current: Node
 
