@@ -2,6 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC

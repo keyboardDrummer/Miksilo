@@ -1,9 +1,8 @@
 package transformations.javac.statements
 
-
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.path.SequenceSelection
+import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -59,12 +58,12 @@ object WhileC extends StatementInstance with WithState {
     super.getNextStatements(obj, labels) ++ getBody(obj).take(1)
   }
 
-  override def getLabels(_while: Path): Map[Any, Path] = {
-    val sequenceOrigin = _while.asInstanceOf[SequenceSelection]
-    val current = sequenceOrigin.current
-    val next = sequenceOrigin.next
-    var result: Map[Any,Path] = Map(startKey(current) -> current, endKey(current) -> next)
-    val body = getBody(_while)
+  override def getLabels(_whilePath: Path): Map[Any, Path] = {
+    val _while = _whilePath.asInstanceOf[SequenceSelection]
+    val current = _while.current
+    val next = _while.next
+    var result: Map[Any,Path] = Map(startKey(current) -> _while, endKey(current) -> next)
+    val body = getBody(_whilePath)
     if (body.nonEmpty)
       result += getNextLabel(body.last) -> next
     result

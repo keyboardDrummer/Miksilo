@@ -1,6 +1,7 @@
 package transformations.javac.classes
 
 import core.particles._
+import core.particles.path.Path
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.VariableC.VariableKey
 

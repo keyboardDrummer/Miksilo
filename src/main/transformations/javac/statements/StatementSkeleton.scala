@@ -2,6 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.MissingToInstructionsFor
 

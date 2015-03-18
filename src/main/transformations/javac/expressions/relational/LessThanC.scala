@@ -2,6 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

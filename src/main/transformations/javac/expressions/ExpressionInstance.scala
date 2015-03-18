@@ -1,6 +1,7 @@
 package transformations.javac.expressions
 
 import core.particles._
+import core.particles.path.Path
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.StatementSkeleton
 

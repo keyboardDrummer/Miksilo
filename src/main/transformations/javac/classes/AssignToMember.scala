@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectField._

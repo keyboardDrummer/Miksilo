@@ -1,6 +1,8 @@
 package core.particles
 
 
+import core.particles.path.Path
+
 import scala.collection.mutable
 
 case class ComparisonOptions(compareIntegers: Boolean, takeAllLeftKeys: Boolean, takeAllRightKeys: Boolean)

@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.path.SequenceSelection
+import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton

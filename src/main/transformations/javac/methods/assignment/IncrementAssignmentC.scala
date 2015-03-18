@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.path.Root
+import core.particles.path.{Path, Root}
 import transformations.javac.expressions.additive.AdditionC
 
 //TODO refactor so it uses a phase to reduce itself.

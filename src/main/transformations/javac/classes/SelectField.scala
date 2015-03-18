@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
 import transformations.javac.methods.MemberSelector

@@ -3,6 +3,7 @@ package transformations.javac.methods.assignment
 import core.biGrammar.BiFailure
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}

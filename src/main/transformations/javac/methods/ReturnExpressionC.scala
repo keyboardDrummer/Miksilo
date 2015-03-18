@@ -2,6 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionC
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
