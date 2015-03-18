@@ -30,7 +30,7 @@ trait StatementInstance extends ParticleWithGrammar {
     if (nextOption.nonEmpty)
       return Set(nextOption.get)
 
-    throw SequenceDoesNotEndInJump(selection.parent.obj(selection.field).asInstanceOf[Seq[MetaObject]])
+    throw SequenceDoesNotEndInJump(selection.parent.current(selection.field).asInstanceOf[Seq[MetaObject]])
   }
 
   def getLabels(obj: Path): Map[Any, Path] = Map.empty

@@ -16,7 +16,7 @@ object WhileC extends StatementInstance with WithState {
     val endLabel = state.getUniqueLabel("end")
 
     val conditionInstructions = ExpressionSkeleton.getToInstructions(state)(getCondition(_while))
-    getState(state).whileStartLabels += _while.obj -> startLabel
+    getState(state).whileStartLabels += _while.current -> startLabel
 
     val body = getBody(_while)
     val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(state)(statement))

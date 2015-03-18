@@ -29,7 +29,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   def getVariableWithCorrectPath(obj: Path): Path = {
     if (obj.clazz == MethodC.MethodKey)
-      return new Root(obj.obj)
+      return new Root(obj.current)
 
     obj match {
       case Selection(parent, field) => Selection(getVariableWithCorrectPath(parent), field)

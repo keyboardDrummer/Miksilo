@@ -78,7 +78,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     def addCodeAnnotation(method: Path) {
       setMethodCompiler(method, state)
       val statements = getMethodBody(method)
-      method.obj.data.remove(MethodBodyKey)
+      method.current.data.remove(MethodBodyKey)
       val statementToInstructions = StatementSkeleton.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val codeIndex = constantPool.store(CodeConstantEntry.entry)

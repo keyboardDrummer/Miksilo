@@ -40,11 +40,11 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
   def transformForLoop(forLoop: Path, state: CompilationState): Unit = {
     val initializer = getInitializer(forLoop)
     val condition = getCondition(forLoop)
-    val forBody = getBody(forLoop.obj)
+    val forBody = getBody(forLoop.current)
     val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
-    val _while = WhileC._while(condition.obj, whileBody)
+    val _while = WhileC._while(condition.current, whileBody)
 
-    val newStatements = Seq(initializer.obj, _while)
+    val newStatements = Seq(initializer.current, _while)
     val originSequence = forLoop.asInstanceOf[SequenceSelection]
     originSequence.replaceWith(newStatements)
   }
