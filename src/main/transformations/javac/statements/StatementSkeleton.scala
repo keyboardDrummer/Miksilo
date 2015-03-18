@@ -5,21 +5,13 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.expressions.ExpressionSkeleton.MissingToInstructionsFor
-
-import scala.collection.mutable
-
 
 object StatementSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   def getToInstructions(state: CompilationState): Path => Seq[Node] = {
-    statement => {
-      val statementTransformation = getState(state).instances.get(statement.clazz)
-      val transformation = statementTransformation.getOrElse(throw new MissingToInstructionsFor(statement.clazz))
-      transformation.toByteCode(statement, state)
-    }
+    statement => getState(state).instances(statement.clazz).toByteCode(statement, state)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue) {
