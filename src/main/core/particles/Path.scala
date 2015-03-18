@@ -1,7 +1,7 @@
 package core.particles
 
 trait Path extends MetaLikeGen[Path] {
-  val current: MetaObject //TODO rename to current
+  val current: MetaObject
   
   def parentOption: Option[Path]
   def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
@@ -19,7 +19,7 @@ trait Path extends MetaLikeGen[Path] {
     case child => child
   }
   
-  override def data2: Map[Any, Any] = current.data.keys.map(key => (key,apply(key))).toMap
+  override def dataView: Map[Any, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 }
 
 trait OriginWithParent extends Path {
@@ -55,7 +55,7 @@ case class SequenceSelection(parent: Path, field: Any, index: Int) extends Origi
   def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]
   def next = sequence(index + 1)
   def hasNext = sequence.length > (index + 1)
-  def current = sequence(index)
+
   def replaceWith(replacements: Seq[MetaObject]) = {
     val originalSequence = parent.current.data(field).asInstanceOf[Seq[Path]]
     val newSequence = originalSequence.take(index) ++ replacements ++ originalSequence.drop(index + 1)

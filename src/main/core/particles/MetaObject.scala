@@ -72,7 +72,7 @@ trait MetaLike {
   def get(key: Any): Option[Any]
   def apply(key: Any): Any
   def clazz: Any
-  def data2: Map[Any, Any]
+  def dataView: Map[Any, Any]
 
   def transform[T <: MetaLike](transformation: T => Unit, visited: mutable.Set[T] = new mutable.HashSet[T]()) = {
 
@@ -83,7 +83,7 @@ trait MetaLike {
 
       transformation(metaObject)
 
-      val children = metaObject.data2.values
+      val children = metaObject.dataView.values
       for(child <- children)
       {
         child match {
@@ -117,7 +117,7 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   data ++= entries
 
-  def data2 = data.toMap
+  def dataView = data.toMap
 
   def apply(key: Any) = data(key)
 
