@@ -14,7 +14,7 @@ object SelectorReferenceKind extends Particle {
     })
   }
 
-  def getReferenceKind(selector: MetaObjectWithOrigin, compiler: ClassCompiler): ReferenceKind = {
+  def getReferenceKind(selector: Origin, compiler: ClassCompiler): ReferenceKind = {
     val obj = MemberSelector.getSelectorObject(selector)
     val member = MemberSelector.getSelectorMember(selector)
     MemberSelector.getReferenceKind(compiler, obj) match {

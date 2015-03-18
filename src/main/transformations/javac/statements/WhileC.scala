@@ -11,7 +11,7 @@ object WhileC extends StatementInstance with WithState {
 
   override val key: AnyRef = WhileKey
 
-  override def toByteCode(_while: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(_while: Origin, state: CompilationState): Seq[MetaObject] = {
     val startLabel = state.getUniqueLabel("start")
     val endLabel = state.getUniqueLabel("end")
 
@@ -54,15 +54,15 @@ object WhileC extends StatementInstance with WithState {
 
   def startKey(_while: MetaLike) = (_while,"start")
   def endKey(_while: MetaLike) = (_while,"end")
-  override def getNextStatements(obj: MetaObjectWithOrigin, labels: Map[Any, MetaObjectWithOrigin]): Set[MetaObjectWithOrigin] = {
+  override def getNextStatements(obj: Origin, labels: Map[Any, Origin]): Set[Origin] = {
     super.getNextStatements(obj, labels) ++ getBody(obj).take(1)
   }
 
-  override def getLabels(_while: MetaObjectWithOrigin): Map[Any, MetaObjectWithOrigin] = {
-    val sequenceOrigin = _while.origin.asInstanceOf[SequenceSelection]
+  override def getLabels(_while: Origin): Map[Any, Origin] = {
+    val sequenceOrigin = _while.asInstanceOf[SequenceSelection]
     val current = sequenceOrigin.current
     val next = sequenceOrigin.next
-    var result: Map[Any,MetaObjectWithOrigin] = Map(startKey(current) -> current, endKey(current) -> next)
+    var result: Map[Any,Origin] = Map(startKey(current) -> current, endKey(current) -> next)
     val body = getBody(_while)
     if (body.nonEmpty)
       result += getNextLabel(body.last) -> next

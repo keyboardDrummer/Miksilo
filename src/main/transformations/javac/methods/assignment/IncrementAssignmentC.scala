@@ -1,12 +1,11 @@
 package transformations.javac.methods.assignment
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import transformations.javac.expressions.additive.AdditionC
-import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.IntTypeC
 
-object IncrementAssignmentC extends ExpressionInstance {
+//TODO refactor so it uses a phase to reduce itself.
+object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AdditionC, AssignmentSkeleton)
 
@@ -26,18 +25,19 @@ object IncrementAssignmentC extends ExpressionInstance {
 
   object ValueKey
 
-  override val key: AnyRef = IncrementAssignmentKey
-
-  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = IntTypeC.intType
-
-  override def toByteCode(incrementAssignment: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+  def transformIncrementAssignment(incrementAssignment: Origin, state: CompilationState): Unit = {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
     val newValue = AdditionC.addition(value, target)
     val assignment = AssignmentSkeleton.assignment(target, newValue)
+    incrementAssignment.replaceWith(assignment)
+  }
 
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
-    toInstructions(new MetaObjectWithOrigin(assignment, incrementAssignment.origin))
+  override def transform(program: MetaObject, state: CompilationState): Unit = {
+    new Root(program).transform[Origin](obj => obj.clazz match {
+      case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
+      case _ =>
+    })
   }
 
   def getValue[T <: MetaLike](incrementAssignment: T): T = {

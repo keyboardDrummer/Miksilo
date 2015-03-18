@@ -19,7 +19,7 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
-  def getType(state: CompilationState): MetaObjectWithOrigin => MetaObject = expression => {
+  def getType(state: CompilationState): Origin => MetaObject = expression => {
     val getTypeMethod = Try(getGetTypeRegistry(state)(expression.clazz)).
       recover({case e: NoSuchElementException => throw new GetTypeNotFound(expression.clazz)}).get
     getTypeMethod(expression)
@@ -27,7 +27,7 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   def getGetTypeRegistry(state: CompilationState) = getState(state).getTypeRegistry
 
-  def getToInstructions(state: CompilationState): MetaObjectWithOrigin => Seq[MetaObject] = {
+  def getToInstructions(state: CompilationState): Origin => Seq[MetaObject] = {
     expression => {
       val implementation = getToInstructionsRegistry(state).getOrElse(expression.clazz, throw new MissingToInstructionsFor(expression.clazz))
       implementation(expression)
@@ -43,8 +43,8 @@ object ExpressionSkeleton extends ParticleWithGrammar with WithState {
 
   def createState = new State()
   class State {
-    val expressionToInstructions = new ClassRegistry[MetaObjectWithOrigin => Seq[MetaObject]]
-    val getTypeRegistry = new ClassRegistry[MetaObjectWithOrigin => MetaObject]
+    val expressionToInstructions = new ClassRegistry[Origin => Seq[MetaObject]]
+    val getTypeRegistry = new ClassRegistry[Origin => MetaObject]
   }
 
   object CoreGrammar

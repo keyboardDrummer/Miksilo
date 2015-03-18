@@ -3,7 +3,7 @@ package transformations.javac.expressions.literals
 import core.biGrammar.BiGrammar
 import core.grammar.RegexG
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{MetaObjectWithOrigin, CompilationState, Contract, MetaObject}
+import core.particles.{Origin, CompilationState, Contract, MetaObject}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -25,13 +25,13 @@ object LongLiteralC extends ExpressionInstance {
 
   def literal(value: Long) = new MetaObject(LongLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(literal: Origin, state: CompilationState): Seq[MetaObject] = {
     Seq(LongConstantC.constant(getValue(literal).toInt))
   }
 
   def getValue(literal: MetaObject) = literal(ValueKey).asInstanceOf[Long]
 
-  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = LongTypeC.longType
+  override def getType(expression: Origin, state: CompilationState): MetaObject = LongTypeC.longType
 
   object LongLiteralKey
 

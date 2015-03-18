@@ -37,20 +37,20 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
 
   object BodyKey
 
-  def transformForLoop(forLoop: MetaObjectWithOrigin, state: CompilationState): Unit = {
+  def transformForLoop(forLoop: Origin, state: CompilationState): Unit = {
     val initializer = getInitializer(forLoop)
     val condition = getCondition(forLoop)
     val forBody = getBody(forLoop.obj)
     val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
-    val _while = new MetaObjectWithOrigin(WhileC._while(condition.obj, whileBody), forLoop.origin)
+    val _while = WhileC._while(condition.obj, whileBody)
 
-    val newStatements = Seq(initializer.obj, _while.obj)
-    val originSequence = forLoop.origin.asInstanceOf[SequenceSelection]
+    val newStatements = Seq(initializer.obj, _while)
+    val originSequence = forLoop.asInstanceOf[SequenceSelection]
     originSequence.replaceWith(newStatements)
   }
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new MetaObjectWithOrigin(program).transform[MetaObjectWithOrigin](obj => obj.clazz match {
+    new Root(program).transform[Origin](obj => obj.clazz match {
       case ForLoopKey => transformForLoop(obj, state)
       case _ =>
     })

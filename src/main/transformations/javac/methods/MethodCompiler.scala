@@ -1,11 +1,11 @@
 package transformations.javac.methods
 
 import core.exceptions.BadInputException
-import core.particles.{MetaObjectWithOrigin, CompilationState, MetaObject}
+import core.particles.{Origin, CompilationState, MetaObject, Root}
 import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.methods.MethodC._
 import transformations.javac.statements.locals.LocalsAnalysis
 import transformations.types.{ObjectTypeC, TypeSkeleton}
-import MethodC._
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
 }
@@ -43,7 +43,7 @@ case class MethodCompiler(state: CompilationState, method: MetaObject) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody(new MetaObjectWithOrigin(method))(0)
+  val firstInstruction = getMethodBody[Origin](new Root(method))(0)
   val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables = {

@@ -71,11 +71,11 @@ object MethodC extends ParticleWithGrammar with WithState {
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptorIndex(method)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
-    addCodeAnnotation(new MetaObjectWithOrigin(method))
+    addCodeAnnotation(new Root(method))
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
 
-    def addCodeAnnotation(method: MetaObjectWithOrigin) {
+    def addCodeAnnotation(method: Origin) {
       setMethodCompiler(method, state)
       val statements = getMethodBody(method)
       method.obj.data.remove(MethodBodyKey)
@@ -129,7 +129,7 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
 
-  def getMethodBody[T <: MetaLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
+  def getMethodBody[T <: MetaLikeGen[T]](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
   def getMethodName(method: MetaObject) = {
     method(MethodNameKey).asInstanceOf[String]

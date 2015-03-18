@@ -12,11 +12,11 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)
 
-  def addThisToVariable(state: CompilationState, variable: MetaObjectWithOrigin) {
+  def addThisToVariable(state: CompilationState, variable: Origin) {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val name = VariableC.getVariableName(variable)
-    val variableWithCorrectPath: MetaObjectWithOrigin = getVariableWithCorrectPath(variable)
+    val variableWithCorrectPath: Origin = getVariableWithCorrectPath(variable)
     if (!VariableC.getVariables(state, variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
       currentClass.content.get(name).foreach(classMember => {
@@ -27,20 +27,21 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
     }
   }
 
-  def getVariableWithCorrectPath(obj: MetaObjectWithOrigin): MetaObjectWithOrigin = {
+  def getVariableWithCorrectPath(obj: Origin): Origin = {
     if (obj.clazz == MethodC.MethodKey)
-      return new MetaObjectWithOrigin(obj.obj)
-    new MetaObjectWithOrigin(obj, obj.origin match {
+      return new Root(obj.obj)
+
+    obj match {
       case Selection(parent, field) => Selection(getVariableWithCorrectPath(parent), field)
       case SequenceSelection(parent, field, index) => SequenceSelection(getVariableWithCorrectPath(parent), field, index)
-    })
+    }
   }
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
-    val programWithOrigin = new MetaObjectWithOrigin(program)
-    programWithOrigin.transform[MetaObjectWithOrigin](obj => obj.clazz match {
+    val programWithOrigin = new Root(program)
+    programWithOrigin.transform[Origin](obj => obj.clazz match {
       case ByteCodeSkeleton.ClassFileKey => JavaClassSkeleton.initializeClassCompiler(state, program)
       case MethodC.MethodKey => MethodC.setMethodCompiler(obj, state)
       case VariableC.VariableKey => addThisToVariable(state, obj)

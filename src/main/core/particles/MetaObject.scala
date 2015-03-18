@@ -63,6 +63,10 @@ object MetaObject {
   }
 }
 
+trait MetaLikeGen[T] extends MetaLike {
+
+}
+
 trait MetaLike {
 
   def get(key: Any): Option[Any]
@@ -102,7 +106,7 @@ trait Key
   override def toString = MetaObject.classDebugRepresentation(this)
 }
 
-class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLike {
+class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with MetaLikeGen[MetaObject] {
 
   def replaceWith(metaObject: MetaObject): Unit = {
     clazz = metaObject.clazz
@@ -118,10 +122,10 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
   def apply(key: Any) = data(key)
 
   def update(key: Any, value: Any) = {
-    value match
+    value match //TODO maybe throw this check away.
     {
-      case wrong: MetaObjectWithOrigin => throwInsertedWithOriginIntoRegularMetaObject()
-      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[MetaObjectWithOrigin]))
+      case wrong: Origin => throwInsertedWithOriginIntoRegularMetaObject()
+      case sequence: Seq[_] => if (!sequence.forall(item => !item.isInstanceOf[Origin]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }
@@ -130,7 +134,7 @@ class MetaObject(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with M
   }
 
   def throwInsertedWithOriginIntoRegularMetaObject(): Unit = {
-    throw new scala.UnsupportedOperationException("Don't insert a MetaObjectWithOrigin into a regular MetaObject.")
+    throw new scala.UnsupportedOperationException("Don't insert a Origin into a regular MetaObject.")
   }
 
   def selectDynamic(name: String) =

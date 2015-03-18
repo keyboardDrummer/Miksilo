@@ -15,7 +15,7 @@ object AssignToMember extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: CompilationState): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: MetaObjectWithOrigin) => {
+    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: Origin) => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
       val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)

@@ -18,7 +18,7 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(ifThen: Origin, state: CompilationState): Seq[MetaObject] = {
     val condition = getCondition(ifThen)
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)
@@ -51,13 +51,13 @@ object IfThenC extends StatementInstance {
 
   override def description: String = "Enables using the if-then (no else) construct."
 
-  override def getNextStatements(obj: MetaObjectWithOrigin, labels: Map[Any, MetaObjectWithOrigin]): Set[MetaObjectWithOrigin] = 
+  override def getNextStatements(obj: Origin, labels: Map[Any, Origin]): Set[Origin] =
   {
     Set(getThenStatements(obj)(0)) ++ super.getNextStatements(obj, labels)
   }
 
-  override def getLabels(obj: MetaObjectWithOrigin): Map[Any, MetaObjectWithOrigin] = {
-    val next = obj.origin.asInstanceOf[SequenceSelection].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
+  override def getLabels(obj: Origin): Map[Any, Origin] = {
+    val next = obj.asInstanceOf[SequenceSelection].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     Map(IfThenC.getNextLabel(getThenStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }

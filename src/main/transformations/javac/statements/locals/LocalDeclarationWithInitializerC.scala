@@ -33,19 +33,19 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(declarationWithInitializer: MetaObjectWithOrigin, state: CompilationState): Unit = {
+  def transformDeclarationWithInitializer(declarationWithInitializer: Origin, state: CompilationState): Unit = {
     val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
-    val declaration = new MetaObjectWithOrigin(LocalDeclarationC.declaration(name, _type),declarationWithInitializer.origin)
+    val declaration = LocalDeclarationC.declaration(name, _type)
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
-    val assignmentStatement = new MetaObjectWithOrigin(ExpressionAsStatementC.asStatement(assignment), declarationWithInitializer.origin)
-    val originSequence = declarationWithInitializer.origin.asInstanceOf[SequenceSelection]
-    originSequence.replaceWith(Seq(declaration.obj, assignmentStatement.obj))
+    val assignmentStatement = ExpressionAsStatementC.asStatement(assignment)
+    val originSequence = declarationWithInitializer.asInstanceOf[SequenceSelection]
+    originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
   override def transform(program: MetaObject, state: CompilationState): Unit = {
-    new MetaObjectWithOrigin(program).transform[MetaObjectWithOrigin](obj => obj.clazz match {
+    new Root(program).transform[Origin](obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

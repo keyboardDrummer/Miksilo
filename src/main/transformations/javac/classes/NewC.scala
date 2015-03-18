@@ -27,11 +27,11 @@ object NewC extends ExpressionInstance {
 
   override val key: AnyRef = NewCallKey
 
-  override def getType(expression: MetaObjectWithOrigin, state: CompilationState): MetaObject = {
-    expression(NewObject).asInstanceOf[MetaObjectWithOrigin]
+  override def getType(expression: Origin, state: CompilationState): MetaObject = {
+    expression(NewObject).asInstanceOf[Origin]
   }
 
-  override def toByteCode(expression: MetaObjectWithOrigin, state: CompilationState): Seq[MetaObject] = {
+  override def toByteCode(expression: Origin, state: CompilationState): Seq[MetaObject] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val objectType = getNewObject(expression)
