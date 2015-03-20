@@ -56,7 +56,7 @@ object InferredStackFrames extends ParticleWithPhase {
         new Node(StackMapTableAttribute.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new Node(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack(0))
+        new Node(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack.head)
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
         new Node(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)

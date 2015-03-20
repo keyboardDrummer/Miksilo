@@ -70,7 +70,8 @@ object LabelledTargets extends ParticleWithPhase {
     def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
-      codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++ getStackMapTable(constantPool, targetLocations, instructions)
+      codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
+        getStackMapTable(constantPool, targetLocations, instructions)
 
       val newInstructions: Seq[Node] = getNewInstructions(instructions, targetLocations)
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
@@ -92,29 +93,29 @@ object LabelledTargets extends ParticleWithPhase {
   }
 
   def getJumpInstructionLabel(instruction: Node): String = {
-    getInstructionArguments(instruction)(0).asInstanceOf[String]
+    getInstructionArguments(instruction).head.asInstanceOf[String]
   }
 
   def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
-    val frameLocations = instructions.filter(i => i.clazz == LabelKey).map(i => (labelLocations(getLabelName(i)), getLabelStackFrame(i)))
-    var adjustedZero = 0
+    val framesPerLocation = instructions.filter(i => i.clazz == LabelKey).
+      map(i => (labelLocations(getLabelName(i)), getLabelStackFrame(i))).toMap
+    var locationAfterPreviousFrame = 0
     var stackFrames = ArrayBuffer[Node]()
-    stackFrames.sizeHint(frameLocations.size)
-    for (framePair <- frameLocations) {
-      val location = framePair._1
-      val frame = framePair._2
-      val offset = location - adjustedZero
+    stackFrames.sizeHint(framesPerLocation.size)
+    for (location <- framesPerLocation.keys.toSeq.sorted) {
+      val frame = framesPerLocation(location)
+      val offset = location - locationAfterPreviousFrame
 
       frame(StackMapTableAttribute.OffsetDelta) = offset
       stackFrames += frame
-      adjustedZero = location + 1
+      locationAfterPreviousFrame = location + 1
     }
     if (stackFrames.nonEmpty) {
       val nameIndex = constantPool.store(StackMapTableAttribute.stackMapTableId)
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else
-      Seq[Node]()
+      Seq.empty[Node]
   }
 
   def getLabelStackFrame(label: Node) = label(LabelStackFrame).asInstanceOf[Node]
