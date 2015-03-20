@@ -20,7 +20,7 @@ object PostFixIncrementC extends ExpressionInstance {
   override def toByteCode(plusPlus: Path, state: CompilationState): Seq[Node] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     val name: String = plusPlus(VariableKey).asInstanceOf[String]
-    val variableAddress = getVariables(state, plusPlus)(name).offset
+    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset
     Seq(LoadIntegerC.load(variableAddress), IncrementIntegerC.integerIncrement(variableAddress, 1))
   }
 

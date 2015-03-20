@@ -16,7 +16,6 @@ object InferredStackFrames extends ParticleWithPhase {
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)

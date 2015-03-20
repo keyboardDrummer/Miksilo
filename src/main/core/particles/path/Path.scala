@@ -10,8 +10,11 @@ trait Path extends NodeLike {
   type Self = Path
   val current: Node
 
+  override def toString = s"Path: $pathAsString\nCurrent: $current\nRoot: ${root.current}"
+  def pathAsString: String
   def parentOption: Option[Path]
   def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
+  def root = ancestors.last
   def clazz = current.clazz
   def apply(key: Any) = get(key).get
   def get(key: Any): Option[Any] = current.data.get(key).map {

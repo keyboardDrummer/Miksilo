@@ -11,7 +11,7 @@ trait StatementInstance extends ParticleWithGrammar {
     super.inject(state)
   }
 
-  val key: AnyRef
+  val key: AnyRef = this
 
   def toByteCode(statement: Path, state: CompilationState): Seq[Node]
 

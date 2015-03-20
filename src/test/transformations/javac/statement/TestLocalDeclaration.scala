@@ -7,11 +7,11 @@ class TestLocalDeclaration {
 
   @Test
   def testIfElseBlockScoping() {
-    TestUtils.compareWithJavacAfterRunning("IfElseBlockScoping")
+    TestUtils.compareWithJavacAfterRunning("IfElseBlockScoping.java")
   }
 
   @Test
   def testWhileBlockScoping() {
-    TestUtils.compareWithJavacAfterRunning("WhileBlockScoping")
+    TestUtils.compareWithJavacAfterRunning("WhileBlockScoping.java")
   }
 }

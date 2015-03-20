@@ -37,7 +37,7 @@ object VariableC extends ExpressionInstance {
   }
 
   def getVariableInfo(variable: Path, state: CompilationState): VariableInfo = {
-    getVariables(state, variable)(VariableC.getVariableName(variable))
+    MethodC.getMethodCompiler(state).getVariables(variable)(VariableC.getVariableName(variable))
   }
 
   override def toByteCode(variable: Path, state: CompilationState): Seq[Node] = {

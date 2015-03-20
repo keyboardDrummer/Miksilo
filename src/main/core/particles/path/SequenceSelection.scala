@@ -26,4 +26,6 @@ case class SequenceSelection(parent: Path, field: Any, index: Int) extends Origi
 
 
   override def replaceWith(replacement: Node): Unit = replaceWith(Seq(replacement))
+
+  override def pathAsString: String = s"${parent.pathAsString}.$field[$index]"
 }

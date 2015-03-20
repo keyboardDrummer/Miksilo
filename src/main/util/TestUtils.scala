@@ -89,7 +89,9 @@ class TestUtils(val compiler: CompilerFromParticles) {
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
-  def compareWithJavacAfterRunning(className: String, inputDirectory: Path = Path("")) {
+  def compareWithJavacAfterRunning(fileName: String, inputDirectory: Path = Path("")) {
+    val className = if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
+
     val relativeFilePath = inputDirectory / (className + ".java")
     val input: File = File(testResources / relativeFilePath)
 

@@ -19,7 +19,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
     val name = VariableC.getVariableName(variable)
     val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
-    if (!VariableC.getVariables(state, variableWithCorrectPath).contains(name)) {
+    if (!MethodC.getMethodCompiler(state).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
       currentClass.content.get(name).foreach(classMember => {
         val newVariableName = if (classMember._static) currentClass.name else thisName

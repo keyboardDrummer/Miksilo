@@ -50,7 +50,7 @@ object JavaCompiler {
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenC, ContinueC, WhileC, BlockC,
+  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, ContinueC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,

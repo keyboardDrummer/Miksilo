@@ -22,7 +22,7 @@ object AssignToVariable extends ParticleWithGrammar {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Path) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
-      val variableInfo = VariableC.getVariables(state, targetVariable)(target)
+      val variableInfo = methodCompiler.getVariables(targetVariable)(target)
       val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, state)
       Seq(getStoreInstruction(variableInfo, byteCodeType))
     })

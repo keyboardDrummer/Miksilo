@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
@@ -26,11 +26,11 @@ object IfThenC extends StatementInstance {
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 
-    val conditionalBranch = LabelledTargets.ifZero(endLabelName)
+    val jumpToEndIfFalse = LabelledTargets.ifZero(endLabelName)
     val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
     val toInstructionsStatement = StatementSkeleton.getToInstructions(state)
     toInstructionsExpr(condition) ++
-      Seq(conditionalBranch) ++
+      Seq(jumpToEndIfFalse) ++
       body.flatMap(toInstructionsStatement) ++
       Seq(end)
   }
@@ -46,8 +46,9 @@ object IfThenC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val bodyGrammar = grammars.find(BlockC.BlockGrammar) | (statementGrammar ^^ (statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]](0))))
-    val ifThenGrammar = "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^ parseMap(IfThenKey, ConditionKey, ThenKey)
+    val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
+    val ifThenGrammar = grammars.create(this, "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^
+      parseMap(IfThenKey, ConditionKey, ThenKey))
     statementGrammar.addOption(ifThenGrammar)
   }
 
@@ -55,7 +56,7 @@ object IfThenC extends StatementInstance {
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] =
   {
-    Set(getThenStatements(obj)(0)) ++ super.getNextStatements(obj, labels)
+    Set(getThenStatements(obj).head) ++ super.getNextStatements(obj, labels)
   }
 
   override def getLabels(obj: Path): Map[Any, Path] = {

@@ -8,6 +8,7 @@ case class Root(current: Node) extends Path with Key{
   override def hashCode(): Int = 1 //obj.hashCode
 
   override def equals(obj: Any): Boolean = obj.isInstanceOf[Root] //&& obj.equals..
+  override def pathAsString: String = "Root"
 }
 
 
