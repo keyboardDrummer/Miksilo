@@ -21,8 +21,8 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseDeclarationWithInitializer = typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";" ^^
-      parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey)
+    val parseDeclarationWithInitializer = grammars.create(this, typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";" ^^
+      parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey))
     statement.addOption(parseDeclarationWithInitializer)
   }
 

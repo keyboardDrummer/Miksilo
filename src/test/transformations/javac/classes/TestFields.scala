@@ -7,16 +7,16 @@ class TestFields {
 
   @Test
   def testFieldAssignment() {
-    TestUtils.compareWithJavacAfterRunning("FieldAssignment")
+    TestUtils.compareWithJavacAfterRunning("FieldAssignment.java")
   }
 
   @Test
   def fieldMethodMix() {
-    TestUtils.compareWithJavacAfterRunning("FieldMethodMix")
+    TestUtils.compareWithJavacAfterRunning("FieldMethodMix.java")
   }
 
   @Test
   def illegalForwardFieldReference() {
-    TestUtils.compareWithJavacAfterRunning("IllegalForwardFieldReference")
+    TestUtils.compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
   }
 }

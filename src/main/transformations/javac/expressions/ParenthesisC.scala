@@ -10,7 +10,7 @@ object ParenthesisC extends ParticleWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseParenthesis = "(" ~> expression <~ ")"
+    val parseParenthesis = ("(" ~> produce("(" )) ~> expression <~ ")" //TODO: the produce("(") here is a hack to make sure no () show up when printing. Nicer option would be to have a BiGrammar that specifies parsing/printing behavior.
     core.addOption(parseParenthesis)
   }
 

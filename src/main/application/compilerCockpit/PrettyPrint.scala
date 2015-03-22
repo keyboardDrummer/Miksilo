@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.biGrammar.{BiGrammar, BiGrammarToDocument, PrintFailure}
+import core.biGrammar.{BiGrammarToDocument, BiGrammar, PrintFailure}
 import core.particles.grammars.ProgramGrammar
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import core.responsiveDocument.ResponsiveDocument
@@ -33,7 +33,7 @@ case class PrettyPrint(recover: Boolean = false) extends Particle
 object PrettyPrintOption extends CompileOption {
 
   override def perform(cockpit: CompilerCockpit, input: String): String = {
-    val splicedParticles = cockpit.compiler.replace(MarkOutputGrammar,Seq(PrettyPrint(true)))
+    val splicedParticles = cockpit.compiler.replace(MarkOutputGrammar,Seq(PrettyPrint(recover = true)))
     val compiler = new CompilerFromParticles(splicedParticles)
 
     val state = compiler.parseAndTransform(input)

@@ -2,6 +2,8 @@
   <dictionary name="Remy">
     <words>
       <w>bytecode</w>
+      <w>initialiser</w>
+      <w>initialisers</w>
       <w>javap</w>
     </words>
   </dictionary>

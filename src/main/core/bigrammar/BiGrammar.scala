@@ -21,11 +21,11 @@ trait GrammarDocumentWriter {
 
   def keyword(word: String): BiGrammar = new Keyword(word)
 
-  implicit def consume(grammar: Grammar) = new Consume(grammar)
+  implicit def consume(grammar: Grammar): BiGrammar = new Consume(grammar)
 
-  implicit def print(document: ResponsiveDocument) = new Print(document)
+  implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 
-  implicit def print(document: Document) = new Print(document)
+  implicit def print(document: Document): BiGrammar = new Print(document)
 
   implicit def stringToGrammar(value: String): BiGrammar =
     if (value.forall(c => Character.isLetterOrDigit(c)))
@@ -188,9 +188,5 @@ case class TopBottom(first: BiGrammar, second: BiGrammar) extends BiGrammar with
 case class Print(document: ResponsiveDocument) extends BiGrammar
 
 case class Produce(result: Any) extends BiGrammar
-
-case class RowRepeater(inners: Seq[BiGrammar], construct: Seq[Any] => Any, deconstruct: Any => Option[Seq[Any]]) extends BiGrammar
-{
-}
 
 object BiFailure extends BiGrammar

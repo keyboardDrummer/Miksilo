@@ -15,6 +15,7 @@ object FieldDeclaration extends ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, FieldDescriptorConstant)
 
+  def field(_type: Node, name: String) = new Node(FieldKey, FieldType -> _type, FieldName -> name)
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
 

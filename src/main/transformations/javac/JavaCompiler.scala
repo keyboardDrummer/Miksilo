@@ -37,7 +37,7 @@ object JavaCompiler {
 
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, ConstructorC, SelectorReferenceKind, VariableReferenceKind) ++
+      NewC, FieldDeclarationWithInitializer, ConstructorC, SelectorReferenceKind, VariableReferenceKind) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
