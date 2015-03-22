@@ -3,7 +3,7 @@ package core.particles
 import core.biGrammar.GrammarDocumentWriter
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{NodeLike, Node}
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def transformGrammars(grammars: GrammarCatalogue)
@@ -29,10 +29,10 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   }
 
   def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
-    if (!value.isInstanceOf[Node])
+    if (!value.isInstanceOf[NodeLike])
       return None
 
-    val metaObject = value.asInstanceOf[Node]
+    val metaObject = value.asInstanceOf[NodeLike]
 
     if (metaObject.clazz == key) {
       val first :: rest = fields
@@ -46,7 +46,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     }
   }
 
-  def getWithPartial(meta: Node, key: Any): Any = {
+  def getWithPartial(meta: NodeLike, key: Any): Any = {
     if (key == PartialSelf) meta else meta(key)
   }
 

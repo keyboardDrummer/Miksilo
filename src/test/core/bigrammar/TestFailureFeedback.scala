@@ -14,7 +14,7 @@ class TestFailureFeedback extends GrammarDocumentWriter {
       BiGrammarToDocument.toDocument(input, grammar)
       Assert.fail()
     } catch {
-      case e: PrintFailure =>
+      case e: PrintError =>
     }
   }
 }

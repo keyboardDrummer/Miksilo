@@ -46,7 +46,7 @@ trait ResponsiveDocument {
   }
   def inParenthesis = ResponsiveDocument.text("(") ~ this ~ ")"
 
-  def indent(width: Int) = new WhiteSpace(width,0) ~ this
+  def indent(width: Int = 2) = new WhiteSpace(width,0) ~ this
 
-  override def toString = renderString(false)
+  override def toString = renderString(trim = false)
 }

@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.biGrammar.{BiGrammarToDocument, BiGrammar, PrintFailure}
+import core.biGrammar.{BiGrammar, BiGrammarToDocument, PrintError}
 import core.particles.grammars.ProgramGrammar
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import core.responsiveDocument.ResponsiveDocument
@@ -17,7 +17,7 @@ case class PrettyPrint(recover: Boolean = false) extends Particle
       val grammar = state.data(this).asInstanceOf[BiGrammar]
       val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToDocument.toDocument(state.program, grammar))
       val documentTryWithOptionalRecover: Try[ResponsiveDocument] = if (recover) {
-        documentTry.recover({ case e: PrintFailure => e.toDocument})
+        documentTry.recover({ case e: PrintError => e.toDocument})
       }
       else {
         documentTry

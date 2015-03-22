@@ -20,7 +20,9 @@ class BiGrammarToDocument {
   var cache: Map[LabelWithValue, Try[ResponsiveDocument]] = Map.empty
   
   def toDocumentCached(value: Any, grammar: BiGrammar): Try[ResponsiveDocument] = {
-    grammar match {
+    def nestError(result: Try[ResponsiveDocument]) = result.recoverWith[ResponsiveDocument]({case e: PrintError => Failure(NestedError(value ,grammar, e))})
+
+    val result: Try[ResponsiveDocument] = grammar match {
       case Choice(first, second) => ToDocumentApplicative.or(toDocumentCached(value, second), toDocumentCached(value, first))
       case Consume(StringLiteral) => Try("\"" + value + "\"")
       case Consume(consume) => Try(value.toString)
@@ -29,14 +31,17 @@ class BiGrammarToDocument {
       case labelled: Labelled => labelToDocument(value, labelled)
       case many: ManyHorizontal => foldSequence(value, many.inner, (left, right) => left ~ right)
       case many: ManyVertical => foldSequence(value, many.inner, (left, right) => left % right)
-      case Sequence(first, second) => foldProduct(value, first, second, (left, right) => left ~ right)
-      case TopBottom(top, bottom) => foldProduct(value, top, bottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
+      case sequence: Sequence => foldProduct(value, sequence, (left, right) => left ~ right)
+      case topBottom: TopBottom => foldProduct(value, topBottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
       case mapGrammar: MapGrammar => mapGrammarToDocument(value, mapGrammar)
       case BiFailure => failureToGrammar(value, grammar)
       case Produce(producedValue) => produceToDocument(value, grammar, producedValue)
       case Print(document) => Try(document)
     }
+
+    nestError(result)
   }
+
 
   object EncounteredFailure extends Throwable
   def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {
@@ -68,12 +73,13 @@ class BiGrammarToDocument {
     }
   }
 
-  def foldProduct(value: Any, first: BiGrammar, second: BiGrammar,
+
+  def foldProduct(value: Any, grammar: SequenceLike,
                   combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument): Try[ResponsiveDocument] = {
     for {
-      ~(firstValue, secondValue) <- extractProduct(value)
-      firstDocument = toDocumentCached(firstValue, first)
-      secondDocument = toDocumentCached(secondValue, second)
+      ~(firstValue, secondValue) <- extractProduct(value, grammar)
+      firstDocument = toDocumentCached(firstValue, grammar.first)
+      secondDocument = toDocumentCached(secondValue, grammar.second)
       result <- combineTwo(firstDocument, secondDocument, combine)
     } yield result
   }
@@ -103,11 +109,8 @@ class BiGrammarToDocument {
     }
   }
 
-  def pickBestFailure(left: PrintFailure, right: PrintFailure): Try[ResponsiveDocument] =
-    if (left.depth >= right.depth) Failure(left) else Failure(right)
-
   def emptyFailure(value: Any, inner: Throwable, grammar: BiGrammar = null, depth: Int = 0) =
-    Failure(PrintFailure(depth, Empty, value, grammar, inner))
+    Failure(RootError(depth, Empty, value, grammar, inner))
 
   def combineTwo(first: Try[ResponsiveDocument], second: => Try[ResponsiveDocument],
                  combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument): Try[ResponsiveDocument] = {
@@ -119,23 +122,47 @@ class BiGrammarToDocument {
   }
 
   object ValueWasNotAProduct extends Throwable
-  def extractProduct(value: Any): Try[core.grammar.~[Any, Any]] = value match {
+  def extractProduct(value: Any, grammar: BiGrammar): Try[core.grammar.~[Any, Any]] = value match {
     case ~(left, right) => Try(core.grammar.~(left, right))
     case MissingValue => Try(core.grammar.~(MissingValue, MissingValue))
-    case _ => emptyFailure(value, ValueWasNotAProduct)
+    case _ => emptyFailure(value, ValueWasNotAProduct, grammar)
   }
 }
 
-case class PrintFailure(depth: Int, partial: ResponsiveDocument, value: Any, grammar: BiGrammar, inner: Throwable) extends Throwable {
+trait PrintError extends Throwable
+{
   override def toString = toDocument.renderString()
+  def toDocument: ResponsiveDocument
+  val value: Any
+  val grammar: BiGrammar
+  def partial: ResponsiveDocument
+  val depth: Int
+  def mapPartial(f: ResponsiveDocument => ResponsiveDocument): PrintError
+}
 
-  def toDocument: ResponsiveDocument = ("print failure": ResponsiveDocument) %
+case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extends PrintError
+{
+  def partial = inner.partial
+  def mapPartial(f: ResponsiveDocument => ResponsiveDocument) = NestedError(value, grammar, inner.mapPartial(f))
+  val depth = inner.depth
+
+  override def toDocument = ("Nested:": ResponsiveDocument) % (
+    ("Value:": ResponsiveDocument) ~~ value.toString %
+    ("Grammar:": ResponsiveDocument) ~~ grammar.toString %
+    inner.toDocument).indent()
+}
+
+case class RootError(depth: Int, partial: ResponsiveDocument, value: Any, grammar: BiGrammar, inner: Throwable) extends PrintError {
+
+  def toDocument: ResponsiveDocument = ("print error root": ResponsiveDocument) %
     (s"inner = $inner": ResponsiveDocument) %
     s"value = $value" %
     s"grammar = $grammar" %
     "partial = " % partial.indent(4) %
     (s"depth = $depth": ResponsiveDocument) %
     s"trace = " % inner.getStackTrace.map(e => e.toString: ResponsiveDocument).reduce((a, b) => a % b).indent(4)
+
+  override def mapPartial(f: (ResponsiveDocument) => ResponsiveDocument): PrintError = new RootError(1 + depth, f(partial), value, grammar, inner)
 }
 
 class NonePrintFailureException(e: Throwable) extends RuntimeException
@@ -146,23 +173,21 @@ class NonePrintFailureException(e: Throwable) extends RuntimeException
 object ToDocumentApplicative {
 
   def or(first: Try[ResponsiveDocument], second: Try[ResponsiveDocument]) : Try[ResponsiveDocument] = {
-    first.recoverWith({ case leftFailure: PrintFailure =>
-      second.recoverWith({ case rightFailure: PrintFailure =>
+    first.recoverWith({ case leftFailure: PrintError =>
+      second.recoverWith({ case rightFailure: PrintError =>
         combineOrFailures(leftFailure, rightFailure)
       })
     })
   }
 
-  private def combineOrFailures(left: PrintFailure, right: PrintFailure): Try[ResponsiveDocument] =
-    if (left.depth >= right.depth) Failure(PrintFailure(left.depth, left.partial, left.value, left.grammar | right.grammar, left.inner))
-    else Failure(PrintFailure(right.depth, right.partial, right.value, left.grammar | right.grammar, right.inner))
+  private def combineOrFailures(left: PrintError, right: PrintError): Try[ResponsiveDocument] =
+    if (left.depth >= right.depth) Failure(left) else Failure(right)
 
   def bind(first: Try[ResponsiveDocument => ResponsiveDocument], second: Try[ResponsiveDocument]) : Try[ResponsiveDocument] = {
     first match {
       case Success(f) => second match {
         case Success(secondSuccess) => Success(f(secondSuccess))
-        case Failure(PrintFailure(depth, partial, value, grammar, inner)) =>
-          Failure(new PrintFailure(depth + 1, f(partial), value, grammar, inner))
+        case Failure(printError: PrintError) => Failure(printError.mapPartial(f))
         case Failure(e: NonePrintFailureException) => throw e
         case Failure(e: Throwable) => throw new NonePrintFailureException(e)
       }
