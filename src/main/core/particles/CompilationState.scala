@@ -1,6 +1,6 @@
 package core.particles
 
-import core.biGrammar.BiFailure
+import core.bigrammar.BiFailure
 import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, Node$}

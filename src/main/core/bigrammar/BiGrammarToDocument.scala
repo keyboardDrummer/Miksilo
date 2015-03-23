@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 import java.util.Objects
 
@@ -41,7 +41,6 @@ class BiGrammarToDocument {
 
     nestError(result)
   }
-
 
   object EncounteredFailure extends Throwable
   def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {

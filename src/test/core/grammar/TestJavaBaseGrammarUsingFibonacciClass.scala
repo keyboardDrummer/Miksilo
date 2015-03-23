@@ -1,6 +1,6 @@
 package core.grammar
 
-import core.biGrammar.TestGrammarUtils
+import core.bigrammar.TestGrammarUtils
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.classes._

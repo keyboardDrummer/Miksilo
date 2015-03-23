@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Grammar, Identifier, NumberG, PrintGrammar, ~}

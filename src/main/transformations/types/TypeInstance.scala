@@ -1,6 +1,6 @@
 package transformations.types
 
-import core.biGrammar.BiGrammar
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}

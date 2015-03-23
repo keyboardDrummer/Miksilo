@@ -1,6 +1,6 @@
 package transformations.bytecode.constants
 
-import core.biGrammar.BiGrammar
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.Node

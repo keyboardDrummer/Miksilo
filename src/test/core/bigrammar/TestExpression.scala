@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 case class Value(value: Int) extends TestExpression {
   override def compute = value

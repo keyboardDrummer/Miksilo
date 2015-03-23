@@ -1,6 +1,6 @@
 package core.grammar
 
-import core.biGrammar.BiGrammarToGrammar
+import core.bigrammar.BiGrammarToGrammar
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.responsiveDocument.ResponsiveDocument
 

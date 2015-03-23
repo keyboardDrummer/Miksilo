@@ -2,7 +2,7 @@ package core.particles.grammars
 
 import java.util.NoSuchElementException
 
-import core.biGrammar._
+import core.bigrammar._
 
 class GrammarCatalogue {
 

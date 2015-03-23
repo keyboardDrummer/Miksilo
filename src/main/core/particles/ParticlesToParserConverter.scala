@@ -1,6 +1,6 @@
 package core.particles
 
-import core.biGrammar.{BiGrammarToGrammar, Labelled}
+import core.bigrammar.{BiGrammarToGrammar, Labelled}
 import core.grammar.GrammarToParserConverter
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 

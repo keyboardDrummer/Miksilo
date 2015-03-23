@@ -1,6 +1,6 @@
 package transformations.javac.expressions.literals
 
-import core.biGrammar.BiGrammar
+import core.bigrammar.BiGrammar
 import core.grammar.RegexG
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node

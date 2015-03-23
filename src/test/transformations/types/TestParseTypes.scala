@@ -1,6 +1,6 @@
 package transformations.types
 
-import core.biGrammar.TestGrammarUtils
+import core.bigrammar.TestGrammarUtils
 import org.junit.{Assert, Test}
 import transformations.javac.classes.QualifiedClassName
 

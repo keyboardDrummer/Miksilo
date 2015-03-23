@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 import org.junit.{Ignore, Test}
 

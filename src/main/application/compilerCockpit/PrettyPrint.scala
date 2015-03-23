@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.biGrammar.{BiGrammar, BiGrammarToDocument, PrintError}
+import core.bigrammar.{BiGrammar, BiGrammarToDocument, PrintError}
 import core.particles.grammars.ProgramGrammar
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import core.responsiveDocument.ResponsiveDocument

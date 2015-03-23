@@ -1,6 +1,6 @@
 package core.particles
 
-import core.biGrammar.GrammarDocumentWriter
+import core.bigrammar.GrammarDocumentWriter
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{NodeLike, Node}

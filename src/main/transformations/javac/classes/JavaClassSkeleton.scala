@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.biGrammar.{BiGrammar, MapGrammar}
+import core.bigrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}

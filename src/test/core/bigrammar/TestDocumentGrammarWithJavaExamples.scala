@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 import application.compilerCockpit._
 import core.particles.{CompilerFromParticles, Particle, ParticleWithGrammar}

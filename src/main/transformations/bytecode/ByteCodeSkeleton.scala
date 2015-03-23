@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.biGrammar.BiGrammar
+import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._

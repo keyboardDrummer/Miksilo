@@ -1,4 +1,4 @@
-package core.biGrammar
+package core.bigrammar
 
 import core.grammar.{NumberG, ~}
 import org.junit.Test

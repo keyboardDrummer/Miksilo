@@ -1,6 +1,6 @@
 package transformations.bytecode.attributes
 
-import core.biGrammar.{BiGrammar, ManyVertical}
+import core.bigrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
