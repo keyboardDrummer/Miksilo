@@ -50,7 +50,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
 
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
-    val fieldInitializerMethod = MethodC.method("fieldInitialiser",VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
+    val fieldInitializerMethod = MethodC.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
     val members: Seq[Node] = JavaClassSkeleton.getMembers(program)
     program(JavaClassSkeleton.Members) = Seq(fieldInitializerMethod) ++ members
 
@@ -59,10 +59,14 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
-        val callToFieldInitialiser = ExpressionAsStatementC.asStatement(CallC.call(VariableC.variable("fieldInitialiser")))
+        val callToFieldInitialiser = ExpressionAsStatementC.asStatement(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
         constructor(MethodC.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }
+  }
+
+  def getFieldInitialiserMethodName: String = { //TODO make sure this name doesn't collide with other method names.
+    "fieldInitialiser"
   }
 
   def statementIsSuperCall(statement: Node): Boolean = {
