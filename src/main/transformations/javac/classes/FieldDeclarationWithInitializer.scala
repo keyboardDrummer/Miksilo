@@ -4,10 +4,12 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
-import transformations.javac.methods.VariableC
+import transformations.javac.constructor.{ConstructorC, SuperCallExpression}
+import transformations.javac.methods.{CallC, MethodC, VariableC}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
+import transformations.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -33,6 +35,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
     val assignmentStatement = ExpressionAsStatementC.asStatement(assignment)
     initializerStatements += assignmentStatement
     fieldWithInitialiser.replaceWith(declaration)
+
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
@@ -41,5 +44,29 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })
+
+    if (initializerStatements.isEmpty)
+      return
+
+    val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
+
+    val fieldInitializerMethod = MethodC.method("fieldInitialiser",VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
+    val members: Seq[Node] = JavaClassSkeleton.getMembers(program)
+    program(JavaClassSkeleton.Members) = Seq(fieldInitializerMethod) ++ members
+
+    for(constructor <- members.filter(member => member.clazz == ConstructorC.ConstructorKey)) {
+      val body = MethodC.getMethodBody(constructor)
+      if (statementIsSuperCall(body.head)) {
+        val bodyAfterHead = body.drop(1)
+        val head = body.head
+        val callToFieldInitialiser = ExpressionAsStatementC.asStatement(CallC.call(VariableC.variable("fieldInitialiser")))
+        constructor(MethodC.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
+      }
+    }
+  }
+
+  def statementIsSuperCall(statement: Node): Boolean = {
+    statement.clazz == ExpressionAsStatementC.key &&
+      ExpressionAsStatementC.getExpression(statement).clazz == SuperCallExpression.SuperCall
   }
 }

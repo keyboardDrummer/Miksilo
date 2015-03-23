@@ -6,7 +6,6 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.types.IntTypeC
 
 object LoadIntegerC extends InstructionC {
@@ -17,7 +16,7 @@ object LoadIntegerC extends InstructionC {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
-    val location = arguments(0)
+    val location = arguments.head
     if (location > 3)
       hexToBytes("15") ++ byteToBytes(location)
     else
