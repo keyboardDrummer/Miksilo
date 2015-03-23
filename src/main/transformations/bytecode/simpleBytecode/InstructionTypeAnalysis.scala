@@ -19,7 +19,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Node])
   def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature
   
   case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
-    override def toString = s"StackDoesNotFitInstructionInput: instruction= $instruction; inputTypes= $inputTypes; stack= $stack"
+    override def toString = s"StackDoesNotFitInstructionInput: instruction = $instruction; inputTypes = $inputTypes; stack = $stack"
   }
 
   case class TargetInstructionEnteredWithDifferentLayouts(first: ProgramTypeState, second: ProgramTypeState) extends RuntimeException

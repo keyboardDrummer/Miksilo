@@ -38,7 +38,7 @@ abstract class InvokeC extends InstructionC {
   }
 
   def getInvokeTargetMethodRef(instruction: Node, constantPool: ConstantPool) = {
-    val location = CodeAttribute.getInstructionArguments(instruction)(0)
+    val location = CodeAttribute.getInstructionArguments(instruction).head
     constantPool.getValue(location).asInstanceOf[Node]
   }
 

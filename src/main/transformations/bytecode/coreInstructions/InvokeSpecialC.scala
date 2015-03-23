@@ -13,7 +13,7 @@ object InvokeSpecialC extends InvokeC {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
-    hexToBytes("b7") ++ shortToBytes(arguments(0))
+    hexToBytes("b7") ++ shortToBytes(arguments.head)
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
