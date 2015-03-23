@@ -5,9 +5,6 @@ class FieldMethodMix {
     int y = z;
     int a = bla();
 
-    FieldMethodMix() {
-    }
-
     FieldMethodMix(int c) {
         b = c;
     }
@@ -23,4 +20,12 @@ class FieldMethodMix {
     int bloe() { return b; }
 
     int b = bloe();
+
+    public static void main(String[] args) {
+        new FieldMethodMix(5).print();
+    }
+
+    void print() {
+        System.out.print(x + z + y + a + b);
+    }
 }
