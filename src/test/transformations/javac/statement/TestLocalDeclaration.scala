@@ -1,6 +1,7 @@
 package transformations.javac.statement
 
-import org.junit.Test
+import jdk.nashorn.internal.ir.annotations.Ignore
+import org.junit.{Assert, Test}
 import util.TestUtils
 
 class TestLocalDeclaration {
@@ -13,5 +14,11 @@ class TestLocalDeclaration {
   @Test
   def testWhileBlockScoping() {
     TestUtils.compareWithJavacAfterRunning("WhileBlockScoping.java")
+  }
+  
+  @Ignore
+  @Test
+  def testIfElseWhereBothBranchesDefineSameVariableAndItIsUsedAfterwards() = {
+    Assert.fail()
   }
 }
