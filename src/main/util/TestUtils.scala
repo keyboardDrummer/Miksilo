@@ -66,7 +66,8 @@ class TestUtils(val compiler: CompilerFromParticles) {
     compiler.parseAndTransform(input).program
   }
 
-  def getJavaTestFile(className: String, inputDirectory: Path): File = {
+  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): File = {
+    val className = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     getTestFile(relativeFilePath)
   }
@@ -90,7 +91,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   def compareWithJavacAfterRunning(fileName: String, inputDirectory: Path = Path("")) {
-    val className = if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
+    val className = fileNameToClassName(fileName)
 
     val relativeFilePath = inputDirectory / (className + ".java")
     val input: File = File(testResources / relativeFilePath)
@@ -112,6 +113,10 @@ class TestUtils(val compiler: CompilerFromParticles) {
       case e: AssertionError =>
         throw new AssertionError(getErrorMessage(className, inputDirectory, expectedOutputDirectory, state, e))
     }
+  }
+
+  def fileNameToClassName(fileName: String): String = {
+    if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
   }
 
   def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: CompilationState, e: AssertionError): String = {

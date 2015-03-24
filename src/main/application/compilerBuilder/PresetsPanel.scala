@@ -10,8 +10,12 @@ import application.compilerCockpit.MarkOutputGrammar
 import core.particles.Particle
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
-import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
+import transformations.javac.classes.FieldDeclarationWithInitializer
+import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
+import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
+import transformations.javac.statements.ForLoopC
+import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
 class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel(new GridBagLayout()) {
 
@@ -28,7 +32,17 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     val model: DefaultListModel[Preset] = createModel
 
     StyleSheet.setTitleBorder(this, "Presets")
-    val presetsList = new JList(model)
+    val presetsList = new JList(model) {
+      override def getToolTipText(event: MouseEvent): String = {
+        val index = this.locationToIndex(event.getPoint)
+        val model = this.getModel
+        val text: String = model.getElementAt(index).description
+        if (text.isEmpty)
+          return null;
+        text
+      }
+    }
+
     presetsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
     presetsList.addMouseListener(new MouseAdapter {
       override def mouseClicked(e: MouseEvent): Unit = {
@@ -58,6 +72,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     model.addElement(getPrettyPrintPreset)
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
+    model.addElement(getRevealSyntaxSugar)
     model
   }
 
@@ -88,6 +103,14 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
+  def getRevealSyntaxSugar: Preset = {
+    val implicits = Seq[Particle](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
+      ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
+
+    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)), "Performs all compiler phases that still maintain a valid Java program.")
+  }
+
   def getApplyButton(presetsList: JList[Preset]): JButton = {
     val applyButton = new JButton()
     applyButton.setText("Apply")
@@ -111,6 +134,6 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   }
 }
 
-case class Preset(name: String, particles: Seq[Particle]) {
+case class Preset(name: String, particles: Seq[Particle], description: String = "") {
   override def toString = name
 }
