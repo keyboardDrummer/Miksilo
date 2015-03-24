@@ -66,7 +66,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
   }
 
   def getFieldInitialiserMethodName: String = { //TODO make sure this name doesn't collide with other method names.
-    "fieldInitialiser"
+    "initialiseFields"
   }
 
   def statementIsSuperCall(statement: Node): Boolean = {

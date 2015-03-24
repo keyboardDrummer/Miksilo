@@ -22,6 +22,7 @@ object JavaLang {
   val javaIO = javaPackage.newPackageInfo(ioPackageName)
   val printStreamClass = javaIO.newClassInfo("PrintStream")
   printStreamClass.newMethodInfo("print", MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType)), _static = false)
+  printStreamClass.newMethodInfo("println", MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType)), _static = false)
 
   val stringClass = langPackage.newClassInfo("String")
 }
