@@ -19,13 +19,13 @@ object NewC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
-    val newGrammar = "new" ~> objectGrammar ~ callArgumentsGrammar ^^
+    val newGrammar = "new" ~~> objectGrammar ~ callArgumentsGrammar ^^
       parseMap(NewCallKey, NewObject, CallC.CallArguments)
     val expressionGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallC)
+  override def dependencies: Set[Contract] = Set(CallC, NewByteCodeC, InvokeSpecialC)
 
   override val key: AnyRef = NewCallKey
 
