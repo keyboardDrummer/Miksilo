@@ -17,7 +17,7 @@ object Node {
   }
 }
 
-class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLike {
+class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLike { // TODO rename Node to something that imports more easily.
   type Self = Node
 
   def replaceWith(node: Node): Unit = {

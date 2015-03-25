@@ -3,7 +3,8 @@ package core.particles
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.expressions.literals.IntLiteralC
-import transformations.javac.methods.{CallC, MemberSelector, VariableC}
+import transformations.javac.methods.call.CallC
+import transformations.javac.methods.{MemberSelector, VariableC}
 
 class TestMetaObject {
 

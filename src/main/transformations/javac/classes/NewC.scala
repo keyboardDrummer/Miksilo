@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.javac.methods.CallC
+import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
 import transformations.types.ObjectTypeC
 
 object NewC extends ExpressionInstance {
@@ -25,7 +25,7 @@ object NewC extends ExpressionInstance {
     expressionGrammar.addOption(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallC, NewByteCodeC, InvokeSpecialC)
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeC, InvokeSpecialC) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
   override val key: AnyRef = NewCallKey
 

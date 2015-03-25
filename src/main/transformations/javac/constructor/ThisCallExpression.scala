@@ -6,7 +6,7 @@ import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.javac.methods.CallC
+import transformations.javac.methods.call.{CallC}
 import transformations.types.VoidTypeC
 
 object ThisCallExpression extends ExpressionInstance {

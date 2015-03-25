@@ -3,11 +3,12 @@ package transformations.javac
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, Root, SequenceSelection, Selection}
+import core.particles.path.{Path, Root, Selection, SequenceSelection}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.{CallC, MemberSelector, MethodC, VariableC}
+import transformations.javac.methods.call.CallC
+import transformations.javac.methods.{MemberSelector, MethodC, VariableC}
 
 object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with ParticleWithGrammar {
   val thisName: String = "this"

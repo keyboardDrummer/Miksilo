@@ -7,14 +7,15 @@ import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
+import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC._
-import transformations.javac.methods.{CallC, MethodC}
+import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements.BlockC
 import transformations.types.VoidTypeC
 
 object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodC, CallC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 

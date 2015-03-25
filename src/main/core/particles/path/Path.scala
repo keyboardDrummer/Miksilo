@@ -6,7 +6,7 @@ object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
 }
 
-trait Path extends NodeLike {
+trait Path extends NodeLike { //TODO rename path to something that imports more easily.
   type Self = Path
   val current: Node
 

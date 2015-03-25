@@ -5,8 +5,9 @@ import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
 import transformations.javac.constructor.{ConstructorC, SuperCallExpression}
-import transformations.javac.methods.{CallC, MethodC, VariableC}
 import transformations.javac.methods.assignment.AssignmentSkeleton
+import transformations.javac.methods.call.CallC
+import transformations.javac.methods.{MethodC, VariableC}
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 import transformations.types.VoidTypeC

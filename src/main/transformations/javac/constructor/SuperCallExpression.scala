@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{JavaClassSkeleton, MethodId}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.javac.methods.CallC
+import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
 import transformations.javac.statements.StatementSkeleton
 import transformations.types.VoidTypeC
 
@@ -16,7 +16,7 @@ object SuperCallExpression extends ExpressionInstance {
   override val key: AnyRef = SuperCall
   val constructorName: String = "<init>"
 
-  override def dependencies: Set[Contract] = Set(CallC) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC) ++ super.dependencies
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallC.CallArguments -> arguments)
 

@@ -10,6 +10,7 @@ import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
+import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 

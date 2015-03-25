@@ -25,8 +25,9 @@ import transformations.javac.expressions.prefix.NotC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentC}
+import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements._
-import transformations.javac.statements.locals.{LocalDeclarationWithInitializerC, LocalDeclarationC}
+import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 import transformations.types._
 
 object JavaCompiler {
@@ -46,7 +47,7 @@ object JavaCompiler {
   def fields = Seq(FieldDeclaration, AssignToMember)
 
   def javaMethod = Seq(ForLoopC, LocalDeclarationWithInitializerC) ++
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallC, SelectField, MemberSelector) ++ methodBlock
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
