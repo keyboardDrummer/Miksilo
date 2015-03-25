@@ -54,22 +54,38 @@ object CallC extends ExpressionInstance {
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
-    val callCallee = getCallCallee(call)
-    val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val methodKey: MethodId = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
+    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
+    if (staticCall)
+    {
+      getStaticCallInstructions(call, state, methodRefIndex)
+    } else
+    {
+      getInstanceCallInstructions(call, state, compiler, methodRefIndex)
+    }
+  }
+
+  def getStaticCallInstructions(call: Path, state: CompilationState, methodRefIndex: Int): Seq[Node] = {
+    val calleeInstructions = Seq[Node]()
+    val invokeInstructions = Seq(InvokeStaticC.invokeStatic(methodRefIndex))
+    getGenericCallInstructions(call, state, calleeInstructions, invokeInstructions)
+  }
+
+  def getInstanceCallInstructions(call: Path, state: CompilationState, compiler: ClassCompiler, methodRefIndex: Int): Seq[Node] = {
+    val callCallee = getCallCallee(call)
+    val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compiler.state)
-    val calleeInstructions =
-      if (!staticCall) expressionToInstruction(objectExpression)
-      else Seq[Node]()
+    val calleeInstructions = expressionToInstruction(objectExpression)
+    val invokeInstructions = Seq(InvokeVirtualC.invokeVirtual(methodRefIndex))
+    getGenericCallInstructions(call, state, calleeInstructions, invokeInstructions)
+  }
+
+  def getGenericCallInstructions(call: Path, state: CompilationState, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
+    val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val callArguments = getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
-    val invokeInstructions = Seq(if (staticCall)
-      InvokeStaticC.invokeStatic(methodRefIndex)
-    else
-      InvokeVirtualC.invokeVirtual(methodRefIndex))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 

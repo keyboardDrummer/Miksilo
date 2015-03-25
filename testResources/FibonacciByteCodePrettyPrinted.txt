@@ -12,22 +12,22 @@ constant pool:
   #9: Code
   #10: "main"
   #11: void (java.lang.String[])
-  #12: java.lang.System
+  #12: java.io.PrintStream
   #13: class reference: 12
-  #14: "out"
-  #15: Tjava.io.PrintStream
+  #14: "print"
+  #15: void (int)
   #16: name and type: 14:15
-  #17: field reference: 13.16
-  #18: "fibonacci"
-  #19: int (int)
-  #20: name and type: 18:19
-  #21: method reference: 2.20
-  #22: java.io.PrintStream
-  #23: class reference: 22
-  #24: "print"
-  #25: void (int)
+  #17: method reference: 13.16
+  #18: java.lang.System
+  #19: class reference: 18
+  #20: "out"
+  #21: Tjava.io.PrintStream
+  #22: name and type: 20:21
+  #23: field reference: 19.22
+  #24: "fibonacci"
+  #25: int (int)
   #26: name and type: 24:25
-  #27: method reference: 23.26
+  #27: method reference: 2.26
   #28: StackMapTable
 
 fields:
@@ -46,14 +46,14 @@ methods:
   attributes:
     code: nameIndex:9, maxStack:2, maxLocal:1
     instructions:
-      get static(17)
+      get static(23)
       integer constant(5)
-      invoke static(21)
-      invoke virtual(27)
+      invoke static(27)
+      invoke virtual(17)
       void return instruction()
     attributes:
     exceptions:
-  nameIndex:18, descriptorIndex:19, flags:ACC_STATIC, ACC_PUBLIC
+  nameIndex:24, descriptorIndex:25, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:3, maxLocal:1
     instructions:
@@ -65,11 +65,11 @@ methods:
       load integer(0)
       integer constant(1)
       subtract integer()
-      invoke static(21)
+      invoke static(27)
       load integer(0)
       integer constant(2)
       subtract integer()
-      invoke static(21)
+      invoke static(27)
       add integers()
       integer return instruction()
     attributes:
