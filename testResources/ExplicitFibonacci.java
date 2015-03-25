@@ -1,7 +1,7 @@
 import java.lang.*;
 class Fibonacci extends Object
 {
-    public  void <init>()
+    public void <init>()
     {
         super();
         return;
