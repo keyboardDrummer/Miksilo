@@ -55,7 +55,7 @@ class TestDocumentGrammarWithJavaExamples {
   @Test
   def testPrintAfterImplicitAddition() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
-    val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci", Path("")).slurp()
+    val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
