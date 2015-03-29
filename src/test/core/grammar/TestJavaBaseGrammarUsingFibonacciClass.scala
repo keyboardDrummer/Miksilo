@@ -26,7 +26,6 @@ class TestJavaBaseGrammarUsingFibonacciClass {
 
   @Test
   def testMainExpression() {
-
     val input = "System.out.print(fibonacci(5))"
     val result: Any = getExpressionGrammarResult(input)
     val expectation = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),

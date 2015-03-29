@@ -30,7 +30,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   def getMethodInstructions(method: Node) =
-    CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method)(0))
+    CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method).head)
 
   def printByteCode(byteCode: Node): String = {
     PrintByteCode.printBytes(getBytes(byteCode))
