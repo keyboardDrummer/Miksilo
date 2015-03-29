@@ -8,6 +8,8 @@ import transformations.javac.classes.{JavaClassSkeleton, MethodId}
 
 object CallStaticC extends GenericCall {
 
+  override def description: String = "Enables calling static methods."
+
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 

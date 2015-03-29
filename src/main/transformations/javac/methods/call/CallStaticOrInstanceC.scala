@@ -7,6 +7,8 @@ import transformations.javac.classes._
 
 object CallStaticOrInstanceC extends GenericCall {
 
+  override def description: String = "Enables calling static and virtual methods."
+
   override def dependencies: Set[Contract] = CallStaticC.dependencies ++ CallInstanceC.dependencies
 
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {

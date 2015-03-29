@@ -10,6 +10,8 @@ import transformations.javac.methods.MemberSelector
 
 object CallInstanceC extends GenericCall {
 
+  override def description: String = "Enables calling instance methods."
+
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 

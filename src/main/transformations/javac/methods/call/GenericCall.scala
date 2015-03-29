@@ -71,6 +71,4 @@ trait GenericCall extends ExpressionInstance {
     val member = MemberSelector.getSelectorMember(callCallee)
     new MethodId(kind.info.getQualifiedName, member)
   }
-
-  override def description: String = "Enables calling static and virtual methods."
 }
