@@ -20,6 +20,12 @@ object Node {
 class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLike { // TODO rename Node to something that imports more easily.
   type Self = Node
 
+  def shallowClone: Node = {
+    val result = new Node(clazz)
+    result.data ++= data
+    result
+  }
+
   def replaceWith(node: Node): Unit = {
     clazz = node.clazz
     data.clear()

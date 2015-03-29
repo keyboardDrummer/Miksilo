@@ -3,15 +3,17 @@ package transformations.bytecode.attributes
 import core.bigrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import ClassFileParser._
 
 object InstructionArgumentsKey
 
-object CodeAttribute extends ParticleWithGrammar with WithState {
+object CodeAttribute extends ByteCodeAttribute with WithState {
 
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
@@ -98,7 +100,7 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
   def getCodeInstructions(code: Node) = code(CodeInstructionsKey).asInstanceOf[Seq[Node]]
 
 
-  object CodeKey
+  object CodeKey extends Key
 
   object CodeMaxStackKey
 
@@ -113,8 +115,10 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
   object InstructionGrammar
 
   object CodeGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
+
+  override def key: Key = CodeKey
+
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
@@ -123,9 +127,10 @@ object CodeAttribute extends ParticleWithGrammar with WithState {
     val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
       parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, CodeMaxStackKey, CodeMaxLocalsKey,
         CodeInstructionsKey, CodeAttributesKey, CodeExceptionTableKey)
-
-    attributeGrammar.addOption(grammars.create(CodeGrammar, codeAttributeGrammar))
+    grammars.create(CodeGrammar, codeAttributeGrammar)
   }
+
+  override def constantPoolKey: String = "Code"
 
   override def description: String = "Adds a new bytecode attribute named code. Its main content is a list of instructions."
 }

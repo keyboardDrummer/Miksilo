@@ -2,14 +2,14 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.node.{Key, Node}
+import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.types.ObjectTypeC.ObjectTypeName
-import transformations.types.{ObjectTypeC, LongTypeC, IntTypeC, TypeSkeleton}
+import transformations.types.{TypeSkeleton, IntTypeC, LongTypeC, ObjectTypeC}
 
-object StackMapTableAttribute extends ParticleWithGrammar {
+object StackMapTableAttribute extends ByteCodeAttribute {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -35,7 +35,7 @@ object StackMapTableAttribute extends ParticleWithGrammar {
 
   object SameFrameKey
 
-  object StackMapTableKey
+  object StackMapTableKey extends Key
 
   object StackMapTableMaps
 
@@ -64,23 +64,6 @@ object StackMapTableAttribute extends ParticleWithGrammar {
   def sameFrame(offset: Int) = new Node(SameFrameKey, OffsetDelta -> offset)
 
   object StackMapTableGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
-    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
-    constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
-
-    val parseType : BiGrammar = grammars.find(TypeSkeleton.TypeGrammar)
-    val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> integer % parseType.indent() ^^
-      parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
-    val appendFrameGrammar = "append frame, delta:" ~> integer % parseType.manyVertical.indent() ^^
-      parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
-    val sameFrameGrammar = "same frame, delta:" ~> integer ^^ parseMap(SameFrameKey, OffsetDelta)
-    val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
-    val stackMapTableGrammar = "sm nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
-      parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
-
-    grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammars.create(StackMapTableGrammar, stackMapTableGrammar))
-  }
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -129,4 +112,26 @@ object StackMapTableAttribute extends ParticleWithGrammar {
     "For these targets, the stack map table specifies a stack frame." +
     "Each stack from provides information on the current types on the stack and in the local registers." +
     "Given a frame at and the frames before it, all stack and local types are fully defined at the location of that frame."
+
+  override def key: Key = StackMapTableKey
+
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
+    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
+    constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
+
+    val parseType : BiGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> integer % parseType.indent() ^^
+      parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
+    val appendFrameGrammar = "append frame, delta:" ~> integer % parseType.manyVertical.indent() ^^
+      parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
+    val sameFrameGrammar = "same frame, delta:" ~> integer ^^ parseMap(SameFrameKey, OffsetDelta)
+    val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
+    val stackMapTableGrammar = "sm nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
+      parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
+
+    grammars.create(StackMapTableGrammar, stackMapTableGrammar)
+  }
+
+  override def constantPoolKey: String = "StackMapTable"
 }

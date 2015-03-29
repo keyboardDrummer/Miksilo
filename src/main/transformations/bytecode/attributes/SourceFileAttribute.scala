@@ -1,15 +1,16 @@
 package transformations.bytecode.attributes
 
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.node.{Key, Node}
+import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
 import transformations.bytecode.PrintByteCode._
 
-object SourceFileAttribute extends ParticleWithGrammar {
+object SourceFileAttribute extends ByteCodeAttribute {
 
-  object SourceFileAttributeKey
+  object SourceFileAttributeKey extends Key
 
   object SourceFileFileNameIndex
 
@@ -33,11 +34,13 @@ object SourceFileAttribute extends ParticleWithGrammar {
 
   def getSourceFileFileNameIndex(sourceFile: Node) = sourceFile(SourceFileFileNameIndex).asInstanceOf[Int]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-
-  }
-
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
 
   override def description: String = "Defines the source file attribute. It identifies which source file a particular class file was compiled from."
+
+  override def key: Key = SourceFileAttributeKey
+
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = null
+
+  override def constantPoolKey: String = "SourceFile"
 }

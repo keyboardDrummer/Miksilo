@@ -69,7 +69,8 @@ object JavaCompiler {
   def constantEntryParticles = Seq(FieldRefConstant, MethodRefConstant, NameAndType, ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant,
     FieldDescriptorConstant, IntegerConstant, StringConstant)
 
-  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable, CodeAttribute, UnParsedAttribute)
+  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable,
+    CodeAttribute, ExceptionsAttribute, SignatureAttribute)
   def byteCodeWithoutInstructions = {
     bytecodeAttributes ++ constantEntryParticles ++
       Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++

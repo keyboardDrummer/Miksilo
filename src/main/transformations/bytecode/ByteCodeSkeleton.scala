@@ -6,6 +6,7 @@ import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node}
+import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 
 object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
@@ -48,6 +49,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
   class State {
     var constantPool: ConstantPool = null
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
+    val attributes = new ClassRegistry[ByteCodeAttribute]
   }
 
   object AttributeKey
