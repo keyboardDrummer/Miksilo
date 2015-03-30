@@ -120,7 +120,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
-    val parseType : BiGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val sameLocals1StackItemGrammar = "same locals, 1 stack item, delta:" ~> integer % parseType.indent() ^^
       parseMap(SameLocals1StackItem, OffsetDelta, SameLocals1StackItemType)
     val appendFrameGrammar = "append frame, delta:" ~> integer % parseType.manyVertical.indent() ^^

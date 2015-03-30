@@ -19,7 +19,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseDeclarationWithInitializer = grammars.create(this, typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";" ^^
       parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey))

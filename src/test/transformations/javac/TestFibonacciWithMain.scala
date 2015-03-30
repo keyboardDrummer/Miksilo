@@ -9,14 +9,12 @@ class TestFibonacciWithMain {
 
   @Test
   def test() {
-    val inputDirectory = Path("")
-    TestUtils.compareWithJavacAfterRunning("Fibonacci", inputDirectory)
+    TestUtils.compareWithJavacAfterRunning("Fibonacci")
   }
 
   @Test
   def testInstanceMethod() {
-    val inputDirectory = Path("")
-    TestUtils.compareWithJavacAfterRunning("FibonacciInstanceMethod", inputDirectory)
+    TestUtils.compareWithJavacAfterRunning("FibonacciInstanceMethod")
   }
 
 }

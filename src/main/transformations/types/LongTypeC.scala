@@ -1,16 +1,17 @@
 package transformations.types
 
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.BiGrammar
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Key, Node}
 
-object LongTypeC extends TypeInstance {
+object LongTypeC extends TypeInstance with StackType {
 
-  override val key: AnyRef = LongTypeKey
+  override val key = LongTypeKey
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeString(_type: Node, state: CompilationState): String = "J"
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "J" ~> produce(longType)
 
   override def getStackSize: Int = 2
 
@@ -20,7 +21,7 @@ object LongTypeC extends TypeInstance {
 
   def longType = new Node(LongTypeKey)
 
-  object LongTypeKey
+  object LongTypeKey extends Key
 
   override def description: String = "Defines the long type."
 }

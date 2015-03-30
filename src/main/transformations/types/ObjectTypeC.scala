@@ -3,12 +3,12 @@ package transformations.types
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.QualifiedClassName
 
-object ObjectTypeC extends TypeInstance {
-  override val key: AnyRef = ObjectTypeKey
+object ObjectTypeC extends TypeInstance with StackType {
+  override val key = ObjectTypeKey
   val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = {
@@ -42,8 +42,18 @@ object ObjectTypeC extends TypeInstance {
   def objectType(className: String) = new Node(ObjectTypeKey,
     ObjectTypeName -> Left(className))
 
-  override def getByteCodeString(_type: Node, state: CompilationState): String =
-    s"L${getObjectTypeName(_type).right.get.parts.mkString("/")};"
+
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    val construct: Any => Any = {
+      case ids: Seq[Any] =>
+        val stringIds = ids.collect({ case v: String => v})
+        Right(new QualifiedClassName(stringIds))
+    }
+    def deconstruct(value: Any): Option[Any] = Some(value match {
+      case Right(QualifiedClassName(stringIds)) => stringIds
+    })
+    "L" ~> identifier.someSeparated("/") <~ ";" ^^(construct, deconstruct)^^ parseMap(ObjectTypeKey, ObjectTypeName)
+  }
 
   def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String, QualifiedClassName]]
 
@@ -51,7 +61,7 @@ object ObjectTypeC extends TypeInstance {
 
   object ObjectTypeName
 
-  object ObjectTypeKey
+  object ObjectTypeKey extends Key
 
   override def getStackType(_type: Node, state: CompilationState): Node = {
     ObjectTypeC.stackObjectType(ByteCodeSkeleton.getConstantPool(state).getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))

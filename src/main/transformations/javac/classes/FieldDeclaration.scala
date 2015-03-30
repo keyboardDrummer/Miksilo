@@ -78,7 +78,7 @@ object FieldDeclaration extends ParticleWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = typeGrammar ~~ identifier <~ ";" ^^ parseMap(FieldKey, FieldType, FieldName)
     memberGrammar.addOption(fieldGrammar)

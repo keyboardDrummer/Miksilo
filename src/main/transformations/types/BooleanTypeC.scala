@@ -1,16 +1,18 @@
 package transformations.types
 
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 
-object BooleanTypeC extends TypeInstance {
-  override val key: AnyRef = BooleanTypeKey
+object BooleanTypeC extends TypeInstance
+  with StackType //TODO remove this and change VariablePool accordingly.
+{
+  override val key = BooleanTypeKey
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq.empty
 
-  override def getByteCodeString(_type: Node, state: CompilationState): String = "Z"
-
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "Z" ~> produce(booleanType)
 
   override def getStackType(_type: Node, state: CompilationState): Node = IntTypeC.intType
 
@@ -20,9 +22,10 @@ object BooleanTypeC extends TypeInstance {
 
   def booleanType = new Node(BooleanTypeKey)
 
-  override def getStackSize: Int = 1
 
-  object BooleanTypeKey
+  object BooleanTypeKey extends Key
 
   override def description: String = "Defines the boolean type."
+
+  override def getStackSize: Int = IntTypeC.getStackSize
 }

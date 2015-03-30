@@ -20,19 +20,9 @@ class CompilationState {
 
   def getGUID: Long = Random.nextLong()
 
-
   def parseString(input: String): Unit = {
     val manager = new ParticlesToParserConverter()
-    val parser = manager.buildParser(grammarCatalogue)
-
-    val parseResult = parser(input)
-    if (!parseResult.successful)
-      throw new ParseException(parseResult.toString)
-
-    if(!parseResult.next.atEnd)
-      throw new ParseException("Did not parse until end.")
-
-    program = parseResult.get.asInstanceOf[Node]
+    program = manager.parse(grammarCatalogue.find(ProgramGrammar), input).asInstanceOf[Node]
   }
 
   def runPhases() = {

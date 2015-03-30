@@ -2,19 +2,16 @@ package transformations.types
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.ConstantEntry
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
-trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
-
-  val key: AnyRef
+trait TypeInstance extends ParticleWithGrammar with ConstantEntry {
+  val key: Key
 
   override def inject(state: CompilationState): Unit = {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
-    TypeSkeleton.getState(state).toByteCodeString.put(key, _type => getByteCodeString(_type, state))
-    TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
     TypeSkeleton.getState(state).instances.put(key, this)
     super.inject(state)
   }
@@ -23,21 +20,23 @@ trait TypeInstance extends ParticleWithGrammar with ConstantEntry  {
 
   def getStackType(_type: Node, state: CompilationState) = _type
 
-  def getByteCodeString(_type: Node, state: CompilationState): String
-
-  def getStackSize: Int
+  def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
-    PrintByteCode.toUTF8ConstantEntry(getByteCodeString(constant, state))
+    PrintByteCode.toUTF8ConstantEntry(TypeSkeleton.getByteCodeString(state)(constant))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)
-    val parseType = grammars.find(TypeSkeleton.TypeGrammar)
+    val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
     parseType.addOption(javaGrammar)
+
+    val byteCodeGrammar = getByteCodeGrammar(grammars)
+    val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+    byteCodeType.addOption(byteCodeGrammar)
     super.transformGrammars(grammars)
   }
 

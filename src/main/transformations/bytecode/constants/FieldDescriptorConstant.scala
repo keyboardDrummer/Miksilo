@@ -22,7 +22,7 @@ object FieldDescriptorConstant extends ConstantEntry {
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     "field:" ~> typeGrammar ^^ parseMap(Key, Type)
   }
 

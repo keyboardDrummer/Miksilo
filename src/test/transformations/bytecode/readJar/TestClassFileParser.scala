@@ -5,6 +5,7 @@ import java.io.BufferedInputStream
 import application.compilerCockpit.PrettyPrint
 import core.particles.CompilerFromParticles
 import org.junit.{Assert, Test}
+import transformations.javac.JavaCompiler
 import util.TestUtils
 
 class TestClassFileParser {
@@ -37,4 +38,18 @@ class TestClassFileParser {
     Assert.assertEquals(expected, state.output)
   }
 
+  @Test
+  def testObjectClassSignatureDeCompilation() = {
+
+    val file = TestUtils.getTestFile("Object.class")
+    val bis = new BufferedInputStream(file.inputStream())
+    val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
+    val parseResult = ClassFileParser.classFileParser(new ArrayReader(0, inputBytes))
+    val clazz = parseResult.get
+    val state = new CompilerFromParticles(Seq(ParseAttributes, DecompileByteCodeSignature) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+    val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
+
+    //val expected = TestUtils.getTestFile("DecodedWithAttributesObjectClassPrettyPrint.txt").slurp()
+    Assert.assertEquals("", outputState.output)
+  }
 }

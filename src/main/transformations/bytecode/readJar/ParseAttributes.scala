@@ -1,13 +1,9 @@
 package transformations.bytecode.readJar
 
-import core.particles.{CompilationState, ParticleWithPhase}
 import core.particles.node.Node
+import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.UnParsedAttribute
-
-import scala.util.parsing.input.{Position, Reader}
-
-
 
 object ParseAttributes extends ParticleWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {

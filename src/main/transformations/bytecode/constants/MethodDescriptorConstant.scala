@@ -38,7 +38,7 @@ object MethodDescriptorConstant extends ConstantEntry {
   }
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeSkeleton.TypeGrammar)
+    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     (typeGrammar ~~ typeGrammar.manySeparated(";").inParenthesis) ^^
       parseMap(MethodDescriptor, MethodReturnType, MethodDescriptorParameters)
   }

@@ -1,7 +1,7 @@
 package core.particles
 
 import core.bigrammar.{BiGrammarToGrammar, Labelled}
-import core.grammar.GrammarToParserConverter
+import core.grammar.{ParseException, GrammarToParserConverter}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 
 import scala.util.parsing.input.CharArrayReader
@@ -12,9 +12,17 @@ class ParticlesToParserConverter extends GrammarToParserConverter {
     buildParser(programGrammar)
   }
 
-  def buildParser(grammars: GrammarCatalogue): (String) => ParseResult[Any] = {
-    val programGrammarDocument: Labelled = grammars.find(ProgramGrammar)
-    buildParser(programGrammarDocument)
+  def parse(grammar: Labelled, input: String): Any = {
+    val parser = buildParser(grammar)
+
+    val parseResult = parser(input)
+    if (!parseResult.successful)
+      throw new ParseException(parseResult.toString)
+
+    if(!parseResult.next.atEnd)
+      throw new ParseException("Did not parse until end.")
+
+    parseResult.get
   }
 
   def buildParser(programGrammarDocument: Labelled): (String) => ParseResult[Any] = {

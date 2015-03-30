@@ -1,16 +1,17 @@
 package transformations.types
 
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.BiGrammar
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Key, Node}
 
-object DoubleTypeC extends TypeInstance {
+object DoubleTypeC extends TypeInstance with StackType {
 
-  override val key: AnyRef = DoubleTypeKey
+  override val key = DoubleTypeKey
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeString(_type: Node, state: CompilationState): String = "D"
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "D" ~> produce(doubleType)
 
   override def getStackSize: Int = 2
 
@@ -20,7 +21,7 @@ object DoubleTypeC extends TypeInstance {
 
   val doubleType = new Node(key)
 
-  object DoubleTypeKey
+  object DoubleTypeKey extends Key
 
   override def description: String = "Defines the double type."
 }

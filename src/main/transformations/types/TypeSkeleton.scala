@@ -1,6 +1,8 @@
 package transformations.types
 
+import core.bigrammar.BiGrammarToDocument
 import core.exceptions.BadInputException
+import core.grammar.ParseException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
@@ -15,6 +17,10 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 object TypeSkeleton extends ParticleWithGrammar with WithState {
+  def getTypeFromByteCodeString(state: CompilationState, typeString: String): Node = {
+    val manager = new ParticlesToParserConverter()
+    manager.parse(state.grammarCatalogue.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
+  }
 
   def toStackType(_type: Node, state: CompilationState) : Node = {
     getState(state).instances(_type.clazz).getStackType(_type, state)
@@ -22,8 +28,10 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
 
   def getTypeSize(_type: Node, state: CompilationState): Int = getState(state).stackSize(_type.clazz)
 
-  def getByteCodeString(state: CompilationState): Node => String =
-    _type => getState(state).toByteCodeString(_type.clazz)(_type)
+  def getByteCodeString(state: CompilationState)(_type: Node): String = {
+      val grammar = state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar)
+      BiGrammarToDocument.toDocument(_type, grammar).renderString()
+  }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -64,20 +72,21 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
     })
   }
 
+  object ByteCodeTypeGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    grammars.create(TypeGrammar)
+    grammars.create(JavaTypeGrammar)
+    grammars.create(ByteCodeTypeGrammar)
   }
 
   def createState = new State
   
   class State {
     val superTypes = new ClassRegistry[Node => Seq[Node]]()
-    val toByteCodeString = new ClassRegistry[Node => String]()
     val stackSize = new ClassRegistry[Int]()
     val instances = new ClassRegistry[TypeInstance]
   }
 
-  object TypeGrammar
+  object JavaTypeGrammar
 
   override def description: String = "Defines the concept of a type."
 }

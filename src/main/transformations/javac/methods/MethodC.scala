@@ -149,7 +149,7 @@ object MethodC extends ParticleWithGrammar with WithState {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val block = grammars.find(BlockC.BlockGrammar)
 
-    val parseType = grammars.find(TypeSkeleton.TypeGrammar)
+    val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType ~~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)

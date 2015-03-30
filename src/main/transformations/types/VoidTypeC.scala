@@ -1,16 +1,17 @@
 package transformations.types
 
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 
-object VoidTypeC extends TypeInstance {
+object VoidTypeC extends TypeInstance with StackType {
 
-  override val key: AnyRef = VoidTypeKey
+  override val key = VoidTypeKey
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeString(_type: Node, state: CompilationState): String = "V"
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "V" ~> produce(voidType)
 
   override def getStackSize: Int = 0
 
@@ -20,7 +21,7 @@ object VoidTypeC extends TypeInstance {
 
   def voidType = new Node(VoidTypeKey)
 
-  object VoidTypeKey
+  object VoidTypeKey extends Key
 
   override def description: String = "Defines the void type."
 }
