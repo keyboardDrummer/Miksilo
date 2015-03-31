@@ -19,12 +19,17 @@ trait ByteCodeAttribute extends ParticleWithGrammar {
   def constantPoolKey: String
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val grammar = getGrammar(grammars)
-    if (grammar == null) //TODO remove this silly hack.
-      return
-
-    val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
-    attributeGrammar.addOption(grammar)
+    try  //TODO remove this silly hack.
+    {
+      val grammar = getGrammar(grammars)
+      val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
+      attributeGrammar.addOption(grammar)
+    }
+    catch
+    {
+      case e: NullPointerException =>
+      case e:NotImplementedError =>
+    }
   }
 
   def getParser(unParsed: Node) : ClassFileParser.Parser[Node] = {

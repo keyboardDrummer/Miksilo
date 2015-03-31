@@ -74,6 +74,11 @@ object ClassFileParser extends ByteParsers {
   } yield MethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex)
 
 
+  def interfaceMethodReference: Parser[Node] = for {
+    classRefIndex <- ParseShort
+    nameAndTypeIndex <- ParseShort
+  } yield InterfaceMethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex)
+
   def utf8Parser: Parser[String] = parseUtf8
 
   def nameAndTypeParser: Parser[Node] = for {
@@ -102,6 +107,4 @@ object ClassFileParser extends ByteParsers {
     case 18 => ???
     case _ => failure("There is no constant starting here.")
   }
-
-  def interfaceMethodReference: Parser[Node] = ???
 }

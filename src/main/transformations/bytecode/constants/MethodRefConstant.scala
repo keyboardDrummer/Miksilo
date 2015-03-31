@@ -5,6 +5,7 @@ import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
 
+
 object MethodRefConstant extends ConstantEntry {
 
   object MethodRefKey

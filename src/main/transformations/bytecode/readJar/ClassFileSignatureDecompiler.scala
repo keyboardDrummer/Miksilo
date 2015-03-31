@@ -8,6 +8,6 @@ object ClassFileSignatureDecompiler {
 
   val byteCodeParticles: Seq[ParticleWithGrammar] = Seq(UnParsedAttribute) ++ JavaCompiler.byteCodeTransformations
   def getDecompiler = {
-    Seq(ParseAttributes) ++ Seq(UnParsedAttribute) ++ byteCodeParticles
+    Seq(ParseKnownAttributes) ++ Seq(UnParsedAttribute) ++ byteCodeParticles
   }
 }

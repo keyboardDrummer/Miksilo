@@ -7,7 +7,7 @@ import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 
-object CodeConstantEntry extends ConstantEntry
+object CodeConstantEntry extends ConstantEntry //TODO deze kan toch helemaal weg??
 {
   object CodeAttributeId
 

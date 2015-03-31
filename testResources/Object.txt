@@ -1,0 +1,267 @@
+Classfile /d:/Dropbox/Projects/Code/ParticleCompiler/testResources/Object.class
+  Last modified Oct 7, 2014; size 1515 bytes
+  MD5 checksum 3eb49ad08047a8a98a997acf5542c545
+  Compiled from "Object.java"
+public class java.lang.Object
+  SourceFile: "Object.java"
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Integer            500000
+   #2 = Integer            999999
+   #3 = String             #17            //  @
+   #4 = String             #39            //  nanosecond timeout value out of range
+   #5 = String             #43            //  timeout value is negative
+   #6 = Utf8               ()I
+   #7 = Utf8               ()Ljava/lang/Object;
+   #8 = Utf8               ()Ljava/lang/String;
+   #9 = Utf8               ()V
+  #10 = Utf8               (I)Ljava/lang/String;
+  #11 = Utf8               (J)V
+  #12 = Utf8               (JI)V
+  #13 = Utf8               (Ljava/lang/Object;)Z
+  #14 = Utf8               (Ljava/lang/String;)V
+  #15 = Utf8               <clinit>
+  #16 = Utf8               <init>
+  #17 = Utf8               @
+  #18 = Utf8               Code
+  #19 = Utf8               Exceptions
+  #20 = Utf8               LineNumberTable
+  #21 = Utf8               Signature
+  #22 = Utf8               SourceFile
+  #23 = Utf8               StackMapTable
+  #24 = Utf8               append
+  #25 = Utf8               clone
+  #26 = Utf8               equals
+  #27 = Utf8               finalize
+  #28 = Utf8               getClass
+  #29 = Utf8               getName
+  #30 = Utf8               hashCode
+  #31 = Utf8               java/lang/Class
+  #32 = Utf8               java/lang/CloneNotSupportedException
+  #33 = Utf8               java/lang/IllegalArgumentException
+  #34 = Utf8               java/lang/Integer
+  #35 = Utf8               java/lang/InterruptedException
+  #36 = Utf8               java/lang/Object
+  #37 = Utf8               java/lang/StringBuilder
+  #38 = Utf8               java/lang/Throwable
+  #39 = Utf8               nanosecond timeout value out of range
+  #40 = Utf8               notify
+  #41 = Utf8               notifyAll
+  #42 = Utf8               registerNatives
+  #43 = Utf8               timeout value is negative
+  #44 = Utf8               toHexString
+  #45 = Utf8               toString
+  #46 = Utf8               wait
+  #47 = Class              #31            //  java/lang/Class
+  #48 = Class              #32            //  java/lang/CloneNotSupportedException
+  #49 = Class              #33            //  java/lang/IllegalArgumentException
+  #50 = Class              #34            //  java/lang/Integer
+  #51 = Class              #35            //  java/lang/InterruptedException
+  #52 = Class              #36            //  java/lang/Object
+  #53 = Class              #37            //  java/lang/StringBuilder
+  #54 = Class              #38            //  java/lang/Throwable
+  #55 = Utf8               ()Ljava/lang/Class;
+  #56 = Utf8               ()Ljava/lang/Class<*>;
+  #57 = Utf8               (Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #58 = NameAndType        #30:#6         //  hashCode:()I
+  #59 = NameAndType        #16:#9         //  "<init>":()V
+  #60 = NameAndType        #42:#9         //  registerNatives:()V
+  #61 = NameAndType        #46:#11        //  wait:(J)V
+  #62 = NameAndType        #28:#55        //  getClass:()Ljava/lang/Class;
+  #63 = NameAndType        #29:#8         //  getName:()Ljava/lang/String;
+  #64 = NameAndType        #45:#8         //  toString:()Ljava/lang/String;
+  #65 = NameAndType        #44:#10        //  toHexString:(I)Ljava/lang/String;
+  #66 = NameAndType        #16:#14        //  "<init>":(Ljava/lang/String;)V
+  #67 = NameAndType        #24:#57        //  append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #68 = Methodref          #47.#63        //  java/lang/Class.getName:()Ljava/lang/String;
+  #69 = Methodref          #49.#66        //  java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+  #70 = Methodref          #50.#65        //  java/lang/Integer.toHexString:(I)Ljava/lang/String;
+  #71 = Methodref          #52.#58        //  java/lang/Object.hashCode:()I
+  #72 = Methodref          #52.#60        //  java/lang/Object.registerNatives:()V
+  #73 = Methodref          #52.#61        //  java/lang/Object.wait:(J)V
+  #74 = Methodref          #52.#62        //  java/lang/Object.getClass:()Ljava/lang/Class;
+  #75 = Methodref          #53.#59        //  java/lang/StringBuilder."<init>":()V
+  #76 = Methodref          #53.#64        //  java/lang/StringBuilder.toString:()Ljava/lang/String;
+  #77 = Methodref          #53.#67        //  java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #78 = Utf8               Object.java
+{
+  public java.lang.Object();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=0, locals=1, args_size=1
+         0: return        
+      LineNumberTable:
+        line 37: 0
+
+  public final native java.lang.Class<?> getClass();
+    descriptor: ()Ljava/lang/Class;
+    flags: ACC_PUBLIC, ACC_FINAL, ACC_NATIVE
+    Signature: #56                          // ()Ljava/lang/Class<*>;
+
+  public native int hashCode();
+    descriptor: ()I
+    flags: ACC_PUBLIC, ACC_NATIVE
+
+  public boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=2, args_size=2
+         0: aload_0       
+         1: aload_1       
+         2: if_acmpne     9
+         5: iconst_1      
+         6: goto          10
+         9: iconst_0      
+        10: ireturn       
+      StackMapTable: number_of_entries = 2
+           frame_type = 9 /* same */
+           frame_type = 64 /* same_locals_1_stack_item */
+          stack = [ int ]
+
+      LineNumberTable:
+        line 149: 0
+
+  protected native java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+    descriptor: ()Ljava/lang/Object;
+    flags: ACC_PROTECTED, ACC_NATIVE
+    Exceptions:
+      throws java.lang.CloneNotSupportedException
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: new           #53                 // class java/lang/StringBuilder
+         3: dup           
+         4: invokespecial #75                 // Method java/lang/StringBuilder."<init>":()V
+         7: aload_0       
+         8: invokevirtual #74                 // Method getClass:()Ljava/lang/Class;
+        11: invokevirtual #68                 // Method java/lang/Class.getName:()Ljava/lang/String;
+        14: invokevirtual #77                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        17: ldc           #3                  // String @
+        19: invokevirtual #77                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        22: aload_0       
+        23: invokevirtual #71                 // Method hashCode:()I
+        26: invokestatic  #70                 // Method java/lang/Integer.toHexString:(I)Ljava/lang/String;
+        29: invokevirtual #77                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        32: invokevirtual #76                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+        35: areturn       
+      LineNumberTable:
+        line 236: 0
+
+  public final native void notify();
+    descriptor: ()V
+    flags: ACC_PUBLIC, ACC_FINAL, ACC_NATIVE
+
+  public final native void notifyAll();
+    descriptor: ()V
+    flags: ACC_PUBLIC, ACC_FINAL, ACC_NATIVE
+
+  public final native void wait(long) throws java.lang.InterruptedException;
+    descriptor: (J)V
+    flags: ACC_PUBLIC, ACC_FINAL, ACC_NATIVE
+    Exceptions:
+      throws java.lang.InterruptedException
+
+  public final void wait(long, int) throws java.lang.InterruptedException;
+    descriptor: (JI)V
+    flags: ACC_PUBLIC, ACC_FINAL
+    Code:
+      stack=4, locals=4, args_size=3
+         0: lload_1       
+         1: lconst_0      
+         2: lcmp          
+         3: ifge          16
+         6: new           #49                 // class java/lang/IllegalArgumentException
+         9: dup           
+        10: ldc           #5                  // String timeout value is negative
+        12: invokespecial #69                 // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+        15: athrow        
+        16: iload_3       
+        17: iflt          26
+        20: iload_3       
+        21: ldc           #2                  // int 999999
+        23: if_icmple     36
+        26: new           #49                 // class java/lang/IllegalArgumentException
+        29: dup           
+        30: ldc           #4                  // String nanosecond timeout value out of range
+        32: invokespecial #69                 // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+        35: athrow        
+        36: iload_3       
+        37: ldc           #1                  // int 500000
+        39: if_icmpge     52
+        42: iload_3       
+        43: ifeq          56
+        46: lload_1       
+        47: lconst_0      
+        48: lcmp          
+        49: ifne          56
+        52: lload_1       
+        53: lconst_1      
+        54: ladd          
+        55: lstore_1      
+        56: aload_0       
+        57: lload_1       
+        58: invokevirtual #73                 // Method wait:(J)V
+        61: return        
+      StackMapTable: number_of_entries = 5
+           frame_type = 16 /* same */
+           frame_type = 9 /* same */
+           frame_type = 9 /* same */
+           frame_type = 15 /* same */
+           frame_type = 3 /* same */
+
+      LineNumberTable:
+        line 447: 0
+        line 448: 6
+        line 451: 16
+        line 452: 26
+        line 456: 36
+        line 457: 52
+        line 460: 56
+        line 461: 61
+    Exceptions:
+      throws java.lang.InterruptedException
+
+  public final void wait() throws java.lang.InterruptedException;
+    descriptor: ()V
+    flags: ACC_PUBLIC, ACC_FINAL
+    Code:
+      stack=3, locals=1, args_size=1
+         0: aload_0       
+         1: lconst_0      
+         2: invokevirtual #73                 // Method wait:(J)V
+         5: return        
+      LineNumberTable:
+        line 502: 0
+        line 503: 5
+    Exceptions:
+      throws java.lang.InterruptedException
+
+  protected void finalize() throws java.lang.Throwable;
+    descriptor: ()V
+    flags: ACC_PROTECTED
+    Code:
+      stack=0, locals=1, args_size=1
+         0: return        
+      LineNumberTable:
+        line 555: 0
+    Exceptions:
+      throws java.lang.Throwable
+
+  static {};
+    descriptor: ()V
+    flags: ACC_STATIC
+    Code:
+      stack=0, locals=0, args_size=0
+         0: invokestatic  #72                 // Method registerNatives:()V
+         3: return        
+      LineNumberTable:
+        line 41: 0
+        line 42: 3
+}

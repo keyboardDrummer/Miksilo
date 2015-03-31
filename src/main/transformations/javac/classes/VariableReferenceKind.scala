@@ -20,7 +20,7 @@ object VariableReferenceKind extends Particle {
     if (isClass)
       new ClassOrObjectReference(classCompiler.findClass(name), true)
     else {
-      val mbPackage = classCompiler.compiler.env.content.get(name)
+      val mbPackage = classCompiler.compiler.classPath.content.get(name)
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageInfo])
       else {

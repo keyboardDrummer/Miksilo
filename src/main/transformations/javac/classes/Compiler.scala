@@ -63,13 +63,13 @@ case class ClassInfo(parent: PackageInfo, name: String, content: mutable.Map[Str
 }
 
 class MyCompiler {
-  val env: PackageInfo = JavaLang.standardLib
+  val classPath: PackageInfo = JavaLang.standardLib
 
-  def getPackage(parts: List[String]): PackageInfo = env.getPackage(parts)
+  def getPackage(parts: List[String]): PackageInfo = classPath.getPackage(parts)
 
   def find(methodId: MethodId): MethodInfo = find(methodId.className.parts)
     .asInstanceOf[ClassInfo].getMethod(methodId.methodName)
 
-  def find(parts: Seq[String]): PackageContent = parts.foldLeft[PackageContent](env)(
+  def find(parts: Seq[String]): PackageContent = parts.foldLeft[PackageContent](classPath)(
     (pck: PackageContent, part: String) => pck.asInstanceOf[PackageInfo].content(part))
 }
