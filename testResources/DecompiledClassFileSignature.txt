@@ -1,0 +1,59 @@
+package java.lang;
+class Object
+{
+    private void <init>()
+    {
+    }
+
+    private void registerNatives()
+    {
+    }
+
+    private java.lang.Class<*> getClass()
+    {
+    }
+
+    private int hashCode()
+    {
+    }
+
+    private boolean equals(java.lang.Object parameter0)
+    {
+    }
+
+    private java.lang.Object clone()
+    {
+    }
+
+    private java.lang.String toString()
+    {
+    }
+
+    private void notify()
+    {
+    }
+
+    private void notifyAll()
+    {
+    }
+
+    private void wait(long parameter0)
+    {
+    }
+
+    private void wait(long parameter0,int parameter1)
+    {
+    }
+
+    private void wait()
+    {
+    }
+
+    private void finalize()
+    {
+    }
+
+    private void <clinit>()
+    {
+    }
+}

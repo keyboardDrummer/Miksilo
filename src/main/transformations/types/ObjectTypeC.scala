@@ -1,6 +1,6 @@
 package transformations.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Labelled, BiGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
@@ -17,7 +17,7 @@ object ObjectTypeC extends TypeInstance with StackType {
 
   def stackObjectType(constantPoolClassRef: Int) = new Node(ObjectTypeKey, ObjectTypeName -> constantPoolClassRef)
 
-  object ObjectTypeGrammar
+  object ObjectTypeJavaGrammar
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val construct: Any => Any = {
       case ids: Seq[Any] =>
@@ -31,7 +31,7 @@ object ObjectTypeC extends TypeInstance with StackType {
       case Right(QualifiedClassName(stringIds)) => stringIds
       case Left(string) => Seq(string)
     })
-    val parseObjectType = grammars.create(ObjectTypeGrammar,
+    val parseObjectType = grammars.create(ObjectTypeJavaGrammar,
       identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
     parseObjectType
   }
@@ -42,7 +42,8 @@ object ObjectTypeC extends TypeInstance with StackType {
   def objectType(className: String) = new Node(ObjectTypeKey,
     ObjectTypeName -> Left(className))
 
-
+  object ObjectTypeByteCodeGrammar
+  object ObjectTypeByteCodeGrammarInner
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val construct: Any => Any = {
       case ids: Seq[Any] =>
@@ -52,7 +53,10 @@ object ObjectTypeC extends TypeInstance with StackType {
     def deconstruct(value: Any): Option[Any] = Some(value match {
       case Right(QualifiedClassName(stringIds)) => stringIds
     })
-    "L" ~> identifier.someSeparated("/") <~ ";" ^^(construct, deconstruct)^^ parseMap(ObjectTypeKey, ObjectTypeName)
+    val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner, identifier.someSeparated("/") ^^
+      (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
+    val grammar: BiGrammar = "L" ~> inner <~ ";"
+    grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 
   def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String, QualifiedClassName]]

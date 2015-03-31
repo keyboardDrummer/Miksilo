@@ -148,7 +148,7 @@ case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extend
   override def toDocument = ("Nested:": ResponsiveDocument) % (
     ("Value:": ResponsiveDocument) ~~ value.toString %
     ("Grammar:": ResponsiveDocument) ~~ grammar.toString %
-    inner.toDocument).indent()
+    inner.toDocument)
 }
 
 case class RootError(depth: Int, partial: ResponsiveDocument, value: Any, grammar: BiGrammar, inner: Throwable) extends PrintError {

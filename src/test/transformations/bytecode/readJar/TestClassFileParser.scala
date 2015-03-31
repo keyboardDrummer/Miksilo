@@ -49,7 +49,7 @@ class TestClassFileParser {
     val state = new CompilerFromParticles(Seq(ParseAttributes, DecompileByteCodeSignature) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    //val expected = TestUtils.getTestFile("DecodedWithAttributesObjectClassPrettyPrint.txt").slurp()
-    Assert.assertEquals("", outputState.output)
+    val expected = TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
+    Assert.assertEquals(expected, outputState.output)
   }
 }

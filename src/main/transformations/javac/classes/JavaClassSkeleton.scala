@@ -77,7 +77,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical
-    val packageGrammar = (keyword("package") ~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
+    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
     val classParentGrammar = ("extends" ~~> identifier ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]])) | produce(None)
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"

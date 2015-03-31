@@ -52,7 +52,8 @@ object DecompileByteCodeSignature extends ParticleWithPhase {
       val name: String = constantPool.getValue(nameIndex).asInstanceOf[String]
       val returnType = _type(MethodTypeC.ReturnType).asInstanceOf[Node]
       val parameterTypes = _type(MethodTypeC.Parameters).asInstanceOf[Seq[Node]]
-      MethodC.method(name, returnType, parameterTypes, Seq.empty) //TODO convert the parameterTypes to parameters.
+	  val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex => MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
+      MethodC.method(name, returnType, parameters, Seq.empty)
     })
   }
   

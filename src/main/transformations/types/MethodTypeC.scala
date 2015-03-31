@@ -26,12 +26,6 @@ object MethodTypeC extends TypeInstance {
 
   val key: Key = MethodTypeKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    (typeGrammar ~~ typeGrammar.manySeparated(";").inParenthesis) ^^
-      parseMap(MethodTypeKey, ReturnType, Parameters)
-  }
-
   override def description: String = "Defines the method type."
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???

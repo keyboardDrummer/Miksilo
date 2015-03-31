@@ -17,7 +17,7 @@ object NewC extends ExpressionInstance {
   object NewObject
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeGrammar)
+    val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar ~ callArgumentsGrammar ^^
       parseMap(NewCallKey, NewObject, CallC.CallArguments)
