@@ -57,3 +57,5 @@ out/
 
 nonEssentialFiles/*
 target/*
+
+resource/*
