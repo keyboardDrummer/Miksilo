@@ -14,7 +14,7 @@ object BiGrammarToGrammar {
       case Delimiter(keyword) => core.grammar.Delimiter(keyword)
       case Many(inner) => core.grammar.Many(recursive(inner))
       case MapGrammar(inner, construct, _) => core.grammar.MapGrammar(recursive(inner), construct)
-      case BiFailure => core.grammar.FailureG
+      case BiFailure => core.grammar.FailureG()
       case Print(_) => core.grammar.Produce(Unit)
       case Produce(value) => core.grammar.Produce(value)
     }

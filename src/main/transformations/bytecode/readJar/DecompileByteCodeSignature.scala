@@ -7,6 +7,7 @@ import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ConstantPool, FieldDeclaration, JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.methods.MethodC
+import transformations.javac.methods.MethodC.{Visibility, DefaultVisibility}
 import transformations.types.{MethodTypeC, TypeSkeleton}
 
 import scala.collection.mutable.ArrayBuffer
@@ -33,6 +34,8 @@ object DecompileByteCodeSignature extends ParticleWithPhase {
     program.replaceWith(javaClazz)
   }
 
+  val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = MethodC.visibilityAccessFlagLinks.
+    flatMap(p => p._2.map(flag => (flag, p._1))).toMap
   def getMethods(state: CompilationState, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
@@ -44,16 +47,21 @@ object DecompileByteCodeSignature extends ParticleWithPhase {
           val signatureTypeString = constantPool.getValue(signatureIndex).asInstanceOf[String]
           TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
         case None =>
-          val fieldDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptorIndex).asInstanceOf[Int]
-          val descriptor = constantPool.getValue(fieldDescriptorIndex).asInstanceOf[String]
+          val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptorIndex).asInstanceOf[Int]
+          val descriptor = constantPool.getValue(methodDescriptorIndex).asInstanceOf[String]
           val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
           descriptorType
       }
       val name: String = constantPool.getValue(nameIndex).asInstanceOf[String]
       val returnType = _type(MethodTypeC.ReturnType).asInstanceOf[Node]
       val parameterTypes = _type(MethodTypeC.Parameters).asInstanceOf[Seq[Node]]
-	  val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex => MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
-      MethodC.method(name, returnType, parameters, Seq.empty)
+	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
+        MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
+      val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
+      val foundVisibilities: Set[Visibility] = accessFlags.map(f => accessFlagsToVisibility.get(f)).flatMap(s => s)
+      val visibility: Visibility = (foundVisibilities ++ Seq(DefaultVisibility)).head
+      val static: Boolean = false //TODO fix.
+      MethodC.method(name, returnType, parameters, Seq.empty, static, visibility)
     })
   }
   

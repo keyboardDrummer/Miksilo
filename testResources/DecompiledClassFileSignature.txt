@@ -1,59 +1,59 @@
 package java.lang;
 class Object
 {
-    private void <init>()
+    void <init>()
     {
     }
 
-    private void registerNatives()
+    void registerNatives()
     {
     }
 
-    private java.lang.Class<*> getClass()
+    java.lang.Class<*> getClass()
     {
     }
 
-    private int hashCode()
+    int hashCode()
     {
     }
 
-    private boolean equals(java.lang.Object parameter0)
+    boolean equals(java.lang.Object parameter0)
     {
     }
 
-    private java.lang.Object clone()
+    java.lang.Object clone()
     {
     }
 
-    private java.lang.String toString()
+    java.lang.String toString()
     {
     }
 
-    private void notify()
+    void notify()
     {
     }
 
-    private void notifyAll()
+    void notifyAll()
     {
     }
 
-    private void wait(long parameter0)
+    void wait(long parameter0)
     {
     }
 
-    private void wait(long parameter0,int parameter1)
+    void wait(long parameter0,int parameter1)
     {
     }
 
-    private void wait()
+    void wait()
     {
     }
 
-    private void finalize()
+    void finalize()
     {
     }
 
-    private void <clinit>()
+    void <clinit>()
     {
     }
 }

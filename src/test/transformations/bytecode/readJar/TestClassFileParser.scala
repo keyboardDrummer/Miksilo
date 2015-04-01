@@ -25,7 +25,8 @@ class TestClassFileParser {
   @Test
   def testObjectClassParsedAttributes() = {
     val clazz: Node = decodeFile("Object.class")
-    val state = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+    val state = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
+      ClassFileSignatureDecompiler.decompilerByteCodeParticles).transformReturnState(clazz)
 
     val expected = TestUtils.getTestFile("DecodedWithAttributesObjectClassPrettyPrint.txt").slurp()
     Assert.assertEquals(expected, state.output)
@@ -34,7 +35,7 @@ class TestClassFileParser {
   @Test
   def testObjectClassSignatureDeCompilation() = {
     val clazz: Node = decodeFile("Object.class")
-    val state = new CompilerFromParticles(Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
@@ -44,7 +45,7 @@ class TestClassFileParser {
   @Test
   def testSystemClassSignatureDeCompilation() = {
     val clazz: Node = decodeFile("System.class")
-    val state = new CompilerFromParticles(Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = ""//TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
@@ -54,7 +55,7 @@ class TestClassFileParser {
   @Test
   def testPrintStreamClassSignatureDeCompilation() = {
     val clazz: Node = decodeFile("PrintStream.class")
-    val state = new CompilerFromParticles(Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = ""//TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()

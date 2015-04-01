@@ -133,4 +133,6 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   override def constantPoolKey: String = "Code"
 
   override def description: String = "Adds a new bytecode attribute named code. Its main content is a list of instructions."
+
+  override def getParser(unParsed: Node): ClassFileParser.Parser[Node] = ???
 }

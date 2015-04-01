@@ -12,8 +12,6 @@ object SignatureAttribute extends ByteCodeAttribute {
   object SignatureIndex
   override def key: Key = SignatureKey
 
-  def construct(index: Int) = new Node(SignatureKey, SignatureIndex -> index)
-
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     "signature with index:" ~~> integer ^^ parseMap(SignatureKey, SignatureIndex)
   }
@@ -24,5 +22,5 @@ object SignatureAttribute extends ByteCodeAttribute {
 
   override def getParser(unParsed: Node): ClassFileParser.Parser[Node] = for {
     index <- ParseShort
-  } yield construct(index)
+  } yield new Node(SignatureKey, SignatureIndex -> index.toInt)
 }

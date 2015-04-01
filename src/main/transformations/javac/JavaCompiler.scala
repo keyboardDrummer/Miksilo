@@ -70,15 +70,16 @@ object JavaCompiler {
     ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant,
     FieldDescriptorConstant, IntegerConstant, StringConstant)
 
-  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, SourceFileAttribute, LineNumberTable,
-    CodeAttribute, ExceptionsAttribute, InnerClassesAttribute, SignatureAttribute)
+  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
+    CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
+    SignatureAttribute)
   def byteCodeWithoutInstructions = {
     bytecodeAttributes ++ constantEntryParticles ++
       Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
       typeTransformations ++ Seq(ByteCodeSkeleton)
   }
 
-  def typeTransformations = Seq(WildcardTypeArgument, TypeApplication, MethodTypeC) ++
+  def typeTransformations = Seq(ConcreteTypeArgument, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
     Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
 
   def byteCodeInstructions: Seq[InstructionC] = {

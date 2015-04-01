@@ -11,26 +11,26 @@ object TypeApplication extends ParticleWithGrammar {
   object TypeApplicationFunc
   object TypeApplicationArgument
 
-  object TypeArgumentGrammar
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    grammars.create(TypeArgumentGrammar)
     transformByteCodeGrammars(grammars)
     transformJavaGrammars(grammars)
   }
 
+  object JavaTypeArgumentGrammar
   def transformJavaGrammars(grammars: GrammarCatalogue): Unit = {
-    val typeArgumentGrammar = grammars.find(TypeArgumentGrammar)
+    val typeArgumentGrammar = grammars.create(JavaTypeArgumentGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val objectInner = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
-    typeGrammar.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar <~ ">") ^^
+    typeGrammar.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">") ^^
       parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
   }
 
+  object ByteCodeTypeArgumentGrammar
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {
-    val typeArgumentGrammar = grammars.find(TypeArgumentGrammar)
+    val typeArgumentGrammar = grammars.create(ByteCodeTypeArgumentGrammar)
     val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)
-    objectInner.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar <~ ">") ^^
+    objectInner.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar.some <~ ">") ^^
       parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
   }
 

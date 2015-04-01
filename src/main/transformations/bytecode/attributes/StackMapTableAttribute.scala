@@ -6,6 +6,7 @@ import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.readJar.ClassFileParser
 import transformations.types.ObjectTypeC.ObjectTypeName
 import transformations.types.{TypeSkeleton, IntTypeC, LongTypeC, ObjectTypeC}
 
@@ -134,4 +135,6 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   }
 
   override def constantPoolKey: String = "StackMapTable"
+
+  override def getParser(unParsed: Node): ClassFileParser.Parser[Node] = ???
 }

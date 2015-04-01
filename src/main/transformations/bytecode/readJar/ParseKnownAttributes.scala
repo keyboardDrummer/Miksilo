@@ -3,6 +3,7 @@ package transformations.bytecode.readJar
 import core.particles.node.Node
 import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
 import transformations.bytecode.attributes.UnParsedAttribute
 
 object ParseKnownAttributes extends ParticleWithPhase {
@@ -15,7 +16,11 @@ object ParseKnownAttributes extends ParticleWithPhase {
         val attributeTypeOption = ByteCodeSkeleton.getState(state).attributes.get(name)
         for(attributeType <- attributeTypeOption)
         {
-          val parser = attributeType.getParser(node)
+          val parseWithoutNameIndex: ClassFileParser.Parser[Node] = attributeType.getParser(node)
+          val parser = parseWithoutNameIndex.map(node => {
+            node(AttributeNameKey) = index
+            node
+          })
           val inputBytes = node(UnParsedAttribute.UnParsedAttributeData).asInstanceOf[Seq[Byte]].toArray
           val parseResult = parser(new ArrayReader(0, inputBytes))
           val newNode = parseResult.get

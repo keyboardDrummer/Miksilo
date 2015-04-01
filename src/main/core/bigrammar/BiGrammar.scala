@@ -59,6 +59,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[Node])
 
+  def some: BiGrammar = this ~ (this*) ^^ separatedMap
   def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ separatedMap
 
   private def separatedMap: ((Any) => Seq[Any], (Any) => Option[~[Any, Seq[Any]]]) = {

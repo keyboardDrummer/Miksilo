@@ -49,7 +49,7 @@ object PrintGrammar {
     case Option(inner) => toDocumentInner(inner).inParenthesis ~ "?"
     case RegexG(value) => s"Regex($value)"
     case Produce(value) => "produce"
-    case FailureG => "fail"
+    case FailureG(message) => message
     case NumberG => "number"
     case Identifier => "identifier"
     case labelled: Labelled =>
@@ -73,10 +73,10 @@ object PrintGrammar {
     case Choice(_left, _right) =>
       val left = transform(_left)
       val right = transform(_right)
-      if (left == FailureG)
+      if (left.isInstanceOf[FailureG])
         return right
 
-      if (right == FailureG)
+      if (right.isInstanceOf[FailureG])
         return left
 
       if (right.isInstanceOf[Produce]) {

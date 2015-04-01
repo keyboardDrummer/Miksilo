@@ -2,7 +2,8 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Key
+import core.particles.node.{Node, Key}
+import transformations.bytecode.readJar.ClassFileParser
 
 object InnerClassesAttribute extends ByteCodeAttribute {
   object InnerClasses
@@ -13,4 +14,6 @@ object InnerClassesAttribute extends ByteCodeAttribute {
   override def constantPoolKey: String = "InnerClasses"
 
   override def description: String = "Adds the InnerClasses attribute."
+
+    override def getParser(unParsed: Node): ClassFileParser.Parser[Node] = ???
 }

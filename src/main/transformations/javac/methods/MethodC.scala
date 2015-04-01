@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, Root}
+import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
@@ -13,7 +14,6 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.types.{TypeSkeleton, VoidTypeC}
-
 object MethodC extends ParticleWithGrammar with WithState {
 
   override def inject(state: CompilationState): Unit = {
@@ -116,14 +116,17 @@ object MethodC extends ParticleWithGrammar with WithState {
     if (getMethodStatic(method))
       flags += ByteCodeMethodInfo.StaticAccess
 
-    getMethodVisibility(method) match {
-      case MethodC.PublicVisibility => flags += ByteCodeMethodInfo.PublicAccess
-      case MethodC.PrivateVisibility => flags += ByteCodeMethodInfo.PrivateAccess
-      case MethodC.DefaultVisibility => flags += ByteCodeMethodInfo.PrivateAccess
-    }
+    flags ++= visibilityToAccessFlag(getMethodVisibility(method))
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = flags
   }
+
+  val visibilityToAccessFlag = visibilityAccessFlagLinks.toMap
+  def visibilityAccessFlagLinks: Seq[(Visibility, Set[ByteCodeMethodInfo.MethodAccessFlag])] = Seq(
+    (PublicVisibility, Set[MethodAccessFlag](PublicAccess)),
+    (PrivateVisibility, Set[MethodAccessFlag](PrivateAccess)),
+    (DefaultVisibility, Set.empty[MethodAccessFlag])
+  )
 
   def getMethodVisibility(method: Node) = method(VisibilityKey).asInstanceOf[Visibility]
 

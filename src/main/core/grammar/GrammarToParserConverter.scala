@@ -49,7 +49,7 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
         case labelled: Labelled => helper(labelled.inner)
         case map: MapGrammar => helper(map.inner) ^^ map.map
         case produce: Produce => success(produce.result)
-        case FailureG => failure("fail")
+        case FailureG(message) => failure(message)
         case null => throw new RuntimeException("cannot convert empty grammar")
       })
     }

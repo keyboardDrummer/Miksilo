@@ -7,16 +7,14 @@ import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.readJar.ClassFileParser
+import ClassFileParser._
 
 object SourceFileAttribute extends ByteCodeAttribute {
 
   object SourceFileAttributeKey extends Key
 
   object SourceFileFileNameIndex
-
-  private object SourceFileId
-
-  def sourceFileId = new Node(SourceFileId)
 
   def sourceFile(nameIndex: Int, fileNameIndex: Int): Node = new Node(SourceFileAttributeKey,
     SourceFileFileNameIndex -> fileNameIndex,
@@ -25,7 +23,6 @@ object SourceFileAttribute extends ByteCodeAttribute {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(SourceFileAttributeKey) = getSourceFileBytes
-    ByteCodeSkeleton.getState(state).getBytes(SourceFileId) = _ => toUTF8ConstantEntry("SourceFile")
   }
 
   def getSourceFileBytes(sourceFile: Node) = {
@@ -40,7 +37,10 @@ object SourceFileAttribute extends ByteCodeAttribute {
 
   override def key: Key = SourceFileAttributeKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = null
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "Not implemented" ^^ parseMap(key) // TODO implement.
 
   override def constantPoolKey: String = "SourceFile"
+
+  override def getParser(unParsed: Node): ClassFileParser.Parser[Node] = ParseShort.
+    map(index => new Node(SourceFileAttributeKey, SourceFileFileNameIndex -> index))
 }
