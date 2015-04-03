@@ -32,9 +32,10 @@ object MethodTypeC extends TypeInstance {
 
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "jerp" ^^ parseMap(key)
 
+  object ByteCodeMethodTypeGrammar
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     val methodGrammar = ("(" ~> (typeGrammar*) <~ ")") ~ typeGrammar ^^ parseMap(MethodTypeKey, Parameters, ReturnType)
-    methodGrammar
+    grammars.create(ByteCodeMethodTypeGrammar, methodGrammar)
   }
 }

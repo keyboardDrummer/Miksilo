@@ -36,7 +36,7 @@ trait GrammarDocumentWriter {
 
 trait BiGrammar extends GrammarDocumentWriter {
 
-  override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(false)
+  override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(trim = false)
 
   lazy val height = 1
 
@@ -59,6 +59,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[Node])
 
+  def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | produce(None)
   def some: BiGrammar = this ~ (this*) ^^ separatedMap
   def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ separatedMap
 
@@ -69,7 +70,12 @@ trait BiGrammar extends GrammarDocumentWriter {
       case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
     })
   }
-  
+
+  def optionToSeq: BiGrammar = new MapGrammar(this,
+    option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {
+      case seq:Seq[Any] => Some(if (seq.isEmpty) None else Some(seq))
+      case _ => None
+    })
   def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))
 
   def inParenthesis = ("(": BiGrammar) ~> this <~ ")"
@@ -154,7 +160,7 @@ trait SequenceLike extends BiGrammar {
 
 case class Delimiter(value: String) extends BiGrammar
 
-case class Keyword(value: String) extends BiGrammar
+case class Keyword(value: String, reserved: Boolean = true) extends BiGrammar
 
 case class Consume(grammar: Grammar) extends BiGrammar
 

@@ -3,10 +3,12 @@ package transformations.bytecode.readJar
 import java.io.BufferedInputStream
 
 import application.compilerCockpit.PrettyPrint
+import core.bigrammar.TestGrammarUtils
 import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.JavaCompiler
+import transformations.types.TypeSkeleton.ByteCodeTypeGrammar
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -38,7 +40,7 @@ class TestClassFileParser {
     val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 
@@ -48,7 +50,7 @@ class TestClassFileParser {
     val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = ""//TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFile("DecompiledSystemClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 
@@ -58,7 +60,7 @@ class TestClassFileParser {
     val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = ""//TestUtils.getTestFile("DecompiledClassFileSignature.txt").slurp()
+    val expected = ""//TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 
@@ -69,5 +71,29 @@ class TestClassFileParser {
     val parseResult = ClassFileParser.classFileParser(new ArrayReader(0, inputBytes))
     val clazz = parseResult.get
     clazz
+  }
+
+  @Test
+  def testParseByteCodeType3() = {
+    val grammarUtils = TestGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    grammarUtils.compareInputWithPrint("([BII)V", None, ByteCodeTypeGrammar)
+  }
+
+  @Test
+  def testParseByteCodeType2() = {
+    val grammarUtils = TestGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    grammarUtils.compareInputWithPrint("[B", None, ByteCodeTypeGrammar)
+  }
+
+  @Test
+  def testParseByteCodeType1() = {
+    val grammarUtils = TestGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    grammarUtils.compareInputWithPrint("B", None, ByteCodeTypeGrammar)
+  }
+
+  @Test
+  def testParseByteCodeType0() = {
+    val grammarUtils = TestGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    grammarUtils.compareInputWithPrint("I", None, ByteCodeTypeGrammar)
   }
 }

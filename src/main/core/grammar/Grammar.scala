@@ -115,7 +115,7 @@ case class Delimiter(value: String) extends Grammar {
     throw new RuntimeException("value must have non-zero length")
 }
 
-case class Keyword(value: String) extends Grammar {
+case class Keyword(value: String, reserved: Boolean = true) extends Grammar {
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 }

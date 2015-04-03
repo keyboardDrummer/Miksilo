@@ -8,7 +8,9 @@ import transformations.javac.JavaCompiler
 
 import scala.util.parsing.input.CharArrayReader
 
-object TestGrammarUtils {
+object TestGrammarUtils extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations)
+
+case class TestGrammarUtils(particles: Seq[Particle]) {
 
   def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar) {
     val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
@@ -47,7 +49,7 @@ object TestGrammarUtils {
   }
 
   def getTransformations(key: Any) = {
-    Seq(new SelectorTransformation(key)) ++ JavaCompiler.javaCompilerTransformations
+    Seq(new SelectorTransformation(key)) ++ particles
   }
 
   class SelectorTransformation(key: Any) extends ParticleWithGrammar {

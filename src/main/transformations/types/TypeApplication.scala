@@ -1,5 +1,6 @@
 package transformations.types
 
+import core.bigrammar.BiGrammar
 import core.particles.ParticleWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Key
@@ -22,8 +23,10 @@ object TypeApplication extends ParticleWithGrammar {
     val typeArgumentGrammar = grammars.create(JavaTypeArgumentGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val objectInner = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
-    typeGrammar.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">") ^^
-      parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
+    typeArgumentGrammar.addOption(typeGrammar)
+    val typeApplication: BiGrammar = objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">") ^^
+      parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument)
+    typeGrammar.addOption(typeApplication)
   }
 
   object ByteCodeTypeArgumentGrammar
@@ -32,7 +35,14 @@ object TypeApplication extends ParticleWithGrammar {
     val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)
     objectInner.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar.some <~ ">") ^^
       parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
+
+    val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+    val argumentGrammar = grammars.find(TypeApplication.ByteCodeTypeArgumentGrammar)
+    argumentGrammar.addOption(typeGrammar)
   }
 
   override def description: String = "Adds application of generic types"
 }
+
+
+

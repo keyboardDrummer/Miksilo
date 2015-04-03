@@ -29,6 +29,7 @@ object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
       constructor.clazz = MethodC.MethodKey
       constructor(MethodC.MethodNameKey) = SuperCallExpression.constructorName
       constructor(MethodC.ReturnTypeKey) = VoidTypeC.voidType
+      constructor(MethodC.TypeParameters) = Seq.empty
       constructor(StaticKey) = false
       constructor.data.remove(ConstructorClassNameKey)
     }

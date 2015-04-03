@@ -79,8 +79,8 @@ object JavaCompiler {
       typeTransformations ++ Seq(ByteCodeSkeleton)
   }
 
-  def typeTransformations = Seq(ConcreteTypeArgument, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
-    Seq(ObjectTypeC, ArrayTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
+  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
+    Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,

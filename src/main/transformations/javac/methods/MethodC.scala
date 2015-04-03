@@ -1,5 +1,6 @@
 package transformations.javac.methods
 
+import core.bigrammar.BiGrammar
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -13,7 +14,7 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.types.{TypeSkeleton, VoidTypeC}
+import transformations.types.{TypeAbstraction, TypeSkeleton, VoidTypeC}
 object MethodC extends ParticleWithGrammar with WithState {
 
   override def inject(state: CompilationState): Unit = {
@@ -165,22 +166,26 @@ object MethodC extends ParticleWithGrammar with WithState {
         "private " ~> produce(PrivateVisibility) |
         produce(DefaultVisibility))
 
-    val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ parseReturnType ~~ identifier ~ parseParameters % block ^^
-      parseMap(MethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+    val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
+
+    val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
+      parseReturnType ~~ identifier ~ parseParameters % block ^^
+      parseMap(MethodKey, VisibilityKey, StaticKey, TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
   }
 
   def method(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],
-             static: Boolean = false, visibility: Visibility = PrivateVisibility) = {
+             static: Boolean = false, visibility: Visibility = PrivateVisibility, typeParameters: Seq[Node] = Seq.empty) = {
     new Node(MethodKey,
       MethodNameKey -> name,
       ReturnTypeKey -> _returnType,
       MethodParametersKey -> _parameters,
       MethodBodyKey -> _body,
       StaticKey -> static,
-      VisibilityKey -> visibility)
+      VisibilityKey -> visibility,
+      TypeParameters -> typeParameters)
   }
 
   object ParameterKey
@@ -215,6 +220,7 @@ object MethodC extends ParticleWithGrammar with WithState {
 
   object MethodParametersKey
 
+  object TypeParameters
 
   object ParameterTypeKey
 

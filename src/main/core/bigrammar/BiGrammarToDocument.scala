@@ -26,7 +26,7 @@ class BiGrammarToDocument {
       case Choice(first, second) => ToDocumentApplicative.or(toDocumentCached(value, second), toDocumentCached(value, first))
       case Consume(StringLiteral) => Try("\"" + value + "\"")
       case Consume(consume) => Try(value.toString)
-      case Keyword(keyword) => Try(keyword)
+      case Keyword(keyword, _) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled => labelToDocument(value, labelled)
       case many: ManyHorizontal => foldSequence(value, many.inner, (left, right) => left ~ right)

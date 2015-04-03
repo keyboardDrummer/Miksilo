@@ -26,7 +26,10 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
 
   def convert(grammar: Grammar) : PackratParser[Any] = {
     val allGrammars: Set[Grammar] = grammar.getGrammars
-    keywords ++= allGrammars.collect({ case keyword: Keyword => keyword.value})
+    keywords ++= allGrammars.flatMap({
+      case keyword: Keyword => if (keyword.reserved) Set(keyword.value) else Set.empty[String]
+      case _ => Set.empty[String]
+    })
     phrase(convertInner(grammar))
   }
 

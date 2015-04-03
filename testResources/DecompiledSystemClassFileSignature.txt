@@ -1,0 +1,177 @@
+package java.lang;
+class System
+{
+    java.io.InputStream in;
+
+    java.io.PrintStream out;
+
+    java.io.PrintStream err;
+
+    java.lang.SecurityManager security;
+
+    java.io.Console cons;
+
+    java.util.Properties props;
+
+    java.lang.String lineSeparator;
+
+    void registerNatives()
+    {
+    }
+
+    void <init>()
+    {
+    }
+
+    void setIn(java.io.InputStream parameter0)
+    {
+    }
+
+    void setOut(java.io.PrintStream parameter0)
+    {
+    }
+
+    void setErr(java.io.PrintStream parameter0)
+    {
+    }
+
+    java.io.Console console()
+    {
+    }
+
+    java.nio.channels.Channel inheritedChannel()
+    {
+    }
+
+    void checkIO()
+    {
+    }
+
+    void setIn0(java.io.InputStream parameter0)
+    {
+    }
+
+    void setOut0(java.io.PrintStream parameter0)
+    {
+    }
+
+    void setErr0(java.io.PrintStream parameter0)
+    {
+    }
+
+    void setSecurityManager(java.lang.SecurityManager parameter0)
+    {
+    }
+
+    void setSecurityManager0(java.lang.SecurityManager parameter0)
+    {
+    }
+
+    java.lang.SecurityManager getSecurityManager()
+    {
+    }
+
+    long currentTimeMillis()
+    {
+    }
+
+    long nanoTime()
+    {
+    }
+
+    void arraycopy(java.lang.Object parameter0,int parameter1,java.lang.Object parameter2,int parameter3,int parameter4)
+    {
+    }
+
+    int identityHashCode(java.lang.Object parameter0)
+    {
+    }
+
+    java.util.Properties initProperties(java.util.Properties parameter0)
+    {
+    }
+
+    java.util.Properties getProperties()
+    {
+    }
+
+    java.lang.String lineSeparator()
+    {
+    }
+
+    void setProperties(java.util.Properties parameter0)
+    {
+    }
+
+    java.lang.String getProperty(java.lang.String parameter0)
+    {
+    }
+
+    java.lang.String getProperty(java.lang.String parameter0,java.lang.String parameter1)
+    {
+    }
+
+    java.lang.String setProperty(java.lang.String parameter0,java.lang.String parameter1)
+    {
+    }
+
+    java.lang.String clearProperty(java.lang.String parameter0)
+    {
+    }
+
+    void checkKey(java.lang.String parameter0)
+    {
+    }
+
+    java.lang.String getenv(java.lang.String parameter0)
+    {
+    }
+
+    java.util.Map<java.lang.String,java.lang.String> getenv()
+    {
+    }
+
+    void exit(int parameter0)
+    {
+    }
+
+    void gc()
+    {
+    }
+
+    void runFinalization()
+    {
+    }
+
+    void runFinalizersOnExit(boolean parameter0)
+    {
+    }
+
+    void load(java.lang.String parameter0)
+    {
+    }
+
+    void loadLibrary(java.lang.String parameter0)
+    {
+    }
+
+    java.lang.String mapLibraryName(java.lang.String parameter0)
+    {
+    }
+
+    java.io.PrintStream newPrintStream(java.io.FileOutputStream parameter0,java.lang.String parameter1)
+    {
+    }
+
+    void initializeSystemClass()
+    {
+    }
+
+    void setJavaLangAccess()
+    {
+    }
+
+    void <clinit>()
+    {
+    }
+}

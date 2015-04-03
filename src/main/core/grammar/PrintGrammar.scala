@@ -44,7 +44,7 @@ object PrintGrammar {
     case Choice(left, right) => toDocumentInner(left) ~~ "|" ~~ toDocumentInner(right)
     case Many(inner: Labelled) => toDocumentInner(inner) ~ "*"
     case Many(inner) => toDocumentInner(inner).inParenthesis ~ "*"
-    case Keyword(value) => ResponsiveDocument.text(value)
+    case Keyword(value, _) => ResponsiveDocument.text(value)
     case Option(inner: Labelled) => toDocumentInner(inner) ~ "?"
     case Option(inner) => toDocumentInner(inner).inParenthesis ~ "?"
     case RegexG(value) => s"Regex($value)"
