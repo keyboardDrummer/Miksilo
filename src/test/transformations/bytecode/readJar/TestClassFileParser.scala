@@ -60,7 +60,7 @@ class TestClassFileParser {
     val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = ""//TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFile("DecompiledPrintStreamClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 

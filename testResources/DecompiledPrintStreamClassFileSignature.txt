@@ -1,0 +1,223 @@
+package java.io;
+class PrintStream
+{
+    boolean autoFlush;
+
+    boolean trouble;
+
+    java.util.Formatter formatter;
+
+    java.io.BufferedWriter textOut;
+
+    java.io.OutputStreamWriter charOut;
+
+    boolean closing;
+
+    <T> T requireNonNull(T parameter0,java.lang.String parameter1)
+    {
+    }
+
+    java.nio.charset.Charset toCharset(java.lang.String parameter0)
+    {
+    }
+
+    void <init>(boolean parameter0,java.io.OutputStream parameter1)
+    {
+    }
+
+    void <init>(boolean parameter0,java.io.OutputStream parameter1,java.nio.charset.Charset parameter2)
+    {
+    }
+
+    void <init>(boolean parameter0,java.nio.charset.Charset parameter1,java.io.OutputStream parameter2)
+    {
+    }
+
+    void <init>(java.io.OutputStream parameter0)
+    {
+    }
+
+    void <init>(java.io.OutputStream parameter0,boolean parameter1)
+    {
+    }
+
+    void <init>(java.io.OutputStream parameter0,boolean parameter1,java.lang.String parameter2)
+    {
+    }
+
+    void <init>(java.lang.String parameter0)
+    {
+    }
+
+    void <init>(java.lang.String parameter0,java.lang.String parameter1)
+    {
+    }
+
+    void <init>(java.io.File parameter0)
+    {
+    }
+
+    void <init>(java.io.File parameter0,java.lang.String parameter1)
+    {
+    }
+
+    void ensureOpen()
+    {
+    }
+
+    void flush()
+    {
+    }
+
+    void close()
+    {
+    }
+
+    boolean checkError()
+    {
+    }
+
+    void setError()
+    {
+    }
+
+    void clearError()
+    {
+    }
+
+    void write(int parameter0)
+    {
+    }
+
+    void write(byte[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    void write(char[] parameter0)
+    {
+    }
+
+    void write(java.lang.String parameter0)
+    {
+    }
+
+    void newLine()
+    {
+    }
+
+    void print(boolean parameter0)
+    {
+    }
+
+    void print(char parameter0)
+    {
+    }
+
+    void print(int parameter0)
+    {
+    }
+
+    void print(long parameter0)
+    {
+    }
+
+    void print(float parameter0)
+    {
+    }
+
+    void print(double parameter0)
+    {
+    }
+
+    void print(char[] parameter0)
+    {
+    }
+
+    void print(java.lang.String parameter0)
+    {
+    }
+
+    void print(java.lang.Object parameter0)
+    {
+    }
+
+    void println()
+    {
+    }
+
+    void println(boolean parameter0)
+    {
+    }
+
+    void println(char parameter0)
+    {
+    }
+
+    void println(int parameter0)
+    {
+    }
+
+    void println(long parameter0)
+    {
+    }
+
+    void println(float parameter0)
+    {
+    }
+
+    void println(double parameter0)
+    {
+    }
+
+    void println(char[] parameter0)
+    {
+    }
+
+    void println(java.lang.String parameter0)
+    {
+    }
+
+    void println(java.lang.Object parameter0)
+    {
+    }
+
+    java.io.PrintStream printf(java.lang.String parameter0,java.lang.Object[] parameter1)
+    {
+    }
+
+    java.io.PrintStream printf(java.util.Locale parameter0,java.lang.String parameter1,java.lang.Object[] parameter2)
+    {
+    }
+
+    java.io.PrintStream format(java.lang.String parameter0,java.lang.Object[] parameter1)
+    {
+    }
+
+    java.io.PrintStream format(java.util.Locale parameter0,java.lang.String parameter1,java.lang.Object[] parameter2)
+    {
+    }
+
+    java.io.PrintStream append(java.lang.CharSequence parameter0)
+    {
+    }
+
+    java.io.PrintStream append(java.lang.CharSequence parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    java.io.PrintStream append(char parameter0)
+    {
+    }
+
+    java.lang.Appendable append(char parameter0)
+    {
+    }
+
+    java.lang.Appendable append(java.lang.CharSequence parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    java.lang.Appendable append(java.lang.CharSequence parameter0)
+    {
+    }
+}
