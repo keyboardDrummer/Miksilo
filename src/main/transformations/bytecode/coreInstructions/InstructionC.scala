@@ -9,7 +9,7 @@ import transformations.bytecode.attributes.CodeAttribute.{JumpBehavior, Instruct
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 

@@ -6,7 +6,7 @@ import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.{IntTypeC, LongTypeC}
+import transformations.bytecode.types.{IntTypeC, LongTypeC}
 
 object CompareLongC extends InstructionC {
 

@@ -28,7 +28,8 @@ import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPre
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements._
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import transformations.types._
+import transformations.bytecode.types._
+import transformations.javac.types._
 
 object JavaCompiler {
 

@@ -12,7 +12,7 @@ import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
-import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
 class TestJavaBaseGrammarUsingFibonacciClass {
 

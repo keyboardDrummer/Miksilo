@@ -14,7 +14,9 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.types.{TypeAbstraction, TypeSkeleton, VoidTypeC}
+import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
+import transformations.javac.types.TypeAbstraction
+
 object MethodC extends ParticleWithGrammar with WithState {
 
   override def inject(state: CompilationState): Unit = {

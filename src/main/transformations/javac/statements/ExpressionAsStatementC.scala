@@ -6,7 +6,7 @@ import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.coreInstructions.{Pop2C, PopC}
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object ExpressionAsStatementC extends StatementInstance {
 

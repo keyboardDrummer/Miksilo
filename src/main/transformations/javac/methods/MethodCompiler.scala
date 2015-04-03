@@ -8,7 +8,7 @@ import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementSkeleton
 import transformations.javac.statements.locals.LocalsAnalysis
-import transformations.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
 }

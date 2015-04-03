@@ -6,7 +6,8 @@ import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
-import transformations.types.{BooleanTypeC, TypeSkeleton}
+import transformations.bytecode.types.TypeSkeleton
+import transformations.javac.types.BooleanTypeC
 
 object TernaryC extends ExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]

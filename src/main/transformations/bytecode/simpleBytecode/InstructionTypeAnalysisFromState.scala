@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.QualifiedClassName
-import transformations.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeC
 
 class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   val constantPool = ByteCodeSkeleton.getConstantPool(state.program)

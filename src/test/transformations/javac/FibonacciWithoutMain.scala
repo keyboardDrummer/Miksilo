@@ -12,7 +12,7 @@ import CallC._
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 import util.TestUtils
 
 class FibonacciWithoutMain {

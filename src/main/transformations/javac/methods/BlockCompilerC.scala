@@ -6,7 +6,7 @@ import core.particles.node.Node
 import transformations.javac.ImplicitObjectSuperClass
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton
-import transformations.types.{VoidTypeC, ObjectTypeC, ArrayTypeC}
+import transformations.bytecode.types.{VoidTypeC, ObjectTypeC, ArrayTypeC}
 
 object BlockCompilerC extends ParticleWithGrammar with ParticleWithPhase
 {

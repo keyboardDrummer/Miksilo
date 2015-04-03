@@ -9,7 +9,7 @@ import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.LongTypeC
+import transformations.bytecode.types.LongTypeC
 
 object LongLiteralC extends ExpressionInstance {
   val key = LongLiteralKey

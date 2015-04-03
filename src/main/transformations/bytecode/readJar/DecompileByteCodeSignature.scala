@@ -8,7 +8,8 @@ import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCode
 import transformations.javac.classes.{ConstantPool, FieldDeclaration, JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC.{Visibility, DefaultVisibility}
-import transformations.types.{TypeAbstraction, MethodTypeC, TypeSkeleton}
+import transformations.bytecode.types.TypeSkeleton
+import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 

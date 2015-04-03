@@ -8,7 +8,8 @@ import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, ObjectTypeC}
+import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC}
+import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
 

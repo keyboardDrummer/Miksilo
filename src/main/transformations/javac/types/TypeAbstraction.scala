@@ -1,10 +1,11 @@
-package transformations.types
+package transformations.javac.types
 
 import core.bigrammar.BiGrammar
 import core.grammar.FailureG
 import core.particles.ParticleWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
+import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 
 object TypeAbstraction extends ParticleWithGrammar {
 

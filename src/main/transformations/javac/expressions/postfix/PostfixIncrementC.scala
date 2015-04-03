@@ -7,7 +7,7 @@ import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MethodC
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 
 object PostFixIncrementC extends ExpressionInstance {
 

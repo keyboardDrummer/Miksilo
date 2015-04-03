@@ -8,11 +8,11 @@ import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.longs.StoreLongC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
-import transformations.types.ArrayTypeC.ArrayTypeKey
-import transformations.types.IntTypeC.IntTypeKey
-import transformations.types.LongTypeC.LongTypeKey
-import transformations.types.ObjectTypeC.ObjectTypeKey
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
+import transformations.bytecode.types.IntTypeC.IntTypeKey
+import transformations.bytecode.types.LongTypeC.LongTypeKey
+import transformations.bytecode.types.ObjectTypeC.ObjectTypeKey
+import transformations.bytecode.types.TypeSkeleton
 
 object AssignToVariable extends ParticleWithGrammar {
 

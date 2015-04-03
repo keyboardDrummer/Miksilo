@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.objects.StoreAddressC
 import transformations.bytecode.coreInstructions.{Duplicate2InstructionC, DuplicateInstructionC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MethodC
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object AssignmentSkeleton extends ExpressionInstance with WithState {
 

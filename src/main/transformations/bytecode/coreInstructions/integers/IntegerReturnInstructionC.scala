@@ -8,7 +8,7 @@ import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 
 object IntegerReturnInstructionC extends InstructionC {
 

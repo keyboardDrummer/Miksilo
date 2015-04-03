@@ -1,4 +1,4 @@
-package transformations.types
+package transformations.bytecode.types
 
 import core.bigrammar.BiGrammarToDocument
 import core.exceptions.BadInputException

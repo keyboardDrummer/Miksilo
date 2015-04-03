@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.PrintByteCode._
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object MethodDescriptorConstant extends ConstantEntry {
 

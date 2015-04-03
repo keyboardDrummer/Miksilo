@@ -10,7 +10,7 @@ import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MethodC, VariableC}
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer
 

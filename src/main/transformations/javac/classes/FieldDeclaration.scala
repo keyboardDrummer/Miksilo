@@ -5,7 +5,7 @@ import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object FieldDeclaration extends ParticleWithGrammar {
 

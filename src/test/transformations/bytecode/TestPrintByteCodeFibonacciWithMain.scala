@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfInteg
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
 import transformations.javac.constructor.SuperCallExpression
-import transformations.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import util.TestUtils
 
 import scala.collection.mutable.ArrayBuffer

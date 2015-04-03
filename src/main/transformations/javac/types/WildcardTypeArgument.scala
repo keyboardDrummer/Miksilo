@@ -1,4 +1,4 @@
-package transformations.types
+package transformations.javac.types
 
 import core.particles.ParticleWithGrammar
 import core.particles.grammars.GrammarCatalogue

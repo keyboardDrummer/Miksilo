@@ -7,7 +7,8 @@ import core.particles.path.Path
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.{BooleanTypeC, IntTypeC, LongTypeC, TypeSkeleton}
+import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
+import transformations.javac.types.BooleanTypeC
 
 object EqualityC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)

@@ -8,7 +8,7 @@ import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.JavaCompiler
-import transformations.types.TypeSkeleton.ByteCodeTypeGrammar
+import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import util.TestUtils
 
 import scala.reflect.io.Path

@@ -5,7 +5,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 import scala.util.Try
 

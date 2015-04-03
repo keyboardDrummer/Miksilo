@@ -1,7 +1,8 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.types._
+import transformations.bytecode.types._
+import transformations.javac.types.BooleanTypeC
 
 object ByteCodeWithTypes extends TransformationGroup {
   override def dependants: Set[Contract] = Set.empty

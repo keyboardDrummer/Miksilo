@@ -1,9 +1,10 @@
-package transformations.types
+package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
+import transformations.bytecode.types.{IntTypeC, StackType, TypeInstance}
 
 object BooleanTypeC extends TypeInstance
   with StackType //TODO remove this and change VariablePool accordingly.

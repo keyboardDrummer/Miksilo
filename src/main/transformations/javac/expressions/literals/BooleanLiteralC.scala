@@ -6,7 +6,7 @@ import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.BooleanTypeC
+import transformations.javac.types.BooleanTypeC
 
 object BooleanLiteralC extends ExpressionInstance {
   val key = LiteralBooleanKey

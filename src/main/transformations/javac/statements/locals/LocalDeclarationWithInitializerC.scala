@@ -9,7 +9,7 @@ import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
 import transformations.javac.statements.locals.LocalDeclarationC.{DeclarationName, DeclarationType}
 import transformations.javac.statements.{ExpressionAsStatementC, StatementSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object LocalDeclarationWithInitializerC extends ParticleWithGrammar with ParticleWithPhase {
 

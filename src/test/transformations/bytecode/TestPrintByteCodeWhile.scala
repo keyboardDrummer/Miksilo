@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfInteg
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes.{ConstantPool, QualifiedClassName}
-import transformations.types.{IntTypeC, VoidTypeC}
+import transformations.bytecode.types.{IntTypeC, VoidTypeC}
 import util.TestUtils
 
 class TestPrintByteCodeWhile {

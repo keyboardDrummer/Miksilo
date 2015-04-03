@@ -1,9 +1,10 @@
-package transformations.types
+package transformations.javac.types
 
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
+import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
 
 
 object MethodTypeC extends TypeInstance {

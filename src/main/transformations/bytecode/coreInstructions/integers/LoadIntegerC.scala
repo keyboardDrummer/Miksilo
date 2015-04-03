@@ -6,7 +6,7 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 
 object LoadIntegerC extends InstructionC {
 

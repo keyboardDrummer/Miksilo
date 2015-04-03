@@ -7,8 +7,8 @@ import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
-import transformations.types.ObjectTypeC.ObjectTypeName
-import transformations.types.{TypeSkeleton, IntTypeC, LongTypeC, ObjectTypeC}
+import transformations.bytecode.types.ObjectTypeC.ObjectTypeName
+import transformations.bytecode.types.{TypeSkeleton, IntTypeC, LongTypeC, ObjectTypeC}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 

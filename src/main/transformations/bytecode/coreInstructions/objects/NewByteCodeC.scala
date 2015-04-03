@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions.{InstructionC, InstructionSigna
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.QualifiedClassName
-import transformations.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeC
 
 object NewByteCodeC extends InstructionC {
 

@@ -6,7 +6,7 @@ import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.{IntTypeC, TypeSkeleton}
+import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 
 object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 

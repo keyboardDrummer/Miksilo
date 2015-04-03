@@ -7,7 +7,7 @@ import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallC}
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 
 object ThisCallExpression extends ExpressionInstance {
   override val key: AnyRef = ThisCall

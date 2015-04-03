@@ -7,7 +7,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.LongTypeC
+import transformations.bytecode.types.LongTypeC
 
 object StoreLongC  extends InstructionC {
 

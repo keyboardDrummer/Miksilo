@@ -7,7 +7,8 @@ import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.{BooleanTypeC, IntTypeC, TypeSkeleton}
+import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
+import transformations.javac.types.BooleanTypeC
 
 object LessThanC extends ExpressionInstance {
 

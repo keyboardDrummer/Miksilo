@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeS
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
-import transformations.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeC
 
 object NewC extends ExpressionInstance {
 

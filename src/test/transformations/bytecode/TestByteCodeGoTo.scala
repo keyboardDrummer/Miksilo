@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfInteg
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 import util.TestUtils
 
 class TestByteCodeGoTo {

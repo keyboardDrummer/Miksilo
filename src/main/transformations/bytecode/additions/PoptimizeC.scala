@@ -6,7 +6,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object PoptimizeC extends ParticleWithPhase {
 

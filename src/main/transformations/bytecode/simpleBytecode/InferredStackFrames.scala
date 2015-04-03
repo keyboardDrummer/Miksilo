@@ -6,7 +6,7 @@ import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object InferredStackFrames extends ParticleWithPhase {
 

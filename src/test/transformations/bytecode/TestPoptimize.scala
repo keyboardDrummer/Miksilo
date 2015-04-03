@@ -11,7 +11,7 @@ import transformations.bytecode.coreInstructions.longs.LongConstantC
 import transformations.bytecode.coreInstructions.{Pop2C, PopC, VoidReturnInstructionC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 
 class TestPoptimize {
 

@@ -7,7 +7,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
-import transformations.types.IntTypeC
+import transformations.bytecode.types.IntTypeC
 
 object IfIntegerCompareEqualC extends JumpInstruction {
 

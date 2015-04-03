@@ -6,7 +6,7 @@ import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object InferredMaxStack extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(LabelledTargets)

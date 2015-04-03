@@ -5,7 +5,7 @@ import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, FieldRefConstant, MethodRefConstant, NameAndType}
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeC
 
 object ClassCompiler {
 }

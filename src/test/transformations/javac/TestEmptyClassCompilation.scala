@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInst
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.{ConstantPool, JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.constructor.SuperCallExpression
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 import util.TestUtils
 
 class TestEmptyClassCompilation {

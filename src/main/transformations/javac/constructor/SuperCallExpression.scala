@@ -10,7 +10,7 @@ import transformations.javac.classes.{JavaClassSkeleton, MethodId}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
 import transformations.javac.statements.StatementSkeleton
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 
 object SuperCallExpression extends ExpressionInstance {
   override val key: AnyRef = SuperCall

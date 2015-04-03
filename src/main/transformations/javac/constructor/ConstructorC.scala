@@ -11,7 +11,7 @@ import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements.BlockC
-import transformations.types.VoidTypeC
+import transformations.bytecode.types.VoidTypeC
 
 object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
 

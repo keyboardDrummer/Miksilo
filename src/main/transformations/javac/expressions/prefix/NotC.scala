@@ -6,7 +6,7 @@ import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.types.BooleanTypeC
+import transformations.javac.types.BooleanTypeC
 
 object NotC extends ExpressionInstance {
 

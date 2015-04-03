@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javac.statements.BlockC
-import transformations.types.{ArrayTypeC, ObjectTypeC}
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC}
 
 
 object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with WithState {

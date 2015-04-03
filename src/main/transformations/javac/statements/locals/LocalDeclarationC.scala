@@ -7,7 +7,7 @@ import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.classes.JavaClassSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
-import transformations.types.TypeSkeleton
+import transformations.bytecode.types.TypeSkeleton
 
 object LocalDeclarationC extends StatementInstance {
 
