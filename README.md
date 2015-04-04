@@ -9,7 +9,7 @@ A similar approach is described in the paper '*A Nanopass Framework for Compiler
 A particle can include one or several phases such as parsing, type checking, optimization and code generation.
 Commonly compilers are modularised by defining several compiler phases and using a limited number of intermediate languages.
 Particle compiler focuses purely on intermediate languages to achieve modularisation.
-Using weak typing it becomes simple to define a new intermediate language by applying a delta to an existing one.
+By keeping the abstract syntax tree untyped, it becomes relatively simple to define a language as a sequence of language delta's.
 
 ###GUI
 Particle compiler includes a GUI. You can use this to play around with the defined particles and construct a compiler from them.
