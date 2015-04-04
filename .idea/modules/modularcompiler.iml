@@ -29,5 +29,6 @@
     <orderEntry type="library" name="Maven: com.typesafe.akka:akka-actor_2.10:2.1.3" level="project" />
     <orderEntry type="library" name="Maven: com.typesafe:config:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.scalatest:scalatest_2.11:2.2.3" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.11.5" level="application" />
   </component>
 </module>
