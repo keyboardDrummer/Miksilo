@@ -6,8 +6,9 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.{ConstantPool, QualifiedClassName}
+import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 abstract class InvokeC extends InstructionC {
 

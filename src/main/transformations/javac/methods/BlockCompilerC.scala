@@ -4,7 +4,7 @@ import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
 import core.particles._
 import core.particles.node.Node
 import transformations.javac.ImplicitObjectSuperClass
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton
 import transformations.bytecode.types.{VoidTypeC, ObjectTypeC, ArrayTypeC}
 

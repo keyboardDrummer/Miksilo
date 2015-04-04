@@ -2,19 +2,17 @@ package transformations.javac.constructor
 
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.methods.MethodC.PublicVisibility
 
 object DefaultConstructorC extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
   def transform(clazz: Node, state: CompilationState): Unit = {
-    val className = JavaClassSkeleton.getClassName(clazz)
-    val members = JavaClassSkeleton.getMembers(clazz)
-    val noConstructors = members.filter(member => member.clazz == ConstructorC.ConstructorKey).isEmpty
+    val noConstructors = clazz.members.filter(member => member.clazz == ConstructorC.ConstructorKey).isEmpty
     if (noConstructors) {
-      val defaultConstructor = ConstructorC.constructor(className, Seq(), Seq(), PublicVisibility)
-      clazz(JavaClassSkeleton.Members) = Seq(defaultConstructor) ++ members
+      val defaultConstructor = ConstructorC.constructor(clazz.name, Seq(), Seq(), PublicVisibility)
+      clazz.members = Seq(defaultConstructor) ++ clazz.members
     }
   }
 

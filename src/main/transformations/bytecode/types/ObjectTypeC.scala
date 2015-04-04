@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance with StackType {
   override val key = ObjectTypeKey

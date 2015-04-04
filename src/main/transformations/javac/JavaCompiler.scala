@@ -15,6 +15,7 @@ import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.constructor._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}

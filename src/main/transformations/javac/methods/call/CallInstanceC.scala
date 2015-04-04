@@ -4,7 +4,8 @@ import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.InvokeVirtualC
-import transformations.javac.classes.{JavaClassSkeleton, MethodId}
+import transformations.javac.classes.MethodId
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MemberSelector
 

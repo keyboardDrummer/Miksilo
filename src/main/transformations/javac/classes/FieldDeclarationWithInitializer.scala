@@ -4,22 +4,22 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
+import transformations.bytecode.types.VoidTypeC
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.constructor.{ConstructorC, SuperCallExpression}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MethodC, VariableC}
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import transformations.bytecode.types.VoidTypeC
 
 import scala.collection.mutable.ArrayBuffer
-
 object FieldDeclarationWithInitializer extends ParticleWithGrammar with ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = grammars.find(ClassMemberGrammar)
     val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC) ^^ parseMap(FieldWithInitializerKey, PartialSelf)
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
@@ -36,7 +36,6 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
     val assignmentStatement = ExpressionAsStatementC.asStatement(assignment)
     initializerStatements += assignmentStatement
     fieldWithInitialiser.replaceWith(declaration)
-
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
@@ -52,10 +51,9 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
     val fieldInitializerMethod = MethodC.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
-    val members: Seq[Node] = JavaClassSkeleton.getMembers(program)
-    program(JavaClassSkeleton.Members) = Seq(fieldInitializerMethod) ++ members
+    program.members = Seq(fieldInitializerMethod) ++ program.members
 
-    for(constructor <- members.filter(member => member.clazz == ConstructorC.ConstructorKey)) {
+    for(constructor <- program.members.filter(member => member.clazz == ConstructorC.ConstructorKey)) {
       val body = MethodC.getMethodBody(constructor)
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)

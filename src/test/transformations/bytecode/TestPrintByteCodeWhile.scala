@@ -8,8 +8,9 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.{ConstantPool, QualifiedClassName}
+import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
+import transformations.javac.classes.skeleton.QualifiedClassName
 import util.TestUtils
 
 class TestPrintByteCodeWhile {

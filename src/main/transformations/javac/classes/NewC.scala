@@ -6,6 +6,7 @@ import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}

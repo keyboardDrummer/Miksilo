@@ -4,7 +4,7 @@ import core.particles.node.Node
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.ClassRefConstant
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.skeleton.QualifiedClassName
 import util.TestUtils
 
 object RunWithJVM extends Particle

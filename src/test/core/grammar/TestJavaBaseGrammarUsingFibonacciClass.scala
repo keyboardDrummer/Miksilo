@@ -4,6 +4,7 @@ import core.bigrammar.TestGrammarUtils
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.javac.classes._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC

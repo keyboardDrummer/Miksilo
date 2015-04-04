@@ -4,7 +4,8 @@ import core.particles.{Contract, CompilationState}
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.InvokeStaticC
-import transformations.javac.classes.{JavaClassSkeleton, MethodId}
+import transformations.javac.classes.MethodId
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 
 object CallStaticC extends GenericCall {
 

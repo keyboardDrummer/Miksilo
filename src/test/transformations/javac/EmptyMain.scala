@@ -2,8 +2,8 @@ package transformations.javac
 
 import core.particles.node.Node
 import org.junit.Test
-import transformations.javac.classes.JavaClassSkeleton._
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import JavaClassSkeleton._
 import transformations.javac.methods.MethodC._
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 import util.TestUtils

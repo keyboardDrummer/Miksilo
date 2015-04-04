@@ -7,7 +7,8 @@ import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorCon
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.{ConstantPool, JavaClassSkeleton, QualifiedClassName}
+import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import transformations.javac.classes.ConstantPool
 import transformations.javac.constructor.SuperCallExpression
 import transformations.bytecode.types.VoidTypeC
 import util.TestUtils

@@ -4,6 +4,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.javac.classes.BasicImportC._
+import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton, PackageInfo}
 
 object WildcardImportC extends ParticleWithGrammar {
 

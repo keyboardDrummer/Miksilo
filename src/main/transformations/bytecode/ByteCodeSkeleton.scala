@@ -7,7 +7,8 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node}
 import transformations.bytecode.attributes.ByteCodeAttribute
-import transformations.javac.classes.{ConstantPool, QualifiedClassName}
+import transformations.javac.classes.ConstantPool
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 

@@ -7,8 +7,8 @@ import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
-import transformations.javac.classes.QualifiedClassName
 import transformations.bytecode.types.ObjectTypeC
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 object NewByteCodeC extends InstructionC {
 

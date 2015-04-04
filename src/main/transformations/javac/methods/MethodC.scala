@@ -12,7 +12,8 @@ import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.{ClassCompiler, JavaClassSkeleton, MethodInfo}
+import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.javac.types.TypeAbstraction

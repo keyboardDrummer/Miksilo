@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.{Path, Root, Selection, SequenceSelection}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MemberSelector, MethodC, VariableC}

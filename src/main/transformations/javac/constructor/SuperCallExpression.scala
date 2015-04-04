@@ -6,7 +6,8 @@ import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.{JavaClassSkeleton, MethodId}
+import transformations.javac.classes.MethodId
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
 import transformations.javac.statements.StatementSkeleton

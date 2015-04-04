@@ -17,7 +17,7 @@ object Node {
   }
 }
 
-class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLike { // TODO rename Node to something that imports more easily.
+class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike { // TODO rename Node to something that imports more easily.
   type Self = Node
 
   def shallowClone: Node = {
@@ -55,12 +55,12 @@ class Node(var clazz: AnyRef, entries: (Any, Any)*) extends Dynamic with NodeLik
     throw new scala.UnsupportedOperationException("Don't insert a Origin into a regular MetaObject.")
   }
 
-  def selectDynamic(name: String) =
-    data.getOrElse(name, sys.error("member not found"))
-
-  def updateDynamic(name: String)(value: Any) {
-    data += name -> value
-  }
+//  def selectDynamic(name: String) =
+//    data.getOrElse(name, sys.error("member not found"))
+//
+//  def updateDynamic(name: String)(value: Any) {
+//    data += name -> value
+//  }
 
   override def toString: String = {
     val className = Node.classDebugRepresentation(clazz)

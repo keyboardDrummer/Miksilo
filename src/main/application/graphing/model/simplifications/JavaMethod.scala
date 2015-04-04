@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.methods.ImplicitReturnAtEndOfMethod
 import transformations.javac.methods.assignment.{AssignToVariable, IncrementAssignmentC}

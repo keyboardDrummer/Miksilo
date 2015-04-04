@@ -1,5 +1,7 @@
 package transformations.javac.classes
 
+import transformations.javac.classes.skeleton.{ClassInfo, PackageInfo}
+
 
 trait ReferenceKind
 

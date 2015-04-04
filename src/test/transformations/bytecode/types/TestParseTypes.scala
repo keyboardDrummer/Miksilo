@@ -2,7 +2,7 @@ package transformations.bytecode.types
 
 import core.bigrammar.TestGrammarUtils
 import org.junit.{Assert, Test}
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 class TestParseTypes {
 

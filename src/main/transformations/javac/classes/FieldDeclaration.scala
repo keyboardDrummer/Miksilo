@@ -6,6 +6,7 @@ import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 
 object FieldDeclaration extends ParticleWithGrammar {
 

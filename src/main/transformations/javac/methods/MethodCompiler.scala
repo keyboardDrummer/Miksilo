@@ -4,7 +4,7 @@ import core.exceptions.BadInputException
 import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.CompilationState
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementSkeleton
 import transformations.javac.statements.locals.LocalsAnalysis

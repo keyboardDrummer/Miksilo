@@ -6,6 +6,7 @@ import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MemberSelector
 import MemberSelector._
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

@@ -3,7 +3,7 @@ package transformations.javaPlus
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}

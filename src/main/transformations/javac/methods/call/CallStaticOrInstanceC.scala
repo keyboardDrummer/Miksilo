@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.classes._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 
 object CallStaticOrInstanceC extends GenericCall {
 

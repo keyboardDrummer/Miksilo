@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.particles.node.Node
 import transformations.bytecode.constants.ClassRefConstant
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 import scala.collection.mutable
 

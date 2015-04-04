@@ -4,7 +4,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallC}
 import transformations.bytecode.types.VoidTypeC

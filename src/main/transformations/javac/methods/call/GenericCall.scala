@@ -5,7 +5,8 @@ import core.particles.{Contract, CompilationState}
 import core.particles.node.{NodeLike, Node}
 import core.particles.path.Path
 import transformations.bytecode.constants.MethodDescriptorConstant
-import transformations.javac.classes.{JavaClassSkeleton, MethodId, ClassOrObjectReference, ClassCompiler}
+import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.{MethodId, ClassOrObjectReference, ClassCompiler}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.call.CallC.CallArgumentsGrammar

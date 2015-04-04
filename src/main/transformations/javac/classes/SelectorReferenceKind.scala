@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.path.Path
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo, PackageInfo}
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.MemberSelector.SelectorKey
 

@@ -5,7 +5,8 @@ import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.attributes.SignatureAttribute
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.{ConstantPool, FieldDeclaration, JavaClassSkeleton, QualifiedClassName}
+import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import transformations.javac.classes.{ConstantPool, FieldDeclaration}
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC.{Visibility, DefaultVisibility}
 import transformations.bytecode.types.TypeSkeleton

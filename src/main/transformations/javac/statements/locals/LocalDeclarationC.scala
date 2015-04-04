@@ -5,7 +5,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.javac.classes.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 

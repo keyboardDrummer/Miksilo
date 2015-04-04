@@ -5,6 +5,7 @@ import core.particles._
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.javac.classes._
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends ParticleWithGrammar with WithState {

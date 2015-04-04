@@ -5,7 +5,7 @@ import java.math.BigInteger
 import akka.util.Convert
 import core.particles.CompilationState
 import core.particles.node.Node
-import transformations.javac.classes.QualifiedClassName
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 object PrintByteCode { //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)

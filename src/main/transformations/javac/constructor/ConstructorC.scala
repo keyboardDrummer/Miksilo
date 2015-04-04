@@ -7,6 +7,7 @@ import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.classes._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.call.CallStaticOrInstanceC

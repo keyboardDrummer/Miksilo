@@ -2,7 +2,8 @@ package transformations.javac
 
 import core.particles.node.Node
 import org.junit.Test
-import transformations.javac.classes.JavaClassSkeleton._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
+import JavaClassSkeleton._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC

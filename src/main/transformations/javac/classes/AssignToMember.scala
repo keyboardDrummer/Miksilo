@@ -6,6 +6,7 @@ import core.particles.path.Path
 import transformations.bytecode.coreInstructions.SwapInstruction
 import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectField._
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MemberSelector.{SelectorMember, SelectorObject, SelectorKey}
 import transformations.javac.methods.{MemberSelector, VariableC}
