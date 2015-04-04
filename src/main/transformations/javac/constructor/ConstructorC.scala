@@ -1,18 +1,18 @@
 package transformations.javac.constructor
 
-import core.exceptions.BadInputException
 import core.particles._
+import core.particles.exceptions.BadInputException
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes._
+import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements.BlockC
-import transformations.bytecode.types.VoidTypeC
 
 object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
 
@@ -21,7 +21,7 @@ object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
   override def transform(clazz: Node, state: CompilationState): Unit = {
-    val className = JavaClassSkeleton.getClassName(clazz)
+    val className = clazz.name
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
       if (!constructorClassName.equals(className))
@@ -37,7 +37,7 @@ object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
   }
 
   def getConstructors(clazz: Node): Seq[Node] = {
-    JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == ConstructorKey)
+    clazz.members.filter(member => member.clazz == ConstructorKey)
   }
 
   def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],

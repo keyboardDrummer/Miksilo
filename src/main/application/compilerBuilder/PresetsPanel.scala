@@ -38,7 +38,7 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
         val model = this.getModel
         val text: String = model.getElementAt(index).description
         if (text.isEmpty)
-          return null;
+          return null
         text
       }
     }

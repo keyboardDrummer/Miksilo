@@ -1,7 +1,7 @@
 package transformations.bytecode.types
 
 import core.bigrammar.BiGrammarToDocument
-import core.exceptions.BadInputException
+import core.particles.exceptions.BadInputException
 import core.grammar.ParseException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue

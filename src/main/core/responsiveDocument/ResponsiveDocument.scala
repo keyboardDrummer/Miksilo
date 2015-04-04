@@ -3,8 +3,8 @@ package core.responsiveDocument
 import core.document.{BlankLine, Document, WhiteSpace}
 
 object ResponsiveDocument {
-  implicit def toResponsive(sized: Document) = new WrappedSizedDocument(sized)
-  implicit def text(text: String) = new WrappedSizedDocument(text)
+  implicit def toResponsive(sized: Document): WrappedSizedDocument = new WrappedSizedDocument(sized)
+  implicit def text(text: String): WrappedSizedDocument = new WrappedSizedDocument(text)
 }
 
 case class WrappedSizedDocument(sized: Document) extends ResponsiveDocument {

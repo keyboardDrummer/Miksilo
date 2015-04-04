@@ -1,4 +1,4 @@
-package core.exceptions
+package core.particles.exceptions
 
 import core.particles.Contract
 

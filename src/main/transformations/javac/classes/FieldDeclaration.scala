@@ -7,6 +7,7 @@ import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object FieldDeclaration extends ParticleWithGrammar {
 
@@ -48,7 +49,7 @@ object FieldDeclaration extends ParticleWithGrammar {
   }
 
   def getFields(clazz: Node): Seq[Node] = {
-    JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == FieldKey)
+    clazz.members.filter(member => member.clazz == FieldKey)
   }
 
   def convertFields(state: CompilationState, clazz: Node) = {

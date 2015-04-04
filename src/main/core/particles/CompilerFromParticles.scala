@@ -1,7 +1,7 @@
 package core.particles
 
 import core.bigrammar.Labelled
-import core.exceptions.ParticleDependencyViolation
+import core.particles.exceptions.ParticleDependencyViolation
 import core.particles.grammars.ProgramGrammar
 import core.particles.node.Node
 

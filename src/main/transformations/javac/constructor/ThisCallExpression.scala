@@ -6,8 +6,9 @@ import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.javac.methods.call.{CallC}
+import transformations.javac.methods.call.CallC
 import transformations.bytecode.types.VoidTypeC
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object ThisCallExpression extends ExpressionInstance {
   override val key: AnyRef = ThisCall
@@ -25,7 +26,7 @@ object ThisCallExpression extends ExpressionInstance {
   }
 
   def transformThisCall(clazz: Node, call: Path, state: CompilationState): Seq[Node] = {
-    SuperCallExpression.transformToByteCode(call, state, JavaClassSkeleton.getClassName(clazz))
+    SuperCallExpression.transformToByteCode(call, state, clazz.name)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

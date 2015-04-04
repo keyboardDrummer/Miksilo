@@ -5,8 +5,8 @@ import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.{ClassRefConstant, FieldRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.types.ObjectTypeC
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
-import JavaClassSkeleton._
 
 object ClassCompiler {
 }
@@ -22,7 +22,7 @@ case class MethodId(className: QualifiedClassName, methodName: String)
 case class ClassCompiler(currentClass: Node, state: CompilationState) {
   val compiler = new MyCompiler()
   val myPackage = compiler.getPackage(currentClass._package.toList)
-  val className = JavaClassSkeleton.getClassName(currentClass)
+  val className = currentClass.name
   val currentClassInfo = myPackage.newClassInfo(className)
 
   ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()

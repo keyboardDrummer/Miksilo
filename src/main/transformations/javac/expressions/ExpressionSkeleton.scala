@@ -1,6 +1,6 @@
 package transformations.javac.expressions
 
-import core.exceptions.CompilerException
+import core.particles.exceptions.CompilerException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node

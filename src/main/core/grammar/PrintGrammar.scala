@@ -60,10 +60,9 @@ object PrintGrammar {
 
   def grammarKeyToName(key: Any): String = key match {
     case string: String => string
-    case _ => {
+    case _ =>
       val regex = new Regex("Grammar\\$")
       regex.replaceAllIn(key.getClass.getSimpleName, "")
-    }
   }
 
   case class Option(inner: Grammar) extends Grammar

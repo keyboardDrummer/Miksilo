@@ -1,6 +1,6 @@
 package transformations.javac.statements.locals
 
-import core.exceptions.BadInputException
+import core.particles.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node

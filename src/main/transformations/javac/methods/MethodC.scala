@@ -6,6 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, Root}
 import transformations.bytecode.ByteCodeMethodInfo._
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
@@ -144,7 +145,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     method(MethodNameKey).asInstanceOf[String]
   }
 
-  def getMethods(clazz: Node) = JavaClassSkeleton.getMembers(clazz).filter(member => member.clazz == MethodKey)
+  def getMethods(clazz: Node) = clazz.members.filter(member => member.clazz == MethodKey)
 
   def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 

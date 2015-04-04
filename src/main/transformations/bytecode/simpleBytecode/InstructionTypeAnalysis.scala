@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.exceptions.BadInputException
+import core.particles.exceptions.BadInputException
 import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects

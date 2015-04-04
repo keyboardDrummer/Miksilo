@@ -5,7 +5,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Node}
+import core.particles.node.Node
 import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName

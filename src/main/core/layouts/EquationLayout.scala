@@ -25,8 +25,8 @@ class EquationLayout() {
   }
 
   def addRow(components: Component*) {
-    addEquals(components.map(c => c.height).toSeq: _*)
-    addEquals(components.map(c => c.bottom).toSeq: _*)
+    addEquals(components.map(c => c.height): _*)
+    addEquals(components.map(c => c.bottom): _*)
   }
 
   def addLeftToRight(components: Component*) {

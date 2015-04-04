@@ -2,7 +2,7 @@ package core.layouts
 
 object Expression
 {
-  implicit def constant(value: Double) = new Constant(value)
+  implicit def constant(value: Double): Constant = new Constant(value)
 }
 
 trait Expression {

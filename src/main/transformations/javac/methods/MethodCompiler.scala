@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.exceptions.BadInputException
+import core.particles.exceptions.BadInputException
 import core.particles.node.Node
 import core.particles.path.{Path, Root}
 import core.particles.CompilationState

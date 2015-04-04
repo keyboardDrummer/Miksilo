@@ -6,8 +6,8 @@ import javax.swing._
 import javax.swing.text.{DefaultCaret, PlainDocument}
 
 import application.StyleSheet
-import core.exceptions.CompileException
 import core.layouts.SwingEquationLayout
+import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromParticles, Particle}
 import transformations.bytecode.ByteCodeSkeleton
 

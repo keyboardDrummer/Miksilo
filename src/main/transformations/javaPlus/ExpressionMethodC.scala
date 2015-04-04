@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}
@@ -30,7 +31,7 @@ object ExpressionMethodC extends ParticleWithGrammar with ParticleWithPhase {
   }
 
   override def transform(clazz: Node, state: CompilationState): Unit = {
-    for(expressionMethod <- JavaClassSkeleton.getMembers(clazz).filter(method => method.clazz == ExpressionMethodKey))
+    for(expressionMethod <- clazz.members.filter(method => method.clazz == ExpressionMethodKey))
     {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[Node]
       expressionMethod.clazz = MethodC.MethodKey

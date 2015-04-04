@@ -12,6 +12,7 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
 import transformations.javac.statements.StatementSkeleton
 import transformations.bytecode.types.VoidTypeC
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object SuperCallExpression extends ExpressionInstance {
   override val key: AnyRef = SuperCall
@@ -29,7 +30,7 @@ object SuperCallExpression extends ExpressionInstance {
   }
 
   def transformSuperCall(clazz: Node, call: Path, state: CompilationState): Seq[Node] = {
-    transformToByteCode(call, state, JavaClassSkeleton.getParent(clazz).get)
+    transformToByteCode(call, state, clazz.parent.get)
   }
 
   def transformToByteCode(call: Path, state: CompilationState, className: String): Seq[Node] = {

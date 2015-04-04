@@ -1,3 +1,3 @@
-package core.exceptions
+package core.particles.exceptions
 
 class CompilerException extends CompileException

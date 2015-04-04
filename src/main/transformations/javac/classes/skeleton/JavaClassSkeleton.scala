@@ -42,7 +42,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
 
       val classRef = classCompiler.getClassRef(classInfo)
       clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
-      val parentName = getParent(clazz).get
+      val parentName = clazz.parent.get
       val parentRef = classCompiler.constantPool.getClassRef(classCompiler.fullyQualify(parentName))
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
@@ -72,16 +72,11 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     case _ =>
   }
 
-  def getParent(clazz: Node): Option[String] = clazz.data(ClassParent).asInstanceOf[Option[String]]
-
   def getClassCompiler(state: CompilationState) = getState(state).classCompiler
 
   def getQualifiedClassName(clazz: Node): QualifiedClassName = {
-    val className = getClassName(clazz)
-    new QualifiedClassName(clazz._package ++ Seq(className))
+    new QualifiedClassName(clazz._package ++ Seq(clazz.name))
   }
-
-  def getClassName(clazz: Node) = clazz(ClassName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
@@ -118,8 +113,6 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     var firstMemberPasses = List.empty[Node => Unit]
     var secondMemberPasses = List.empty[Node => Unit]
   }
-
-  def getMembers(clazz: Node) = clazz(Members).asInstanceOf[Seq[Node]]
 
   object ClassGrammar
 
