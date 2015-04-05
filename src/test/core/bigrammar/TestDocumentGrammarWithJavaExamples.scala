@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.particles.{CompilerFromParticles, Particle, ParticleWithGrammar}
+import core.particles.{CompilerFromParticles, Particle}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -82,7 +82,7 @@ class TestDocumentGrammarWithJavaExamples {
   def testPrettyPrintAndParseByteCode() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
 
-    val byteCodeTransformations: Seq[ParticleWithGrammar] = JavaCompiler.byteCodeTransformations
+    val byteCodeTransformations = JavaCompiler.byteCodeTransformations
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)

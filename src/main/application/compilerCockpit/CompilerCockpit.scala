@@ -1,7 +1,8 @@
 package application.compilerCockpit
 
 import java.awt._
-import java.io.CharArrayWriter
+import java.io.{ByteArrayInputStream, CharArrayWriter}
+import java.nio.charset.StandardCharsets
 import javax.swing._
 import javax.swing.text.{DefaultCaret, PlainDocument}
 
@@ -20,7 +21,10 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
   val compiler = new CompilerFromParticles(particles)
   private val inputDocument = new PlainDocument()
   private val outputDocument = new PlainDocument()
-  val textAreaInput: ParseFromFunction = new ParseFromFunction(() => inputDocument.getText(0, inputDocument.getLength))
+  val textAreaInput: ParseFromFunction = new ParseFromFunction(() => {
+    val stringText = inputDocument.getText(0, inputDocument.getLength)
+    new ByteArrayInputStream(stringText.getBytes(StandardCharsets.UTF_8))
+  })
 
   val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
   val compileOptions = getCompileOptions.toArray

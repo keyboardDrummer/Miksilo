@@ -1,8 +1,10 @@
 package application.compilerCockpit
 
-class ParseFromFunction(getText: () => String) extends InputOption {
+import java.io.InputStream
 
-  override def getInput: String = {
+class ParseFromFunction(getText: () => InputStream) extends InputOption {
+
+  override def getInput: InputStream = {
     getText()
   }
 

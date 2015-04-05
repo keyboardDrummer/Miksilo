@@ -1,15 +1,34 @@
 package transformations.bytecode.readJar
 
-import core.particles.ParticleWithGrammar
-import transformations.bytecode.attributes.{SignatureAttribute, ByteCodeAttribute, UnParsedAttribute}
+import java.io.{BufferedInputStream, InputStream}
+
+import core.particles.node.Node
+import core.particles.{CompilationState, Particle}
+import transformations.bytecode.attributes.{ByteCodeAttribute, SignatureAttribute, UnParsedAttribute}
 import transformations.javac.JavaCompiler
+
+object DecodeByteCodeParser extends Particle {
+  override def inject(state: CompilationState): Unit = {
+    state.parse = decodeStream
+  }
+
+  def decodeStream(inputStream: InputStream): Node = {
+    val bis = new BufferedInputStream(inputStream)
+    val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
+    val parseResult = ClassFileParser.classFileParser(new ArrayReader(0, inputBytes))
+    val clazz = parseResult.get
+    clazz
+  }
+
+  override def description: String = "Decodes a binary bytecode classfile."
+}
 
 object ClassFileSignatureDecompiler {
 
-  val byteCodeParticles: Seq[ParticleWithGrammar] = Seq(UnParsedAttribute) ++ JavaCompiler.byteCodeWithoutInstructions
-  val decompilerByteCodeParticles: Seq[ParticleWithGrammar] = byteCodeParticles.
+  val byteCodeParticles: Seq[Particle] = Seq(UnParsedAttribute) ++ JavaCompiler.byteCodeWithoutTextualParser ++ Seq(DecodeByteCodeParser)
+  val onlySignatureAttribute: Seq[Particle] = byteCodeParticles.
     filter(particle => !particle.isInstanceOf[ByteCodeAttribute] || particle == SignatureAttribute)
   def getDecompiler = {
-    Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ decompilerByteCodeParticles
+    Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ onlySignatureAttribute
   }
 }

@@ -1,14 +1,13 @@
 package transformations.bytecode.readJar
 
-import java.io.BufferedInputStream
+import java.io.InputStream
 
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
 import core.particles.CompilerFromParticles
-import core.particles.node.Node
 import org.junit.{Assert, Test}
-import transformations.javac.JavaCompiler
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
+import transformations.javac.JavaCompiler
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -16,9 +15,10 @@ import scala.reflect.io.Path
 class TestClassFileParser {
 
   @Test
-  def testObjectClassUnparsedAttributes() = {
-    val clazz: Node = decodeFile("Object.class")
-    val state = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles).transformReturnState(clazz)
+  def testObjectClassUnParsedAttributes() = {
+    val inputStream = getInputStream("Object.class")
+    val compiler: CompilerFromParticles = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
+    val state = compiler.parseAndTransform(inputStream)
 
     val expected = TestUtils.getTestFile("DecodedObjectClassPrettyPrint.txt").slurp()
     Assert.assertEquals(expected, state.output)
@@ -26,9 +26,9 @@ class TestClassFileParser {
 
   @Test
   def testObjectClassParsedAttributes() = {
-    val clazz: Node = decodeFile("Object.class")
-    val state = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
-      ClassFileSignatureDecompiler.decompilerByteCodeParticles).transformReturnState(clazz)
+    val compiler = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
+      ClassFileSignatureDecompiler.onlySignatureAttribute)
+    val state = compiler.parseAndTransform(getInputStream("Object.class"))
 
     val expected = TestUtils.getTestFile("DecodedWithAttributesObjectClassPrettyPrint.txt").slurp()
     Assert.assertEquals(expected, state.output)
@@ -36,8 +36,8 @@ class TestClassFileParser {
 
   @Test
   def testObjectClassSignatureDeCompilation() = {
-    val clazz: Node = decodeFile("Object.class")
-    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.parseAndTransform(getInputStream("Object.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
@@ -46,8 +46,8 @@ class TestClassFileParser {
 
   @Test
   def testSystemClassSignatureDeCompilation() = {
-    val clazz: Node = decodeFile("System.class")
-    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.parseAndTransform(getInputStream("System.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = TestUtils.getTestFile("DecompiledSystemClassFileSignature.txt").slurp()
@@ -56,21 +56,17 @@ class TestClassFileParser {
 
   @Test
   def testPrintStreamClassSignatureDeCompilation() = {
-    val clazz: Node = decodeFile("PrintStream.class")
-    val state = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler).transformReturnState(clazz)
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.parseAndTransform(getInputStream("PrintStream.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
     val expected = TestUtils.getTestFile("DecompiledPrintStreamClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 
-  def decodeFile(fileName: Path): Node = {
+  def getInputStream(fileName: Path): InputStream = {
     val file = TestUtils.getTestFile(fileName)
-    val bis = new BufferedInputStream(file.inputStream())
-    val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
-    val parseResult = ClassFileParser.classFileParser(new ArrayReader(0, inputBytes))
-    val clazz = parseResult.get
-    clazz
+    file.inputStream()
   }
 
   @Test

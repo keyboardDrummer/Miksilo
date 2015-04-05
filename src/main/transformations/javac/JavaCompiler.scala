@@ -68,22 +68,6 @@ object JavaCompiler {
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
-  def constantEntryParticles = Seq(FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
-    ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant,
-    FieldDescriptorConstant, IntegerConstant, StringConstant)
-
-  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
-    CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
-    SignatureAttribute)
-  def byteCodeWithoutInstructions = {
-    bytecodeAttributes ++ constantEntryParticles ++
-      Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
-      typeTransformations ++ Seq(ByteCodeSkeleton)
-  }
-
-  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
-    Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
-
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
@@ -96,6 +80,23 @@ object JavaCompiler {
 
   def integerInstructions = Seq(AddIntegersC, IntegerConstantC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
+
+  def byteCodeWithoutInstructions = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
+
+  def byteCodeWithoutTextualParser: Seq[ParticleWithGrammar] = bytecodeAttributes ++ constantEntryParticles ++
+    Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
+    typeTransformations ++ Seq(ByteCodeSkeleton)
+
+  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
+    CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
+    SignatureAttribute)
+
+  def constantEntryParticles = Seq(FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
+    ClassRefConstant, CodeConstantEntry, MethodDescriptorConstant,
+    FieldDescriptorConstant, IntegerConstant, StringConstant)
+  
+  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
+    Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
     val implicitsSet = implicits.toSet

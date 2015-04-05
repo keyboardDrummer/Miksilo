@@ -1,5 +1,7 @@
 package application.compilerCockpit
 
+import java.io.InputStream
+
 import core.particles.node.Node
 import core.particles.{CompilationState, CompilerFromParticles, Particle}
 import transformations.bytecode.ByteCodeSkeleton
@@ -25,9 +27,9 @@ object RunWithJVM extends Particle
 
 object CompileAndRunOption extends CompileOption {
 
-  override def perform(cockpit: CompilerCockpit, input: String): String = {
+  override def perform(cockpit: CompilerCockpit, inputStream: InputStream): String = {
     val compiler = new CompilerFromParticles(cockpit.particles ++ Seq(RunWithJVM))
-    val state = compiler.parseAndTransform(input)
+    val state = compiler.parseAndTransform(inputStream)
 
     state.output
   }

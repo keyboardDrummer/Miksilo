@@ -1,5 +1,8 @@
 package core.particles
 
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.StandardCharsets
+
 import core.bigrammar.Labelled
 import core.particles.exceptions.ParticleDependencyViolation
 import core.particles.grammars.ProgramGrammar
@@ -18,13 +21,12 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
 
   def parseAndTransform(input: File): CompilationState = {
     val inputStream = File(input).slurp()
-    val state: CompilationState = parseAndTransform(inputStream)
+    val state: CompilationState = parseAndTransform(input.inputStream())
     state
   }
 
   def compile(input: File, outputDirectory: Directory): CompilationState = {
-    val inputStream = File(input).slurp()
-    val state: CompilationState = parseAndTransform(inputStream)
+    val state: CompilationState = parseAndTransform(input.inputStream())
 
     PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
     state
@@ -44,13 +46,19 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
 
   def parse(input: String): Node = {
     val state = buildState
-    state.parseString(input)
+    state.program = state.parse(stringToInputStream(input))
     state.program
   }
 
+  def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+
   def parseAndTransform(input: String): CompilationState = {
+    parseAndTransform(stringToInputStream(input))
+  }
+
+  def parseAndTransform(input: InputStream): CompilationState = {
     val state = buildState
-    state.parseString(input)
+    state.program = state.parse(input)
     state.runPhases()
     state
   }

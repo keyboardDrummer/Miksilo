@@ -1,5 +1,7 @@
 package core.particles
 
+import java.io.InputStream
+
 import core.bigrammar.BiFailure
 import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -8,6 +10,19 @@ import core.particles.node.{Node, Node$}
 import scala.collection.mutable
 import scala.util.Random
 
+object ParseUsingTextualGrammar extends Particle {
+  override def inject(state: CompilationState): Unit = {
+    val grammarCatalogue = state.grammarCatalogue
+    state.parse = input => {
+      val inputString = scala.io.Source.fromInputStream(input).mkString
+      val manager = new ParticlesToParserConverter()
+      manager.parse(grammarCatalogue.find(ProgramGrammar), inputString).asInstanceOf[Node]
+    }
+  }
+
+  override def description: String = "Parses the input file using a textual grammar."
+}
+
 class CompilationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
@@ -15,6 +30,7 @@ class CompilationState {
   grammarCatalogue.create(ProgramGrammar, BiFailure)
   var program: Node = null
   var compilerPhases: List[() => Unit] = List.empty
+  var parse: InputStream => Node = null
 
   def getUniqueLabel(prefix: String) = prefix + getGUID
 
