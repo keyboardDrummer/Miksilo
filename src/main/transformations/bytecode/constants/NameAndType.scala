@@ -18,18 +18,18 @@ object NameAndType extends ConstantEntry {
     NameAndTypeName -> nameIndex,
     NameAndTypeType -> typeIndex)
 
-  def getNameAndTypeName(nameAndType: Node) = nameAndType(NameAndTypeName).asInstanceOf[Int]
+  def getName(nameAndType: Node) = nameAndType(NameAndTypeName).asInstanceOf[Int]
 
   def getTypeIndex(nameAndType: Node) = nameAndType(NameAndTypeType).asInstanceOf[Int]
 
   override def key: Any = NameAndTypeKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
-    byteToBytes(12) ++ shortToBytes(getNameAndTypeName(constant)) ++
+    byteToBytes(12) ++ shortToBytes(getName(constant)) ++
       shortToBytes(getTypeIndex(constant))
   }
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "name and type:" ~~> (integer <~ ":") ~ integer ^^
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "name and type:" ~~> (integer <~ ":") ~ integer ^^
     parseMap(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
 
   override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."

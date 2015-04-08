@@ -1,6 +1,6 @@
 package transformations.javac.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiFailure, BiGrammar}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
@@ -9,15 +9,19 @@ import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
 
 object MethodTypeC extends TypeInstance {
 
-  def construct(returnDescriptor: Node, parameterDescriptors: Seq[Node]) = {
-    new Node(MethodTypeKey,
-      Parameters -> parameterDescriptors,
-      ReturnType -> returnDescriptor)
+  implicit class MethodType(node: Node) {
+    def returnType: Node = node(ReturnType).asInstanceOf[Node]
+    def returnType_=(value: Node) = node(ReturnType) = value
+
+    def parameterTypes: Seq[Node] = node(Parameters).asInstanceOf[Seq[Node]]
+    def parameterTypes_=(value: Seq[Node]) = node(Parameters) = value
   }
 
-  def getReturnType(descriptor: Node) = descriptor(ReturnType).asInstanceOf[Node]
-
-  def getParameters(descriptor: Node) = descriptor(Parameters).asInstanceOf[Seq[Node]]
+  def construct(returnType: Node, parameterTypes: Seq[Node]) = {
+    new Node(MethodTypeKey,
+      Parameters -> parameterTypes,
+      ReturnType -> returnType)
+  }
 
   object MethodTypeKey extends Key
 
@@ -31,7 +35,7 @@ object MethodTypeC extends TypeInstance {
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "jerp" ^^ parseMap(key)
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure ///Deze heeft helemaal geen Java grammar.
 
   object ByteCodeMethodTypeGrammar
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {

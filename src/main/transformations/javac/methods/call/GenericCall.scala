@@ -1,15 +1,15 @@
 package transformations.javac.methods.call
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, CompilationState}
-import core.particles.node.{NodeLike, Node}
+import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.constants.MethodDescriptorConstant
+import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
-import transformations.javac.classes.{MethodId, ClassOrObjectReference, ClassCompiler}
+import transformations.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.call.CallC.CallArgumentsGrammar
+import transformations.javac.types.MethodTypeC._
 
 object CallC
 {
@@ -53,7 +53,7 @@ trait GenericCall extends ExpressionInstance {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
-    val returnType = MethodDescriptorConstant.getMethodDescriptorReturnType(methodInfo.descriptor)
+    val returnType = methodInfo._type.returnType
     returnType
   }
 
@@ -69,7 +69,10 @@ trait GenericCall extends ExpressionInstance {
     val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
+    val callArguments = CallC.getCallArguments(call)
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compiler.state)(argument))
+
     val member = MemberSelector.getSelectorMember(callCallee)
-    new MethodId(kind.info.getQualifiedName, member)
+    new MethodQuery(kind.info.getQualifiedName, member, callTypes)
   }
 }

@@ -4,7 +4,7 @@ import core.particles.{Contract, CompilationState}
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.InvokeStaticC
-import transformations.javac.classes.MethodId
+import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 
 object CallStaticC extends GenericCall {
@@ -14,7 +14,7 @@ object CallStaticC extends GenericCall {
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
-    val methodKey: MethodId = getMethodKey(call, compiler)
+    val methodKey: MethodQuery = getMethodKey(call, compiler)
     val methodRefIndex = compiler.getMethodRefIndex(methodKey)
     getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
   }

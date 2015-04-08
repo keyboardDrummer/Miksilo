@@ -116,8 +116,9 @@ class BiGrammarToDocument {
     ToDocumentApplicative.bind(first.map(firstDoc => secondDoc => combine(firstDoc, secondDoc)), second)
   }
 
-  def extractSequence(value: Any): Try[Seq[Any]] = {
-    Try.apply(value.asInstanceOf[Seq[Any]]).recoverWith({ case e: ClassCastException => emptyFailure(value, e) })
+  def extractSequence(value: Any): Try[Seq[Any]] = value match {
+    case sequence: Seq[Any] => Try(sequence)
+    case _ => emptyFailure(value, new ClassCastException(s"value $value was not a sequence"))
   }
 
   object ValueWasNotAProduct extends Throwable

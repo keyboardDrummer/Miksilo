@@ -21,7 +21,7 @@ object FieldDescriptorConstant extends ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(typeString)
   }
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     "field:" ~> typeGrammar ^^ parseMap(Key, Type)
   }

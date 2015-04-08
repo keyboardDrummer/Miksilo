@@ -22,7 +22,7 @@ object ClassRefConstant extends ConstantEntry {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
   }
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~> integer ^^ parseMap(ClassRefKey, ClassRefName)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~> integer ^^ parseMap(ClassRefKey, ClassRefName)
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

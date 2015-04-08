@@ -30,7 +30,7 @@ object FieldRefConstant extends ConstantEntry {
 
   def getNameAndTypeIndex(fieldRef: Node) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 }

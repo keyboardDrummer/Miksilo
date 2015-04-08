@@ -6,26 +6,26 @@ constant pool:
   #3: java.lang.Object
   #4: class reference: 3
   #5: "<init>"
-  #6: void ()
+  #6: T()V
   #7: name and type: 5:6
   #8: method reference: 4.7
   #9: Code
   #10: "main"
-  #11: void (java.lang.String[])
+  #11: T([Ljava/lang/String;)V
   #12: java.io.PrintStream
   #13: class reference: 12
   #14: "print"
-  #15: void (int)
+  #15: T(I)V
   #16: name and type: 14:15
   #17: method reference: 13.16
   #18: java.lang.System
   #19: class reference: 18
   #20: "out"
-  #21: Tjava.io.PrintStream
+  #21: TLjava/io/PrintStream;
   #22: name and type: 20:21
   #23: field reference: 19.22
   #24: "fibonacci"
-  #25: int (int)
+  #25: T(I)I
   #26: name and type: 24:25
   #27: method reference: 2.26
   #28: StackMapTable

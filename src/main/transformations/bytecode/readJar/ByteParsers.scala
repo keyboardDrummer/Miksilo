@@ -27,7 +27,14 @@ trait ByteParsers extends scala.util.parsing.combinator.Parsers {
      }
    }
 
-   object ParseByte extends Parser[Byte] {
+  object ParseLong extends Parser[Long] {
+    override def apply(in: Input): ParseResult[Long] = {
+      val (bytes, rest) = splitInput(in, 8)
+      Success(ByteBuffer.wrap(bytes.toArray).getLong, rest)
+    }
+  }
+
+  object ParseByte extends Parser[Byte] {
      override def apply(in: Input): ParseResult[Elem] = {
        Success(in.first, in.rest)
      }

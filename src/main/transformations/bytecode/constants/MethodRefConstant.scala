@@ -16,7 +16,7 @@ object MethodRefConstant extends ConstantEntry {
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
-      shortToBytes(getMethodRefMethodNameIndex(constant))
+      shortToBytes(getNameAndTypeIndex(constant))
   }
 
   override def key: Any = MethodRefKey
@@ -27,9 +27,9 @@ object MethodRefConstant extends ConstantEntry {
 
   def getMethodRefClassRefIndex(methodRef: Node) = methodRef(MethodRefClassName).asInstanceOf[Int]
 
-  def getMethodRefMethodNameIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
+  def getNameAndTypeIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+  def getConstantEntryGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^ parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 }

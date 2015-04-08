@@ -6,7 +6,7 @@ import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.MethodId
+import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
@@ -36,8 +36,9 @@ object SuperCallExpression extends ExpressionInstance {
   def transformToByteCode(call: Path, state: CompilationState, className: String): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val callArguments = CallC.getCallArguments(call)
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
     val qualifiedName = compiler.fullyQualify(className)
-    val methodRefIndex = compiler.getMethodRefIndex(new MethodId(qualifiedName, constructorName))
+    val methodRefIndex = compiler.getMethodRefIndex(new MethodQuery(qualifiedName, constructorName, callTypes))
     val argumentInstructions = callArguments.flatMap(argument => StatementSkeleton.getToInstructions(state)(argument))
     Seq(LoadAddressC.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialC.invokeSpecial(methodRefIndex))
   }

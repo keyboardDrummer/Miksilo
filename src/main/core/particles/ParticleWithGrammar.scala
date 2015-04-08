@@ -35,12 +35,8 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     val metaObject = value.asInstanceOf[NodeLike]
 
     if (metaObject.clazz == key) {
-      val first :: rest = fields
-      var result: Any = getWithPartial(metaObject, first)
-      for (other <- rest) {
-        result = core.grammar.~(result, getWithPartial(metaObject, other))
-      }
-      Some(result)
+      val fieldValues = fields.map(field => getWithPartial(metaObject, field))
+      Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
     } else {
       None
     }

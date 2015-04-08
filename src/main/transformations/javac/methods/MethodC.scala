@@ -10,16 +10,23 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
-import transformations.bytecode.constants.MethodDescriptorConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.{MethodClassKey, JavaClassSkeleton}
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
-import transformations.javac.types.TypeAbstraction
+import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
 object MethodC extends ParticleWithGrammar with WithState {
+
+  implicit class Method(node: Node) {
+    def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]
+    def returnType_=(value: Node) = node(ReturnTypeKey) = value
+
+    def parameters: Seq[Node] = node(MethodParametersKey).asInstanceOf[Seq[Node]]
+    def parameters_=(value: Seq[Node]) = node(MethodParametersKey) = value
+  }
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -48,8 +55,11 @@ object MethodC extends ParticleWithGrammar with WithState {
 
     def bindMethod(method: Node) = {
       val methodName: String = MethodC.getMethodName(method)
-      val descriptor = MethodC.getMethodDescriptor(method, classCompiler)
-      classInfo.content(methodName) = new MethodInfo(descriptor, MethodC.getMethodStatic(method))
+      val parameters = method.parameters
+      val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
+      val _type = MethodTypeC.construct(method.returnType, parameterTypes)
+      val key = new MethodClassKey(methodName, parameterTypes)
+      classInfo.methods(key) = new MethodInfo(_type, MethodC.getMethodStatic(method))
     }
   }
 
@@ -64,7 +74,7 @@ object MethodC extends ParticleWithGrammar with WithState {
   def getMethodDescriptor(method: Node, classCompiler: ClassCompiler): Node = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)
-    MethodDescriptorConstant.methodDescriptor(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    MethodTypeC.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
   }
 
   def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
@@ -114,7 +124,6 @@ object MethodC extends ParticleWithGrammar with WithState {
   def getMethodParameters(metaObject: Node) = {
     metaObject(MethodParametersKey).asInstanceOf[Seq[Node]]
   }
-
 
   def addMethodFlags(method: Node) = {
     var flags = Set[ByteCodeMethodInfo.MethodAccessFlag]()

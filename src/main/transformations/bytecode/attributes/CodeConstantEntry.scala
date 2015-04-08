@@ -19,7 +19,7 @@ object CodeConstantEntry extends ConstantEntry //TODO deze kan toch helemaal weg
     PrintByteCode.toUTF8ConstantEntry("Code")
   }
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "Code" ~> produce(entry)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "Code" ~> produce(entry)
 
   override def description: String = "Adds a constant entry used by the code attribute to identity itself."
 }

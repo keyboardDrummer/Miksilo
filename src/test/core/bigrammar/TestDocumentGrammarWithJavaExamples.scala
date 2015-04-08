@@ -80,7 +80,7 @@ class TestDocumentGrammarWithJavaExamples {
 
   @Test
   def testPrettyPrintAndParseByteCode() {
-    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
 
     val byteCodeTransformations = JavaCompiler.byteCodeTransformations
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler

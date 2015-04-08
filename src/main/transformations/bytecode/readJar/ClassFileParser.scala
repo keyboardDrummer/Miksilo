@@ -29,8 +29,16 @@ object ClassFileParser extends ByteParsers {
 
   def constantPoolParser: Parser[ConstantPool] = for {
     constantPoolItemCount <- ParseShort.map(s => s - 1)
-    constants <- repN(constantPoolItemCount, constantParser)
+    constants <- constantsParser(constantPoolItemCount)
   } yield new ConstantPool(constants)
+
+  def constantsParser(constantCount: Int): Parser[List[Any]] = constantCount match {
+    case 0 => success(List.empty)
+    case _ => for {
+      ConstantParseResult(constant, entriesConsumed) <- constantParser
+      result <- constantsParser(constantCount - entriesConsumed).map(rest => constant :: rest)
+    } yield result
+  }
 
   def attributeParser: Parser[Node] = for {
     nameIndex <- ParseShort
@@ -90,18 +98,21 @@ object ClassFileParser extends ByteParsers {
 
   def integerParser = ParseInteger.map(integer => IntegerConstant.construct(integer))
 
-  def constantParser: Parser[Any] = ParseByte.into {
-    case 1 => utf8Parser
-    case 3 => integerParser
-    case 4 => ParseFloat
-    case 5 => failure("can't parse long")
-    case 6 => failure("can't parse double")
-    case 7 => classReferenceParser
-    case 8 => stringParser
-    case 9 => fieldReferenceParser
-    case 10 => methodReferenceParser
-    case 11 => interfaceMethodReference
-    case 12 => nameAndTypeParser
+  case class ConstantParseResult(constant: Any, entriesConsumed: Int)
+  def consumeOne(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 1))
+  def consumeTwo(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 2))
+  def constantParser: Parser[ConstantParseResult] = ParseByte.into {
+    case 1 => consumeOne(utf8Parser)
+    case 3 => consumeOne(integerParser)
+    case 4 => consumeOne(ParseFloat)
+    case 5 => consumeTwo(ParseLong)
+    case 6 => consumeTwo(failure("can't parse double"))
+    case 7 => consumeOne(classReferenceParser)
+    case 8 => consumeOne(stringParser)
+    case 9 => consumeOne(fieldReferenceParser)
+    case 10 => consumeOne(methodReferenceParser)
+    case 11 => consumeOne(interfaceMethodReference)
+    case 12 => consumeOne(nameAndTypeParser)
     case 15 => ???
     case 16 => ???
     case 18 => ???

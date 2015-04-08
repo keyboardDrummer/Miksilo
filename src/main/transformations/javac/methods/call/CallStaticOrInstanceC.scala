@@ -15,7 +15,7 @@ object CallStaticOrInstanceC extends GenericCall {
   override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
-    val methodKey: MethodId = getMethodKey(call, compiler)
+    val methodKey: MethodQuery = getMethodKey(call, compiler)
     val methodRefIndex = compiler.getMethodRefIndex(methodKey)
 
     val methodInfo = compiler.compiler.find(methodKey)

@@ -5,7 +5,8 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.{Path, Root, Selection, SequenceSelection}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.ClassCompiler
+import transformations.javac.classes.skeleton.{ClassSignature, ClassMember, JavaClassSkeleton, MyCompiler}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MemberSelector, MethodC, VariableC}
@@ -22,12 +23,23 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
     val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
     if (!MethodC.getMethodCompiler(state).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
-      currentClass.content.get(name).foreach(classMember => {
-        val newVariableName = if (classMember._static) currentClass.name else thisName
-        val selector = MemberSelector.selector(VariableC.variable(newVariableName), name)
-        variable.replaceWith(selector)
+      currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
+        val classMember: ClassMember = currentClass.methods(key)
+        addThisToVariable(classMember, currentClass, variable)
+      })
+
+      currentClass.fields.keys.find(key => key == name).foreach(key => {
+        val classMember = currentClass.fields(key)
+        addThisToVariable(classMember, currentClass, variable)
       })
     }
+  }
+
+  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: Path) = {
+    val name = VariableC.getVariableName(variable)
+    val newVariableName = if (classMember._static) currentClass.name else thisName
+    val selector = MemberSelector.selector(VariableC.variable(newVariableName), name)
+    variable.replaceWith(selector)
   }
 
   def getVariableWithCorrectPath(obj: Path): Path = {
@@ -45,7 +57,10 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
   override def transform(program: Node, state: CompilationState): Unit = {
     val programWithOrigin = new Root(program)
     programWithOrigin.transform(obj => obj.clazz match {
-      case ByteCodeSkeleton.ClassFileKey => JavaClassSkeleton.initializeClassCompiler(state, program)
+      case ByteCodeSkeleton.ClassFileKey =>
+        val compiler = new MyCompiler(state)
+        JavaLang.initialise(compiler)
+        new ClassCompiler(obj, compiler)
       case MethodC.MethodKey => MethodC.setMethodCompiler(obj, state)
       case VariableC.VariableKey => addThisToVariable(state, obj)
       case _ =>

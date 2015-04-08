@@ -18,10 +18,10 @@ trait ConstantEntry extends ParticleWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val itemContent = grammars.find(ConstantPoolItemContentGrammar)
-    itemContent.addOption(getGrammar(grammars))
+    itemContent.addOption(getConstantEntryGrammar(grammars))
   }
   
-  def getGrammar(grammars: GrammarCatalogue): BiGrammar
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
 }

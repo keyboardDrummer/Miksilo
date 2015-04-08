@@ -5,6 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
+import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SubtractionC extends ExpressionInstance {
@@ -32,7 +33,14 @@ object SubtractionC extends ExpressionInstance {
 
   override val key: AnyRef = SubtractionKey
 
-  override def getType(expression: Path, state: CompilationState): Node = ???
+  override def getType(expression: Path, state: CompilationState): Node = {
+    val getType = ExpressionSkeleton.getType(state)
+    val firstType = getType(getFirst(expression))
+    val secondType = getType(getSecond(expression))
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    IntTypeC.intType
+  }
 
   override def toByteCode(subtraction: Path, state: CompilationState): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)

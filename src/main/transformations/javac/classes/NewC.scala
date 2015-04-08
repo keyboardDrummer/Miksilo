@@ -6,7 +6,7 @@ import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
@@ -34,16 +34,17 @@ object NewC extends ExpressionInstance {
     expression(NewObject).asInstanceOf[Path]
   }
 
-  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val objectType = getNewObject(expression)
-    val classInfo: ClassInfo = compiler.findClass(objectType)
+    val classInfo: ClassSignature = compiler.findClass(objectType)
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = CallC.getCallArguments(expression)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
 
-    val methodKey = new MethodId(classInfo.getQualifiedName, SuperCallExpression.constructorName)
+    val methodKey = new MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
     Seq(NewByteCodeC.newInstruction(classRef), DuplicateInstructionC.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }

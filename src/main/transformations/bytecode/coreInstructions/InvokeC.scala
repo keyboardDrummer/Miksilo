@@ -4,18 +4,20 @@ import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 import transformations.javac.classes.skeleton.QualifiedClassName
+import transformations.javac.types.MethodTypeC
+import MethodTypeC._
 
 abstract class InvokeC extends InstructionC {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val constantPool: ConstantPool = ByteCodeSkeleton.getConstantPool(state)
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
-    val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[Node]
+    val nameAndType = constantPool.getValue(MethodRefConstant.getNameAndTypeIndex(methodRef)).asInstanceOf[Node]
     val descriptor = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]
     getMethodStackModification(descriptor, constantPool, state)
   }
@@ -23,7 +25,7 @@ abstract class InvokeC extends InstructionC {
   def getInstanceInstructionSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val constantPool = ByteCodeSkeleton.getConstantPool(state)
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
-    val nameAndType = constantPool.getValue(MethodRefConstant.getMethodRefMethodNameIndex(methodRef)).asInstanceOf[Node]
+    val nameAndType = constantPool.getValue(MethodRefConstant.getNameAndTypeIndex(methodRef)).asInstanceOf[Node]
     val classRef = constantPool.getValue(MethodRefConstant.getMethodRefClassRefIndex(methodRef)).asInstanceOf[Node]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)
@@ -32,9 +34,9 @@ abstract class InvokeC extends InstructionC {
     InstructionSignature(Seq(classType) ++ ins, outs)
   }
 
-  def getMethodStackModification(descriptor: Node, constantPool: ConstantPool, state: CompilationState): InstructionSignature = {
-    val ins = MethodDescriptorConstant.getMethodDescriptorParameters(descriptor).map(_type => TypeSkeleton.toStackType(_type, state))
-    val outs = Seq(TypeSkeleton.toStackType(MethodDescriptorConstant.getMethodDescriptorReturnType(descriptor), state))
+  def getMethodStackModification(methodType: Node, constantPool: ConstantPool, state: CompilationState): InstructionSignature = {
+    val ins = methodType.parameterTypes.map(_type => TypeSkeleton.toStackType(_type, state))
+    val outs = Seq(TypeSkeleton.toStackType(methodType.returnType, state))
     InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))
   }
 

@@ -12,6 +12,7 @@ import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.constructor.SuperCallExpression
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.javac.types.MethodTypeC
 import util.TestUtils
 
 import scala.collection.mutable.ArrayBuffer
@@ -80,14 +81,14 @@ class TestPrintByteCodeFibonacciWithMain {
       ClassRefConstant.classRef(24),
       ClassRefConstant.classRef(25),
       SuperCallExpression.constructorName,
-      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       LineNumberTable.constantPoolKey,
       "main",
-      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(
+      MethodTypeC.construct(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
-      MethodDescriptorConstant.methodDescriptor(IntTypeC.intType, Seq(IntTypeC.intType)),
+      MethodTypeC.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
       StackMapTableAttribute.stackMapTableId,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
@@ -104,7 +105,7 @@ class TestPrintByteCodeFibonacciWithMain {
       ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       "java/io/PrintStream",
       "print",
-      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq(IntTypeC.intType))
+      MethodTypeC.construct(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
     new ConstantPool(constantPool)
   }

@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.path.Path
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, PackageInfo}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.VariableC.VariableKey
 
@@ -23,7 +23,7 @@ object VariableReferenceKind extends Particle {
     else {
       val mbPackage = classCompiler.compiler.classPath.content.get(name)
       if (mbPackage.isDefined)
-        new PackageReference(mbPackage.get.asInstanceOf[PackageInfo])
+        new PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
       else {
         MemberSelector.getReferenceKindFromExpressionType(classCompiler, variable)
       }

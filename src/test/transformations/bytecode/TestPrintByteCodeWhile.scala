@@ -3,14 +3,15 @@ package transformations.bytecode
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.bytecode.attributes._
-import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
+import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
+import transformations.javac.types.MethodTypeC
 import util.TestUtils
 
 class TestPrintByteCodeWhile {
@@ -26,7 +27,7 @@ class TestPrintByteCodeWhile {
       ClassRefConstant.classRef(13),
       ClassRefConstant.classRef(14),
       "<init>",
-      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       LineNumberTable.constantPoolKey,
       "whilee",

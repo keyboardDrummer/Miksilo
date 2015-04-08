@@ -4,12 +4,14 @@ import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
-import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant}
+import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.QualifiedClassName
+import transformations.javac.types.MethodTypeC
+import MethodTypeC._
 
 class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
@@ -41,8 +43,8 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   
   private def getMethodParameters = {
     val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
-    val methodDescriptor = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node]
-    val methodParameters = MethodDescriptorConstant.getMethodDescriptorParameters(methodDescriptor)
+    val methodType = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node]
+    val methodParameters = methodType.parameterTypes
     if (methodIsStatic) {
       methodParameters
     }

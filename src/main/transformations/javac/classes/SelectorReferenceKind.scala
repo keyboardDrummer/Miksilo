@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.path.Path
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo, PackageInfo}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature, PackageSignature}
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.MemberSelector.SelectorKey
 
@@ -21,8 +21,8 @@ object SelectorReferenceKind extends Particle {
     val member = MemberSelector.getSelectorMember(selector)
     MemberSelector.getReferenceKind(compiler, obj) match {
       case PackageReference(info) => info.content(member) match {
-        case result: PackageInfo => new PackageReference(result)
-        case result: ClassInfo => new ClassOrObjectReference(result, true)
+        case result: PackageSignature => new PackageReference(result)
+        case result: ClassSignature => new ClassOrObjectReference(result, true)
       }
       case ClassOrObjectReference(info, _) =>
         val field = info.getField(member)

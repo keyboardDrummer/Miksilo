@@ -6,6 +6,9 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
+/**
+ * Invokes an instance method using static binding, so no dynamic dispatch is applied.
+ */
 object InvokeSpecialC extends InvokeC {
   override val key: AnyRef = InvokeSpecialKey
 

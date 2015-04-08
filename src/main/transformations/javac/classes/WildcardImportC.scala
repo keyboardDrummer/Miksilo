@@ -4,7 +4,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.javac.classes.BasicImportC._
-import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton, PackageInfo}
+import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton, PackageSignature}
 
 object WildcardImportC extends ParticleWithGrammar {
 
@@ -22,7 +22,7 @@ object WildcardImportC extends ParticleWithGrammar {
       val packageParts = getParts(wildcardImport)
       val classCompiler = JavaClassSkeleton.getState(state).classCompiler
       val compiler = classCompiler.compiler
-      val finalPackage = compiler.find(packageParts).asInstanceOf[PackageInfo]
+      val finalPackage = compiler.find(packageParts).asInstanceOf[PackageSignature]
 
       finalPackage.flattenContents().map(entry => {
         val className = entry._1.last

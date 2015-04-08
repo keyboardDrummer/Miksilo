@@ -3,7 +3,7 @@ package transformations.javac
 import core.particles.node.Node
 import org.junit.Test
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
-import transformations.bytecode.constants.{ClassRefConstant, MethodDescriptorConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -11,6 +11,7 @@ import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkel
 import transformations.javac.classes.ConstantPool
 import transformations.javac.constructor.SuperCallExpression
 import transformations.bytecode.types.VoidTypeC
+import transformations.javac.types.MethodTypeC
 import util.TestUtils
 
 class TestEmptyClassCompilation {
@@ -39,7 +40,7 @@ class TestEmptyClassCompilation {
       ClassRefConstant.classRef(11),
       ClassRefConstant.classRef(12),
       SuperCallExpression.constructorName,
-      MethodDescriptorConstant.methodDescriptor(VoidTypeC.voidType, Seq()),
+      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       NameAndType.nameAndType(4, 5),
       new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),

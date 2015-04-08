@@ -9,6 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC}
+import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
 
@@ -35,7 +36,9 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     transformClass(program)
 
     def transformClass(clazz: Node) {
-      val classCompiler: ClassCompiler = initializeClassCompiler(state, clazz)
+      val compiler = new MyCompiler(state)
+      JavaLang.initialise(compiler)
+      val classCompiler: ClassCompiler = new ClassCompiler(clazz, compiler)
       
       val classInfo = classCompiler.currentClassInfo
       clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
@@ -53,15 +56,6 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
 
       clazz.data.remove(Members)
     }
-  }
-
-  def initializeClassCompiler(state: CompilationState, clazz: Node): ClassCompiler = {
-    val classCompiler = new ClassCompiler(clazz, state)
-    getState(state).classCompiler = classCompiler
-
-    for (firstMemberPass <- getState(state).firstMemberPasses)
-      firstMemberPass(clazz)
-    classCompiler
   }
 
   def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {

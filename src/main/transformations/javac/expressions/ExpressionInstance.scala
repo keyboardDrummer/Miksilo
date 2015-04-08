@@ -14,8 +14,10 @@ trait ExpressionInstance extends ParticleWithGrammar {
 
   def toByteCode(expression: Path, state: CompilationState): Seq[Node]
 
+  /**
+   * Given expression is a path so that a variablePool can be retrieved.
+   */
   def getType(expression: Path, state: CompilationState): Node
-
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 }

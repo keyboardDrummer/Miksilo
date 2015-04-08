@@ -5,7 +5,7 @@ import core.particles._
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.javac.classes._
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassInfo}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends ParticleWithGrammar with WithState {
@@ -36,7 +36,6 @@ object MemberSelector extends ParticleWithGrammar with WithState {
       SelectorMember -> member)
   }
 
-
   def getClassOrObjectReference(selector: Path, compiler: ClassCompiler): ClassOrObjectReference = {
     val obj = getSelectorObject(selector)
     getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
@@ -50,7 +49,7 @@ object MemberSelector extends ParticleWithGrammar with WithState {
   }
 
   def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: Path): ClassOrObjectReference = {
-    val classInfo: ClassInfo = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
+    val classInfo: ClassSignature = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
     new ClassOrObjectReference(classInfo, false)
   }
 
