@@ -12,7 +12,7 @@ import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestClassFileParser {
+class TestClassFileDecompiler {
 
   @Test
   def testObjectClassUnParsedAttributes() = {
