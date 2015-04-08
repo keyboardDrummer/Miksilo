@@ -94,7 +94,8 @@ object JavaCompiler {
   def constantEntryParticles = Seq(FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
     ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant)
   
-  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, TypeApplication, MethodTypeC) ++
+  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
+    TypeApplication, MethodTypeC) ++
     Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {

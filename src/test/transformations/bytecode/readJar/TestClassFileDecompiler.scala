@@ -5,7 +5,7 @@ import java.io.InputStream
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
 import core.particles.CompilerFromParticles
-import org.junit.{Ignore, Assert, Test}
+import org.junit.{Assert, Test}
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
 import util.TestUtils
@@ -44,14 +44,13 @@ class TestClassFileDecompiler {
     Assert.assertEquals(expected, outputState.output)
   }
 
-  @Ignore
   @Test
   def testStringClassSignatureDeCompilation() = {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(getInputStream("String.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFile("DecompiledStringClassFileSignature.txt").slurp()
     Assert.assertEquals(expected, outputState.output)
   }
 

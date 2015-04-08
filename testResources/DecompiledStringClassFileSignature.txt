@@ -1,0 +1,389 @@
+package java.lang;
+class String
+{
+    char[] value;
+
+    int hash;
+
+    long serialVersionUID;
+
+    java.io.ObjectStreamField[] serialPersistentFields;
+
+    java.util.Comparator<java.lang.String> CASE_INSENSITIVE_ORDER;
+
+    void <init>()
+    {
+    }
+
+    void <init>(java.lang.String parameter0)
+    {
+    }
+
+    void <init>(char[] parameter0)
+    {
+    }
+
+    void <init>(char[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    void <init>(int[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    void <init>(byte[] parameter0,int parameter1,int parameter2,int parameter3)
+    {
+    }
+
+    void <init>(byte[] parameter0,int parameter1)
+    {
+    }
+
+    void checkBounds(byte[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    void <init>(byte[] parameter0,int parameter1,int parameter2,java.lang.String parameter3)
+    {
+    }
+
+    void <init>(byte[] parameter0,int parameter1,int parameter2,java.nio.charset.Charset parameter3)
+    {
+    }
+
+    void <init>(byte[] parameter0,java.lang.String parameter1)
+    {
+    }
+
+    void <init>(byte[] parameter0,java.nio.charset.Charset parameter1)
+    {
+    }
+
+    void <init>(byte[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    void <init>(byte[] parameter0)
+    {
+    }
+
+    void <init>(java.lang.StringBuffer parameter0)
+    {
+    }
+
+    void <init>(java.lang.StringBuilder parameter0)
+    {
+    }
+
+    void <init>(char[] parameter0,boolean parameter1)
+    {
+    }
+
+    int length()
+    {
+    }
+
+    boolean isEmpty()
+    {
+    }
+
+    char charAt(int parameter0)
+    {
+    }
+
+    int codePointAt(int parameter0)
+    {
+    }
+
+    int codePointBefore(int parameter0)
+    {
+    }
+
+    int codePointCount(int parameter0,int parameter1)
+    {
+    }
+
+    int offsetByCodePoints(int parameter0,int parameter1)
+    {
+    }
+
+    void getChars(char[] parameter0,int parameter1)
+    {
+    }
+
+    void getChars(int parameter0,int parameter1,char[] parameter2,int parameter3)
+    {
+    }
+
+    void getBytes(int parameter0,int parameter1,byte[] parameter2,int parameter3)
+    {
+    }
+
+    byte[] getBytes(java.lang.String parameter0)
+    {
+    }
+
+    byte[] getBytes(java.nio.charset.Charset parameter0)
+    {
+    }
+
+    byte[] getBytes()
+    {
+    }
+
+    boolean equals(java.lang.Object parameter0)
+    {
+    }
+
+    boolean contentEquals(java.lang.StringBuffer parameter0)
+    {
+    }
+
+    boolean nonSyncContentEquals(java.lang.AbstractStringBuilder parameter0)
+    {
+    }
+
+    boolean contentEquals(java.lang.CharSequence parameter0)
+    {
+    }
+
+    boolean equalsIgnoreCase(java.lang.String parameter0)
+    {
+    }
+
+    int compareTo(java.lang.String parameter0)
+    {
+    }
+
+    int compareToIgnoreCase(java.lang.String parameter0)
+    {
+    }
+
+    boolean regionMatches(int parameter0,java.lang.String parameter1,int parameter2,int parameter3)
+    {
+    }
+
+    boolean regionMatches(boolean parameter0,int parameter1,java.lang.String parameter2,int parameter3,int parameter4)
+    {
+    }
+
+    boolean startsWith(java.lang.String parameter0,int parameter1)
+    {
+    }
+
+    boolean startsWith(java.lang.String parameter0)
+    {
+    }
+
+    boolean endsWith(java.lang.String parameter0)
+    {
+    }
+
+    int hashCode()
+    {
+    }
+
+    int indexOf(int parameter0)
+    {
+    }
+
+    int indexOf(int parameter0,int parameter1)
+    {
+    }
+
+    int indexOfSupplementary(int parameter0,int parameter1)
+    {
+    }
+
+    int lastIndexOf(int parameter0)
+    {
+    }
+
+    int lastIndexOf(int parameter0,int parameter1)
+    {
+    }
+
+    int lastIndexOfSupplementary(int parameter0,int parameter1)
+    {
+    }
+
+    int indexOf(java.lang.String parameter0)
+    {
+    }
+
+    int indexOf(java.lang.String parameter0,int parameter1)
+    {
+    }
+
+    int indexOf(char[] parameter0,int parameter1,int parameter2,java.lang.String parameter3,int parameter4)
+    {
+    }
+
+    int indexOf(char[] parameter0,int parameter1,int parameter2,char[] parameter3,int parameter4,int parameter5,int parameter6)
+    {
+    }
+
+    int lastIndexOf(java.lang.String parameter0)
+    {
+    }
+
+    int lastIndexOf(java.lang.String parameter0,int parameter1)
+    {
+    }
+
+    int lastIndexOf(char[] parameter0,int parameter1,int parameter2,java.lang.String parameter3,int parameter4)
+    {
+    }
+
+    int lastIndexOf(char[] parameter0,int parameter1,int parameter2,char[] parameter3,int parameter4,int parameter5,int parameter6)
+    {
+    }
+
+    java.lang.String substring(int parameter0)
+    {
+    }
+
+    java.lang.String substring(int parameter0,int parameter1)
+    {
+    }
+
+    java.lang.CharSequence subSequence(int parameter0,int parameter1)
+    {
+    }
+
+    java.lang.String concat(java.lang.String parameter0)
+    {
+    }
+
+    java.lang.String replace(char parameter0,char parameter1)
+    {
+    }
+
+    boolean matches(java.lang.String parameter0)
+    {
+    }
+
+    boolean contains(java.lang.CharSequence parameter0)
+    {
+    }
+
+    java.lang.String replaceFirst(java.lang.String parameter0,java.lang.String parameter1)
+    {
+    }
+
+    java.lang.String replaceAll(java.lang.String parameter0,java.lang.String parameter1)
+    {
+    }
+
+    java.lang.String replace(java.lang.CharSequence parameter0,java.lang.CharSequence parameter1)
+    {
+    }
+
+    java.lang.String[] split(java.lang.String parameter0,int parameter1)
+    {
+    }
+
+    java.lang.String[] split(java.lang.String parameter0)
+    {
+    }
+
+    java.lang.String join(java.lang.CharSequence parameter0,java.lang.CharSequence[] parameter1)
+    {
+    }
+
+    java.lang.String join(java.lang.CharSequence parameter0,java.lang.Iterable<? extends java.lang.CharSequence> parameter1)
+    {
+    }
+
+    java.lang.String toLowerCase(java.util.Locale parameter0)
+    {
+    }
+
+    java.lang.String toLowerCase()
+    {
+    }
+
+    java.lang.String toUpperCase(java.util.Locale parameter0)
+    {
+    }
+
+    java.lang.String toUpperCase()
+    {
+    }
+
+    java.lang.String trim()
+    {
+    }
+
+    java.lang.String toString()
+    {
+    }
+
+    char[] toCharArray()
+    {
+    }
+
+    java.lang.String format(java.lang.String parameter0,java.lang.Object[] parameter1)
+    {
+    }
+
+    java.lang.String format(java.util.Locale parameter0,java.lang.String parameter1,java.lang.Object[] parameter2)
+    {
+    }
+
+    java.lang.String valueOf(java.lang.Object parameter0)
+    {
+    }
+
+    java.lang.String valueOf(char[] parameter0)
+    {
+    }
+
+    java.lang.String valueOf(char[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    java.lang.String copyValueOf(char[] parameter0,int parameter1,int parameter2)
+    {
+    }
+
+    java.lang.String copyValueOf(char[] parameter0)
+    {
+    }
+
+    java.lang.String valueOf(boolean parameter0)
+    {
+    }
+
+    java.lang.String valueOf(char parameter0)
+    {
+    }
+
+    java.lang.String valueOf(int parameter0)
+    {
+    }
+
+    java.lang.String valueOf(long parameter0)
+    {
+    }
+
+    java.lang.String valueOf(float parameter0)
+    {
+    }
+
+    java.lang.String valueOf(double parameter0)
+    {
+    }
+
+    java.lang.String intern()
+    {
+    }
+
+    int compareTo(java.lang.Object parameter0)
+    {
+    }
+
+    void <clinit>()
+    {
+    }
+}
