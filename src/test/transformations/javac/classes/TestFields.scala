@@ -20,4 +20,10 @@ class TestFields {
   def illegalForwardFieldReference() {
     TestUtils.compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
   }
+
+  @Ignore //Don't yet feel like testing cases where Javac fails.
+  @Test
+  def fieldAndMethodOverloading() {
+    TestUtils.compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
+  }
 }
