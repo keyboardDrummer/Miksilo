@@ -43,9 +43,8 @@ class BiGrammarToPrinter {
     nestError(result)
   }
 
-  object EncounteredFailure extends Throwable
   def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {
-    fail(EncounteredFailure, -10000)
+    fail("encountered failure", -10000)
   }
 
   def mapGrammarToDocument(value: Any, mapGrammar: MapGrammar): Try[ResponsiveDocument] = {
