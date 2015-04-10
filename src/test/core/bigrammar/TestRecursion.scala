@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.printer.BiGrammarToPrinter$
+import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
 import org.junit.{Assert, Ignore, Test}
 
 class TestRecursion extends GrammarDocumentWriter {

@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.printer.BiGrammarToPrinter$
+import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}

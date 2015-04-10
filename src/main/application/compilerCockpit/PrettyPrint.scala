@@ -2,7 +2,7 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.bigrammar.printer.{PrintError, BiGrammarToPrinter$}
+import core.bigrammar.printer.{BiGrammarToPrinter, PrintError, BiGrammarToPrinter$}
 import core.bigrammar.BiGrammar
 import core.particles.grammars.ProgramGrammar
 import core.particles.{CompilationState, CompilerFromParticles, Particle}

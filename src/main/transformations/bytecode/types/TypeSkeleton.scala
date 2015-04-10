@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.printer.BiGrammarToPrinter$
+import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
 import core.particles.exceptions.BadInputException
 import core.grammar.ParseException
 import core.particles._

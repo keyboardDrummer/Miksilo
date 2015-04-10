@@ -45,7 +45,7 @@ class BiGrammarToPrinter {
 
   object EncounteredFailure extends Throwable
   def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {
-    fail(value, EncounteredFailure, grammar, -10000)
+    fail(EncounteredFailure, -10000)
   }
 
   def mapGrammarToDocument(value: Any, mapGrammar: MapGrammar): Try[ResponsiveDocument] = {
@@ -66,7 +66,7 @@ class BiGrammarToPrinter {
       case Some(cachedValue) => cachedValue
       case None =>
         val oldCache = cache
-        cache += key -> fail(value, FoundDirectRecursionInLabel(labelled), labelled, -1000)
+        cache += key -> fail(FoundDirectRecursionInLabel(labelled), -1000)
         val result = toDocumentCached(value, labelled.inner)
         cache = oldCache + (key -> result)
         result
@@ -93,25 +93,23 @@ class BiGrammarToPrinter {
     } yield result
   }
 
-  case class ProduceWithDifferentValue(expected: Any) extends Throwable {
+  case class ProduceWithDifferentValue(expected: Any) {
     override def toString = s"value was not equal to produce value $expected"
   }
   
   def produceToDocument(value: Any, grammar: BiGrammar, producedValue: Any): Try[ResponsiveDocument] = {
     if (Objects.equals(producedValue, value)) Try(Empty)
-    else fail(value, ProduceWithDifferentValue(producedValue), grammar, -100)
+    else fail(ProduceWithDifferentValue(producedValue), -100)
   }
 
-  object CouldNotDeconstructValue extends Throwable
   def deconstructValue(value: Any, grammar: MapGrammar): Try[Any] = {
     grammar.deconstruct(value) match {
       case Some(x) => Try(x)
-      case None => fail(value, CouldNotDeconstructValue, grammar)
+      case None => fail("could not deconstruct value")
     }
   }
 
-  def fail(value: Any, inner: Throwable, grammar: BiGrammar = null, depth: Int = 0) =
-    Failure(RootError(depth, Empty, value, grammar, inner))
+  def fail(inner: Any, depth: Int = 0) = Failure(RootError(depth, Empty, inner))
 
   def combineTwo(first: Try[ResponsiveDocument], second: => Try[ResponsiveDocument],
                  combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument): Try[ResponsiveDocument] = {
@@ -120,13 +118,12 @@ class BiGrammarToPrinter {
 
   def extractSequence(value: Any): Try[Seq[Any]] = value match {
     case sequence: Seq[Any] => Try(sequence)
-    case _ => fail(value, new ClassCastException(s"value $value was not a sequence"))
+    case _ => fail(s"value $value was not a sequence.")
   }
 
-  object ValueWasNotAProduct extends Throwable
   def extractProduct(value: Any, grammar: BiGrammar): Try[core.grammar.~[Any, Any]] = value match {
     case ~(left, right) => Try(core.grammar.~(left, right))
     case MissingValue => Try(core.grammar.~(MissingValue, MissingValue))
-    case _ => fail(value, ValueWasNotAProduct, grammar)
+    case _ => fail("value was not a product.")
   }
 }

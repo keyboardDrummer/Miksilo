@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.printer.{PrintError, BiGrammarToPrinter$}
+import core.bigrammar.printer.{BiGrammarToPrinter, PrintError, BiGrammarToPrinter$}
 import org.junit.{Assert, Test}
 
 class TestFailureFeedback extends GrammarDocumentWriter {

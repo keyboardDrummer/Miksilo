@@ -6,7 +6,7 @@ import java.io.InputStream
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
 import core.particles.CompilerFromParticles
-import org.junit.{Assert, Test}
+import org.junit.{Ignore, Assert, Test}
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
 import util.TestUtils
@@ -15,6 +15,7 @@ import scala.reflect.io.{File, Path}
 
 class TestClassFileDecompiler {
 
+  @Ignore
   @Test
   def decompileRuntimeJar() = {
     val currentDir = new File(new io.File("."))
