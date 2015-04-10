@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.printer.{PrintError, BiGrammarToPrinter$}
 import org.junit.{Assert, Test}
 
 class TestFailureFeedback extends GrammarDocumentWriter {
@@ -11,7 +12,7 @@ class TestFailureFeedback extends GrammarDocumentWriter {
     val grammar: BiGrammar = ("1": BiGrammar) *
 
     try {
-      BiGrammarToDocument.toDocument(input, grammar)
+      BiGrammarToPrinter.toDocument(input, grammar)
       Assert.fail()
     } catch {
       case e: PrintError =>

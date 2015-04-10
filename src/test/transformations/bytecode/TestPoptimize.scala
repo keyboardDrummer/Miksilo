@@ -6,7 +6,7 @@ import org.junit.{Assert, Test}
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.{IntegerConstantC, StoreIntegerC}
-import transformations.bytecode.coreInstructions.longs.LongConstantC
+import transformations.bytecode.coreInstructions.longs.PushLongC
 import transformations.bytecode.coreInstructions.{Pop2C, PopC, VoidReturnInstructionC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
@@ -84,7 +84,7 @@ class TestPoptimize {
   
   @Test
   def testPop2() = {
-    val instructions = Seq(LongConstantC.constant(1), Pop2C.pop2, VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(PushLongC.constant(1), Pop2C.pop2, VoidReturnInstructionC.voidReturn)
     val expected = Seq(VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     Assert.assertEquals(expected, newInstructions)

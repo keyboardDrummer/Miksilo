@@ -106,8 +106,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
-    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar,
-        utf8 | qualifiedClassName)
+    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar, utf8 | qualifiedClassName)
     val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
       parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
     val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment

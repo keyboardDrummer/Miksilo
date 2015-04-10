@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.printer.BiGrammarToPrinter$
 import org.junit.{Assert, Ignore, Test}
 
 class TestRecursion extends GrammarDocumentWriter {
@@ -51,7 +52,7 @@ class TestRecursion extends GrammarDocumentWriter {
 
     val result = getExpectedLeftRecursiveResult
 
-    val document = BiGrammarToDocument.toDocument(result, grammarDocument)
+    val document = BiGrammarToPrinter.toDocument(result, grammarDocument)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }
@@ -67,7 +68,7 @@ class TestRecursion extends GrammarDocumentWriter {
     inner.addOption(outer ~ "!")
     inner.addOption(produce(null))
 
-    val document = BiGrammarToDocument.toDocument(getExpectedLeftRecursiveResult, outer)
+    val document = BiGrammarToPrinter.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()
     Assert.assertEquals(input, documentResult)
   }

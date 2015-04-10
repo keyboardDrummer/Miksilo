@@ -9,7 +9,7 @@ import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
-import transformations.bytecode.coreInstructions.longs.{CompareLongC, LoadLongC, LongConstantC, StoreLongC}
+import transformations.bytecode.coreInstructions.longs._
 import transformations.bytecode.coreInstructions.objects._
 import transformations.bytecode.extraBooleanInstructions._
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -76,7 +76,7 @@ object JavaCompiler {
       integerInstructions ++ longInstructions
   }
 
-  def longInstructions = Seq(CompareLongC, LongConstantC, LoadLongC, StoreLongC)
+  def longInstructions = Seq(CompareLongC, PushLongC, LoadLongC, StoreLongC)
 
   def integerInstructions = Seq(AddIntegersC, IntegerConstantC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
@@ -91,7 +91,7 @@ object JavaCompiler {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
+  def constantEntryParticles = Seq(LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
     ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant)
   
   def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,

@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.printer.BiGrammarToPrinter$
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -26,7 +27,7 @@ case class TestGrammarUtils(particles: Seq[Particle]) {
     expectedOption.foreach(expected =>
       Assert.assertEquals(expected, result))
 
-    val documentResult = BiGrammarToDocument.toDocument(result, grammarDocument).renderString()
+    val documentResult = BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
     Assert.assertEquals(example, documentResult)
   }
 
@@ -36,7 +37,7 @@ case class TestGrammarUtils(particles: Seq[Particle]) {
 
   def getPrintResult(value: Any, grammarTransformer: Any = ProgramGrammar): String = {
     val document = getGrammarUsingTransformer(grammarTransformer)
-    BiGrammarToDocument.toDocument(value, document).renderString()
+    BiGrammarToPrinter.toDocument(value, document).renderString()
   }
 
   def getGrammarUsingTransformer(grammarTransformer: Any): Labelled = {

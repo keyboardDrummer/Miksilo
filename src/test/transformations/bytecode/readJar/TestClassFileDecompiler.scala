@@ -1,5 +1,6 @@
 package transformations.bytecode.readJar
 
+import java.io
 import java.io.InputStream
 
 import application.compilerCockpit.PrettyPrint
@@ -10,9 +11,25 @@ import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
 import util.TestUtils
 
-import scala.reflect.io.Path
+import scala.reflect.io.{File, Path}
 
 class TestClassFileDecompiler {
+
+  @Test
+  def decompileRuntimeJar() = {
+    val currentDir = new File(new io.File("."))
+    val testResources = currentDir / Path("resources") / "rtUnzipped"
+    val allCassFiles = testResources.toDirectory.deepFiles
+    val compiler: CompilerFromParticles = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
+    var counter = 0
+    for(file <- allCassFiles) {
+      val inputStream = file.inputStream()
+      Console.println(s"starting: ${file.name}")
+      compiler.parseAndTransform(inputStream)
+      counter += 1
+      Console.println(s"progress: $counter / 19.626")
+    }
+  }
 
   @Test
   def testObjectClassUnParsedAttributes() = {

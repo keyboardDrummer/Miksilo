@@ -7,7 +7,7 @@ import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.IntegerConstantC
-import transformations.bytecode.coreInstructions.longs.LongConstantC
+import transformations.bytecode.coreInstructions.longs.PushLongC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.LongTypeC
 
@@ -28,7 +28,7 @@ object LongLiteralC extends ExpressionInstance {
   def literal(value: Long) = new Node(LongLiteralKey, ValueKey -> value)
 
   override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
-    Seq(LongConstantC.constant(getValue(literal).toInt))
+    Seq(PushLongC.constant(getValue(literal).toInt))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Long]

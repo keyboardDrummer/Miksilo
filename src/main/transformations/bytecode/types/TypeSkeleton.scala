@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.BiGrammarToDocument
+import core.bigrammar.printer.BiGrammarToPrinter$
 import core.particles.exceptions.BadInputException
 import core.grammar.ParseException
 import core.particles._
@@ -30,7 +30,7 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
 
   def getByteCodeString(state: CompilationState)(_type: Node): String = {
       val grammar = state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar)
-      BiGrammarToDocument.toDocument(_type, grammar).renderString()
+      BiGrammarToPrinter.toDocument(_type, grammar).renderString()
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
