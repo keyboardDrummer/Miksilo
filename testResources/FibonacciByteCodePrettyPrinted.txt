@@ -47,7 +47,7 @@ methods:
     code: nameIndex:9, maxStack:2, maxLocal:1
     instructions:
       get static(23)
-      integer constant(5)
+      small integer constant(5)
       invoke static(27)
       invoke virtual(17)
       void return instruction()
@@ -58,16 +58,16 @@ methods:
     code: nameIndex:9, maxStack:3, maxLocal:1
     instructions:
       load integer(0)
-      integer constant(2)
+      small integer constant(2)
       if integer compare greater or equal(7)
-      integer constant(1)
+      small integer constant(1)
       goto(16)
       load integer(0)
-      integer constant(1)
+      small integer constant(1)
       subtract integer()
       invoke static(27)
       load integer(0)
-      integer constant(2)
+      small integer constant(2)
       subtract integer()
       invoke static(27)
       add integers()

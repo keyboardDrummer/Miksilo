@@ -13,6 +13,8 @@ import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
 
+
+
 object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with WithState {
 
   implicit class JavaClass(val node: Node) extends AnyVal {
@@ -51,8 +53,8 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
       clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
-      for(secondMemberPass <- getState(state).secondMemberPasses)
-        secondMemberPass(clazz)
+      for(member <- getState(state).members)
+        member.compile(state, clazz)
 
       clazz.data.remove(Members)
     }
@@ -104,8 +106,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
   class State() {
     var classCompiler: ClassCompiler = null
     val importToClassMap = new ClassRegistry[Node => Map[String, QualifiedClassName]]()
-    var firstMemberPasses = List.empty[Node => Unit]
-    var secondMemberPasses = List.empty[Node => Unit]
+    var members = List.empty[ClassMemberC]
   }
 
   object ClassGrammar

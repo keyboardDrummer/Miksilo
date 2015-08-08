@@ -6,10 +6,10 @@ import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.{ClassSignature, ClassMemberC, JavaClassSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
-object FieldDeclaration extends ParticleWithGrammar {
+object FieldDeclaration extends ParticleWithGrammar with ClassMemberC {
 
   object FieldKey
   object FieldType
@@ -18,16 +18,8 @@ object FieldDeclaration extends ParticleWithGrammar {
   override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, FieldDescriptorConstant)
 
   def field(_type: Node, name: String) = new Node(FieldKey, FieldType -> _type, FieldName -> name)
-  override def inject(state: CompilationState): Unit = {
-    super.inject(state)
-
-    JavaClassSkeleton.getState(state).firstMemberPasses ::= (clazz => bindFields(state, clazz))
-    JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertFields(state, clazz))
-  }
   
-  def bindFields(state: CompilationState, clazz: Node): Unit = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
-    val classInfo = classCompiler.currentClassInfo
+    def bind(state: CompilationState, signature: ClassSignature, clazz: Node): Unit = {
 
     val fields = getFields(clazz)
     for (field <- fields)
@@ -36,7 +28,7 @@ object FieldDeclaration extends ParticleWithGrammar {
     def bindField(field: Node) = {
       val name: String = getFieldName(field)
       val _type = getFieldType(field)
-      classInfo.newFieldInfo(name, _type)
+      signature.newFieldInfo(name, _type)
     }
   }
 
@@ -52,7 +44,7 @@ object FieldDeclaration extends ParticleWithGrammar {
     clazz.members.filter(member => member.clazz == FieldKey)
   }
 
-  def convertFields(state: CompilationState, clazz: Node) = {
+  def compile(state: CompilationState, clazz: Node) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val fields = getFields(clazz)

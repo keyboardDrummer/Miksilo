@@ -13,7 +13,6 @@ object TypeApplication extends ParticleWithGrammar {
   object TypeApplicationFunc
   object TypeApplicationArgument
 
-
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     transformByteCodeGrammars(grammars)
     transformJavaGrammars(grammars)
@@ -44,3 +43,4 @@ object TypeApplication extends ParticleWithGrammar {
 
   override def description: String = "Adds application of generic types"
 }
+

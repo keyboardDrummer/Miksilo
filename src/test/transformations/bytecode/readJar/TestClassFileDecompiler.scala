@@ -21,14 +21,17 @@ class TestClassFileDecompiler {
     val currentDir = new File(new io.File("."))
     val testResources = currentDir / Path("resources") / "rtUnzipped"
     val allCassFiles = testResources.toDirectory.deepFiles
-    val compiler: CompilerFromParticles = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
+    val compiler: CompilerFromParticles = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
     var counter = 0
+    val start = 633
     for(file <- allCassFiles) {
-      val inputStream = file.inputStream()
-      Console.println(s"starting: ${file.name}")
-      compiler.parseAndTransform(inputStream)
+      if (counter >= start) {
+        val inputStream = file.inputStream()
+        Console.println(s"starting: ${file.name}")
+        compiler.parseAndTransform(inputStream)
+        Console.println(s"progress: $counter / 19.626")
+      }
       counter += 1
-      Console.println(s"progress: $counter / 19.626")
     }
   }
 

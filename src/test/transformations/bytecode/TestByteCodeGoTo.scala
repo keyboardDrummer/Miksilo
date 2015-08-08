@@ -7,7 +7,7 @@ import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, SmallIntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
@@ -30,10 +30,10 @@ class TestByteCodeGoTo {
 
   def getExpectedJumpWhile: Node = {
     val instructions = Seq(
-      IntegerConstantC.integerConstant(0),
+      SmallIntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(3),
+      SmallIntegerConstantC.integerConstant(3),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8))
@@ -46,12 +46,12 @@ class TestByteCodeGoTo {
 
   def getLabelledJumpWhile: Node = {
     val instructions = Seq(
-      IntegerConstantC.integerConstant(0),
+      SmallIntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LabelledTargets.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(3),
+      SmallIntegerConstantC.integerConstant(3),
       LabelledTargets.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
       LabelledTargets.goTo("start"),

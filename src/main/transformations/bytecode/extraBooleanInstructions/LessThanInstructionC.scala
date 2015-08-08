@@ -4,7 +4,7 @@ import core.particles.node.Node
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareLessC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
@@ -20,10 +20,10 @@ object LessThanInstructionC extends ExpandInstruction {
     val falseStartLabel = state.getUniqueLabel("falseStart")
     val endLabel = state.getUniqueLabel("end")
     Seq(LabelledTargets.ifIntegerCompareLess(falseStartLabel),
-      IntegerConstantC.integerConstant(0),
+      SmallIntegerConstantC.integerConstant(0),
       LabelledTargets.goTo(endLabel),
       InferredStackFrames.label(falseStartLabel),
-      IntegerConstantC.integerConstant(1),
+      SmallIntegerConstantC.integerConstant(1),
       InferredStackFrames.label(endLabel))
   }
 

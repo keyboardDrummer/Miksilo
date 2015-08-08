@@ -23,7 +23,7 @@ case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
   initialise()
   def initialise(): Unit = {
     getState(state).classCompiler = this
-    myPackage.addClass(state, currentClass)
+    myPackage.addClass(state, currentClassInfo, currentClass)
   }
 
   ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()

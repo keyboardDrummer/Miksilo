@@ -97,6 +97,7 @@ object ClassFileParser extends ByteParsers {
   def stringParser = ParseShort.map(index => StringConstant.construct(index))
 
   def integerParser = ParseInteger.map(integer => IntegerConstant.construct(integer))
+  def longParser = ParseLong.map(long => LongConstantEntryC.construct(long))
 
   case class ConstantParseResult(constant: Any, entriesConsumed: Int)
   def consumeOne(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 1))
@@ -105,7 +106,7 @@ object ClassFileParser extends ByteParsers {
     case 1 => consumeOne(utf8Parser)
     case 3 => consumeOne(integerParser)
     case 4 => consumeOne(ParseFloat)
-    case 5 => consumeTwo(ParseLong)
+    case 5 => consumeTwo(longParser)
     case 6 => consumeTwo(failure("can't parse double"))
     case 7 => consumeOne(classReferenceParser)
     case 8 => consumeOne(stringParser)

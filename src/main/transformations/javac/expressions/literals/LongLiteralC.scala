@@ -6,7 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
-import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.coreInstructions.longs.PushLongC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.LongTypeC
@@ -14,7 +14,7 @@ import transformations.bytecode.types.LongTypeC
 object LongLiteralC extends ExpressionInstance {
   val key = LongLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, IntegerConstantC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
 
   def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 

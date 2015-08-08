@@ -4,14 +4,17 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.constants.IntegerConstant
+import transformations.bytecode.coreInstructions.integers.{LoadConstantIntC, SmallIntegerConstantC}
+import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.IntTypeC
 
 object IntLiteralC extends ExpressionInstance {
   val key = IntLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, IntegerConstantC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
     val parseNumber = number ^^ (number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i)) ^^ parseMap(IntLiteralKey, ValueKey)
@@ -22,7 +25,14 @@ object IntLiteralC extends ExpressionInstance {
   def literal(value: Int) = new Node(IntLiteralKey, ValueKey -> value)
 
   override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
-    Seq(IntegerConstantC.integerConstant(getValue(literal)))
+    val value: Int = getValue(literal)
+    if (-1 <= value && value <= 5)
+      Seq(SmallIntegerConstantC.integerConstant(value))
+    else
+    {
+      val reference = ByteCodeSkeleton.getConstantPool(state).store(IntegerConstant.construct(value))
+      Seq(LoadConstantIntC.integerConstant(reference))
+    }
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Int]

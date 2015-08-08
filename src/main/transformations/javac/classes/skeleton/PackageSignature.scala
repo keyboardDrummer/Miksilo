@@ -23,9 +23,9 @@ class PackageSignature(val parent: Option[PackageSignature], val name: String, v
    })
   }
 
-  def addClass(state: CompilationState, clazz: Node) {
-   for (firstMemberPass <- getState(state).firstMemberPasses)
-     firstMemberPass(clazz)
+  def addClass(state: CompilationState, signature: ClassSignature, clazz: Node) {
+   for (member <- getState(state).members)
+     member.bind(state, signature, clazz)
   }
 
   def findPackageSignature(clazz: Node): PackageSignature = {

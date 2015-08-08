@@ -18,7 +18,7 @@ object IntegerConstant extends ConstantEntry {
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(3) ++
     PrintByteCode.intToBytes(constant(IntegerValue).asInstanceOf[Int])
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = integer ^^ parseMap(IntegerKey, IntegerValue)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "integer:" ~~> integer ^^ parseMap(IntegerKey, IntegerValue)
 
   override def description: String = "Adds the integer constant entry."
 }

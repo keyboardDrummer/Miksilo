@@ -78,7 +78,7 @@ object JavaCompiler {
 
   def longInstructions = Seq(CompareLongC, PushLongC, LoadLongC, StoreLongC)
 
-  def integerInstructions = Seq(AddIntegersC, IntegerConstantC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
+  def integerInstructions = Seq(AddIntegersC, SmallIntegerConstantC, LoadConstantIntC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
 
   def byteCodeWithoutInstructions = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
@@ -94,9 +94,10 @@ object JavaCompiler {
   def constantEntryParticles = Seq(LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
     ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant)
   
-  def typeTransformations = Seq(TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
-    TypeApplication, MethodTypeC) ++
-    Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC, TypeSkeleton)
+  def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
+    SuperTypeArgument, TypeApplication, MethodTypeC) ++
+    Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
+      ShortTypeC, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
     val implicitsSet = implicits.toSet

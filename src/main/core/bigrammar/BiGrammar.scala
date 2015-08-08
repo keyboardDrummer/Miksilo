@@ -33,7 +33,6 @@ trait GrammarDocumentWriter {
     else new Delimiter(value)
 }
 
-
 trait BiGrammar extends GrammarDocumentWriter {
 
   override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(trim = false)

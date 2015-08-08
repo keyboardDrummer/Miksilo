@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
@@ -14,7 +14,7 @@ object LessThanC extends ExpressionInstance {
 
   val key = LessThanKey
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, IntegerConstantC, LessThanInstructionC)
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantC, LessThanInstructionC)
 
   override def toByteCode(lessThan: Path, state: CompilationState): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)

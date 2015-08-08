@@ -50,16 +50,16 @@ class TestPrintByteCodeFibonacciWithMain {
   def getFibonacciMethod: Node = {
     val instructions = Seq(
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(2),
+      SmallIntegerConstantC.integerConstant(2),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(7),
-      IntegerConstantC.integerConstant(1),
+      SmallIntegerConstantC.integerConstant(1),
       GotoC.goTo(16),
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(1),
+      SmallIntegerConstantC.integerConstant(1),
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(2),
+      SmallIntegerConstantC.integerConstant(2),
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),
       AddIntegersC.addInteger,
@@ -120,7 +120,7 @@ class TestPrintByteCodeFibonacciWithMain {
 
   def getMainByteCode: Node = {
     val instructions = Seq(GetStaticC.getStatic(2),
-      IntegerConstantC.integerConstant(5),
+      SmallIntegerConstantC.integerConstant(5),
       InvokeStaticC.invokeStatic(3),
       InvokeVirtualC.invokeVirtual(4),
       VoidReturnInstructionC.voidReturn)

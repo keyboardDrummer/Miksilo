@@ -25,6 +25,8 @@
         <module name="modularcompiler" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="modularcompiler" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
-

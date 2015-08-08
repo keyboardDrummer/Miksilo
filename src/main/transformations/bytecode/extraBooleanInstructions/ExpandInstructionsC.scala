@@ -5,7 +5,7 @@ import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.IntegerConstantC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 import scala.collection.mutable
@@ -48,10 +48,10 @@ object ExpandInstructionsC extends ParticleWithPhase with WithState {
             val falseStartLabel = state.getUniqueLabel("falseStart")
             val endLabel = state.getUniqueLabel("end")
             Seq(LabelledTargets.ifIntegerCompareLess(falseStartLabel),
-              IntegerConstantC.integerConstant(0),
+              SmallIntegerConstantC.integerConstant(0),
               LabelledTargets.goTo(endLabel),
               InferredStackFrames.label(falseStartLabel),
-              IntegerConstantC.integerConstant(1),
+              SmallIntegerConstantC.integerConstant(1),
               InferredStackFrames.label(endLabel))
           case _ => Seq(instruction)
         }

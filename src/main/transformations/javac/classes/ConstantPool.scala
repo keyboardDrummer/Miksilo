@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.node.Node
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.{LongConstantEntryC, ClassRefConstant}
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 import scala.collection.mutable
@@ -27,12 +27,17 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
       constants.append(ref)
       index
     })
-    if (ref.isInstanceOf[Long] || ref.isInstanceOf[Double])
-      store(Hole)
+    ref match {
+      case node:Node => node.clazz match {
+        case LongConstantEntryC.LongEntryKey => store(new Hole())
+        case _ =>
+      }
+      case _ =>
+    }
     result
   }
 
-  object Hole
+  class Hole
 
   def constantSize(constant: Any): Int = {
     if (constant.isInstanceOf[Long] || constant.isInstanceOf[Double]) 2 else 1

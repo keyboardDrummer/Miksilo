@@ -1,8 +1,8 @@
 class 52 extends 0 with interfaces: ()
 
 constant pool:
-  #1: 500000
-  #2: 999999
+  #1: integer: 500000
+  #2: integer: 999999
   #3: string at index: 17
   #4: string at index: 39
   #5: string at index: 43

@@ -13,7 +13,8 @@ object TypeAbstraction extends ParticleWithGrammar {
   object Parameters
   object ParameterKey
   object ParameterName
-  object ParameterBound
+  object ParameterClassBound
+  object ParameterInterfaceBound
 
   def getBody(_type: Node): Node = {
     _type(TypeAbstraction.Body).asInstanceOf[Node]
@@ -40,7 +41,8 @@ object TypeAbstraction extends ParticleWithGrammar {
     val methodTypeGrammar = grammars.find(MethodTypeC.ByteCodeMethodTypeGrammar)
     val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
-    val variableGrammar: BiGrammar = identifier ~ (":" ~> classBound) ^^ parseMap(ParameterKey, ParameterName, ParameterBound)
+    val variableGrammar: BiGrammar = identifier ~ (":" ~> classBound.option) ~~ ((":" ~> classBound)*) ^^
+      parseMap(ParameterKey, ParameterName, ParameterClassBound, ParameterInterfaceBound)
     val parametersGrammar: BiGrammar = variableGrammar.some
     val abstractMethodType = ("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar ^^
       parseMap(TypeAbstractionKey, Parameters, Body)

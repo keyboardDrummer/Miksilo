@@ -6,7 +6,7 @@ import transformations.bytecode.attributes._
 import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, IntegerConstantC, LoadIntegerC, StoreIntegerC}
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, SmallIntegerConstantC, LoadIntegerC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
@@ -65,10 +65,10 @@ class TestPrintByteCodeWhile {
     val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
-      IntegerConstantC.integerConstant(0),
+      SmallIntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
       LoadIntegerC.load(0),
-      IntegerConstantC.integerConstant(3),
+      SmallIntegerConstantC.integerConstant(3),
       IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
       IncrementIntegerC.integerIncrement(0, 1),
       GotoC.goTo(-8),

@@ -12,13 +12,13 @@ import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, Cod
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.skeleton.{MethodClassKey, JavaClassSkeleton}
+import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
-object MethodC extends ParticleWithGrammar with WithState {
+object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
 
   implicit class Method(node: Node) {
     def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]
@@ -28,14 +28,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     def parameters_=(value: Seq[Node]) = node(MethodParametersKey) = value
   }
 
-  override def inject(state: CompilationState): Unit = {
-    super.inject(state)
-
-    JavaClassSkeleton.getState(state).firstMemberPasses ::= (clazz => bindMethods(state, clazz))
-    JavaClassSkeleton.getState(state).secondMemberPasses ::= (clazz => convertMethods(state, clazz))
-  }
-
-  def convertMethods(state: CompilationState, clazz: Node) = {
+  def compile(state: CompilationState, clazz: Node) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -45,7 +38,7 @@ object MethodC extends ParticleWithGrammar with WithState {
     })
   }
 
-  def bindMethods(state: CompilationState, clazz: Node): Unit = {
+  def bind(state: CompilationState, signature: ClassSignature, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
