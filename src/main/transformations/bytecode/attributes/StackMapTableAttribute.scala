@@ -128,7 +128,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
       parseMap(AppendFrame, OffsetDelta, AppendFrameTypes)
     val sameFrameGrammar = "same frame, delta:" ~> integer ^^ parseMap(SameFrameKey, OffsetDelta)
     val stackMapGrammar: BiGrammar = sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar
-    val stackMapTableGrammar = "sm nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
+    val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
       parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
 
     grammars.create(StackMapTableGrammar, stackMapTableGrammar)

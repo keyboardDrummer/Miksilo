@@ -73,11 +73,13 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
     model.addElement(getRevealSyntaxSugar)
+    model.addElement(getSimplifiedByteCodePreset)
+    model.addElement(getByteCodePreset)
     model
   }
 
   def getJavaCompilerPreset: Preset = {
-    new Preset("Java", getJavaCompiler)
+    new Preset("Java", getJavaCompiler, "Compiles a subset of Java.")
   }
 
   def getJavaCompiler: Seq[Particle] = {
@@ -85,15 +87,28 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations)
+    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations,
+      "Performs no transformations. Just parses and prints the Java.")
   }
 
   def getFibonacciExpressionMethodPreset = {
-    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompiler)
+    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompiler,
+      "Allows you to use an expression as the body of a method.")
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations)
+    new Preset("Java block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
+      "The program consists only of a single statement block.")
+  }
+
+  def getSimplifiedByteCodePreset = {
+    new Preset("Bytecode++", Seq(BlockCompilerC) ++ JavaCompiler.allTransformations,
+      "The program takes simplified and extended JVM bytecode as input.")
+  }
+
+  def getByteCodePreset = {
+    new Preset("Basic bytecode", JavaCompiler.byteCodeTransformations,
+      "The program takes regular JVM bytecode as input.")
   }
 
   def getAddImplicitsPreset: Preset = {
@@ -108,7 +123,8 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
       ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
-    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)), "Performs all compiler phases that still maintain a valid Java program.")
+    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
+      "Performs all compiler phases that still maintain a valid Java program.")
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {
