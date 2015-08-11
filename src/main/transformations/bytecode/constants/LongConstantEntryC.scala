@@ -5,6 +5,7 @@ import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
+import transformations.bytecode.constants.LongConstantEntryC.{LongEntryValue, LongEntryKey}
 
 object LongConstantEntryC extends ConstantEntry {
 

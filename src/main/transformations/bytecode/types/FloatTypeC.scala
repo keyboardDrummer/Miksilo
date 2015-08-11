@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Keyword, BiGrammar}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
@@ -15,7 +15,7 @@ object FloatTypeC extends TypeInstance
 
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "float" ~> produce(me)
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "F" ~> produce(me)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("F",false) ~> produce(me)
 
   override def description: String = "Adds the float type."
 }

@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Keyword, BiGrammar}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, Key}
@@ -15,7 +15,7 @@ object ByteTypeC extends TypeInstance
 
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "byte" ~> produce(me)
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "B" ~> produce(me)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("B",false) ~> produce(me)
 
   override def description: String = "Adds the byte type."
 }

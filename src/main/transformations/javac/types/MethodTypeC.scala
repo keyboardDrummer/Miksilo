@@ -29,6 +29,8 @@ object MethodTypeC extends TypeInstance {
 
   object ReturnType extends Key
 
+  object ThrowsSignature extends Key
+
   val key: Key = MethodTypeKey
 
   override def description: String = "Defines the method type."
@@ -40,7 +42,8 @@ object MethodTypeC extends TypeInstance {
   object ByteCodeMethodTypeGrammar
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val methodGrammar = ("(" ~> (typeGrammar*) <~ ")") ~ typeGrammar ^^ parseMap(MethodTypeKey, Parameters, ReturnType)
+    val throwsGrammar = ("^" ~> typeGrammar).option
+    val methodGrammar = ("(" ~> (typeGrammar*) <~ ")") ~ typeGrammar ~ throwsGrammar ^^ parseMap(MethodTypeKey, Parameters, ReturnType, ThrowsSignature)
     grammars.create(ByteCodeMethodTypeGrammar, methodGrammar)
   }
 }

@@ -1,6 +1,6 @@
 package transformations.javac.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Keyword, BiGrammar}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
@@ -13,7 +13,7 @@ object BooleanTypeC extends TypeInstance
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq.empty
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "Z" ~> produce(booleanType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("Z",false) ~> produce(booleanType)
 
   override def getStackType(_type: Node, state: CompilationState): Node = IntTypeC.intType
 

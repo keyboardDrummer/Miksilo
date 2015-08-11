@@ -36,6 +36,7 @@ object TypeAbstraction extends ParticleWithGrammar {
     grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar <~ ">" <~ " ").option.optionToSeq)
   }
 
+  object AbstractMethodTypeGrammar
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     val methodTypeGrammar = grammars.find(MethodTypeC.ByteCodeMethodTypeGrammar)
@@ -44,8 +45,8 @@ object TypeAbstraction extends ParticleWithGrammar {
     val variableGrammar: BiGrammar = identifier ~ (":" ~> classBound.option) ~~ ((":" ~> classBound)*) ^^
       parseMap(ParameterKey, ParameterName, ParameterClassBound, ParameterInterfaceBound)
     val parametersGrammar: BiGrammar = variableGrammar.some
-    val abstractMethodType = ("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar ^^
-      parseMap(TypeAbstractionKey, Parameters, Body)
+    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, ("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar ^^
+      parseMap(TypeAbstractionKey, Parameters, Body))
     byteCodeType.addOption(abstractMethodType)
   }
 

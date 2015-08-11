@@ -5,15 +5,28 @@ import java.io.InputStream
 
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
-import core.particles.CompilerFromParticles
+import core.particles.grammars.ProgramGrammar
+import core.particles.node.Node
+import core.particles.{ParticlesToParserConverter, CompilerFromParticles}
 import org.junit.{Ignore, Assert, Test}
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
+import transformations.javac.types.TypeAbstraction
 import util.TestUtils
 
 import scala.reflect.io.{File, Path}
 
 class TestClassFileDecompiler {
+
+  @Test
+  def testTypeVariableSimilarToBooleanSignature() = {
+    val signature = "<B:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/lang/Class<TB;>;Ljava/lang/String;Ljava/lang/String;)Lcom/sun/xml/internal/bind/api/RawAccessor<TB;TV;>;"
+    val compiler = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.buildState
+
+    val manager = new ParticlesToParserConverter()
+    val result = manager.parse(state.grammarCatalogue.find(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
+  }
 
   @Ignore
   @Test
@@ -23,7 +36,7 @@ class TestClassFileDecompiler {
     val allCassFiles = testResources.toDirectory.deepFiles
     val compiler: CompilerFromParticles = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
     var counter = 0
-    val start = 633
+    val start = 7431
     for(file <- allCassFiles) {
       if (counter >= start) {
         val inputStream = file.inputStream()

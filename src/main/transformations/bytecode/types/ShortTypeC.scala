@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Keyword, BiGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
@@ -12,7 +12,7 @@ object ShortTypeC extends TypeInstance with StackType {
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq.empty //TODO extend. long ?
 
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = "S" ~> produce(shortType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("S",false) ~> produce(shortType)
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
     "short" ~> produce(shortType)

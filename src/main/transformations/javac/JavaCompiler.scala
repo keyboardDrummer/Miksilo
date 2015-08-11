@@ -91,7 +91,7 @@ object JavaCompiler {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
+  def constantEntryParticles = Seq(DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
     ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant)
   
   def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
