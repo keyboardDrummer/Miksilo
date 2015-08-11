@@ -36,7 +36,7 @@ class TestClassFileDecompiler {
     val allCassFiles = testResources.toDirectory.deepFiles
     val compiler: CompilerFromParticles = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
     var counter = 0
-    val start = 7431
+    val start = 7943
     for(file <- allCassFiles) {
       if (counter >= start) {
         val inputStream = file.inputStream()

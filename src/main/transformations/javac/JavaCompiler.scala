@@ -92,7 +92,8 @@ object JavaCompiler {
     SignatureAttribute)
 
   def constantEntryParticles = Seq(DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
-    ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant)
+    ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant, MethodHandleConstant, MethodTypeConstant,
+    InvokeDynamicConstant)
   
   def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
     SuperTypeArgument, TypeApplication, MethodTypeC) ++

@@ -103,6 +103,21 @@ object ClassFileParser extends ByteParsers {
   case class ConstantParseResult(constant: Any, entriesConsumed: Int)
   def consumeOne(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 1))
   def consumeTwo(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 2))
+
+  def methodHandleParser: Parser[Any] = for {
+    referenceKind <- ParseByte
+    referenceIndex <- ParseShort
+  } yield MethodHandleConstant.construct(referenceKind, referenceIndex)
+
+  def methodTypeParser = for {
+    descriptorIndex <- ParseShort
+  } yield MethodTypeConstant.construct(descriptorIndex)
+
+  def invokeDynamicParser = for {
+    bootstrapMethodIndex <- ParseShort
+    nameAndTypeIndex <- ParseShort
+  } yield InvokeDynamicConstant.construct(bootstrapMethodIndex, nameAndTypeIndex)
+
   def constantParser: Parser[ConstantParseResult] = ParseByte.into {
     case 1 => consumeOne(utf8Parser)
     case 3 => consumeOne(integerParser)
@@ -115,9 +130,9 @@ object ClassFileParser extends ByteParsers {
     case 10 => consumeOne(methodReferenceParser)
     case 11 => consumeOne(interfaceMethodReference)
     case 12 => consumeOne(nameAndTypeParser)
-    case 15 => ???
-    case 16 => ???
-    case 18 => ???
+    case 15 => consumeOne(methodHandleParser)
+    case 16 => consumeOne(methodTypeParser)
+    case 18 => consumeOne(invokeDynamicParser)
     case _ => failure("There is no constant starting here.")
   }
 }
