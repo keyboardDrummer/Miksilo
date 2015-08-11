@@ -14,11 +14,11 @@ class TransformationGraph
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
     , JavaSimpleStatement, JavaMethod, JavaC)
-  //addSimplifications() TODO bring this back.
+  addSimplifications()// TODO bring this back.
 
   val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
-  if (sources.size > 1)
-    throw new RuntimeException(s"more than once source, sources = $sources.")
+//  if (sources.size > 1)
+//    throw new RuntimeException(s"more than once source, sources = $sources.")
 
   if (sources.size == 0)
     throw new RuntimeException("zero sources.")

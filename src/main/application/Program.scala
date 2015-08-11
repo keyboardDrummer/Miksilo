@@ -21,8 +21,8 @@ object Program extends SimpleSwingApplication {
     val compilerBuilder = new CompilerBuilderPanel()
     tabbedPane.add("Compiler Builder", compilerBuilder)
 
-//    val architecturePanel = getGraphComponent
-//    tabbedPane.add("Architecture", architecturePanel)
+    val architecturePanel = getGraphComponent
+    tabbedPane.add("Architecture", architecturePanel)
 
     contents = Component.wrap(tabbedPane)
     //architecturePanel.scrollToCenter(true)

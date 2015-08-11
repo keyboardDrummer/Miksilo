@@ -5,10 +5,10 @@ import java.io.InputStream
 
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
-import core.particles.grammars.ProgramGrammar
 import core.particles.node.Node
-import core.particles.{ParticlesToParserConverter, CompilerFromParticles}
-import org.junit.{Ignore, Assert, Test}
+import core.particles.{CompilerFromParticles, ParticlesToParserConverter}
+import org.junit.{Assert, Ignore, Test}
+import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
 import transformations.javac.types.TypeAbstraction
@@ -21,11 +21,41 @@ class TestClassFileDecompiler {
   @Test
   def testTypeVariableSimilarToBooleanSignature() = {
     val signature = "<B:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/lang/Class<TB;>;Ljava/lang/String;Ljava/lang/String;)Lcom/sun/xml/internal/bind/api/RawAccessor<TB;TV;>;"
-    val compiler = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildState
 
     val manager = new ParticlesToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
+  }
+
+  @Test
+  def testTypeVariable() = {
+    val signature = "<NoSuchMemberException:Ljava/lang/ReflectiveOperationException;>(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;"
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.buildState
+
+    val manager = new ParticlesToParserConverter()
+    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+  }
+
+  @Test
+  def testTypeVariable2() = {
+    val signature = "<NoSuchMemberException:Ljava/lang/ReflectiveOperationException;>(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.buildState
+
+    val manager = new ParticlesToParserConverter()
+    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+  }
+
+  @Test
+  def testTypeVariable3() = {
+    val signature = "(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
+    val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+    val state = compiler.buildState
+
+    val manager = new ParticlesToParserConverter()
+    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
   @Ignore
@@ -36,9 +66,9 @@ class TestClassFileDecompiler {
     val allCassFiles = testResources.toDirectory.deepFiles
     val compiler: CompilerFromParticles = new CompilerFromParticles(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
     var counter = 0
-    val start = 7943
+    val start = 17453
     for(file <- allCassFiles) {
-      if (counter >= start) {
+      if (counter >= start && file.extension.contains("class")) {
         val inputStream = file.inputStream()
         Console.println(s"starting: ${file.name}")
         compiler.parseAndTransform(inputStream)

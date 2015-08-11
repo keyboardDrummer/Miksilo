@@ -6,9 +6,16 @@ import transformations.bytecode.constants._
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeFieldInfo, PrintByteCode, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 
-object ClassFileParser extends ByteParsers {
+import scala.util.parsing.combinator.PackratParsers
+import scala.util.parsing.input.Reader
 
-  def classFileParser: Parser[Node] = {
+object ClassFileParser extends ByteParsers with PackratParsers {
+
+  def packratParser(reader: Reader[Byte]): ParseResult[Node] = {
+    classFileParser(new ClassFileParser.PackratReader[Byte](reader))
+  }
+
+  private def classFileParser: Parser[Node] = {
     for {
       _ <- elems(PrintByteCode.cafeBabeBytes)
       versionCode <- ParseInteger

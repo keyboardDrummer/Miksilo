@@ -3,7 +3,7 @@ package transformations.bytecode.readJar
 import java.nio.ByteBuffer
 
 trait ByteParsers extends scala.util.parsing.combinator.Parsers {
-   type Elem = Byte
+  type Elem = Byte
 
   val parseUtf8 = ParseShort.into(length => new ParseString(length))
   class ParseString(length: Int) extends Parser[String] {

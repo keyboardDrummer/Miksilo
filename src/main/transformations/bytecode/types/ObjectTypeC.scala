@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Labelled, BiGrammar}
+import core.bigrammar.{Keyword, Labelled, BiGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
@@ -55,7 +55,7 @@ object ObjectTypeC extends TypeInstance with StackType {
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner, identifier.someSeparated("/") ^^
       (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
-    val grammar: BiGrammar = "L" ~> inner <~ ";"
+    val grammar: BiGrammar = new Keyword("L",false) ~> inner <~ ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 

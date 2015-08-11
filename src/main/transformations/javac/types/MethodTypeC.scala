@@ -20,7 +20,8 @@ object MethodTypeC extends TypeInstance {
   def construct(returnType: Node, parameterTypes: Seq[Node]) = {
     new Node(MethodTypeKey,
       Parameters -> parameterTypes,
-      ReturnType -> returnType)
+      ReturnType -> returnType,
+      ThrowsSignature -> Seq.empty[Node])
   }
 
   object MethodTypeKey extends Key
@@ -42,7 +43,7 @@ object MethodTypeC extends TypeInstance {
   object ByteCodeMethodTypeGrammar
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val throwsGrammar = ("^" ~> typeGrammar).option
+    val throwsGrammar = ("^" ~> typeGrammar)*
     val methodGrammar = ("(" ~> (typeGrammar*) <~ ")") ~ typeGrammar ~ throwsGrammar ^^ parseMap(MethodTypeKey, Parameters, ReturnType, ThrowsSignature)
     grammars.create(ByteCodeMethodTypeGrammar, methodGrammar)
   }

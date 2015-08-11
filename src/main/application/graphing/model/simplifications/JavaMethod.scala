@@ -11,5 +11,5 @@ object JavaMethod extends TransformationGroup {
 
   override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, LocalDeclarationWithInitializerC, IncrementAssignmentC, PostFixIncrementC, AssignToVariable)
 
-  override def dependants: Set[Contract] = Set(JavaClassSkeleton)
+  override def dependants: Set[Contract] = Set()
 }
