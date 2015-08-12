@@ -2,7 +2,8 @@ package application.graphing.model
 
 import application.graphing.model.simplifications._
 import com.google.common.collect.Lists
-import org.jgrapht.alg.StrongConnectivityInspector
+import org.jgrapht.alg.{DijkstraShortestPath, StrongConnectivityInspector}
+import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.traverse.TopologicalOrderIterator
 import transformations.javac.JavaCompiler
 
@@ -12,9 +13,9 @@ import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 class TransformationGraph
   extends GraphFromTransformations(JavaCompiler.allTransformations) {
 
-  val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression
-    , JavaSimpleStatement, JavaMethod, JavaC)
-  addSimplifications()// TODO bring this back.
+  val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
+    JavaSimpleStatement, JavaMethod, JavaC)
+  addSimplifications()
 
   val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
 //  if (sources.size > 1)
@@ -32,10 +33,14 @@ class TransformationGraph
       var dependants = simplification.dependants
       for (dependency <- simplification.dependencies) {
         addVertex(dependency)
-        for (derivedDependant <- getOutgoingNodes(dependency)) {
-          dependants += derivedDependant.transformation
-        }
         addEdge(dependency, simplification)
+      }
+      for (dependency <- simplification.dependencies) {
+        for (derivedDependant <- getOutgoingNodes(dependency)) {
+          val dijkstra = DijkstraShortestPath.findPathBetween[TransformationVertex, DefaultEdge](this, derivedDependant, simplification)
+          if (dijkstra == null)
+            dependants += derivedDependant.transformation
+        }
       }
       for (incoming <- dependants) {
         addVertex(incoming)

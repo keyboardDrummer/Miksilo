@@ -40,8 +40,6 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
     additiveGrammar.inner = additiveGrammar.inner | parseAddition
   }
 
-  private def addition(first: Any, second: Any): Node = addition(first.asInstanceOf[Node], second.asInstanceOf[Node])
-
   def addition(first: Node, second: Node) = new Node(AdditionClazz, FirstKey -> first, SecondKey -> second)
 
   object AdditionClazz

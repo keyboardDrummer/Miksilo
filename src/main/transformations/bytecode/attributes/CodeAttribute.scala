@@ -118,14 +118,17 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   override def key: Key = CodeKey
 
+  object MaxStackGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val header: BiGrammar = Seq("code: nameIndex:" ~> integer, "maxStack:" ~> integer, "maxLocal:" ~> integer).reduce((l, r) => (l <~ ",") ~~ r)
+    val maxStackGrammar = grammars.create(MaxStackGrammar, "," ~~> "maxStack:" ~> integer ^^ parseMap(CodeKey, CodeMaxStackKey))
+    val maxLocalGrammar = "," ~~> "maxLocal:" ~> integer ^^ parseMap(CodeKey, CodeMaxLocalsKey)
+    val header: BiGrammar = ("code: nameIndex:" ~> integer) ~ maxStackGrammar ~ maxLocalGrammar
     val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
     val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
-      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, CodeMaxStackKey, CodeMaxLocalsKey,
+      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, PartialSelf, PartialSelf,
         CodeInstructionsKey, CodeAttributesKey, CodeExceptionTableKey)
     grammars.create(CodeGrammar, codeAttributeGrammar)
   }

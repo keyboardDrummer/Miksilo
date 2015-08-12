@@ -24,7 +24,7 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Node])
       result += instructionIndex + 1
 
     if (jumpBehavior.hasJumpInFirstArgument)
-      result += labelIndices(CodeAttribute.getInstructionArguments(instruction)(0).asInstanceOf[String])
+      result += labelIndices(CodeAttribute.getInstructionArguments(instruction).head.asInstanceOf[String])
 
     result
   }

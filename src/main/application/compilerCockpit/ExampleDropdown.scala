@@ -23,7 +23,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
 
   def getFibonacciByteCode = {
     val fibonacciContent = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
-    new Example("Fibonacci Bytecode", fibonacciContent)
+    new Example("Basic Fibonacci Bytecode", fibonacciContent)
   }
 
   def getForLoop = {

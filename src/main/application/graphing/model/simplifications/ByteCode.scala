@@ -1,12 +1,11 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.bytecode.additions.LabelledTargets
-import transformations.bytecode.extraBooleanInstructions.ExpandInstructionsC
 import transformations.javac.JavaCompiler
 
 object ByteCode extends TransformationGroup {
-  override def dependants: Set[Contract] = Set(LabelledTargets, ExpandInstructionsC)
 
-  override def dependencies: Set[Contract] = JavaCompiler.byteCodeInstructions.toSet
+  override def dependencies: Set[Contract] = JavaCompiler.byteCodeTransformations.toSet
+
+  override def dependants: Set[Contract] = Set.empty //Set(LabelledTargets, ExpandInstructionsC)
 }

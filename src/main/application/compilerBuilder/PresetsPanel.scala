@@ -68,12 +68,12 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   def createModel: DefaultListModel[Preset] = {
     val model = new DefaultListModel[Preset]()
     model.addElement(getJavaCompilerPreset)
-    model.addElement(getAddImplicitsPreset)
+    //model.addElement(getAddImplicitsPreset)
     model.addElement(getPrettyPrintPreset)
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
     model.addElement(getRevealSyntaxSugar)
-    model.addElement(getSimplifiedByteCodePreset)
+    //model.addElement(getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
     model
   }
@@ -97,12 +97,12 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
+    new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
       "The program consists only of a single statement block.")
   }
 
   def getSimplifiedByteCodePreset = {
-    new Preset("Bytecode++", Seq(BlockCompilerC) ++ JavaCompiler.allTransformations,
+    new Preset("Bytecode++", JavaCompiler.allByteCodeTransformations,
       "The program takes simplified and extended JVM bytecode as input.")
   }
 
