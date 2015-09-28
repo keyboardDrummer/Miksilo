@@ -2,8 +2,7 @@ Particle Compiler
 ===============
 
 Particle compiler is a tool for quickly building toy compilers. It can be used for prototyping language features or as a way of teaching compiler construction.
-The approach taken is to define compiler 'particles' that represent language features and which can be combined in many ways.
-A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
+A compiler *particle* is piece of code that applies a small change to a compiler, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a compiler. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
 
 ###Particles
 A particle can include one or several phases such as parsing, type checking, optimization and code generation.
