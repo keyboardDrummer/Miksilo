@@ -12,8 +12,8 @@ By keeping the abstract syntax tree untyped, it becomes relatively simple to def
 
 ###GUI
 Particle compiler includes a GUI. You can use this to play around with the defined particles and construct a compiler from them.
-Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can of course run the compiler,
-but also do things like ask the compiler for its in- and output grammar.
+Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can run your compiler,
+and do things like ask the compiler for its in- and output grammar.
 
 ###BiGrammar
 To enable parsing and printing with little development effort, particle compiler uses a 'BiGrammar'.
