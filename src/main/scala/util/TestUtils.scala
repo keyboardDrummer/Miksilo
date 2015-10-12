@@ -1,10 +1,8 @@
 package util
 
-import java.io
-
 import application.compilerCockpit.PrettyPrint
 import core.particles._
-import core.particles.node.{Node, ComparisonOptions}
+import core.particles.node.{ComparisonOptions, Node}
 import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
@@ -20,7 +18,6 @@ class TestUtils(val compiler: CompilerFromParticles) {
   def currentDir = new File(new java.io.File("."))
   def rootOutput = currentDir / Path("testOutput")
   def actualOutputDirectory = rootOutput / "actual"
-  def testResources = currentDir / Path("testResources")
 
   def testInstructionEquivalence(expectedByteCode: Node, compiledCode: Node) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
@@ -73,9 +70,9 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   def getTestFile(relativeFilePath: Path): File = {
-    val currentDir = new File(new io.File("."))
-    val testResources = currentDir / Path("testResources")
-    val input: File = File(testResources / relativeFilePath)
+    val fullPath = relativeFilePath
+    val testResources = ClassLoader.getSystemResource(fullPath.path)
+    val input: File = File(testResources.getPath)
     input
   }
 
@@ -83,8 +80,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
     val testOutput = Directory(currentDir / Path("testOutput"))
-    val testResources = currentDir / Path("testResources")
-    val input: File = File(testResources / relativeFilePath)
+    val input: File = getTestFile(relativeFilePath)
     compiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
@@ -94,7 +90,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val className = fileNameToClassName(fileName)
 
     val relativeFilePath = inputDirectory / (className + ".java")
-    val input: File = File(testResources / relativeFilePath)
+    val input: File = getTestFile(relativeFilePath)
 
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
