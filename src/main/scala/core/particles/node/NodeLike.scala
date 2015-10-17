@@ -12,13 +12,13 @@ trait NodeLike {
   def transform(transformation: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
 
     transformNode(this.asInstanceOf[Self])
-    def transformNode(metaObject: Self): Unit = {
-      if (!visited.add(metaObject))
+    def transformNode(node: Self): Unit = {
+      if (!visited.add(node))
         return
 
-      transformation(metaObject)
+      transformation(node)
 
-      val children = metaObject.dataView.values
+      val children = node.dataView.values
       for(child <- children)
       {
         child match {

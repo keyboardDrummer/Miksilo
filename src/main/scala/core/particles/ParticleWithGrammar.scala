@@ -6,6 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{NodeLike, Node}
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
+  implicit val postfixOps = language.postfixOps
   def transformGrammars(grammars: GrammarCatalogue)
 
   override def inject(state: CompilationState): Unit = {

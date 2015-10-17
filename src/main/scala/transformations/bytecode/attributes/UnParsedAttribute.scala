@@ -7,6 +7,14 @@ import transformations.bytecode.ByteCodeSkeleton
 
 object UnParsedAttribute extends ParticleWithGrammar {
 
+  class UnParsedAttribute(val node: Node) {
+    def nameIndex: Int = node(UnParsedAttribute.UnParsedAttributeName).asInstanceOf[Int]
+    def nameIndex_=(value: Int) = node(UnParsedAttribute.UnParsedAttributeName) = value
+
+    def data = node(UnParsedAttribute.UnParsedAttributeData).asInstanceOf[Seq[Byte]]
+    def data_=(value: Seq[Byte]) = node(UnParsedAttribute.UnParsedAttributeData) = value
+  }
+
   def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(UnParsedAttributeKey, UnParsedAttributeName -> nameIndex, UnParsedAttributeData -> bytes)
 
   object UnParsedAttributeKey

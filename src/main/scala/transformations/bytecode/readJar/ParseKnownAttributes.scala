@@ -4,31 +4,38 @@ import core.particles.node.Node
 import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
-import transformations.bytecode.attributes.UnParsedAttribute
+import transformations.bytecode.attributes.{ByteCodeAttribute, UnParsedAttribute}
+import transformations.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
 
 object ParseKnownAttributes extends ParticleWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
     val constantPool = ByteCodeSkeleton.getConstantPool(program)
     program.transform(node => node.clazz match {
       case UnParsedAttribute.UnParsedAttributeKey =>
-        val index = node(UnParsedAttribute.UnParsedAttributeName).asInstanceOf[Int]
+        val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
+        val index = typedNode.nameIndex
         val name = constantPool.getValue(index).asInstanceOf[String]
         val attributeTypeOption = ByteCodeSkeleton.getState(state).attributes.get(name)
         for(attributeType <- attributeTypeOption)
         {
-          val parseWithoutNameIndex: ClassFileParser.Parser[Node] = attributeType.getParser(node)
-          val parser = parseWithoutNameIndex.map(node => {
-            node(AttributeNameKey) = index
-            node
-          })
-          val inputBytes = node(UnParsedAttribute.UnParsedAttributeData).asInstanceOf[Seq[Byte]].toArray
-          val parseResult = parser(new ArrayReader(0, inputBytes))
-          val newNode = parseResult.get
-          node.replaceWith(newNode)
+          parseAttribute(typedNode, attributeType)
         }
       case _ =>
     })
   }
 
-  override def description: String = "Parses attributes that still require it."
+  def parseAttribute(typedNode: UnParsedAttribute, attributeType: ByteCodeAttribute): Unit = {
+    val parseWithoutNameIndex: ClassFileParser.Parser[Node] = attributeType.getParser(typedNode.node)
+    val parser = parseWithoutNameIndex.map(node => {
+      node(AttributeNameKey) = typedNode.nameIndex
+      node
+    })
+    val inputBytes = typedNode.data.toArray
+    val parseResult = parser(new ArrayReader(0, inputBytes))
+    val newNode = parseResult.get
+    typedNode.node.replaceWith(newNode)
+  }
+
+  override def description: String = "In the initial parsing of bytecode, the attributes are not parsed. " +
+    "This phase parses the attributes, but only if the attribute type is known by the compiler."
 }
