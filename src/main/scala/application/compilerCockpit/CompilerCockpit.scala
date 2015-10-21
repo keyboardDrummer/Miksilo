@@ -89,6 +89,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
     val inputPanel = equationLayout.addComponent(getInputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
+    val showPhasesButton = equationLayout.addComponent(new ShowPhasesButton(this))
     val inputGrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
     val outputGrammarButton = equationLayout.addComponent(new ShowOutputGrammarButton(this))
     val exampleDropdown = equationLayout.addComponent(new ExampleDropdown(this))
@@ -98,6 +99,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     equationLayout.makePreferredSize(chooseCompile)
     equationLayout.makePreferredSize(chooseOutput)
     equationLayout.makePreferredSize(chooseInput)
+    equationLayout.makePreferredSize(showPhasesButton)
     equationLayout.makePreferredSize(inputGrammarButton)
     equationLayout.makePreferredSize(outputGrammarButton)
     equationLayout.makePreferredSize(exampleDropdown)
@@ -105,7 +107,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
     def addHorizontalEquations() {
       innerLayout.addLeftToRight(innerLayout.container, inputPanel, outputPanel, innerLayout.container)
-      innerLayout.addLeftToRight(exampleDropdown, inputGrammarButton, outputGrammarButton, innerLayout.container)
+      innerLayout.addLeftToRight(exampleDropdown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
       innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton)
 
       innerLayout.expressions += inputPanel.width - outputPanel.width
@@ -116,6 +118,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
       innerLayout.addEquals(chooseInput.verticalCenter2,
         chooseCompile.verticalCenter2,
         chooseOutput.verticalCenter2,
+        showPhasesButton.verticalCenter2,
         inputGrammarButton.verticalCenter2,
         outputGrammarButton.verticalCenter2,
         exampleDropdown.verticalCenter2,

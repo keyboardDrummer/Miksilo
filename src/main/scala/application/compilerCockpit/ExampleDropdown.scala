@@ -51,15 +51,22 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def initialise() {
-    val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
-      getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciByteCode, getRevealSyntaxSugar))
-    add(new JLabel("code examples:"))
-    val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
+    try
+    {
+      val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
+        getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciByteCode, getRevealSyntaxSugar))
+      add(new JLabel("code examples:"))
+      val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
 
-    comboBox.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = compilerCockpit.setInputText(exampleModel.getSelectedItem.asInstanceOf[Example].content)
-    })
-    add(comboBox)
+      comboBox.addActionListener(new ActionListener {
+        override def actionPerformed(e: ActionEvent): Unit = compilerCockpit.setInputText(exampleModel.getSelectedItem.asInstanceOf[Example].content)
+      })
+      add(comboBox)
+    }
+    catch
+    {
+      case e:RuntimeException => compilerCockpit.setOutputText("Could not load example dropdown.") //TODO move to Logger.
+    }
   }
 
 }

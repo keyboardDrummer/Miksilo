@@ -7,6 +7,6 @@ trait ParticleWithPhase extends Particle {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    state.compilerPhases ::= (() => transform(state.program, state))
+    state.compilerPhases ::= new Phase(this.name, description, () => transform(state.program, state))
   }
 }

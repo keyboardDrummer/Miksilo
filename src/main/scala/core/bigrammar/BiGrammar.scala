@@ -52,17 +52,17 @@ trait BiGrammar extends GrammarDocumentWriter {
   }
 
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
-    this % new ManyVertical(separator %> this) ^^ separatedMap
+    this % new ManyVertical(separator %> this) ^^ someMap
 
   def manyVertical = new ManyVertical(this)
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[Node])
 
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | produce(None)
-  def some: BiGrammar = this ~ (this*) ^^ separatedMap
-  def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ separatedMap
+  def some: BiGrammar = this ~ (this*) ^^ someMap
+  def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ someMap
 
-  private def separatedMap: ((Any) => Seq[Any], (Any) => Option[~[Any, Seq[Any]]]) = {
+  private def someMap: ((Any) => Seq[Any], (Any) => Option[~[Any, Seq[Any]]]) = {
     ( {
       case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
     }, {

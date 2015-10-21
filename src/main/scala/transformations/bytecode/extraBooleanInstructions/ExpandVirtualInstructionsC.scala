@@ -10,7 +10,7 @@ import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 import scala.collection.mutable
 
-object ExpandInstructionsC extends ParticleWithPhase with WithState {
+object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
 
   def lessThanInstruction = CodeAttribute.instruction(LessThanInstructionKey)
 

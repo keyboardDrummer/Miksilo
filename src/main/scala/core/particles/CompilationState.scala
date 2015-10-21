@@ -23,13 +23,15 @@ object ParseUsingTextualGrammar extends Particle {
   override def description: String = "Parses the input file using a textual grammar."
 }
 
+case class Phase(name: String, description: String, action: () => Unit)
+
 class CompilationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
   grammarCatalogue.create(ProgramGrammar, BiFailure)
   var program: Node = null
-  var compilerPhases: List[() => Unit] = List.empty
+  var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = null
 
   def getUniqueLabel(prefix: String) = prefix + getGUID
@@ -43,6 +45,6 @@ class CompilationState {
 
   def runPhases() = {
     for(phase <- compilerPhases)
-      phase()
+      phase.action()
   }
 }

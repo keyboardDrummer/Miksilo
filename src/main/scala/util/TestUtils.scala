@@ -72,8 +72,11 @@ class TestUtils(val compiler: CompilerFromParticles) {
   def getTestFile(relativeFilePath: Path): File = {
     val fullPath = relativeFilePath
     val testResources = ClassLoader.getSystemResource(fullPath.path)
-    val input: File = File(testResources.getPath)
-    input
+    if (testResources == null)
+    {
+      throw new RuntimeException("Test file not found")
+    }
+    File(testResources.getPath)
   }
 
   def compileAndRun(className: String, inputDirectory: Path): String = {

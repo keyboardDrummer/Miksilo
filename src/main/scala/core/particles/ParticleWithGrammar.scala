@@ -3,7 +3,7 @@ package core.particles
 import core.bigrammar.GrammarDocumentWriter
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{NodeLike, Node}
+import core.particles.node.{Node, NodeLike}
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
@@ -29,6 +29,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
   }
 
+  //noinspection ComparingUnrelatedTypes
   def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
     if (!value.isInstanceOf[NodeLike])
       return None

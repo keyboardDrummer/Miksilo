@@ -26,7 +26,7 @@ libraryDependencies += "com.google.guava" % "guava" % "18.0"
 
 libraryDependencies += "com.typesafe.akka" % "akka-actor_2.10" % "2.1.3"
 
-unmanagedResourceDirectories in Test += baseDirectory.value / "testResources"
+unmanagedResourceDirectories in Compile += baseDirectory.value / "testResources"
 //resourceDirectory in Test := baseDirectory.value / "testResources"
 
     
