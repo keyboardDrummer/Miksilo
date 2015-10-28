@@ -56,7 +56,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
 
   def parseAndPrint(example: String, expected: Any) {
     val grammarDocument = getExpressionGrammarDocument
-    TestGrammarUtils.parseAndPrint(example, Some(expected), grammarDocument)
+    TestGrammarUtils.parseAndPrintSame(example, Some(expected), grammarDocument)
   }
 
   def getExpressionGrammarDocument: Labelled = {

@@ -13,7 +13,12 @@ object TestGrammarUtils extends TestGrammarUtils(JavaCompiler.javaCompilerTransf
 
 case class TestGrammarUtils(particles: Seq[Particle]) {
 
-  def parseAndPrint(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar) {
+  def parseAndPrintSame(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar): Unit = {
+    val documentResult: String = parseAndPrint(example, expectedOption, grammarDocument)
+    Assert.assertEquals(example, documentResult)
+  }
+
+  def parseAndPrint(example: String, expectedOption: Option[Any], grammarDocument: BiGrammar): String = {
     val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
 
     val packrat: GrammarToParserConverter = new GrammarToParserConverter()
@@ -28,11 +33,11 @@ case class TestGrammarUtils(particles: Seq[Particle]) {
       Assert.assertEquals(expected, result))
 
     val documentResult = BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
-    Assert.assertEquals(example, documentResult)
+    documentResult
   }
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: Any = ProgramGrammar) {
-    parseAndPrint(input, expected, getGrammarUsingTransformer(grammarTransformer))
+    parseAndPrintSame(input, expected, getGrammarUsingTransformer(grammarTransformer))
   }
 
   def getPrintResult(value: Any, grammarTransformer: Any = ProgramGrammar): String = {
@@ -40,7 +45,7 @@ case class TestGrammarUtils(particles: Seq[Particle]) {
     BiGrammarToPrinter.toDocument(value, document).renderString()
   }
 
-  def getGrammarUsingTransformer(grammarTransformer: Any): Labelled = {
+  def getGrammarUsingTransformer(grammarTransformer: Any = ProgramGrammar): Labelled = {
     new CompilerFromParticles(getTransformations(grammarTransformer)).getGrammar
   }
 

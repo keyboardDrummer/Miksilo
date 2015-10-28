@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.TestGrammarUtils
-import core.particles.node.Node
+import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
 import transformations.javac.classes._
 import transformations.javac.classes.skeleton.JavaClassSkeleton
@@ -105,7 +105,8 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val result = getMethodGrammarResult(input)
 
     val expectation = getMainMethod
-    Assert.assertEquals(expectation, result)
+
+    Assert.assertTrue(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
   }
 
   def getMethodGrammarResult(input: String): Any = {
@@ -119,7 +120,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
     val result: Any = getMethodGrammarResult(input)
 
     val expectation = getFibonacciMethod
-    Assert.assertEquals(expectation, result)
+    Assert.assertTrue(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
   }
 
   def getMainMethod: Node = {

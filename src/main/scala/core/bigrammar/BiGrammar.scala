@@ -86,6 +86,7 @@ trait BiGrammar extends GrammarDocumentWriter {
   def ~~>(right: BiGrammar) = (this ~ space) ~> right
 
   def * = new ManyHorizontal(this)
+  def many = new ManyHorizontal(this)
 
   def %(bottom: BiGrammar) = new TopBottom(this, bottom)
 

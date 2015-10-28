@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{TopBottom, BiGrammar}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -174,9 +174,10 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
 
     val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodGrammar = grammars.create(MethodGrammar, visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
-      parseReturnType ~~ identifier ~ parseParameters % block ^^
-      parseMap(MethodKey, VisibilityKey, StaticKey, TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+    val methodUnmapped: TopBottom = visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
+      parseReturnType ~~ identifier ~ parseParameters % block
+    val methodGrammar = grammars.create(MethodGrammar, new NodeMap(methodUnmapped, MethodKey, VisibilityKey, StaticKey,
+      TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
@@ -208,27 +209,27 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
 
   class Visibility extends Key
 
-  object MethodKey
+  object MethodKey extends Key
 
   object MethodGrammar
 
   object MethodBodyKey extends Key
 
-  object ParameterNameKey
+  object ParameterNameKey extends Key
 
-  object StaticKey
+  object StaticKey extends Key
 
-  object VisibilityKey
+  object VisibilityKey extends Key
 
-  object ReturnTypeKey
+  object ReturnTypeKey extends Key
 
-  object MethodNameKey
+  object MethodNameKey extends Key
 
-  object MethodParametersKey
+  object MethodParametersKey extends Key
 
-  object TypeParameters
+  object TypeParameters extends Key
 
-  object ParameterTypeKey
+  object ParameterTypeKey extends Key
 
   object PublicVisibility extends Visibility
 

@@ -1,9 +1,9 @@
 package core.particles
 
-import core.bigrammar.GrammarDocumentWriter
+import core.bigrammar.{BiGrammar, MapGrammar, GrammarDocumentWriter}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
@@ -29,6 +29,10 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
   }
 
+  class NodeMap(inner: BiGrammar, val key: Key, val fields: Key*) extends MapGrammar(inner,
+      input => construct(input, key, fields.toList),
+      obj => destruct(obj, key, fields.toList))
+
   //noinspection ComparingUnrelatedTypes
   def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
     if (!value.isInstanceOf[NodeLike])
@@ -44,8 +48,9 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     }
   }
 
+  object ValueNotFound
   def getWithPartial(meta: NodeLike, key: Any): Any = {
-    if (key == PartialSelf) meta else meta(key)
+    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound)
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {

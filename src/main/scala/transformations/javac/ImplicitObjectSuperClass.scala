@@ -18,5 +18,5 @@ object ImplicitObjectSuperClass extends ParticleWithPhase {
     }
   }
 
-  override def description: String = "Implicit adds Object as a class parent if no explicit parent is specified."
+  override def description: String = "Implicitly adds Object as a class parent if no explicit parent is specified."
 }

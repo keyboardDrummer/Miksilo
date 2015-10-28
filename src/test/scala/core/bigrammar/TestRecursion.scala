@@ -27,7 +27,7 @@ class TestRecursion extends GrammarDocumentWriter {
   }
 
   def testUsingGrammar(grammar: Labelled) {
-    TestGrammarUtils.parseAndPrint(input, Some(getExpectedRightRecursiveResult), grammar)
+    TestGrammarUtils.parseAndPrintSame(input, Some(getExpectedRightRecursiveResult), grammar)
   }
 
   def getExpectedRightRecursiveResult: AnyRef = {

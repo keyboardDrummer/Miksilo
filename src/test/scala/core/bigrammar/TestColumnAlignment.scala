@@ -10,6 +10,6 @@ class TestColumnAlignment extends GrammarDocumentWriter {
     val input = "Hallo.              Hier staat een tweede gesprek." + System.lineSeparator() +
                 "Hoe gaat het met je?"
     val grammar: BiGrammar = (("Hallo." : BiGrammar) % "Hoe gaat het met je?") ~ "Hier staat een tweede gesprek."
-    TestGrammarUtils.parseAndPrint(input, None, grammar)
+    TestGrammarUtils.parseAndPrintSame(input, None, grammar)
   }
 }
