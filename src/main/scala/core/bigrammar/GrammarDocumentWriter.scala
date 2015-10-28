@@ -1,5 +1,9 @@
 package core.bigrammar
 
+import core.document.{Document, WhiteSpace}
+import core.grammar.{Grammar, Identifier, NumberG}
+import core.responsiveDocument.ResponsiveDocument
+
 trait GrammarDocumentWriter {
 
   def identifier: BiGrammar = consume(Identifier)
