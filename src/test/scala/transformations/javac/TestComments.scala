@@ -2,7 +2,6 @@ package transformations.javac
 
 import core.bigrammar.TestGrammarUtils
 import org.junit.{Assert, Test}
-import transformations.javac.classes.skeleton.JavaClassSkeleton
 import util.TestUtils
 
 import scala.reflect.io.{File, Path}
@@ -12,7 +11,7 @@ class TestComments {
   @Test
   def testBasicClass() {
     val input = "/* jooo */"
-    TestGrammarUtils.parseAndPrintSame(input, None, JavaCommentsC.commentGrammar)
+    TestGrammarUtils.parseAndPrintSame(input, None, JavaCommentsC.getCommentGrammar)
   }
 
   @Test
@@ -34,7 +33,7 @@ class TestComments {
   @Test
   def testFullPipeline() {
     val inputDirectory = Path("")
-    val output: String = TestUtils.compileAndRun("WhileeWithComment", inputDirectory)
+    val output: String = TestUtils.compileAndRun("WhileeWithComment.java", inputDirectory)
     Assert.assertEquals("3", output)
   }
 }

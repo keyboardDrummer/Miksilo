@@ -79,13 +79,14 @@ class TestUtils(val compiler: CompilerFromParticles) {
     File(testResources.getPath)
   }
 
-  def compileAndRun(className: String, inputDirectory: Path): String = {
+  def compileAndRun(fileName: String, inputDirectory: Path): String = {
+    val className: String = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
     val testOutput = Directory(currentDir / Path("testOutput"))
     val input: File = getTestFile(relativeFilePath)
     compiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
-    val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
+    val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 

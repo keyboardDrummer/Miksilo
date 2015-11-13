@@ -4,6 +4,8 @@ import core.document.{Document, WhiteSpace}
 import core.grammar.{Grammar, Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
+import scala.language.implicitConversions
+
 trait GrammarDocumentWriter {
 
   def identifier: BiGrammar = consume(Identifier)

@@ -11,9 +11,9 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
 
   def whitespaceG: Parser[Any] = rep(
     whitespaceChar
-      | '/' ~ '*' ~ comment
-      | '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
-      | '/' ~ '*' ~ failure("unclosed comment")
+      //| '/' ~ '*' ~ comment
+      //| '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
+      //| '/' ~ '*' ~ failure("unclosed comment")
   )
 
   def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != EofCh)

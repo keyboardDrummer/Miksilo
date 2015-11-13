@@ -24,7 +24,7 @@ class BiGrammarToPrinter {
       { case e: PrintError => Failure(NestedError(value, grammar, e))})
 
     val result: Try[ResponsiveDocument] = grammar match {
-      case Choice(first, second) => ToDocumentApplicative.or(toDocumentCached(value, second), toDocumentCached(value, first))
+      case choice:Choice => ToDocumentApplicative.or(toDocumentCached(value, choice.left), toDocumentCached(value, choice.right))
       case Consume(StringLiteral) => Try("\"" + value + "\"")
       case Consume(consume) => Try(value.toString)
       case Keyword(keyword, _) => Try(keyword)
