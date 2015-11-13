@@ -3,7 +3,7 @@ package transformations.javac
 import core.bigrammar._
 import core.grammar.RegexG
 import core.particles.ParticleWithGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
 import core.particles.node.Key
 import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
@@ -41,10 +41,9 @@ object JavaCommentsC extends ParticleWithGrammar {
   val commentsGrammar = getCommentsGrammar
   object CommentKey extends Key
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val methodGrammar = grammars.find(MethodC.MethodGrammar)
 
     val analysis = new GrammarAnalysis()
-    analysis.run(new Root(methodGrammar), false)
+    analysis.run(new Root(grammars.find(ProgramGrammar)), false)
     
     for(pathWithState <- analysis.states)
     {
@@ -53,25 +52,24 @@ object JavaCommentsC extends ParticleWithGrammar {
         case selection: GrammarSelection =>
           val current = selection.get
           current match {
-            case _:Keyword =>
-              selection.set(new Sequence(commentsGrammar, current))
-            case _:Delimiter =>
-              selection.set(new Sequence(commentsGrammar, current))
+//            case _:Keyword =>
+//              selection.set(new Sequence(commentsGrammar, current))
+//            case _:Delimiter =>
+//              selection.set(new Sequence(commentsGrammar, current))
             case _:NodeMap =>
               addCommentToNodeMap(selection.parent.asInstanceOf[Labelled])
-            case _:MapGrammar =>
-              selection.set(new Sequence(commentsGrammar, current))
+//            case _:MapGrammar =>
+//              selection.set(new Sequence(commentsGrammar, current))
             case _ =>
           }
         case _ =>
       }
     }
-    addCommentToNodeMap(methodGrammar)
   }
 
   def addCommentToNodeMap(labelledWithNodeMap: Labelled): Unit = {
     val nodeMap = labelledWithNodeMap.inner.asInstanceOf[NodeMap]
-    val newInner = nodeMap.inner ^^(combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
+    val newInner = new Sequence(commentsGrammar, nodeMap.inner) ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
     val newNodeMap = new NodeMap(newInner, nodeMap.key, Seq(CommentKey) ++ nodeMap.fields: _*)
     labelledWithNodeMap.inner = newNodeMap
   }
@@ -81,32 +79,6 @@ object JavaCommentsC extends ParticleWithGrammar {
     commentGrammar.many ^^
       (comments => CommentCollection(comments.asInstanceOf[Seq[String]]),
         commentCollection => Some(commentCollection.asInstanceOf[CommentCollection].comments))
-  }
-
-  def transform(path: GrammarPath, insideNodeMap: Boolean): Unit = {
-    val current = path.get
-    val newInsideNodeMap = current match {
-      case _: NodeMap => true
-      case _: MapGrammar => false
-      case _ => insideNodeMap
-    }
-    for(child <- path.children)
-    {
-      transform(child, newInsideNodeMap)
-    }
-    if (!insideNodeMap)
-      return
-
-    path match {
-      case selection: GrammarSelection =>
-        current match {
-          case _:Keyword => selection.set(new Sequence(commentsGrammar, current))
-          case _:NodeMap =>
-          case _:MapGrammar => selection.set(new Sequence(commentsGrammar, current))
-          case _ =>
-        }
-      case _ =>
-    }
   }
 
   def getCommentGrammar: BiGrammar = {

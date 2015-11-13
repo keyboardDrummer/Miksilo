@@ -167,10 +167,11 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
     val parseStatic = grammars.create(StaticGrammar, "static " ~> produce(true) | produce(false))
 
     val visibilityModifier = grammars.create(VisibilityGrammar,
-      "public" ~> produce(PublicVisibility) |
-        "protected" ~> produce(ProtectedVisibility) |
-        "private" ~> produce(PrivateVisibility) |
-        produce(DefaultVisibility)) <~ " "
+      "public " ~> produce(PublicVisibility) |
+        "protected " ~> produce(ProtectedVisibility) |
+        "private " ~> produce(PrivateVisibility) |
+        produce(DefaultVisibility))
+
 
     val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
 
