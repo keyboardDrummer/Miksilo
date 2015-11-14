@@ -19,7 +19,7 @@ class TestComments {
     val testFile: File = TestUtils.getJavaTestFile("Whilee")
     val input = testFile.slurp()
     val result = TestGrammarUtils.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
-    Assert.assertEquals("jo", result)
+    Assert.assertEquals(input, result)
   }
 
   @Test
@@ -27,7 +27,7 @@ class TestComments {
     val testFile: File = TestUtils.getJavaTestFile("WhileeWithComment.java")
     val input = testFile.slurp()
     val result = TestGrammarUtils.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
-    Assert.assertEquals("jo", result)
+    Assert.assertEquals(input, result)
   }
 
   @Test

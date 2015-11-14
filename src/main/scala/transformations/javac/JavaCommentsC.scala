@@ -3,9 +3,8 @@ package transformations.javac
 import core.bigrammar._
 import core.grammar.RegexG
 import core.particles.ParticleWithGrammar
-import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
-import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
 
 import scala.util.matching.Regex
@@ -69,7 +68,7 @@ object JavaCommentsC extends ParticleWithGrammar {
 
   def addCommentToNodeMap(labelledWithNodeMap: Labelled): Unit = {
     val nodeMap = labelledWithNodeMap.inner.asInstanceOf[NodeMap]
-    val newInner = new Sequence(commentsGrammar, nodeMap.inner) ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
+    val newInner = new TopBottom(commentsGrammar, nodeMap.inner) ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
     val newNodeMap = new NodeMap(newInner, nodeMap.key, Seq(CommentKey) ++ nodeMap.fields: _*)
     labelledWithNodeMap.inner = newNodeMap
   }
