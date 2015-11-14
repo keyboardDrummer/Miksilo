@@ -3,7 +3,7 @@ package transformations.javac.methods.assignment
 import core.bigrammar.BiFailure
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerC
 import transformations.bytecode.coreInstructions.objects.StoreAddressC
@@ -23,7 +23,8 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val assignmentGrammar = (targetGrammar <~~ "=") ~~ expressionGrammar ^^ parseMap(AssignmentKey, AssignmentTarget, AssignmentValue)
+    val assignmentInner = (targetGrammar <~~ "=") ~~ expressionGrammar
+    val assignmentGrammar = new NodeMap(assignmentInner, AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.addOption(assignmentGrammar)
   }
 
@@ -31,11 +32,11 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
-  object AssignmentKey
+  object AssignmentKey extends Key
 
-  object AssignmentTarget
+  object AssignmentTarget extends Key
 
-  object AssignmentValue
+  object AssignmentValue extends Key
 
   override val key: AnyRef = AssignmentKey
 

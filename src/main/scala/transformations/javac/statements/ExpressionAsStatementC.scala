@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.coreInstructions.{Pop2C, PopC}
@@ -10,9 +10,9 @@ import transformations.bytecode.types.TypeSkeleton
 
 object ExpressionAsStatementC extends StatementInstance {
 
-  object ExpressionAsStatementKey
+  object ExpressionAsStatementKey extends Key
 
-  object ExpressionKey
+  object ExpressionKey extends Key
 
   def asStatement(expression: Node) = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
 
@@ -36,7 +36,8 @@ object ExpressionAsStatementC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val expressionAsStatement = (expressionGrammar <~ ";") ^^ parseMap(ExpressionAsStatementKey, ExpressionKey)
+    val inner = expressionGrammar <~ ";"
+    val expressionAsStatement = new NodeMap(inner, ExpressionAsStatementKey, ExpressionKey)
     statementGrammar.addOption(expressionAsStatement)
   }
 

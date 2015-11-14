@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerC
 import transformations.bytecode.coreInstructions.longs.LoadLongC
@@ -19,7 +19,7 @@ object VariableC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val variableGrammar = grammars.create(VariableGrammar, identifier ^^ parseMap(VariableKey, VariableNameKey))
+    val variableGrammar = grammars.create(VariableGrammar, new NodeMap(identifier, VariableKey, VariableNameKey))
     core.addOption(variableGrammar)
   }
 
@@ -27,9 +27,9 @@ object VariableC extends ExpressionInstance {
 
   def variable(name: String) = new Node(VariableKey, VariableNameKey -> name)
 
-  object VariableNameKey
+  object VariableNameKey extends Key
 
-  object VariableKey
+  object VariableKey extends Key
 
   override val key: AnyRef = VariableKey
 

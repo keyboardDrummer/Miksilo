@@ -20,14 +20,17 @@ trait GrammarPath {
   }
 
   override def hashCode(): Int = get.hashCode()
+  def ancestors: Seq[GrammarPath]
 }
 
 class Root(value: BiGrammar) extends GrammarPath
 {
   override def get: BiGrammar = value
+
+  override def ancestors: Seq[GrammarPath] = Seq.empty
 }
 
-class GrammarSelection(previous: GrammarPath, property: Property[BiGrammar, AnyRef]) extends GrammarPath
+class GrammarSelection(val previous: GrammarPath, property: Property[BiGrammar, AnyRef]) extends GrammarPath
 {
   val parent = previous.get
 
@@ -40,4 +43,6 @@ class GrammarSelection(previous: GrammarPath, property: Property[BiGrammar, AnyR
   }
 
   override def toString = s"GrammarSelection($get)"
+
+  override def ancestors: Seq[GrammarPath] = Seq(previous) ++ previous.ancestors
 }

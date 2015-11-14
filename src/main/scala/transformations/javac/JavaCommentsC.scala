@@ -56,7 +56,7 @@ object JavaCommentsC extends ParticleWithGrammar {
 //            case _:Delimiter =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case _:NodeMap =>
-              addCommentToNodeMap(selection.parent.asInstanceOf[Labelled])
+              addCommentToNodeMap(selection)
 //            case _:MapGrammar =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case _ =>
@@ -66,11 +66,18 @@ object JavaCommentsC extends ParticleWithGrammar {
     }
   }
 
-  def addCommentToNodeMap(labelledWithNodeMap: Labelled): Unit = {
-    val nodeMap = labelledWithNodeMap.inner.asInstanceOf[NodeMap]
-    val newInner = new TopBottom(commentsGrammar, nodeMap.inner) ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
+  def addCommentToNodeMap(nodeMapPath: GrammarSelection): Unit = {
+    val nodeMap = nodeMapPath.get.asInstanceOf[NodeMap]
+    val growers = nodeMapPath.ancestors.
+      map(path => path.get).
+      filter(grammar => grammar.isInstanceOf[TopBottom] || grammar.isInstanceOf[Sequence] || grammar.isInstanceOf[ManyVertical] || grammar.isInstanceOf[ManyHorizontal])
+    val firstGrower = growers.head
+    val verticalNotHorizontal = firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
+    val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMap.inner)
+                           else new Sequence(commentsGrammar, nodeMap.inner)
+    val newInner = innerWithComment ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
     val newNodeMap = new NodeMap(newInner, nodeMap.key, Seq(CommentKey) ++ nodeMap.fields: _*)
-    labelledWithNodeMap.inner = newNodeMap
+    nodeMapPath.set(newNodeMap)
   }
 
   def getCommentsGrammar: BiGrammar = {

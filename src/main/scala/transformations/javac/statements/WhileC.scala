@@ -1,8 +1,8 @@
 package transformations.javac.statements
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, NodeLike}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, SequenceSelection}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -38,18 +38,18 @@ object WhileC extends StatementInstance with WithState {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileGrammar = "while" ~> ("(" ~> expressionGrammar <~ ")") % blockGrammar ^^
-      parseMap(WhileKey, WhileCondition, WhileBody)
+    val whileInner = "while" ~> ("(" ~> expressionGrammar <~ ")") % blockGrammar
+    val whileGrammar = new NodeMap(whileInner, WhileKey, WhileCondition, WhileBody)
     statementGrammar.addOption(whileGrammar)
   }
 
   def _while(condition: Node, body: Seq[Node]) = new Node(WhileKey, WhileCondition -> condition, WhileBody -> body)
 
-  object WhileKey
+  object WhileKey extends Key
 
-  object WhileCondition
+  object WhileCondition extends Key
 
-  object WhileBody
+  object WhileBody extends Key
 
   override def description: String = "Enables using the while construct."
 
