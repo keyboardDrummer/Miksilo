@@ -17,7 +17,7 @@ import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMetho
 import transformations.javac.statements.ForLoopC
 import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
-class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel(new GridBagLayout()) {
+class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
 
   initialise()
 
@@ -144,9 +144,9 @@ class PresetsPanel(compilerParticles: DefaultListModel[Particle]) extends JPanel
   }
 
   def applyPreset(preset: Preset) {
-    compilerParticles.clear()
+    selectedParticles.clear()
     for (particle <- preset.particles)
-      compilerParticles.addElement(particle)
+      selectedParticles.addElement(new ParticleInstance(particle))
   }
 }
 

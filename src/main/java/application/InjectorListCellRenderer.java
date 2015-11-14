@@ -1,5 +1,6 @@
 package application;
 
+import application.compilerBuilder.ParticleInstance;
 import application.compilerBuilder.ParticleLabelPainter;
 import core.particles.Particle;
 
@@ -16,7 +17,14 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
   public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
     JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-    Particle particle = (Particle) value;
+    Particle particle;
+    if (value instanceof Particle)
+    {
+      particle = (Particle)value;
+    } else // if (value instanceof ParticleInstance)
+    {
+      particle = ((ParticleInstance)value).particle();
+    }
     label.setText(particle.name());
     if (!isSelected) {
       Color color = painter.isDependency(particle) ? Color.RED

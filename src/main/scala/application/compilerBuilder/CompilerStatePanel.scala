@@ -10,8 +10,13 @@ import core.particles.Particle
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
+class ParticleInstanceList extends DefaultListModel[ParticleInstance]
+{
+  def scalaElements: Seq[Particle] = JEnumerationWrapper(super.elements()).map(instance => instance.particle).toSeq
+}
+
 class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
-  val compilerParticles = new DefaultListModel[Particle]()
+  val selectedParticles = new ParticleInstanceList()
 
   StyleSheet.setTitleBorder(this, "Compiler")
 
@@ -22,7 +27,7 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
   constraints.weighty = 2
   add(firstPanel, constraints)
 
-  val consolePanel = new ConsolePanel(compilerParticles)
+  val consolePanel = new ConsolePanel(selectedParticles)
 
   constraints.weighty = 1
   add(consolePanel, constraints)
@@ -39,8 +44,7 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     val launchCockpitButton = new JButton("Launch Cockpit")
     launchCockpitButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        val particlesAsSequence = new JEnumerationWrapper(compilerParticles.elements()).toList
-        val cockpit = new CompilerCockpit(particlesAsSequence)
+        val cockpit = new CompilerCockpit(selectedParticles.scalaElements)
         cockpit.pack()
         cockpit.maximize()
         cockpit.visible = true
@@ -53,12 +57,12 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
-    val compilerListPanel = SelectedParticlesPanel.getPanel(panel, compilerParticles)
+    val compilerListPanel = SelectedParticlesPanel.getPanel(panel, selectedParticles)
     val compilerListConstraints = getConstraints
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)
 
-    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, compilerParticles)
+    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, selectedParticles)
     val dependentConstraints = getConstraints
     dependentConstraints.gridx = 1
     firstPanel.add(dependentPanel, dependentConstraints)

@@ -1,15 +1,42 @@
 package application.compilerBuilder
 
 import java.awt.BorderLayout
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.{MouseEvent, ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import core.particles.Particle
+import org.jdesktop.swingx.JXList
+
+object ParticleInstance
+{
+  implicit class ParticleLike(val particleLike: Any)
+  {
+    def getParticle: Particle = particleLike match {
+      case particle: Particle => particle
+      case instance: ParticleInstance => instance.particle
+    }
+
+    def getParticleInstance: ParticleInstance = particleLike match {
+      case particle: Particle => new ParticleInstance(particle)
+      case instance: ParticleInstance => instance
+    }
+  }
+}
+
+class ParticleInstance(val particle: Particle)
+
+class ParticleInstanceJXList() extends JXList() {
+  override def getToolTipText(event: MouseEvent): String = {
+    val index = this.locationToIndex(event.getPoint)
+    val model = this.getModel
+    model.getElementAt(index).asInstanceOf[ParticleInstance].particle.description
+  }
+}
 
 object SelectedParticlesPanel {
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
-    val compilerList = new ParticleList()
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[ParticleInstance]) = {
+    val compilerList = new ParticleInstanceJXList()
     compilerList.setTransferHandler(new SelectedParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)

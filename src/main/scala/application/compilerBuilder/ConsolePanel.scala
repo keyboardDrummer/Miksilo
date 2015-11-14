@@ -10,7 +10,7 @@ import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
-class ConsolePanel(val compilerParticles: DefaultListModel[Particle])  extends JPanel(new BorderLayout()) {
+class ConsolePanel(val selectedParticles: ParticleInstanceList)  extends JPanel(new BorderLayout()) {
 
   val console = new JTextArea()
   console.setBorder(BorderFactory.createLoweredBevelBorder())
@@ -18,7 +18,7 @@ class ConsolePanel(val compilerParticles: DefaultListModel[Particle])  extends J
   setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Console"))
   add(console)
 
-  compilerParticles.addListDataListener(new ListDataListener {
+  selectedParticles.addListDataListener(new ListDataListener {
     override def intervalRemoved(e: ListDataEvent): Unit = refreshConsolePanel()
 
     override def intervalAdded(e: ListDataEvent): Unit = refreshConsolePanel()
@@ -27,7 +27,7 @@ class ConsolePanel(val compilerParticles: DefaultListModel[Particle])  extends J
   })
 
   def refreshConsolePanel() = {
-    val errors = getDependencyErrors(JEnumerationWrapper(compilerParticles.elements()).toSeq)
+    val errors = getDependencyErrors(selectedParticles.scalaElements)
     val document = errors.map(e => e.toDocument).fold[ResponsiveDocument](Empty)((a, b) => a %% b)
     console.setText(document.renderString())
   }

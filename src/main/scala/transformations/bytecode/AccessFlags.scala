@@ -12,7 +12,7 @@ trait AccessFlags {
 
   object PrivateAccess extends MethodAccessFlag
 
-  object AccessFlagsKey
+  object AccessFlagsKey extends Key
 
   private val accessCodesToByteCode = Map(
     PublicAccess -> "0001",

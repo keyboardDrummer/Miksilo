@@ -8,11 +8,9 @@ import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, L
 import application.graphing.model.DepthFirstTraversal
 import core.particles.Particle
 
-import scala.collection.convert.Wrappers.JEnumerationWrapper
-
 object MissingParticlesPanel {
 
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[Particle]) = {
+  def getPanel(panel: CompilerBuilderPanel, selectedParticles: ParticleInstanceList) = {
     val dependentItems = new DefaultListModel[Particle]()
     val dependentList = new ParticleList()
     dependentList.setModel(dependentItems)
@@ -30,19 +28,19 @@ object MissingParticlesPanel {
     addButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         for (selectedValue <- dependentList.getSelectedValues)
-          compilerParticles.addElement(selectedValue.asInstanceOf[Particle])
+          selectedParticles.addElement(new ParticleInstance(selectedValue.asInstanceOf[Particle]))
       }
     })
     dependentPanel.add(addButton, BorderLayout.PAGE_END)
 
     def setDependentItems() = {
       dependentItems.clear()
-      val missingDependencies = getMissingDependencies(JEnumerationWrapper(compilerParticles.elements()).toSeq)
+      val missingDependencies = getMissingDependencies(selectedParticles.scalaElements)
       for (missingDependency <- missingDependencies)
         dependentItems.addElement(missingDependency)
     }
 
-    compilerParticles.addListDataListener(new ListDataListener {
+    selectedParticles.addListDataListener(new ListDataListener {
 
       override def intervalRemoved(e: ListDataEvent): Unit = setDependentItems()
 

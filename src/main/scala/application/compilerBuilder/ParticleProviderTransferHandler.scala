@@ -3,28 +3,27 @@ package application.compilerBuilder
 import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 import javax.swing.{JComponent, JList, TransferHandler}
-
+import application.compilerBuilder.ParticleInstance._
 import core.particles.Particle
 
 import scala.collection.convert.Wrappers.JListWrapper
-
 
 class ParticleProviderTransferHandler(val availableList: JList[_]) extends TransferHandler {
 
   @Override
   override def createTransferable(comp: JComponent): Transferable = {
-    new ListItemTransferable(JListWrapper(availableList.getSelectedValuesList).collect({ case x: Particle => x}).toSeq)
+    new ListItemTransferable(JListWrapper(availableList.getSelectedValuesList).map(x => x.getParticleInstance).toSeq)
   }
 
   override def getSourceActions(c: JComponent): Int = DnDConstants.ACTION_COPY
+
 }
 
 object ListItemTransferable {
   val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Seq[Particle]], "java/ListItem")
 }
 
-case class ListItemTransferable(listItems: Seq[Particle]) extends Transferable {
-
+case class ListItemTransferable(listItems: Seq[ParticleInstance]) extends Transferable {
 
   @Override
   def getTransferDataFlavors: Array[DataFlavor] = {

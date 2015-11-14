@@ -10,6 +10,7 @@ import application.{InjectorListCellRenderer, StyleSheet}
 import core.particles.Particle
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
+import application.compilerBuilder.ParticleInstance._
 
 object CompilerBuilderPanel {
   val availableParticles = JavaCompiler.allTransformations ++ Seq(MarkOutputGrammar)
@@ -23,7 +24,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   setAutoscrolls(true)
 
   val programPanel = new CompilerStatePanel(this)
-  val compilerParticles = programPanel.compilerParticles
+  val compilerParticles = programPanel.selectedParticles
   val presetsPanel: JPanel = new PresetsPanel(compilerParticles)
 
   val presetsConstraints = getConstraints
@@ -45,7 +46,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
     list.addListSelectionListener(new ListSelectionListener {
       override def valueChanged(e: ListSelectionEvent): Unit = {
-        painter.select(list.getSelectedValues.map(i => i.asInstanceOf[Particle]).toSeq)
+        painter.select(list.getSelectedValues.map(i => i.getParticle).toSeq)
       }
     })
 

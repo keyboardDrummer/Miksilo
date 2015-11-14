@@ -2,20 +2,20 @@ package transformations.bytecode
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
 object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
 
-  object MethodInfoKey
+  object MethodInfoKey extends Key
 
-  object MethodNameIndex
+  object MethodNameIndex extends Key
 
-  object MethodDescriptorIndex
+  object MethodDescriptorIndex extends Key
 
-  object MethodAttributes
+  object MethodAttributes extends Key
 
   def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[Node], flags: Set[MethodAccessFlag] = Set()) =
     new Node(MethodInfoKey,
@@ -62,8 +62,8 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
       "descriptorIndex:" ~> integer,
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
-    val methodInfoGrammar: BiGrammar = methodHeader % attributesGrammar ^^
-      parseMap(MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
+    val inner = methodHeader % attributesGrammar
+    val methodInfoGrammar: BiGrammar = new NodeMap(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 
