@@ -4,6 +4,8 @@ version := "1.0"
 
 scalaVersion := "2.11.7"
 
+libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8"
+
 libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1"
 
 libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0"

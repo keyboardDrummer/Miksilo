@@ -4,12 +4,14 @@ import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 import javax.swing._
-import javax.swing.text.{DefaultCaret, PlainDocument}
+import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.layouts.SwingEquationLayout
 import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromParticles, Particle}
+import org.fife.ui.rsyntaxtextarea.{SyntaxConstants, RSyntaxDocument, RSyntaxTextArea}
+import org.fife.ui.rtextarea.RTextScrollPane
 import transformations.bytecode.ByteCodeSkeleton
 
 import scala.swing.{Component, Frame}
@@ -19,8 +21,8 @@ import scala.util.Try
 class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
   val compiler = new CompilerFromParticles(particles)
-  private val inputDocument = new PlainDocument()
-  private val outputDocument = new PlainDocument()
+  private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
+  private val outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   val textAreaInput: ParseFromFunction = new ParseFromFunction(() => {
     val stringText = inputDocument.getText(0, inputDocument.getLength)
     new ByteArrayInputStream(stringText.getBytes(StandardCharsets.UTF_8))
@@ -133,24 +135,24 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
   def getInputPanel: JPanel = {
     val cardLayout = new CardLayout()
     val panel = new JPanel(cardLayout)
-    val inputTextArea = new JTextArea(inputDocument)
+    val inputTextArea = new RSyntaxTextArea(inputDocument)
     inputTextArea.setFont(StyleSheet.codeFont)
     inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
-    panel.add(new JScrollPane(inputTextArea))
+    panel.add(new RTextScrollPane(inputTextArea))
     panel
   }
 
   def getOutputPanel: JPanel = {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
-    val outputTextArea = new JTextArea(outputDocument)
+    val outputTextArea = new RSyntaxTextArea(outputDocument)
     outputTextArea.setAutoscrolls(false)
     outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
 
     outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
 
-    outputPanel.add(new JScrollPane(outputTextArea))
+    outputPanel.add(new RTextScrollPane(outputTextArea))
     outputPanel
   }
 
