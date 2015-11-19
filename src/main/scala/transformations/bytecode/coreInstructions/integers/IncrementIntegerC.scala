@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions.integers
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object IncrementIntegerC extends InstructionC {
 
-  override val key: AnyRef = IntegerIncrementKey
+  override val key: Key = IntegerIncrementKey
 
   def integerIncrement(location: Int, amount: Int) = CodeAttribute.instruction(IntegerIncrementKey, Seq(location, amount))
 
@@ -26,7 +25,7 @@ object IncrementIntegerC extends InstructionC {
 
   override def getInstructionSize(): Int = 3
 
-  object IntegerIncrementKey
+  object IntegerIncrementKey extends Key
 
   override def description: String = "Defines the increment integer instruction, which increments an integer variable by a specific amount."
 }

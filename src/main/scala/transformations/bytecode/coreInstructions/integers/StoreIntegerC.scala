@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object StoreIntegerC extends InstructionC {
 
-  override val key: AnyRef = IntegerStore
+  override val key: Key = IntegerStore
 
   def integerStore(location: Int) = CodeAttribute.instruction(IntegerStore, Seq(location))
 
@@ -30,7 +29,7 @@ object StoreIntegerC extends InstructionC {
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 
-  object IntegerStore
+  object IntegerStore extends Key
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeC
 import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
@@ -14,7 +14,7 @@ import transformations.bytecode.types.ObjectTypeC
 
 object NewC extends ExpressionInstance {
 
-  object NewCallKey
+  object NewCallKey extends Key
   object NewObject
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
@@ -28,7 +28,7 @@ object NewC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeC, InvokeSpecialC) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
-  override val key: AnyRef = NewCallKey
+  override val key: Key = NewCallKey
 
   override def getType(expression: Path, state: CompilationState): Node = {
     expression(NewObject).asInstanceOf[Path]

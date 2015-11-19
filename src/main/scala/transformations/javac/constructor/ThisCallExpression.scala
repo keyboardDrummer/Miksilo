@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
@@ -11,8 +11,8 @@ import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object ThisCallExpression extends ExpressionInstance {
-  override val key: AnyRef = ThisCall
-  object ThisCall
+  override val key: Key = ThisCall
+  object ThisCall extends Key
 
   def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallC.CallArguments -> arguments)
 

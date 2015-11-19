@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -13,7 +13,7 @@ import transformations.javac.classes.ConstantPool
 
 object GetStaticC extends InstructionC {
 
-  override val key: AnyRef = GetStaticKey
+  override val key: Key = GetStaticKey
 
   def getStatic(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
 
@@ -35,7 +35,7 @@ object GetStaticC extends InstructionC {
 
   override def getInstructionSize: Int = 3
 
-  object GetStaticKey
+  object GetStaticKey extends Key
 
   override def description: String = "Defines the getStatic instruction, which retrieves a value from a static field."
 }

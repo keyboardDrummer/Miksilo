@@ -12,7 +12,7 @@ class JavaToSimplifiedByteCode
 
   @Test
   def comparePrintResult() {
-    val resultFile: File = getJavaTestFile("WhileeWithComment.java")
+    val resultFile: File = getTestFile("FibonacciInSimplifiedByteCode.txt")
     val expectedResult = resultFile.slurp()
     val result = compileAndPrettyPrint(getJavaTestFile("Fibonacci.java"))
     Assert.assertEquals(expectedResult, result)

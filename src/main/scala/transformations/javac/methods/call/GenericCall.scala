@@ -1,7 +1,7 @@
 package transformations.javac.methods.call
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
@@ -13,7 +13,7 @@ import transformations.javac.types.MethodTypeC._
 
 object CallC
 {
-  object CallKey
+  object CallKey extends Key
 
   object CallCallee
 
@@ -47,7 +47,7 @@ trait GenericCall extends ExpressionInstance {
     core.addOption(parseCall)
   }
 
-  override val key: AnyRef = CallC.CallKey
+  override val key: Key = CallC.CallKey
 
   override def getType(call: Path, state: CompilationState): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)

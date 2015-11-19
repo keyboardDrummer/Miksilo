@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -12,7 +12,7 @@ import transformations.javac.classes.ConstantPool
 
 object GetFieldC extends InstructionC {
 
-  override val key: AnyRef = GetFieldKey
+  override val key: Key = GetFieldKey
 
   def construct(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
 
@@ -37,5 +37,5 @@ object GetFieldC extends InstructionC {
 
   override def getInstructionSize: Int = 3
 
-  object GetFieldKey
+  object GetFieldKey extends Key
 }

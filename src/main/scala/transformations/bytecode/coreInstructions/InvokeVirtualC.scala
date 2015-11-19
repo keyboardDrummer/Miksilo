@@ -1,14 +1,14 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object InvokeVirtualC extends InvokeC {
 
-  override val key: AnyRef = InvokeVirtual
+  override val key: Key = InvokeVirtual
 
   def invokeVirtual(methodRefIndex: Int) = CodeAttribute.instruction(InvokeVirtual, Seq(methodRefIndex))
 
@@ -21,7 +21,7 @@ object InvokeVirtualC extends InvokeC {
     getInstanceInstructionSignature(instruction, typeState, state)
   }
 
-  object InvokeVirtual
+  object InvokeVirtual extends Key
 
   override def description: String = "Defines the invoke virtual instruction, which can be used to call virtual methods."
 }

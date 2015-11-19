@@ -6,6 +6,7 @@ import core.particles.{CompilationState, Contract, ParticleWithGrammar, Particle
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.additions.LabelledTargets.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.attributes.CodeAttribute.CodeKey
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
@@ -29,14 +30,12 @@ object InferredMaxStack extends ParticleWithPhase with ParticleWithGrammar {
     }
   }
 
-  def getInstructionStackSizeModification(constantPool: Seq[Any], instruction: Node): Integer =
-    instruction.clazz match {
+  def getInstructionStackSizeModification(constantPool: Seq[Any], instruction: Node): Integer = instruction.clazz match {
       case LabelKey => 0
-    }
+  }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val maxStackPath = grammars.getGrammarPath(CodeAttribute.CodeGrammar, CodeAttribute.MaxStackGrammar)
-    maxStackPath.removeMeFromSequence()
+    grammars.find(CodeAttribute.MaxStackGrammar).inner = produce(Unit) ^^ parseMap(CodeKey)
   }
 
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."

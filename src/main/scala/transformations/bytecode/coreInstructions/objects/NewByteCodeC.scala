@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
@@ -12,11 +12,11 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 
 object NewByteCodeC extends InstructionC {
 
-  object NewByteCodeKey
+  object NewByteCodeKey extends Key
   
   def newInstruction(classRefIndex: Int) = CodeAttribute.instruction(NewByteCodeKey, Seq(classRefIndex))
   
-  override val key: AnyRef = NewByteCodeKey
+  override val key: Key = NewByteCodeKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)

@@ -1,12 +1,12 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 
 object InvokeStaticC extends InvokeC {
 
-  override val key: AnyRef = InvokeStaticKey
+  override val key: Key = InvokeStaticKey
 
   def invokeStatic(constantIndex: Int): Node = CodeAttribute.instruction(InvokeStaticKey, Seq(constantIndex))
 
@@ -15,7 +15,7 @@ object InvokeStaticC extends InvokeC {
     hexToBytes("b8") ++ shortToBytes(arguments(0))
   }
 
-  object InvokeStaticKey
+  object InvokeStaticKey extends Key
 
   override def description: String = "Defines the invoke static instruction, which can be used to call static methods."
 }

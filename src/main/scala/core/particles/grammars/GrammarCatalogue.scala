@@ -3,6 +3,12 @@ package core.particles.grammars
 import java.util.NoSuchElementException
 
 import core.bigrammar._
+import core.particles.node.Key
+
+case class KeyGrammar(key: Key)
+{
+  override def toString = key.toString
+}
 
 class GrammarCatalogue {
 

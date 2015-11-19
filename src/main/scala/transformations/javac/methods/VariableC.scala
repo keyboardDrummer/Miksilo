@@ -31,7 +31,7 @@ object VariableC extends ExpressionInstance {
 
   object VariableKey extends Key
 
-  override val key: AnyRef = VariableKey
+  override val key: Key = VariableKey
 
   override def getType(variable: Path, state: CompilationState): Node = {
     getVariableInfo(variable, state)._type

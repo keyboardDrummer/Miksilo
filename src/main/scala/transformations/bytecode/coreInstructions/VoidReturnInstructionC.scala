@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object VoidReturnInstructionC extends InstructionC {
 
-  override val key: AnyRef = VoidReturn
+  override val key: Key = VoidReturn
 
   def voidReturn: Node = CodeAttribute.instruction(VoidReturn)
 
@@ -23,7 +22,7 @@ object VoidReturnInstructionC extends InstructionC {
 
   override def getInstructionSize: Int = 1
 
-  object VoidReturn
+  object VoidReturn extends Key
 
   override def description: String = "Defines the void return instruction, which returns from the current method."
 }

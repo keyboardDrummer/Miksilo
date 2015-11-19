@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object IfIntegerCompareEqualC extends JumpInstruction {
 
-  override val key: AnyRef = IfIntegerCompareEqualKey
+  override val key: Key = IfIntegerCompareEqualKey
 
   def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(IfIntegerCompareEqualKey, Seq(target))
 
@@ -23,7 +22,7 @@ object IfIntegerCompareEqualC extends JumpInstruction {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
-  object IfIntegerCompareEqualKey
+  object IfIntegerCompareEqualKey extends Key
 
   override def description: String = "Defines the if-integer-compare-equal instruction, which will to a target instruction if the two top stack integers are equal."
 }

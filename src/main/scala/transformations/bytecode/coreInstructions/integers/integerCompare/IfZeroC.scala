@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
 
 object IfZeroC extends JumpInstruction {
-  override val key: AnyRef = IfZeroKey
+  override val key: Key = IfZeroKey
 
   def ifZero(target: Int) = CodeAttribute.instruction(IfZeroKey, Seq(target))
 
@@ -23,6 +23,6 @@ object IfZeroC extends JumpInstruction {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
-  object IfZeroKey
+  object IfZeroKey extends Key
 
 }

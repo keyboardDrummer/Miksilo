@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.LongTypeC
 
 object LoadLongC extends InstructionC {
 
-  override val key: AnyRef = LongLoad
+  override val key: Key = LongLoad
 
   def load(location: Integer) = CodeAttribute.instruction(LongLoad, Seq(location))
 
@@ -27,6 +26,6 @@ object LoadLongC extends InstructionC {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
-  object LongLoad
+  object LongLoad extends Key
 }
 

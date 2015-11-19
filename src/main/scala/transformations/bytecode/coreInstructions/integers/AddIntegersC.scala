@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
 
 object AddIntegersC extends InstructionC {
-  override val key: AnyRef = AddIntegersKey
+  override val key: Key = AddIntegersKey
 
   def addInteger = CodeAttribute.instruction(AddIntegersKey)
 
@@ -19,7 +19,7 @@ object AddIntegersC extends InstructionC {
 
   override def getInstructionSize: Int = 1
 
-  object AddIntegersKey
+  object AddIntegersKey extends Key
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

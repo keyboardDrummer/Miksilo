@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.LongTypeC
 
 object StoreLongC  extends InstructionC {
 
-  override val key: AnyRef = LongStore
+  override val key: Key = LongStore
 
   def longStore(location: Int) = CodeAttribute.instruction(LongStore, Seq(location))
 
@@ -29,6 +28,6 @@ object StoreLongC  extends InstructionC {
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> LongTypeC.longType)
 
-  object LongStore
+  object LongStore extends Key
 
 }

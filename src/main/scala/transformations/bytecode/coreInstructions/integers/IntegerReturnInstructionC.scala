@@ -1,18 +1,17 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object IntegerReturnInstructionC extends InstructionC {
 
-  override val key: AnyRef = IntegerReturn
+  override val key: Key = IntegerReturn
 
   def integerReturn: Node = CodeAttribute.instruction(IntegerReturn)
 
@@ -24,7 +23,7 @@ object IntegerReturnInstructionC extends InstructionC {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ac")
 
-  object IntegerReturn
+  object IntegerReturn extends Key
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

@@ -1,12 +1,12 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{Consume, BiGrammar}
 import core.grammar.StringLiteral
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
+import core.particles.node.{Key, Node}
+import core.particles.{ParticleWithGrammar, CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
+import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC, InstructionSignature}
@@ -17,7 +17,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import CodeAttribute._
 
-object LabelledTargets extends ParticleWithPhase {
+object LabelledTargets extends ParticleWithPhase with ParticleWithGrammar {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
@@ -128,7 +128,7 @@ object LabelledTargets extends ParticleWithPhase {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
   object LabelC extends InstructionC {
-    override val key: AnyRef = LabelKey
+    override val key: Key = LabelKey
 
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
@@ -139,13 +139,13 @@ object LabelledTargets extends ParticleWithPhase {
     override def getInstructionSize: Int = 0
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-      name ~> ":" ~~> StringLiteral ^^ parseMap(LabelKey, LabelNameKey) //TODO missing LabelStackFrame
+      name ~> ("(" ~> StringLiteral <~ ")") ^^ parseMap(LabelKey, LabelNameKey) //TODO missing LabelStackFrame
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
   }
 
-  object LabelKey
+  object LabelKey extends Key
 
   object LabelNameKey
 
@@ -154,4 +154,18 @@ object LabelledTargets extends ParticleWithPhase {
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    overrideJumpGrammars(grammars)
+  }
+
+  def overrideJumpGrammars(grammars: GrammarCatalogue) = {
+    val jumps = Seq[InstructionC](IfZeroC, IfNotZero, GotoC,
+      IfIntegerCompareGreaterOrEqualC,
+      IfIntegerCompareLessC, IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
+    for(jump <- jumps)
+    {
+      val grammar = grammars.find(KeyGrammar(jump.key))
+      grammar.inner = jump.name ~> new Consume(StringLiteral).manySeparated(",").inParenthesis ^^ parseMap(jump.key, InstructionArgumentsKey)
+    }
+  }
 }

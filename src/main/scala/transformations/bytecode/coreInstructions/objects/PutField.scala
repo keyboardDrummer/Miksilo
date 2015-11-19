@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{ByteCodeTypeException, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object PutField extends InstructionC {
 
-  object PutFieldKey
-  override val key: AnyRef = PutFieldKey
+  object PutFieldKey extends Key
+  override val key: Key = PutFieldKey
 
   def putField(index: Int) = CodeAttribute.instruction(PutFieldKey, Seq(index))
 

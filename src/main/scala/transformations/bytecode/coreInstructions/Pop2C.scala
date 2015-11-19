@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object Pop2C extends InstructionC {
 
-  object Pop2Key
-  override val key: AnyRef = Pop2Key
+  object Pop2Key extends Key
+  override val key: Key = Pop2Key
 
   def pop2 = CodeAttribute.instruction(Pop2Key)
 

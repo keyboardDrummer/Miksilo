@@ -2,8 +2,8 @@ package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
+import core.particles.node.{Key, Node}
 import transformations.bytecode._
 import transformations.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
@@ -44,7 +44,7 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  val key: AnyRef
+  val key: Key
 
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
   def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature
@@ -60,7 +60,7 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
   }
 
   def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
+    grammars.create(KeyGrammar(key), name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey))
   }
 
   protected def binary(_type: Node) = InstructionSignature(Seq(_type, _type), Seq(_type))

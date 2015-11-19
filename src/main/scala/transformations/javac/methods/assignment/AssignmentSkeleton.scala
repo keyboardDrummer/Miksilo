@@ -38,7 +38,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   object AssignmentValue extends Key
 
-  override val key: AnyRef = AssignmentKey
+  override val key: Key = AssignmentKey
 
   override def getType(assignment: Path, state: CompilationState): Node = {
     val target = getAssignmentTarget(assignment)

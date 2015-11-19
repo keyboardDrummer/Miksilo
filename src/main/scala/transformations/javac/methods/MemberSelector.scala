@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import transformations.javac.classes._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
@@ -22,7 +22,7 @@ object MemberSelector extends ParticleWithGrammar with WithState {
 
   object SelectGrammar
 
-  object SelectorKey
+  object SelectorKey extends Key
 
   object SelectorObject
 

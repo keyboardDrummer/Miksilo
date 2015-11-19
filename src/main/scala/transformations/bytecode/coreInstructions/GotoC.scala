@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object GotoC extends InstructionC {
 
-  override val key: AnyRef = GoToKey
+  override val key: Key = GoToKey
 
   def goTo(target: Int): Node = CodeAttribute.instruction(GoToKey, Seq(target))
 
@@ -25,7 +24,7 @@ object GotoC extends InstructionC {
 
   override def getInstructionSize: Int = 3
 
-  object GoToKey
+  object GoToKey extends Key
 
   override def description: String = "Defines the goto instruction, which jumps to a target instruction."
 }

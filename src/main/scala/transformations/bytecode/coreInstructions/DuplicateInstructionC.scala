@@ -1,20 +1,19 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 
 
 object DuplicateInstructionC extends InstructionC {
 
-  object DuplicateKey
+  object DuplicateKey extends Key
   def duplicate = CodeAttribute.instruction(DuplicateKey, Seq.empty)
 
-  override val key: AnyRef = DuplicateKey
+  override val key: Key = DuplicateKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("59")

@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object LoadAddressC extends InstructionC {
 
-  override val key: AnyRef = AddressLoad
+  override val key: Key = AddressLoad
 
   def addressLoad(location: Int): Node = CodeAttribute.instruction(AddressLoad, Seq(location))
 
@@ -30,6 +29,6 @@ object LoadAddressC extends InstructionC {
     InstructionSignature(Seq(), Seq(typeState.variableTypes(location)))
   }
 
-  object AddressLoad
+  object AddressLoad extends Key
 
 }

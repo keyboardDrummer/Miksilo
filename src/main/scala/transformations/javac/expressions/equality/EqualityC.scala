@@ -2,7 +2,7 @@ package transformations.javac.expressions.equality
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.longs.CompareLongC
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
@@ -25,13 +25,13 @@ object EqualityC extends ExpressionInstance {
 
   def equality(first: Node, second: Node) = new Node(EqualityKey, FirstKey -> first, SecondKey -> second)
 
-  object EqualityKey
+  object EqualityKey extends Key
 
   object FirstKey
 
   object SecondKey
 
-  override val key: AnyRef = EqualityKey
+  override val key: Key = EqualityKey
 
   override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
 

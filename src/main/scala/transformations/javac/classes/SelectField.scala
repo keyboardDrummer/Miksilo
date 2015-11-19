@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticC
 import transformations.bytecode.coreInstructions.objects.GetFieldC
@@ -13,7 +13,7 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 
 object SelectField extends ExpressionInstance {
 
-  override val key: AnyRef = SelectorKey
+  override val key: Key = SelectorKey
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC, MemberSelector)
 

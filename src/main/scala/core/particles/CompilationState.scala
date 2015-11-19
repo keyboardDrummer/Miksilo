@@ -34,9 +34,10 @@ class CompilationState {
   var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = null
 
+  var random = new Random(0)
   def getUniqueLabel(prefix: String) = prefix + getGUID
 
-  def getGUID: Long = Random.nextLong()
+  def getGUID: Long = random.nextLong()
 
   def parseString(input: String): Unit = {
     val manager = new ParticlesToParserConverter()

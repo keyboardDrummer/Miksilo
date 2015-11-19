@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.BiGrammarToGrammar
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.{KeyGrammar, GrammarCatalogue, ProgramGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons
@@ -60,6 +60,7 @@ object PrintGrammar {
 
   def grammarKeyToName(key: Any): String = key match {
     case string: String => string
+    case key: KeyGrammar => key.toString
     case _ =>
       val regex = new Regex("Grammar\\$")
       regex.replaceAllIn(key.getClass.getSimpleName, "")

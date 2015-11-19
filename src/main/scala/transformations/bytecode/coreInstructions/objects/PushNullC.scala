@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object PushNullC extends InstructionC {
 
-  override val key: AnyRef = PushNullKey
+  override val key: Key = PushNullKey
   val pushNull = CodeAttribute.instruction(PushNullC)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("01")
@@ -20,6 +19,6 @@ object PushNullC extends InstructionC {
 
   override def getInstructionSize: Int = 1
 
-  object PushNullKey
+  object PushNullKey extends Key
 
 }

@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -10,7 +10,7 @@ import transformations.bytecode.types.IntTypeC
 
 object LoadIntegerC extends InstructionC {
 
-  override val key: AnyRef = IntegerLoad
+  override val key: Key = IntegerLoad
 
   def load(location: Integer) = CodeAttribute.instruction(IntegerLoad, Seq(location))
 
@@ -25,7 +25,7 @@ object LoadIntegerC extends InstructionC {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
-  object IntegerLoad
+  object IntegerLoad extends Key
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

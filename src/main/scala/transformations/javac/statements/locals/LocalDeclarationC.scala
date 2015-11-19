@@ -3,7 +3,7 @@ package transformations.javac.statements.locals
 import core.particles.exceptions.BadInputException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
@@ -33,13 +33,12 @@ object LocalDeclarationC extends StatementInstance {
     override def toString = s"variable '$variable' was defined more than once."
   }
 
-  object DeclarationKey
-
+  object DeclarationKey extends Key
   object DeclarationName
 
   object DeclarationType
 
-  override val key: AnyRef = DeclarationKey
+  override val key: Key = DeclarationKey
 
   override def toByteCode(declaration: Path, state: CompilationState): Seq[Node] = {
     Seq.empty[Node]

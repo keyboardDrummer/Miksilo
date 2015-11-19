@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.PushNullC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -19,9 +19,9 @@ object NullC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullC)
 
-  object NullKey
+  object NullKey extends Key
 
-  override val key: AnyRef = NullKey
+  override val key: Key = NullKey
 
   override def getType(expression: Path, state: CompilationState): Node = ???
 

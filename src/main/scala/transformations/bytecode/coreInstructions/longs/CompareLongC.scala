@@ -1,20 +1,19 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{IntTypeC, LongTypeC}
 
 object CompareLongC extends InstructionC {
 
   val compareLong = new Node(CompareLongKey)
 
-  object CompareLongKey
+  object CompareLongKey extends Key
 
-  override val key: AnyRef = CompareLongKey
+  override val key: Key = CompareLongKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("94")

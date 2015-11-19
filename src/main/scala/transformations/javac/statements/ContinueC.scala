@@ -1,15 +1,15 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.additions.LabelledTargets
 
 object ContinueC extends StatementInstance {
-  override val key: AnyRef = ContinueKey
+  override val key: Key = ContinueKey
 
-  object ContinueKey
+  object ContinueKey extends Key
   def continue = new Node(ContinueKey)
 
   override def toByteCode(statement: Path, state: CompilationState): Seq[Node] = {

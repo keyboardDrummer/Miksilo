@@ -1,7 +1,7 @@
 package transformations.javac.expressions.prefix
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.CompilationState
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
@@ -10,11 +10,11 @@ import transformations.javac.types.BooleanTypeC
 
 object NotC extends ExpressionInstance {
 
-  object NotKey
+  object NotKey extends Key
 
   object NotExpression
 
-  override val key: AnyRef = NotKey
+  override val key: Key = NotKey
 
   override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
 

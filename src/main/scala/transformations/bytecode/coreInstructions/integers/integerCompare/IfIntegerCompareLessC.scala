@@ -1,17 +1,16 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object IfIntegerCompareLessC extends JumpInstruction {
 
-  override val key: AnyRef = IfIntegerCompareLessKey
+  override val key: Key = IfIntegerCompareLessKey
 
   def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(IfIntegerCompareLessKey, Seq(target))
 
@@ -23,6 +22,6 @@ object IfIntegerCompareLessC extends JumpInstruction {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
-  object IfIntegerCompareLessKey
+  object IfIntegerCompareLessKey extends Key
 
 }

@@ -6,12 +6,11 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
 
 object SmallIntegerConstantC extends InstructionC {
 
-  override val key: AnyRef = IntegerConstantKey
+  override val key: Key = IntegerConstantKey
 
   def integerConstant(value: Int) = {
     require (value <= 5)
@@ -28,7 +27,7 @@ object SmallIntegerConstantC extends InstructionC {
 
   override def getInstructionSize: Int = 1
 
-  private object IntegerConstantKey
+  private object IntegerConstantKey extends Key
 
   override def description: String = "Defines the integer constant instruction, which places an integer between -1 and 5 on the stack."
 }

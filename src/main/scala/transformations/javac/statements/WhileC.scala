@@ -10,7 +10,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object WhileC extends StatementInstance with WithState {
 
-  override val key: AnyRef = WhileKey
+  override val key: Key = WhileKey
 
   override def toByteCode(_while: Path, state: CompilationState): Seq[Node] = {
     val startLabel = state.getUniqueLabel("start")

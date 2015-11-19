@@ -1,7 +1,7 @@
 package transformations.javac.expressions.postfix
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC}
@@ -11,7 +11,7 @@ import transformations.bytecode.types.IntTypeC
 
 object PostFixIncrementC extends ExpressionInstance {
 
-  override val key: AnyRef = PostfixIncrementKey
+  override val key: Key = PostfixIncrementKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodC, IncrementIntegerC)
 
@@ -30,7 +30,7 @@ object PostFixIncrementC extends ExpressionInstance {
     coreGrammar.addOption(postFixIncrement)
   }
 
-  object PostfixIncrementKey
+  object PostfixIncrementKey extends Key
 
   object VariableKey
 

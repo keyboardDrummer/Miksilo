@@ -42,7 +42,10 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
     if (metaObject.clazz == key) {
       val fieldValues = fields.map(field => getWithPartial(metaObject, field))
-      Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
+      if (fieldValues.isEmpty)
+        Some(Unit)
+      else
+        Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
     } else {
       None
     }

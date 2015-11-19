@@ -1,15 +1,14 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object StoreAddressC extends InstructionC {
-  override val key: AnyRef = AddressStore
+  override val key: Key = AddressStore
 
   def addressStore(location: Int): Node = CodeAttribute.instruction(AddressStore, Seq(location))
 
@@ -34,6 +33,6 @@ object StoreAddressC extends InstructionC {
     Map(variableLocation -> _type)
   }
 
-  object AddressStore
+  object AddressStore extends Key
 
 }

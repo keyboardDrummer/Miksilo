@@ -16,7 +16,7 @@ object ExpressionAsStatementC extends StatementInstance {
 
   def asStatement(expression: Node) = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
 
-  override val key: AnyRef = ExpressionAsStatementKey
+  override val key: Key = ExpressionAsStatementKey
 
   override def toByteCode(statement: Path, state: CompilationState): Seq[Node] = {
     val expression = getExpression(statement)
