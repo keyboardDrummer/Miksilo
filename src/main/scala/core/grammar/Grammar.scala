@@ -23,10 +23,6 @@ trait GrammarWriter {
 
 trait Grammar extends GrammarWriter {
 
-  def ~~(right: Grammar): BiGrammar = {
-    (this <~ space) ~ right
-  }
-
   def simplify: Grammar = this
 
   def some: Grammar = this ~ (this*)
