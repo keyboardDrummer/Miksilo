@@ -29,7 +29,7 @@ trait GrammarDocumentWriter {
   implicit def print(document: Document): BiGrammar = new Print(document)
 
   implicit def stringToGrammar(value: String): BiGrammar =
-    if (value.forall(c => Character.isLetterOrDigit(c)))
+    if (value.exists(c => Character.isLetterOrDigit(c))) //either exists or forall is a bit of an arbitrary choice. exists works better for syntax highlighting
       new Keyword(value)
     else new Delimiter(value)
 }
