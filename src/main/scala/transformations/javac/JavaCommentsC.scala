@@ -44,7 +44,7 @@ object JavaCommentsC extends ParticleWithGrammar {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     val analysis = new GrammarAnalysis()
-    analysis.run(new Root(grammars.find(ProgramGrammar)), false)
+    analysis.run(new RootGrammar(grammars.find(ProgramGrammar)), false)
     
     for(pathWithState <- analysis.states)
     {

@@ -35,7 +35,9 @@ object InferredMaxStack extends ParticleWithPhase with ParticleWithGrammar {
     }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    grammars.find(CodeAttribute.MaxStackGrammar).inner = produce(())
+    val maxStackPath = grammars.getGrammarPath(CodeAttribute.CodeGrammar, CodeAttribute.MaxStackGrammar)
+    maxStackPath.removeMeFromSequence()
   }
+
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."
 }

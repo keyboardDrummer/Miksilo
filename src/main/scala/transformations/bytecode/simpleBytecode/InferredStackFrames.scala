@@ -1,14 +1,15 @@
 package transformations.bytecode.simpleBytecode
 
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
-object InferredStackFrames extends ParticleWithPhase {
+object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledTargets)
 
@@ -72,4 +73,9 @@ object InferredStackFrames extends ParticleWithPhase {
 
   override def description: String = "Generates a stack frame for each label instruction. " +
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
+
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val stackMapTablePath = grammars.getGrammarPath(ByteCodeSkeleton.AttributeGrammar, StackMapTableAttribute.StackMapTableGrammar)
+    stackMapTablePath.removeMeFromOption()
+  }
 }

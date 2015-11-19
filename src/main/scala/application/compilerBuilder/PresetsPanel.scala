@@ -73,7 +73,7 @@ class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new G
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
     model.addElement(getRevealSyntaxSugar)
-    //model.addElement(getSimplifiedByteCodePreset)
+    model.addElement(getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
     model
   }
@@ -102,13 +102,13 @@ class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new G
   }
 
   def getSimplifiedByteCodePreset = {
-    new Preset("Bytecode++", JavaCompiler.allByteCodeTransformations,
-      "The program takes simplified and extended JVM bytecode as input.")
+    new Preset("Simplified bytecode", JavaCompiler.simpleByteCodeTransformations,
+      "Simplified JVM bytecode.")
   }
 
   def getByteCodePreset = {
     new Preset("Basic bytecode", JavaCompiler.byteCodeTransformations,
-      "The program takes regular JVM bytecode as input.")
+      "Regular JVM bytecode.")
   }
 
   def getAddImplicitsPreset: Preset = {

@@ -21,6 +21,13 @@ class GrammarCatalogue {
     grammars += key -> result
     result
   }
+
+  def getGrammarPath(ancestor: Any, grammarToFind: Any): GrammarSelection = {
+    val attributeGrammar = find(ancestor)
+    val rootGrammar = new RootGrammar(attributeGrammar)
+    val maxStackGrammar = find(grammarToFind)
+    rootGrammar.descentsIncludingSelf.filter(path => path.get == maxStackGrammar).head.asInstanceOf[GrammarSelection]
+  }
 }
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)
 {
