@@ -104,7 +104,7 @@ case class IgnoreRight(first: Grammar, second: Grammar) extends Grammar
   override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l})
 }
 
-case class Choice(left: Grammar, right: Grammar) extends Grammar
+case class Choice(left: Grammar, right: Grammar, firstBeforeSecond: Boolean = false) extends Grammar
 
 case class Sequence(first: Grammar, second: Grammar) extends Grammar
 

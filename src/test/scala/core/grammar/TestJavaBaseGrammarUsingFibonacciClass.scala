@@ -3,7 +3,8 @@ package core.grammar
 import core.bigrammar.TestGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
-import transformations.javac.classes._
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.javac.{JavaCommentsC, JavaCompiler}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
@@ -13,9 +14,10 @@ import transformations.javac.methods._
 import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
-import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 
-class TestJavaBaseGrammarUsingFibonacciClass {
+class TestJavaBaseGrammarUsingFibonacciClass
+  extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaCommentsC))
+{
 
   @Test
   def testBasicClass() {
@@ -70,7 +72,7 @@ class TestJavaBaseGrammarUsingFibonacciClass {
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = TestGrammarUtils.getGrammarResult(input, ExpressionSkeleton.ExpressionGrammar)
+    val result: Any = getGrammarResult(input, ExpressionSkeleton.ExpressionGrammar)
     result
   }
 

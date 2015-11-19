@@ -22,7 +22,7 @@ object PrintGrammar {
   def toTopLevelDocument(labelled: Labelled): ResponsiveDocument = {
 
     def getOrs(grammar: Grammar): Seq[Grammar] = grammar match {
-      case Choice(left, right) => getOrs(left) ++ getOrs(right)
+      case choice:Choice => getOrs(choice.left) ++ getOrs(choice.right)
       case _ => Seq(grammar)
     }
 
@@ -41,7 +41,7 @@ object PrintGrammar {
         case _ => toDocumentInner(grammar)
       }
       withParenthesis(left) ~~ withParenthesis(right)
-    case Choice(left, right) => toDocumentInner(left) ~~ "|" ~~ toDocumentInner(right)
+    case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case Many(inner: Labelled) => toDocumentInner(inner) ~ "*"
     case Many(inner) => toDocumentInner(inner).inParenthesis ~ "*"
     case Keyword(value, _) => ResponsiveDocument.text(value)
@@ -69,9 +69,9 @@ object PrintGrammar {
 
 
   def transform(grammar: Grammar): Grammar = grammar.simplify match {
-    case Choice(_left, _right) =>
-      val left = transform(_left)
-      val right = transform(_right)
+    case choice:Choice =>
+      val left = transform(choice.left)
+      val right = transform(choice.right)
       if (left.isInstanceOf[FailureG])
         return right
 

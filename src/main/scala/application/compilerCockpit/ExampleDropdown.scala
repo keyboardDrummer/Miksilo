@@ -17,7 +17,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getFibonacci = {
-    val fibonacciContent = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
     new Example("Fibonacci", fibonacciContent)
   }
 

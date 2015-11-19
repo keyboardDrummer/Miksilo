@@ -26,17 +26,19 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
     val reachables = grammar.getGrammars
     val tokenParsers = reachables.collect({
       case keyword: Keyword => keyword ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s.asInstanceOf[String]))
-      //case delimiter: Delimiter => delimiter ^^ (s => MyToken(TokenTypes.SEPARATOR, s.asInstanceOf[String]))
+      case delimiter: Delimiter => new Keyword(delimiter.value, false) ^^ (s => MyToken(TokenTypes.SEPARATOR, s.asInstanceOf[String]))
       case Identifier => Identifier ^^ (s => MyToken(TokenTypes.IDENTIFIER, s.asInstanceOf[String]))
-      //case regex: RegexG => regex ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s.asInstanceOf[String]))
+      case NumberG => NumberG ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s.asInstanceOf[String]))
+      case StringLiteral => StringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s.asInstanceOf[String]))
+      case regex: RegexG => regex ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s.asInstanceOf[String]))
     })
 
     val whiteSpaceToken = new RegexG(new Regex("\\s")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
     val errorToken = new RegexG(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s.asInstanceOf[String]))
-    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken, errorToken)
+    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
-    val tokenGrammar = allTokenParsers.reduce((a, b) => a | b).*
-    converter.convert(tokenGrammar)
+    val tokenGrammar = allTokenParsers.reduce((a, b) => new Choice(a, b)).*
+    converter.convert(new Choice(tokenGrammar, errorToken, true))
   }
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
@@ -46,22 +48,22 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
     resetTokenList()
 
     val resultOption: converter.ParseResult[Any] = parser(new CharArrayReader(text.toString.toCharArray))
+    var start = text.offset
     if (resultOption.isEmpty)
     {
-      addNullToken()  
+      addToken(text, text.offset, start + text.length() - 1, TokenTypes.ERROR_CHAR, startOffset)
     } 
     else
     {
       val tokens = resultOption.get.asInstanceOf[Seq[MyToken]]
-      var start = text.offset
       for(token <- tokens)
       {
         val end = start + token.text.length - 1
         addToken(text, start, end, token.tokenType, startOffset)
         start = end + 1
       }
-      addNullToken()
     }
+    addNullToken()
     firstToken
   }
 

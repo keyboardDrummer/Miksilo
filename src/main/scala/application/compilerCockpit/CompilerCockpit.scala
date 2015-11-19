@@ -143,6 +143,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val cardLayout = new CardLayout()
     val panel = new JPanel(cardLayout)
     val inputTextArea = new RSyntaxTextArea(inputDocument)
+    inputTextArea.setBracketMatchingEnabled(false)
     inputTextArea.setFont(StyleSheet.codeFont)
     inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new RTextScrollPane(inputTextArea))
@@ -153,6 +154,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
     val outputTextArea = new RSyntaxTextArea(outputDocument)
+    outputTextArea.setBracketMatchingEnabled(false)
     outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
 

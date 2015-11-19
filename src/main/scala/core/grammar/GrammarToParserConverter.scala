@@ -38,7 +38,9 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
 
     def helper(grammar: Grammar): PackratParser[Any] = {
       map.getOrElseUpdate(grammar, grammar.simplify match {
-        case choice: Choice => helper(choice.left) ||| helper(choice.right)
+        case choice: Choice => if (choice.firstBeforeSecond)
+          helper(choice.left) | helper(choice.right)
+          else helper(choice.left) ||| helper(choice.right)
         case sequence: Sequence => helper(sequence.first) ~ helper(sequence.second) ^^ {
           case l ~ r => new core.grammar.~(l, r)
         }
@@ -46,7 +48,7 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
         case NumberG => wholeNumber
         case StringLiteral => stringLiteral ^^ (s => s.dropRight(1).drop(1))
         case many: Many => helper(many.inner).*
-        case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value)
+        case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value) //TODO What's that whitespace here? remove or explain.
         case originalKeyword: core.grammar.Keyword => literal(originalKeyword.value)
         case core.grammar.Identifier => ident.filter(identifier => !keywords.contains(identifier))
         case labelled: Labelled => helper(labelled.inner)

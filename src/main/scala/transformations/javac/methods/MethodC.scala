@@ -164,12 +164,12 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
 
     val parseParameter = parseType ~~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") <~ ")")
-    val parseStatic = grammars.create(StaticGrammar, "static " ~> produce(true) | produce(false))
+    val parseStatic = grammars.create(StaticGrammar, "static" ~~> produce(true) | produce(false))
 
     val visibilityModifier = grammars.create(VisibilityGrammar,
-      "public " ~> produce(PublicVisibility) |
-        "protected " ~> produce(ProtectedVisibility) |
-        "private " ~> produce(PrivateVisibility) |
+      "public" ~~> produce(PublicVisibility) |
+        "protected" ~~> produce(ProtectedVisibility) |
+        "private" ~~> produce(PrivateVisibility) |
         produce(DefaultVisibility))
 
 
