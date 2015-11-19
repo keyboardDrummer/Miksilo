@@ -23,7 +23,13 @@ trait GrammarWriter {
 
 trait Grammar extends GrammarWriter {
 
+  def ~~(right: Grammar): BiGrammar = {
+    (this <~ space) ~ right
+  }
+
   def simplify: Grammar = this
+
+  def some: Grammar = this ~ (this*)
 
   override def toString = PrintGrammar.toDocument(this).renderString(false)
 
@@ -33,7 +39,7 @@ trait Grammar extends GrammarWriter {
 
   def |(other: Grammar) = new Choice(this, other)
 
-  def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this) *) ^^ {
+  def someSeparated(separator: Grammar): Grammar = this ~ ((separator ~> this).*) ^^ {
     case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 

@@ -8,7 +8,7 @@ object BiGrammarToGrammar {
 
     override def handleGrammar(self: BiGrammar, recursive: (BiGrammar) => Grammar): Grammar = self match {
       case sequence: SequenceLike => core.grammar.Sequence(recursive(sequence.first), recursive(sequence.second))
-      case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right))
+      case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right), choice.firstBeforeSecond)
       case Consume(consume) => consume
       case Keyword(keyword, reserved) => core.grammar.Keyword(keyword, reserved)
       case Delimiter(keyword) => core.grammar.Delimiter(keyword)

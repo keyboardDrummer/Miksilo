@@ -37,9 +37,11 @@ object JavaCommentsC extends ParticleWithGrammar {
   
   case class CommentCollection(comments: Seq[String])
 
-  val commentsGrammar = getCommentsGrammar
   object CommentKey extends Key
+  object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+
+    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     val analysis = new GrammarAnalysis()
     analysis.run(new Root(grammars.find(ProgramGrammar)), false)
@@ -56,7 +58,7 @@ object JavaCommentsC extends ParticleWithGrammar {
 //            case _:Delimiter =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case _:NodeMap =>
-              addCommentToNodeMap(selection)
+              addCommentToNodeMap(commentsGrammar, selection)
 //            case _:MapGrammar =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case _ =>
@@ -66,7 +68,7 @@ object JavaCommentsC extends ParticleWithGrammar {
     }
   }
 
-  def addCommentToNodeMap(nodeMapPath: GrammarSelection): Unit = {
+  def addCommentToNodeMap(commentsGrammar: BiGrammar, nodeMapPath: GrammarSelection): Unit = {
     val nodeMap = nodeMapPath.get.asInstanceOf[NodeMap]
     val growers = nodeMapPath.ancestors.
       map(path => path.get).

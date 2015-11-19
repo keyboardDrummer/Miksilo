@@ -118,7 +118,7 @@ object MissingValue
   override def toString = "_"
 }
 
-class Choice(var left: BiGrammar, var right: BiGrammar) extends BiGrammar
+class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: Boolean = false) extends BiGrammar
 {
   override def children = Seq(left, right)
 }
