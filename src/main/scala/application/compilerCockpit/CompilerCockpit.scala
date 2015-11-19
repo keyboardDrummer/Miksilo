@@ -7,10 +7,11 @@ import javax.swing._
 import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
+import core.bigrammar.BiGrammarToGrammar
 import core.layouts.SwingEquationLayout
 import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromParticles, Particle}
-import org.fife.ui.rsyntaxtextarea.{SyntaxConstants, RSyntaxDocument, RSyntaxTextArea}
+import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import transformations.bytecode.ByteCodeSkeleton
 
@@ -20,8 +21,14 @@ import scala.util.Try
 
 class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
+
   val compiler = new CompilerFromParticles(particles)
+  val grammar = BiGrammarToGrammar.toGrammar(compiler.getGrammar)
+  val factory = new TokenMakerFactoryFromGrammar(grammar)
+
   private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
+  inputDocument.setTokenMakerFactory(factory)
+
   private val outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   val textAreaInput: ParseFromFunction = new ParseFromFunction(() => {
     val stringText = inputDocument.getText(0, inputDocument.getLength)
@@ -146,7 +153,6 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
     val outputTextArea = new RSyntaxTextArea(outputDocument)
-    outputTextArea.setAutoscrolls(false)
     outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
 
