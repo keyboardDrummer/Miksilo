@@ -22,6 +22,8 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
 
   val parser = getParser
 
+
+
   def getParser: converter.Parser[Any] = {
     val reachables = grammar.getGrammars
     val tokenParsers = reachables.collect({
@@ -33,7 +35,7 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
       case regex: RegexG => regex ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s.asInstanceOf[String]))
     })
 
-    val whiteSpaceToken = new RegexG(new Regex("\\s")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
+    val whiteSpaceToken = new RegexG(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
     val errorToken = new RegexG(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s.asInstanceOf[String]))
     val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
@@ -47,7 +49,8 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val resultOption: converter.ParseResult[Any] = parser(new CharArrayReader(text.toString.toCharArray))
+    val charArrayReader = new CharArrayReader(text.toString.toCharArray)
+    val resultOption: converter.ParseResult[Any] = parser(charArrayReader)
     var start = text.offset
     if (resultOption.isEmpty)
     {
@@ -59,7 +62,7 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
       for(token <- tokens)
       {
         val end = start + token.text.length - 1
-        addToken(text, start, end, token.tokenType, startOffset)
+        addToken(text, start, end, token.tokenType, start - text.offset + startOffset)
         start = end + 1
       }
     }
