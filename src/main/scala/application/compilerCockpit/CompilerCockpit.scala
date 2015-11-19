@@ -4,6 +4,7 @@ import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 import javax.swing._
+import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammarToGrammar
@@ -68,10 +69,14 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
   def setOutputText(text: String, useThisGrammar: Grammar = null) {
     outputDocument.replace(0, outputDocument.getLength, text, null)
-    if (grammar != null)
-      outputDocument.setSyntaxStyle(new TokenMakerFromGrammar(grammar))
+    if (useThisGrammar != null)
+    {
+      outputDocument.setSyntaxStyle(new TokenMakerFromGrammar(useThisGrammar))
+    }
     else
+    {
       outputDocument.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_NONE)
+    }
   }
 
   def setInputText(text: String) {
@@ -150,7 +155,6 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val inputTextArea = new RSyntaxTextArea(inputDocument)
     inputTextArea.setBracketMatchingEnabled(false)
     inputTextArea.setFont(StyleSheet.codeFont)
-    //inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new RTextScrollPane(inputTextArea))
     panel
   }
@@ -161,11 +165,11 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val outputTextArea = new RSyntaxTextArea(outputDocument)
     outputTextArea.setBracketMatchingEnabled(false)
     outputTextArea.setFont(StyleSheet.codeFont)
-    outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
 
-    //TODO find out what this was for. outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+    outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE) //TODO this is used to prevent auto scrolling. this has nasty edit side-effects. find another solution.
 
-    outputPanel.add(new RTextScrollPane(outputTextArea))
+    val scrollPane = new RTextScrollPane(outputTextArea)
+    outputPanel.add(scrollPane)
     outputPanel
   }
 
