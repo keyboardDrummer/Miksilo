@@ -30,7 +30,10 @@ class ParticleInstanceJXList() extends JXList() {
   override def getToolTipText(event: MouseEvent): String = {
     val index = this.locationToIndex(event.getPoint)
     val model = this.getModel
-    model.getElementAt(index).asInstanceOf[ParticleInstance].particle.description
+    if (index >= 0)
+      model.getElementAt(index).asInstanceOf[ParticleInstance].particle.description
+    else
+      ""
   }
 }
 
