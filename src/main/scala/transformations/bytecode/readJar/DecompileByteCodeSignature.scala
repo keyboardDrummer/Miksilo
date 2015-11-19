@@ -5,6 +5,7 @@ import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.attributes.SignatureAttribute
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
 import transformations.javac.classes.{ConstantPool, FieldDeclaration}
 import transformations.javac.methods.MethodC
@@ -16,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object DecompileByteCodeSignature extends ParticleWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
-    val constantPool = ByteCodeSkeleton.getConstantPool(program)
+    val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
     val nameIndex = classReference(ClassRefConstant.ClassRefName).asInstanceOf[Int]
     val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)

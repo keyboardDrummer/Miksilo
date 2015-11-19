@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.Particle
+import core.particles.{CompilerFromParticles, Particle}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
 import transformations.javac.classes.FieldDeclarationWithInitializer
@@ -20,7 +20,8 @@ import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset = {
-    new Preset("Simplified bytecode", JavaCompiler.simpleByteCodeTransformations,
+    new Preset("Simplified bytecode", new CompilerFromParticles(JavaCompiler.simpleByteCodeTransformations).
+      spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar)),
       "Simplified JVM bytecode.")
   }
 

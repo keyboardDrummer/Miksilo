@@ -8,13 +8,14 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 import util.TestUtils
+import transformations.bytecode.ByteCodeSkeleton._
 
 object RunWithJVM extends ParticleWithPhase
 {
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz: Node = state.program
     val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
+    val constantPool = clazz.constantPool
     val classNameIndex = ClassRefConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[Node])
     val className = constantPool.getValue(classNameIndex).asInstanceOf[QualifiedClassName].toString
     state.output = TestUtils.runByteCode(className, clazz)

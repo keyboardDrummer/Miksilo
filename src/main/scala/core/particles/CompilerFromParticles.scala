@@ -20,7 +20,6 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
   }
 
   def parseAndTransform(input: File): CompilationState = {
-    val inputStream = File(input).slurp()
     val state: CompilationState = parseAndTransform(input.inputStream())
     state
   }
@@ -89,5 +88,15 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
     val pivot = particles.indexWhere(particle => marker == particle)
     val (before,after) = particles.splitAt(pivot)
     before ++ splice ++ after.drop(1)
+  }
+
+  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
+    val implicitsSet = implicits.toSet
+    particles.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+  }
+
+  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
+    val implicitsSet = implicits.toSet
+    implicits ++ splice ++ particles.filter(t => !implicitsSet.contains(t))
   }
 }

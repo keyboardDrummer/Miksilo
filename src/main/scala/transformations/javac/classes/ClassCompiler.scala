@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.node.Node
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton.ByteCode
 import transformations.bytecode.constants.{FieldRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
@@ -24,11 +24,10 @@ case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
   def initialise(): Unit = {
     getState(state).classCompiler = this
     myPackage.addClass(state, currentClassInfo, currentClass)
+    new ByteCode(currentClass).constantPool = new ConstantPool()
   }
 
-  ByteCodeSkeleton.getState(state).constantPool = new ConstantPool()
-
-  def constantPool = ByteCodeSkeleton.getState(state).constantPool
+  def constantPool = currentClass.constantPool
 
   lazy val classNames = getClassMapFromImports(currentClass.imports)
 

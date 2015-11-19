@@ -13,6 +13,7 @@ import transformations.bytecode.coreInstructions.{GotoC, InstructionC, Instructi
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
+import transformations.bytecode.ByteCodeSkeleton._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import CodeAttribute._
@@ -63,7 +64,7 @@ object LabelledTargets extends ParticleWithPhase with ParticleWithGrammar {
     }
 
     val clazz = program
-    val constantPool = ByteCodeSkeleton.getConstantPool(clazz)
+    val constantPool = clazz.constantPool
     val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {

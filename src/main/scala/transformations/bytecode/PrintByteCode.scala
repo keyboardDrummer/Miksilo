@@ -6,6 +6,7 @@ import akka.util.Convert
 import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.javac.classes.skeleton.QualifiedClassName
+import transformations.bytecode.ByteCodeSkeleton._
 
 object PrintByteCode {
   def longToBytes(long: Long): scala.Seq[Byte] = Convert.longToBytes(long)
@@ -26,7 +27,7 @@ object PrintByteCode {
 
       result ++= cafeBabeBytes
       result ++= versionNumber
-      val constantPool = ByteCodeSkeleton.getConstantPool(clazz).constants
+      val constantPool = clazz.constantPool.constants
       val constantPoolItemCountPlusOne = shortToBytes(constantPool.length + 1)
       result ++= constantPoolItemCountPlusOne
       for (constantPoolEntry <- constantPool) {

@@ -71,7 +71,7 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
   }
 
   def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
-    val constantPool = ByteCodeSkeleton.getState(state).constantPool
+    val constantPool = state.program.constantPool
     def getMethodDescriptorIndex(method: Node): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey

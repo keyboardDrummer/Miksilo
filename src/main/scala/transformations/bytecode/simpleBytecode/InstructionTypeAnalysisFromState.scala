@@ -12,9 +12,10 @@ import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.types.MethodTypeC
 import MethodTypeC._
+import transformations.bytecode.ByteCodeSkeleton._
 
 class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
-  val constantPool = ByteCodeSkeleton.getConstantPool(state.program)
+  val constantPool = state.program.constantPool
 
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters

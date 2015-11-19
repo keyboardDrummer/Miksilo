@@ -4,12 +4,11 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.IntegerConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantIntC, SmallIntegerConstantC}
-import transformations.javac.classes.skeleton.JavaClassSkeleton
-import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.IntTypeC
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object IntLiteralC extends ExpressionInstance {
   val key = IntLiteralKey
@@ -30,7 +29,7 @@ object IntLiteralC extends ExpressionInstance {
       Seq(SmallIntegerConstantC.integerConstant(value))
     else
     {
-      val reference = ByteCodeSkeleton.getConstantPool(state).store(IntegerConstant.construct(value))
+      val reference = state.program.constantPool.store(IntegerConstant.construct(value))
       Seq(LoadConstantIntC.integerConstant(reference))
     }
   }

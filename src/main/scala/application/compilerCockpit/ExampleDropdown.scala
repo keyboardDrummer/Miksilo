@@ -16,6 +16,11 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     override def toString = name
   }
 
+  def getFibonacciSimplifiedByteCode = {
+    val content = TestUtils.getTestFile("FibonacciInSimplifiedByteCode.txt").slurp()
+    new Example("Fibonacci Simplified Bytecode", content)
+  }
+
   def getFibonacci = {
     val fibonacciContent = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
     new Example("Fibonacci", fibonacciContent)
@@ -54,7 +59,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     try
     {
       val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
-        getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciByteCode, getRevealSyntaxSugar))
+        getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciSimplifiedByteCode, getFibonacciByteCode, getRevealSyntaxSugar))
       add(new JLabel("code examples:"))
       val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
 

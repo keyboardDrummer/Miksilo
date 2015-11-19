@@ -2,7 +2,7 @@ package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
@@ -24,7 +24,7 @@ object GetFieldC extends InstructionC {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
-    new InstructionSignature(Seq(stackTop), Seq(getReturnType(ByteCodeSkeleton.getConstantPool(state), instruction)))
+    new InstructionSignature(Seq(stackTop), Seq(getReturnType(state.program.constantPool, instruction)))
   }
 
   def getReturnType(constantPool: ConstantPool, getField: Node): Node = {

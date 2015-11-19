@@ -2,11 +2,12 @@ package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
+import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.QualifiedClassName
 
@@ -25,8 +26,8 @@ object NewByteCodeC extends InstructionC {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-    val constantPool = ByteCodeSkeleton.getConstantPool(state)
-    val location = CodeAttribute.getInstructionArguments(instruction)(0)
+    val constantPool = state.program.constantPool
+    val location = CodeAttribute.getInstructionArguments(instruction).head
     val classRef = constantPool.getValue(location).asInstanceOf[Node]
     val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
     val classType = ObjectTypeC.objectType(className)

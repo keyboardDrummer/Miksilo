@@ -7,7 +7,7 @@ import org.junit.Assert
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.JavaCompiler
-
+import transformations.bytecode.ByteCodeSkeleton._
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
@@ -181,8 +181,8 @@ class TestUtils(val compiler: CompilerFromParticles) {
   }
 
   def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
-    val expectedConstantPoolSet = ByteCodeSkeleton.getConstantPool(expectedByteCode).constants
-    val compiledConstantPoolSet = ByteCodeSkeleton.getConstantPool(compiledCode).constants
+    val expectedConstantPoolSet = expectedByteCode.constantPool.constants
+    val compiledConstantPoolSet = compiledCode.constantPool.constants
     Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
     Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem => {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => ComparisonOptions(false,false,true).deepEquality(compiledItem, expectedItem))

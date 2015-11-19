@@ -12,6 +12,11 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
+  implicit class ByteCode(node: Node) {
+    def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
+    def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
+  }
+  
   def getMethods(clazz: Node) = clazz(ClassMethodsKey).asInstanceOf[Seq[Node]]
 
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
@@ -33,8 +38,6 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   def getParentIndex(clazz: Node) = clazz(ClassParentIndex).asInstanceOf[Int]
 
-  def getConstantPool(clazz: Node): ConstantPool = clazz(ClassConstantPool).asInstanceOf[ConstantPool]
-
   def getClassNameIndex(clazz: Node) = clazz(ClassNameIndexKey).asInstanceOf[Int]
 
   def getClassInterfaces(clazz: Node) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
@@ -45,10 +48,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set.empty
 
-  def getConstantPool(state: CompilationState) = getState(state).constantPool
-
   class State {
-    var constantPool: ConstantPool = null
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new ClassRegistry[ByteCodeAttribute]
   }

@@ -100,15 +100,11 @@ object JavaCompiler {
     Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
       ShortTypeC, TypeSkeleton)
 
-  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
-    val implicitsSet = implicits.toSet
-    javaCompilerTransformations.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
-  }
+  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] =
+    getCompiler.spliceBeforeTransformations(implicits, splice)
 
-  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
-    val implicitsSet = implicits.toSet
-    implicits ++ splice ++ javaCompilerTransformations.filter(t => !implicitsSet.contains(t))
-  }
+  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] =
+    getCompiler.spliceAfterTransformations(implicits, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler = {
     new CompilerFromParticles(spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint)))
