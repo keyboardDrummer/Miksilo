@@ -12,5 +12,5 @@ object OutputOption {
 }
 
 trait OutputOption {
-  def handleOutput(output: String)
+    def handleOutput(output: TextWithGrammar)
 }

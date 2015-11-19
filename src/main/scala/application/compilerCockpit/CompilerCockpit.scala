@@ -4,10 +4,10 @@ import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 import javax.swing._
-import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammarToGrammar
+import core.grammar.Grammar
 import core.layouts.SwingEquationLayout
 import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromParticles, Particle}
@@ -35,7 +35,8 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     new ByteArrayInputStream(stringText.getBytes(StandardCharsets.UTF_8))
   })
 
-  val textAreaOutput: TextAreaOutput = new TextAreaOutput(s => setOutputText(s))
+  val textAreaOutput: TextAreaOutput =
+    new TextAreaOutput(textWithGrammar => setOutputText(textWithGrammar.text, textWithGrammar.grammar))
   val compileOptions = getCompileOptions.toArray
 
   def getCompileOptions: Seq[CompileOption] = {
@@ -65,8 +66,12 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
 
   def inputOption = inputOptionModel.getSelectedItem.asInstanceOf[InputOption]
 
-  def setOutputText(text: String) {
+  def setOutputText(text: String, useThisGrammar: Grammar = null) {
     outputDocument.replace(0, outputDocument.getLength, text, null)
+    if (grammar != null)
+      outputDocument.setSyntaxStyle(new TokenMakerFromGrammar(grammar))
+    else
+      outputDocument.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_NONE)
   }
 
   def setInputText(text: String) {
@@ -145,7 +150,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val inputTextArea = new RSyntaxTextArea(inputDocument)
     inputTextArea.setBracketMatchingEnabled(false)
     inputTextArea.setFont(StyleSheet.codeFont)
-    inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
+    //inputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
     panel.add(new RTextScrollPane(inputTextArea))
     panel
   }
@@ -158,7 +163,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     outputTextArea.setFont(StyleSheet.codeFont)
     outputTextArea.setBorder(BorderFactory.createLoweredBevelBorder())
 
-    outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+    //TODO find out what this was for. outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
 
     outputPanel.add(new RTextScrollPane(outputTextArea))
     outputPanel

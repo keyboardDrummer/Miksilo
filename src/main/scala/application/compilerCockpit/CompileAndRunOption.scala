@@ -25,11 +25,11 @@ object RunWithJVM extends ParticleWithPhase
 
 object CompileAndRunOption extends CompileOption {
 
-  override def perform(cockpit: CompilerCockpit, inputStream: InputStream): String = {
+  override def perform(cockpit: CompilerCockpit, inputStream: InputStream): TextWithGrammar = {
     val compiler = new CompilerFromParticles(cockpit.particles ++ Seq(RunWithJVM))
     val state = compiler.parseAndTransform(inputStream)
 
-    state.output
+    TextWithGrammar(state.output)
   }
 
   override def toString = "Compile and run"

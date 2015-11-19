@@ -1,9 +1,9 @@
 package application.compilerCockpit
 
-class TextAreaOutput(setText: String => Unit) extends OutputOption {
+class TextAreaOutput(setText: TextWithGrammar => Unit) extends OutputOption {
 
-  override def handleOutput(output: String): Unit = {
-    setText(output)
+  override def handleOutput(textWithGrammar: TextWithGrammar): Unit = {
+    setText(textWithGrammar)
   }
 
   override def toString = "Output to text area"
