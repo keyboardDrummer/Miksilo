@@ -1,5 +1,8 @@
 package transformations.bytecode.additions
 
+import core.bigrammar.BiGrammar
+import core.grammar.StringLiteral
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
@@ -133,7 +136,11 @@ object LabelledTargets extends ParticleWithPhase {
       new InstructionSignature(Seq.empty, Seq.empty)
     }
 
-    override def getInstructionSize(): Int = 0
+    override def getInstructionSize: Int = 0
+
+    override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
+      name ~> ":" ~~> StringLiteral ^^ parseMap(LabelKey, LabelNameKey) //TODO missing LabelStackFrame
+    }
 
     override def description: String = "Used to mark a specific point in an instruction list."
   }

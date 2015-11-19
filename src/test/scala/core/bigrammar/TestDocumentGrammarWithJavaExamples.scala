@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
+import core.bigrammar.printer.{BiGrammarToPrinter}
 import core.particles.{CompilerFromParticles, Particle}
 import org.junit.{Assert, Test}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
@@ -112,7 +112,7 @@ class TestDocumentGrammarWithJavaExamples {
 
   @Test
   def testPrettyAddressLoad(): Unit = {
-    val grammar = LoadAddressC.getGrammarForThisInstruction
+    val grammar = LoadAddressC.getGrammarForThisInstruction(null)
     val addressLoad = LoadAddressC.addressLoad(0)
     BiGrammarToPrinter.toDocument(addressLoad, grammar)
   }

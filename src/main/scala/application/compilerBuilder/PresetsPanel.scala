@@ -17,6 +17,20 @@ import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMetho
 import transformations.javac.statements.ForLoopC
 import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
+object PresetsPanel
+{
+  def getSimplifiedByteCodePreset = {
+    new Preset("Simplified bytecode", JavaCompiler.simpleByteCodeTransformations,
+      "Simplified JVM bytecode.")
+  }
+
+  def getJavaToSimplifiedByteCodePreset = {
+    new Preset("Java to simplified bytecode",
+      JavaCompiler.spliceBeforeTransformations(JavaCompiler.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
+      "Compiles Java into simplified bytecode")
+  }
+}
+
 class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
 
   initialise()
@@ -73,7 +87,8 @@ class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new G
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
     model.addElement(getRevealSyntaxSugar)
-    model.addElement(getSimplifiedByteCodePreset)
+    model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
+    model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
     model
   }
@@ -99,11 +114,6 @@ class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new G
   def getBlockCompilerPreset = {
     new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
       "The program consists only of a single statement block.")
-  }
-
-  def getSimplifiedByteCodePreset = {
-    new Preset("Simplified bytecode", JavaCompiler.simpleByteCodeTransformations,
-      "Simplified JVM bytecode.")
   }
 
   def getByteCodePreset = {

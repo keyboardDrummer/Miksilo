@@ -48,9 +48,9 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     }
   }
 
-  object ValueNotFound
+  case class ValueNotFound(meta: NodeLike, field: Any)
   def getWithPartial(meta: NodeLike, key: Any): Any = {
-    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound)
+    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {

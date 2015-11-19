@@ -1,6 +1,6 @@
 package util
 
-import application.compilerCockpit.PrettyPrint
+import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.particles._
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.Assert
@@ -88,6 +88,16 @@ class TestUtils(val compiler: CompilerFromParticles) {
     compiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
+  }
+
+  def compileAndPrettyPrint(fileName: File): String = {
+
+    val prettyPrint = PrettyPrint(recover = true)
+    val splicedParticles = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
+    val newCompiler = new CompilerFromParticles(splicedParticles)
+
+    val state = newCompiler.parseAndTransform(fileName)
+    state.output
   }
 
   def compareWithJavacAfterRunning(fileName: String, inputDirectory: Path = Path("")) {

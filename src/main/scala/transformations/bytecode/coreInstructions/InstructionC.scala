@@ -5,10 +5,9 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode._
-import transformations.bytecode.attributes.CodeAttribute.{JumpBehavior, InstructionSignatureProvider, InstructionSideEffectProvider}
+import transformations.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
@@ -57,10 +56,10 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
-    instructionGrammar.addOption(getGrammarForThisInstruction)
+    instructionGrammar.addOption(getGrammarForThisInstruction(grammars))
   }
 
-  def getGrammarForThisInstruction: BiGrammar = {
+  def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
     name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
   }
 
