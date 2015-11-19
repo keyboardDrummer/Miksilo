@@ -8,11 +8,7 @@ import org.fife.ui.rsyntaxtextarea._
 import scala.util.matching.Regex
 import scala.util.parsing.input.CharArrayReader
 
-class TokenMakerFactoryFromGrammar(grammar: Grammar) extends TokenMakerFactory
-{
-  override def getTokenMakerImpl(key: String): TokenMaker = new TokenMakerFromGrammar(grammar)
-  override def keySet(): java.util.Set[String] = new java.util.HashSet[String]()
-}
+
 
 class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
 
@@ -37,7 +33,7 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
 
     val whiteSpaceToken = new RegexG(new Regex("\\s")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
     val errorToken = new RegexG(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s.asInstanceOf[String]))
-    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken) //, errorToken)
+    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken, errorToken)
 
     val tokenGrammar = allTokenParsers.reduce((a, b) => a | b).*
     converter.convert(tokenGrammar)
