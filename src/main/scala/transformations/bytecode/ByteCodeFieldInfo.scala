@@ -1,15 +1,15 @@
 package transformations.bytecode
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
 object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
-  object FieldKey
-  object NameIndex
-  object DescriptorIndex
-  object FieldAttributes
+  object FieldKey extends Key
+  object NameIndex extends Key
+  object DescriptorIndex extends Key
+  object FieldAttributes extends Key
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -31,8 +31,8 @@ object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val attributesGrammar = grammars.find(AttributesGrammar)
-    val fieldGrammar = (("nameIndex:" ~> integer) ~~ (", descriptorIndex" ~> integer) <~ ", attributes") % attributesGrammar ^^
-      parseMap(FieldKey, NameIndex, DescriptorIndex, FieldAttributes)
+    val fieldGrammar = new NodeMap((("nameIndex:" ~> integer) ~~ (", descriptorIndex" ~> integer) <~ ", attributes") % attributesGrammar,
+      FieldKey, NameIndex, DescriptorIndex, FieldAttributes)
     val parseFields = "fields:" %> fieldGrammar.manyVertical.indent()
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)

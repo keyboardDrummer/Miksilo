@@ -10,7 +10,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object WhileC extends StatementInstance with WithState {
 
-  override val key: Key = WhileKey
+  override val key: Key = Key
 
   override def toByteCode(_while: Path, state: CompilationState): Seq[Node] = {
     val startLabel = state.getUniqueLabel("start")
@@ -28,28 +28,27 @@ object WhileC extends StatementInstance with WithState {
       bodyInstructions ++ Seq(LabelledTargets.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
 
-  def getCondition[T <: NodeLike](_while: T) = _while(WhileCondition).asInstanceOf[T]
+  def getCondition[T <: NodeLike](_while: T) = _while(Condition).asInstanceOf[T]
 
-  def getBody[T <: NodeLike](_while: T) = _while(WhileBody).asInstanceOf[Seq[T]]
+  def getBody[T <: NodeLike](_while: T) = _while(Body).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileInner = "while" ~> ("(" ~> expressionGrammar <~ ")") % blockGrammar
-    val whileGrammar = new NodeMap(whileInner, WhileKey, WhileCondition, WhileBody)
+    val whileGrammar = new NodeMap("while" ~> expression.inParenthesis % blockGrammar, Key, Condition, Body)
     statementGrammar.addOption(whileGrammar)
   }
 
-  def _while(condition: Node, body: Seq[Node]) = new Node(WhileKey, WhileCondition -> condition, WhileBody -> body)
+  def _while(condition: Node, body: Seq[Node]) = new Node(Key, Condition -> condition, Body -> body)
 
-  object WhileKey extends Key
+  object Key extends core.particles.node.Key
 
-  object WhileCondition extends Key
+  object Condition extends Key
 
-  object WhileBody extends Key
+  object Body extends Key
 
   override def description: String = "Enables using the while construct."
 
