@@ -3,6 +3,7 @@ package application.compilerBuilder
 import java.awt._
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
+import javax.swing.text.{PlainDocument, Document}
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
@@ -17,6 +18,7 @@ class ParticleInstanceList extends DefaultListModel[ParticleInstance]
 
 class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
   val selectedParticles = new ParticleInstanceList()
+  val compilerName = new PlainDocument()
 
   StyleSheet.setTitleBorder(this, "Compiler")
 
@@ -44,12 +46,16 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     val launchCockpitButton = new JButton("Launch Cockpit")
     launchCockpitButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
-        val cockpit = new CompilerCockpit(selectedParticles.scalaElements)
+        val cockpit = new CompilerCockpit(compilerName.getText(0,compilerName.getLength), selectedParticles.scalaElements)
         cockpit.pack()
         cockpit.maximize()
         cockpit.visible = true
       }
     })
+    val compilerNameField = new JTextField(20)
+    compilerNameField.setDocument(compilerName)
+    actionButtons.add(new JLabel("Name:"))
+    actionButtons.add(compilerNameField)
     actionButtons.add(launchCockpitButton)
     actionButtons
   }

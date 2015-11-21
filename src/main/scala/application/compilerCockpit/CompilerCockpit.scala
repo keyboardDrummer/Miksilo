@@ -20,9 +20,9 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
+class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Frame {
 
-
+  this.title = name
   val compiler = new CompilerFromParticles(particles)
   val grammar = BiGrammarToGrammar.toGrammar(compiler.getGrammar)
   val factory = new TokenMakerFactoryFromGrammar(grammar)
@@ -153,8 +153,7 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val cardLayout = new CardLayout()
     val panel = new JPanel(cardLayout)
     val inputTextArea = new RSyntaxTextArea(inputDocument)
-    inputTextArea.setBracketMatchingEnabled(false)
-    inputTextArea.setFont(StyleSheet.codeFont)
+    initializeTextArea(inputTextArea)
     panel.add(new RTextScrollPane(inputTextArea))
     panel
   }
@@ -163,14 +162,19 @@ class CompilerCockpit(val particles: Seq[Particle]) extends Frame {
     val cardLayout = new CardLayout()
     val outputPanel = new JPanel(cardLayout)
     val outputTextArea = new RSyntaxTextArea(outputDocument)
-    outputTextArea.setBracketMatchingEnabled(false)
-    outputTextArea.setFont(StyleSheet.codeFont)
+    initializeTextArea(outputTextArea)
 
     outputTextArea.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE) //TODO this is used to prevent auto scrolling. this has nasty edit side-effects. find another solution.
 
     val scrollPane = new RTextScrollPane(outputTextArea)
     outputPanel.add(scrollPane)
     outputPanel
+  }
+
+  def initializeTextArea(inputTextArea: RSyntaxTextArea): Unit = {
+    inputTextArea.setBracketMatchingEnabled(false)
+    inputTextArea.setFont(StyleSheet.codeFont)
+    inputTextArea.setTabSize(4)
   }
 
   def getConstraints = {

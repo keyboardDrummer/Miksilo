@@ -4,6 +4,7 @@ import java.awt.event._
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
+import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
@@ -32,7 +33,7 @@ object PresetsPanel
   }
 }
 
-class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
+class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
 
   initialise()
 
@@ -156,6 +157,7 @@ class PresetsPanel(selectedParticles: ParticleInstanceList) extends JPanel(new G
 
   def applyPreset(preset: Preset) {
     selectedParticles.clear()
+    compilerName.replace(0, compilerName.getLength, preset.name, null)
     for (particle <- preset.particles)
       selectedParticles.addElement(new ParticleInstance(particle))
   }

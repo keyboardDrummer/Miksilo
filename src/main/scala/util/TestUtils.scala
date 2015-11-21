@@ -79,7 +79,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     File(testResources.getPath)
   }
 
-  def compileAndRun(fileName: String, inputDirectory: Path): String = {
+  def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))

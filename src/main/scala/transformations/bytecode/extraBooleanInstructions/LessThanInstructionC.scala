@@ -17,12 +17,12 @@ object LessThanInstructionC extends ExpandInstruction {
   override def key: Any = LessThanInstructionKey
 
   override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
-    val falseStartLabel = state.getUniqueLabel("falseStart")
+    val trueLabel = state.getUniqueLabel("true")
     val endLabel = state.getUniqueLabel("end")
-    Seq(LabelledTargets.ifIntegerCompareLess(falseStartLabel),
+    Seq(LabelledTargets.ifIntegerCompareLess(trueLabel),
       SmallIntegerConstantC.integerConstant(0),
       LabelledTargets.goTo(endLabel),
-      InferredStackFrames.label(falseStartLabel),
+      InferredStackFrames.label(trueLabel),
       SmallIntegerConstantC.integerConstant(1),
       InferredStackFrames.label(endLabel))
   }

@@ -37,7 +37,7 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
     }
 
     def getLocalTypesSequenceFromMap(localTypes: Map[Int, Node]): Seq[Node] = {
-      val max = localTypes.keys.max
+      val max = (localTypes.keys ++ Seq(-1)).max
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 

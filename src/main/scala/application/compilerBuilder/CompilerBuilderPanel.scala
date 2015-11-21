@@ -25,7 +25,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
   val programPanel = new CompilerStatePanel(this)
   val compilerParticles = programPanel.selectedParticles
-  val presetsPanel: JPanel = new PresetsPanel(compilerParticles)
+  val presetsPanel: JPanel = new PresetsPanel(programPanel.compilerName, compilerParticles)
 
   val presetsConstraints = getConstraints
   add(presetsPanel, presetsConstraints)
