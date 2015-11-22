@@ -18,7 +18,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import CodeAttribute._
 
-object LabelledTargets extends ParticleWithPhase with ParticleWithGrammar {
+object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 

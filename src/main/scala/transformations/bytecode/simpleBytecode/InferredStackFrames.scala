@@ -3,7 +3,7 @@ package transformations.bytecode.simpleBytecode
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.types.TypeSkeleton
@@ -11,9 +11,9 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(LabelledTargets)
+  override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String) = new Node(LabelledTargets.LabelKey, LabelledTargets.LabelNameKey -> name)
+  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelNameKey -> name)
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program
@@ -24,13 +24,13 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
       val stackLayouts = new InstructionTypeAnalysisFromState(state, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
-      for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledTargets.LabelKey)) {
+      for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledLocations.LabelKey)) {
         val index = indexedLabel._2
         val label = indexedLabel._1
         val currentStack = stackLayouts.typeStatePerInstruction(index).stackTypes
         val localTypes = stackLayouts.typeStatePerInstruction(index).variableTypes
         val locals = getLocalTypesSequenceFromMap(localTypes)
-        label(LabelledTargets.LabelStackFrame) = getStackMap(previousStack, currentStack, previousLocals, locals)
+        label(LabelledLocations.LabelStackFrame) = getStackMap(previousStack, currentStack, previousLocals, locals)
         previousStack = currentStack
         previousLocals = locals
       }

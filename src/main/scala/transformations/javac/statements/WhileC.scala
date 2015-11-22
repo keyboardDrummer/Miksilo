@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, SequenceSelection}
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
 
@@ -24,8 +24,8 @@ object WhileC extends StatementInstance with WithState {
 
     Seq(InferredStackFrames.label(startLabel)) ++
       conditionInstructions ++
-      Seq(LabelledTargets.ifZero(endLabel)) ++
-      bodyInstructions ++ Seq(LabelledTargets.goTo(startLabel), InferredStackFrames.label(endLabel))
+      Seq(LabelledLocations.ifZero(endLabel)) ++
+      bodyInstructions ++ Seq(LabelledLocations.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
 
   def getCondition[T <: NodeLike](_while: T) = _while(Condition).asInstanceOf[T]

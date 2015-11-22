@@ -4,7 +4,7 @@ import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{SequenceSelection, Path}
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.statements.IfThenC._
@@ -19,13 +19,13 @@ object IfThenElseC extends StatementInstance {
     val elseLabel = InferredStackFrames.label(elseLabelName)
     val thenBody = getThenStatements(ifThenElse)
 
-    val jumpToElseIfFalse = LabelledTargets.ifZero(elseLabelName)
+    val jumpToElseIfFalse = LabelledLocations.ifZero(elseLabelName)
     val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
     val toInstructionsStatement = StatementSkeleton.getToInstructions(state)
     toInstructionsExpr(condition) ++
       Seq(jumpToElseIfFalse) ++
       thenBody.flatMap(toInstructionsStatement) ++
-      Seq(LabelledTargets.goTo(endLabelName), elseLabel) ++
+      Seq(LabelledLocations.goTo(endLabelName), elseLabel) ++
       getElseStatements(ifThenElse).flatMap(toInstructionsStatement) ++
       Seq(endLabel)
   }

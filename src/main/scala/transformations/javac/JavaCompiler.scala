@@ -3,7 +3,7 @@ package transformations.javac
 import application.compilerCockpit.PrettyPrint
 import core.particles._
 import transformations.bytecode._
-import transformations.bytecode.additions.{LabelledTargets, PoptimizeC}
+import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
@@ -64,7 +64,7 @@ object JavaCompiler {
     Seq(LessThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 
-  def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledTargets) ++ byteCodeTransformations
+  def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 

@@ -3,7 +3,7 @@ package transformations.bytecode.extraBooleanInstructions
 import core.particles._
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -47,9 +47,9 @@ object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
           case LessThanInstructionKey =>
             val falseStartLabel = state.getUniqueLabel("falseStart")
             val endLabel = state.getUniqueLabel("end")
-            Seq(LabelledTargets.ifIntegerCompareLess(falseStartLabel),
+            Seq(LabelledLocations.ifIntegerCompareLess(falseStartLabel),
               SmallIntegerConstantC.integerConstant(0),
-              LabelledTargets.goTo(endLabel),
+              LabelledLocations.goTo(endLabel),
               InferredStackFrames.label(falseStartLabel),
               SmallIntegerConstantC.integerConstant(1),
               InferredStackFrames.label(endLabel))

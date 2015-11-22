@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.junit.Test
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
@@ -23,7 +23,7 @@ class TestByteCodeGoTo {
   @Test
   def compareCompiledVersusNativeCode() {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = new CompilerFromParticles(Seq(LabelledTargets) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
+    val compiledWhile = new CompilerFromParticles(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }
@@ -48,14 +48,14 @@ class TestByteCodeGoTo {
     val instructions = Seq(
       SmallIntegerConstantC.integerConstant(0),
       StoreIntegerC.integerStore(0),
-      LabelledTargets.label("start", new Node(StackMapTableAttribute.AppendFrame,
+      LabelledLocations.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
       LoadIntegerC.load(0),
       SmallIntegerConstantC.integerConstant(3),
-      LabelledTargets.ifIntegerCompareGreaterEquals("end"),
+      LabelledLocations.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerC.integerIncrement(0, 1),
-      LabelledTargets.goTo("start"),
-      LabelledTargets.label("end", new Node(StackMapTableAttribute.SameFrameKey))
+      LabelledLocations.goTo("start"),
+      LabelledLocations.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )
 
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

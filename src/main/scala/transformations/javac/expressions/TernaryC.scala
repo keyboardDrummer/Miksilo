@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.types.BooleanTypeC
@@ -18,7 +18,7 @@ object TernaryC extends ExpressionInstance {
     metaObject(ConditionKey).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledTargets)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -63,10 +63,10 @@ object TernaryC extends ExpressionInstance {
     val falsePath = TernaryC.falseBranch(_ternary)
     val falseLabelName = state.getUniqueLabel("falseStart")
     val falseTarget = InferredStackFrames.label(falseLabelName)
-    val conditionalBranch = LabelledTargets.ifZero(falseLabelName)
+    val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
     val endLabelName = state.getUniqueLabel("end")
     val end = InferredStackFrames.label(endLabelName)
-    val goToEnd = LabelledTargets.goTo(endLabelName)
+    val goToEnd = LabelledLocations.goTo(endLabelName)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     toInstructions(condition) ++
       Seq(conditionalBranch) ++

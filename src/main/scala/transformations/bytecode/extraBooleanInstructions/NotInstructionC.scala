@@ -2,7 +2,7 @@ package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC
@@ -12,7 +12,7 @@ object NotInstructionC extends ExpandInstruction {
 
   def not = CodeAttribute.instruction(NotInstructionKey)
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfZeroC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfZeroC)
 
   object NotInstructionKey extends Key
 
@@ -21,9 +21,9 @@ object NotInstructionC extends ExpandInstruction {
   override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
     val falseStartLabel = state.getUniqueLabel("falseStart")
     val endLabel = state.getUniqueLabel("end")
-    Seq(LabelledTargets.ifZero(falseStartLabel),
+    Seq(LabelledLocations.ifZero(falseStartLabel),
       SmallIntegerConstantC.integerConstant(0),
-      LabelledTargets.goTo(endLabel),
+      LabelledLocations.goTo(endLabel),
       InferredStackFrames.label(falseStartLabel),
       SmallIntegerConstantC.integerConstant(1),
       InferredStackFrames.label(endLabel))

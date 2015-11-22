@@ -3,15 +3,15 @@ package transformations.bytecode.simpleBytecode
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
-import transformations.bytecode.additions.LabelledTargets
-import transformations.bytecode.additions.LabelledTargets.LabelKey
+import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.CodeKey
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InferredMaxStack extends ParticleWithPhase with ParticleWithGrammar {
-  override def dependencies: Set[Contract] = Set(LabelledTargets)
+  override def dependencies: Set[Contract] = Set(LabelledLocations)
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program

@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.particles.node.Node
-import transformations.bytecode.additions.LabelledTargets
+import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import util.DataFlowAnalysis
@@ -12,8 +12,8 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Node])
   def getJumpBehavior(instructionClazz: Any): JumpBehavior
   
   val labelIndices = instructions.zipWithIndex.
-    filter(indexedInstruction => indexedInstruction._1.clazz == LabelledTargets.LabelKey).
-    map(indexedInstruction => (LabelledTargets.getLabelName(indexedInstruction._1), indexedInstruction._2)).toMap
+    filter(indexedInstruction => indexedInstruction._1.clazz == LabelledLocations.LabelKey).
+    map(indexedInstruction => (LabelledLocations.getLabelName(indexedInstruction._1), indexedInstruction._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)

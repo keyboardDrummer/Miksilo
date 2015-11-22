@@ -2,8 +2,8 @@ package transformations.bytecode
 
 import core.particles.CompilationState
 import core.particles.node.Node
-import transformations.bytecode.additions.LabelledTargets
-import transformations.bytecode.additions.LabelledTargets.LabelKey
+import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.javac.classes.ConstantPool
 
 object Instructions {
