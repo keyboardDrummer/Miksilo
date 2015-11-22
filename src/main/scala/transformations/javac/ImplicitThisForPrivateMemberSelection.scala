@@ -3,7 +3,7 @@ package transformations.javac
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, Root, Selection, SequenceSelection}
+import core.particles.path.{Path, PathRoot, Selection, SequenceSelection}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.classes.skeleton.{ClassSignature, ClassMember, JavaClassSkeleton, MyCompiler}
@@ -44,7 +44,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   def getVariableWithCorrectPath(obj: Path): Path = {
     if (obj.clazz == MethodC.MethodKey)
-      return new Root(obj.current)
+      return new PathRoot(obj.current)
 
     obj match {
       case Selection(parent, field) => Selection(getVariableWithCorrectPath(parent), field)
@@ -55,7 +55,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    val programWithOrigin = new Root(program)
+    val programWithOrigin = new PathRoot(program)
     programWithOrigin.foreach(obj => obj.clazz match {
       case ByteCodeSkeleton.ClassFileKey =>
         val compiler = new MyCompiler(state)

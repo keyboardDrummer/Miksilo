@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles.exceptions.BadInputException
 import core.particles.node.Node
-import core.particles.path.{Path, Root}
+import core.particles.path.{Path, PathRoot}
 import core.particles.CompilationState
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
@@ -46,7 +46,7 @@ case class MethodCompiler(state: CompilationState, method: Node) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody[Path](new Root(method)).head
+  val firstInstruction = getMethodBody[Path](new PathRoot(method)).head
   val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables = {

@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, Root}
+import core.particles.path.{Path, PathRoot}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
@@ -40,7 +40,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new Root(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).foreach(obj => obj.clazz match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })

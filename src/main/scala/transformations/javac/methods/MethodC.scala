@@ -4,7 +4,7 @@ import core.bigrammar.{TopBottom, BiGrammar}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
-import core.particles.path.{Path, Root}
+import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.bytecode.ByteCodeSkeleton._
@@ -81,7 +81,7 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptorIndex(method)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
-    addCodeAnnotation(new Root(method))
+    addCodeAnnotation(new PathRoot(method))
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
 

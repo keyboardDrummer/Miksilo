@@ -3,7 +3,7 @@ package transformations.javac.statements.locals
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, Root, SequenceSelection}
+import core.particles.path.{Path, PathRoot, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
@@ -47,7 +47,7 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new Root(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).foreach(obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

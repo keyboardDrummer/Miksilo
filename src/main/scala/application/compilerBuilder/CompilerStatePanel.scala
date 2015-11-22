@@ -3,7 +3,7 @@ package application.compilerBuilder
 import java.awt._
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing._
-import javax.swing.text.{PlainDocument, Document}
+import javax.swing.text.PlainDocument
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit

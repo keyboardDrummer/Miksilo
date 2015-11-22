@@ -2,7 +2,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, Root, SequenceSelection}
+import core.particles.path.{Path, PathRoot, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
@@ -46,14 +46,14 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
   object BodyKey
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new Root(program).foreach(obj => obj.clazz match {
-      case ForLoopKey => transformForLoop(obj, state)
+    new PathRoot(program).foreach(path => path.clazz match {
+      case ForLoopKey => transformForLoop(path, state)
       case _ =>
     })
   }
   
   def transformForLoop(forLoopPath: Path, state: CompilationState): Unit = {
-    val forLoop = forLoopPath.current
+    val forLoop: ForLoop = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementC.create(forLoop.increment))
     val _while = WhileC._while(forLoop.condition, whileBody)

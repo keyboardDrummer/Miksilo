@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.node.Node
-import core.particles.path.{Path, Root}
+import core.particles.path.{Path, PathRoot}
 import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
 
@@ -13,7 +13,7 @@ abstract class StatementFlowAnalysis[State](state: CompilationState, method: Nod
   val labels = getLabels
 
   def getLabels: Map[Any, Path] = {
-    val statements = MethodC.getMethodBody[Path](new Root(method))
+    val statements = MethodC.getMethodBody[Path](new PathRoot(method))
     statements.flatMap(statement => instances(statement.clazz).getLabels(statement)).toMap
   }
 
