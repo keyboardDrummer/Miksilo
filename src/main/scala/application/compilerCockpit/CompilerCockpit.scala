@@ -20,7 +20,7 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Frame {
+class CompilerCockpit(val name: String, val particles: Seq[Particle], beamerMode: Boolean = true) extends Frame {
 
   this.title = name
   val compiler = new CompilerFromParticles(particles)
@@ -144,7 +144,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Fr
         executeButton.verticalCenter2)
 
       innerLayout.addRow(inputPanel, outputPanel)
-      innerLayout.addTopToBottom(innerLayout.container, chooseInput, inputPanel, innerLayout.container)
+      innerLayout.addTopToBottom(innerLayout.container, chooseCompile, inputPanel, innerLayout.container)
     }
     addVerticalEquations()
   }
@@ -185,9 +185,12 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Fr
 
   def getChooseInput = {
     val chooseInput = new JPanel()
-    chooseInput.add(new JLabel("Input:"))
-    val inputComboBox: JComboBox[InputOption] = new JComboBox(inputOptionModel)
-    chooseInput.add(inputComboBox)
+    if (!beamerMode)
+    {
+      chooseInput.add(new JLabel("Input:"))
+      val inputComboBox: JComboBox[InputOption] = new JComboBox(inputOptionModel)
+      chooseInput.add(inputComboBox)
+    }
     chooseInput
   }
 
@@ -201,10 +204,11 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Fr
 
   def getChooseOutput: JPanel = {
     val chooseOutput = new JPanel()
-    chooseOutput.add(new JLabel("Output:"))
-
-    val chooseOutputComboBox = new JComboBox(outputOptionModel)
-    chooseOutput.add(chooseOutputComboBox)
+    if (!beamerMode) {
+      chooseOutput.add(new JLabel("Output:"))
+      val chooseOutputComboBox = new JComboBox(outputOptionModel)
+      chooseOutput.add(chooseOutputComboBox)
+    }
     chooseOutput
   }
 }
