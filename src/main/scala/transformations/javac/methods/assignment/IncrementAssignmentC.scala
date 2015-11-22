@@ -36,7 +36,7 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new Root(program).transform(obj => obj.clazz match {
+    new Root(program).foreach(obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })

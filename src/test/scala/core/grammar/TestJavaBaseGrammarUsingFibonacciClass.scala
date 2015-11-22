@@ -130,7 +130,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val printCall = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
-      Seq(ExpressionAsStatementC.asStatement(printCall)), true, MethodC.PublicVisibility)
+      Seq(ExpressionAsStatementC.create(printCall)), true, MethodC.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {

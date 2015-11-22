@@ -11,7 +11,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 object ParseKnownAttributes extends ParticleWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
     val constantPool = program.constantPool
-    program.transform(node => node.clazz match {
+    program.foreach(node => node.clazz match {
       case UnParsedAttribute.UnParsedAttributeKey =>
         val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
         val index = typedNode.nameIndex

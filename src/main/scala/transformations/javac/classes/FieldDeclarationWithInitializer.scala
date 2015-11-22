@@ -33,14 +33,14 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
     val declaration = FieldDeclaration.field(_type, name)
 
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), LocalDeclarationWithInitializerC.getInitializer(fieldWithInitialiser))
-    val assignmentStatement = ExpressionAsStatementC.asStatement(assignment)
+    val assignmentStatement = ExpressionAsStatementC.create(assignment)
     initializerStatements += assignmentStatement
     fieldWithInitialiser.replaceWith(declaration)
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new Root(program).transform(obj => obj.clazz match {
+    new Root(program).foreach(obj => obj.clazz match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })
@@ -58,7 +58,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
-        val callToFieldInitialiser = ExpressionAsStatementC.asStatement(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
+        val callToFieldInitialiser = ExpressionAsStatementC.create(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
         constructor(MethodC.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }

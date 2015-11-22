@@ -7,7 +7,7 @@ import transformations.javac.types.TypeVariable
 
 object ClassifyTypeIdentifiers extends ParticleWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
-    program.transform(node => node.clazz match {
+    program.foreach(node => node.clazz match {
       case TypeVariable.TypeVariableKey =>
         val objectType = ObjectTypeC.objectType(TypeVariable.getTypeVariableName(node))
         node.replaceWith(objectType)

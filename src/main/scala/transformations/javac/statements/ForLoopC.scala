@@ -1,19 +1,25 @@
 package transformations.javac.statements
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Node, NodeLike}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.Node
 import core.particles.path.{Path, Root, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
 
-  def getInitializer[T <: NodeLike](forLoop: T) = forLoop(InitializerKey).asInstanceOf[T]
+  implicit class ForLoop(forLoop: Node) {
+    def initializer = forLoop(InitializerKey).asInstanceOf[Node]
+    def initializer_=(value: Node) = forLoop(InitializerKey) = value
 
-  def getCondition[T <: NodeLike](forLoop: T) = forLoop(ConditionKey).asInstanceOf[T]
+    def condition = forLoop(ConditionKey).asInstanceOf[Node]
+    def condition_=(value: Node) = forLoop(ConditionKey) = value
 
-  def getIncrement[T <: NodeLike](forLoop: T) = forLoop(IncrementKey).asInstanceOf[T]
+    def increment = forLoop(IncrementKey).asInstanceOf[Node]
+    def increment_=(value: Node) = forLoop(IncrementKey) = value
 
-  def getBody[T <: NodeLike](forLoop: T) = forLoop(BodyKey).asInstanceOf[Seq[T]]
+    def body = forLoop(BodyKey).asInstanceOf[Seq[Node]]
+    def body_=(value: Node) = forLoop(BodyKey) = value
+  }
 
   override def dependencies: Set[Contract] = Set(WhileC)
 
@@ -39,23 +45,21 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
 
   object BodyKey
 
-  def transformForLoop(forLoop: Path, state: CompilationState): Unit = {
-    val initializer = getInitializer(forLoop)
-    val condition = getCondition(forLoop)
-    val forBody = getBody(forLoop.current)
-    val whileBody = forBody ++ Seq(ExpressionAsStatementC.asStatement(getIncrement(forLoop)))
-    val _while = WhileC._while(condition.current, whileBody)
-
-    val newStatements = Seq(initializer.current, _while)
-    val originSequence = forLoop.asInstanceOf[SequenceSelection]
-    originSequence.replaceWith(newStatements)
-  }
-
   override def transform(program: Node, state: CompilationState): Unit = {
-    new Root(program).transform(obj => obj.clazz match {
+    new Root(program).foreach(obj => obj.clazz match {
       case ForLoopKey => transformForLoop(obj, state)
       case _ =>
     })
+  }
+  
+  def transformForLoop(forLoopPath: Path, state: CompilationState): Unit = {
+    val forLoop = forLoopPath.current
+    val whileBody = forLoop.body ++
+      Seq(ExpressionAsStatementC.create(forLoop.increment))
+    val _while = WhileC._while(forLoop.condition, whileBody)
+
+    val newStatements = Seq(forLoop.initializer, _while)
+    forLoopPath.asInstanceOf[SequenceSelection].replaceWith(newStatements)
   }
 
 

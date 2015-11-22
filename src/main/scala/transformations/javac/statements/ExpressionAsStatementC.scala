@@ -14,7 +14,7 @@ object ExpressionAsStatementC extends StatementInstance {
 
   object ExpressionKey extends Key
 
-  def asStatement(expression: Node) = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
+  def create(expression: Node) = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
 
   override val key: Key = ExpressionAsStatementKey
 

@@ -9,7 +9,7 @@ trait NodeLike {
   def clazz: Any
   def dataView: Map[Any, Any]
 
-  def transform(transformation: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
+  def foreach(transformation: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
 
     transformNode(this.asInstanceOf[Self])
     def transformNode(node: Self): Unit = {

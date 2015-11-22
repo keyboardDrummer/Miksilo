@@ -41,13 +41,13 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
     val declaration = LocalDeclarationC.declaration(name, _type)
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
-    val assignmentStatement = ExpressionAsStatementC.asStatement(assignment)
+    val assignmentStatement = ExpressionAsStatementC.create(assignment)
     val originSequence = declarationWithInitializer.asInstanceOf[SequenceSelection]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new Root(program).transform(obj => obj.clazz match {
+    new Root(program).foreach(obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

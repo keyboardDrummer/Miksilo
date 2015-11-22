@@ -23,7 +23,7 @@ object ImplicitSuperConstructorCall extends ParticleWithPhase {
       }
 
       if (addSuperCall)
-        constructor(MethodC.MethodBodyKey) = Seq(ExpressionAsStatementC.asStatement(SuperCallExpression.superCall())) ++ statements
+        constructor(MethodC.MethodBodyKey) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
     }
   }
 

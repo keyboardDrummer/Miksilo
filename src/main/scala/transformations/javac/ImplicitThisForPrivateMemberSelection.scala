@@ -56,7 +56,7 @@ object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with Part
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val programWithOrigin = new Root(program)
-    programWithOrigin.transform(obj => obj.clazz match {
+    programWithOrigin.foreach(obj => obj.clazz match {
       case ByteCodeSkeleton.ClassFileKey =>
         val compiler = new MyCompiler(state)
         JavaLang.initialise(compiler)
