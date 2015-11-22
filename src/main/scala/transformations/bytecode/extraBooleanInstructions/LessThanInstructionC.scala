@@ -1,6 +1,6 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.additions.LabelledTargets
 import transformations.bytecode.attributes.CodeAttribute
@@ -14,7 +14,7 @@ object LessThanInstructionC extends ExpandInstruction {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledTargets, IfIntegerCompareLessC)
 
-  override def key: Any = LessThanInstructionKey
+  override val key = LessThanInstructionKey
 
   override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
     val trueLabel = state.getUniqueLabel("true")
@@ -27,7 +27,7 @@ object LessThanInstructionC extends ExpandInstruction {
       InferredStackFrames.label(endLabel))
   }
 
-  object LessThanInstructionKey
+  object LessThanInstructionKey extends Key
 
   override def description: String = "Defines a custom instruction which applies < to the top stack values."
 }

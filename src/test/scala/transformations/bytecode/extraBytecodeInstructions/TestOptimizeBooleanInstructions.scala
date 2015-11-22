@@ -4,7 +4,7 @@ import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.junit.{Assert, Test}
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.extraBooleanInstructions.OptimizeBooleanInstructionsC
+import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.JavaCompiler
 import util.TestUtils
@@ -16,7 +16,7 @@ class TestOptimizeBooleanInstructions {
   @Test
   def testForFibonacci() {
     val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""))
-    val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeBooleanInstructionsC)
+    val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
     val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)

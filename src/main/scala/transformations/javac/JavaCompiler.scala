@@ -60,7 +60,7 @@ object JavaCompiler {
     AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
 
-  def allByteCodeTransformations = Seq(OptimizeBooleanInstructionsC) ++
+  def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 

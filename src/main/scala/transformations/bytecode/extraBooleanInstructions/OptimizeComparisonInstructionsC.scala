@@ -14,7 +14,7 @@ import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInst
 
 import scala.collection.mutable
 
-object OptimizeBooleanInstructionsC extends ParticleWithPhase {
+object OptimizeComparisonInstructionsC extends ParticleWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
     NotInstructionC, IntegerEqualsInstructionC)

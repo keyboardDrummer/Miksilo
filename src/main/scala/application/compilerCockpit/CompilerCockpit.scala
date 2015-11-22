@@ -44,7 +44,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle]) extends Fr
     val selection = Set(MarkOutputGrammar, ByteCodeSkeleton)
     val orderedSelection = particles.filter(o => selection.contains(o))
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
-    byteCodeActions ++ Seq(PrettyPrintOption)
+    Seq(PrettyPrintOption) ++ byteCodeActions
   }
 
   val outputOptions = Array[OutputOption](textAreaOutput)

@@ -1,9 +1,7 @@
 package transformations.bytecode.coreInstructions
 
-import core.bigrammar.BiGrammar
 import core.particles._
-import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
-import core.particles.node.{Key, Node}
+import core.particles.node.Node
 import transformations.bytecode._
 import transformations.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
@@ -14,7 +12,9 @@ case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
 class ByteCodeTypeException(message: String) extends Exception(message)
 
-trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider with InstructionSideEffectProvider {
+
+
+trait InstructionC extends InstructionWithGrammar with InstructionSignatureProvider with InstructionSideEffectProvider {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -44,7 +44,6 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  val key: Key
 
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
   def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature
@@ -54,14 +53,6 @@ trait InstructionC extends ParticleWithGrammar with InstructionSignatureProvider
   def getInstructionSize: Int = getInstructionByteCode(new Node(key, InstructionArgumentsKey -> List.range(0,10))).size
   def getInstructionByteCode(instruction: Node): Seq[Byte]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
-    instructionGrammar.addOption(getGrammarForThisInstruction(grammars))
-  }
-
-  def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    grammars.create(KeyGrammar(key), name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey))
-  }
 
   protected def binary(_type: Node) = InstructionSignature(Seq(_type, _type), Seq(_type))
 
