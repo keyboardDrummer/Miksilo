@@ -1,13 +1,15 @@
 package transformations.javac
 
 import core.bigrammar.TestGrammarUtils
+import core.particles.CompilerFromParticles
 import org.junit.{Assert, Test}
 import util.TestUtils
 
 import scala.reflect.io.{File, Path}
 
-class TestComments {
+class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
 
+  val testGrammar = TestGrammarUtils(this.compiler.particles)
   @Test
   def testBasicClass() {
     val input = "/* jooo */"
@@ -16,24 +18,24 @@ class TestComments {
 
   @Test
   def comparePrintResultWithoutComment() {
-    val testFile: File = TestUtils.getJavaTestFile("Whilee")
+    val testFile: File = getJavaTestFile("Whilee")
     val input = testFile.slurp()
-    val result = TestGrammarUtils.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
+    val result = testGrammar.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
     Assert.assertEquals(input, result)
   }
 
   @Test
   def comparePrintResult() {
-    val testFile: File = TestUtils.getJavaTestFile("WhileeWithComment.java")
+    val testFile: File = getJavaTestFile("WhileeWithComment.java")
     val input = testFile.slurp()
-    val result = TestGrammarUtils.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
+    val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     Assert.assertEquals(input, result)
   }
 
   @Test
   def testFullPipeline() {
     val inputDirectory = Path("")
-    val output: String = TestUtils.compileAndRun("WhileeWithComment.java", inputDirectory)
+    val output: String = compileAndRun("WhileeWithComment.java", inputDirectory)
     Assert.assertEquals("3", output)
   }
 }
