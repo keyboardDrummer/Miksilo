@@ -61,7 +61,7 @@ object TernaryC extends ExpressionInstance {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
-    val falseLabelName = state.getUniqueLabel("falseStart")
+    val falseLabelName = state.getUniqueLabel("false")
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
     val endLabelName = state.getUniqueLabel("end")

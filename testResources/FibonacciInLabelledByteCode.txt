@@ -58,10 +58,10 @@ methods:
     instructions:
       load integer(0)
       small integer constant(2)
-      if integer compare greater or equal("falseStart-4962768465676381896")
+      if integer compare greater or equal("false-4962768465676381896")
       small integer constant(1)
       goto("end4437113781045784766")
-      label("falseStart-4962768465676381896")
+      label("false-4962768465676381896")
         same frame
       load integer(0)
       small integer constant(1)
