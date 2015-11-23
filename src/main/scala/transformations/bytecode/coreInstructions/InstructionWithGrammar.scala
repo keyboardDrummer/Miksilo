@@ -16,6 +16,6 @@ trait InstructionWithGrammar extends ParticleWithGrammar
   }
 
   def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
+    (name ~> integer.manySeparated(",").inParenthesis).asNode(key, InstructionArgumentsKey)
   }
 }

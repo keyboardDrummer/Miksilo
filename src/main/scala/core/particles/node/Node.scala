@@ -26,9 +26,10 @@ class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike {
     result
   }
 
-  def replaceWith(node: Node): Unit = {
+  def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     clazz = node.clazz
-    data.clear()
+    if (!keepData)
+      data.clear()
     data ++= node.data
   }
 

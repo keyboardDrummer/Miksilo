@@ -11,7 +11,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import ClassFileParser._
 
-object InstructionArgumentsKey
+object InstructionArgumentsKey extends Key
 
 object CodeAttribute extends ByteCodeAttribute with WithState {
 

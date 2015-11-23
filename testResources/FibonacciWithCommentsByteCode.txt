@@ -61,6 +61,7 @@ methods:
     code: nameIndex:9, maxStack:3, maxLocal:1
     instructions:
       load integer(0)
+      /* here comes two */
       small integer constant(2)
       if integer compare greater or equal(7)
       small integer constant(1)

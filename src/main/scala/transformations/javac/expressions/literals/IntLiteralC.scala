@@ -26,8 +26,11 @@ object IntLiteralC extends ExpressionInstance {
 
   override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
     val value: Int = getValue(literal)
-    if (-1 <= value && value <= 5)
-      Seq(SmallIntegerConstantC.integerConstant(value))
+    if (-1 <= value && value <= 5) {
+      val node = literal.current.shallowClone
+      node.replaceWith(SmallIntegerConstantC.integerConstant(value), keepData = true)
+      Seq(node) //TODO dit mooier maken. Maak de nieuwe node gewoon en en schuif deze over de oude node.
+    }
     else
     {
       val reference = state.program.constantPool.store(IntegerConstant.construct(value))
