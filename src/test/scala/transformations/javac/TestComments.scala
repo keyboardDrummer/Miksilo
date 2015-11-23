@@ -7,13 +7,13 @@ import util.TestUtils
 
 import scala.reflect.io.{File, Path}
 
-class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
+class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
 
   val testGrammar = TestGrammarUtils(this.compiler.particles)
   @Test
   def testBasicClass() {
     val input = "/* jooo */"
-    TestGrammarUtils.parseAndPrintSame(input, None, JavaCommentsC.getCommentGrammar)
+    TestGrammarUtils.parseAndPrintSame(input, None, JavaStyleCommentsC.getCommentGrammar)
   }
 
   @Test

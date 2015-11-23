@@ -15,7 +15,7 @@ object BiGrammarToGrammar {
       case many:Many => core.grammar.Many(recursive(many.inner))
       case mapGrammar: MapGrammar => core.grammar.MapGrammar(recursive(mapGrammar.inner), mapGrammar.construct)
       case BiFailure => core.grammar.FailureG()
-      case Print(document) => core.grammar.Produce(document.toString)
+      case Print(document) => core.grammar.Produce(Unit)
       case Produce(value) => core.grammar.Produce(value)
     }
 

@@ -56,8 +56,11 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getVariableAlreadyDefined = {
-    val fibonacciContent = TestUtils.getJavaTestFile("VariableAlreadyDefined", Path("")).slurp()
-    new Example("Variable defined twice", fibonacciContent)
+    new Example("Variable defined twice", TestUtils.getJavaTestFile("VariableAlreadyDefined", Path("")).slurp())
+  }
+
+  def getFibonacciWithComments = {
+    new Example("Fibonacci with comments", TestUtils.getJavaTestFile("FibonacciWithComments.java").slurp())
   }
 
   def initialise() {
@@ -65,7 +68,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     {
       val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
         getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciSimplifiedByteCode, getFibonacciByteCode, getRevealSyntaxSugar,
-        getComparisonOptimization))
+        getComparisonOptimization, getFibonacciWithComments))
       add(new JLabel("code examples:"))
       val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
 

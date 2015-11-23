@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.IntegerConstant
@@ -16,7 +16,8 @@ object IntLiteralC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
-    val parseNumber = number ^^ (number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i)) ^^ parseMap(IntLiteralKey, ValueKey)
+    val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
+    val parseNumber = inner.asNode(IntLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
@@ -38,9 +39,9 @@ object IntLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
 
-  object IntLiteralKey
+  object IntLiteralKey extends Key
 
-  object ValueKey
+  object ValueKey extends Key
 
   override def description: String = "Adds the usage of int literals."
 }

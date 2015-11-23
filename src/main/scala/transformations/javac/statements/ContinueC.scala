@@ -31,7 +31,7 @@ object ContinueC extends StatementInstance {
 
   def getWhileParent(obj: Path): Path = {
     val ancestors = obj.ancestors
-    val _whileParent = ancestors.filter(ancestor => ancestor.clazz == WhileC.Key).head
+    val _whileParent = ancestors.filter(ancestor => ancestor.clazz == WhileC.WhileKey).head
     _whileParent
   }
 }

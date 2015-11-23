@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{Labelled, MissingValue}
-import core.particles.grammars.{ProgramGrammar, GrammarCatalogue, KeyGrammar}
+import core.bigrammar.{GrammarSelection, Labelled}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledLocations
@@ -81,7 +81,8 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
     val labelMap = labelLabel.inner.asInstanceOf[NodeMap]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
     labelLabel.inner = new NodeMap(labelMap.inner, labelMap.key, newFields)
+
     val stackMapTablePath = grammars.getGrammarPath(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar)
-    stackMapTablePath.removeMeFromSequence()
+    stackMapTablePath.previous.asInstanceOf[GrammarSelection].previous.asInstanceOf[GrammarSelection].removeMeFromSequence()
   }
 }

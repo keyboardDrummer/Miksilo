@@ -9,7 +9,7 @@ import util.DataFlowAnalysis
 
 import scala.util.matching.Regex
 
-object JavaCommentsC extends ParticleWithGrammar {
+object JavaStyleCommentsC extends ParticleWithGrammar {
 
   class GrammarAnalysis extends DataFlowAnalysis[GrammarPath,Boolean]
   {
@@ -76,7 +76,7 @@ object JavaCommentsC extends ParticleWithGrammar {
     val firstGrower = growers.head
     val verticalNotHorizontal = firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
     val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMapToTransform.inner)
-                           else new Sequence(commentsGrammar, nodeMapToTransform.inner)
+                           else commentsGrammar ~ nodeMapToTransform.inner
     val newInner = innerWithComment ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
     val newNodeMap = nodeMap(newInner, nodeMapToTransform.key, Seq(CommentKey) ++ nodeMapToTransform.fields: _*)
     nodeMapPath.set(newNodeMap)
@@ -84,7 +84,7 @@ object JavaCommentsC extends ParticleWithGrammar {
 
   def getCommentsGrammar: BiGrammar = {
     val commentGrammar = getCommentGrammar
-    commentGrammar.many ^^
+    commentGrammar.manyVertical ^^
       (comments => CommentCollection(comments.asInstanceOf[Seq[String]]),
         commentCollection => Some(commentCollection.asInstanceOf[CommentCollection].comments))
   }

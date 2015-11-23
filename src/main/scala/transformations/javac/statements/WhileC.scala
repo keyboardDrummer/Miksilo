@@ -10,7 +10,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object WhileC extends StatementInstance with WithState {
 
-  override val key: Key = Key
+  override val key: Key = WhileKey
 
   override def toByteCode(_while: Path, state: CompilationState): Seq[Node] = {
     val startLabel = state.getUniqueLabel("start")
@@ -38,13 +38,16 @@ object WhileC extends StatementInstance with WithState {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileGrammar = nodeMap("while" ~> expression.inParenthesis % blockGrammar, Key, Condition, Body)
+    val whileInner =
+      "while" ~> expression.inParenthesis % blockGrammar
+    val whileGrammar =
+      whileInner.asNode(WhileKey, Condition, Body)
     statementGrammar.addOption(whileGrammar)
   }
 
-  def _while(condition: Node, body: Seq[Node]) = new Node(Key, Condition -> condition, Body -> body)
+  def _while(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
 
-  object Key extends core.particles.node.Key
+  object WhileKey extends core.particles.node.Key
 
   object Condition extends Key
 
