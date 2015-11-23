@@ -31,6 +31,64 @@ object PresetsPanel
       JavaCompiler.spliceBeforeTransformations(JavaCompiler.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
+  
+  def getJavaCompilerPreset: Preset = {
+    new Preset("Java", getJavaCompilerParticles, "Compiles a subset of Java.")
+  }
+
+  def getJavaCompilerParticles: Seq[Particle] = {
+    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
+  }
+
+  def getPrettyPrintPreset = {
+    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations,
+      "Performs no transformations. Just parses and prints the Java.")
+  }
+
+  def getFibonacciExpressionMethodPreset = {
+    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompilerParticles,
+      "Allows you to use an expression as the body of a method.")
+  }
+
+  def getBlockCompilerPreset = {
+    new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
+      "The program consists only of a single statement block.")
+  }
+
+  def getByteCodePreset = {
+    new Preset("Basic bytecode", JavaCompiler.byteCodeTransformations,
+      "Regular JVM bytecode.")
+  }
+
+  def getAddImplicitsPreset: Preset = {
+    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
+
+    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
+  }
+
+  def getRevealSyntaxSugar: Preset = {
+    val implicits = Seq[Particle](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
+      ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
+
+    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
+      "Performs all compiler phases that still maintain a valid Java program.")
+  }
+
+  def createModel: DefaultListModel[Preset] = {
+    val model = new DefaultListModel[Preset]()
+    model.addElement(PresetsPanel.getJavaCompilerPreset)
+    //model.addElement(getAddImplicitsPreset)
+    model.addElement(PresetsPanel.getPrettyPrintPreset)
+    model.addElement(getFibonacciExpressionMethodPreset)
+    model.addElement(getBlockCompilerPreset)
+    model.addElement(getRevealSyntaxSugar)
+    model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
+    model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
+    model.addElement(getByteCodePreset)
+    model
+  }
 }
 
 class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
@@ -45,7 +103,7 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
     listConstraints.gridx = 0
     listConstraints.insets = StyleSheet.defaultInsets
 
-    val model: DefaultListModel[Preset] = createModel
+    val model: DefaultListModel[Preset] = PresetsPanel.createModel
 
     StyleSheet.setTitleBorder(this, "Presets")
     val presetsList = new JList(model) {
@@ -80,64 +138,6 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
     buttonConstraints.insets = StyleSheet.defaultInsets
     val applyButton: JButton = getApplyButton(presetsList)
     add(applyButton, buttonConstraints)
-  }
-
-  def createModel: DefaultListModel[Preset] = {
-    val model = new DefaultListModel[Preset]()
-    model.addElement(getJavaCompilerPreset)
-    //model.addElement(getAddImplicitsPreset)
-    model.addElement(getPrettyPrintPreset)
-    model.addElement(getFibonacciExpressionMethodPreset)
-    model.addElement(getBlockCompilerPreset)
-    model.addElement(getRevealSyntaxSugar)
-    model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
-    model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
-    model.addElement(getByteCodePreset)
-    model
-  }
-
-  def getJavaCompilerPreset: Preset = {
-    new Preset("Java", getJavaCompiler, "Compiles a subset of Java.")
-  }
-
-  def getJavaCompiler: Seq[Particle] = {
-    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
-  }
-
-  def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations,
-      "Performs no transformations. Just parses and prints the Java.")
-  }
-
-  def getFibonacciExpressionMethodPreset = {
-    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompiler,
-      "Allows you to use an expression as the body of a method.")
-  }
-
-  def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
-      "The program consists only of a single statement block.")
-  }
-
-  def getByteCodePreset = {
-    new Preset("Basic bytecode", JavaCompiler.byteCodeTransformations,
-      "Regular JVM bytecode.")
-  }
-
-  def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
-
-    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
-  }
-
-  def getRevealSyntaxSugar: Preset = {
-    val implicits = Seq[Particle](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
-      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
-      ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
-
-    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
-      "Performs all compiler phases that still maintain a valid Java program.")
   }
 
   def getApplyButton(presetsList: JList[Preset]): JButton = {
