@@ -1,11 +1,12 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{Consume, BiGrammar}
+import core.bigrammar.{MissingValue, Consume, BiGrammar}
 import core.grammar.StringLiteral
 import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
 import core.particles.node.{Key, Node}
 import core.particles.{ParticleWithGrammar, CompilationState, Contract, ParticleWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, OffsetDelta, DeltaGrammar, StackMapTableGrammar}
 import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -140,7 +141,9 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
     override def getInstructionSize: Int = 0
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-      name ~> ("(" ~> StringLiteral <~ ")") ^^ parseMap(LabelKey, LabelNameKey) //TODO missing LabelStackFrame
+      val stackMapTableGrammar = grammars.find(StackMapFrameGrammar)
+      nodeMap(name ~> ("(" ~> StringLiteral <~ ")") % stackMapTableGrammar.indent(),
+        LabelKey, LabelNameKey, LabelStackFrame)
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
@@ -148,15 +151,22 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   object LabelKey extends Key
 
-  object LabelNameKey
+  object LabelNameKey extends Key
 
-  object LabelStackFrame
+  object LabelStackFrame extends Key
 
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
+
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     overrideJumpGrammars(grammars)
+    overrideStackMapFrameGrammars(grammars)
+  }
+
+  def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
+    val delta = grammars.find(DeltaGrammar)
+    delta.inner = nodeMap(produce(MissingValue), PartialSelf)
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {

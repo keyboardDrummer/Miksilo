@@ -29,6 +29,8 @@ class ExtendedType[T](_type: Class[T])
       override def get(obj: T): AnyRef = getter.invoke(obj)
 
       override def set(obj: T, value: AnyRef): Unit = setter.invoke(obj, value)
+
+      override def _type: Class[AnyRef] = propertyType.asInstanceOf[Class[AnyRef]]
     })
   }
 }

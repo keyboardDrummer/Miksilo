@@ -20,7 +20,9 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val name: String, val particles: Seq[Particle], beamerMode: Boolean = true) extends Frame {
+class CompilerCockpit(val name: String, val particles: Seq[Particle],
+                      presentationMode: Boolean = StyleSheet.presentationMode)
+  extends Frame {
 
   this.title = name
   val compiler = new CompilerFromParticles(particles)
@@ -185,7 +187,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle], beamerMode
 
   def getChooseInput = {
     val chooseInput = new JPanel()
-    if (!beamerMode)
+    if (!presentationMode)
     {
       chooseInput.add(new JLabel("Input:"))
       val inputComboBox: JComboBox[InputOption] = new JComboBox(inputOptionModel)
@@ -204,7 +206,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle], beamerMode
 
   def getChooseOutput: JPanel = {
     val chooseOutput = new JPanel()
-    if (!beamerMode) {
+    if (!presentationMode) {
       chooseOutput.add(new JLabel("Output:"))
       val chooseOutputComboBox = new JComboBox(outputOptionModel)
       chooseOutput.add(chooseOutputComboBox)

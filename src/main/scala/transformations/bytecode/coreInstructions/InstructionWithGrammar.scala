@@ -12,10 +12,10 @@ trait InstructionWithGrammar extends ParticleWithGrammar
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
-    instructionGrammar.addOption(getGrammarForThisInstruction(grammars))
+    instructionGrammar.addOption(grammars.create(KeyGrammar(key), getGrammarForThisInstruction(grammars)))
   }
 
   def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    grammars.create(KeyGrammar(key), name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey))
+    name ~> integer.manySeparated(",").inParenthesis ^^ parseMap(key, InstructionArgumentsKey)
   }
 }

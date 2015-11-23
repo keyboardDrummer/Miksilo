@@ -1,9 +1,11 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.{Labelled, MissingValue}
+import core.particles.grammars.{ProgramGrammar, GrammarCatalogue, KeyGrammar}
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.types.TypeSkeleton
@@ -67,7 +69,6 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
       else {
         new Node(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
       }
-
     }
   }
 
@@ -75,7 +76,12 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val stackMapTablePath = grammars.getGrammarPath(ByteCodeSkeleton.AttributeGrammar, StackMapTableAttribute.StackMapTableGrammar)
-    stackMapTablePath.removeMeFromOption()
+    val labelMapPath = grammars.getGrammarPath(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey))
+    val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
+    val labelMap = labelLabel.inner.asInstanceOf[NodeMap]
+    val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
+    labelLabel.inner = new NodeMap(labelMap.inner, labelMap.key, newFields)
+    val stackMapTablePath = grammars.getGrammarPath(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar)
+    stackMapTablePath.removeMeFromSequence()
   }
 }

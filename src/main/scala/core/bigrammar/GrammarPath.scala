@@ -7,7 +7,9 @@ trait GrammarPath {
   def get: BiGrammar
   def children: Seq[GrammarPath] = {
     val clazz: Class[_ <: BiGrammar] = get.getClass
-    new ExtendedType(clazz).properties.map(property => {
+    new ExtendedType(clazz).properties.
+      filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
+      map(property => {
         new GrammarSelection(this, property.asInstanceOf[Property[BiGrammar, AnyRef]])
       })
   }
@@ -51,7 +53,7 @@ class GrammarSelection(val previous: GrammarPath, property: Property[BiGrammar, 
   }
 
   def removeMeFromSequence(): Unit = {
-    val choiceParent = parent.asInstanceOf[Sequence]
+    val choiceParent = parent.asInstanceOf[SequenceLike]
     val me = get
     val sibling = Set(choiceParent.first,choiceParent.second).filter(grammar => grammar != me).head
     previous.asInstanceOf[GrammarSelection].set(sibling)

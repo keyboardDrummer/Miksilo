@@ -1,6 +1,6 @@
 package core.particles
 
-import core.bigrammar.{BiGrammar, MapGrammar, GrammarDocumentWriter}
+import core.bigrammar.{MissingValue, BiGrammar, MapGrammar, GrammarDocumentWriter}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -23,15 +23,19 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
   }
 
-  object PartialSelf
+  object PartialSelf extends Key
   def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
     val fieldList = fields.toList
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
   }
 
-  class NodeMap(inner: BiGrammar, val key: Key, val fields: Key*) extends MapGrammar(inner,
+  def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
+
+  class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner,
       input => construct(input, key, fields.toList),
       obj => destruct(obj, key, fields.toList))
+  {
+  }
 
   //noinspection ComparingUnrelatedTypes
   def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
@@ -40,10 +44,10 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
     val metaObject = value.asInstanceOf[NodeLike]
 
-    if (metaObject.clazz == key) {
+    if (metaObject.clazz == key || key == PartialSelf) {
       val fieldValues = fields.map(field => getWithPartial(metaObject, field))
       if (fieldValues.isEmpty)
-        Some(Unit)
+        Some(MissingValue)
       else
         Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
     } else {
@@ -52,6 +56,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   }
 
   case class ValueNotFound(meta: NodeLike, field: Any)
+
   def getWithPartial(meta: NodeLike, key: Any): Any = {
     if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }

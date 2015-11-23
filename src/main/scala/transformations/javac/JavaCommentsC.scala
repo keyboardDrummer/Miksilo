@@ -69,16 +69,16 @@ object JavaCommentsC extends ParticleWithGrammar {
   }
 
   def addCommentToNodeMap(commentsGrammar: BiGrammar, nodeMapPath: GrammarSelection): Unit = {
-    val nodeMap = nodeMapPath.get.asInstanceOf[NodeMap]
+    val nodeMapToTransform = nodeMapPath.get.asInstanceOf[NodeMap]
     val growers = nodeMapPath.ancestors.
       map(path => path.get).
       filter(grammar => grammar.isInstanceOf[TopBottom] || grammar.isInstanceOf[Sequence] || grammar.isInstanceOf[ManyVertical] || grammar.isInstanceOf[ManyHorizontal])
     val firstGrower = growers.head
     val verticalNotHorizontal = firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
-    val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMap.inner)
-                           else new Sequence(commentsGrammar, nodeMap.inner)
+    val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMapToTransform.inner)
+                           else new Sequence(commentsGrammar, nodeMapToTransform.inner)
     val newInner = innerWithComment ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
-    val newNodeMap = new NodeMap(newInner, nodeMap.key, Seq(CommentKey) ++ nodeMap.fields: _*)
+    val newNodeMap = nodeMap(newInner, nodeMapToTransform.key, Seq(CommentKey) ++ nodeMapToTransform.fields: _*)
     nodeMapPath.set(newNodeMap)
   }
 

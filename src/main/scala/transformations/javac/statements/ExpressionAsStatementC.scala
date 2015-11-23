@@ -37,7 +37,7 @@ object ExpressionAsStatementC extends StatementInstance {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val inner = expressionGrammar <~ ";"
-    val expressionAsStatement = new NodeMap(inner, ExpressionAsStatementKey, ExpressionKey)
+    val expressionAsStatement = nodeMap(inner, ExpressionAsStatementKey, ExpressionKey)
     statementGrammar.addOption(expressionAsStatement)
   }
 

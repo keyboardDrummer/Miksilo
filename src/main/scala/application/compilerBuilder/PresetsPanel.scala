@@ -49,6 +49,7 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
 
     StyleSheet.setTitleBorder(this, "Presets")
     val presetsList = new JList(model) {
+
       override def getToolTipText(event: MouseEvent): String = {
         val index = this.locationToIndex(event.getPoint)
         val model = this.getModel

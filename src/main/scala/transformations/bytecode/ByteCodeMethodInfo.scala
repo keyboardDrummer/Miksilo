@@ -63,7 +63,7 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
     val inner = methodHeader % attributesGrammar
-    val methodInfoGrammar: BiGrammar = new NodeMap(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
+    val methodInfoGrammar: BiGrammar = nodeMap(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 

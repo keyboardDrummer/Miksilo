@@ -113,7 +113,7 @@ class ManyVertical(inner: BiGrammar) extends Many(inner)
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
-object MissingValue
+object MissingValue //TODO looks a bit like ValueNotFound. Combine??
 {
   override def toString = "_"
 }
