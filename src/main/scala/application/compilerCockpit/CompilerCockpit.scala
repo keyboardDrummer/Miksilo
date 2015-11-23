@@ -4,12 +4,13 @@ import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 import javax.swing._
+import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammarToGrammar
 import core.grammar.Grammar
-import core.layouts.SwingEquationLayout
+import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromParticles, Particle}
 import org.fife.ui.rsyntaxtextarea._
@@ -61,6 +62,10 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
   val compileOptionModel = new DefaultComboBoxModel[CompileOption](compileOptions)
   compileOptionModel.setSelectedItem(compileOptions(0))
 
+  val panelOptions = Array[PanelMode](Both,Input, Output)
+  var panelsOptionModel = new DefaultComboBoxModel[PanelMode](panelOptions)
+  panelsOptionModel.setSelectedItem(Both)
+
   initialise()
 
   def outputOption = outputOptionModel.getSelectedItem.asInstanceOf[OutputOption]
@@ -95,6 +100,28 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
         setOutputText(writer.toString) }).get
   }
 
+  trait PanelMode
+  object Both extends PanelMode
+  {
+    override def toString = "Both"
+  }
+  object Input extends PanelMode
+  {
+    override def toString = "Input"
+  }
+  object Output extends PanelMode
+  {
+    override def toString = "Output"
+  }
+
+
+  def applyInputOutputMode(equations: Map[PanelMode, Expression], layout: EquationLayout, mode: PanelMode) = {
+    for(expression <- equations.values)
+    {
+      layout.expressions -= expression
+    }
+    layout.expressions += equations(mode)
+  }
 
   def initialise() {
     val panel = new JPanel()
@@ -107,6 +134,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
     val chooseInput = equationLayout.addComponent(getChooseInput)
     val chooseCompile = equationLayout.addComponent(getChooseCompile)
     val chooseOutput = equationLayout.addComponent(getChooseOutput)
+    val choosePanels = equationLayout.addComponent(getChoosePanels)
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
     val inputPanel = equationLayout.addComponent(getInputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
@@ -120,6 +148,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
     equationLayout.makePreferredSize(chooseCompile)
     equationLayout.makePreferredSize(chooseOutput)
     equationLayout.makePreferredSize(chooseInput)
+    equationLayout.makePreferredSize(choosePanels)
     equationLayout.makePreferredSize(showPhasesButton)
     equationLayout.makePreferredSize(inputGrammarButton)
     equationLayout.makePreferredSize(outputGrammarButton)
@@ -129,16 +158,37 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
     def addHorizontalEquations() {
       innerLayout.addLeftToRight(innerLayout.container, inputPanel, outputPanel, innerLayout.container)
       innerLayout.addLeftToRight(exampleDropdown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
-      innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton)
+      innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, choosePanels)
 
-      innerLayout.expressions += inputPanel.width - outputPanel.width
     }
     addHorizontalEquations()
+
+    val inputOutputModeEquations: Map[PanelMode, Expression] = Map(Both -> inputPanel.width.-(outputPanel.width),
+      Input -> outputPanel.width,
+      Output -> inputPanel.width)
+
+    panelsOptionModel.addListDataListener(new ListDataListener {
+
+      override def intervalRemoved(e: ListDataEvent): Unit = {
+
+      }
+
+      override def intervalAdded(e: ListDataEvent): Unit = {
+
+      }
+
+      override def contentsChanged(e: ListDataEvent): Unit = {
+        applyInputOutputMode(inputOutputModeEquations, innerLayout, panelsOptionModel.getSelectedItem.asInstanceOf[PanelMode])
+        panel.revalidate()
+      }
+    })
+    applyInputOutputMode(inputOutputModeEquations, innerLayout, Both)
 
     def addVerticalEquations() {
       innerLayout.addEquals(chooseInput.verticalCenter2,
         chooseCompile.verticalCenter2,
         chooseOutput.verticalCenter2,
+        choosePanels.verticalCenter2,
         showPhasesButton.verticalCenter2,
         inputGrammarButton.verticalCenter2,
         outputGrammarButton.verticalCenter2,
@@ -194,6 +244,14 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
       chooseInput.add(inputComboBox)
     }
     chooseInput
+  }
+
+  def getChoosePanels = {
+    val choosePanels = new JPanel()
+    choosePanels.add(new JLabel("Panels:"))
+    val inputComboBox: JComboBox[PanelMode] = new JComboBox(panelsOptionModel)
+    choosePanels.add(inputComboBox)
+    choosePanels
   }
 
   def getChooseCompile: JPanel = {

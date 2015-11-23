@@ -10,7 +10,7 @@ trait Expression {
 
   def *(right: Double) = new Multiply(this, right)
 
-  def -(right: Expression) = this + (right * -1)
+  def -(right: Expression): Expression = this + (right * -1)
 
   def getElements: Map[Variable, Double]
 

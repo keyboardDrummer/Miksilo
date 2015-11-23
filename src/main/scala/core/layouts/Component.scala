@@ -29,7 +29,7 @@ case class Component(index: Int) {
 
   def height = bottom - top
 
-  def width = right - left
+  def width: Expression = right - left
 
   def horizontalCenter2 = left + right
   def verticalCenter2 = top + bottom
