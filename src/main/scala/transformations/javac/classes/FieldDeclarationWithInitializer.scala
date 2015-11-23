@@ -3,7 +3,7 @@ package transformations.javac.classes
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
-import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
+import core.particles._
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.constructor.{ConstructorC, SuperCallExpression}

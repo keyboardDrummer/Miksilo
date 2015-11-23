@@ -4,7 +4,7 @@ import core.bigrammar.{MissingValue, Consume, BiGrammar}
 import core.grammar.StringLiteral
 import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
 import core.particles.node.{Key, Node}
-import core.particles.{ParticleWithGrammar, CompilationState, Contract, ParticleWithPhase}
+import core.particles._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, OffsetDelta, DeltaGrammar, StackMapTableGrammar}
 import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute, StackMapTableAttribute}

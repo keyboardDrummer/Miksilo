@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{PartialSelf, CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
 object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {

@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.ParticleWithGrammar
+import core.particles.{PartialSelf, ParticleWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
 import util.DataFlowAnalysis
@@ -57,8 +57,11 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 //              selection.set(new Sequence(commentsGrammar, current))
 //            case _:Delimiter =>
 //              selection.set(new Sequence(commentsGrammar, current))
-            case _:NodeMap =>
-              addCommentToNodeMap(commentsGrammar, selection)
+            case nodeMap:NodeMap =>
+              if (nodeMap.key != PartialSelf)
+              {
+                addCommentToNodeMap(commentsGrammar, selection)
+              }
 //            case _:MapGrammar =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case _ =>
@@ -108,7 +111,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
     val withoutComment = values.drop(1)
     val comment = values.head match {
       case collection: CommentCollection => collection
-      case ValueNotFound => CommentCollection(Seq.empty)
+      case _:ValueNotFound => CommentCollection(Seq.empty)
     }
     Some(core.grammar.~(comment, withoutComment.reduce((a,b) => core.grammar.~(a,b))))
   }

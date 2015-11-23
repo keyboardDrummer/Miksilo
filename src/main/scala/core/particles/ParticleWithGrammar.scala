@@ -5,6 +5,8 @@ import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 
+object PartialSelf extends Key
+
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
   def transformGrammars(grammars: GrammarCatalogue)
@@ -23,7 +25,6 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
   }
 
-  object PartialSelf extends Key
   def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
     val fieldList = fields.toList
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))

@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.CompilationState
+import core.particles.{PartialSelf, CompilationState}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{SequenceSelection, Path}

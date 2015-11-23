@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{PartialSelf, CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
