@@ -57,7 +57,7 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
-    val methodHeader: BiGrammar = Seq[BiGrammar](
+    val methodHeader: BiGrammar = Seq[BiGrammar]("method =>" ~~
       "nameIndex:" ~> integer,
       "descriptorIndex:" ~> integer,
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).

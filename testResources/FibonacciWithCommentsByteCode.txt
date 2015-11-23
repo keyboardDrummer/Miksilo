@@ -33,7 +33,7 @@ constant pool:
 fields:
 
 methods:
-  nameIndex:5, descriptorIndex:6, flags:ACC_PUBLIC
+  method => nameIndex:5, descriptorIndex:6, flags:ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:1, maxLocal:1
     instructions:
@@ -45,7 +45,7 @@ methods:
   /* hello */
   /* bye */
   /* PS */
-  nameIndex:10, descriptorIndex:11, flags:ACC_STATIC, ACC_PUBLIC
+  method => nameIndex:10, descriptorIndex:11, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:2, maxLocal:1
     instructions:
@@ -56,7 +56,7 @@ methods:
       void return instruction()
     attributes:
     exceptions:
-  nameIndex:24, descriptorIndex:25, flags:ACC_STATIC, ACC_PUBLIC
+  method => nameIndex:24, descriptorIndex:25, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
     code: nameIndex:9, maxStack:3, maxLocal:1
     instructions:

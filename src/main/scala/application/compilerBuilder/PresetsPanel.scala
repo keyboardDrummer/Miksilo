@@ -31,7 +31,13 @@ object PresetsPanel
       JavaCompiler.spliceBeforeTransformations(JavaCompiler.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
-  
+
+  def getJavaToExtendedByteCodePreset = {
+    new Preset("Java to extended bytecode",
+      JavaCompiler.spliceBeforeTransformations(JavaCompiler.allByteCodeTransformations, Seq(MarkOutputGrammar)),
+      "Compiles Java into extended bytecode")
+  }
+
   def getJavaCompilerPreset: Preset = {
     new Preset("Java", getJavaCompilerParticles, "Compiles a subset of Java.")
   }
@@ -84,6 +90,7 @@ object PresetsPanel
     model.addElement(getFibonacciExpressionMethodPreset)
     model.addElement(getBlockCompilerPreset)
     model.addElement(getRevealSyntaxSugar)
+    model.addElement(PresetsPanel.getJavaToExtendedByteCodePreset)
     model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
     model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)

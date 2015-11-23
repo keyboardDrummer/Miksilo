@@ -6,13 +6,12 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
+import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 import scala.collection.mutable
 
 object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
-
-  def lessThanInstruction = CodeAttribute.instruction(LessThanInstructionKey)
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -42,19 +41,6 @@ object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
       for (instruction <- instructions) {
 
         val expandOption = getState(state).expandInstruction.get(instruction.clazz)
-
-        val replacement = instruction.clazz match {
-          case LessThanInstructionKey =>
-            val falseStartLabel = state.getUniqueLabel("falseStart")
-            val endLabel = state.getUniqueLabel("end")
-            Seq(LabelledLocations.ifIntegerCompareLess(falseStartLabel),
-              SmallIntegerConstantC.integerConstant(0),
-              LabelledLocations.goTo(endLabel),
-              InferredStackFrames.label(falseStartLabel),
-              SmallIntegerConstantC.integerConstant(1),
-              InferredStackFrames.label(endLabel))
-          case _ => Seq(instruction)
-        }
         newInstructions ++= expandOption.fold(Seq(instruction))(expand => expand(instruction))
       }
 
@@ -62,8 +48,6 @@ object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
 
     }
   }
-
-  object LessThanInstructionKey
 
   override def description: String = "Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions."
 

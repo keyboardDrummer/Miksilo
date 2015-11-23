@@ -83,45 +83,45 @@ constant pool:
 fields:
 
 methods:
-  nameIndex:16, descriptorIndex:9, flags:
+  method => nameIndex:16, descriptorIndex:9, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
-  nameIndex:42, descriptorIndex:9, flags:
+  method => nameIndex:42, descriptorIndex:9, flags:
   attributes:
-  nameIndex:28, descriptorIndex:55, flags:
+  method => nameIndex:28, descriptorIndex:55, flags:
   attributes:
     signature with index: 56
-  nameIndex:30, descriptorIndex:6, flags:
+  method => nameIndex:30, descriptorIndex:6, flags:
   attributes:
-  nameIndex:26, descriptorIndex:13, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-  nameIndex:25, descriptorIndex:7, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 19
-  nameIndex:45, descriptorIndex:8, flags:
+  method => nameIndex:26, descriptorIndex:13, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
-  nameIndex:40, descriptorIndex:9, flags:
-  attributes:
-  nameIndex:41, descriptorIndex:9, flags:
-  attributes:
-  nameIndex:46, descriptorIndex:11, flags:
+  method => nameIndex:25, descriptorIndex:7, flags:
   attributes:
     UnParsed attribute with nameIndex: 19
-  nameIndex:46, descriptorIndex:12, flags:
+  method => nameIndex:45, descriptorIndex:8, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
+  method => nameIndex:40, descriptorIndex:9, flags:
+  attributes:
+  method => nameIndex:41, descriptorIndex:9, flags:
+  attributes:
+  method => nameIndex:46, descriptorIndex:11, flags:
+  attributes:
     UnParsed attribute with nameIndex: 19
-  nameIndex:46, descriptorIndex:9, flags:
+  method => nameIndex:46, descriptorIndex:12, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
     UnParsed attribute with nameIndex: 19
-  nameIndex:27, descriptorIndex:9, flags:
+  method => nameIndex:46, descriptorIndex:9, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
     UnParsed attribute with nameIndex: 19
-  nameIndex:15, descriptorIndex:9, flags:
+  method => nameIndex:27, descriptorIndex:9, flags:
+  attributes:
+    UnParsed attribute with nameIndex: 18
+    UnParsed attribute with nameIndex: 19
+  method => nameIndex:15, descriptorIndex:9, flags:
   attributes:
     UnParsed attribute with nameIndex: 18
 
