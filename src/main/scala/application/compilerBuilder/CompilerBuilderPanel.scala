@@ -35,7 +35,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   add(availableScrollPane, availableListConstraints)
 
   val programPanelConstraints = getConstraints
-  programPanelConstraints.weightx = 2
+  programPanelConstraints.weightx = if (!StyleSheet.presentationMode) 2 else 1
   add(programPanel, programPanelConstraints)
 
   def getInjectorListVisuals(list: JXList) = {

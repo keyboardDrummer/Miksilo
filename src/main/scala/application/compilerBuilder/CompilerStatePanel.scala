@@ -43,7 +43,7 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     val actionButtonsLayout = new FlowLayout()
     actionButtonsLayout.setAlignment(FlowLayout.RIGHT)
     val actionButtons = new JPanel(actionButtonsLayout)
-    val launchCockpitButton = new JButton("Launch Cockpit")
+    val launchCockpitButton = new JButton("Build")
     launchCockpitButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         val cockpit = new CompilerCockpit(compilerName.getText(0,compilerName.getLength), selectedParticles.scalaElements)
@@ -68,10 +68,13 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)
 
-    val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, selectedParticles)
-    val dependentConstraints = getConstraints
-    dependentConstraints.gridx = 1
-    firstPanel.add(dependentPanel, dependentConstraints)
+    if (!StyleSheet.presentationMode)
+    {
+      val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, selectedParticles)
+      val dependentConstraints = getConstraints
+      dependentConstraints.gridx = 1
+      firstPanel.add(dependentPanel, dependentConstraints)
+    }
     firstPanel
   }
 
