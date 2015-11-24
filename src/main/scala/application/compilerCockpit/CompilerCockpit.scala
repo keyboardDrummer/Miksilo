@@ -248,7 +248,8 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
 
   def getChoosePanels = {
     val choosePanels = new JPanel()
-    choosePanels.add(new JLabel("Panels:"))
+    if (!presentationMode)
+      choosePanels.add(new JLabel("Panels:"))
     val inputComboBox: JComboBox[PanelMode] = new JComboBox(panelsOptionModel)
     choosePanels.add(inputComboBox)
     choosePanels
@@ -256,7 +257,8 @@ class CompilerCockpit(val name: String, val particles: Seq[Particle],
 
   def getChooseCompile: JPanel = {
     val chooseCompile = new JPanel()
-    chooseCompile.add(new JLabel("Action:"))
+    if (!presentationMode)
+      chooseCompile.add(new JLabel("Action:"))
     val compileComboBox: JComboBox[CompileOption] = new JComboBox(compileOptionModel)
     chooseCompile.add(compileComboBox)
     chooseCompile

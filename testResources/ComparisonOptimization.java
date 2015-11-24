@@ -6,14 +6,14 @@ class ComparisonOptimization
         cannotOptimize();
     }
 
-    private static void canOptimize() {
-        if (2 < 3)
-            System.out.print(5);
-    }
-
     private static void cannotOptimize() {
         boolean x = 2 < 3;
         if (x)
             System.out.print(x);
+    }
+
+    private static void canOptimize() {
+        if (2 < 3)
+            System.out.print(5);
     }
 }
