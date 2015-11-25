@@ -90,11 +90,11 @@ trait SequenceLike extends BiGrammar {
   def first: BiGrammar
   def second: BiGrammar
   def ignoreLeft: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(MissingValue, r)))
+    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(VoidValue, r)))
   }
 
   def ignoreRight: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, MissingValue)))
+    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, VoidValue)))
   }
 }
 
@@ -113,7 +113,7 @@ class ManyVertical(inner: BiGrammar) extends Many(inner)
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
-object MissingValue //TODO looks a bit like ValueNotFound. Combine??
+object VoidValue //TODO looks a bit like ValueNotFound. Combine??
 {
   override def toString = "_"
 }

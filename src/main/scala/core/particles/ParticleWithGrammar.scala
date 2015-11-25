@@ -1,6 +1,6 @@
 package core.particles
 
-import core.bigrammar.{MissingValue, BiGrammar, MapGrammar, GrammarDocumentWriter}
+import core.bigrammar.{VoidValue, BiGrammar, MapGrammar, GrammarDocumentWriter}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -53,7 +53,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     if (metaObject.clazz == key || key == PartialSelf) {
       val fieldValues = fields.map(field => getWithPartial(metaObject, field))
       if (fieldValues.isEmpty)
-        Some(MissingValue)
+        Some(VoidValue)
       else
         Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
     } else {

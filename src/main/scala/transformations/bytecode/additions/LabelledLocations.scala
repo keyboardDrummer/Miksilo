@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{MissingValue, Consume, BiGrammar}
+import core.bigrammar.{VoidValue, Consume, BiGrammar}
 import core.grammar.StringLiteral
 import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
 import core.particles.node.{Key, Node}
@@ -166,7 +166,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
     val delta = grammars.find(DeltaGrammar)
-    delta.inner = nodeMap(produce(MissingValue), PartialSelf)
+    delta.inner = nodeMap(produce(VoidValue), PartialSelf)
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {
