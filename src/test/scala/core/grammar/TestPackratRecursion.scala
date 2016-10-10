@@ -17,6 +17,16 @@ class TestPackratRecursion extends StandardTokenParsers with PackratParsers {
     Assert.assertEquals(input, result.get)
   }
 
+  @Test
+  def testRightRecursion2() {
+    lazy val parser: Parser[String] = keyword("!") ~ parser ^^ { case a ~ b => a + b} ||| success("")
+    val input = "!!!!!"
+    lexical.delimiters += "!"
+    val result = parser(new lexical.Scanner(input))
+
+    Assert.assertEquals(input, result.get)
+  }
+
   @Ignore
   @Test
   def testLeftRecursion() {
@@ -27,4 +37,18 @@ class TestPackratRecursion extends StandardTokenParsers with PackratParsers {
 
     Assert.assertEquals(input, result.get)
   }
+
+  @Ignore
+  @Test
+  def testLeftRecursion2() {
+    lazy val parser: Parser[String] = parser ~ keyword("!") ^^ { case a ~ b => a + b} | success("")
+    val input = "!!!!!"
+    lexical.delimiters += "!"
+    val result = parser(new lexical.Scanner(input))
+
+    Assert.assertEquals(input, result.get)
+  }
 }
+
+
+
