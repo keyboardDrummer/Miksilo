@@ -1,4 +1,4 @@
-Particle Compiler
+Particle Compiler [![Build Status](https://travis-ci.org/keyboardDrummer/ParticleCompiler.svg?branch=master)](https://travis-ci.org/keyboardDrummer/ParticleCompiler) [![Join the chat at https://gitter.im/ParticleCompiler/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ParticleCompiler/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============
 
 Particle compiler is a tool for quickly building toy compilers. It can be used for prototyping language features or as a way of teaching compiler construction.
