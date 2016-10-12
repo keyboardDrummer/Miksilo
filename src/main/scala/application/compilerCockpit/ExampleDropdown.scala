@@ -79,7 +79,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     }
     catch
     {
-      case e:RuntimeException => compilerCockpit.setOutputText("Could not load example dropdown.") //TODO move to Logger.
+      case e:RuntimeException => compilerCockpit.setOutputText("Could not load example dropdown, because: " + e.toString) //TODO move to Logger.
     }
   }
 
