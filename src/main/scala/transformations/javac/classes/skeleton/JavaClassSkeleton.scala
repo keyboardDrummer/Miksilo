@@ -36,7 +36,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     transformClass(program)
 
     def transformClass(clazz: Node) {
-      val compiler = new MyCompiler(state)
+      val compiler = MyCompiler(state)
       JavaLang.initialise(compiler)
       val classCompiler: ClassCompiler = new ClassCompiler(clazz, compiler)
       
@@ -69,7 +69,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
   def getClassCompiler(state: CompilationState) = getState(state).classCompiler
 
   def getQualifiedClassName(clazz: Node): QualifiedClassName = {
-    new QualifiedClassName(clazz._package ++ Seq(clazz.name))
+    QualifiedClassName(clazz._package ++ Seq(clazz.name))
   }
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
