@@ -25,17 +25,17 @@ case class VariablePool(state: CompilationState, typedVariables: Map[String, Nod
 
   def get(name: String) = variables.get(name)
 
-  def apply(name: String) = variables.getOrElse(name, throw new VariableDoesNotExist(name))
+  def apply(name: String) = variables.getOrElse(name, throw VariableDoesNotExist(name))
 
   def contains(name: String) = variables.contains(name)
 
   private def privateAdd(variable: String, _type: Node) {
-    variables = variables.updated(variable, new VariableInfo(offset, _type))
+    variables = variables.updated(variable, VariableInfo(offset, _type))
     offset += TypeSkeleton.getTypeSize(_type, state)
   }
 
   def add(variable: String, _type: Node): VariablePool = {
-    new VariablePool(state, typedVariables.updated(variable, _type))
+    VariablePool(state, typedVariables.updated(variable, _type))
   }
 }
 
@@ -46,11 +46,11 @@ case class MethodCompiler(state: CompilationState, method: Node) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody[Path](new PathRoot(method)).head
+  val firstInstruction = getMethodBody[Path](PathRoot(method)).head
   val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables = {
-    var result = new VariablePool(state)
+    var result = VariablePool(state)
     if (!getMethodStatic(method))
       result = result.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))
     for (parameter <- parameters)
@@ -72,7 +72,7 @@ case class MethodCompiler(state: CompilationState, method: Node) {
       variablesPerStatement(statement)
     } catch
       {
-        case e: NoSuchElementException => throw new StatementWasNotFoundDuringLocalsAnalysis(statement)
+        case e: NoSuchElementException => throw StatementWasNotFoundDuringLocalsAnalysis(statement)
       }
   }
 }

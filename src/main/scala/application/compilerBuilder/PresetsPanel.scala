@@ -39,7 +39,7 @@ object PresetsPanel
   }
 
   def getJavaCompilerPreset: Preset = {
-    new Preset("Java", getJavaCompilerParticles, "Compiles a subset of Java.")
+    new Preset("JavaSubset", getJavaCompilerParticles, "Compiles a subset of Java.")
   }
 
   def getJavaCompilerParticles: Seq[Particle] = {

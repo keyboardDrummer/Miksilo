@@ -102,7 +102,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
 
   def createState = new State()
   class State() {
-    var classCompiler: ClassCompiler = null
+    var classCompiler: ClassCompiler = _
     val importToClassMap = new ClassRegistry[Node => Map[String, QualifiedClassName]]()
     var members = List.empty[ClassMemberC]
   }
