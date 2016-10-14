@@ -3,8 +3,11 @@ package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import core.particles.CompilationState
+import core.particles.{CompilationState, ParticleWithGrammar}
 import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.simpleBytecode.InferredStackFrames
+
+
 
 object ContinueC extends StatementInstance {
   override val key: Key = ContinueKey
@@ -26,7 +29,7 @@ object ContinueC extends StatementInstance {
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     val _whileParent: Path = getWhileParent(obj)
-    Set(labels(WhileC.startKey(_whileParent)))
+    Set(labels(WhileC.startKey(_whileParent.current)))
   }
 
   def getWhileParent(obj: Path): Path = {

@@ -9,10 +9,17 @@ object Node {
   def classDebugRepresentation(_clazz: Any): String = _clazz match {
     case string: String => string
     case anyRef: AnyRef =>
-      val simpleName: String = anyRef.getClass.getSimpleName
-      if (simpleName.last == '$')
-        return simpleName.dropRight(1)
-      simpleName
+      try
+      {
+        val simpleName: String = anyRef.getClass.getSimpleName
+        if (simpleName.last == '$')
+          return simpleName.dropRight(1)
+        simpleName
+      }
+      catch
+      {
+        case e: java.lang.InternalError => "internalError"
+      }
     case _ => _clazz.toString
   }
 }

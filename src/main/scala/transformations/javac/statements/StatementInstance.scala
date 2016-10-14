@@ -22,7 +22,7 @@ trait StatementInstance extends ParticleWithGrammar {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
 
-  def getNextLabel(statement: Path) = (statement,"next")
+  def getNextLabel(statement: Path) = (statement, "next") //TODO volgens mij kan dit weg.
   def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     val selection = obj.asInstanceOf[SequenceSelection]
     if (selection.hasNext)

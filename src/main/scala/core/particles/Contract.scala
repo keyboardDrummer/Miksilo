@@ -4,10 +4,18 @@ trait Contract {
   def dependencies: Set[Contract] = Set.empty
 
   def name = {
-    var result = getClass.getSimpleName.dropRight(1)
-    if (result.last == 'C')
-      result = result.dropRight(1)
-    splitCamelCase(result).toLowerCase
+    try
+    {
+      val simpleName = getClass.getSimpleName
+      var result = simpleName.dropRight(1)
+      if (result.last == 'C')
+        result = result.dropRight(1)
+      splitCamelCase(result).toLowerCase
+    }
+    catch
+    {
+      case e: java.lang.InternalError => "internalError"
+    }
   }
 
   def splitCamelCase(input: String): String = {

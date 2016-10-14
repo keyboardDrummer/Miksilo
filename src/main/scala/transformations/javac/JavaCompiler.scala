@@ -36,7 +36,7 @@ object JavaCompiler {
 
   def getCompiler = new CompilerFromParticles(javaCompilerTransformations)
 
-  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC)
+  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC, JavaGotoC)
 
   def javaCompilerTransformations: Seq[Particle] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,

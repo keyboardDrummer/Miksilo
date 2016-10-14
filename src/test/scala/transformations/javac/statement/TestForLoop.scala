@@ -3,10 +3,15 @@ package transformations.javac.statement
 import org.junit.Test
 import util.TestUtils
 
-class TestSimpleForLoop {
+class TestForLoop {
 
   @Test
-  def test() {
+  def testSimple() {
     TestUtils.compareWithJavacAfterRunning("SimpleForLoop")
+  }
+
+  @Test
+  def testWithContinue() {
+    TestUtils.compareWithJavacAfterRunning("ForLoopWithContinue")
   }
 }

@@ -77,6 +77,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)
       frame.clazz match {
+        case StackMapTableAttribute.ChopFrame =>
+            byteToBytes(251 - frame(ChopFrameCount).asInstanceOf[Int]) ++ shortToBytes(offset)
         case StackMapTableAttribute.SameFrameKey =>
           if (offset > 63)
             byteToBytes(251) ++ shortToBytes(offset)

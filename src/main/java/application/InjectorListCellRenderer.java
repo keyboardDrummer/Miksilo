@@ -2,6 +2,8 @@ package application;
 
 import application.compilerBuilder.ParticleInstance;
 import application.compilerBuilder.ParticleLabelPainter;
+import application.compilerCockpit.MarkOutputGrammar;
+import application.compilerCockpit.MarkOutputGrammar$;
 import core.particles.Particle;
 
 import javax.swing.*;
@@ -29,6 +31,10 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
     if (!isSelected) {
       Color color = painter.isDependency(particle) ? Color.RED
               : painter.isDependant(particle) ? Color.GREEN : getBackground();
+      if (particle == MarkOutputGrammar$.MODULE$)
+      {
+        color = Color.LIGHT_GRAY;
+      }
       this.setBackground(color);
     }
 

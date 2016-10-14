@@ -62,6 +62,5 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
     forLoopPath.asInstanceOf[SequenceSelection].replaceWith(newStatements)
   }
 
-
   override def description: String = "Enables using the non-iterator for loop."
 }

@@ -58,9 +58,9 @@ case class MethodCompiler(state: CompilationState, method: Node) {
     result
   }
 
-  case class StatementWasNotFoundDuringLocalsAnalysis(statement: Path) extends Exception
+  case class StatementWasNotFoundDuringLocalsAnalysis(statement: Path) extends BadInputException
   {
-    override def toString = s"the following statement was not found during locals analysis:\n$statement"
+    override def toString = s"the following statement is unreachable:\n$statement"
   }
 
   def getVariables(obj: Path): VariablePool = {
