@@ -5,8 +5,6 @@ import core.grammar.{Grammar, PrintGrammar, ~}
 import core.particles.node.Node
 import core.responsiveDocument.ResponsiveDocument
 
-
-
 trait BiGrammar extends GrammarDocumentWriter {
 
   def getDescendantsAndSelf: Seq[BiGrammar] = ???
@@ -19,7 +17,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def <~~(right: BiGrammar) = this <~ (space ~ right)
 
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | new Produce(Seq.empty[Any])
+  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | Produce(Seq.empty[Any])
 
   def |(other: BiGrammar) = new Choice(this, other)
 
@@ -32,7 +30,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manyVertical = new ManyVertical(this)
 
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | new Produce(Seq.empty[Node])
+  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | Produce(Seq.empty[Node])
 
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | produce(None)
   def some: BiGrammar = this ~ (this*) ^^ someMap
@@ -77,14 +75,10 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def ^^(map: (Any => Any, Any => Option[Any])): BiGrammar = new MapGrammar(this, map._1, map._2)
 
-  def indent(width: Int = 2) = new WhiteSpace(width, 0) ~> this
+  def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
 }
-
-
-
-
 
 trait SequenceLike extends BiGrammar {
   def first: BiGrammar

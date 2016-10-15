@@ -13,7 +13,7 @@ abstract class StatementFlowAnalysis[State](state: CompilationState, method: Nod
   val labels = getLabels
 
   def getLabels: Map[Any, Path] = {
-    val statements = MethodC.getMethodBody[Path](PathRoot(method))
+    val statements: Seq[Path] = PathRoot(method).getDescendants.filter(node => instances.contains(node.clazz))
     statements.flatMap(statement => instances(statement.clazz).getLabels(statement)).toMap
   }
 

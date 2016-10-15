@@ -2,14 +2,13 @@ package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.path.Path
-import core.particles.{CompilationState, ParticleWithGrammar}
+import core.particles.path.{Path, PathRoot}
+import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledLocations
-import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 
 
-object ContinueC extends StatementInstance {
+object WhileContinueC extends StatementInstance {
   override val key: Key = ContinueKey
 
   object ContinueKey extends Key

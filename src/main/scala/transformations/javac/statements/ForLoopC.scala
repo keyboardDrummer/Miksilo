@@ -46,7 +46,7 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
   object BodyKey
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new PathRoot(program).foreach(path => path.clazz match {
+    PathRoot(program).foreach(path => path.clazz match {
       case ForLoopKey => transformForLoop(path, state)
       case _ =>
     })

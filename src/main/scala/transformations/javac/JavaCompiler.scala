@@ -48,12 +48,12 @@ object JavaCompiler {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ForLoopC, LocalDeclarationWithInitializerC) ++
+  def javaMethod = Seq(ForLoopContinueC, JavaGotoC, ForLoopC, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, ContinueC, WhileC, BlockC,
+  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,
