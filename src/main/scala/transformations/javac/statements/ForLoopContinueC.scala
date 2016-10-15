@@ -11,21 +11,23 @@ object ForLoopContinueC extends ParticleWithPhase {
   override def description: String = "Add proper C-style for-loop continue semantics."
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    val forLoops = new scala.collection.mutable.HashMap[Node, String]()
+    val beforeIncrementLabels = new scala.collection.mutable.HashMap[Node, String]()
     PathRoot(program).foreach(path => path.clazz match {
-      case WhileContinueC.ContinueKey => transformContinue(path, forLoops, state)
+      case WhileContinueC.ContinueKey => transformContinue(path, beforeIncrementLabels, state)
       case _ =>
     })
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Node, String], state: CompilationState): Unit = {
-    val parent = continuePath.ancestors.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopKey).head
-    if (!beforeIncrementLabels.contains(parent))
-    {
-      beforeIncrementLabels(parent) = transformForLoop(parent, state)
-    }
-    val label = beforeIncrementLabels(parent)
-    continuePath.replaceWith(JustJavaGoto.goto(label))
+    val containingForLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopKey)
+    containingForLoopOption.foreach(containingForLoop => {
+      if (!beforeIncrementLabels.contains(containingForLoop))
+      {
+        beforeIncrementLabels(containingForLoop) = transformForLoop(containingForLoop, state)
+      }
+      val label = beforeIncrementLabels(containingForLoop)
+      continuePath.replaceWith(JustJavaGoto.goto(label))
+    })
   }
 
   def transformForLoop(forLoopPath: Path, state: CompilationState): String = {
