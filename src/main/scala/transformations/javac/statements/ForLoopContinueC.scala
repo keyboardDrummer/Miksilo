@@ -19,8 +19,8 @@ object ForLoopContinueC extends ParticleWithPhase {
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Node, String], state: CompilationState): Unit = {
-    val containingForLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopKey)
-    containingForLoopOption.foreach(containingForLoop => {
+    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopKey || ancestor.clazz == WhileC.WhileKey)
+    containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopKey).foreach(containingForLoop => {
       if (!beforeIncrementLabels.contains(containingForLoop))
       {
         beforeIncrementLabels(containingForLoop) = transformForLoop(containingForLoop, state)

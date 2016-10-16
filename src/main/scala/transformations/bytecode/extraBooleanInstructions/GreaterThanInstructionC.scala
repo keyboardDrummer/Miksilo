@@ -8,18 +8,18 @@ import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareGreaterOrEqualC, IfIntegerCompareLessC}
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
-object LessThanInstructionC extends ExpandInstruction {
+object GreaterThanInstructionC extends ExpandInstruction {
 
-  def lessThanInstruction = CodeAttribute.instruction(LessThanInstructionKey)
+  def greaterThanInstruction = CodeAttribute.instruction(GreaterThanInstructionKey)
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfIntegerCompareLessC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfIntegerCompareGreaterOrEqualC)
 
-  override val key = LessThanInstructionKey
+  override val key = GreaterThanInstructionKey
 
   override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
     val trueLabel = state.getUniqueLabel("true")
     val endLabel = state.getUniqueLabel("end")
-    Seq(LabelledLocations.ifIntegerCompareLess(trueLabel),
+    Seq(LabelledLocations.ifIntegerCompareGreater(trueLabel),
       SmallIntegerConstantC.integerConstant(0),
       LabelledLocations.goTo(endLabel),
       InferredStackFrames.label(trueLabel),
@@ -27,7 +27,7 @@ object LessThanInstructionC extends ExpandInstruction {
       InferredStackFrames.label(endLabel))
   }
 
-  object LessThanInstructionKey extends Key
+  object GreaterThanInstructionKey extends Key
 
-  override def description: String = "Defines a custom instruction which applies < to the top stack values."
+  override def description: String = "Defines a custom instruction which applies > to the top stack values."
 }

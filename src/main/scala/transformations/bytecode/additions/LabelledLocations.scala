@@ -25,10 +25,12 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   def goTo(target: String) = instruction(GotoC.GoToKey, Seq(target))
 
-  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualC.IfIntegerCompareGreaterKey, Seq(target))
+  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualC.IfIntegerCompareGreaterEqualKey, Seq(target))
   def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessC.key, Seq(target))
+  def ifIntegerCompareGreater(target: String) = instruction(IfIntegerCompareGreaterC.key, Seq(target))
   def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualC.key, Seq(target))
   def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualC.key, Seq(target))
+  def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualC.key, Seq(target))
 
   def label(name: String, stackFrame: Node) = new Node(LabelKey,
     LabelNameKey -> name,

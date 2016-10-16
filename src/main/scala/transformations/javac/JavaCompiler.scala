@@ -23,7 +23,7 @@ import transformations.javac.expressions.equality.{AddEqualityPrecedence, Equali
 import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.prefix.NotC
-import transformations.javac.expressions.relational.{AddRelationalPrecedence, LessThanC}
+import transformations.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
 import transformations.javac.methods._
 import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentC}
 import transformations.javac.methods.call.CallStaticOrInstanceC
@@ -57,11 +57,11 @@ object JavaCompiler {
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,
-    AddEqualityPrecedence, LessThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
+    AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
-    Seq(LessThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
+    Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
@@ -69,7 +69,7 @@ object JavaCompiler {
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
   def byteCodeInstructions: Seq[InstructionC] = {
-    Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC,
+    Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareLessOrEqualC,
       IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
       LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
       SwapInstruction, GetFieldC, PutField) ++

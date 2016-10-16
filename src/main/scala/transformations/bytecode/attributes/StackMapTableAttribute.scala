@@ -30,9 +30,9 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object FullFrameStack
 
-  object ChopFrame
+  object ChopFrame extends Key
 
-  object ChopFrameCount
+  object ChopFrameCount extends Key
 
   object SameFrameKey extends Key
 
@@ -132,9 +132,12 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val appendFrameGrammar = "append frame" ~> deltaGrammar % parseType.manyVertical.indent() ^^ //TODO idee: in LabelledLocations dit opnieuw definieren.
       parseMap(AppendFrame, PartialSelf, AppendFrameTypes)
     val sameFrameGrammar = nodeMap("same frame" ~> deltaGrammar, SameFrameKey, PartialSelf)
-    val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar)
+    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~ (", count = " ~> integer)).asNode(ChopFrame, PartialSelf, ChopFrameCount)
+
+    val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
       parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
+
 
     grammars.create(StackMapTableGrammar, stackMapTableGrammar)
   }

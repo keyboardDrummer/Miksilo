@@ -8,6 +8,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC.IfZeroKey
+import transformations.bytecode.extraBooleanInstructions.GreaterThanInstructionC.GreaterThanInstructionKey
 import transformations.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
@@ -45,6 +46,7 @@ object OptimizeComparisonInstructionsC extends ParticleWithPhase {
 
         val replacementInstruction : Option[Node] = first.clazz match {
           case LessThanInstructionKey => findLessThanReplacement(second)
+          case GreaterThanInstructionKey => findGreaterThanReplacement(second)
           case NotInstructionKey => findNotReplacement(second)
           case IntegerEqualsInstructionKey => findIntegerEqualsReplacement(second)
           case _ => None
@@ -83,6 +85,18 @@ object OptimizeComparisonInstructionsC extends ParticleWithPhase {
       case IfNotZeroKey =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifZero(target))
+      case _ => None
+    }
+  }
+
+  def findGreaterThanReplacement(second: Node): Option[Node] = {
+    second.clazz match {
+      case IfZeroKey =>
+        val target = LabelledLocations.getJumpInstructionLabel(second)
+        Some(LabelledLocations.ifIntegerCompareLessEquals(target))
+      case IfNotZeroKey =>
+        val target = LabelledLocations.getJumpInstructionLabel(second)
+        Some(LabelledLocations.ifIntegerCompareGreater(target))
       case _ => None
     }
   }

@@ -10,6 +10,19 @@ class ForLoopWithContinue
             x += 2;
 
         }
+
+        for(int i = 0;i < 5;i++)
+        {
+            int j = 0;
+            while(j < 5)
+            {
+                j++;
+                if (x > 20)
+                    continue;
+
+                x += 2;
+            }
+        }
         System.out.print(x);
     }
 }
