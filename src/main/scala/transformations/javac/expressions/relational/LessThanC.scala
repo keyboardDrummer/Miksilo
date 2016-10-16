@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
-import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC
+import transformations.bytecode.extraBooleanInstructions.{GreaterThanInstructionC, LessThanInstructionC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 import transformations.javac.types.BooleanTypeC
@@ -20,7 +20,7 @@ object GreaterThanC extends ExpressionInstance {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
-    firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
+    firstInstructions ++ secondInstructions ++ Seq(GreaterThanInstructionC.greaterThanInstruction)
   }
 
   def getFirst[T <: NodeLike](lessThan: T) = lessThan(GreaterThanFirst).asInstanceOf[T]
