@@ -7,15 +7,14 @@ class Whilee
         {
             i = i + 1;
         }
-
         while(i < 6)
         {
             i = i + 1;
-            if (i == 6)
+            if(i==6){
                 continue;
+            }
             i = i + 1;
         }
-
         System.out.print(i);
     }
 }

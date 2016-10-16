@@ -6,8 +6,6 @@ import core.particles.path.{Path, PathRoot}
 import core.particles.{CompilationState, ParticleWithPhase}
 import transformations.bytecode.additions.LabelledLocations
 
-
-
 object WhileContinueC extends StatementInstance {
   override val key: Key = ContinueKey
 
@@ -21,7 +19,7 @@ object WhileContinueC extends StatementInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption("continue;" ~> produce(continue))
+    statementGrammar.addOption(new NodeMap("continue;", ContinueKey, Seq.empty))
   }
 
   override def description: String = "Jumps the program to the start of the loop."
