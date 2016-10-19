@@ -91,9 +91,9 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     addLabel.addOption(multipleLabel)
 
     val _if: BiGrammar = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
-      case cond ~ then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
+      case cond ~ _then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], _then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
     }, {
-      case IfNotZero(cond, then, _else) => Some(core.grammar.~(core.grammar.~(cond, then), _else))
+      case IfNotZero(cond, _then, _else) => Some(core.grammar.~(core.grammar.~(cond, _then), _else))
       case _ => None
     })
 
