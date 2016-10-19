@@ -4,6 +4,10 @@ version := "1.0"
 
 scalaVersion := "2.11.8"
 
+scalacOptions += "-deprecation"
+scalacOptions += "-feature"
+scalacOptions += "-language:implicitConversions"
+scalacOptions += "-language:postfixOps"
 
 libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8"
 
