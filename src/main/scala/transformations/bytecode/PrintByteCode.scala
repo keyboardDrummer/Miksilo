@@ -2,14 +2,14 @@ package transformations.bytecode
 
 import java.math.BigInteger
 
-import akka.util.Convert
+import com.google.common.primitives.{Ints, Longs}
 import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.bytecode.ByteCodeSkeleton._
 
 object PrintByteCode {
-  def longToBytes(long: Long): scala.Seq[Byte] = Convert.longToBytes(long)
+  def longToBytes(long: Long): scala.Seq[Byte] = Longs.toByteArray(long)
 
   //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
@@ -74,7 +74,7 @@ object PrintByteCode {
     val bytes = _bytes()
     if (counterBefore + bytes.length != debugCounter)
       System.out.append('a')
-    Convert.intToBytes(bytes.length) ++ bytes
+    Ints.toByteArray(bytes.length) ++ bytes
   }
 
   def getInterfacesByteCode(clazz: Node): Seq[Byte] = {
@@ -108,15 +108,15 @@ object PrintByteCode {
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
   def byteToBytes(value: Int): Seq[Byte] = {
-    debugBytes(Convert.intToBytes(value).drop(3))
+    debugBytes(Ints.toByteArray(value).drop(3))
   }
 
   def shortToBytes(short: Int): Seq[Byte] = {
-    debugBytes(Convert.intToBytes(short).takeRight(2))
+    debugBytes(Ints.toByteArray(short).takeRight(2))
   }
 
   def intToBytes(int: Int): Seq[Byte] = {
-    debugBytes(Convert.intToBytes(int))
+    debugBytes(Ints.toByteArray(int))
   }
 
   def debugBytes(bytes: Seq[Byte]) = {
