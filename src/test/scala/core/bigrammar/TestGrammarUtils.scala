@@ -24,7 +24,7 @@ case class TestGrammarUtils(particles: Seq[Particle]) extends FunSuite {
     val packrat: GrammarToParserConverter = new GrammarToParserConverter()
     val packratParser = packrat.convert(grammar)
     val parseResult = packratParser(new CharArrayReader(example.toCharArray))
-    assert(parseResult.successful)
+    assert(parseResult.successful, parseResult.toString)
 
     val result = parseResult.get
 

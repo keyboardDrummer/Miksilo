@@ -70,9 +70,9 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
   def getTestFile(relativeFilePath: Path): File = {
     val fullPath = relativeFilePath
-    var testResources = ClassLoader.getSystemResource(fullPath.path)
+    var testResources = ClassLoader.getSystemResource("/" + fullPath.path)
     if (testResources == null)
-      testResources = getClass.getResource(fullPath.path)
+      testResources = getClass.getResource("/" + fullPath.path)
     if (testResources == null)
     {
       throw new RuntimeException("Test file not found")
