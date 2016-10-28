@@ -1,23 +1,19 @@
 package transformations.javac.statement
 
-import org.junit.{Ignore, Assert, Test}
+import org.junit.{Assert, Ignore, Test}
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestLocalDeclaration {
+class TestLocalDeclaration extends FunSuite {
 
-  @Test
-  def testIfElseBlockScoping() {
+  test("IfElseBlockScoping") {
     TestUtils.compareWithJavacAfterRunning("IfElseBlockScoping.java")
   }
 
-  @Test
-  def testWhileBlockScoping() {
+  test("WhileBlockScoping") {
     TestUtils.compareWithJavacAfterRunning("WhileBlockScoping.java")
   }
 
-  @Ignore
-  @Test
-  def testIfElseWhereBothBranchesDefineSameVariableAndItIsUsedAfterwards() = {
-    Assert.fail()
+  ignore("IfElseWhereBothBranchesDefineSameVariableAndItIsUsedAfterwards") {
   }
 }

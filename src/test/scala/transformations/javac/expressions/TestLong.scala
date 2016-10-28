@@ -8,12 +8,12 @@ import util.TestUtils
 
 class TestLong {
 
-  @Test
+
   def simpleLong() {
     TestUtils.compareWithJavacAfterRunning("SimpleLong")
   }
 
-  @Test
+
   def longWithoutPoptimize() {
     val regularParticles = JavaCompiler.javaCompilerTransformations
     val withoutPoptimize = regularParticles.filter(p => p != PoptimizeC)

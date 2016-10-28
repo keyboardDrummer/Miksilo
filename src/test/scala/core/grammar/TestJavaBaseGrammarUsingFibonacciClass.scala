@@ -19,56 +19,50 @@ class TestJavaBaseGrammarUsingFibonacciClass
   extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
 {
 
-  @Test
-  def testBasicClass() {
+  test("BasicClass") {
     val input = "package bla; class Help {}"
     val result = TestGrammarUtils.getGrammarResult(input)
     val expectation = JavaClassSkeleton.clazz(Seq("bla"), "Help")
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testMainExpression() {
+  test("MainExpression") {
     val input = "System.out.print(fibonacci(5))"
     val result: Any = getExpressionGrammarResult(input)
     val expectation = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(CallC.call(VariableC.variable("fibonacci"), Seq(IntLiteralC.literal(5)))))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testFibonacciExpression() {
+  test("FibonacciExpression") {
     val input = "index < 2 ? 1 : fibonacci(index-1) + fibonacci(index-2)"
     val result: Any = getExpressionGrammarResult(input)
 
     val expectation: Node = getFibonacciExpression
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testParseLessThanInsideTernary() {
+  test("ParseLessThanInsideTernary") {
     val input = "1 < 2 ? 3 : 4"
     val result: Any = getExpressionGrammarResult(input)
 
     val expectation: Node = TernaryC.ternary(LessThanC.lessThan(IntLiteralC.literal(1), IntLiteralC.literal(2)),
       IntLiteralC.literal(3), IntLiteralC.literal(4))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testLessThan() {
+  test("LessThan") {
     val input = "index < 2"
     val result: Any = getExpressionGrammarResult(input)
     val expectation: Node = LessThanC.lessThan(VariableC.variable("index"), IntLiteralC.literal(2))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testAddition() {
+  test("Addition") {
     val input = "index + 1"
     val result: Any = getExpressionGrammarResult(input)
     val expectation: Node = AdditionC.addition(VariableC.variable("index"), IntLiteralC.literal(1))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
   def getExpressionGrammarResult(input: String): Any = {
@@ -76,39 +70,34 @@ class TestJavaBaseGrammarUsingFibonacciClass
     result
   }
 
-
-  @Test
-  def testSubtraction() {
+  test("Subtraction") {
     val input = "index - 1"
     val result: Any = getExpressionGrammarResult(input)
     val expectation: Node = SubtractionC.subtraction(VariableC.variable("index"), IntLiteralC.literal(1))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testTernary() {
+  test("Ternary") {
     val input = "1 ? 2 : 3"
     val result: Any = getExpressionGrammarResult(input)
     val expectation: Node = TernaryC.ternary(IntLiteralC.literal(1), IntLiteralC.literal(2), IntLiteralC.literal(3))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testIncrementAssignment() {
+  test("IncrementAssignment") {
     val input = "x += 1"
     val result: Any = getExpressionGrammarResult(input)
     val expectation = IncrementAssignmentC.incrementAssignment(VariableC.variable("x"), IntLiteralC.literal(1))
-    Assert.assertEquals(expectation, result)
+    assertResult(expectation)(result)
   }
 
-  @Test
-  def testFibonacciMainMethod() {
+  test("FibonacciMainMethod") {
     val input = "public static void main(java.lang.String[] args) { System.out.print(fibonacci(5)); }"
     val result = getMethodGrammarResult(input)
 
     val expectation = getMainMethod
 
-    Assert.assertTrue(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
+    assert(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
   }
 
   def getMethodGrammarResult(input: String): Any = {
@@ -116,13 +105,12 @@ class TestJavaBaseGrammarUsingFibonacciClass
     result
   }
 
-  @Test
-  def testFibonacciMethod() {
+  test("FibonacciMethod") {
     val input = "public static int fibonacci(int index) { return index < 2 ? 1 : fibonacci(index-1) + fibonacci(index-2); }"
     val result: Any = getMethodGrammarResult(input)
 
     val expectation = getFibonacciMethod
-    Assert.assertTrue(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
+    assert(ComparisonOptions(takeAllRightKeys = false).deepEquality(expectation, result))
   }
 
   def getMainMethod: Node = {
@@ -130,7 +118,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val printCall = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
-      Seq(ExpressionAsStatementC.create(printCall)), true, MethodC.PublicVisibility)
+      Seq(ExpressionAsStatementC.create(printCall)), static = true, MethodC.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {

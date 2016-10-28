@@ -19,9 +19,9 @@ libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5"
 
 libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" // % "test"
 
-libraryDependencies += "junit" % "junit" % "4.12" % "test"
+libraryDependencies += "junit" % "junit" % "4.12"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
@@ -38,6 +38,7 @@ libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5"
 libraryDependencies += "com.google.guava" % "guava" % "18.0"
 
 unmanagedResourceDirectories in Compile += baseDirectory.value / "testResources"
+unmanagedResourceDirectories in Test += baseDirectory.value / "testResources"
 //resourceDirectory in Test := baseDirectory.value / "testResources"
 
     

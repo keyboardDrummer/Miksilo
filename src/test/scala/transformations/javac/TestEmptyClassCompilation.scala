@@ -18,7 +18,7 @@ class TestEmptyClassCompilation {
   val className: String = "EmptyClass"
   val classPackage: Seq[String] = Seq("transformations", "java", "testing")
 
-  @Test
+
   def testEquivalentConstantPool() {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
@@ -26,7 +26,7 @@ class TestEmptyClassCompilation {
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
-  @Test
+
   def testEquivalentMethod() {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass

@@ -20,7 +20,7 @@ class TestByteCodeGoTo {
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 
-  @Test
+
   def compareCompiledVersusNativeCode() {
     val labelledWhile = getLabelledJumpWhile
     val compiledWhile = new CompilerFromParticles(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)

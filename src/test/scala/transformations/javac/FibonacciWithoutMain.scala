@@ -21,7 +21,7 @@ class FibonacciWithoutMain {
   val defaultPackage = Seq("transformations", "bytecode", "testing")
   val methodName = "fibonacci"
 
-  @Test
+
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
     val byteCode = JavaCompiler.getCompiler.transform(fibonacci)

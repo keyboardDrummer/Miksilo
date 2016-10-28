@@ -1,20 +1,21 @@
 package transformations.javac
 
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestObjectTypeUnification {
+class TestObjectTypeUnification extends FunSuite {
 
-  @Test
+
   def testFullPipeline() {
     val inputDirectory = Path("")
     val output: String = TestUtils.compileAndRun("ObjectTypeUnification", inputDirectory)
-    Assert.assertEquals("3", output)
+    assertResult("3")( output)
   }
 
-  @Test
+
   def compareWithJavaC() {
     val inputDirectory = Path("")
     TestUtils.compareWithJavacAfterRunning("ObjectTypeUnification", inputDirectory)

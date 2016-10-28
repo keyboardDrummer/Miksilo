@@ -7,7 +7,7 @@ import scala.reflect.io.Path
 
 class TestIncrementAssignment {
 
-  @Test
+
   def test() {
     val inputDirectory = Path("")
     TestUtils.compareWithJavacAfterRunning("IncrementAssignment", inputDirectory)

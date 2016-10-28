@@ -2,26 +2,27 @@ package core.particles
 
 import core.particles.node.Node
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MemberSelector, VariableC}
 
-class TestMetaObject {
+class TestMetaObject extends FunSuite {
 
-  @Test
+
   def testEquals() {
     val first = new Node(ClazzKey, FieldKey -> FieldValue)
     val second = new Node(ClazzKey, FieldKey -> FieldValue)
-    Assert.assertEquals(first, second)
+    assertResult(first)( second)
   }
 
-  @Test
+
   def testEqualsOnJavaModel() {
     val first = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       List(CallC.call(VariableC.variable("fibonacci"), List(IntLiteralC.literal(5)))))
     val second = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       List(CallC.call(VariableC.variable("fibonacci"), List(IntLiteralC.literal(5)))))
-    Assert.assertEquals(first, second)
+    assertResult(first)(second)
   }
 
   object ClazzKey

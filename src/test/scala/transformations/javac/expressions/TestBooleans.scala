@@ -5,7 +5,7 @@ import util.TestUtils
 
 class TestBooleans {
 
-  @Test
+
   def test() {
     TestUtils.compareWithJavacAfterRunning("Booleans")
   }

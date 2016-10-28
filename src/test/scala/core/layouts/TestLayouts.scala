@@ -1,12 +1,12 @@
 package core.layouts
 
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 
-class TestLayouts {
+class TestLayouts extends FunSuite {
 
   val smallNumber: Double = 0.0001
 
-  @Test
   def test() {
     val layout = new EquationLayout()
     val inputPanel = layout.createComponent
@@ -19,9 +19,9 @@ class TestLayouts {
     layout.addEquals(layout.container.top, inputPanel.top, executeButton.top, outputPanel.top)
     layout.addEquals(layout.container.bottom, inputPanel.bottom, executeButton.bottom, outputPanel.bottom)
     val solution = layout.solve(500, 500)
-    Assert.assertEquals(0.0, solution(inputPanel.left), smallNumber)
-    Assert.assertEquals(200, solution(inputPanel.right), smallNumber)
-    Assert.assertEquals(300, solution(outputPanel.left), smallNumber)
-    Assert.assertEquals(500, solution(outputPanel.right), smallNumber)
+    assertResult(0.0)( solution(inputPanel.left), smallNumber)
+    assertResult(200)( solution(inputPanel.right), smallNumber)
+    assertResult(300)( solution(outputPanel.left), smallNumber)
+    assertResult(500)( solution(outputPanel.right), smallNumber)
   }
 }

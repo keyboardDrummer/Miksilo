@@ -13,7 +13,7 @@ class EmptyMain {
   val defaultPackage = Seq()
   val other = new FibonacciWithoutMain()
 
-  @Test
+
   def runCompiledCode() {
     val byteCode: Node = getByteCode
     TestUtils.runByteCode(className, byteCode)

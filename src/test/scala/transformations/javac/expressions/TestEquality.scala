@@ -5,7 +5,7 @@ import util.TestUtils
 
 class TestEquality {
 
-  @Test
+
   def test() {
     TestUtils.compareWithJavacAfterRunning("SimpleEquality")
   }

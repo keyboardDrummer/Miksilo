@@ -5,7 +5,7 @@ import util.TestUtils
 
 class TestWhile {
 
-  @Test
+
   def testSimple() {
     TestUtils.compareWithJavacAfterRunning("Whilee")
   }

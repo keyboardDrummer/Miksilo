@@ -5,7 +5,7 @@ import org.junit.Test
 
 class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
 
-  @Test
+
   def testSimpleAddition() {
     val example = "3 + 4"
     val expected = Add(Value(3), Value(4))
@@ -13,7 +13,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  @Test
+
   def testTwoAdditions() {
     val example = "3 + 4 + 2"
     val expected = Add(Value(3), Add(Value(4),Value(2)))
@@ -21,7 +21,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  @Test
+
   def testMultiplyWithAddition() {
     val example = "3 * 4 + 2"
     val expected = Add(Multiply(Value(3), Value(4)),Value(2))
@@ -29,7 +29,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  @Test
+
   def testMultiplyWithAddition2() {
     val example = "3 + 4 * 2"
     val expected = Add(Value(3), Multiply(Value(4),Value(2)))
@@ -37,7 +37,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  @Test
+
   def testMultiplyWithAdditionWithParenthesis() {
     val example = "3 * (4 + 2)"
     val expected = Multiply(Value(3), Add(Value(4),Value(2)))
@@ -45,7 +45,7 @@ class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
     parseAndPrint(example, expected)
   }
 
-  @Test
+
   def testIf() {
     val newLine = System.lineSeparator()
     val example = s"3$newLine? 4$newLine: 2"

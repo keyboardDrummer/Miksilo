@@ -1,10 +1,10 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.bigrammar.printer.{BiGrammarToPrinter}
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.particles.grammars.GrammarCatalogue
 import core.particles.{CompilerFromParticles, Particle}
-import org.junit.{Assert, Test}
+import org.scalatest.{FunSpec, FunSuite}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.TernaryC
@@ -15,46 +15,45 @@ import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestDocumentGrammarWithJavaExamples {
+class TestDocumentGrammarWithJavaExamples extends FunSuite {
   val lineSeparator = System.lineSeparator()
 
-  @Test
+
   def testSimpleForLoop() {
     val testFileContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-  @Test
+
   def testWhile() {
     val testFileContent = TestUtils.getJavaTestFile("whilee", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-  @Test
   def testFibonacci() {
     val testFileContent = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-  @Test
+
   def testTernary() {
     val input = "1 ? 2 : 3"
     TestGrammarUtils.compareInputWithPrint(input, None, TernaryC.TernaryExpressionGrammar)
   }
 
-  @Test
+
   def testFibonacciMainMethod() {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
     TestGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
   }
 
-  @Test
+
   def testBlock() {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
     TestGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
   }
 
-  @Test
+
   def testPrintAfterImplicitAddition() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
@@ -66,10 +65,10 @@ class TestDocumentGrammarWithJavaExamples {
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
     val output = state.output
 
-    Assert.assertEquals(expectation, output)
+    assertResult(expectation)(output)
   }
 
-  @Test
+
   def testPrettyPrintByteCode() {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
@@ -77,10 +76,10 @@ class TestDocumentGrammarWithJavaExamples {
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)
-    Assert.assertEquals(expectation, state.output)
+    assertResult(expectation)(state.output)
   }
 
-  @Test
+
   def testPrettyPrintAndParseByteCode() {
     val input = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
 
@@ -92,26 +91,26 @@ class TestDocumentGrammarWithJavaExamples {
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(byteCode).output
-    Assert.assertEquals("8", output)
+    assertResult("8")(output)
   }
 
-  @Test
+
   def prettyPrintByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
-    Assert.assertEquals(input, output)
+    assertResult(input)(output)
   }
 
-  @Test
+
   def parseByteCode() {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
     val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
-    Assert.assertEquals("8", output)
+    assertResult("8")(output)
   }
 
-  @Test
+
   def testPrettyAddressLoad(): Unit = {
     val grammar = LoadAddressC.getGrammarForThisInstruction(new GrammarCatalogue())
     val addressLoad = LoadAddressC.addressLoad(0)

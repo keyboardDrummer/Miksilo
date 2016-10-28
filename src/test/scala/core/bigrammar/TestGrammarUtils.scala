@@ -1,21 +1,21 @@
 package core.bigrammar
 
-import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import org.junit.Assert
+import org.scalatest.{FlatSpec, FunSuite, Matchers}
 import transformations.javac.JavaCompiler
 
 import scala.util.parsing.input.CharArrayReader
 
 object TestGrammarUtils extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations)
 
-case class TestGrammarUtils(particles: Seq[Particle]) {
+case class TestGrammarUtils(particles: Seq[Particle]) extends FunSuite {
 
   def parseAndPrintSame(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar): Unit = {
     val documentResult: String = parseAndPrint(example, expectedOption, grammarDocument)
-    Assert.assertEquals(example, documentResult)
+    assertResult(example)(documentResult)
   }
 
   def parseAndPrint(example: String, expectedOption: Option[Any], grammarDocument: BiGrammar): String = {
@@ -24,13 +24,11 @@ case class TestGrammarUtils(particles: Seq[Particle]) {
     val packrat: GrammarToParserConverter = new GrammarToParserConverter()
     val packratParser = packrat.convert(grammar)
     val parseResult = packratParser(new CharArrayReader(example.toCharArray))
-    if (parseResult.isEmpty)
-      Assert.fail(parseResult.toString)
+    assert(parseResult.successful)
 
     val result = parseResult.get
 
-    expectedOption.foreach(expected =>
-      Assert.assertEquals(expected, result))
+    expectedOption.foreach(expected => assertResult(expected)(result))
 
     val documentResult = BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
     documentResult

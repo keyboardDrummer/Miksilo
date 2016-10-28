@@ -3,6 +3,7 @@ package transformations.bytecode.extraBytecodeInstructions
 import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -11,9 +12,9 @@ import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestOptimizeBooleanInstructions {
+class TestOptimizeBooleanInstructions extends FunSuite {
 
-  @Test
+
   def testForFibonacci() {
     val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
@@ -22,8 +23,8 @@ class TestOptimizeBooleanInstructions {
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)
 
-    Assert.assertTrue(s"optimizedInstructions.size (${optimizedInstructions.size}) + 5 < unoptimizedInstructions.size (${unoptimizedInstructions.size})",
-      optimizedInstructions.size + 3 < unoptimizedInstructions.size)
+    assert(optimizedInstructions.size + 3 < unoptimizedInstructions.size,
+      s"optimizedInstructions.size (${optimizedInstructions.size}) + 5 < unoptimizedInstructions.size (${unoptimizedInstructions.size})")
   }
 
   def getFibonacciInstructions(clazz: Node) = {

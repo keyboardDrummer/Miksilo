@@ -7,7 +7,7 @@ import scala.reflect.io.Path
 
 class TestDeclarationWithInitializer {
 
-  @Test
+
   def test() {
     val inputDirectory = Path("")
     TestUtils.compareWithJavacAfterRunning("DeclarationWithInitializer", inputDirectory)

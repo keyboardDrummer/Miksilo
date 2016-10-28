@@ -1,71 +1,65 @@
 package core.document
 
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 
-class TestDocument {
+class TestDocument extends FunSuite {
 
   val lineSep = System.lineSeparator()
 
-  @Test
-  def testEmptyWithExclamation() {
+
+  test("EmptyWithExclamation") {
     val expected = "!"
     val text = new LeftRight(Empty, new Text("!"))
-    Assert.assertEquals(expected, text.render())
+    assertResult(expected)(text.render())
   }
 
-  @Test
-  def testText()
+  test("Text")
   {
     val expected: String = "hallo"
     val text = new Text(expected)
-    Assert.assertEquals(expected, text.render())
+    assertResult(expected)(text.render())
   }
 
-  @Test
-  def testLeftRight()
+  test("LeftRight")
   {
     val expected = "hallo" + "daar"
     val document = ("hallo": Document) ~ "daar"
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 
-  @Test
-  def testTopBottom()
+  test("TopBottom")
   {
     val expected = "a" + lineSep + "b"
     val document = ("a" : Document) % "b"
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 
-  @Test
-  def testLeftRightLeftHigher()
+  test("LeftRightLeftHigher")
   {
     val expected = "ab" + lineSep + "a"
     val document = (new Text("a") % "a") ~ "b"
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 
-  @Test
-  def testLeftRightRightHigher()
+  test("LeftRightRightHigher")
   {
     val expected = "ab" + lineSep + " b"
     val document = new Text("a") ~ (new Text("b") % "b")
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 
-  @Test
-  def testTopBottomTopWider()
+  test("TopBottomTopWider")
   {
     val expected = "aa" + lineSep + "b"
     val document = new Text("aa") % "b"
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 
-  @Test
-  def testTopBottomBottomWider()
+  test("TopBottomBottomWider")
   {
     val expected = "a" + lineSep + "bb"
     val document = new Text("a") % "bb"
-    Assert.assertEquals(expected, document.render())
+    assertResult(expected)(document.render())
   }
 }

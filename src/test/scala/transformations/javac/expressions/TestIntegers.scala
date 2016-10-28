@@ -5,7 +5,7 @@ import util.TestUtils
 
 class TestIntegers {
 
-  @Test
+
   def simpleInteger() {
     TestUtils.compareWithJavacAfterRunning("BigInteger")
   }

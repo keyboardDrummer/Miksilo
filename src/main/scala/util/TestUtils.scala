@@ -3,17 +3,17 @@ package util
 import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.particles._
 import core.particles.node.{ComparisonOptions, Node}
-import org.junit.Assert
+import org.scalatest.FunSuite
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.JavaCompiler
-import transformations.bytecode.ByteCodeSkeleton._
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
 object TestUtils extends TestUtils(JavaCompiler.getCompiler)
 
-class TestUtils(val compiler: CompilerFromParticles) {
+class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
   def currentDir = new File(new java.io.File("."))
   def rootOutput = currentDir / Path("testOutput")
@@ -21,8 +21,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def testInstructionEquivalence(expectedByteCode: Node, compiledCode: Node) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
-      Assert.assertTrue(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1),
-        getMethodInstructions(methodPair._2)))
+      assert(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }
   }
 
@@ -42,7 +41,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def runByteCode(className: String, code: Node, expectedResult: Int) {
     val line = runByteCode(className, code)
-    Assert.assertEquals(expectedResult, Integer.parseInt(line))
+    assertResult(expectedResult)(Integer.parseInt(line))
   }
 
   def runByteCode(className: String, code: Node) : String = {
@@ -71,7 +70,9 @@ class TestUtils(val compiler: CompilerFromParticles) {
 
   def getTestFile(relativeFilePath: Path): File = {
     val fullPath = relativeFilePath
-    val testResources = ClassLoader.getSystemResource(fullPath.path)
+    var testResources = ClassLoader.getSystemResource(fullPath.path)
+    if (testResources == null)
+      testResources = getClass.getResource(fullPath.path)
     if (testResources == null)
     {
       throw new RuntimeException("Test file not found")
@@ -109,7 +110,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
     val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
-    Assert.assertEquals("", javaCompilerOutput)
+    assertResult("")(javaCompilerOutput)
 
     val state = compiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
@@ -117,7 +118,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
     val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)
     try {
       val actualOutput = TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
-      Assert.assertEquals(expectedOutput, actualOutput)
+      assertResult(expectedOutput)(actualOutput)
     }
     catch {
       case e: AssertionError =>
@@ -154,7 +155,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
       (o: String) => line += o + "\n",
       (e: String) => line += e + "\n")
     val exitValue = processBuilder ! logger
-    Assert.assertEquals(line, 0, exitValue)
+    assertResult(0, line)(exitValue)
     line
   }
 
@@ -165,7 +166,7 @@ class TestUtils(val compiler: CompilerFromParticles) {
       (o: String) => line += o,
       (e: String) => line += e)
     val exitValue = processBuilder ! logger
-    Assert.assertEquals(s"Java compiler did not exit successfully.\nMessage was $line", 0, exitValue)
+    assertResult(0, s"Java compiler did not exit successfully.\nMessage was $line")(exitValue)
     line
   }
 
@@ -183,9 +184,10 @@ class TestUtils(val compiler: CompilerFromParticles) {
   def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
     val expectedConstantPoolSet = expectedByteCode.constantPool.constants
     val compiledConstantPoolSet = compiledCode.constantPool.constants
-    Assert.assertEquals(expectedConstantPoolSet.length, compiledConstantPoolSet.length)
-    Assert.assertTrue(expectedConstantPoolSet.forall(expectedItem => {
-      val hasEquivalent = compiledConstantPoolSet.exists(compiledItem => ComparisonOptions(false,false,true).deepEquality(compiledItem, expectedItem))
+    assertResult(expectedConstantPoolSet.length)(compiledConstantPoolSet.length)
+    assert(expectedConstantPoolSet.forall(expectedItem => {
+      val hasEquivalent = compiledConstantPoolSet.exists(compiledItem =>
+        ComparisonOptions(compareIntegers = false,takeAllLeftKeys = false,takeAllRightKeys = true).deepEquality(compiledItem, expectedItem))
       hasEquivalent
     }))
   }

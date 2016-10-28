@@ -1,29 +1,27 @@
 package transformations.javac.classes
 
 import org.junit.{Ignore, Test}
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestFields {
+class TestFields extends FunSuite {
 
-  @Test
-  def testFieldAssignment() {
+
+  test("FieldAssignment") {
     TestUtils.compareWithJavacAfterRunning("FieldAssignment.java")
   }
 
-  @Test
-  def fieldMethodMix() {
+  test("fieldMethodMix") {
     TestUtils.compareWithJavacAfterRunning("FieldMethodMix.java")
   }
 
-  @Ignore //Don't yet feel like testing cases where Javac fails.
-  @Test
-  def illegalForwardFieldReference() {
+  //Don't yet feel like testing cases where Javac fails.
+  ignore("illegalForwardFieldReference") {
     TestUtils.compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
   }
 
-  @Ignore //Don't yet feel like testing cases where Javac fails.
-  @Test
-  def fieldAndMethodOverloading() {
+  //Don't yet feel like testing cases where Javac fails.
+  ignore("fieldAndMethodOverloading") {
     TestUtils.compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
   }
 }

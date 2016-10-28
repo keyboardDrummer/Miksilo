@@ -1,61 +1,57 @@
 package core.grammar
 
 import org.junit.{Assert, Ignore, Test}
+import org.scalatest.FunSuite
 
-import scala.util.parsing.combinator.syntactical.StandardTokenParsers
+import scala.util.parsing.combinator.lexical.StdLexical
+import scala.util.parsing.combinator.syntactical.{StandardTokenParsers, StdTokenParsers}
+import scala.util.parsing.combinator.token.StdTokens
 
-class TestNonPackratRecursion extends StandardTokenParsers {
+class TestNonPackratRecursion extends FunSuiteStandardTokenParsers {
 
-  @Test
-  def testRightRecursion() {
+  test("RightRecursion") {
     lazy val parser: Parser[Any] = success("") ||| keyword("!") ~ parser ^^ { case a ~ b => (a, b)}
     val input = "!!!"
     lexical.delimiters += "!"
     val result = parser(new lexical.Scanner(input))
 
-    Assert.assertEquals(("!",("!",("!",""))), result.get)
+    assertResult(("!",("!",("!",""))))(result.get)
   }
 
-  @Test
-  def testRightRecursion2() {
+
+  test("testRightRecursion2") {
     lazy val parser: Parser[Any] = keyword("!") ~ parser ^^ { case a ~ b => (a, b)} ||| success("")
     val input = "!!!"
     lexical.delimiters += "!"
     val result = parser(new lexical.Scanner(input))
 
-    Assert.assertEquals(("!",("!",("!",""))), result.get)
+    assertResult(("!",("!",("!",""))))(result.get)
   }
 
-  @Ignore
-  @Test
-  def testLeftRecursion() {
+  ignore("testLeftRecursion") {
     lazy val parser: Parser[Any] = success("") ||| parser ~ keyword("!") ^^ { case a ~ b => (a,b)}
     val input = "!!!"
     lexical.delimiters += "!"
     val result = parser(new lexical.Scanner(input))
 
-    Assert.assertEquals(((("","!"),"!"),"!"), result.get)
+    assertResult(((("","!"),"!"),"!"))(result.get)
   }
 
-  @Ignore
-  @Test
-  def testLeftRecursion2() {
+  ignore("LeftRecursion2") {
     lazy val parser: Parser[Any] = parser ~ keyword("!") ^^ { case a ~ b => (a,b)} ||| success("")
     val input = "!!!"
     lexical.delimiters += "!"
     val result = parser(new lexical.Scanner(input))
 
-    Assert.assertEquals(((("","!"),"!"),"!"), result.get)
+    assertResult(((("","!"),"!"),"!"))(result.get)
   }
 
-  @Ignore
-  @Test
-  def testBothRecursion() {
+  ignore("BothRecursion") {
     lazy val parser: Parser[Any] = keyword("!") ||| parser ~ parser ^^ { case a ~ b => (a,b)}
     val input = "!!!"
     lexical.delimiters += "!"
     val result = parser(new lexical.Scanner(input))
 
-    Assert.assertEquals(("!",("!","!")), result.get)
+    assertResult(("!",("!","!")))(result.get)
   }
 }
