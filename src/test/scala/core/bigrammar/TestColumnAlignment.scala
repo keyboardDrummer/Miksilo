@@ -1,8 +1,10 @@
 package core.bigrammar
 
-class TestColumnAlignment extends GrammarDocumentWriter {
+import org.scalatest.FunSuite
 
-  def test() {
+class TestColumnAlignment extends FunSuite with GrammarDocumentWriter {
+
+  test("test") {
     val input = "Hallo.              Hier staat een tweede gesprek." + System.lineSeparator() +
                 "Hoe gaat het met je?"
     val grammar: BiGrammar = (("Hallo." : BiGrammar) % "Hoe gaat het met je?") ~ "Hier staat een tweede gesprek."

@@ -18,43 +18,37 @@ import scala.reflect.io.Path
 class TestDocumentGrammarWithJavaExamples extends FunSuite {
   val lineSeparator = System.lineSeparator()
 
-
-  def testSimpleForLoop() {
+  test("SimpleForLoop") {
     val testFileContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-
-  def testWhile() {
+  test("While") {
     val testFileContent = TestUtils.getJavaTestFile("whilee", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-  def testFibonacci() {
+  test("Fibonacci") {
     val testFileContent = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
-
-  def testTernary() {
+  test("Ternary") {
     val input = "1 ? 2 : 3"
     TestGrammarUtils.compareInputWithPrint(input, None, TernaryC.TernaryExpressionGrammar)
   }
 
-
-  def testFibonacciMainMethod() {
+  test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
     TestGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
   }
 
-
-  def testBlock() {
+  test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
     TestGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
   }
 
-
-  def testPrintAfterImplicitAddition() {
+  test("PrintAfterImplicitAddition") {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
 
@@ -68,8 +62,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     assertResult(expectation)(output)
   }
 
-
-  def testPrettyPrintByteCode() {
+  test("PrettyPrintByteCode") {
     val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
@@ -79,8 +72,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     assertResult(expectation)(state.output)
   }
 
-
-  def testPrettyPrintAndParseByteCode() {
+  test("PrettyPrintAndParseByteCode") {
     val input = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
 
     val byteCodeTransformations = JavaCompiler.byteCodeTransformations
@@ -94,24 +86,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     assertResult("8")(output)
   }
 
-
-  def prettyPrintByteCode() {
+  test("prettyPrintByteCode") {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
     assertResult(input)(output)
   }
 
-
-  def parseByteCode() {
+  test("parseByteCode") {
     val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
     val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
     assertResult("8")(output)
   }
 
-
-  def testPrettyAddressLoad(): Unit = {
+  test("PrettyAddressLoad") {
     val grammar = LoadAddressC.getGrammarForThisInstruction(new GrammarCatalogue())
     val addressLoad = LoadAddressC.addressLoad(0)
     BiGrammarToPrinter.toDocument(addressLoad, grammar)
