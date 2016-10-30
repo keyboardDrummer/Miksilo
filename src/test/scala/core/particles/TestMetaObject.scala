@@ -9,15 +9,13 @@ import transformations.javac.methods.{MemberSelector, VariableC}
 
 class TestMetaObject extends FunSuite {
 
-
-  def testEquals() {
+  test("Equals") {
     val first = new Node(ClazzKey, FieldKey -> FieldValue)
     val second = new Node(ClazzKey, FieldKey -> FieldValue)
     assertResult(first)( second)
   }
 
-
-  def testEqualsOnJavaModel() {
+  test("EqualsOnJavaModel") {
     val first = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       List(CallC.call(VariableC.variable("fibonacci"), List(IntLiteralC.literal(5)))))
     val second = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
@@ -30,6 +28,4 @@ class TestMetaObject extends FunSuite {
   object FieldKey
 
   object FieldValue
-
-
 }

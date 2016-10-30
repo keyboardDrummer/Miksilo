@@ -7,37 +7,32 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 
 class TestParseTypes extends FunSuite {
 
-
-  def testArrayArrayType() {
+  test("ArrayArrayType") {
     val input = "int[][]"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     assertResult(ArrayTypeC.arrayType(ArrayTypeC.arrayType(IntTypeC.intType)))(result)
   }
 
-
-  def testVoidType() {
+  test("VoidType") {
     val input = "void"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     assertResult(VoidTypeC.voidType)(result)
   }
 
-
-  def testArrayType() {
+  test("ArrayType") {
     val input = "int[]"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     assertResult(ArrayTypeC.arrayType(IntTypeC.intType))(result)
   }
 
-
-  def testObjectType() {
+  test("ObjectType") {
     val input = "java.lang.String"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     val objectType = ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(objectType)(result)
   }
 
-
-  def testArrayType2() {
+  test("ArrayType2") {
     val input = "java.lang.String[]"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     val objectType = ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))

@@ -9,8 +9,7 @@ import util.TestUtils
 
 class TestJavaGoto extends FunSuite {
 
-
-  def test() {
+  test("basic") {
     val testUtils: TestUtils = new TestUtils(new CompilerFromParticles(Seq(JavaGotoC) ++ JavaCompiler.javaCompilerTransformations))
     assertResult("11")(testUtils.compileAndRun("JavaGoto"))
   }

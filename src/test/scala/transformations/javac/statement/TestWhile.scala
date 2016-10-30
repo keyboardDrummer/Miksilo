@@ -1,12 +1,12 @@
 package transformations.javac.statement
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestWhile {
+class TestWhile extends FunSuite {
 
-
-  def testSimple() {
+  test("basic") {
     TestUtils.compareWithJavacAfterRunning("Whilee")
   }
 }

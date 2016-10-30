@@ -8,13 +8,13 @@ import scala.reflect.io.Path
 
 class TestAssignment extends FunSuite {
 
-  def testFullPipeline() {
+  test("FullPipeline") {
     val inputDirectory = Path("")
     val output: String = TestUtils.compileAndRun("Assignment", inputDirectory)
     assertResult("1")(output)
   }
 
-  def testAssignmentWithJump() {
+  test("AssignmentWithJump") {
     val inputDirectory = Path("")
     val output: String = TestUtils.compileAndRun("AssignmentWithJump", inputDirectory)
     assertResult("1")(output)

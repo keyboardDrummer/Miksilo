@@ -7,7 +7,6 @@ class TestDocument extends FunSuite {
 
   val lineSep = System.lineSeparator()
 
-
   test("EmptyWithExclamation") {
     val expected = "!"
     val text = new LeftRight(Empty, new Text("!"))

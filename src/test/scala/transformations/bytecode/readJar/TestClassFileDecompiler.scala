@@ -19,7 +19,6 @@ import scala.reflect.io.{File, Path}
 
 class TestClassFileDecompiler extends FunSuite {
 
-
   test("TypeVariableSimilarToBooleanSignature") {
     val signature = "<B:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/lang/Class<TB;>;Ljava/lang/String;Ljava/lang/String;)Lcom/sun/xml/internal/bind/api/RawAccessor<TB;TV;>;"
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
@@ -38,7 +37,6 @@ class TestClassFileDecompiler extends FunSuite {
     val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
-
   test("TypeVariable2") {
     val signature = "<NoSuchMemberException:Ljava/lang/ReflectiveOperationException;>(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
@@ -47,7 +45,6 @@ class TestClassFileDecompiler extends FunSuite {
     val manager = new ParticlesToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
-
 
   test("TypeVariable3") {
     val signature = "(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
@@ -76,7 +73,6 @@ class TestClassFileDecompiler extends FunSuite {
     }
   }
 
-
   test("ObjectClassUnParsedAttributes") {
     val inputStream = getInputStream("Object.class")
     val compiler: CompilerFromParticles = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
@@ -85,7 +81,6 @@ class TestClassFileDecompiler extends FunSuite {
     val expected = TestUtils.getTestFile("DecodedObjectClassPrettyPrint.txt").slurp()
     assertResult(expected)(state.output)
   }
-
 
   test("ObjectClassParsedAttributes") {
     val compiler = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
@@ -96,7 +91,6 @@ class TestClassFileDecompiler extends FunSuite {
     assertResult(expected)(state.output)
   }
 
-
   test("ObjectClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(getInputStream("Object.class"))
@@ -105,7 +99,6 @@ class TestClassFileDecompiler extends FunSuite {
     val expected = TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
     assertResult(expected)(outputState.output)
   }
-
 
   test("StringClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
@@ -116,7 +109,6 @@ class TestClassFileDecompiler extends FunSuite {
     assertResult(expected)(outputState.output)
   }
 
-
   test("SystemClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(getInputStream("System.class"))
@@ -125,7 +117,6 @@ class TestClassFileDecompiler extends FunSuite {
     val expected = TestUtils.getTestFile("DecompiledSystemClassFileSignature.txt").slurp()
     assertResult(expected)(outputState.output)
   }
-
 
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)

@@ -2,13 +2,13 @@ package transformations.javac.methods
 
 import core.particles.CompilationState
 import org.junit.{Assert, Test}
+import org.scalatest.FunSuite
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
+import transformations.javac.methods.call.{CallC, CallStaticOrInstanceC}
 
-class TestCallC {
+class TestCallC extends FunSuite {
 
-
-  def test() {
+  test("callC") {
     val state = new CompilationState()
     ExpressionSkeleton.inject(state)
     MemberSelector.inject(state)

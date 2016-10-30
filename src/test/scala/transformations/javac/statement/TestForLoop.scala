@@ -1,19 +1,16 @@
 package transformations.javac.statement
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
+class TestForLoop extends FunSuite {
 
-
-class TestForLoop {
-
-
-  def testSimple() {
+  test("testSimple") {
     TestUtils.compareWithJavacAfterRunning("SimpleForLoop")
   }
 
-
-  def testWithContinue() {
+  test("WithContinue") {
     TestUtils.compareWithJavacAfterRunning("ForLoopWithContinue")
   }
 }

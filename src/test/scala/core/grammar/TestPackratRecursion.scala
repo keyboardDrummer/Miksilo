@@ -8,8 +8,7 @@ import scala.util.parsing.input.CharArrayReader
 
 class TestPackratRecursion extends FunSuiteStandardTokenParsers with PackratParsers {
 
-
-  def testRightRecursion() {
+  test("RightRecursion") {
     lazy val parser: PackratParser[Any] = success("") ||| keyword("!") ~ parser ^^ { case a ~ b => (a, b)}
     val input = "!!!"
     lexical.delimiters += "!"
@@ -18,8 +17,7 @@ class TestPackratRecursion extends FunSuiteStandardTokenParsers with PackratPars
     assertResult(("!",("!",("!",""))))(result.get)
   }
 
-
-  def testRightRecursion2() {
+  test("RightRecursion2") {
     lazy val parser: PackratParser[Any] = keyword("!") ~ parser ^^ { case a ~ b => (a, b)} ||| success("")
     val input = "!!!"
     lexical.delimiters += "!"
@@ -28,8 +26,7 @@ class TestPackratRecursion extends FunSuiteStandardTokenParsers with PackratPars
     assertResult(("!",("!",("!",""))))(result.get)
   }
 
-
-  def testLeftRecursion() {
+  test("LeftRecursion") {
     lazy val parser: PackratParser[Any] = success("") ||| parser ~ keyword("!") ^^ { case a ~ b => (a,b)}
     val input = "!!!"
     lexical.delimiters += "!"
@@ -38,8 +35,7 @@ class TestPackratRecursion extends FunSuiteStandardTokenParsers with PackratPars
     assertResult(((("","!"),"!"),"!"))(result.get)
   }
 
-
-  def testLeftRecursion2() {
+  test("LeftRecursion2") {
     lazy val parser: PackratParser[Any] = parser ~ keyword("!") ^^ { case a ~ b => (a,b)} ||| success("")
     val input = "!!!"
     lexical.delimiters += "!"
@@ -48,8 +44,7 @@ class TestPackratRecursion extends FunSuiteStandardTokenParsers with PackratPars
     assertResult(((("","!"),"!"),"!"))(result.get)
   }
 
-
-  def testBothRecursion() {
+  test("BothRecursion") {
     lazy val parser: PackratParser[Any] = keyword("!") ||| parser ~ parser ^^ { case a ~ b => (a,b)}
     val input = "!!!"
     lexical.delimiters += "!"

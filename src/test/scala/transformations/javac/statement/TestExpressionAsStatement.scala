@@ -1,14 +1,14 @@
 package transformations.javac.statement
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
 import scala.reflect.io.Path
 
-class TestExpressionAsStatement {
+class TestExpressionAsStatement extends FunSuite {
 
-
-  def test() {
+  test("basic") {
     val inputDirectory = Path("")
     TestUtils.compareWithJavacAfterRunning("ExpressionAsStatement", inputDirectory)
   }

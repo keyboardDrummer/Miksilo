@@ -16,7 +16,6 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
     testUsingGrammar(grammar)
   }
 
-
   test("DirectRecursion") {
     val grammar: Labelled = new Labelled("leftRec")
     grammar.addOption("!" ~ grammar)
@@ -57,7 +56,6 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
   def getExpectedLeftRecursiveResult: AnyRef = {
     "!!!!!".map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
   }
-
 
   test("PrintingIndirectLeftRecursion") {
     val inner = new Labelled("boep")

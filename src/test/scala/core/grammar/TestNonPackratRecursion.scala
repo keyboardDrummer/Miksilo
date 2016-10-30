@@ -18,7 +18,6 @@ class TestNonPackratRecursion extends FunSuiteStandardTokenParsers {
     assertResult(("!",("!",("!",""))))(result.get)
   }
 
-
   test("testRightRecursion2") {
     lazy val parser: Parser[Any] = keyword("!") ~ parser ^^ { case a ~ b => (a, b)} ||| success("")
     val input = "!!!"

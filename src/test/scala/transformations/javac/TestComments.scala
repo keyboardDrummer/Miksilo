@@ -12,33 +12,32 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
 
   val testGrammar = TestGrammarUtils(this.compiler.particles)
 
-  def testBasicClass() {
+  test("BasicClass") {
     val input = "/* jooo */"
     TestGrammarUtils.parseAndPrintSame(input, None, JavaStyleCommentsC.getCommentGrammar)
   }
 
-  def comparePrintResultWithoutComment() {
+  test("comparePrintResultWithoutComment") {
     val testFile: File = getJavaTestFile("Whilee")
     val input = testFile.slurp()
     val result = testGrammar.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
-
-  def comparePrintResult() {
+  test("comparePrintResult") {
     val testFile: File = getJavaTestFile("WhileeWithComment.java")
     val input = testFile.slurp()
     val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
-  def testFullPipeline() {
+  test("FullPipeline") {
     val inputDirectory = Path("")
     val output: String = compileAndRun("WhileeWithComment.java", inputDirectory)
     assertResult("3")( output)
   }
 
-  def javaToSimplified() {
+  test("javaToSimplified") {
     val initialCompiler = new CompilerFromParticles(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("FibonacciWithComments.java"))

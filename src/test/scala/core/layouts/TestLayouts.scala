@@ -7,7 +7,7 @@ class TestLayouts extends FunSuite {
 
   val smallNumber: Double = 0.0001
 
-  def test() {
+  test("basic") {
     val layout = new EquationLayout()
     val inputPanel = layout.createComponent
     val executeButton = layout.createComponent

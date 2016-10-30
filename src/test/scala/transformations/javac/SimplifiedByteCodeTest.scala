@@ -8,15 +8,14 @@ import util.TestUtils
 
 class SimplifiedByteCodeTest extends FunSuite {
 
-
-  def javaToSimplified() {
+  test("javaToSimplified") {
     val utils = new TestUtils(new CompilerFromParticles(PresetsPanel.getJavaToSimplifiedByteCodePreset.particles))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("Fibonacci.java"))
     val expectedResult = utils.getTestFile("FibonacciInSimplifiedByteCode.txt").slurp()
     assertResult(expectedResult)(result)
   }
 
-  def simplifiedToByteCode() {
+  test("simplifiedToByteCode") {
     val utils = new TestUtils(new CompilerFromParticles(PresetsPanel.getSimplifiedByteCodePreset.particles))
     val result = utils.compileAndPrettyPrint(utils.getTestFile("FibonacciInSimplifiedByteCode.txt"))
     val expectedResult = utils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()

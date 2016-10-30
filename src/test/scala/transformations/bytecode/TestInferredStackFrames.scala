@@ -1,12 +1,12 @@
 package transformations.bytecode
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestInferredStackFrames {
+class TestInferredStackFrames extends FunSuite {
 
-
-  def regression1(): Unit = {
+  test("regression1") {
     TestUtils.compareWithJavacAfterRunning("ComparisonOptimization.java")
   }
 }

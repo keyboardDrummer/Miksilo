@@ -14,7 +14,7 @@ class TestLabelledLocations extends FunSuite {
 
   val labelledParticles: Seq[Particle] = Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations
 
-  def javaToLabelled() {
+  test("javaToLabelled") {
     val particles: Seq[Particle] = JavaCompiler.spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
     val utils = new TestUtils(new CompilerFromParticles(particles))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("Fibonacci.java"))
@@ -22,8 +22,7 @@ class TestLabelledLocations extends FunSuite {
     assertResult(expectedResult)(result)
   }
 
-
-  def labelledToByteCode() {
+  test("labelledToByteCode") {
     val labelledByteCodeCompiler = new CompilerFromParticles(labelledParticles)
     val utils = new TestUtils(new CompilerFromParticles(labelledByteCodeCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))))
     val result = utils.compileAndPrettyPrint(utils.getTestFile("FibonacciInLabelledByteCode.txt"))

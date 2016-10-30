@@ -25,7 +25,6 @@ class TestPackratParsing extends FunSuiteStandardTokenParsers with PackratParser
   lexical.delimiters += "]"
   lexical.delimiters ++= Seq("+", "<", "?", ":")
 
-
   test("ParseType") {
 
     lazy val parseTypeInner: PackratParser[TestType] =
@@ -45,7 +44,6 @@ class TestPackratParsing extends FunSuiteStandardTokenParsers with PackratParser
     assertResult(2)(parseExpression1(new PackratReader(new lexical.Scanner("a"))).get)
     assertResult(1)(parseExpression2(new PackratReader(new lexical.Scanner("a"))).get)
   }
-
 
   test("ParseExpressionPrecedenceFailure") {
 

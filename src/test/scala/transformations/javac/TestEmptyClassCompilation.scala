@@ -2,32 +2,31 @@ package transformations.javac
 
 import core.particles.node.Node
 import org.junit.Test
+import org.scalatest.FunSuite
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.constructor.SuperCallExpression
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.types.MethodTypeC
 import util.TestUtils
 
-class TestEmptyClassCompilation {
+class TestEmptyClassCompilation extends FunSuite {
   val className: String = "EmptyClass"
   val classPackage: Seq[String] = Seq("transformations", "java", "testing")
 
-
-  def testEquivalentConstantPool() {
+  test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
     val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
-
-  def testEquivalentMethod() {
+  test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
     val compiledCode = JavaCompiler.getCompiler.transform(javaCode)

@@ -1,12 +1,12 @@
 package transformations.javac.expressions
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestIntegers {
+class TestIntegers extends FunSuite {
 
-
-  def simpleInteger() {
+  test("simpleInteger") {
     TestUtils.compareWithJavacAfterRunning("BigInteger")
   }
 }

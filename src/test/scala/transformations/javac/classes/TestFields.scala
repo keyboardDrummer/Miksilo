@@ -6,7 +6,6 @@ import util.TestUtils
 
 class TestFields extends FunSuite {
 
-
   test("FieldAssignment") {
     TestUtils.compareWithJavacAfterRunning("FieldAssignment.java")
   }

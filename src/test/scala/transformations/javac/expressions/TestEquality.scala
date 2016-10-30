@@ -1,12 +1,12 @@
 package transformations.javac.expressions
 
 import org.junit.Test
+import org.scalatest.FunSuite
 import util.TestUtils
 
-class TestEquality {
+class TestEquality extends FunSuite {
 
-
-  def test() {
+  test("equality") {
     TestUtils.compareWithJavacAfterRunning("SimpleEquality")
   }
 }

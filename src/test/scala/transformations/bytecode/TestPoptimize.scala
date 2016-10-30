@@ -16,15 +16,13 @@ import transformations.javac.types.MethodTypeC
 
 class TestPoptimize extends FunSuite {
 
-
-  def testBasic() {
+  test("Basic") {
     val instructions = Seq(SmallIntegerConstantC.integerConstant(3), PopC.pop, VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(Seq(VoidReturnInstructionC.voidReturn))(newInstructions)
   }
 
-
-  def testMemory() {
+  test("Memory") {
     val instructions = Seq(SmallIntegerConstantC.integerConstant(3),
       SmallIntegerConstantC.integerConstant(2),
       PopC.pop,
@@ -34,9 +32,7 @@ class TestPoptimize extends FunSuite {
     assertResult(Seq(VoidReturnInstructionC.voidReturn))(newInstructions)
   }
 
-
-
-  def testEncapsulation() {
+  test("Encapsulation") {
     val middle = Seq(SmallIntegerConstantC.integerConstant(2), StoreIntegerC.integerStore(0))
     val expected = middle ++ Seq(VoidReturnInstructionC.voidReturn)
     val instructions = Seq(SmallIntegerConstantC.integerConstant(3)) ++ middle ++ Seq(PopC.pop, VoidReturnInstructionC.voidReturn)
@@ -44,8 +40,7 @@ class TestPoptimize extends FunSuite {
     assertResult(expected)(newInstructions)
   }
 
-
-  def testAdvanced() {
+  test("Advanced") {
     val expected = Seq(SmallIntegerConstantC.integerConstant(3),
       SmallIntegerConstantC.integerConstant(3),
       StoreIntegerC.integerStore(0),
@@ -66,8 +61,7 @@ class TestPoptimize extends FunSuite {
     assertResult(expected)(newInstructions)
   }
 
-
-  def testRobustness(){
+  test("Robustness"){
     val instructions = Seq(SmallIntegerConstantC.integerConstant(3), VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(instructions)(newInstructions)
@@ -82,9 +76,8 @@ class TestPoptimize extends FunSuite {
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)
   }
-  
 
-  def testPop2() = {
+  test("Pop2") {
     val instructions = Seq(PushLongC.constant(1), Pop2C.pop2, VoidReturnInstructionC.voidReturn)
     val expected = Seq(VoidReturnInstructionC.voidReturn)
     val newInstructions = transformInstructions(instructions)

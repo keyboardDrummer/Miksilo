@@ -2,51 +2,46 @@ package core.bigrammar
 
 import core.grammar.{NumberG, ~}
 import org.junit.Test
+import org.scalatest.FunSuite
 
-class TestSimpleExpressionLanguage extends GrammarDocumentWriter {
+class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
 
-
-  def testSimpleAddition() {
+  test("SimpleAddition") {
     val example = "3 + 4"
     val expected = Add(Value(3), Value(4))
 
     parseAndPrint(example, expected)
   }
 
-
-  def testTwoAdditions() {
+  test("TwoAdditions") {
     val example = "3 + 4 + 2"
     val expected = Add(Value(3), Add(Value(4),Value(2)))
 
     parseAndPrint(example, expected)
   }
 
-
-  def testMultiplyWithAddition() {
+  test("MultiplyWithAddition") {
     val example = "3 * 4 + 2"
     val expected = Add(Multiply(Value(3), Value(4)),Value(2))
 
     parseAndPrint(example, expected)
   }
 
-
-  def testMultiplyWithAddition2() {
+  test("MultiplyWithAddition2") {
     val example = "3 + 4 * 2"
     val expected = Add(Value(3), Multiply(Value(4),Value(2)))
 
     parseAndPrint(example, expected)
   }
 
-
-  def testMultiplyWithAdditionWithParenthesis() {
+  test("MultiplyWithAdditionWithParenthesis") {
     val example = "3 * (4 + 2)"
     val expected = Multiply(Value(3), Add(Value(4),Value(2)))
 
     parseAndPrint(example, expected)
   }
 
-
-  def testIf() {
+  test("If") {
     val newLine = System.lineSeparator()
     val example = s"3$newLine? 4$newLine: 2"
     val expected = IfNotZero(Value(3), Value(4),Value(2))
