@@ -15,7 +15,7 @@ import scala.reflect.io.Path
 class TestOptimizeBooleanInstructions extends FunSuite {
 
   test("ForFibonacci") {
-    val withOptimization = TestUtils.parseAndTransform("fibonacci", Path(""))
+    val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
     val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
 

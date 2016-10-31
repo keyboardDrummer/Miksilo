@@ -19,9 +19,9 @@ class TestLayouts extends FunSuite {
     layout.addEquals(layout.container.top, inputPanel.top, executeButton.top, outputPanel.top)
     layout.addEquals(layout.container.bottom, inputPanel.bottom, executeButton.bottom, outputPanel.bottom)
     val solution = layout.solve(500, 500)
-    assertResult(0.0)( solution(inputPanel.left), smallNumber)
-    assertResult(200)( solution(inputPanel.right), smallNumber)
-    assertResult(300)( solution(outputPanel.left), smallNumber)
-    assertResult(500)( solution(outputPanel.right), smallNumber)
+    assert(solution(inputPanel.left) < smallNumber)
+    assert(Math.abs(200 - solution(inputPanel.right)) < smallNumber)
+    assert(Math.abs(300 - solution(outputPanel.left)) < smallNumber)
+    assert(Math.abs(500 - solution(outputPanel.right)) < smallNumber)
   }
 }

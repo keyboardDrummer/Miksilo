@@ -10,6 +10,6 @@ class TestPostfixIncrement extends FunSuite {
 
   test("basic") {
     val inputDirectory = Path("")
-    TestUtils.compareWithJavacAfterRunning("PostFixIncrement", inputDirectory)
+    TestUtils.compareWithJavacAfterRunning("postFixIncrement", inputDirectory)
   }
 }

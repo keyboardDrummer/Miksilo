@@ -49,7 +49,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrintAfterImplicitAddition") {
-    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
 
     val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
@@ -63,7 +63,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrettyPrintByteCode") {
-    val input = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
     val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
 
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
