@@ -24,12 +24,12 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("While") {
-    val testFileContent = TestUtils.getJavaTestFile("whilee", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFile("Whilee", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Fibonacci") {
-    val testFileContent = TestUtils.getJavaTestFile("fibonacci", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
