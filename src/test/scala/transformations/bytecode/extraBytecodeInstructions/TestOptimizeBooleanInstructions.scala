@@ -17,7 +17,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
   test("ForFibonacci") {
     val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
-    val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("fibonacci", Path(""))
+    val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)
