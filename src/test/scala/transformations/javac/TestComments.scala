@@ -41,7 +41,7 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
     val initialCompiler = new CompilerFromParticles(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("FibonacciWithComments.java"))
-    val expectedResult = utils.getTestFile("FibonacciWithCommentsBytecode.txt").slurp()
+    val expectedResult = utils.getTestFile("FibonacciWithCommentsByteCode.txt").slurp()
     assertResult(expectedResult)(result)
   }
 }
