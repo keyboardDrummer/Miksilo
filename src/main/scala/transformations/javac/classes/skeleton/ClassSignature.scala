@@ -14,7 +14,13 @@ case class ClassSignature(parent: PackageSignature, name: String,
   extends PackageMember(Some(parent), name) {
   
   def getMethod(query: MethodQuery) = {
-    methods(new MethodClassKey(query.methodName, query.argumentTypes))
+    try
+    {
+      methods(new MethodClassKey(query.methodName, query.argumentTypes))
+    } catch
+    {
+      case e: NoSuchElementException => throw new RuntimeException(s"couldn't find ${query} in map ${method.toString}") //TODO remove?
+    }
   }
 
   def getField(name: String) = fields(name)
