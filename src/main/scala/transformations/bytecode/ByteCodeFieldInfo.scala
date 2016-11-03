@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{PartialSelf, CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{FromMap, CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
 
 object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
@@ -36,7 +36,7 @@ object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
     val parseFields = "fields:" %> fieldGrammar.manyVertical.indent()
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = (parseFields ~ membersGrammar.inner).asNode(ClassFileKey, ClassFields, PartialSelf)
+    membersGrammar.inner = (parseFields ~ membersGrammar.inner).asNode(ClassFileKey, ClassFields, FromMap)
   }
   
   override def description: String = "Adds field members to bytecode."

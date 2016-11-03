@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.{PartialSelf, CompilationState}
+import core.particles.{FromMap, CompilationState}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{SequenceSelection, Path}
@@ -36,7 +36,7 @@ object IfThenElseC extends StatementInstance {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
     val ifThenGrammar = grammars.find(IfThenC)
-    val ifThenElseGrammar = ifThenGrammar ~ ("else" ~> bodyGrammar) ^^ parseMap(key, PartialSelf, ElseKey)
+    val ifThenElseGrammar = ifThenGrammar ~ ("else" ~> bodyGrammar) ^^ parseMap(key, FromMap, ElseKey)
     statementGrammar.addOption(ifThenElseGrammar)
   }
 

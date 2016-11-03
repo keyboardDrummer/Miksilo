@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{PartialSelf, CompilationState, Contract}
+import core.particles.{FromMap, CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
@@ -128,11 +128,11 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
     val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val sameLocals1StackItemGrammar = "same locals, 1 stack item" ~> deltaGrammar % parseType.indent() ^^
-      parseMap(SameLocals1StackItem, PartialSelf, SameLocals1StackItemType)
+      parseMap(SameLocals1StackItem, FromMap, SameLocals1StackItemType)
     val appendFrameGrammar = "append frame" ~> deltaGrammar % parseType.manyVertical.indent() ^^ //TODO idee: in LabelledLocations dit opnieuw definieren.
-      parseMap(AppendFrame, PartialSelf, AppendFrameTypes)
-    val sameFrameGrammar = nodeMap("same frame" ~> deltaGrammar, SameFrameKey, PartialSelf)
-    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~ (", count = " ~> integer)).asNode(ChopFrame, PartialSelf, ChopFrameCount)
+      parseMap(AppendFrame, FromMap, AppendFrameTypes)
+    val sameFrameGrammar = nodeMap("same frame" ~> deltaGrammar, SameFrameKey, FromMap)
+    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~ (", count = " ~> integer)).asNode(ChopFrame, FromMap, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^

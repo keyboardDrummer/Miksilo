@@ -5,7 +5,7 @@ import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 
-object PartialSelf extends Key
+object FromMap extends Key
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
@@ -35,13 +35,13 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     /* This is a somewhat hacky way to remove part of a grammar that was used by a node.
     It requires that this grammar part was included using .as and that the Node was using PartialSelf
      */
-    def remove() : Unit = grammar.inner = produce(VoidValue).asNode(PartialSelf)
+    def remove() : Unit = grammar.inner = produce(VoidValue).asNode(FromMap)
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)
   {
     def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
-    def as(fields: Key*) = new NodeMap(grammar, PartialSelf, fields.toSeq)
+    def as(fields: Key*) = new NodeMap(grammar, FromMap, fields.toSeq)
   }
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
@@ -59,7 +59,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
     val metaObject = value.asInstanceOf[NodeLike]
 
-    if (metaObject.clazz == key || key == PartialSelf) {
+    if (metaObject.clazz == key || key == FromMap) {
       val fieldValues = fields.map(field => getWithPartial(metaObject, field))
       if (fieldValues.isEmpty)
         Some(VoidValue)
@@ -73,7 +73,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   case class ValueNotFound(meta: NodeLike, field: Any)
 
   def getWithPartial(meta: NodeLike, key: Any): Any = {
-    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
+    if (key == FromMap) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {
@@ -87,7 +87,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     fields.zip(values).foreach(pair => {
       val field: Any = pair._1
       val fieldValue: Any = pair._2
-      if (field == PartialSelf)
+      if (field == FromMap)
       {
         fieldValue match {
           case metaFieldValue: Node =>

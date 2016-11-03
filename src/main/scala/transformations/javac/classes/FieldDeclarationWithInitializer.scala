@@ -20,7 +20,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val memberGrammar = grammars.find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC) ^^ parseMap(FieldWithInitializerKey, PartialSelf)
+    val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC) ^^ parseMap(FieldWithInitializerKey, FromMap)
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 

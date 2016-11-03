@@ -128,7 +128,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
     val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
-      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, PartialSelf, PartialSelf,
+      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, FromMap, FromMap,
         CodeInstructionsKey, CodeAttributesKey, CodeExceptionTableKey)
     grammars.create(CodeGrammar, codeAttributeGrammar)
   }

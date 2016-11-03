@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{PartialSelf, CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{FromMap, CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
@@ -49,7 +49,7 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = membersGrammar.inner %% methods ^^ parseMap(ClassFileKey, PartialSelf, ClassMethodsKey)
+    membersGrammar.inner = membersGrammar.inner %% methods ^^ parseMap(ClassFileKey, FromMap, ClassMethodsKey)
   }
 
   object AccessFlagGrammar

@@ -96,7 +96,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
     val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
       constantPool %% membersGrammar %% attributesGrammar ^^
       parseMap(ClassFileKey, ClassNameIndexKey, ClassParentIndex, ClassInterfaces, ClassConstantPool,
-        PartialSelf, ClassAttributes))
+        FromMap, ClassAttributes))
 
     program.inner = classGrammar
   }
