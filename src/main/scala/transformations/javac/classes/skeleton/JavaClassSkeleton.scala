@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -84,7 +84,7 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"
-    val nameAndParent: BiGrammar = nameGrammar ~~ classParentGrammar ^^ parseMap(ClassFileKey, ClassName, ClassParent)
+    val nameAndParent: BiGrammar = (nameGrammar ~~ classParentGrammar).as(ClassName, ClassParent)
     val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % membersGrammar ^^
       parseMap(ClassFileKey, ClassPackage, ClassImports, PartialSelf, Members))
     grammars.find(ProgramGrammar).inner = classGrammar
@@ -113,11 +113,11 @@ object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with
 
   object ClassImports
 
-  object ClassParent
+  object ClassParent extends Key
 
   object Members
 
-  object ClassName
+  object ClassName extends Key
 
   override def description: String = "Defines a skeleton for the Java class."
 }

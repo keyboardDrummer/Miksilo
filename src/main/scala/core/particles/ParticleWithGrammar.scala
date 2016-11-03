@@ -41,7 +41,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit class GrammarForAst(grammar: BiGrammar)
   {
     def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
-    def as(key: Key) = asNode(PartialSelf, key) //grammar ^^ (v => Map[Any,Any](key -> v), { case k: Map[Any, Any] => k.get(key) } )
+    def as(fields: Key*) = new NodeMap(grammar, PartialSelf, fields.toSeq)
   }
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
@@ -73,7 +73,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   case class ValueNotFound(meta: NodeLike, field: Any)
 
   def getWithPartial(meta: NodeLike, key: Any): Any = {
-    if (key == PartialSelf) meta/*.dataView*/ else meta.get(key).getOrElse(ValueNotFound(meta, key))
+    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {
@@ -84,15 +84,14 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def construct(value: Any, key: AnyRef, fields: List[Any]) = {
     val result = new Node(key)
     val values = tildeValuesToSeq(value)
-    //val keyedValues = values.collect({ case value: Node => value.clazz == PartialSelf })
     fields.zip(values).foreach(pair => {
       val field: Any = pair._1
       val fieldValue: Any = pair._2
       if (field == PartialSelf)
       {
         fieldValue match {
-          case metaFieldValue: Node /*Map[Any, Any]*/ =>
-            result.data ++= fieldValue.asInstanceOf[Node].data //metaFieldValue
+          case metaFieldValue: Node =>
+            result.data ++= fieldValue.asInstanceOf[Node].data
           case _ =>
         }
       }
