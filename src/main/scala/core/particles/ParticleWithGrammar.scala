@@ -5,7 +5,17 @@ import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 
+/*
+Used as a field key when mapping a grammar to a node, to indicate that value at this location is mapped not using a regular field key,
+but as a map.
+ */
 object FromMap extends Key
+
+/*
+Used for the moment because we can't yet store parsed values into some map.
+We put them into a Node because it already has support for tupling/detupling
+ */
+object MapInsideNode extends Key
 
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
@@ -35,13 +45,13 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     /* This is a somewhat hacky way to remove part of a grammar that was used by a node.
     It requires that this grammar part was included using .as and that the Node was using PartialSelf
      */
-    def remove() : Unit = grammar.inner = produce(VoidValue).asNode(FromMap)
+    def remove() : Unit = grammar.inner = produce(VoidValue).as()
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)
   {
     def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
-    def as(fields: Key*) = new NodeMap(grammar, FromMap, fields.toSeq)
+    def as(fields: Key*) = new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
@@ -57,10 +67,11 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     if (!value.isInstanceOf[NodeLike])
       return None
 
-    val metaObject = value.asInstanceOf[NodeLike]
+    val node = value.asInstanceOf[NodeLike]
 
-    if (metaObject.clazz == key || key == FromMap) {
-      val fieldValues = fields.map(field => getWithPartial(metaObject, field))
+    val ignoreNodeClazz: Boolean = key == MapInsideNode //When we're hiding a map in a node we don't care about the node's clazz.
+    if (node.clazz == key || ignoreNodeClazz) {
+      val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
       if (fieldValues.isEmpty)
         Some(VoidValue)
       else
@@ -72,7 +83,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
   case class ValueNotFound(meta: NodeLike, field: Any)
 
-  def getWithPartial(meta: NodeLike, key: Any): Any = {
+  def getFieldValueTakingFromMapIntoAccount(meta: NodeLike, key: Any): Any = {
     if (key == FromMap) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }
 

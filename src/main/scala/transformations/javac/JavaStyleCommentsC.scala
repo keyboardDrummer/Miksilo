@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.{FromMap, ParticleWithGrammar}
+import core.particles.{MapInsideNode, ParticleWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
 import util.DataFlowAnalysis
@@ -58,7 +58,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 //            case _:Delimiter =>
 //              selection.set(new Sequence(commentsGrammar, current))
             case nodeMap:NodeMap =>
-              if (nodeMap.key != FromMap)
+              if (nodeMap.key != MapInsideNode)
               {
                 addCommentToNodeMap(commentsGrammar, selection)
               }
