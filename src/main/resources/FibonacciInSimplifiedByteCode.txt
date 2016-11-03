@@ -1,0 +1,79 @@
+class 2 extends 4 with interfaces: ()
+
+constant pool:
+  #1: Fibonacci
+  #2: class reference: 1
+  #3: java.lang.Object
+  #4: class reference: 3
+  #5: "<init>"
+  #6: T()V
+  #7: name and type: 5:6
+  #8: method reference: 4.7
+  #9: Code
+  #10: "main"
+  #11: T([Ljava/lang/String;)V
+  #12: java.io.PrintStream
+  #13: class reference: 12
+  #14: "print"
+  #15: T(I)V
+  #16: name and type: 14:15
+  #17: method reference: 13.16
+  #18: java.lang.System
+  #19: class reference: 18
+  #20: "out"
+  #21: TLjava/io/PrintStream;
+  #22: name and type: 20:21
+  #23: field reference: 19.22
+  #24: "fibonacci"
+  #25: T(I)I
+  #26: name and type: 24:25
+  #27: method reference: 2.26
+
+fields:
+
+methods:
+  method => nameIndex:5, descriptorIndex:6, flags:ACC_PUBLIC
+  attributes:
+    code: nameIndex:9, maxLocal:1
+    instructions:
+      load address(0)
+      invoke special(8)
+      void return instruction()
+    attributes:
+    exceptions:
+  method => nameIndex:10, descriptorIndex:11, flags:ACC_STATIC, ACC_PUBLIC
+  attributes:
+    code: nameIndex:9, maxLocal:1
+    instructions:
+      get static(23)
+      small integer constant(5)
+      invoke static(27)
+      invoke virtual(17)
+      void return instruction()
+    attributes:
+    exceptions:
+  method => nameIndex:24, descriptorIndex:25, flags:ACC_STATIC, ACC_PUBLIC
+  attributes:
+    code: nameIndex:9, maxLocal:1
+    instructions:
+      load integer(0)
+      small integer constant(2)
+      if integer compare greater or equal("false-4962768465676381896")
+      small integer constant(1)
+      goto("end4437113781045784766")
+      label("false-4962768465676381896")
+      load integer(0)
+      small integer constant(1)
+      subtract integer()
+      invoke static(27)
+      load integer(0)
+      small integer constant(2)
+      subtract integer()
+      invoke static(27)
+      add integers()
+      label("end4437113781045784766")
+      integer return instruction()
+    attributes:
+    exceptions:
+
+attributes:
