@@ -36,7 +36,7 @@ object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
     val parseFields = "fields:" %> fieldGrammar.manyVertical.indent()
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = parseFields ~ membersGrammar.inner ^^ parseMap(ClassFileKey, ClassFields, PartialSelf)
+    membersGrammar.inner = (parseFields ~ membersGrammar.inner).asNode(ClassFileKey, ClassFields, PartialSelf)
   }
   
   override def description: String = "Adds field members to bytecode."

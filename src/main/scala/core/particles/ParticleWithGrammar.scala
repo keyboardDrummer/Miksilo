@@ -1,6 +1,6 @@
 package core.particles
 
-import core.bigrammar.{VoidValue, BiGrammar, MapGrammar, GrammarDocumentWriter}
+import core.bigrammar._
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -30,9 +30,18 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     (input => construct(input, key, fieldList), obj => destruct(obj, key, fieldList))
   }
 
+  implicit class LabelledGrammarForAst(grammar: Labelled)
+  {
+    /* This is a somewhat hacky way to remove part of a grammar that was used by a node.
+    It requires that this grammar part was included using .as and that the Node was using PartialSelf
+     */
+    def remove() : Unit = grammar.inner = produce(VoidValue).asNode(PartialSelf)
+  }
+
   implicit class GrammarForAst(grammar: BiGrammar)
   {
     def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
+    def as(key: Key) = asNode(PartialSelf, key) //grammar ^^ (v => Map[Any,Any](key -> v), { case k: Map[Any, Any] => k.get(key) } )
   }
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
@@ -64,7 +73,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   case class ValueNotFound(meta: NodeLike, field: Any)
 
   def getWithPartial(meta: NodeLike, key: Any): Any = {
-    if (key == PartialSelf) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
+    if (key == PartialSelf) meta/*.dataView*/ else meta.get(key).getOrElse(ValueNotFound(meta, key))
   }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {
@@ -75,14 +84,15 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def construct(value: Any, key: AnyRef, fields: List[Any]) = {
     val result = new Node(key)
     val values = tildeValuesToSeq(value)
+    //val keyedValues = values.collect({ case value: Node => value.clazz == PartialSelf })
     fields.zip(values).foreach(pair => {
       val field: Any = pair._1
       val fieldValue: Any = pair._2
       if (field == PartialSelf)
       {
         fieldValue match {
-          case metaFieldValue: Node =>
-            result.data ++= fieldValue.asInstanceOf[Node].data
+          case metaFieldValue: Node /*Map[Any, Any]*/ =>
+            result.data ++= fieldValue.asInstanceOf[Node].data //metaFieldValue
           case _ =>
         }
       }

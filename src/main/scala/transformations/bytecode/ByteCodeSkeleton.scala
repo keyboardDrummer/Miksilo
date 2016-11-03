@@ -5,7 +5,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -57,7 +57,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   object AttributeNameKey
 
-  object ClassFileKey
+  object ClassFileKey extends Key
 
   object ClassMethodsKey
 
@@ -69,7 +69,7 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   object ClassInterfaces
 
-  object ClassFields
+  object ClassFields extends Key
 
   object ClassAttributes
 

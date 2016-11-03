@@ -1,23 +1,23 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{VoidValue, Consume, BiGrammar}
+import core.bigrammar.{BiGrammar, Consume, VoidValue}
 import core.grammar.StringLiteral
-import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
-import core.particles.node.{Key, Node}
 import core.particles._
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, OffsetDelta, DeltaGrammar, StackMapTableGrammar}
-import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute, StackMapTableAttribute}
+import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.attributes.CodeAttribute._
+import transformations.bytecode.attributes.StackMapTableAttribute.{DeltaGrammar, StackMapFrameGrammar}
+import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
-import transformations.bytecode.ByteCodeSkeleton._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import CodeAttribute._
 
 object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
@@ -160,7 +160,6 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
-
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     overrideJumpGrammars(grammars)
     overrideStackMapFrameGrammars(grammars)
@@ -168,7 +167,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
     val delta = grammars.find(DeltaGrammar)
-    delta.inner = nodeMap(produce(VoidValue), PartialSelf)
+    delta.remove()
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {

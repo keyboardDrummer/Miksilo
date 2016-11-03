@@ -121,7 +121,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   object DeltaGrammar
   object StackMapFrameGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val deltaGrammar = grammars.create(DeltaGrammar, nodeMap(", delta:" ~> integer, PartialSelf, OffsetDelta))
+    val deltaGrammar = grammars.create(DeltaGrammar, (", delta:" ~> integer).as(OffsetDelta))
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
