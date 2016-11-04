@@ -122,7 +122,7 @@ class BiGrammarToPrinter {
 
   def extractProduct(value: Any, grammar: BiGrammar): Try[core.grammar.~[Any, Any]] = value match {
     case ~(left, right) => Try(core.grammar.~(left, right))
-    case VoidValue => Try(core.grammar.~(VoidValue, VoidValue)) //TODO is this really necessary?
+    case UndefinedDestructuringValue => Try(core.grammar.~(UndefinedDestructuringValue, UndefinedDestructuringValue)) //TODO is this really necessary?
     case _ => fail("value was not a product.")
   }
 }

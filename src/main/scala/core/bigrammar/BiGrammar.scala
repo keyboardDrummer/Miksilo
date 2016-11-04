@@ -84,11 +84,11 @@ trait SequenceLike extends BiGrammar {
   def first: BiGrammar
   def second: BiGrammar
   def ignoreLeft: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(VoidValue, r)))
+    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
   }
 
   def ignoreRight: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, VoidValue)))
+    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, UndefinedDestructuringValue)))
   }
 }
 
@@ -107,7 +107,10 @@ class ManyVertical(inner: BiGrammar) extends Many(inner)
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner)
 
-object VoidValue //TODO looks a bit like ValueNotFound. Combine??
+/*
+Used in destructuring when a value is required as a result but it's not in the object to be destructured.
+*/
+object UndefinedDestructuringValue //TODO looks a bit like ValueNotFound. Combine??
 {
   override def toString = "_"
 }

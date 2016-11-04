@@ -44,8 +44,9 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   {
     /* This is a somewhat hacky way to remove part of a grammar that was used by a node.
     It requires that this grammar part was included using .as and that the Node was using PartialSelf
+    We produce an UndefinedDestructuringValue because that's also what you get when you 'ignore' part of a grammar.
      */
-    def remove() : Unit = grammar.inner = produce(VoidValue).as()
+    def remove() : Unit = grammar.inner = produce(UndefinedDestructuringValue).as()
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)
@@ -73,7 +74,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     if (node.clazz == key || ignoreNodeClazz) {
       val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
       if (fieldValues.isEmpty)
-        Some(VoidValue)
+        Some(UndefinedDestructuringValue) //Apparently this node maps onto grammars that are all ignored so it does not contain any values, however we have to return a value here.
       else
         Some(fieldValues.reduce((a,b) => core.grammar.~(a,b)))
     } else {

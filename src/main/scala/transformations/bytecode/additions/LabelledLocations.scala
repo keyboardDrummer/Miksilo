@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{BiGrammar, Consume, VoidValue}
+import core.bigrammar.{BiGrammar, Consume}
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
