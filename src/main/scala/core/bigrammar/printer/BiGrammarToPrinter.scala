@@ -38,6 +38,9 @@ class BiGrammarToPrinter {
       case BiFailure => failureToGrammar(value, grammar)
       case Produce(producedValue) => produceToDocument(value, grammar, producedValue)
       case Print(document) => Try(document)
+      case As(inner, key) => value match {
+        case WithMap(v, state) => toDocumentCached(state(key), inner)
+      }
     }
 
     nestError(result)

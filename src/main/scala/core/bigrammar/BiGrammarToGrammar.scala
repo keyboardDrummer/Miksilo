@@ -20,14 +20,19 @@ object BiGrammarToGrammar {
       case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ addState
       case many:Many => core.grammar.Many(recursive(many.inner)) ^^
         { case elements: Seq[Any] =>
-          val WithMaps = elements.map({ case x:WithMap =>x })
+          val WithMaps = elements.map({ case x:WithMap => x })
           WithMap(WithMaps.map(x => x.value), WithMaps.map(x => x.state).fold(Map.empty)((a,b) => a ++ b))
         }
       case mapGrammar: MapGrammar => core.grammar.MapGrammar(recursive(mapGrammar.inner),
-        { case WithMap(value, state) => WithMap(mapGrammar.construct(value), state) })
-      case BiFailure => core.grammar.FailureG() //^^ addState //TODO addState useful?
-      case Print(document) => core.grammar.Produce(Unit) ^^ addState
+          if (!mapGrammar.showMap)
+            { case WithMap(value, state) => WithMap(mapGrammar.construct(value), state) }
+          else
+            mapGrammar.construct
+        )
+      case BiFailure => core.grammar.FailureG()
+      case Print(document) => core.grammar.Produce(Unit) ^^ addState //TODO really want unit here?
       case Produce(value) => core.grammar.Produce(value) ^^ addState
+      case As(inner, key) => recursive(inner) ^^ { case WithMap(v, state) => WithMap(Unit, state ++ Map(key -> v))} //TODO really want unit here?
     }
 
     override def labelledLeave(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner

@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.document.{BlankLine, WhiteSpace}
 import core.grammar.{Grammar, PrintGrammar, ~}
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.responsiveDocument.ResponsiveDocument
 
 /*
@@ -128,10 +128,10 @@ class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar wi
   override def children = Seq(first, second)
 }
 
-class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any]) extends BiGrammar
+class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any], val showMap: Boolean = false) extends BiGrammar
 {
   override def children = Seq(inner)
-}
+} //TODO deze nog wat meer typed maken met WithState
 
 class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGrammar {
 
@@ -151,5 +151,8 @@ class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar w
 case class Print(document: ResponsiveDocument) extends BiGrammar
 
 case class Produce(result: Any) extends BiGrammar
+
+case class As(inner: BiGrammar, key: Key) extends BiGrammar
+object Get extends BiGrammar
 
 object BiFailure extends BiGrammar
