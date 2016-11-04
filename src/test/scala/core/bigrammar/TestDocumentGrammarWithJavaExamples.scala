@@ -7,7 +7,7 @@ import core.particles.{CompilerFromParticles, Particle}
 import org.scalatest.{FunSpec, FunSuite}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.expressions.TernaryC
+import transformations.javac.expressions.{ExpressionSkeleton, TernaryC}
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
 import transformations.javac.statements.BlockC
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompiler}
@@ -35,7 +35,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Ternary") {
     val input = "1 ? 2 : 3"
-    TestGrammarUtils.compareInputWithPrint(input, None, TernaryC.TernaryExpressionGrammar)
+    TestGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
   test("FibonacciMainMethod") {

@@ -5,6 +5,9 @@ import core.grammar.{Grammar, PrintGrammar, ~}
 import core.particles.node.Node
 import core.responsiveDocument.ResponsiveDocument
 
+/*
+A grammar that maps to both a parser and a printer
+ */
 trait BiGrammar extends GrammarDocumentWriter {
 
   def getDescendantsAndSelf: Seq[BiGrammar] = ???
