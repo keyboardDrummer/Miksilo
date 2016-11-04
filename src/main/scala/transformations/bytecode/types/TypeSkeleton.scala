@@ -66,7 +66,7 @@ object TypeSkeleton extends ParticleWithGrammar with WithState {
   def getAllSuperTypes(state: CompilationState)(_type: Node): Stream[Set[Node]] = {
     var returnedTypes = Set.empty[Node]
     Stream.iterate(Set(_type))(previousDepthTypes => {
-      val result = previousDepthTypes.flatMap(_type => getSuperTypes(state)(_type)).filter(_type => !returnedTypes.contains(_type))
+      val result = previousDepthTypes.flatMap(_type => getSuperTypes(state)(_type)).diff(returnedTypes)
       returnedTypes ++= result
       result
     })
