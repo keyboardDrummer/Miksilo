@@ -1,7 +1,7 @@
 package transformations.bytecode.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, ParticleWithGrammar}
 import transformations.bytecode.constants.ConstantEntry
@@ -28,7 +28,7 @@ trait TypeInstance extends ParticleWithGrammar with ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(TypeSkeleton.getByteCodeString(state)(constant))
   }
 
-  def byteCodeGrammarKey = (key,"bytecode")
+  def byteCodeGrammarKey = KeyGrammar(key)
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)

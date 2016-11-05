@@ -11,7 +11,7 @@ object VoidTypeC extends TypeInstance with StackType {
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("V",false) ~> produce(voidType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = Keyword("V", false) ~> produce(voidType)
 
   override def getStackSize: Int = 0
 

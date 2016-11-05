@@ -61,12 +61,13 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
   class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner,
       input => construct(input.asInstanceOf[WithMap], key, fields.toList),
-      obj => destruct(obj, key, fields.toList), showMap = true)
+      obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
   {
   }
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[WithMap] = {
+  def destruct(withMap: WithMap, key: Key, fields: List[Key]): Option[WithMap] = {
+    val value = withMap.value
     if (!value.isInstanceOf[NodeLike])
       return None
 
