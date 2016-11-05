@@ -16,13 +16,13 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object OffsetDelta extends Key
 
-  object SameLocals1StackItem
+  object SameLocals1StackItem extends Key
 
-  object SameLocals1StackItemType
+  object SameLocals1StackItemType extends Key
 
-  object AppendFrame
+  object AppendFrame extends Key
 
-  object AppendFrameTypes
+  object AppendFrameTypes extends Key
 
   object FullFrame
 
@@ -127,17 +127,16 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
     val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val sameLocals1StackItemGrammar = "same locals, 1 stack item" ~> deltaGrammar % parseType.indent() ^^
-      parseMap(SameLocals1StackItem, FromMap, SameLocals1StackItemType)
-    val appendFrameGrammar = "append frame" ~> deltaGrammar % parseType.manyVertical.indent() ^^ //TODO idee: in LabelledLocations dit opnieuw definieren.
-      parseMap(AppendFrame, FromMap, AppendFrameTypes)
-    val sameFrameGrammar = nodeMap("same frame" ~> deltaGrammar, SameFrameKey, FromMap)
-    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~ (", count = " ~> integer)).asNode(ChopFrame, FromMap, ChopFrameCount)
+    val sameLocals1StackItemGrammar = ("same locals, 1 stack item" ~> deltaGrammar %> parseType.indent()).
+      asNode(SameLocals1StackItem, SameLocals1StackItemType)
+    val appendFrameGrammar = ("append frame" ~> deltaGrammar %> parseType.manyVertical.indent()). //TODO idee: in LabelledLocations dit opnieuw definieren.
+      asNode(AppendFrame, AppendFrameTypes)
+    val sameFrameGrammar = ("same frame" ~> deltaGrammar).asNode(SameFrameKey)
+    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~> (", count = " ~> integer)).asNode(ChopFrame, FromMap, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
       parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
-
 
     grammars.create(StackMapTableGrammar, stackMapTableGrammar)
   }

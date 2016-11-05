@@ -11,6 +11,8 @@ but as a map.
  */
 object FromMap extends Key
 
+object Remove extends Key
+
 /*
 Used for the moment because we can't yet store parsed values into some map.
 We put them into a Node because it already has support for tupling/detupling
@@ -46,25 +48,25 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
     It requires that this grammar part was included using .as and that the Node was using PartialSelf
     We produce an UndefinedDestructuringValue because that's also what you get when you 'ignore' part of a grammar.
      */
-    def remove() : Unit = grammar.inner = produce(UndefinedDestructuringValue).as()
+    def remove() : Unit = grammar.inner = produce(UndefinedDestructuringValue).as(Remove)
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)
   {
     def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
-    def as(fields: Key*) = new NodeMap(grammar, MapInsideNode, fields.toSeq)
+    def as(field: Key) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
 
   class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner,
-      input => oldConstruct(input, key, fields.toList),
-      obj => oldDestruct(obj, key, fields.toList), showMap = false)
+      input => construct(input.asInstanceOf[WithMap], key, fields.toList),
+      obj => destruct(obj, key, fields.toList), showMap = true)
   {
   }
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[Any] = {
+  def destruct(value: Any, key: AnyRef, fields: List[Any]): Option[WithMap] = {
     if (!value.isInstanceOf[NodeLike])
       return None
 
@@ -115,8 +117,8 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def construct(valueWithMap: WithMap, key: AnyRef, fields: List[Any]) = {
     val value = valueWithMap.value
     val result: Node = oldConstruct(value, key, fields)
-    result.data ++= valueWithMap.state.filter(k => k.isInstanceOf[Key])
-    result
+    result.data ++= valueWithMap.state.filterKeys(k => k.isInstanceOf[Key])
+    WithMap(result, Map.empty)
   }
 
   def oldConstruct(value: Any, key: AnyRef, fields: List[Any]): Node = {

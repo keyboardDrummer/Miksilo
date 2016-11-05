@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.grammar.{Grammar, ~}
 
-case class WithMap(value: Any, var state: Map[Any,Any])
+case class WithMap(value: Any, state: Map[Any,Any])
 {
 }
 
@@ -32,7 +32,8 @@ object BiGrammarToGrammar {
       case BiFailure => core.grammar.FailureG()
       case Print(document) => core.grammar.Produce(Unit) ^^ addState //TODO really want unit here?
       case Produce(value) => core.grammar.Produce(value) ^^ addState
-      case As(inner, key) => recursive(inner) ^^ { case WithMap(v, state) => WithMap(Unit, state ++ Map(key -> v))} //TODO really want unit here?
+      case As(inner, key) => recursive(inner) ^^
+        { case WithMap(v, state) => WithMap(Unit, state ++ Map(key -> v))} //TODO really want unit here?
     }
 
     override def labelledLeave(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner
