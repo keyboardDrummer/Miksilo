@@ -1,18 +1,19 @@
 Blender [![Build Status](https://travis-ci.org/keyboardDrummer/ParticleCompiler.svg?branch=master)](https://travis-ci.org/keyboardDrummer/ParticleCompiler) [![Join the chat at https://gitter.im/ParticleCompiler/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ParticleCompiler/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============
 
-Blender is a language workbench, which is a tool to construct programming languages, such as <a href="https://www.jetbrains.com/mps/">Jetbrain's MPS</a>. 
+Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's MPS</a>. 
 
-Blender's main goal is to allow creating modular and thus re-usable languages. Blender gets this right by allowing you to transform any language into any other language. Most other language workbenches support only partial language modularity by allowing you to extend but not constrain a language. This allows you to only grow a small language into a bigger one, but not to transform between arbitrary ones. 
+Blender's main goal is to allow creating modular and thus re-usable languages. Blender gets this right by allowing you to transform any language into any other language. Other language workbenches support only partial language modularity by allowing you to extend but not constrain a language. This allows you to only grow a small language into a bigger one, but not to transform between arbitrary ones. 
 
-Another differentiator of Blender is that it is embedded in Scala, allowing you to use Blender features while inside a powerful general purpose programming language.
+Another differentiator of Blender is that it is embedded in Scala, allowing you to use Blender  while inside a powerful general purpose programming language. Some workbenches like <a href="https://github.com/usethesource/rascal">Rascal</a> define their own meta language. Here we say meta language to denote a language used to define languages. A custom meta language provides a smooth experience when using its language construction features, but leaves you without the ecosystem of a popular language. Other workbenches like <a href="http://metaborg.org/en/latest/">Spoofax</a> and <a href="https://www.jetbrains.com/mps/">MPS</a> even define several meta languages, each focussing on different aspects such as syntax and typing rules. Often these meta language are not actual programming languages, and such they miss out on a lot of power.
 
-The core concept of Blender is a *particle*. A particle is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a language. Language re-use comes from re-using these particles. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
 
 ###Particles
+The core concept of Blender is a *particle*. A particle is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a language. Language re-use comes from re-using these particles. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
+
 A particle can include one or several phases such as parsing, type checking, optimization and code generation.
 Commonly compilers are modularised by defining several compiler phases and using a limited number of intermediate languages.
-Particle compiler focuses purely on intermediate languages to achieve modularisation.
+Blender focuses purely on intermediate languages to achieve modularisation.
 By keeping the abstract syntax tree untyped, it becomes relatively simple to define a language as a sequence of language delta's.
 
 ###GUI
