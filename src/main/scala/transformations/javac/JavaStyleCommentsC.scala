@@ -41,7 +41,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
 
-    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
+    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar.as(CommentKey))
 
     val analysis = new GrammarAnalysis()
     analysis.run(new RootGrammar(grammars.find(ProgramGrammar)), false)
@@ -76,13 +76,15 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
     val growers = nodeMapPath.ancestors.
       map(path => path.get).
       filter(grammar => grammar.isInstanceOf[TopBottom] || grammar.isInstanceOf[Sequence] || grammar.isInstanceOf[ManyVertical] || grammar.isInstanceOf[ManyHorizontal])
+
+    if (growers.isEmpty)
+      return
+
     val firstGrower = growers.head
     val verticalNotHorizontal = firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
-    val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMapToTransform.inner)
-                           else commentsGrammar ~ nodeMapToTransform.inner
-    val newInner = innerWithComment ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
-    val newNodeMap = nodeMap(newInner, nodeMapToTransform.key, Seq(CommentKey) ++ nodeMapToTransform.fields: _*)
-    nodeMapPath.set(newNodeMap)
+    val innerWithComment = if (verticalNotHorizontal) commentsGrammar %> nodeMapToTransform.inner
+                           else commentsGrammar ~> nodeMapToTransform.inner
+    nodeMapToTransform.inner = innerWithComment
   }
 
   def getCommentsGrammar: BiGrammar = {
@@ -94,26 +96,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 
   def getCommentGrammar: BiGrammar = {
     val regex: Regex = new Regex( """/\*.*\*/""")
-    new RegexG(regex)
-  }
-
-  def combineCommentsAndPlaceLeft(from: Any): Any = {
-    val values = tildeValuesToSeq(from)
-    val commentCollections = values.collect({case x : CommentCollection => x})
-    val combinedComment = CommentCollection(commentCollections.flatMap(commentCollection => commentCollection.comments))
-    val nonComments = values.filter(x => !x.isInstanceOf[CommentCollection])
-    val newValues = Seq(combinedComment) ++ nonComments
-    newValues.reduce((a,b) => core.grammar.~(a,b))
-  }
-
-  def replaceLeftValueNotFoundWithEmptyComment(from: Any): Option[Any] = {
-    val values = tildeValuesToSeq(from)
-    val withoutComment = values.drop(1)
-    val comment = values.head match {
-      case collection: CommentCollection => collection
-      case _:ValueNotFound => CommentCollection(Seq.empty)
-    }
-    Some(core.grammar.~(comment, withoutComment.reduce((a,b) => core.grammar.~(a,b))))
+    RegexG(regex)
   }
 
   override def description: String = "Adds Java-style comments to the language"
