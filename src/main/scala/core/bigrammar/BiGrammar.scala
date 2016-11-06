@@ -152,7 +152,7 @@ case class Print(document: ResponsiveDocument) extends BiGrammar
 
 case class Produce(result: Any) extends BiGrammar
 
-case class As(inner: BiGrammar, key: Key) extends BiGrammar
+case class As(var inner: BiGrammar, key: Key) extends BiGrammar
 object Get extends BiGrammar
 
 object BiFailure extends BiGrammar

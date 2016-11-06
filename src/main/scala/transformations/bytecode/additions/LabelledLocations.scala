@@ -3,7 +3,7 @@ package transformations.bytecode.additions
 import core.bigrammar.{BiGrammar, Consume}
 import core.grammar.StringLiteral
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
@@ -137,7 +137,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
     override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-      new InstructionSignature(Seq.empty, Seq.empty)
+      InstructionSignature(Seq.empty, Seq.empty)
     }
 
     override def getInstructionSize: Int = 0
@@ -166,8 +166,8 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
-    val delta = grammars.find(DeltaGrammar)
-    delta.remove()
+    val deltas = grammars.findPathsToKey(ProgramGrammar, DeltaGrammar)
+    deltas.foreach(delta => delta.removeMeFromSequence())
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {
@@ -177,7 +177,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(KeyGrammar(jump.key))
-      grammar.inner = jump.name ~> new Consume(StringLiteral).manySeparated(",").inParenthesis ^^ parseMap(jump.key, InstructionArgumentsKey)
+      grammar.inner = jump.name ~> Consume(StringLiteral).manySeparated(",").inParenthesis ^^ parseMap(jump.key, InstructionArgumentsKey)
     }
   }
 }

@@ -5,7 +5,7 @@ import util.{GraphBasics, ExtendedType, Property}
 
 trait GrammarPath {
   def get: BiGrammar
-  def children: Seq[GrammarPath] = {
+  def children: Seq[GrammarPath] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
     val clazz: Class[_ <: BiGrammar] = get.getClass
     new ExtendedType(clazz).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
@@ -14,14 +14,6 @@ trait GrammarPath {
       })
   }
 
-  override def equals(obj: scala.Any): Boolean = {
-    obj match {
-      case otherPath: GrammarPath => otherPath.get.equals(get)
-      case _ => false
-    }
-  }
-
-  override def hashCode(): Int = get.hashCode()
   def ancestors: Seq[GrammarPath]
   def descentsIncludingSelf: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this), path => path.children)
 }
@@ -31,14 +23,25 @@ class RootGrammar(value: BiGrammar) extends GrammarPath
   override def get: BiGrammar = value
 
   override def ancestors: Seq[GrammarPath] = Seq.empty
+
+  override def hashCode(): Int = 1 //TODO obj.hashCode
+
+  override def equals(obj: Any): Boolean = obj.isInstanceOf[RootGrammar] //TODO && obj.equals..
 }
 
-class GrammarSelection(val previous: GrammarPath, property: Property[BiGrammar, AnyRef]) extends GrammarPath
+class GrammarSelection(val previous: GrammarPath, val property: Property[BiGrammar, AnyRef]) extends GrammarPath
 {
   val parent = previous.get
 
   def set(value: BiGrammar): Unit = {
     property.set(parent, value)
+  }
+
+  override def hashCode(): Int = parent.hashCode() * get.hashCode()
+
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case other: GrammarSelection => other.parent.equals(parent) && other.get.equals(get)
+    case _ => false
   }
 
   override def get: BiGrammar = {

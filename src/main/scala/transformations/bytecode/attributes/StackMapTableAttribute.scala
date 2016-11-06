@@ -121,7 +121,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   object DeltaGrammar
   object StackMapFrameGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val deltaGrammar = grammars.create(DeltaGrammar, (", delta:" ~> integer).as(OffsetDelta))
+    val deltaGrammar = grammars.create(DeltaGrammar, ", delta:" ~> integer as OffsetDelta)
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
@@ -131,8 +131,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
       asNode(SameLocals1StackItem, SameLocals1StackItemType)
     val appendFrameGrammar = ("append frame" ~> deltaGrammar %> parseType.manyVertical.indent()). //TODO idee: in LabelledLocations dit opnieuw definieren.
       asNode(AppendFrame, AppendFrameTypes)
-    val sameFrameGrammar = ("same frame" ~> deltaGrammar).asNode(SameFrameKey)
-    val chopFrameGrammar = ("chop frame" ~> deltaGrammar ~> (", count = " ~> integer)).asNode(ChopFrame, FromMap, ChopFrameCount)
+    val sameFrameGrammar = "same frame" ~> deltaGrammar asNode SameFrameKey
+    val chopFrameGrammar = "chop frame" ~> deltaGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^

@@ -76,13 +76,13 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val labelMapPath = grammars.getGrammarPath(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey))
+    val labelMapPath = grammars.findPathsToKey(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
     val labelMap = labelLabel.inner.asInstanceOf[NodeMap]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
     labelLabel.inner = new NodeMap(labelMap.inner, labelMap.key, newFields)
 
-    val stackMapTablePath = grammars.getGrammarPath(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar)
+    val stackMapTablePath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar).head
     stackMapTablePath.previous.asInstanceOf[GrammarSelection].previous.asInstanceOf[GrammarSelection].removeMeFromSequence()
   }
 }

@@ -11,8 +11,6 @@ but as a map.
  */
 object FromMap extends Key
 
-object Remove extends Key
-
 /*
 Used for the moment because we can't yet store parsed values into some map.
 We put them into a Node because it already has support for tupling/detupling
@@ -40,15 +38,6 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   def parseMap(key: AnyRef, fields: Any*): (Any => Any, Any => Option[Any]) = {
     val fieldList = fields.toList
     (input => oldConstruct(input, key, fieldList), obj => oldDestruct(obj, key, fieldList))
-  }
-
-  implicit class LabelledGrammarForAst(grammar: Labelled)
-  {
-    /* This is a somewhat hacky way to remove part of a grammar that was used by a node.
-    It requires that this grammar part was included using .as and that the Node was using PartialSelf
-    We produce an UndefinedDestructuringValue because that's also what you get when you 'ignore' part of a grammar.
-     */
-    def remove() : Unit = grammar.inner = produce(UndefinedDestructuringValue).as(Remove)
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)

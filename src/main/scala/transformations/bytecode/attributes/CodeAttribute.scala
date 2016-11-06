@@ -102,15 +102,15 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object CodeKey extends Key
 
-  object CodeMaxStackKey
+  object CodeMaxStackKey extends Key
 
-  object CodeMaxLocalsKey
+  object CodeMaxLocalsKey extends Key
 
-  object CodeInstructionsKey
+  object CodeInstructionsKey extends Key
 
-  object CodeExceptionTableKey
+  object CodeExceptionTableKey extends Key
 
-  object CodeAttributesKey
+  object CodeAttributesKey extends Key
 
   object InstructionGrammar
 
@@ -122,14 +122,15 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, "," ~~> "maxStack:" ~> integer ^^ parseMap(CodeKey, CodeMaxStackKey))
-    val maxLocalGrammar = "," ~~> "maxLocal:" ~> integer ^^ parseMap(CodeKey, CodeMaxLocalsKey)
-    val header: BiGrammar = ("code: nameIndex:" ~> integer) ~ maxStackGrammar ~ maxLocalGrammar
+    val maxStackGrammar = grammars.create(MaxStackGrammar, ("," ~~> "maxStack:" ~> integer).as(CodeMaxStackKey))
+    val maxLocalGrammar = ("," ~~> "maxLocal:" ~> integer).as(CodeMaxLocalsKey)
+    val header: BiGrammar = ("code: nameIndex:" ~> integer).as(ByteCodeSkeleton.AttributeNameKey) ~> maxStackGrammar ~ maxLocalGrammar
     val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val codeAttributeGrammar = header % instructionsGrammar % attributesGrammar % exceptionTableGrammar ^^
-      parseMap(CodeKey, ByteCodeSkeleton.AttributeNameKey, FromMap, FromMap,
-        CodeInstructionsKey, CodeAttributesKey, CodeExceptionTableKey)
+    val codeAttributeGrammar = header %
+      instructionsGrammar.as(CodeInstructionsKey) %
+      attributesGrammar.as(CodeAttributesKey) %
+      exceptionTableGrammar.as(CodeExceptionTableKey) asNode CodeKey
     grammars.create(CodeGrammar, codeAttributeGrammar)
   }
 
