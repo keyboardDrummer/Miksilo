@@ -1,8 +1,9 @@
 Particle Compiler [![Build Status](https://travis-ci.org/keyboardDrummer/ParticleCompiler.svg?branch=master)](https://travis-ci.org/keyboardDrummer/ParticleCompiler) [![Join the chat at https://gitter.im/ParticleCompiler/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ParticleCompiler/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============
 
-Particle compiler is a tool for quickly building toy compilers. It can be used for prototyping language features or as a way of teaching compiler construction.
-A compiler *particle* is piece of code that applies a small change to a compiler, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a compiler. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
+Particle compiler is a language workbench, which is a tool to construct programming languages. The main goal is to allow creating modular and thus re-usable languages. Most other language workbenches support only partial language modularity by allowing you to extend but not constrain a language. This allows you to only grow a small language into a bigger one, but not to transform between arbitrary languages. Particle compiler gets this right.
+
+The core concept of Particle compiler is a *particle*. A particle is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a language. Language re-use comes from re-using these particles. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
 
 ###Particles
 A particle can include one or several phases such as parsing, type checking, optimization and code generation.
