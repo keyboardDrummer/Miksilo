@@ -124,7 +124,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
     val maxStackGrammar = grammars.create(MaxStackGrammar, ("," ~~> "maxStack:" ~> integer).as(CodeMaxStackKey))
     val maxLocalGrammar = ("," ~~> "maxLocal:" ~> integer).as(CodeMaxLocalsKey)
-    val header: BiGrammar = ("code: nameIndex:" ~> integer).as(ByteCodeSkeleton.AttributeNameKey) ~> maxStackGrammar ~ maxLocalGrammar
+    val header: BiGrammar = ("code: nameIndex:" ~> integer).as(ByteCodeSkeleton.AttributeNameKey) ~ maxStackGrammar ~ maxLocalGrammar
     val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
     val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
     val codeAttributeGrammar = header %

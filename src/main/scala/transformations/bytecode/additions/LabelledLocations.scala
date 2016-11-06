@@ -144,8 +144,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapTableGrammar = grammars.find(StackMapFrameGrammar)
-      nodeMap(name ~> ("(" ~> StringLiteral <~ ")") % stackMapTableGrammar.indent(),
-        LabelKey, LabelNameKey, LabelStackFrame)
+      (name ~> ("(" ~> StringLiteral <~ ")").as(LabelNameKey) % stackMapTableGrammar.indent().as(LabelStackFrame)).asNode(LabelKey)
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."

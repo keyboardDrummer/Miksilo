@@ -87,7 +87,10 @@ trait SequenceLike extends BiGrammar {
   def first: BiGrammar
   def second: BiGrammar
   def ignoreLeft: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => r}, r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
+    new MapGrammar(this, { case ~(l, r) => {
+      val x = this
+      r
+    }}, r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
   }
 
   def ignoreRight: MapGrammar = {
