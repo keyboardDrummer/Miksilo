@@ -1,12 +1,12 @@
 package transformations.javac.statements
 
-import core.particles.{CompilationState, ParticleWithPhase}
+import core.particles.{CompilationState, DeltaWithPhase}
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
 import transformations.javac.statements.ForLoopC.ForLoop
 import scala.collection.mutable
 
-object ForLoopContinueC extends ParticleWithPhase {
+object ForLoopContinueC extends DeltaWithPhase {
 
   override def description: String = "Add proper C-style for-loop continue semantics."
 

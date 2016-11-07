@@ -11,7 +11,7 @@ but as a map.
  */
 object FromMap extends Key
 
-trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
+trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
   def transformGrammars(grammars: GrammarCatalogue)
 

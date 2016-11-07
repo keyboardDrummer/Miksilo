@@ -1,10 +1,10 @@
 package transformations.javac.types
 
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import transformations.bytecode.types.TypeSkeleton
 
-object SuperTypeArgument extends ParticleWithGrammar {
+object SuperTypeArgument extends DeltaWithGrammar {
 
   object SuperKey
   object SuperBody

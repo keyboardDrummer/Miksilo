@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import application.compilerBuilder.PresetsPanel
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromParticles, Particle}
+import core.particles.{CompilerFromParticles, Delta}
 import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
@@ -12,10 +12,10 @@ import util.TestUtils
 
 class TestLabelledLocations extends FunSuite {
 
-  val labelledParticles: Seq[Particle] = Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations
+  val labelledParticles: Seq[Delta] = Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations
 
   test("javaToLabelled") {
-    val particles: Seq[Particle] = JavaCompiler.spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
+    val particles: Seq[Delta] = JavaCompiler.spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
     val utils = new TestUtils(new CompilerFromParticles(particles))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("Fibonacci.java"))
     val expectedResult = utils.getTestFile("FibonacciInLabelledByteCode.txt").slurp()

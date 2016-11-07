@@ -1,11 +1,11 @@
 package transformations.javac
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
-object ImplicitObjectSuperClass extends ParticleWithPhase {
+object ImplicitObjectSuperClass extends DeltaWithPhase {
   val objectName = "Object"
   val packageName = Seq("java", "lang")
   val qualifiedObjectName = new QualifiedClassName(packageName ++ Seq(objectName))

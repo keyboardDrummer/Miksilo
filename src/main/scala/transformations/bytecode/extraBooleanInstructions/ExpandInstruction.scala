@@ -1,10 +1,10 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, Particle}
+import core.particles.{CompilationState, Contract, Delta}
 import transformations.bytecode.coreInstructions.InstructionWithGrammar
 
-trait ExpandInstruction extends Particle with InstructionWithGrammar {
+trait ExpandInstruction extends Delta with InstructionWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpandVirtualInstructionsC)
 

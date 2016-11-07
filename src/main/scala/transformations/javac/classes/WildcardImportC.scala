@@ -2,11 +2,11 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.javac.classes.BasicImportC._
 import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton, PackageSignature}
 
-object WildcardImportC extends ParticleWithGrammar {
+object WildcardImportC extends DeltaWithGrammar {
 
   object WildcardImportKey
 

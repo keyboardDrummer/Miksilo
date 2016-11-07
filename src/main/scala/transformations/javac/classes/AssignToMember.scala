@@ -12,7 +12,7 @@ import transformations.javac.methods.MemberSelector.{SelectorMember, SelectorObj
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 
-object AssignToMember extends ParticleWithGrammar {
+object AssignToMember extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 

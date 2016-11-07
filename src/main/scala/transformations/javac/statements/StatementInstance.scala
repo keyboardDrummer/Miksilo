@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.node.Node
 import core.particles.path.{Path, SequenceSelection}
 
-trait StatementInstance extends ParticleWithGrammar {
+trait StatementInstance extends DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     StatementSkeleton.getState(state).instances.put(key, this)

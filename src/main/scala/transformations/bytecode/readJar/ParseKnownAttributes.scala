@@ -1,14 +1,14 @@
 package transformations.bytecode.readJar
 
 import core.particles.node.Node
-import core.particles.{CompilationState, ParticleWithPhase}
+import core.particles.{CompilationState, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
 import transformations.bytecode.attributes.{ByteCodeAttribute, UnParsedAttribute}
 import transformations.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
 import transformations.bytecode.ByteCodeSkeleton._
 
-object ParseKnownAttributes extends ParticleWithPhase {
+object ParseKnownAttributes extends DeltaWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
     val constantPool = program.constantPool
     program.foreach(node => node.clazz match {

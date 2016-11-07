@@ -1,11 +1,11 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, ParticleWithGrammar}
+import core.particles.{Contract, DeltaWithGrammar}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.{VariableKey, VariableNameKey}
 
-object ThisVariable extends ParticleWithGrammar
+object ThisVariable extends DeltaWithGrammar
 {
   object Grammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

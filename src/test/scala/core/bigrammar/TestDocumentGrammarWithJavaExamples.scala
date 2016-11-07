@@ -3,7 +3,7 @@ package core.bigrammar
 import application.compilerCockpit._
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilerFromParticles, Particle}
+import core.particles.{CompilerFromParticles, Delta}
 import org.scalatest.{FunSpec, FunSuite}
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -52,7 +52,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val input = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
     val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
 
-    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+    val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
     val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 

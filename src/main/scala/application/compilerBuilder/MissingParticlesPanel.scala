@@ -6,12 +6,12 @@ import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
 
 import application.graphing.model.DepthFirstTraversal
-import core.particles.Particle
+import core.particles.Delta
 
 object MissingParticlesPanel {
 
   def getPanel(panel: CompilerBuilderPanel, selectedParticles: ParticleInstanceList) = {
-    val dependentItems = new DefaultListModel[Particle]()
+    val dependentItems = new DefaultListModel[Delta]()
     val dependentList = new ParticleList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -28,7 +28,7 @@ object MissingParticlesPanel {
     addButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         for (selectedValue <- dependentList.getSelectedValues)
-          selectedParticles.addElement(new ParticleInstance(selectedValue.asInstanceOf[Particle]))
+          selectedParticles.addElement(new ParticleInstance(selectedValue.asInstanceOf[Delta]))
       }
     })
     dependentPanel.add(addButton, BorderLayout.PAGE_END)
@@ -51,11 +51,11 @@ object MissingParticlesPanel {
     dependentPanel
   }
 
-  def getMissingDependencies(transformations: Seq[Particle]): Seq[Particle] = {
-    var result = List.empty[Particle]
+  def getMissingDependencies(transformations: Seq[Delta]): Seq[Delta] = {
+    var result = List.empty[Delta]
     val transformationSet = transformations.toSet
-    DepthFirstTraversal.traverse[Particle](transformations,
-      t => t.dependencies.collect({case x:Particle => x}),
+    DepthFirstTraversal.traverse[Delta](transformations,
+      t => t.dependencies.collect({case x:Delta => x}),
       t => {}, t => result = t :: result)
     result.filter(e => !transformationSet.contains(e))
   }

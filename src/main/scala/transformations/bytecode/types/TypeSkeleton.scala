@@ -16,7 +16,7 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
-object TypeSkeleton extends ParticleWithGrammar with WithState {
+object TypeSkeleton extends DeltaWithGrammar with WithState {
   def getTypeFromByteCodeString(state: CompilationState, typeString: String): Node = {
     val manager = new ParticlesToParserConverter()
     manager.parse(state.grammarCatalogue.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]

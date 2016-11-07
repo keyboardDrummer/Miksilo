@@ -1,8 +1,8 @@
 package transformations.javac.statements
 
-import core.particles.{CompilationState, Particle, ParticleWithGrammar}
+import core.particles.{CompilationState, Delta, DeltaWithGrammar}
 
-object JavaGotoC extends Particle {
+object JavaGotoC extends Delta {
 
   override def inject(state: CompilationState): Unit = {
     JustJavaGoto.inject(state)

@@ -1,7 +1,7 @@
 package transformations.bytecode.readJar
 
 import core.particles.node.Node
-import core.particles.{CompilationState, ParticleWithPhase}
+import core.particles.{CompilationState, DeltaWithPhase}
 import transformations.bytecode.attributes.SignatureAttribute
 import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -15,7 +15,7 @@ import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 
-object DecompileByteCodeSignature extends ParticleWithPhase {
+object DecompileByteCodeSignature extends DeltaWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])

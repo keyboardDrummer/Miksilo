@@ -6,7 +6,7 @@ import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.MemberSelector.SelectorKey
 
-object SelectorReferenceKind extends Particle {
+object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: CompilationState): Unit = {

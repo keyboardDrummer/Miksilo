@@ -3,7 +3,7 @@ package transformations.bytecode.simpleBytecode
 import core.bigrammar.{As, GrammarSelection, Labelled}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
@@ -11,7 +11,7 @@ import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribut
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
-object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
+object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 

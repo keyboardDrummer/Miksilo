@@ -1,12 +1,12 @@
 package transformations.javac.types
 
 import core.bigrammar.{BiGrammar, Keyword}
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode.types.TypeSkeleton
 
-object TypeVariable extends ParticleWithGrammar {
+object TypeVariable extends DeltaWithGrammar {
 
   object TypeVariableKey
   object TypeVariableName

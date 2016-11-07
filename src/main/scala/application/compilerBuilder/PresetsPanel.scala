@@ -8,7 +8,7 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromParticles, Particle}
+import core.particles.{CompilerFromParticles, Delta}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
 import transformations.javac.classes.FieldDeclarationWithInitializer
@@ -42,7 +42,7 @@ object PresetsPanel
     new Preset("JavaSubset", getJavaCompilerParticles, "Compiles a subset of Java.")
   }
 
-  def getJavaCompilerParticles: Seq[Particle] = {
+  def getJavaCompilerParticles: Seq[Delta] = {
     JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
   }
 
@@ -67,14 +67,14 @@ object PresetsPanel
   }
 
   def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+    val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
 
     new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getRevealSyntaxSugar: Preset = {
-    val implicits = Seq[Particle](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+    val implicits = Seq[Delta](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
       ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
@@ -171,6 +171,6 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
   }
 }
 
-case class Preset(name: String, particles: Seq[Particle], description: String = "") {
+case class Preset(name: String, particles: Seq[Delta], description: String = "") {
   override def toString = name
 }

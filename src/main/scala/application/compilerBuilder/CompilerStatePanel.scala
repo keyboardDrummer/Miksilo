@@ -7,13 +7,13 @@ import javax.swing.text.PlainDocument
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
-import core.particles.Particle
+import core.particles.Delta
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
 class ParticleInstanceList extends DefaultListModel[ParticleInstance]
 {
-  def scalaElements: Seq[Particle] = JEnumerationWrapper(super.elements()).map(instance => instance.particle).toSeq
+  def scalaElements: Seq[Delta] = JEnumerationWrapper(super.elements()).map(instance => instance.particle).toSeq
 }
 
 class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {

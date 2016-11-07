@@ -13,7 +13,7 @@ import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
 
-object JavaClassSkeleton extends ParticleWithGrammar with ParticleWithPhase with WithState {
+object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithState {
 
   implicit class JavaClass(val node: Node) extends AnyVal {
     def _package = node(ClassPackage).asInstanceOf[Seq[String]]

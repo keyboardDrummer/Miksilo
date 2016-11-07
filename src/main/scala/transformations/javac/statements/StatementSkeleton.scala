@@ -6,7 +6,7 @@ import core.particles.node.Node
 import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 
-object StatementSkeleton extends ParticleWithGrammar with WithState {
+object StatementSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 

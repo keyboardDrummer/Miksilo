@@ -8,7 +8,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton
 import transformations.bytecode.types.{VoidTypeC, ObjectTypeC, ArrayTypeC}
 
-object BlockCompilerC extends ParticleWithGrammar with ParticleWithPhase
+object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
 {
   object ProgramKey
   object ProgramStatements

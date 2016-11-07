@@ -2,9 +2,8 @@ package application;
 
 import application.compilerBuilder.ParticleInstance;
 import application.compilerBuilder.ParticleLabelPainter;
-import application.compilerCockpit.MarkOutputGrammar;
 import application.compilerCockpit.MarkOutputGrammar$;
-import core.particles.Particle;
+import core.particles.Delta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,19 +18,19 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
   public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
     JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-    Particle particle;
-    if (value instanceof Particle)
+    Delta delta;
+    if (value instanceof Delta)
     {
-      particle = (Particle)value;
+      delta = (Delta)value;
     } else // if (value instanceof ParticleInstance)
     {
-      particle = ((ParticleInstance)value).particle();
+      delta = ((ParticleInstance)value).particle();
     }
-    label.setText(particle.name());
+    label.setText(delta.name());
     if (!isSelected) {
-      Color color = painter.isDependency(particle) ? Color.RED
-              : painter.isDependant(particle) ? Color.GREEN : getBackground();
-      if (particle == MarkOutputGrammar$.MODULE$)
+      Color color = painter.isDependency(delta) ? Color.RED
+              : painter.isDependant(delta) ? Color.GREEN : getBackground();
+      if (delta == MarkOutputGrammar$.MODULE$)
       {
         color = Color.LIGHT_GRAY;
       }

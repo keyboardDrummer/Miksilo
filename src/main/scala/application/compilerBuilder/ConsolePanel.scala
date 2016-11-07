@@ -5,7 +5,7 @@ import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
 
 import core.document.Empty
-import core.particles.{Contract, Particle}
+import core.particles.{Contract, Delta}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
@@ -38,15 +38,15 @@ class ConsolePanel(val selectedParticles: ParticleInstanceList)  extends JPanel(
   object MissingDependenciesError extends DependencyError {
     override def toDocument: ResponsiveDocument = "Some dependencies are missing."
   }
-  case class BadOrderError(dependency: Particle, dependant: Particle) extends DependencyError {
+  case class BadOrderError(dependency: Delta, dependant: Delta) extends DependencyError {
     override def toDocument: ResponsiveDocument = s"Dependency ${dependency.name} should be placed below ${dependant.name}."
   }
 
-  def getDependencyErrors(transformations: Seq[Particle]) : Set[DependencyError] = {
+  def getDependencyErrors(transformations: Seq[Delta]) : Set[DependencyError] = {
     val allTransformations = transformations.toSet
     var available = Set.empty[Contract]
     var result = Set.empty[DependencyError]
-    var badOrderErrors = Map.empty[Particle, BadOrderError]
+    var badOrderErrors = Map.empty[Delta, BadOrderError]
     for (transformation <- transformations.reverse) {
       transformation.dependencies2.foreach(dependency =>
         if (!available.contains(dependency))

@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.longs.AddLongsC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
-object AdditionC extends ParticleWithGrammar with ExpressionInstance {
+object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 

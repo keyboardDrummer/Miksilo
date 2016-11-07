@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.node.Node
 import core.particles.path.Path
 
-trait ExpressionInstance extends ParticleWithGrammar {
+trait ExpressionInstance extends DeltaWithGrammar {
   val key: AnyRef
 
   override def inject(state: CompilationState): Unit = {

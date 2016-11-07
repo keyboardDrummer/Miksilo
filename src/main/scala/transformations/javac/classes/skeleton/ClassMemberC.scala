@@ -1,9 +1,9 @@
 package transformations.javac.classes.skeleton
 
-import core.particles.{CompilationState, ParticleWithGrammar}
+import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.node.Node
 
-trait ClassMemberC extends ParticleWithGrammar {
+trait ClassMemberC extends DeltaWithGrammar {
   def bind(state: CompilationState, clazz: ClassSignature, member: Node)
   def compile(state: CompilationState, member: Node)
 

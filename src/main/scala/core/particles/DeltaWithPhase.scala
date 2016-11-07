@@ -2,7 +2,7 @@ package core.particles
 
 import core.particles.node.Node
 
-trait ParticleWithPhase extends Particle {
+trait DeltaWithPhase extends Delta {
   def transform(program: Node, state: CompilationState)
 
   override def inject(state: CompilationState): Unit = {

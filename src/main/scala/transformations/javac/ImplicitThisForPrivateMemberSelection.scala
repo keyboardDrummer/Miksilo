@@ -11,7 +11,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MemberSelector, MethodC, VariableC}
 
-object ImplicitThisForPrivateMemberSelection extends ParticleWithPhase with ParticleWithGrammar {
+object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
   val thisName: String = "this"
 
   override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)

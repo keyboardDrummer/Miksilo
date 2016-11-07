@@ -3,11 +3,11 @@ package transformations.bytecode
 import core.bigrammar.{BiGrammar, MapGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, FromMap, ParticleWithGrammar}
+import core.particles.{CompilationState, Contract, FromMap, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
-object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
+object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   object MethodInfoKey extends Key
 

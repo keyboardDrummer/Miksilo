@@ -1,10 +1,10 @@
 package transformations.javac.types
 
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 
-object WildcardTypeArgument extends ParticleWithGrammar {
+object WildcardTypeArgument extends DeltaWithGrammar {
 
   object WildcardArgumentKey
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

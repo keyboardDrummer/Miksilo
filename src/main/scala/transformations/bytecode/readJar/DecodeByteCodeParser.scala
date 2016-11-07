@@ -4,9 +4,9 @@ import java.io.{BufferedInputStream, InputStream}
 
 import core.grammar.ParseException
 import core.particles.node.Node
-import core.particles.{CompilationState, Particle}
+import core.particles.{CompilationState, Delta}
 
-object DecodeByteCodeParser extends Particle {
+object DecodeByteCodeParser extends Delta {
   override def inject(state: CompilationState): Unit = {
     state.parse = decodeStream
   }

@@ -19,7 +19,7 @@ import transformations.javac.classes.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
+object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 

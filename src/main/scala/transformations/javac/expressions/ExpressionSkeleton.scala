@@ -9,7 +9,7 @@ import transformations.bytecode.types.TypeSkeleton
 
 import scala.util.Try
 
-object ExpressionSkeleton extends ParticleWithGrammar with WithState {
+object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 

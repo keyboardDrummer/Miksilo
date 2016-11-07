@@ -5,7 +5,7 @@ import core.particles.node.Node
 import core.particles.path.{Path, PathRoot, SequenceSelection}
 import transformations.javac.expressions.ExpressionSkeleton
 
-object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
+object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   implicit class ForLoop(forLoop: Node) {
     def initializer = forLoop(InitializerKey).asInstanceOf[Node]

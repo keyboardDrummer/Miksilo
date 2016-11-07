@@ -10,7 +10,7 @@ import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 
-object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
+object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   implicit class ByteCode(node: Node) {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]

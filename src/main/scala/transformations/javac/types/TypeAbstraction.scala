@@ -1,13 +1,13 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.Node
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 import transformations.javac.types.MethodTypeC.MethodTypeKey
 
-object TypeAbstraction extends ParticleWithGrammar {
+object TypeAbstraction extends DeltaWithGrammar {
 
   object TypeAbstractionKey
   object Body

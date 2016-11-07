@@ -12,7 +12,7 @@ import core.bigrammar.BiGrammarToGrammar
 import core.grammar.Grammar
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.particles.exceptions.CompileException
-import core.particles.{CompilerFromParticles, Particle}
+import core.particles.{CompilerFromParticles, Delta}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import transformations.bytecode.ByteCodeSkeleton
@@ -21,7 +21,7 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val name: String, val particles: Seq[Particle],
+class CompilerCockpit(val name: String, val particles: Seq[Delta],
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
 

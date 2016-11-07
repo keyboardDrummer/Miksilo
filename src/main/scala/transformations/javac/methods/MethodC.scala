@@ -18,7 +18,7 @@ import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
-object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
+object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
   implicit class Method(node: Node) {
     def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]

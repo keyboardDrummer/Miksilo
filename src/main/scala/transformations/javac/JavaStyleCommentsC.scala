@@ -2,12 +2,12 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
 import scala.util.matching.Regex
 
-object JavaStyleCommentsC extends ParticleWithGrammar {
+object JavaStyleCommentsC extends DeltaWithGrammar {
 
   case class CommentCollection(comments: Seq[String])
 

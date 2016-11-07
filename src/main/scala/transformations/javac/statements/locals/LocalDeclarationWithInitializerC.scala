@@ -11,7 +11,7 @@ import transformations.javac.statements.locals.LocalDeclarationC.{DeclarationNam
 import transformations.javac.statements.{ExpressionAsStatementC, StatementSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 
-object LocalDeclarationWithInitializerC extends ParticleWithGrammar with ParticleWithPhase {
+object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationC)
 

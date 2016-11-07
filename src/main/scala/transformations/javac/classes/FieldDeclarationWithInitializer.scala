@@ -14,7 +14,7 @@ import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 
 import scala.collection.mutable.ArrayBuffer
-object FieldDeclarationWithInitializer extends ParticleWithGrammar with ParticleWithPhase {
+object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 

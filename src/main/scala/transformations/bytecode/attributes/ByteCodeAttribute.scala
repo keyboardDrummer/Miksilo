@@ -3,10 +3,10 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, ParticleWithGrammar}
+import core.particles.{CompilationState, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.readJar.ClassFileParser
-trait ByteCodeAttribute extends ParticleWithGrammar {
+trait ByteCodeAttribute extends DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     ByteCodeSkeleton.getState(state).attributes.put(constantPoolKey, this)

@@ -5,26 +5,26 @@ import java.awt.event.{MouseEvent, ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import core.particles.Particle
+import core.particles.Delta
 import org.jdesktop.swingx.JXList
 
 object ParticleInstance
 {
   implicit class ParticleLike(val particleLike: Any)
   {
-    def getParticle: Particle = particleLike match {
-      case particle: Particle => particle
+    def getParticle: Delta = particleLike match {
+      case particle: Delta => particle
       case instance: ParticleInstance => instance.particle
     }
 
     def getParticleInstance: ParticleInstance = particleLike match {
-      case particle: Particle => new ParticleInstance(particle)
+      case particle: Delta => new ParticleInstance(particle)
       case instance: ParticleInstance => instance
     }
   }
 }
 
-class ParticleInstance(val particle: Particle)
+class ParticleInstance(val particle: Delta)
 
 class ParticleInstanceJXList() extends JXList() {
   override def getToolTipText(event: MouseEvent): String = {
