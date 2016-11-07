@@ -32,7 +32,7 @@ class GrammarCatalogue {
     val attributeGrammar = find(rootKey)
     val rootGrammar = new RootGrammar(attributeGrammar)
     val targetGrammar = find(grammarKeyToFind)
-    rootGrammar.descentsIncludingSelf.filter(path => path.get == targetGrammar).collect { case x: GrammarSelection => x }
+    rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarSelection => x }
   }
 }
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)

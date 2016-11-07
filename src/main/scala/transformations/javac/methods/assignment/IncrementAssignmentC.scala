@@ -36,7 +36,7 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new PathRoot(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).visit(obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })

@@ -17,7 +17,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar.as(CommentKey))
 
-    for(path <- new RootGrammar(grammars.find(ProgramGrammar)).descentsIncludingSelf)
+    for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants)
     {
       path match {
         case selection: GrammarSelection =>
@@ -30,7 +30,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 //            case _:Consume =>
 //              addCommentPrefixToGrammar(commentsGrammar, selection)
             case nodeMap:NodeGrammar =>
-              addCommentPrefixToGrammar(commentsGrammar, selection.descentsIncludingSelf.drop(1).head.asInstanceOf[GrammarSelection])
+              addCommentPrefixToGrammar(commentsGrammar, selection.selfAndDescendants.drop(1).head.asInstanceOf[GrammarSelection])
             case _ =>
           }
         case _ =>

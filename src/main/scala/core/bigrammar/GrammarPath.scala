@@ -15,7 +15,7 @@ trait GrammarPath {
   }
 
   def ancestors: Seq[GrammarPath]
-  def descentsIncludingSelf: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this), path => path.children)
+  def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this), path => path.children)
 }
 
 class RootGrammar(value: BiGrammar) extends GrammarPath

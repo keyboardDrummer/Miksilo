@@ -9,18 +9,19 @@ import transformations.javac.statements.StatementSkeleton.Statement
 
 object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
-  implicit class ForLoop(val node: Node) extends AnyVal with NodeWrapper {
-    def initializer: Statement = node(InitializerKey).asInstanceOf[Node]
-    def initializer_=(value: Node) = node(InitializerKey) = value
+  implicit class ForLoop(val node: Node)
+    extends AnyVal with NodeWrapper {
+    def initializer: Statement = node(Initializer).asInstanceOf[Node]
+    def initializer_=(value: Node) = node(Initializer) = value
 
-    def condition: Expression = node(ConditionKey).asInstanceOf[Node]
-    def condition_=(value: Node) = node(ConditionKey) = value
+    def condition: Expression = node(Condition).asInstanceOf[Node]
+    def condition_=(value: Node) = node(Condition) = value
 
-    def increment: Expression = node(IncrementKey).asInstanceOf[Node]
-    def increment_=(value: Node) = node(IncrementKey) = value
+    def increment: Expression = node(Increment).asInstanceOf[Node]
+    def increment_=(value: Node) = node(Increment) = value
 
-    def body: Seq[Node] = node(BodyKey).asInstanceOf[Seq[Node]]
-    def body_=(value: Node) = node(BodyKey) = value
+    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
+    def body_=(value: Node) = node(Body) = value
   }
 
   override def dependencies: Set[Contract] = Set(WhileC)
@@ -30,25 +31,25 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
-      parseMap(ForLoopKey, InitializerKey, ConditionKey, IncrementKey, BodyKey)
+      parseMap(ForLoopKey, Initializer, Condition, Increment, Body)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
-    new Node(ForLoopKey, InitializerKey -> initializer, ConditionKey -> condition, IncrementKey -> increment, BodyKey -> body)
+    new Node(ForLoopKey, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
   object ForLoopKey
 
-  object InitializerKey
+  object Initializer
 
-  object ConditionKey
+  object Condition
 
-  object IncrementKey
+  object Increment
 
-  object BodyKey
+  object Body
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    PathRoot(program).foreach(path => path.clazz match {
+    PathRoot(program).visit(path => path.clazz match {
       case ForLoopKey => transformForLoop(path, state)
       case _ =>
     })
