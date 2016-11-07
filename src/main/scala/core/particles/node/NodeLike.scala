@@ -2,6 +2,17 @@ package core.particles.node
 
 import scala.collection.mutable
 
+object NodeWrapper
+{
+  implicit def wrapList[TNodeWrapper](list: Seq[Node])(implicit wrap: Node => TNodeWrapper): Seq[TNodeWrapper] = list.map(n => wrap(n))
+  implicit def unwrapList(list: Seq[NodeWrapper]): Seq[Node] = list.map(n => n.node)
+  implicit def unwrap(wrapper: NodeWrapper): Node = wrapper.node
+}
+
+trait NodeWrapper extends Any {
+  def node: Node
+}
+
 trait NodeLike {
   type Self <: NodeLike
   def get(key: Any): Option[Any]

@@ -44,7 +44,7 @@ object WhileC extends StatementInstance with WithState {
     statementGrammar.addOption(whileGrammar)
   }
 
-  def _while(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
+  def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
 
   object WhileKey extends core.particles.node.Key
 

@@ -2,11 +2,15 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Node, NodeWrapper}
 import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 
+
 object StatementSkeleton extends DeltaWithGrammar with WithState {
+
+  implicit class Statement(val node: Node) extends AnyVal with NodeWrapper {
+  }
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
