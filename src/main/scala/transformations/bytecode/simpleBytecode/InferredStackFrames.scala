@@ -78,9 +78,9 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val labelMapPath = grammars.findPathsToKey(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
-    val labelMap = labelLabel.inner.asInstanceOf[NodeMap]
+    val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
-    labelLabel.inner = new NodeMap(labelMap.inner, labelMap.key, newFields)
+    labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
 
     val stackMapTablePath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar).head
     stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarSelection].removeMeFromSequence()

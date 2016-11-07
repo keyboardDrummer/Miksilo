@@ -42,13 +42,13 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
   implicit class GrammarForAst(grammar: BiGrammar)
   {
-    def asNode(key: Key, fields: Key*) = new NodeMap(grammar, key, fields.toSeq)
+    def asNode(key: Key, fields: Key*) = new NodeGrammar(grammar, key, fields.toSeq)
     def as(field: Key) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }
 
-  def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
+  def nodeGrammar(inner: BiGrammar, key: Key, fields: Key*) = new NodeGrammar(inner, key, fields.toSeq)
 
-  class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner, //TODO rename to NodeGrammar?
+  class NodeGrammar(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner, //TODO rename to NodeGrammar?
       input => construct(input.asInstanceOf[WithMap], key, fields.toList),
       obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
   {

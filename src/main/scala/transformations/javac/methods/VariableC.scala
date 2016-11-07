@@ -19,7 +19,7 @@ object VariableC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val variableGrammar = grammars.create(VariableGrammar, nodeMap(identifier, VariableKey, VariableNameKey))
+    val variableGrammar = grammars.create(VariableGrammar, nodeGrammar(identifier, VariableKey, VariableNameKey))
     core.addOption(variableGrammar)
   }
 

@@ -26,16 +26,16 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
           val current = selection.get
           current match {
 //            case _:Keyword =>
-//              selection.set(new Sequence(commentsGrammar, current))
+//              addCommentPrefixToGrammar(commentsGrammar, selection)
 //            case _:Delimiter =>
-//              selection.set(new Sequence(commentsGrammar, current))
-            case nodeMap:NodeMap =>
+//              addCommentPrefixToGrammar(commentsGrammar, selection)
+//            case _:Consume =>
+//              addCommentPrefixToGrammar(commentsGrammar, selection)
+            case nodeMap:NodeGrammar =>
               if (nodeMap.key != MapInsideNode)
               {
-                addCommentToNodeMap(commentsGrammar, selection)
+                addCommentPrefixToGrammar(commentsGrammar, selection.descentsIncludingSelf.drop(1).head.asInstanceOf[GrammarSelection])
               }
-//            case _:MapGrammar =>
-//              selection.set(new Sequence(commentsGrammar, current))
             case _ =>
           }
         case _ =>
@@ -43,13 +43,11 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
     }
   }
 
-  def addCommentToNodeMap(commentsGrammar: BiGrammar, nodeMapPath: GrammarSelection): Unit = {
-    val nodeMapToTransform = nodeMapPath.get.asInstanceOf[NodeMap]
-    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(nodeMapPath)
-
-    val innerWithComment = if (verticalNotHorizontal) commentsGrammar %> nodeMapToTransform.inner
-                           else commentsGrammar ~> nodeMapToTransform.inner
-    nodeMapToTransform.inner = innerWithComment
+  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, grammarPath: GrammarSelection): Unit = {
+    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(grammarPath)
+    val newGrammar = if (verticalNotHorizontal) commentsGrammar %> grammarPath.get
+                           else commentsGrammar ~> grammarPath.get
+    grammarPath.set(newGrammar)
   }
 
   def getCommentVerticalOrHorizontal(nodeMapPath: GrammarSelection): Boolean = {

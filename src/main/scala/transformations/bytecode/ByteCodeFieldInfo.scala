@@ -32,7 +32,7 @@ object ByteCodeFieldInfo extends ParticleWithGrammar with AccessFlags {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val attributesGrammar = grammars.find(AttributesGrammar)
-    val fieldGrammar = nodeMap((("nameIndex:" ~> integer) ~~ (", descriptorIndex" ~> integer) <~ ", attributes") % attributesGrammar,
+    val fieldGrammar = nodeGrammar((("nameIndex:" ~> integer) ~~ (", descriptorIndex" ~> integer) <~ ", attributes") % attributesGrammar,
       FieldKey, NameIndex, DescriptorIndex, FieldAttributes)
     val parseFields = ("fields:" %> fieldGrammar.manyVertical.indent()).as(ClassFields)
 
