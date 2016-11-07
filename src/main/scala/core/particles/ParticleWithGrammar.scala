@@ -48,7 +48,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
   def nodeMap(inner: BiGrammar, key: Key, fields: Key*) = new NodeMap(inner, key, fields.toSeq)
 
-  class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner,
+  class NodeMap(inner: BiGrammar, val key: Key, val fields: Seq[Key]) extends MapGrammar(inner, //TODO rename to NodeGrammar?
       input => construct(input.asInstanceOf[WithMap], key, fields.toList),
       obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
   {
