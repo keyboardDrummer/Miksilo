@@ -8,7 +8,7 @@ class WhileeWithComment
         while(i < 3)
         {
             /* SomeComment3 */
-            i = /* SomeComment4 */i + 1;
+            i = /* SomeComment4 */ i + 1;
         }
         System.out.print(i);
     }

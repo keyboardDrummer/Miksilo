@@ -78,8 +78,8 @@ methods:
       integer return instruction()
     attributes:
       stackMap nameIndex:28
-        same frame, delta:9
-        same locals, 1 stack item, delta:12
+        same frame, offset:9
+        same locals, 1 stack item, offset:12
           int
     exceptions:
 

@@ -8,7 +8,7 @@ import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
-import transformations.bytecode.attributes.StackMapTableAttribute.{DeltaGrammar, StackMapFrameGrammar}
+import transformations.bytecode.attributes.StackMapTableAttribute.{offsetGrammarKey, StackMapFrameGrammar}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -113,7 +113,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
       val frame = framesPerLocation(location)
       val offset = location - locationAfterPreviousFrame
 
-      frame(StackMapTableAttribute.OffsetDelta) = offset
+      frame(StackMapTableAttribute.FrameOffset) = offset
       stackFrames += frame
       locationAfterPreviousFrame = location + 1
     }
@@ -165,7 +165,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
-    val deltas = grammars.findPathsToKey(ProgramGrammar, DeltaGrammar)
+    val deltas = grammars.findPathsToKey(ProgramGrammar, offsetGrammarKey)
     deltas.foreach(delta => delta.removeMeFromSequence())
   }
 

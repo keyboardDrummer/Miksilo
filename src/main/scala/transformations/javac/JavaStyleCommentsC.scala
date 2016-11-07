@@ -48,7 +48,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
     val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(nodeMapPath)
 
     val innerWithComment = if (verticalNotHorizontal) commentsGrammar %> nodeMapToTransform.inner
-                           else commentsGrammar ~~> nodeMapToTransform.inner
+                           else commentsGrammar ~> nodeMapToTransform.inner
     nodeMapToTransform.inner = innerWithComment
   }
 
@@ -72,7 +72,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 
   def getCommentGrammar: BiGrammar = {
     val regex: Regex = new Regex( """/\*.*\*/""")
-    RegexG(regex)
+    RegexG(regex) ~ space
   }
 
   override def description: String = "Adds Java-style comments to the language"

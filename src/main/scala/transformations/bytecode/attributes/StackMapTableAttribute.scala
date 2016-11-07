@@ -1,9 +1,9 @@
 package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node}
-import core.particles.{FromMap, CompilationState, Contract}
+import core.particles.{CompilationState, Contract, FromMap}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
@@ -14,7 +14,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  object OffsetDelta extends Key
+  object FrameOffset extends Key
 
   object SameLocals1StackItem extends Key
 
@@ -41,7 +41,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   object StackMapTableMaps
 
   def stackMapTableId = new Node(StackMapTableId)
-  
+
   private object StackMapTableId
 
   def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(StackMapTableKey,
@@ -50,19 +50,19 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getStackMapTableEntries(stackMapTable: Node) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[Node]]
 
-  def getFrameOffset(frame: Node) = frame(OffsetDelta).asInstanceOf[Int]
+  def getFrameOffset(frame: Node) = frame(FrameOffset).asInstanceOf[Int]
 
-  def sameLocals1StackItem(offsetDelta: Int, _type: Node) = new Node(SameLocals1StackItem,
-    OffsetDelta -> offsetDelta,
+  def sameLocals1StackItem(frameOffset: Int, _type: Node) = new Node(SameLocals1StackItem,
+    FrameOffset -> frameOffset,
     SameLocals1StackItemType -> _type)
 
   def getSameLocals1StackItemType(sameLocals1StackItem: Node) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[Node]
 
-  def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, OffsetDelta -> offset, AppendFrameTypes -> newLocalTypes)
+  def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, FrameOffset -> offset, AppendFrameTypes -> newLocalTypes)
 
   def getAppendFrameTypes(appendFrame: Node) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[Node]]
 
-  def sameFrame(offset: Int) = new Node(SameFrameKey, OffsetDelta -> offset)
+  def sameFrame(offset: Int) = new Node(SameFrameKey, FrameOffset -> offset)
 
   object StackMapTableGrammar
 
@@ -118,21 +118,21 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   override def key: Key = StackMapTableKey
 
-  object DeltaGrammar
+  val offsetGrammarKey = KeyGrammar(FrameOffset)
   object StackMapFrameGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val deltaGrammar = grammars.create(DeltaGrammar, ", delta:" ~> integer as OffsetDelta)
+    val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
     val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
     val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
     val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ deltaGrammar) %> parseType.indent()).
+    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %> parseType.indent()).
       asNode(SameLocals1StackItem, SameLocals1StackItemType)
-    val appendFrameGrammar = ("append frame" ~> deltaGrammar %> parseType.manyVertical.indent()). //TODO idee: in LabelledLocations dit opnieuw definieren.
+    val appendFrameGrammar = ("append frame" ~> offsetGrammar %> parseType.manyVertical.indent()). //TODO idee: in LabelledLocations dit opnieuw definieren.
       asNode(AppendFrame, AppendFrameTypes)
-    val sameFrameGrammar = "same frame" ~ deltaGrammar asNode SameFrameKey
-    val chopFrameGrammar = "chop frame" ~> deltaGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
+    val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
+    val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
