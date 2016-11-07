@@ -19,7 +19,7 @@ case class ClassSignature(parent: PackageSignature, name: String,
       methods(new MethodClassKey(query.methodName, query.argumentTypes))
     } catch
     {
-      case e: NoSuchElementException => throw new RuntimeException(s"couldn't find ${query} in map ${methods.toString}") //TODO remove?
+      case e: NoSuchElementException => throw new RuntimeException(s"couldn't find $query in map ${methods.toString}") //TODO remove?
     }
   }
 

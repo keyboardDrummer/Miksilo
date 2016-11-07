@@ -38,10 +38,9 @@ object WhileC extends StatementInstance with WithState {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileInner =
-      "while" ~> expression.inParenthesis % blockGrammar
     val whileGrammar =
-      whileInner.asNode(WhileKey, Condition, Body)
+      "while" ~> expression.inParenthesis.as(Condition) %
+      blockGrammar.as(Body) asNode WhileKey
     statementGrammar.addOption(whileGrammar)
   }
 

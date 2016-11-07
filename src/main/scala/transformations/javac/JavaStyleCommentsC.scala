@@ -13,7 +13,6 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 
   class GrammarAnalysis extends DataFlowAnalysis[GrammarPath,Boolean]
   {
-
     val biGrammarClass = classOf[BiGrammar]
     override def getOutgoingNodes(path: GrammarPath): Set[GrammarPath] = {
       path.children.toSet
