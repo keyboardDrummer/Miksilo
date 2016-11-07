@@ -17,7 +17,7 @@ object IntTypeC extends TypeInstance with StackType {
     "int" ~> produce(intType)
   }
 
-  def intType = new Node(IntTypeKey)
+  val intType = new Node(IntTypeKey)
 
   override def getStackSize: Int = 1
 

@@ -5,8 +5,9 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersC
+import transformations.bytecode.coreInstructions.longs.AddLongsC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
+import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
 object AdditionC extends ParticleWithGrammar with ExpressionInstance {
 
@@ -16,16 +17,30 @@ object AdditionC extends ParticleWithGrammar with ExpressionInstance {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
-    firstInstructions ++ secondInstructions ++ Seq(AddIntegersC.addInteger)
+    firstInstructions ++ secondInstructions ++ (getType(addition, state) match {
+      case x if x == IntTypeC.intType => Seq(AddIntegersC.addIntegers())
+      case x if x == LongTypeC.longType => Seq(AddLongsC.addLongs())
+      case _ => throw new NotImplementedError()
+    })
   }
 
   override def getType(expression: Path, state: CompilationState): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
-    IntTypeC.intType
+    firstType match
+    {
+      case x if x == IntTypeC.intType =>
+        TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
+        TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+        IntTypeC.intType
+      case x if x == LongTypeC.longType =>
+        TypeSkeleton.checkAssignableTo(state)(LongTypeC.longType, firstType)
+        TypeSkeleton.checkAssignableTo(state)(LongTypeC.longType, secondType)
+        LongTypeC.longType
+      case _ => throw new NotImplementedError()
+    }
+
   }
 
   def getFirst[T <: NodeLike](addition: T) = addition(FirstKey).asInstanceOf[T]

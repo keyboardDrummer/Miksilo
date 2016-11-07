@@ -76,7 +76,7 @@ object JavaCompiler {
       integerInstructions ++ longInstructions
   }
 
-  def longInstructions = Seq(CompareLongC, PushLongC, LoadLongC, StoreLongC)
+  def longInstructions = Seq(LongReturnInstructionC, AddLongsC, CompareLongC, PushLongC, LoadLongC, StoreLongC)
 
   def integerInstructions = Seq(AddIntegersC, SmallIntegerConstantC, LoadConstantIntC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
