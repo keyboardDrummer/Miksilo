@@ -11,12 +11,6 @@ but as a map.
  */
 object FromMap extends Key
 
-/*
-Used for the moment because we can't yet store parsed values into some map.
-We put them into a Node because it already has support for tupling/detupling
- */
-object MapInsideNode extends Key
-
 trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
   def transformGrammars(grammars: GrammarCatalogue)
@@ -62,8 +56,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
     val node = value.asInstanceOf[NodeLike]
 
-    val ignoreNodeClazz: Boolean = key == MapInsideNode //When we're hiding a map in a node we don't care about the node's clazz.
-    if (node.clazz == key || ignoreNodeClazz) {
+    if (node.clazz == key) {
       val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
       if (fieldValues.isEmpty)
         Some(WithMap(UndefinedDestructuringValue, node.dataView)) //Apparently this node maps onto grammars that are all ignored so it does not contain any values, however we have to return a value here.
@@ -81,8 +74,7 @@ trait ParticleWithGrammar extends Particle with GrammarDocumentWriter {
 
     val node = value.asInstanceOf[NodeLike]
 
-    val ignoreNodeClazz: Boolean = key == MapInsideNode //When we're hiding a map in a node we don't care about the node's clazz.
-    if (node.clazz == key || ignoreNodeClazz) {
+    if (node.clazz == key) {
       val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
       if (fieldValues.isEmpty)
         Some(UndefinedDestructuringValue) //Apparently this node maps onto grammars that are all ignored so it does not contain any values, however we have to return a value here.

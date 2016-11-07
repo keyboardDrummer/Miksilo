@@ -2,11 +2,9 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.{MapInsideNode, ParticleWithGrammar}
+import core.particles.ParticleWithGrammar
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
-import util.DataFlowAnalysis
-
 import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends ParticleWithGrammar {
@@ -32,10 +30,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 //            case _:Consume =>
 //              addCommentPrefixToGrammar(commentsGrammar, selection)
             case nodeMap:NodeGrammar =>
-              if (nodeMap.key != MapInsideNode)
-              {
-                addCommentPrefixToGrammar(commentsGrammar, selection.descentsIncludingSelf.drop(1).head.asInstanceOf[GrammarSelection])
-              }
+              addCommentPrefixToGrammar(commentsGrammar, selection.descentsIncludingSelf.drop(1).head.asInstanceOf[GrammarSelection])
             case _ =>
           }
         case _ =>
