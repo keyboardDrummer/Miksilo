@@ -15,7 +15,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelNameKey -> name)
+  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program
@@ -76,13 +76,13 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val labelMapPath = grammars.findPathsToKey(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
+    val labelMapPath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
     val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
     labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
 
-    val stackMapTablePath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar).head
+    val stackMapTablePath = grammars.findPathsToKey(StackMapTableAttribute.StackMapFrameGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
     stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

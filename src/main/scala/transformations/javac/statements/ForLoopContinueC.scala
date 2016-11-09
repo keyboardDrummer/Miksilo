@@ -1,9 +1,10 @@
 package transformations.javac.statements
 
-import core.particles.{CompilationState, DeltaWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
 import transformations.javac.statements.ForLoopC.ForLoop
+
 import scala.collection.mutable
 
 object ForLoopContinueC extends DeltaWithPhase {
@@ -21,11 +22,7 @@ object ForLoopContinueC extends DeltaWithPhase {
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Node, String], state: CompilationState): Unit = {
     val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopType || ancestor.clazz == WhileC.WhileKey)
     containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopType).foreach(containingForLoop => {
-      if (!beforeIncrementLabels.contains(containingForLoop))
-      {
-        beforeIncrementLabels(containingForLoop) = transformForLoop(containingForLoop, state)
-      }
-      val label = beforeIncrementLabels(containingForLoop)
+      val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, transformForLoop(containingForLoop, state))
       continuePath.replaceWith(JustJavaGoto.goto(label))
     })
   }
@@ -36,4 +33,6 @@ object ForLoopContinueC extends DeltaWithPhase {
     forLoop(ForLoopC.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel
   }
+
+  override def dependencies: Set[Contract] = Set(ForLoopC, WhileContinueC)
 }

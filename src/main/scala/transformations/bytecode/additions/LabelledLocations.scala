@@ -33,7 +33,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualC.key, Seq(target))
 
   def label(name: String, stackFrame: Node) = new Node(LabelKey,
-    LabelNameKey -> name,
+    LabelName -> name,
     LabelStackFrame -> stackFrame)
 
   override def inject(state: CompilationState): Unit = {
@@ -127,7 +127,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   def getLabelStackFrame(label: Node) = label(LabelStackFrame).asInstanceOf[Node]
 
-  def getLabelName(label: Node) = label(LabelNameKey).asInstanceOf[String]
+  def getLabelName(label: Node) = label(LabelName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
@@ -144,7 +144,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
-      name ~> StringLiteral.inParenthesis.as(LabelNameKey) % stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
+      name ~> StringLiteral.inParenthesis.as(LabelName) % stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
@@ -152,7 +152,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   object LabelKey extends Key
 
-  object LabelNameKey extends Key
+  object LabelName extends Key
 
   object LabelStackFrame extends Key
 
