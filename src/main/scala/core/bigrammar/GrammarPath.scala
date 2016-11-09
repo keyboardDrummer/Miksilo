@@ -5,7 +5,7 @@ import util.{GraphBasics, ExtendedType, Property}
 
 trait GrammarPath {
   def get: BiGrammar
-  def children: Seq[GrammarPath] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
+  def children: Seq[GrammarSelection] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
     val clazz: Class[_ <: BiGrammar] = get.getClass
     new ExtendedType(clazz).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).

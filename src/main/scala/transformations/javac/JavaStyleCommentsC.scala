@@ -14,21 +14,12 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   object CommentKey extends Key
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar.as(CommentKey))
 
-    for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants)
+    for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants.
+      filter(path => path.get.isInstanceOf[NodeGrammar]))
     {
-      path match {
-        case selection: GrammarSelection =>
-          val current = selection.get
-          current match {
-            case nodeMap:NodeGrammar =>
-              addCommentPrefixToGrammar(commentsGrammar, selection.selfAndDescendants.drop(1).head.asInstanceOf[GrammarSelection])
-            case _ =>
-          }
-        case _ =>
-      }
+      addCommentPrefixToGrammar(commentsGrammar, path.children.head)
     }
   }
 
