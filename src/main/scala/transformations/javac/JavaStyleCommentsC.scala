@@ -23,11 +23,11 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     }
   }
 
-  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, grammarPath: GrammarReference): Unit = {
-    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(grammarPath)
-    val newGrammar = if (verticalNotHorizontal) commentsGrammar %> grammarPath.get
-                           else commentsGrammar ~> grammarPath.get
-    grammarPath.set(newGrammar)
+  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, grammarReference: GrammarReference): Unit = {
+    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(grammarReference)
+    val newGrammar = if (verticalNotHorizontal) commentsGrammar %> grammarReference.get
+                           else commentsGrammar ~> grammarReference.get
+    grammarReference.set(newGrammar)
   }
 
   def getCommentVerticalOrHorizontal(nodeMapPath: GrammarReference): Boolean = {
