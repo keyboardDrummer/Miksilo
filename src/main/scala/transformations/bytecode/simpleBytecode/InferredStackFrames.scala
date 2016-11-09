@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarSelection, Labelled}
+import core.bigrammar.{As, GrammarReference, Labelled}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
@@ -83,6 +83,6 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
 
     val stackMapTablePath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar).head
-    stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarSelection].removeMeFromSequence()
+    stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

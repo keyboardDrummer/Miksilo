@@ -5,12 +5,12 @@ import util.{GraphBasics, ExtendedType, Property}
 
 trait GrammarPath {
   def get: BiGrammar
-  def children: Seq[GrammarSelection] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
+  def children: Seq[GrammarReference] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
     val clazz: Class[_ <: BiGrammar] = get.getClass
     new ExtendedType(clazz).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
       map(property => {
-        new GrammarSelection(this, property.asInstanceOf[Property[BiGrammar, AnyRef]])
+        new GrammarReference(this, property.asInstanceOf[Property[BiGrammar, AnyRef]])
       })
   }
 
@@ -29,7 +29,7 @@ class RootGrammar(value: BiGrammar) extends GrammarPath
   override def equals(obj: Any): Boolean = obj.isInstanceOf[RootGrammar] //TODO && obj.equals..
 }
 
-class GrammarSelection(val previous: GrammarPath, val property: Property[BiGrammar, AnyRef]) extends GrammarPath
+class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, AnyRef]) extends GrammarPath
 {
   val parent = previous.get
 
@@ -40,7 +40,7 @@ class GrammarSelection(val previous: GrammarPath, val property: Property[BiGramm
   override def hashCode(): Int = parent.hashCode() * get.hashCode()
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case other: GrammarSelection => other.parent.equals(parent) && other.get.equals(get)
+    case other: GrammarReference => other.parent.equals(parent) && other.get.equals(get)
     case _ => false
   }
 
@@ -52,14 +52,14 @@ class GrammarSelection(val previous: GrammarPath, val property: Property[BiGramm
     val choiceParent = parent.asInstanceOf[Choice]
     val me = get
     val sibling = Set(choiceParent.left,choiceParent.right).filter(grammar => grammar != me).head 
-    previous.asInstanceOf[GrammarSelection].set(sibling)
+    previous.asInstanceOf[GrammarReference].set(sibling)
   }
 
   def removeMeFromSequence(): Unit = {
     val choiceParent = parent.asInstanceOf[SequenceLike]
     val me = get
     val sibling = Set(choiceParent.first,choiceParent.second).filter(grammar => grammar != me).head
-    previous.asInstanceOf[GrammarSelection].set(sibling)
+    previous.asInstanceOf[GrammarReference].set(sibling)
   }
 
   override def toString = s"GrammarSelection($get)"
