@@ -144,7 +144,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
-      (name ~> ("(" ~> StringLiteral <~ ")").as(LabelNameKey) % stackMapFrameGrammar.indent().as(LabelStackFrame)).asNode(LabelKey)
+      name ~> StringLiteral.inParenthesis.as(LabelNameKey) % stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
@@ -165,9 +165,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
-    val deltas = grammars.findPathsToKey(ProgramGrammar, offsetGrammarKey)
-    deltas.foreach(delta =>
-      delta.removeMeFromSequence())
+    val offsetGrammarPaths = grammars.findPathsToKey(ProgramGrammar, offsetGrammarKey)
+    offsetGrammarPaths.foreach(delta => delta.removeMeFromSequence())
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {
@@ -177,7 +176,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(KeyGrammar(jump.key))
-      grammar.inner = jump.name ~> Consume(StringLiteral).manySeparated(",").inParenthesis ^^ parseMap(jump.key, InstructionArgumentsKey)
+      grammar.inner = jump.name ~> Consume(StringLiteral).manySeparated(",").inParenthesis.as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }
