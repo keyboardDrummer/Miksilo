@@ -7,10 +7,10 @@ Blender's main goal is to help create modular and thus re-usable languages, allo
 
 Another differentiator of Blender is its meta language. The meta language is the language used to define new languages. Blender does not define its own meta language, but instead is implemented as a <a href="http://www.scala-lang.org/">Scala</a> library, allowing you to use Blender while inside a powerful general purpose programming language. Some workbenches like <a href="https://github.com/usethesource/rascal">Rascal</a> define their own meta language, which provides a smooth experience when using its language construction features, but leaves you without the ecosystem of a popular language. Other workbenches like <a href="http://metaborg.org/en/latest/">Spoofax</a> and <a href="https://www.jetbrains.com/mps/">MPS</a> even define several meta languages, that each focus on different aspects of language definition such as syntax or typing rules. While these languages are user-friendly, they are often not programming languages, so they miss out on a lot of power.
 
-###Particles
-The core concept of Blender is a *particle*. A particle is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Particles are put into an ordered list to form a language. Language re-use comes from re-using these particles. Some particles depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
+###Delta's
+The core concept of Blender is a *delta*. A delta is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Delta's are put into an ordered list to form a language. Language re-use comes from re-using these delta's. Some delta's depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
 
-A particle can include one or several phases such as parsing, type checking, optimization and code generation.
+A delta can include one or several phases such as parsing, type checking, optimization and code generation.
 Commonly compilers are modularised by defining several compiler phases and using a limited number of intermediate languages.
 Blender focuses purely on intermediate languages to achieve modularisation.
 By keeping the abstract syntax tree untyped, it becomes relatively simple to define a language as a sequence of language delta's.
