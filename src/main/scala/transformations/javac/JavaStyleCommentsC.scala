@@ -23,12 +23,6 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
         case selection: GrammarSelection =>
           val current = selection.get
           current match {
-//            case _:Keyword =>
-//              addCommentPrefixToGrammar(commentsGrammar, selection)
-//            case _:Delimiter =>
-//              addCommentPrefixToGrammar(commentsGrammar, selection)
-//            case _:Consume =>
-//              addCommentPrefixToGrammar(commentsGrammar, selection)
             case nodeMap:NodeGrammar =>
               addCommentPrefixToGrammar(commentsGrammar, selection.selfAndDescendants.drop(1).head.asInstanceOf[GrammarSelection])
             case _ =>

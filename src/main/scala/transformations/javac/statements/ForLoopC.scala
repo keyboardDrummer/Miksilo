@@ -1,7 +1,7 @@
 package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeWrapper}
+import core.particles.node.{Key, Node, NodeWrapper}
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.Expression
@@ -31,14 +31,14 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
-      parseMap(ForLoopKey, Initializer, Condition, Increment, Body)
+      parseMap(ForLoopType, Initializer, Condition, Increment, Body)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
-    new Node(ForLoopKey, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
+    new Node(ForLoopType, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
-  object ForLoopKey
+  object ForLoopType extends Key
 
   object Initializer
 
@@ -50,14 +50,15 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transform(program: Node, state: CompilationState): Unit = {
     PathRoot(program).visit(path => path.clazz match {
-      case ForLoopKey => transformForLoop(path, state)
+      case ForLoopType => transformForLoop(path)
       case _ =>
     })
   }
   
-  def transformForLoop(forLoopPath: Path, state: CompilationState): Unit = {
+  def transformForLoop(forLoopPath: Path): Unit = {
     val forLoop: ForLoop = forLoopPath.current
-    val whileBody = forLoop.body ++ Seq(ExpressionAsStatementC.create(forLoop.increment))
+    val whileBody = forLoop.body ++
+      Seq(ExpressionAsStatementC.create(forLoop.increment))
     val _while = WhileC.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)

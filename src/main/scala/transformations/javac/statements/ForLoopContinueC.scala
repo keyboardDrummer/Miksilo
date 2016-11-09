@@ -19,8 +19,8 @@ object ForLoopContinueC extends DeltaWithPhase {
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Node, String], state: CompilationState): Unit = {
-    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopKey || ancestor.clazz == WhileC.WhileKey)
-    containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopKey).foreach(containingForLoop => {
+    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopType || ancestor.clazz == WhileC.WhileKey)
+    containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopType).foreach(containingForLoop => {
       if (!beforeIncrementLabels.contains(containingForLoop))
       {
         beforeIncrementLabels(containingForLoop) = transformForLoop(containingForLoop, state)
