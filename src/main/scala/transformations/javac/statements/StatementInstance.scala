@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.node.Node
-import core.particles.path.{Path, SequenceSelection}
+import core.particles.path.{Path, SequenceElement}
 
 trait StatementInstance extends DeltaWithGrammar {
 
@@ -24,7 +24,7 @@ trait StatementInstance extends DeltaWithGrammar {
 
   def getNextLabel(statement: Path) = (statement, "next") //TODO volgens mij kan dit weg.
   def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
-    val selection = obj.asInstanceOf[SequenceSelection]
+    val selection = obj.asInstanceOf[SequenceElement]
     if (selection.hasNext)
       return Set(selection.next)
 

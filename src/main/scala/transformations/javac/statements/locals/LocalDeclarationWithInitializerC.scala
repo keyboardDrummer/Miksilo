@@ -3,7 +3,7 @@ package transformations.javac.statements.locals
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, PathRoot, SequenceSelection}
+import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
@@ -42,7 +42,7 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
     val assignmentStatement = ExpressionAsStatementC.create(assignment)
-    val originSequence = declarationWithInitializer.asInstanceOf[SequenceSelection]
+    val originSequence = declarationWithInitializer.asInstanceOf[SequenceElement]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 

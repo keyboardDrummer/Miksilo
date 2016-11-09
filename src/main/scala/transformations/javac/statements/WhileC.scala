@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
-import core.particles.path.{Path, SequenceSelection}
+import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -61,7 +61,7 @@ object WhileC extends StatementInstance with WithState {
   }
 
   override def getLabels(_whilePath: Path): Map[Any, Path] = {
-    val _while = _whilePath.asInstanceOf[SequenceSelection]
+    val _while = _whilePath.asInstanceOf[SequenceElement]
     val current = _while.current
     val next = _while.next
     var result: Map[Any,Path] = Map(startKey(current) -> _while, endKey(current) -> next)

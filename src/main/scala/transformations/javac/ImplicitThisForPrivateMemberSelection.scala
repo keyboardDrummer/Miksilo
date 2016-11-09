@@ -3,7 +3,7 @@ package transformations.javac
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, PathRoot, Selection, SequenceSelection}
+import core.particles.path.{Path, PathRoot, FieldValue, SequenceElement}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.classes.skeleton.{ClassSignature, ClassMember, JavaClassSkeleton, MyCompiler}
@@ -47,8 +47,8 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
       return new PathRoot(obj.current)
 
     obj match {
-      case Selection(parent, field) => Selection(getVariableWithCorrectPath(parent), field)
-      case SequenceSelection(parent, field, index) => SequenceSelection(getVariableWithCorrectPath(parent), field, index)
+      case FieldValue(parent, field) => FieldValue(getVariableWithCorrectPath(parent), field)
+      case SequenceElement(parent, field, index) => SequenceElement(getVariableWithCorrectPath(parent), field, index)
     }
   }
 

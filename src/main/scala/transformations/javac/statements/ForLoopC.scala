@@ -2,7 +2,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeWrapper}
-import core.particles.path.{Path, PathRoot, SequenceSelection}
+import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.Expression
 import transformations.javac.statements.StatementSkeleton.Statement
@@ -61,7 +61,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val _while = WhileC.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
-    forLoopPath.asInstanceOf[SequenceSelection].replaceWith(newStatements)
+    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
   override def description: String = "Enables using the non-iterator for loop."

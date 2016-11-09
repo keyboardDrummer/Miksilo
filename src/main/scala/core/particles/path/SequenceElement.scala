@@ -2,7 +2,7 @@ package core.particles.path
 
 import core.particles.node.Node
 
-case class SequenceSelection(parent: Path, field: Any, index: Int) extends OriginWithParent
+case class SequenceElement(parent: Path, field: Any, index: Int) extends OriginWithParent
 {
   val current = parent.current(field).asInstanceOf[Seq[Node]](index)
   def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]
@@ -20,7 +20,7 @@ case class SequenceSelection(parent: Path, field: Any, index: Int) extends Origi
   override def hashCode(): Int = parent.hashCode() * field.hashCode() * index
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case other: SequenceSelection => other.parent.equals(parent) && other.field.equals(field) && other.index == index
+    case other: SequenceElement => other.parent.equals(parent) && other.field.equals(field) && other.index == index
     case _ => false
   }
 

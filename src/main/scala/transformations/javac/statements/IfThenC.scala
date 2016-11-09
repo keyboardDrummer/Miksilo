@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
-import core.particles.path.{Path, SequenceSelection}
+import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -60,7 +60,7 @@ object IfThenC extends StatementInstance {
   }
 
   override def getLabels(obj: Path): Map[Any, Path] = {
-    val next = obj.asInstanceOf[SequenceSelection].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
+    val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     Map(IfThenC.getNextLabel(getThenStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }
