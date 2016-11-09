@@ -129,8 +129,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %> parseType.indent()).
       asNode(SameLocals1StackItem, SameLocals1StackItemType)
-    val appendFrameGrammar = ("append frame" ~> offsetGrammar %> parseType.manyVertical.indent()). //TODO idee: in LabelledLocations dit opnieuw definieren.
-      asNode(AppendFrame, AppendFrameTypes)
+    val appendFrameGrammar = ("append frame" ~ offsetGrammar ~ parseType.manyVertical) asNode AppendFrame
     val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
 

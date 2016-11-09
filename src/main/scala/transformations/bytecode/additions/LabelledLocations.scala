@@ -143,8 +143,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     override def getInstructionSize: Int = 0
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-      val stackMapTableGrammar = grammars.find(StackMapFrameGrammar)
-      (name ~> ("(" ~> StringLiteral <~ ")").as(LabelNameKey) % stackMapTableGrammar.indent().as(LabelStackFrame)).asNode(LabelKey)
+      val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
+      (name ~> ("(" ~> StringLiteral <~ ")").as(LabelNameKey) % stackMapFrameGrammar.indent().as(LabelStackFrame)).asNode(LabelKey)
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
@@ -166,7 +166,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
     val deltas = grammars.findPathsToKey(ProgramGrammar, offsetGrammarKey)
-    deltas.foreach(delta => delta.removeMeFromSequence())
+    deltas.foreach(delta =>
+      delta.removeMeFromSequence())
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {

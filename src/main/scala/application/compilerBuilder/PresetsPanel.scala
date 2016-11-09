@@ -9,6 +9,7 @@ import javax.swing.text.AbstractDocument
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.particles.{CompilerFromParticles, Delta}
+import transformations.bytecode.additions.LabelledLocations
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
 import transformations.javac.classes.FieldDeclarationWithInitializer
@@ -82,6 +83,11 @@ object PresetsPanel
       "Performs all compiler phases that still maintain a valid Java program.")
   }
 
+  def getLabelledLocations = {
+    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompiler.byteCodeTransformations,
+      "Replaces integer offsets by labels to indicate positions in instruction lists.")
+  }
+
   def createModel: DefaultListModel[Preset] = {
     val model = new DefaultListModel[Preset]()
     model.addElement(PresetsPanel.getJavaCompilerPreset)
@@ -94,6 +100,7 @@ object PresetsPanel
     model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
     model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
+    model.addElement(getLabelledLocations)
     model
   }
 }
