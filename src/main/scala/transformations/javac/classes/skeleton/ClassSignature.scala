@@ -16,10 +16,11 @@ case class ClassSignature(parent: PackageSignature, name: String,
   def getMethod(query: MethodQuery) = {
     try
     {
-      methods(new MethodClassKey(query.methodName, query.argumentTypes))
+      val key: MethodClassKey = new MethodClassKey(query.methodName, query.argumentTypes)
+      methods(key)
     } catch
     {
-      case e: NoSuchElementException => throw new RuntimeException(s"couldn't find $query in map ${methods.toString}") //TODO remove?
+      case e: NoSuchElementException => throw new NoSuchElementException(s"couldn't find $key in map ${methods.toString}") //TODO remove?
     }
   }
 
