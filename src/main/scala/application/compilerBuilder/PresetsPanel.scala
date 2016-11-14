@@ -58,7 +58,7 @@ object PresetsPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
+    new Preset("Java statement block", Seq(BlockCompilerC) ++ getJavaCompilerParticles,
       "The program consists only of a single statement block.")
   }
 
