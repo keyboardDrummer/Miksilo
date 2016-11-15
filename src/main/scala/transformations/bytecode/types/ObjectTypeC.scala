@@ -10,6 +10,7 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 object ObjectTypeC extends TypeInstance with StackType {
   override val key = ObjectTypeKey
   val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+  val rootObjectType = objectType(new QualifiedClassName(Seq("java", "lang", "Object")))
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = {
     Seq.empty //TODO extend

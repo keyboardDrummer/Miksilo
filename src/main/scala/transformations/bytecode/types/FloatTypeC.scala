@@ -9,13 +9,13 @@ object FloatTypeC extends TypeInstance
 {
   object FloatTypeKey extends Key
   override val key: Key = FloatTypeKey
-  val me = new Node(FloatTypeKey)
+  val floatType = new Node(FloatTypeKey)
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "float" ~> produce(me)
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "float" ~> produce(floatType)
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("F",false) ~> produce(me)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("F",false) ~> produce(floatType)
 
   override def description: String = "Adds the float type."
 }

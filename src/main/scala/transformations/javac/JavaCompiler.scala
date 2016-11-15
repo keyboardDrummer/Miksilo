@@ -7,6 +7,8 @@ import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
+import transformations.bytecode.coreInstructions.doubles.DoubleReturnInstructionC
+import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionC
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
@@ -70,11 +72,17 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareLessOrEqualC,
-      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
-      LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
+      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC) ++
+      objectInstructions ++ Seq(PushNullC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
       SwapInstruction, GetFieldC, PutField) ++
-      integerInstructions ++ longInstructions
+      integerInstructions ++ longInstructions ++ floatInstructions ++ doubleInstructions
   }
+
+  def objectInstructions = Seq(LoadAddressC, AddressReturnInstructionC, StoreAddressC)
+
+  def doubleInstructions = Seq(DoubleReturnInstructionC)
+
+  def floatInstructions = Seq(FloatReturnInstructionC)
 
   def longInstructions = Seq(LongReturnInstructionC, AddLongsC, CompareLongC, PushLongC, LoadLongC, StoreLongC)
 

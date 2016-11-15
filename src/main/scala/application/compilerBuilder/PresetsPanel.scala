@@ -16,7 +16,7 @@ import transformations.javac.classes.FieldDeclarationWithInitializer
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
-import transformations.javac.statements.ForLoopC
+import transformations.javac.statements.{ForLoopC, ForLoopContinueC}
 import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object PresetsPanel
@@ -76,7 +76,7 @@ object PresetsPanel
 
   def getRevealSyntaxSugar: Preset = {
     val implicits = Seq[Delta](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
-      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
+      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopContinueC, ForLoopC, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
     new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
