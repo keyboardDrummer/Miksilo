@@ -37,7 +37,7 @@ object TernaryC extends ExpressionInstance {
 
   object TrueKey extends Key
 
-  object ConditionKey
+  object ConditionKey extends Key
 
   object TernaryKey extends Key
 

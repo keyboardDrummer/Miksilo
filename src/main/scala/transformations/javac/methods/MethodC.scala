@@ -18,7 +18,7 @@ import transformations.javac.statements.{BlockC, StatementSkeleton}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
-object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
+object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
   implicit class Method(node: Node) {
     def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]
@@ -177,7 +177,7 @@ object MethodC extends ParticleWithGrammar with WithState with ClassMemberC {
 
     val methodUnmapped: TopBottom = visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
       parseReturnType ~~ identifier ~ parseParameters % block
-    val methodGrammar = grammars.create(MethodGrammar, nodeMap(methodUnmapped, MethodKey, VisibilityKey, StaticKey,
+    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey, VisibilityKey, StaticKey,
       TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)

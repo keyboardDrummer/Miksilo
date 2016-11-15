@@ -1,9 +1,9 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{GrammarSelection, Labelled}
+import core.bigrammar.{As, GrammarReference, Labelled}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
@@ -11,11 +11,11 @@ import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribut
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
-object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
+object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelNameKey -> name)
+  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz = program
@@ -76,13 +76,13 @@ object InferredStackFrames extends ParticleWithPhase with ParticleWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val labelMapPath = grammars.getGrammarPath(ProgramGrammar, KeyGrammar(LabelledLocations.LabelKey))
+    val labelMapPath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
-    val labelMap = labelLabel.inner.asInstanceOf[NodeMap]
+    val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
-    labelLabel.inner = new NodeMap(labelMap.inner, labelMap.key, newFields)
+    labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
 
-    val stackMapTablePath = grammars.getGrammarPath(KeyGrammar(LabelledLocations.LabelKey), StackMapTableAttribute.StackMapFrameGrammar)
-    stackMapTablePath.previous.asInstanceOf[GrammarSelection].previous.asInstanceOf[GrammarSelection].removeMeFromSequence()
+    val stackMapTablePath = grammars.findPathsToKey(StackMapTableAttribute.StackMapFrameGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
+    stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

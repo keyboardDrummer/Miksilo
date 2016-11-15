@@ -1,24 +1,27 @@
 package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
-import core.particles.path.{Path, PathRoot, SequenceSelection}
+import core.particles.node.{Key, Node, NodeWrapper}
+import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
+import transformations.javac.expressions.ExpressionSkeleton.Expression
+import transformations.javac.statements.StatementSkeleton.Statement
 
-object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
+object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
-  implicit class ForLoop(forLoop: Node) {
-    def initializer = forLoop(InitializerKey).asInstanceOf[Node]
-    def initializer_=(value: Node) = forLoop(InitializerKey) = value
+  implicit class ForLoop(val node: Node)
+    extends AnyVal with NodeWrapper {
+    def initializer: Statement = node(Initializer).asInstanceOf[Node]
+    def initializer_=(value: Node) = node(Initializer) = value
 
-    def condition = forLoop(ConditionKey).asInstanceOf[Node]
-    def condition_=(value: Node) = forLoop(ConditionKey) = value
+    def condition: Expression = node(Condition).asInstanceOf[Node]
+    def condition_=(value: Node) = node(Condition) = value
 
-    def increment = forLoop(IncrementKey).asInstanceOf[Node]
-    def increment_=(value: Node) = forLoop(IncrementKey) = value
+    def increment: Expression = node(Increment).asInstanceOf[Node]
+    def increment_=(value: Node) = node(Increment) = value
 
-    def body = forLoop(BodyKey).asInstanceOf[Seq[Node]]
-    def body_=(value: Node) = forLoop(BodyKey) = value
+    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
+    def body_=(value: Node) = node(Body) = value
   }
 
   override def dependencies: Set[Contract] = Set(WhileC)
@@ -28,38 +31,38 @@ object ForLoopC extends ParticleWithPhase with ParticleWithGrammar {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
-      parseMap(ForLoopKey, InitializerKey, ConditionKey, IncrementKey, BodyKey)
+      parseMap(ForLoopType, Initializer, Condition, Increment, Body)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
-    new Node(ForLoopKey, InitializerKey -> initializer, ConditionKey -> condition, IncrementKey -> increment, BodyKey -> body)
+    new Node(ForLoopType, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
-  object ForLoopKey
+  object ForLoopType extends Key
 
-  object InitializerKey
+  object Initializer
 
-  object ConditionKey
+  object Condition
 
-  object IncrementKey
+  object Increment
 
-  object BodyKey
+  object Body
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    PathRoot(program).foreach(path => path.clazz match {
-      case ForLoopKey => transformForLoop(path, state)
+    PathRoot(program).visit(path => path.clazz match {
+      case ForLoopType => transformForLoop(path)
       case _ =>
     })
   }
   
-  def transformForLoop(forLoopPath: Path, state: CompilationState): Unit = {
+  def transformForLoop(forLoopPath: Path): Unit = {
     val forLoop: ForLoop = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementC.create(forLoop.increment))
-    val _while = WhileC._while(forLoop.condition, whileBody)
+    val _while = WhileC.create(forLoop.condition, whileBody)
 
-    val newStatements = Seq(forLoop.initializer, _while)
-    forLoopPath.asInstanceOf[SequenceSelection].replaceWith(newStatements)
+    val newStatements = Seq[Node](forLoop.initializer, _while)
+    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
   override def description: String = "Enables using the non-iterator for loop."

@@ -14,7 +14,7 @@ import transformations.javac.methods.MethodC._
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements.BlockC
 
-object ConstructorC extends ParticleWithGrammar with ParticleWithPhase {
+object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
 

@@ -14,15 +14,15 @@ object Program extends SimpleSwingApplication {
 
   def top = new MainFrame {
     maximize()
-    title = "Particle Compiler"
+    title = "Blender"
 
     val tabbedPane = new JTabbedPane()
     
     val compilerBuilder = new CompilerBuilderPanel()
-    tabbedPane.add("Compiler Builder", compilerBuilder)
+    tabbedPane.add("Language construction workbench", compilerBuilder)
 
     val architecturePanel = getGraphComponent
-    tabbedPane.add("Architecture", architecturePanel)
+    tabbedPane.add("Delta dependency graph", architecturePanel)
 
     contents = Component.wrap(tabbedPane)
     //architecturePanel.scrollToCenter(true)

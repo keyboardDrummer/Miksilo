@@ -10,7 +10,7 @@ import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
 
-class CompilerFromParticles(val particles: Seq[Particle]) {
+class CompilerFromParticles(val particles: Seq[Delta]) {
 
   validateDependencies(particles)
 
@@ -73,7 +73,7 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
 
   //Bad order error
   //All missing dependencies.
-  def validateDependencies(transformations: Seq[Particle]) = {
+  def validateDependencies(transformations: Seq[Delta]) = {
     var available = Set.empty[Contract]
     for (transformation <- transformations.reverse) {
       transformation.dependencies.foreach(dependency =>
@@ -84,18 +84,18 @@ class CompilerFromParticles(val particles: Seq[Particle]) {
     }
   }
 
-  def replace(marker: Particle, splice: Seq[Particle]): Seq[Particle] = {
+  def replace(marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
     val pivot = particles.indexWhere(particle => marker == particle)
     val (before,after) = particles.splitAt(pivot)
     before ++ splice ++ after.drop(1)
   }
 
-  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
+  def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
     val implicitsSet = implicits.toSet
     particles.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
   }
 
-  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] = {
+  def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
     val implicitsSet = implicits.toSet
     implicits ++ splice ++ particles.filter(t => !implicitsSet.contains(t))
   }

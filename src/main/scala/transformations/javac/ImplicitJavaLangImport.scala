@@ -1,12 +1,12 @@
 package transformations.javac
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import transformations.javac.classes.WildcardImportC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import JavaClassSkeleton._
 
-object ImplicitJavaLangImport extends ParticleWithPhase {
+object ImplicitJavaLangImport extends DeltaWithPhase {
   val javaPackageName: String = "java"
   val langPackageName: String = "lang"
 

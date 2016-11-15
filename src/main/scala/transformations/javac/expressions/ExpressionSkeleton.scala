@@ -3,15 +3,17 @@ package transformations.javac.expressions
 import core.particles.exceptions.CompilerException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Node, NodeLike, NodeWrapper}
 import core.particles.path.Path
 import transformations.bytecode.types.TypeSkeleton
 
 import scala.util.Try
 
-object ExpressionSkeleton extends ParticleWithGrammar with WithState {
+object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
+
+  implicit class Expression(val node: Node) extends AnyVal with NodeWrapper
 
   def getType(state: CompilationState): Path => Node = expression => {
     getState(state).instances(expression.clazz).getType(expression, state)

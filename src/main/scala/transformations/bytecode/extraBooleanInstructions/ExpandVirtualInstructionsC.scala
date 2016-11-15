@@ -11,7 +11,7 @@ import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 import scala.collection.mutable
 
-object ExpandVirtualInstructionsC extends ParticleWithPhase with WithState {
+object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 

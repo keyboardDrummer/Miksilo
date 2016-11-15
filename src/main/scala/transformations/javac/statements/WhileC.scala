@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
-import core.particles.path.{Path, SequenceSelection}
+import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -38,14 +38,13 @@ object WhileC extends StatementInstance with WithState {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val whileInner =
-      "while" ~> expression.inParenthesis % blockGrammar
     val whileGrammar =
-      whileInner.asNode(WhileKey, Condition, Body)
+      "while" ~> expression.inParenthesis.as(Condition) %
+      blockGrammar.as(Body) asNode WhileKey
     statementGrammar.addOption(whileGrammar)
   }
 
-  def _while(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
+  def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
 
   object WhileKey extends core.particles.node.Key
 
@@ -62,7 +61,7 @@ object WhileC extends StatementInstance with WithState {
   }
 
   override def getLabels(_whilePath: Path): Map[Any, Path] = {
-    val _while = _whilePath.asInstanceOf[SequenceSelection]
+    val _while = _whilePath.asInstanceOf[SequenceElement]
     val current = _while.current
     val next = _while.next
     var result: Map[Any,Path] = Map(startKey(current) -> _while, endKey(current) -> next)

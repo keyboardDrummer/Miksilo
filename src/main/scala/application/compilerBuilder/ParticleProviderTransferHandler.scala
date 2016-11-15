@@ -4,7 +4,7 @@ import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 import javax.swing.{JComponent, JList, TransferHandler}
 import application.compilerBuilder.ParticleInstance._
-import core.particles.Particle
+import core.particles.Delta
 
 import scala.collection.convert.Wrappers.JListWrapper
 
@@ -20,7 +20,7 @@ class ParticleProviderTransferHandler(val availableList: JList[_]) extends Trans
 }
 
 object ListItemTransferable {
-  val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Seq[Particle]], "java/ListItem")
+  val LIST_ITEM_DATA_FLAVOR: DataFlavor = new DataFlavor(classOf[Seq[Delta]], "java/ListItem")
 }
 
 case class ListItemTransferable(listItems: Seq[ParticleInstance]) extends Transferable {

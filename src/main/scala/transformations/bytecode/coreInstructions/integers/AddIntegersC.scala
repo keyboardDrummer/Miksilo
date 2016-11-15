@@ -6,12 +6,14 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.types.IntTypeC
+import transformations.bytecode.types.{IntTypeC, LongTypeC}
+
+
 
 object AddIntegersC extends InstructionC {
   override val key: Key = AddIntegersKey
 
-  def addInteger = CodeAttribute.instruction(AddIntegersKey)
+  def addIntegers() = CodeAttribute.instruction(AddIntegersKey)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("60")
 

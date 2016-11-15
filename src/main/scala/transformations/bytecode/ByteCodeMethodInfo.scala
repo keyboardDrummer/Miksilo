@@ -1,13 +1,13 @@
 package transformations.bytecode
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, MapGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{FromMap, CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{CompilationState, Contract, FromMap, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 
-object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
+object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   object MethodInfoKey extends Key
 
@@ -47,9 +47,9 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
   object MethodsGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
-    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2))
+    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2).as(ClassMethodsKey))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = membersGrammar.inner %% methods ^^ parseMap(ClassFileKey, FromMap, ClassMethodsKey)
+    membersGrammar.inner = membersGrammar.inner %% methods
   }
 
   object AccessFlagGrammar
@@ -63,7 +63,7 @@ object ByteCodeMethodInfo extends ParticleWithGrammar with AccessFlags {
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
     val inner = methodHeader % attributesGrammar
-    val methodInfoGrammar: BiGrammar = nodeMap(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
+    val methodInfoGrammar: BiGrammar = nodeGrammar(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 

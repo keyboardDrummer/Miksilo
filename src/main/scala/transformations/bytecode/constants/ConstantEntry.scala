@@ -3,11 +3,11 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
-trait ConstantEntry extends ParticleWithGrammar {
+trait ConstantEntry extends DeltaWithGrammar {
   def key: Any
   def getByteCode(constant: Node, state: CompilationState): Seq[Byte]
 

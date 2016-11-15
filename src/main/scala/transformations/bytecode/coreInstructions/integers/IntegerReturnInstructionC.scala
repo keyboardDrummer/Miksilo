@@ -7,7 +7,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.types.IntTypeC
+import transformations.bytecode.types.{IntTypeC, LongTypeC}
 
 object IntegerReturnInstructionC extends InstructionC {
 

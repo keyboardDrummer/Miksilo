@@ -1,13 +1,13 @@
 package transformations.javac.classes
 
-import core.particles.{CompilationState, ParticleWithPhase}
+import core.particles.{CompilationState, DeltaWithPhase}
 import core.particles.node.Node
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.types.TypeVariable
 
-object ClassifyTypeIdentifiers extends ParticleWithPhase {
+object ClassifyTypeIdentifiers extends DeltaWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
-    program.foreach(node => node.clazz match {
+    program.visit(node => node.clazz match {
       case TypeVariable.TypeVariableKey =>
         val objectType = ObjectTypeC.objectType(TypeVariable.getTypeVariableName(node))
         node.replaceWith(objectType)

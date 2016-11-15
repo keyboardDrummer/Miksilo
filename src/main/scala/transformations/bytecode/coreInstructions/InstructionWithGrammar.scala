@@ -1,12 +1,12 @@
 package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
 import core.particles.node.Key
 import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute}
 
-trait InstructionWithGrammar extends ParticleWithGrammar
+trait InstructionWithGrammar extends DeltaWithGrammar
 {
   val key: Key
 

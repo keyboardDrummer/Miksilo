@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
@@ -15,7 +15,7 @@ import transformations.bytecode.extraBooleanInstructions.NotInstructionC.NotInst
 
 import scala.collection.mutable
 
-object OptimizeComparisonInstructionsC extends ParticleWithPhase {
+object OptimizeComparisonInstructionsC extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
     NotInstructionC, IntegerEqualsInstructionC)

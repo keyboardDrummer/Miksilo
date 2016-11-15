@@ -10,7 +10,7 @@ import core.particles.node.{Node, Node$}
 import scala.collection.mutable
 import scala.util.Random
 
-object ParseUsingTextualGrammar extends Particle {
+object ParseUsingTextualGrammar extends Delta {
   override def inject(state: CompilationState): Unit = {
     val grammarCatalogue = state.grammarCatalogue
     state.parse = input => {

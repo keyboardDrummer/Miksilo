@@ -2,14 +2,14 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithGrammar}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.classes.skeleton.{ClassSignature, ClassMemberC, JavaClassSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
-object FieldDeclaration extends ParticleWithGrammar with ClassMemberC {
+object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
 
   object FieldKey
   object FieldType

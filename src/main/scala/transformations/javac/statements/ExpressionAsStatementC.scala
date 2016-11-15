@@ -14,7 +14,7 @@ object ExpressionAsStatementC extends StatementInstance {
 
   object ExpressionKey extends Key
 
-  def create(expression: Node) = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
+  def create(expression: Node): Node = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
 
   override val key: Key = ExpressionAsStatementKey
 
@@ -37,7 +37,7 @@ object ExpressionAsStatementC extends StatementInstance {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val inner = expressionGrammar <~ ";"
-    val expressionAsStatement = nodeMap(inner, ExpressionAsStatementKey, ExpressionKey)
+    val expressionAsStatement = nodeGrammar(inner, ExpressionAsStatementKey, ExpressionKey)
     statementGrammar.addOption(expressionAsStatement)
   }
 

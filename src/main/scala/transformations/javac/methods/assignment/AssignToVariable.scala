@@ -14,7 +14,7 @@ import transformations.bytecode.types.LongTypeC.LongTypeKey
 import transformations.bytecode.types.ObjectTypeC.ObjectTypeKey
 import transformations.bytecode.types.TypeSkeleton
 
-object AssignToVariable extends ParticleWithGrammar {
+object AssignToVariable extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 

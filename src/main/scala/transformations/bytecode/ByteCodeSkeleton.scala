@@ -1,7 +1,7 @@
 package transformations.bytecode
 
-import core.bigrammar.BiGrammar
-import core.document.Empty
+import core.bigrammar.{BiGrammar, Consume, UndefinedDestructuringValue}
+import core.document.{BlankLine, Empty}
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -10,7 +10,7 @@ import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 
-object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
+object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   implicit class ByteCode(node: Node) {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
@@ -55,23 +55,23 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
 
   object AttributeKey
 
-  object AttributeNameKey
+  object AttributeNameKey extends Key
 
   object ClassFileKey extends Key
 
-  object ClassMethodsKey
+  object ClassMethodsKey extends Key
 
-  object ClassNameIndexKey
+  object ClassNameIndexKey extends Key
 
-  object ClassParentIndex
+  object ClassParentIndex extends Key
 
-  object ClassConstantPool
+  object ClassConstantPool extends Key
 
-  object ClassInterfaces
+  object ClassInterfaces extends Key
 
   object ClassFields extends Key
 
-  object ClassAttributes
+  object ClassAttributes extends Key
 
   private object EnrichedClassConstantEntry
 
@@ -92,11 +92,10 @@ object ByteCodeSkeleton extends ParticleWithGrammar with WithState {
     val classIndexGrammar: BiGrammar = "class" ~~> integer
     val parseIndexGrammar: BiGrammar = "extends" ~~> integer
     val attributesGrammar = grammars.create(AttributesGrammar, "attributes:" %> attributeGrammar.manyVertical.indent())
-    val membersGrammar = grammars.create(MembersGrammar, Empty)
-    val classGrammar = grammars.create(ClassFileKey, classIndexGrammar ~~ parseIndexGrammar ~~ interfacesGrammar %%
-      constantPool %% membersGrammar %% attributesGrammar ^^
-      parseMap(ClassFileKey, ClassNameIndexKey, ClassParentIndex, ClassInterfaces, ClassConstantPool,
-        FromMap, ClassAttributes))
+    val membersGrammar = grammars.create(MembersGrammar, print(Empty))
+    val classGrammar = grammars.create(ClassFileKey,
+      (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %%
+        constantPool.as(ClassConstantPool) %% membersGrammar %% attributesGrammar.as(ClassAttributes)).asNode(ClassFileKey))
 
     program.inner = classGrammar
   }

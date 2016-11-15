@@ -10,7 +10,7 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 import util.TestUtils
 import transformations.bytecode.ByteCodeSkeleton._
 
-object RunWithJVM extends ParticleWithPhase
+object RunWithJVM extends DeltaWithPhase
 {
   override def transform(program: Node, state: CompilationState): Unit = {
     val clazz: Node = state.program

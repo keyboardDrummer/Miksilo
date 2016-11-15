@@ -28,11 +28,11 @@ class GrammarCatalogue {
     result
   }
 
-  def getGrammarPath(ancestor: Any, grammarKeyToFind: Any): GrammarSelection = {
-    val attributeGrammar = find(ancestor)
+  def findPathsToKey(grammarKeyToFind: Any, rootKey: Any = ProgramGrammar): Seq[GrammarReference] = { //TODO GrammarKey requiren
+    val attributeGrammar = find(rootKey)
     val rootGrammar = new RootGrammar(attributeGrammar)
     val targetGrammar = find(grammarKeyToFind)
-    rootGrammar.descentsIncludingSelf.filter(path => path.get == targetGrammar).head.asInstanceOf[GrammarSelection]
+    rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarReference => x }
   }
 }
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)

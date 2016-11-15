@@ -7,6 +7,8 @@ import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
+import transformations.bytecode.coreInstructions.doubles.DoubleReturnInstructionC
+import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionC
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
@@ -38,7 +40,7 @@ object JavaCompiler {
 
   def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC, JavaGotoC)
 
-  def javaCompilerTransformations: Seq[Particle] = {
+  def javaCompilerTransformations: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
       NewC, FieldDeclarationWithInitializer, ConstructorC, SelectorReferenceKind, VariableReferenceKind) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
@@ -56,7 +58,7 @@ object JavaCompiler {
   def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
-  def javaSimpleExpression: Seq[Particle] = Seq(TernaryC, EqualityC,
+  def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityC,
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
 
@@ -70,24 +72,30 @@ object JavaCompiler {
 
   def byteCodeInstructions: Seq[InstructionC] = {
     Seq(Pop2C, PopC, GetStaticC, GotoC, IfIntegerCompareLessC, IfIntegerCompareLessOrEqualC,
-      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC,
-      LoadAddressC, PushNullC, StoreAddressC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
+      IfZeroC, IfNotZero, InvokeSpecialC, InvokeVirtualC, InvokeStaticC, NewByteCodeC, Duplicate2InstructionC, DuplicateInstructionC) ++
+      objectInstructions ++ Seq(PushNullC, StoreIntegerC, SubtractIntegerC, VoidReturnInstructionC,
       SwapInstruction, GetFieldC, PutField) ++
-      integerInstructions ++ longInstructions
+      integerInstructions ++ longInstructions ++ floatInstructions ++ doubleInstructions
   }
 
-  def longInstructions = Seq(CompareLongC, PushLongC, LoadLongC, StoreLongC)
+  def objectInstructions = Seq(LoadAddressC, AddressReturnInstructionC, StoreAddressC)
+
+  def doubleInstructions = Seq(DoubleReturnInstructionC)
+
+  def floatInstructions = Seq(FloatReturnInstructionC)
+
+  def longInstructions = Seq(LongReturnInstructionC, AddLongsC, CompareLongC, PushLongC, LoadLongC, StoreLongC)
 
   def integerInstructions = Seq(AddIntegersC, SmallIntegerConstantC, LoadConstantIntC, IncrementIntegerC, IntegerReturnInstructionC, LoadIntegerC, IfIntegerCompareGreaterOrEqualC,
     IfIntegerCompareEqualC, IfIntegerCompareNotEqualC)
 
   def byteCodeWithoutInstructions = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
 
-  def byteCodeWithoutTextualParser: Seq[ParticleWithGrammar] = bytecodeAttributes ++ constantEntryParticles ++
+  def byteCodeWithoutTextualParser: Seq[DeltaWithGrammar] = bytecodeAttributes ++ constantEntryParticles ++
     Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
-  val bytecodeAttributes: Seq[ParticleWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
+  val bytecodeAttributes: Seq[DeltaWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
@@ -100,10 +108,10 @@ object JavaCompiler {
     Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
       ShortTypeC, TypeSkeleton)
 
-  def spliceBeforeTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] =
+  def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
     getCompiler.spliceBeforeTransformations(implicits, splice)
 
-  def spliceAfterTransformations(implicits: Seq[Particle], splice: Seq[Particle]): Seq[Particle] =
+  def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
     getCompiler.spliceAfterTransformations(implicits, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler = {

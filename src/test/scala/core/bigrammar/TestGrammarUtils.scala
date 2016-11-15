@@ -11,7 +11,7 @@ import scala.util.parsing.input.CharArrayReader
 
 object TestGrammarUtils extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations)
 
-case class TestGrammarUtils(particles: Seq[Particle]) extends FunSuite {
+case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
   def parseAndPrintSame(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar): Unit = {
     val documentResult: String = parseAndPrint(example, expectedOption, grammarDocument)
@@ -56,9 +56,10 @@ case class TestGrammarUtils(particles: Seq[Particle]) extends FunSuite {
     Seq(new SelectorTransformation(key)) ++ particles
   }
 
-  class SelectorTransformation(key: Any) extends ParticleWithGrammar {
+  class SelectorTransformation(key: Any) extends DeltaWithGrammar {
     override def transformGrammars(grammars: GrammarCatalogue) {
-      grammars.find(ProgramGrammar).inner = grammars.find(key).inner
+      if (key != ProgramGrammar)
+        grammars.find(ProgramGrammar).inner = grammars.find(key)
     }
 
     override def dependencies: Set[Contract] = Set.empty

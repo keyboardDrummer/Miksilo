@@ -11,9 +11,17 @@ import transformations.javac.JavaCompiler
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object TestUtils extends TestUtils(JavaCompiler.getCompiler)
+object TestUtils extends TestUtils(JavaCompiler.getCompiler) {
+}
 
 class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
+
+  def toFile(program: String): String = {
+    val fileName = File.makeTemp(suffix = ".java")
+    val file = fileName.createFile()
+    file.writeAll(program)
+    fileName.toString()
+  }
 
   def currentDir = new File(new java.io.File("."))
   def rootOutput = currentDir / Path("testOutput")
@@ -34,7 +42,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Particle] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
+    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
     new CompilerFromParticles(particles).transform(byteCode)
     output
   }
@@ -69,6 +77,9 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
   }
 
   def getTestFile(relativeFilePath: Path): File = {
+    if (relativeFilePath.isAbsolute)
+      return File(relativeFilePath)
+
     val fullPath = relativeFilePath
     var testResources = ClassLoader.getSystemResource("/" + fullPath.path)
     if (testResources == null)
@@ -192,7 +203,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     }))
   }
 
-  class GetBytes(write: Seq[Byte] => Unit) extends ParticleWithPhase {
+  class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
     override def transform(program: Node, state: CompilationState): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }

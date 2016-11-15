@@ -61,7 +61,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       SmallIntegerConstantC.integerConstant(2),
       SubtractIntegerC.subtractInteger,
       InvokeStaticC.invokeStatic(3),
-      AddIntegersC.addInteger,
+      AddIntegersC.addIntegers,
       IntegerReturnInstructionC.integerReturn
     )
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))

@@ -18,11 +18,11 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
   def clazz = current.clazz
   def apply(key: Any) = get(key).get
   def get(key: Any): Option[Any] = current.data.get(key).map {
-    case childObject: Node => new Selection(this, key)
+    case childObject: Node => new FieldValue(this, key)
     case sequence: Seq[_] => sequence.indices.map(index => {
       val element = sequence(index)
       element match {
-        case childObject: Node => new SequenceSelection(this, key, index)
+        case childObject: Node => new SequenceElement(this, key, index)
         case _ => element
       }
     })

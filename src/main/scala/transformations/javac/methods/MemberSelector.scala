@@ -8,7 +8,7 @@ import transformations.javac.classes._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
 import transformations.javac.expressions.ExpressionSkeleton
 
-object MemberSelector extends ParticleWithGrammar with WithState {
+object MemberSelector extends DeltaWithGrammar with WithState {
 
   def getSelectorObject[T <: NodeLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
 

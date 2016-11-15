@@ -63,12 +63,22 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     new Example("Fibonacci with comments", TestUtils.getJavaTestFile("FibonacciWithComments.java").slurp())
   }
 
+  def getMethodOverloading = {
+    val content = TestUtils.getTestFile("MethodOverloading.java").slurp()
+    new Example("MethodOverloading", content)
+  }
+
+  def getFibonacciWithLabelledLocations = {
+    val content = TestUtils.getTestFile("FibonacciWithLabelledLocations.txt").slurp()
+    new Example("Fibonacci with labelled locations", content)
+  }
+
   def initialise() {
     try
     {
       val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
         getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciSimplifiedByteCode, getFibonacciByteCode, getRevealSyntaxSugar,
-        getComparisonOptimization, getFibonacciWithComments))
+        getComparisonOptimization, getFibonacciWithComments, getMethodOverloading, getFibonacciWithLabelledLocations))
       add(new JLabel("code examples:"))
       val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
 

@@ -3,12 +3,12 @@ package transformations.bytecode.additions
 import core.bigrammar.{BiGrammar, Consume}
 import core.grammar.StringLiteral
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
-import transformations.bytecode.attributes.StackMapTableAttribute.{DeltaGrammar, StackMapFrameGrammar}
+import transformations.bytecode.attributes.StackMapTableAttribute.{offsetGrammarKey, StackMapFrameGrammar}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -19,7 +19,7 @@ import transformations.javac.classes.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
+object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifZero(target: String) = instruction(IfZeroC.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
@@ -33,7 +33,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualC.key, Seq(target))
 
   def label(name: String, stackFrame: Node) = new Node(LabelKey,
-    LabelNameKey -> name,
+    LabelName -> name,
     LabelStackFrame -> stackFrame)
 
   override def inject(state: CompilationState): Unit = {
@@ -113,7 +113,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
       val frame = framesPerLocation(location)
       val offset = location - locationAfterPreviousFrame
 
-      frame(StackMapTableAttribute.OffsetDelta) = offset
+      frame(StackMapTableAttribute.FrameOffset) = offset
       stackFrames += frame
       locationAfterPreviousFrame = location + 1
     }
@@ -127,7 +127,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   def getLabelStackFrame(label: Node) = label(LabelStackFrame).asInstanceOf[Node]
 
-  def getLabelName(label: Node) = label(LabelNameKey).asInstanceOf[String]
+  def getLabelName(label: Node) = label(LabelName).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualC, GotoC, IfZeroC)
 
@@ -137,15 +137,14 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
     override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
-      new InstructionSignature(Seq.empty, Seq.empty)
+      InstructionSignature(Seq.empty, Seq.empty)
     }
 
     override def getInstructionSize: Int = 0
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-      val stackMapTableGrammar = grammars.find(StackMapFrameGrammar)
-      nodeMap(name ~> ("(" ~> StringLiteral <~ ")") % stackMapTableGrammar.indent(),
-        LabelKey, LabelNameKey, LabelStackFrame)
+      val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
+      name ~> StringLiteral.inParenthesis.as(LabelName) % stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
@@ -153,7 +152,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
 
   object LabelKey extends Key
 
-  object LabelNameKey extends Key
+  object LabelName extends Key
 
   object LabelStackFrame extends Key
 
@@ -166,8 +165,8 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
-    val delta = grammars.find(DeltaGrammar)
-    delta.remove()
+    val offsetGrammarPaths = grammars.findPathsToKey(offsetGrammarKey)
+    offsetGrammarPaths.foreach(delta => delta.removeMeFromSequence())
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {
@@ -177,7 +176,7 @@ object LabelledLocations extends ParticleWithPhase with ParticleWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(KeyGrammar(jump.key))
-      grammar.inner = jump.name ~> new Consume(StringLiteral).manySeparated(",").inParenthesis ^^ parseMap(jump.key, InstructionArgumentsKey)
+      grammar.inner = jump.name ~> Consume(StringLiteral).manySeparated(",").inParenthesis.as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }

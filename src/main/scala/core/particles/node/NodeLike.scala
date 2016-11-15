@@ -2,6 +2,17 @@ package core.particles.node
 
 import scala.collection.mutable
 
+object NodeWrapper
+{
+  implicit def wrapList[TNodeWrapper](list: Seq[Node])(implicit wrap: Node => TNodeWrapper): Seq[TNodeWrapper] = list.map(n => wrap(n))
+  implicit def unwrapList(list: Seq[NodeWrapper]): Seq[Node] = list.map(n => n.node)
+  implicit def unwrap(wrapper: NodeWrapper): Node = wrapper.node
+}
+
+trait NodeWrapper extends Any {
+  def node: Node
+}
+
 trait NodeLike {
   type Self <: NodeLike
   def get(key: Any): Option[Any]
@@ -9,20 +20,20 @@ trait NodeLike {
   def clazz: Any
   def dataView: Map[Any, Any]
 
-  def getDescendants: List[Self] = {
+  def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
-    foreach(node => result = node :: result)
+    visit(node => result = node :: result)
     result
   }
 
-  def foreach(transformation: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
+  def visit(beforeChildren: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
 
     transformNode(this.asInstanceOf[Self])
     def transformNode(node: Self): Unit = {
       if (!visited.add(node))
         return
 
-      transformation(node)
+      beforeChildren(node)
 
       val children = node.dataView.values
       for(child <- children)

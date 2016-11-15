@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
-import core.particles.Particle
+import core.particles.Delta
 import org.jdesktop.swingx.JXList
 import transformations.javac.JavaCompiler
 import application.compilerBuilder.ParticleInstance._
@@ -64,11 +64,11 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane = {
-    val availableItems: Seq[Particle] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
+    val availableItems: Seq[Delta] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
     val availableList = new ParticleList()
-    availableList.setModel(new AbstractListModel[Particle] {
+    availableList.setModel(new AbstractListModel[Delta] {
       def getSize: Int = availableItems.length
-      def getElementAt(i: Int): Particle = availableItems(i)
+      def getElementAt(i: Int): Delta = availableItems(i)
     })
 
     availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))

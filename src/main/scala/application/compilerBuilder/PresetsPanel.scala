@@ -8,14 +8,15 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromParticles, Particle}
+import core.particles.{CompilerFromParticles, Delta}
+import transformations.bytecode.additions.LabelledLocations
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
 import transformations.javac.classes.FieldDeclarationWithInitializer
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
-import transformations.javac.statements.ForLoopC
+import transformations.javac.statements.{ForLoopC, ForLoopContinueC}
 import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object PresetsPanel
@@ -42,7 +43,7 @@ object PresetsPanel
     new Preset("JavaSubset", getJavaCompilerParticles, "Compiles a subset of Java.")
   }
 
-  def getJavaCompilerParticles: Seq[Particle] = {
+  def getJavaCompilerParticles: Seq[Delta] = {
     JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
   }
 
@@ -57,7 +58,7 @@ object PresetsPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockCompilerC) ++ JavaCompiler.javaCompilerTransformations,
+    new Preset("Java statement block", Seq(BlockCompilerC) ++ getJavaCompilerParticles,
       "The program consists only of a single statement block.")
   }
 
@@ -67,19 +68,24 @@ object PresetsPanel
   }
 
   def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Particle](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
+    val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
 
     new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getRevealSyntaxSugar: Preset = {
-    val implicits = Seq[Particle](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
-      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopC, LocalDeclarationWithInitializerC,
+    val implicits = Seq[Delta](DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+      ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopContinueC, ForLoopC, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
     new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
       "Performs all compiler phases that still maintain a valid Java program.")
+  }
+
+  def getLabelledLocations = {
+    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompiler.byteCodeTransformations,
+      "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 
   def createModel: DefaultListModel[Preset] = {
@@ -94,6 +100,7 @@ object PresetsPanel
     model.addElement(PresetsPanel.getJavaToSimplifiedByteCodePreset)
     model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
+    model.addElement(getLabelledLocations)
     model
   }
 }
@@ -171,6 +178,6 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
   }
 }
 
-case class Preset(name: String, particles: Seq[Particle], description: String = "") {
+case class Preset(name: String, particles: Seq[Delta], description: String = "") {
   override def toString = name
 }

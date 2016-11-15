@@ -2,20 +2,20 @@ package application.compilerBuilder
 
 import javax.swing.JPanel
 
-import core.particles.Particle
+import core.particles.Delta
 import util.Cache
 
 import scala.collection.mutable
 
-class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Particle]) {
+class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Delta]) {
   val dependants = getDependants
-  var selection: Seq[Particle] = Seq.empty
-  val dependenciesCache = new Cache[Set[Particle]](() => selection.flatMap(s => s.dependencies2).toSet)
-  val dependantsCache = new Cache[Set[Particle]](() => selection.flatMap(s => dependants(s)).toSet)
+  var selection: Seq[Delta] = Seq.empty
+  val dependenciesCache = new Cache[Set[Delta]](() => selection.flatMap(s => s.dependencies2).toSet)
+  val dependantsCache = new Cache[Set[Delta]](() => selection.flatMap(s => dependants(s)).toSet)
 
   def getDependants = {
-    val dependants = new mutable.HashMap[Particle, mutable.Set[Particle]]()
-      with mutable.MultiMap[Particle, Particle]
+    val dependants = new mutable.HashMap[Delta, mutable.Set[Delta]]()
+      with mutable.MultiMap[Delta, Delta]
 
     for (particle <- availableParticles) {
       for (dependency <- particle.dependencies2) {
@@ -25,20 +25,20 @@ class ParticleLabelPainter(container: JPanel, availableParticles: Seq[Particle])
     dependants
   }
 
-  def select(selection: Seq[Particle]) {
+  def select(selection: Seq[Delta]) {
     this.selection = selection
     dependenciesCache.clear()
     container.repaint()
   }
 
-  def isDependency(particle: Particle) : Boolean = {
+  def isDependency(particle: Delta) : Boolean = {
     if (selection == null)
       return false
 
     dependenciesCache.get.contains(particle)
   }
 
-  def isDependant(particle: Particle): Boolean = {
+  def isDependant(particle: Delta): Boolean = {
     if (selection == null)
       return false
 

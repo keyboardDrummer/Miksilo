@@ -7,7 +7,7 @@ import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import scala.util.parsing.input.CharArrayReader
 
 class ParticlesToParserConverter extends GrammarToParserConverter {
-  def buildParser(transformations: Seq[ParticleWithGrammar]): String => ParseResult[Any] = {
+  def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
     val programGrammar: Labelled = new CompilerFromParticles(transformations).getGrammar
     buildParser(programGrammar)
   }

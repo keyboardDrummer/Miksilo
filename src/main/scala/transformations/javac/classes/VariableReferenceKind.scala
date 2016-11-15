@@ -6,7 +6,7 @@ import transformations.javac.classes.skeleton.{JavaClassSkeleton, PackageSignatu
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.VariableC.VariableKey
 
-object VariableReferenceKind extends Particle {
+object VariableReferenceKind extends Delta {
   override def inject(state: CompilationState): Unit = {
     MemberSelector.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)

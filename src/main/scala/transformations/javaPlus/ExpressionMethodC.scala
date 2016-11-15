@@ -9,7 +9,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.{MethodC, ReturnExpressionC}
 
-object ExpressionMethodC extends ParticleWithGrammar with ParticleWithPhase {
+object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, JavaClassSkeleton) ++ super.dependencies
 

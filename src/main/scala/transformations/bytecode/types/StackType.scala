@@ -1,9 +1,9 @@
 package transformations.bytecode.types
 
-import core.particles.{CompilationState, Particle}
+import core.particles.{CompilationState, Delta}
 import core.particles.node.Key
 
-trait StackType extends Particle
+trait StackType extends Delta
 {
   val key: Key
   def getStackSize: Int

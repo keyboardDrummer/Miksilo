@@ -24,7 +24,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val assignmentInner = (targetGrammar <~~ "=") ~~ expressionGrammar
-    val assignmentGrammar = nodeMap(assignmentInner, AssignmentKey, AssignmentTarget, AssignmentValue)
+    val assignmentGrammar = nodeGrammar(assignmentInner, AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.addOption(assignmentGrammar)
   }
 

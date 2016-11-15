@@ -5,12 +5,12 @@ import java.io.InputStream
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError, BiGrammarToPrinter$}
 import core.bigrammar.{BiGrammarToGrammar, BiGrammar}
 import core.particles.grammars.ProgramGrammar
-import core.particles.{Phase, CompilationState, CompilerFromParticles, Particle}
+import core.particles.{Phase, CompilationState, CompilerFromParticles, Delta}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
 
-case class PrettyPrint(recover: Boolean = false) extends Particle
+case class PrettyPrint(recover: Boolean = false) extends Delta
 {
   override def inject(state: CompilationState): Unit = {
     val foundGrammar = state.grammarCatalogue.find(ProgramGrammar)

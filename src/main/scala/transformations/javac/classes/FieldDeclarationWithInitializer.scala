@@ -14,7 +14,7 @@ import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 
 import scala.collection.mutable.ArrayBuffer
-object FieldDeclarationWithInitializer extends ParticleWithGrammar with ParticleWithPhase {
+object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 
@@ -40,7 +40,7 @@ object FieldDeclarationWithInitializer extends ParticleWithGrammar with Particle
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new PathRoot(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).visit(obj => obj.clazz match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })

@@ -2,87 +2,43 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.{MapInsideNode, ParticleWithGrammar}
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.Key
-import util.DataFlowAnalysis
-
 import scala.util.matching.Regex
 
-object JavaStyleCommentsC extends ParticleWithGrammar {
+object JavaStyleCommentsC extends DeltaWithGrammar {
 
-  class GrammarAnalysis extends DataFlowAnalysis[GrammarPath,Boolean]
-  {
-
-    val biGrammarClass = classOf[BiGrammar]
-    override def getOutgoingNodes(path: GrammarPath): Set[GrammarPath] = {
-      path.children.toSet
-    }
-
-    override def updateState(state: Boolean, path: GrammarPath): Boolean = {
-      path.get match {
-        case _: NodeMap => true
-        case _: MapGrammar => false
-        case _ => state
-      }
-    }
-
-    override def combineState(first: Boolean, second: Boolean): Option[Boolean] = {
-      if (first == second)
-        return None
-      
-      Some(first && second)
-    }
-  }
-  
   case class CommentCollection(comments: Seq[String])
 
   object CommentKey extends Key
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar.as(CommentKey))
 
-    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
-
-    val analysis = new GrammarAnalysis()
-    analysis.run(new RootGrammar(grammars.find(ProgramGrammar)), false)
-    
-    for(pathWithState <- analysis.states)
+    for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants.
+      filter(path => path.get.isInstanceOf[NodeGrammar]))
     {
-      val path = pathWithState._1
-      path match {
-        case selection: GrammarSelection =>
-          val current = selection.get
-          current match {
-//            case _:Keyword =>
-//              selection.set(new Sequence(commentsGrammar, current))
-//            case _:Delimiter =>
-//              selection.set(new Sequence(commentsGrammar, current))
-            case nodeMap:NodeMap =>
-              if (nodeMap.key != MapInsideNode)
-              {
-                addCommentToNodeMap(commentsGrammar, selection)
-              }
-//            case _:MapGrammar =>
-//              selection.set(new Sequence(commentsGrammar, current))
-            case _ =>
-          }
-        case _ =>
-      }
+      addCommentPrefixToGrammar(commentsGrammar, path.children.head)
     }
   }
 
-  def addCommentToNodeMap(commentsGrammar: BiGrammar, nodeMapPath: GrammarSelection): Unit = {
-    val nodeMapToTransform = nodeMapPath.get.asInstanceOf[NodeMap]
-    val growers = nodeMapPath.ancestors.
-      map(path => path.get).
+  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, grammarReference: GrammarReference): Unit = {
+    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(grammarReference)
+    val newGrammar = if (verticalNotHorizontal) commentsGrammar %> grammarReference.get
+                           else commentsGrammar ~> grammarReference.get
+    grammarReference.set(newGrammar)
+  }
+
+  def getCommentVerticalOrHorizontal(nodeMapPath: GrammarReference): Boolean = {
+    val growers = nodeMapPath.ancestors.map(path => path.get).
       filter(grammar => grammar.isInstanceOf[TopBottom] || grammar.isInstanceOf[Sequence] || grammar.isInstanceOf[ManyVertical] || grammar.isInstanceOf[ManyHorizontal])
-    val firstGrower = growers.head
-    val verticalNotHorizontal = firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
-    val innerWithComment = if (verticalNotHorizontal) new TopBottom(commentsGrammar, nodeMapToTransform.inner)
-                           else commentsGrammar ~ nodeMapToTransform.inner
-    val newInner = innerWithComment ^^ (combineCommentsAndPlaceLeft, replaceLeftValueNotFoundWithEmptyComment)
-    val newNodeMap = nodeMap(newInner, nodeMapToTransform.key, Seq(CommentKey) ++ nodeMapToTransform.fields: _*)
-    nodeMapPath.set(newNodeMap)
+
+    val verticalNotHorizontal = growers.nonEmpty && {
+      val firstGrower = growers.head
+      firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
+    }
+    verticalNotHorizontal
   }
 
   def getCommentsGrammar: BiGrammar = {
@@ -94,26 +50,7 @@ object JavaStyleCommentsC extends ParticleWithGrammar {
 
   def getCommentGrammar: BiGrammar = {
     val regex: Regex = new Regex( """/\*.*\*/""")
-    new RegexG(regex)
-  }
-
-  def combineCommentsAndPlaceLeft(from: Any): Any = {
-    val values = tildeValuesToSeq(from)
-    val commentCollections = values.collect({case x : CommentCollection => x})
-    val combinedComment = CommentCollection(commentCollections.flatMap(commentCollection => commentCollection.comments))
-    val nonComments = values.filter(x => !x.isInstanceOf[CommentCollection])
-    val newValues = Seq(combinedComment) ++ nonComments
-    newValues.reduce((a,b) => core.grammar.~(a,b))
-  }
-
-  def replaceLeftValueNotFoundWithEmptyComment(from: Any): Option[Any] = {
-    val values = tildeValuesToSeq(from)
-    val withoutComment = values.drop(1)
-    val comment = values.head match {
-      case collection: CommentCollection => collection
-      case _:ValueNotFound => CommentCollection(Seq.empty)
-    }
-    Some(core.grammar.~(comment, withoutComment.reduce((a,b) => core.grammar.~(a,b))))
+    RegexG(regex) ~ space
   }
 
   override def description: String = "Adds Java-style comments to the language"

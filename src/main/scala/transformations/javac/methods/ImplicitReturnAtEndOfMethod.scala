@@ -1,9 +1,9 @@
 package transformations.javac.methods
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 
-object ImplicitReturnAtEndOfMethod extends ParticleWithPhase {
+object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
 
   override def transform(program: Node, state: CompilationState): Unit = {

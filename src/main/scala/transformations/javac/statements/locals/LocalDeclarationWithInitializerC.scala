@@ -3,7 +3,7 @@ package transformations.javac.statements.locals
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.path.{Path, PathRoot, SequenceSelection}
+import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.assignment.AssignmentSkeleton
@@ -11,7 +11,7 @@ import transformations.javac.statements.locals.LocalDeclarationC.{DeclarationNam
 import transformations.javac.statements.{ExpressionAsStatementC, StatementSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 
-object LocalDeclarationWithInitializerC extends ParticleWithGrammar with ParticleWithPhase {
+object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationC)
 
@@ -42,12 +42,12 @@ object LocalDeclarationWithInitializerC extends ParticleWithGrammar with Particl
     val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
 
     val assignmentStatement = ExpressionAsStatementC.create(assignment)
-    val originSequence = declarationWithInitializer.asInstanceOf[SequenceSelection]
+    val originSequence = declarationWithInitializer.asInstanceOf[SequenceElement]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new PathRoot(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).visit(obj => obj.clazz match {
       case DeclarationWithInitializerKey => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

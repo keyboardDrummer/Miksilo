@@ -1,11 +1,11 @@
 package transformations.bytecode.attributes
 
-import core.particles.ParticleWithGrammar
+import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 
-object UnParsedAttribute extends ParticleWithGrammar {
+object UnParsedAttribute extends DeltaWithGrammar {
 
   class UnParsedAttribute(val node: Node) {
     def nameIndex: Int = node(UnParsedAttribute.UnParsedAttributeName).asInstanceOf[Int]

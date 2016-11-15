@@ -1,9 +1,9 @@
 package transformations.javac.expressions
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, ParticleWithGrammar}
+import core.particles.{Contract, DeltaWithGrammar}
 
-object ParenthesisC extends ParticleWithGrammar {
+object ParenthesisC extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 

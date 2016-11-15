@@ -1,12 +1,13 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.ParticleWithGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.DeltaWithGrammar
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.Node
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.javac.types.MethodTypeC.MethodTypeKey
 
-object TypeAbstraction extends ParticleWithGrammar {
+object TypeAbstraction extends DeltaWithGrammar {
 
   object TypeAbstractionKey
   object Body
@@ -39,7 +40,7 @@ object TypeAbstraction extends ParticleWithGrammar {
   object AbstractMethodTypeGrammar
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val methodTypeGrammar = grammars.find(MethodTypeC.ByteCodeMethodTypeGrammar)
+    val methodTypeGrammar = grammars.find(KeyGrammar(MethodTypeKey))
     val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier ~ (":" ~> classBound.option) ~~ ((":" ~> classBound)*) ^^

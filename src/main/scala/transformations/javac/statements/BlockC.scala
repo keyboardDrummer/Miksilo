@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 
-object BlockC extends ParticleWithGrammar {
+object BlockC extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 

@@ -1,14 +1,14 @@
 package transformations.bytecode.additions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, ParticleWithPhase}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 
-object PoptimizeC extends ParticleWithPhase {
+object PoptimizeC extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopC)
 

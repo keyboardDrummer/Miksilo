@@ -5,7 +5,7 @@ import java.awt.dnd.DnDConstants
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.{DefaultListModel, JComponent, JList}
 
-import core.particles.Particle
+import core.particles.Delta
 
 class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[ParticleInstance])
   extends ParticleProviderTransferHandler(availableList) {
@@ -46,7 +46,7 @@ class SelectedParticlesTransferHandler(availableList: JList[_], val model: Defau
 
   def getInjectors(transferable: Transferable): Seq[ParticleInstance] = {
     transferable.getTransferData(ListItemTransferable.LIST_ITEM_DATA_FLAVOR).asInstanceOf[Seq[_]].collect({
-      case particle: Particle => new ParticleInstance(particle)
+      case particle: Delta => new ParticleInstance(particle)
       case instance: ParticleInstance => instance
     })
   }

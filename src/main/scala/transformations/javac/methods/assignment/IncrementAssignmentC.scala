@@ -7,7 +7,7 @@ import core.particles.path.{Path, PathRoot}
 import transformations.javac.expressions.additive.AdditionC
 
 //TODO refactor so it uses a phase to reduce itself.
-object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
+object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AdditionC, AssignmentSkeleton)
 
@@ -36,7 +36,7 @@ object IncrementAssignmentC extends ParticleWithPhase with ParticleWithGrammar {
   }
 
   override def transform(program: Node, state: CompilationState): Unit = {
-    new PathRoot(program).foreach(obj => obj.clazz match {
+    new PathRoot(program).visit(obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })

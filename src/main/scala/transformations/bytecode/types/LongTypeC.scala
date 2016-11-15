@@ -9,7 +9,7 @@ object LongTypeC extends TypeInstance with StackType {
 
   override val key = LongTypeKey
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
+  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq.empty
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("J",false) ~> produce(longType)
 
@@ -19,7 +19,7 @@ object LongTypeC extends TypeInstance with StackType {
     "long" ~> produce(longType)
   }
 
-  def longType = new Node(LongTypeKey)
+  val longType = new Node(LongTypeKey)
 
   object LongTypeKey extends Key
 

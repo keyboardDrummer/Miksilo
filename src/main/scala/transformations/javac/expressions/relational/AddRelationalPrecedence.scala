@@ -1,10 +1,10 @@
 package transformations.javac.expressions.relational
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, ParticleWithGrammar}
+import core.particles.{Contract, DeltaWithGrammar}
 import transformations.javac.expressions.ExpressionSkeleton
 
-object AddRelationalPrecedence extends ParticleWithGrammar {
+object AddRelationalPrecedence extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
