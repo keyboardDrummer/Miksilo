@@ -49,7 +49,7 @@ class TestParseTypes extends FunSuite {
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)
   }
 
-  test("labelWithAppendFrameInInstructions2") {
+  ignore("labelWithAppendFrameInInstructions2") {
     val input = "code: nameIndex:9, maxStack:2, maxLocal:3\n    instructions:\n " +
       "label(\"start-4962768465676381896\")\n        append frame int int\n load integer(2) \n    attributes:\n    exceptions:"
     val result = TestGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompiler.byteCodeTransformations).

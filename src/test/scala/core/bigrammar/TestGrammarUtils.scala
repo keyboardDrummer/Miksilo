@@ -58,7 +58,8 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
   class SelectorTransformation(key: Any) extends DeltaWithGrammar {
     override def transformGrammars(grammars: GrammarCatalogue) {
-      grammars.find(ProgramGrammar).inner = grammars.find(key).inner
+      if (key != ProgramGrammar)
+        grammars.find(ProgramGrammar).inner = grammars.find(key)
     }
 
     override def dependencies: Set[Contract] = Set.empty
