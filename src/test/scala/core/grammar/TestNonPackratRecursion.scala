@@ -1,12 +1,5 @@
 package core.grammar
 
-import org.junit.{Assert, Ignore, Test}
-import org.scalatest.FunSuite
-
-import scala.util.parsing.combinator.lexical.StdLexical
-import scala.util.parsing.combinator.syntactical.{StandardTokenParsers, StdTokenParsers}
-import scala.util.parsing.combinator.token.StdTokens
-
 class TestNonPackratRecursion extends FunSuiteStandardTokenParsers {
 
   test("RightRecursion") {
@@ -27,23 +20,25 @@ class TestNonPackratRecursion extends FunSuiteStandardTokenParsers {
     assertResult(("!",("!",("!",""))))(result.get)
   }
 
-  ignore("testLeftRecursion") {
-    lazy val parser: Parser[Any] = success("") ||| parser ~ keyword("!") ^^ { case a ~ b => (a,b)}
-    val input = "!!!"
-    lexical.delimiters += "!"
-    val result = parser(new lexical.Scanner(input))
-
-    assertResult(((("","!"),"!"),"!"))(result.get)
-  }
-
-  ignore("LeftRecursion2") {
-    lazy val parser: Parser[Any] = parser ~ keyword("!") ^^ { case a ~ b => (a,b)} ||| success("")
-    val input = "!!!"
-    lexical.delimiters += "!"
-    val result = parser(new lexical.Scanner(input))
-
-    assertResult(((("","!"),"!"),"!"))(result.get)
-  }
+  // This test code serves as actual documentation, to show what's not possible.
+  // The test can't be turned on because it produces a stack overflow.
+  //  ignore("testLeftRecursion") {
+  //    lazy val parser: Parser[Any] = success("") ||| parser ~ keyword("!") ^^ { case a ~ b => (a,b)}
+  //    val input = "!!!"
+  //    lexical.delimiters += "!"
+  //    val result = parser(new lexical.Scanner(input))
+  //
+  //    assertThrows[StackOverflowError](result.get)
+  //  }
+  //
+  //  ignore("LeftRecursion2") {
+  //    lazy val parser: Parser[Any] = parser ~ keyword("!") ^^ { case a ~ b => (a,b)} ||| success("")
+  //    val input = "!!!"
+  //    lexical.delimiters += "!"
+  //    val result = parser(new lexical.Scanner(input))
+  //
+  //    assertResult(((("","!"),"!"),"!"))(result.get)
+  //  }
 
   ignore("BothRecursion") {
     lazy val parser: Parser[Any] = keyword("!") ||| parser ~ parser ^^ { case a ~ b => (a,b)}
