@@ -39,13 +39,13 @@ class TestNonPackratRecursion extends FunSuiteStandardTokenParsers {
   //
   //    assertResult(((("","!"),"!"),"!"))(result.get)
   //  }
-
-  ignore("BothRecursion") {
-    lazy val parser: Parser[Any] = keyword("!") ||| parser ~ parser ^^ { case a ~ b => (a,b)}
-    val input = "!!!"
-    lexical.delimiters += "!"
-    val result = parser(new lexical.Scanner(input))
-
-    assertResult(("!",("!","!")))(result.get)
-  }
+  //
+  //  ignore("BothRecursion") {
+  //    lazy val parser: Parser[Any] = keyword("!") ||| parser ~ parser ^^ { case a ~ b => (a,b)}
+  //    val input = "!!!"
+  //    lexical.delimiters += "!"
+  //    val result = parser(new lexical.Scanner(input))
+  //
+  //    assertResult(("!",("!","!")))(result.get)
+  //  }
 }
