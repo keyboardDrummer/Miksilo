@@ -95,7 +95,4 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
     result.data ++= valueWithMap.state.filterKeys(k => k.isInstanceOf[Key])
     WithMap(result, Map.empty)
   }
-
-  def oldConstruct(value: Any, key: AnyRef, fields: List[Any]): Node = {
-  }
 }
