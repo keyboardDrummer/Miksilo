@@ -3,13 +3,13 @@ package transformations.javac.types
 import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.types.TypeSkeleton
 
 object TypeVariable extends DeltaWithGrammar {
 
-  object TypeVariableKey
-  object TypeVariableName
+  object TypeVariableKey extends Key
+  object TypeVariableName extends Key
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     transformByteCodeGrammar(grammars)
     transformJavaGrammar(grammars)
@@ -17,13 +17,13 @@ object TypeVariable extends DeltaWithGrammar {
 
   def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val variableGrammar: BiGrammar = identifier ^^ parseMap(TypeVariableKey, TypeVariableName)
+    val variableGrammar: BiGrammar = identifier.asNode(TypeVariableKey, TypeVariableName)
     typeGrammar.addOption(variableGrammar)
   }
 
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    byteCodeType.addOption(new Keyword("T", false) ~> identifier <~ ";" ^^ parseMap(TypeVariableKey, TypeVariableName))
+    byteCodeType.addOption(new Keyword("T", false) ~> identifier <~ ";" asNode(TypeVariableKey, TypeVariableName))
   }
 
   def getTypeVariableName(node: Node): String = {

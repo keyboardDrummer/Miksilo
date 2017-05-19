@@ -3,19 +3,19 @@ package transformations.javac.types
 import core.bigrammar.BiGrammar
 import core.particles.DeltaWithGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 import transformations.javac.types.MethodTypeC.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
 
-  object TypeAbstractionKey
-  object Body
-  object Parameters
-  object ParameterKey
-  object ParameterName
-  object ParameterClassBound
-  object ParameterInterfaceBound
+  object TypeAbstractionKey extends Key
+  object Body extends Key
+  object Parameters extends Key
+  object ParameterKey extends Key
+  object ParameterName extends Key
+  object ParameterClassBound extends Key
+  object ParameterInterfaceBound extends Key
 
   def getBody(_type: Node): Node = {
     _type(TypeAbstraction.Body).asInstanceOf[Node]
@@ -32,7 +32,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
-    val variableGrammar: BiGrammar = identifier ^^ parseMap(ParameterKey, ParameterName)
+    val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
     grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar <~ ">" <~ " ").option.optionToSeq)
   }
@@ -43,11 +43,12 @@ object TypeAbstraction extends DeltaWithGrammar {
     val methodTypeGrammar = grammars.find(KeyGrammar(MethodTypeKey))
     val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
-    val variableGrammar: BiGrammar = identifier ~ (":" ~> classBound.option) ~~ ((":" ~> classBound)*) ^^
-      parseMap(ParameterKey, ParameterName, ParameterClassBound, ParameterInterfaceBound)
+    val variableGrammar: BiGrammar = identifier.as(ParameterName) ~
+      (":" ~> classBound.option).as(ParameterClassBound) ~~
+      ((":" ~> classBound)*).as(ParameterInterfaceBound) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, ("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar ^^
-      parseMap(TypeAbstractionKey, Parameters, Body))
+    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar).
+      asNode(TypeAbstractionKey, Parameters, Body))
     byteCodeType.addOption(abstractMethodType)
   }
 

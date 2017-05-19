@@ -42,7 +42,7 @@ object LineNumberTable extends ByteCodeAttribute {
 
   override def key: Key = LineNumberTableKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "Not implemented" ^^ parseMap(key) // TODO implement. Also figure out why I can't use failure here.
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ("Not implemented" : BiGrammar).asNode(key) // TODO implement. Also figure out why I can't use failure here.
 
   override def constantPoolKey: String = "LineNumberTable"
 

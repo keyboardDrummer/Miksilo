@@ -36,7 +36,7 @@ object IfThenElseC extends StatementInstance {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
     val ifThenGrammar = grammars.find(IfThenC)
-    val ifThenElseGrammar = ifThenGrammar ~ ("else" ~> bodyGrammar) ^^ parseMap(key, FromMap, ElseKey)
+    val ifThenElseGrammar = ifThenGrammar ~ ("else" ~> bodyGrammar) asNode(key, FromMap, ElseKey)
     statementGrammar.addOption(ifThenElseGrammar)
   }
 

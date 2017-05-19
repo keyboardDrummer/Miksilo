@@ -2,7 +2,7 @@ package transformations.javaPlus
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions.ExpressionSkeleton
@@ -13,8 +13,8 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, JavaClassSkeleton) ++ super.dependencies
 
-  object ExpressionMethodKey
-  object ExpressionMethodExpression
+  object ExpressionMethodKey extends Key
+  object ExpressionMethodExpression extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar)
@@ -22,9 +22,9 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
     val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val expressionMethodGrammar = visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
-      identifier ~ parseParameters ~~ ("=" ~~> expressionGrammar) ^^
-      parseMap(ExpressionMethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey,
+    val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
+      identifier ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
+      asNode(ExpressionMethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey,
         MethodParametersKey, ExpressionMethodExpression)
     val methodGrammar = grammars.find(MethodC.MethodGrammar)
     methodGrammar.addOption(expressionMethodGrammar)

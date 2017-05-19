@@ -45,7 +45,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
-    val superCallGrammar = "super" ~> callArguments ^^ parseMap(SuperCall, CallC.CallArguments)
+    val superCallGrammar = "super" ~> callArguments asNode(SuperCall, CallC.CallArguments)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(superCallGrammar)
   }

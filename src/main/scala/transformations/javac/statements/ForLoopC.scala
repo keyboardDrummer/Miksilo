@@ -30,8 +30,8 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
-    val forLoopGrammar = "for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar ^^
-      parseMap(ForLoopType, Initializer, Condition, Increment, Body)
+    val forLoopGrammar = ("for" ~> ("(" ~> statementGrammar ~ (expressionGrammar <~ ";") ~ expressionGrammar <~ ")") % blockGrammar).
+      asNode(ForLoopType, Initializer, Condition, Increment, Body)
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar
   }
 
@@ -40,13 +40,13 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   object ForLoopType extends Key
 
-  object Initializer
+  object Initializer extends Key
 
-  object Condition
+  object Condition extends Key
 
-  object Increment
+  object Increment extends Key
 
-  object Body
+  object Body extends Key
 
   override def transform(program: Node, state: CompilationState): Unit = {
     PathRoot(program).visit(path => path.clazz match {

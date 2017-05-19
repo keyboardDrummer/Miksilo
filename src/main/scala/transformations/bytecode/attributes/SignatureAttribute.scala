@@ -9,11 +9,11 @@ import transformations.bytecode.readJar.ClassFileParser._
 object SignatureAttribute extends ByteCodeAttribute {
 
   object SignatureKey extends Key
-  object SignatureIndex
+  object SignatureIndex extends Key
   override def key: Key = SignatureKey
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    "signature with index:" ~~> integer ^^ parseMap(SignatureKey, SignatureIndex)
+    ("signature with index:" ~~> integer).asNode(SignatureKey, SignatureIndex)
   }
 
   override def constantPoolKey: String = "Signature"

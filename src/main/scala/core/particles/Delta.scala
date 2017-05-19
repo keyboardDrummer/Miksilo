@@ -1,6 +1,8 @@
 package core.particles
 
-trait Delta extends Contract {
+import core.particles.node.Key
+
+trait Delta extends Contract with Key {
 
   def inject(state: CompilationState) = {  }
 

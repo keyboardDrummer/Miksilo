@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.particles.DeltaWithGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 
 object UnParsedAttribute extends DeltaWithGrammar {
@@ -17,12 +17,12 @@ object UnParsedAttribute extends DeltaWithGrammar {
 
   def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(UnParsedAttributeKey, UnParsedAttributeName -> nameIndex, UnParsedAttributeData -> bytes)
 
-  object UnParsedAttributeKey
-  object UnParsedAttributeName
-  object UnParsedAttributeData
+  object UnParsedAttributeKey extends Key
+  object UnParsedAttributeName extends Key
+  object UnParsedAttributeData extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val grammar = "UnParsed attribute with nameIndex:" ~~> integer ^^ parseMap(UnParsedAttributeKey, UnParsedAttributeName)
+    val grammar = "UnParsed attribute with nameIndex:" ~~> integer asNode(UnParsedAttributeKey, UnParsedAttributeName)
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }
 

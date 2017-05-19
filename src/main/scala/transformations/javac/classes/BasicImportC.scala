@@ -1,21 +1,21 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
-import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
 object BasicImportC extends DeltaWithGrammar {
 
-  object ImportKey
-  object ElementsKey
+  object ImportKey extends Key
+  object ElementsKey extends Key
 
   object ImportPathGrammar
 
   def _import(elements: Seq[String]) = new Node(ImportKey, ElementsKey -> elements)
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".") ^^ parseMap(ImportKey, ElementsKey))
+    val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".").asNode(ImportKey, ElementsKey))
     val basicImport = "import" ~~> importPath <~ ";"
     grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
   }

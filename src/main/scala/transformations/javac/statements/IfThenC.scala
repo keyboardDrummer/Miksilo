@@ -12,9 +12,9 @@ object IfThenC extends StatementInstance {
 
   object IfThenKey extends Key
 
-  object ConditionKey
+  object ConditionKey extends Key
 
-  object ThenKey
+  object ThenKey extends Key
 
   override val key: Key = IfThenKey
 
@@ -47,8 +47,8 @@ object IfThenC extends StatementInstance {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
-    val ifThenGrammar = grammars.create(this, "if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar ^^
-      parseMap(IfThenKey, ConditionKey, ThenKey))
+    val ifThenGrammar = grammars.create(this, ("if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar).
+      asNode(IfThenKey, ConditionKey, ThenKey))
     statementGrammar.addOption(ifThenGrammar)
   }
 

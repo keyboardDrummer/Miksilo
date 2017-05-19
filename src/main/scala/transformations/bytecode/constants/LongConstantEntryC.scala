@@ -3,9 +3,9 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
-import transformations.bytecode.constants.LongConstantEntryC.{LongEntryValue, LongEntryKey}
+import transformations.bytecode.constants.LongConstantEntryC.{LongEntryKey, LongEntryValue}
 
 object LongConstantEntryC extends ConstantEntry {
 
@@ -15,14 +15,13 @@ object LongConstantEntryC extends ConstantEntry {
 
   def construct(value: Long) = new Node(LongEntryKey, LongEntryValue -> value)
 
-  object LongEntryKey
-  object LongEntryValue
+  object LongEntryKey extends Key
+  object LongEntryValue extends Key
   override def key: Any = LongEntryKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.longToBytes(constant.value)
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "long:" ~~> number ^^
-    parseMap(LongEntryKey, LongEntryValue)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "long:" ~~> number asNode(LongEntryKey, LongEntryValue)
 
   override def description: String = "Add the long constant entry."
 }

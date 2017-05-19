@@ -2,7 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike}
+import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
 import transformations.bytecode.extraBooleanInstructions.{GreaterThanInstructionC, LessThanInstructionC}
@@ -38,17 +38,17 @@ object GreaterThanC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan = (relationalGrammar <~~ ">") ~~ relationalGrammar ^^ parseMap(GreaterThanKey, GreaterThanFirst, GreaterThanSecond)
+    val parseLessThan = (relationalGrammar <~~ ">") ~~ relationalGrammar asNode(GreaterThanKey, GreaterThanFirst, GreaterThanSecond)
     relationalGrammar.addOption(parseLessThan)
   }
 
   def lessThan(first: Node, second: Node) = new Node(GreaterThanKey, GreaterThanFirst -> first, GreaterThanSecond -> second)
 
-  object GreaterThanKey
+  object GreaterThanKey extends Key
 
-  object GreaterThanFirst
+  object GreaterThanFirst extends Key
 
-  object GreaterThanSecond
+  object GreaterThanSecond extends Key
 
   override def description: String = "Adds the > operator."
 }
@@ -81,17 +81,17 @@ object LessThanC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan = (relationalGrammar <~~ "<") ~~ relationalGrammar ^^ parseMap(LessThanKey, LessThanFirst, LessThanSecond)
+    val parseLessThan = (relationalGrammar <~~ "<") ~~ relationalGrammar asNode(LessThanKey, LessThanFirst, LessThanSecond)
     relationalGrammar.addOption(parseLessThan)
   }
 
   def lessThan(first: Node, second: Node) = new Node(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
 
-  object LessThanKey
+  object LessThanKey extends Key
 
-  object LessThanFirst
+  object LessThanFirst extends Key
 
-  object LessThanSecond
+  object LessThanSecond extends Key
 
   override def description: String = "Adds the < operator."
 }

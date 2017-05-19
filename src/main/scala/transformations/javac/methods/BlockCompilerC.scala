@@ -1,20 +1,20 @@
 package transformations.javac.methods
 
-import core.particles.grammars.{ProgramGrammar, GrammarCatalogue}
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles._
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.javac.ImplicitObjectSuperClass
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.statements.StatementSkeleton
-import transformations.bytecode.types.{VoidTypeC, ObjectTypeC, ArrayTypeC}
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
 
 object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
 {
-  object ProgramKey
-  object ProgramStatements
+  object ProgramKey extends Key
+  object ProgramStatements extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val statements = grammars.find(StatementSkeleton.StatementGrammar).manyVertical ^^ parseMap(ProgramKey, ProgramStatements)
+    val statements = grammars.find(StatementSkeleton.StatementGrammar).manyVertical.asNode(ProgramKey, ProgramStatements)
     grammars.find(ProgramGrammar).inner = statements
   }
 

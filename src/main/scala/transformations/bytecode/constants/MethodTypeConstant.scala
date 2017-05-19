@@ -18,8 +18,8 @@ object MethodTypeConstant extends ConstantEntry {
     byteToBytes(16) ++ shortToBytes(constant(MethodTypeDescriptorIndex).asInstanceOf[Int])
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "method type constant:" ~~> integer ^^
-    parseMap(MethodTypeConstantKey, MethodTypeDescriptorIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("method type constant:" ~~> integer).
+    asNode(MethodTypeConstantKey, MethodTypeDescriptorIndex)
 
   override def description: String = "Add the method type constant"
 }

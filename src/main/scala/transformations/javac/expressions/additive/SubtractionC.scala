@@ -10,8 +10,8 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 
 object SubtractionC extends ExpressionInstance {
   object SubtractionKey extends Key
-  object FirstKey
-  object SecondKey
+  object FirstKey extends Key
+  object SecondKey extends Key
 
   def getFirst[T <: NodeLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
 
@@ -22,7 +22,7 @@ object SubtractionC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue) {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
-    val parseSubtraction = (additiveGrammar <~~ "-") ~~ withoutSubtraction ^^ parseMap(SubtractionKey, FirstKey, SecondKey)
+    val parseSubtraction = ((additiveGrammar <~~ "-") ~~ withoutSubtraction).asNode(SubtractionKey, FirstKey, SecondKey)
     additiveGrammar.addOption(parseSubtraction)
   }
 

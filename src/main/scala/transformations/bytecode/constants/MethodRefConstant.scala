@@ -1,17 +1,18 @@
 package transformations.bytecode.constants
 
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 
 object MethodRefConstant extends ConstantEntry {
 
-  object MethodRefKey
+  object MethodRefKey extends Key
 
-  object MethodRefClassName
+  object MethodRefClassName extends Key
 
-  object MethodRefMethodName
+  object MethodRefMethodName extends Key
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(10) ++
@@ -25,12 +26,12 @@ object MethodRefConstant extends ConstantEntry {
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
 
-  def getMethodRefClassRefIndex(methodRef: Node) = methodRef(MethodRefClassName).asInstanceOf[Int]
+  def getMethodRefClassRefIndex(methodRef: Node): Int = methodRef(MethodRefClassName).asInstanceOf[Int]
 
-  def getNameAndTypeIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
+  def getNameAndTypeIndex(methodRef: Node): Int = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue) = "method reference:" ~~> (integer <~ ".") ~ integer ^^
-    parseMap(MethodRefKey, MethodRefClassName, MethodRefMethodName)
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("method reference:" ~~> (integer <~ ".") ~ integer).
+    asNode(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 }

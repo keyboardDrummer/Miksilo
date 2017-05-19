@@ -2,7 +2,7 @@ package transformations.javac.statements.locals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.VariableC
@@ -21,17 +21,17 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseDeclarationWithInitializer = grammars.create(this, typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";" ^^
-      parseMap(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey))
+    val parseDeclarationWithInitializer = grammars.create(this, (typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";").
+      asNode(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey))
     statement.addOption(parseDeclarationWithInitializer)
   }
 
   def declarationWithInitializer(name: String, _type: Node, initializer: Node) = new Node(DeclarationWithInitializerKey,
     DeclarationName -> name, DeclarationType -> _type, InitializerKey -> initializer)
 
-  object DeclarationWithInitializerKey
+  object DeclarationWithInitializerKey extends Key
 
-  object InitializerKey
+  object InitializerKey extends Key
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 

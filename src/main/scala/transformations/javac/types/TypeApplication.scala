@@ -10,8 +10,8 @@ import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
 object TypeApplication extends DeltaWithGrammar {
 
   object TypeApplicationKey extends Key
-  object TypeApplicationFunc
-  object TypeApplicationArgument
+  object TypeApplicationFunc extends Key
+  object TypeApplicationArgument extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     transformByteCodeGrammars(grammars)
@@ -24,8 +24,8 @@ object TypeApplication extends DeltaWithGrammar {
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val objectInner = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
     typeArgumentGrammar.addOption(typeGrammar)
-    val typeApplication: BiGrammar = objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">") ^^
-      parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument)
+    val typeApplication: BiGrammar = (objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">")).
+      asNode(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument)
     typeGrammar.addOption(typeApplication)
   }
 
@@ -33,8 +33,8 @@ object TypeApplication extends DeltaWithGrammar {
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {
     val typeArgumentGrammar = grammars.create(ByteCodeTypeArgumentGrammar)
     val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)
-    objectInner.addOption(objectInner.inner ~ ("<" ~> typeArgumentGrammar.some <~ ">") ^^
-      parseMap(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
+    objectInner.addOption((objectInner.inner ~ ("<" ~> typeArgumentGrammar.some <~ ">")).
+      asNode(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument))
 
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     val argumentGrammar = grammars.find(TypeApplication.ByteCodeTypeArgumentGrammar)

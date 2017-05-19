@@ -38,7 +38,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object StackMapTableKey extends Key
 
-  object StackMapTableMaps
+  object StackMapTableMaps extends Key
 
   def stackMapTableId = new Node(StackMapTableId)
 
@@ -134,8 +134,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
-    val stackMapTableGrammar = "stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent() ^^
-      parseMap(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
+    val stackMapTableGrammar = ("stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent()).
+      asNode(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
 
     grammars.create(StackMapTableGrammar, stackMapTableGrammar)
   }

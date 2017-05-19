@@ -3,7 +3,7 @@ package transformations.javac.constructor
 import core.particles._
 import core.particles.exceptions.BadInputException
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.coreInstructions.InvokeSpecialC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.types.VoidTypeC
@@ -46,17 +46,17 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
     ConstructorClassNameKey -> className)
 
 
-  object ConstructorKey
+  object ConstructorKey extends Key
 
-  object ConstructorClassNameKey
+  object ConstructorClassNameKey extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)
     val block = grammars.find(BlockC.BlockGrammar)
-    val constructorGrammar = visibilityModifier ~~ identifier ~ parseParameters % block ^^
-      parseMap(ConstructorKey, VisibilityKey, ConstructorClassNameKey, MethodParametersKey, MethodBodyKey)
+    val constructorGrammar = (visibilityModifier ~~ identifier ~ parseParameters % block).
+      asNode(ConstructorKey, VisibilityKey, ConstructorClassNameKey, MethodParametersKey, MethodBodyKey)
     memberGrammar.addOption(constructorGrammar)
   }
 

@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.{Path, SequenceElement}
 
 trait StatementInstance extends DeltaWithGrammar {
@@ -11,7 +11,7 @@ trait StatementInstance extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  val key: AnyRef = this
+  val key: Key = this
 
   def toByteCode(statement: Path, state: CompilationState): Seq[Node]
 

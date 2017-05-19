@@ -3,7 +3,7 @@ package transformations.javac.expressions.literals
 import core.bigrammar.BiGrammar
 import core.grammar.RegexG
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
@@ -20,7 +20,7 @@ object LongLiteralC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) = {
     val longGrammar : BiGrammar = (new RegexG("""-?\d+l""".r) : BiGrammar) ^^
-      (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) ^^ parseMap(LongLiteralKey, ValueKey)
+      (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) asNode(LongLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(longGrammar)
   }
@@ -35,9 +35,9 @@ object LongLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, state: CompilationState): Node = LongTypeC.longType
 
-  object LongLiteralKey
+  object LongLiteralKey extends Key
 
-  object ValueKey
+  object ValueKey extends Key
 
   override def description: String = "Adds the usage of long literals by putting an l after the number."
 }

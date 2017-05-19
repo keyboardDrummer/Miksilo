@@ -19,7 +19,7 @@ object EqualityC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
-    val parseEquality = (equalityGrammar <~ "==") ~ equalityGrammar ^^ parseMap(EqualityKey, FirstKey, SecondKey)
+    val parseEquality = ((equalityGrammar <~ "==") ~ equalityGrammar).asNode(EqualityKey, FirstKey, SecondKey)
     equalityGrammar.addOption(parseEquality)
   }
 
@@ -27,9 +27,9 @@ object EqualityC extends ExpressionInstance {
 
   object EqualityKey extends Key
 
-  object FirstKey
+  object FirstKey extends Key
 
-  object SecondKey
+  object SecondKey extends Key
 
   override val key: Key = EqualityKey
 

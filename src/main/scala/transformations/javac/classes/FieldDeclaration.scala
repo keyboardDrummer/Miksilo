@@ -1,19 +1,19 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.javac.classes.skeleton.{ClassSignature, ClassMemberC, JavaClassSkeleton}
+import transformations.javac.classes.skeleton.{ClassMemberC, ClassSignature, JavaClassSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
 
-  object FieldKey
-  object FieldType
-  object FieldName
+  object FieldKey extends Key
+  object FieldType extends Key
+  object FieldName extends Key
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, FieldDescriptorConstant)
 
@@ -74,7 +74,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 
-    val fieldGrammar = typeGrammar ~~ identifier <~ ";" ^^ parseMap(FieldKey, FieldType, FieldName)
+    val fieldGrammar = (typeGrammar ~~ identifier <~ ";").asNode(FieldKey, FieldType, FieldName)
     memberGrammar.addOption(fieldGrammar)
   }
 

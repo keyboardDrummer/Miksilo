@@ -37,7 +37,7 @@ object SourceFileAttribute extends ByteCodeAttribute {
 
   override def key: Key = SourceFileAttributeKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = "Not implemented" ^^ parseMap(key) // TODO implement.
+  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ("Not implemented" : BiGrammar).asNode(key) // TODO implement.
 
   override def constantPoolKey: String = "SourceFile"
 

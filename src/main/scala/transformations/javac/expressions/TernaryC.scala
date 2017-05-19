@@ -22,8 +22,8 @@ object TernaryC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue) {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseTernary = (expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar ^^
-      parseMap(TernaryKey, ConditionKey, TrueKey, FalseKey)
+    val parseTernary = ((expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar).
+      asNode(TernaryKey, ConditionKey, TrueKey, FalseKey)
     val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar
   }

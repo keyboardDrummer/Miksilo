@@ -13,18 +13,18 @@ object ArrayTypeC extends TypeInstance with StackType {
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val grammar: BiGrammar = "[" ~> typeGrammar ^^ parseMap(ArrayTypeKey, ArrayElementType)
+    val grammar: BiGrammar = ("[" ~> typeGrammar).asNode(ArrayTypeKey, ArrayElementType)
     grammar
   }
 
-  def getArrayElementType(arrayType: Node) = arrayType(ArrayElementType).asInstanceOf[Node]
+  def getArrayElementType(arrayType: Node): Node = arrayType(ArrayElementType).asInstanceOf[Node]
 
-  override def getJavaGrammar(grammars: GrammarCatalogue)= {
+  override def getJavaGrammar(grammars: GrammarCatalogue): ArrayTypeC.NodeGrammar = {
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-     parseType <~ "[]" ^^ parseMap(ArrayTypeKey, ArrayElementType)
+    (parseType <~ "[]").asNode(ArrayTypeKey, ArrayElementType)
   }
 
-  def arrayType(elementType: Node) = {
+  def arrayType(elementType: Node): Node = {
     new Node(ArrayTypeKey, ArrayElementType -> elementType)
   }
 
@@ -32,7 +32,7 @@ object ArrayTypeC extends TypeInstance with StackType {
 
   object ArrayTypeKey extends Key
 
-  object ArrayElementType
+  object ArrayElementType extends Key
 
   override def description: String = "Defines the array type."
 }

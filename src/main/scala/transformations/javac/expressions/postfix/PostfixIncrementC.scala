@@ -26,13 +26,13 @@ object PostFixIncrementC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val postFixIncrement = identifier <~ "++" ^^ parseMap(PostfixIncrementKey, VariableKey)
+    val postFixIncrement = identifier <~ "++" asNode(PostfixIncrementKey, VariableKey)
     coreGrammar.addOption(postFixIncrement)
   }
 
   object PostfixIncrementKey extends Key
 
-  object VariableKey
+  object VariableKey extends Key
 
   override def description: String = "Adds the postfix ++ operator."
 }

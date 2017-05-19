@@ -73,11 +73,11 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   object ClassAttributes extends Key
 
-  private object EnrichedClassConstantEntry
+  private object EnrichedClassConstantEntry extends Key
 
-  private object ClassConstantEntryIndex
+  private object ClassConstantEntryIndex extends Key
 
-  private object ClassConstantEntryContent
+  private object ClassConstantEntryContent extends Key
 
   object ConstantPoolItemContentGrammar
 
@@ -106,8 +106,8 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
     val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar, utf8 | qualifiedClassName)
-    val constantPoolItem = ("#" ~> number <~ ":") ~~ constantPoolItemContent ^^
-      parseMap(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
+    val constantPoolItem = (("#" ~> number <~ ":") ~~ constantPoolItemContent).
+      asNode(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
     val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
     val result = "constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),

@@ -15,13 +15,13 @@ import transformations.bytecode.types.ObjectTypeC
 object NewC extends ExpressionInstance {
 
   object NewCallKey extends Key
-  object NewObject
+  object NewObject extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
-    val newGrammar = "new" ~~> objectGrammar ~ callArgumentsGrammar ^^
-      parseMap(NewCallKey, NewObject, CallC.CallArguments)
+    val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).
+      asNode(NewCallKey, NewObject, CallC.CallArguments)
     val expressionGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }

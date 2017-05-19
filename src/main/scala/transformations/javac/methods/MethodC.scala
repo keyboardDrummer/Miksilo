@@ -162,7 +162,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
 
-    val parseParameter = parseType ~~ identifier ^^ parseMap(ParameterKey, ParameterTypeKey, ParameterNameKey)
+    val parseParameter = parseType ~~ identifier asNode(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") <~ ")")
     val parseStatic = grammars.create(StaticGrammar, "static" ~~> produce(true) | produce(false))
 
@@ -196,7 +196,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       TypeParameters -> typeParameters)
   }
 
-  object ParameterKey
+  object ParameterKey extends Key
   def parameter(name: String, _type: Any) = {
     new Node(ParameterKey,
       ParameterNameKey -> name,

@@ -12,7 +12,7 @@ object NotC extends ExpressionInstance {
 
   object NotKey extends Key
 
-  object NotExpression
+  object NotExpression extends Key
 
   override val key: Key = NotKey
 
@@ -24,7 +24,7 @@ object NotC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
-    coreGrammar.addOption("!" ~> coreGrammar ^^ parseMap(NotKey, NotExpression))
+    coreGrammar.addOption("!" ~> coreGrammar asNode(NotKey, NotExpression))
   }
 
   override def description: String = "Adds the ! (not) operator."

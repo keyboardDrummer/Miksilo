@@ -33,7 +33,7 @@ object ObjectTypeC extends TypeInstance with StackType {
       case Left(string) => Seq(string)
     })
     val parseObjectType = grammars.create(ObjectTypeJavaGrammar,
-      identifier.someSeparated(".") ^^ (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
+      (identifier.someSeparated(".") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, ObjectTypeName))
     parseObjectType
   }
 
@@ -54,8 +54,8 @@ object ObjectTypeC extends TypeInstance with StackType {
     def deconstruct(value: Any): Option[Any] = Some(value match {
       case Right(QualifiedClassName(stringIds)) => stringIds
     })
-    val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner, identifier.someSeparated("/") ^^
-      (construct, deconstruct) ^^ parseMap(ObjectTypeKey, ObjectTypeName))
+    val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
+      (identifier.someSeparated("/") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, ObjectTypeName))
     val grammar: BiGrammar = new Keyword("L",false) ~> inner <~ ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
@@ -64,7 +64,7 @@ object ObjectTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ObjectTypeName
+  object ObjectTypeName  extends Key
 
   object ObjectTypeKey extends Key
 

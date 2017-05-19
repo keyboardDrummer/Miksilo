@@ -3,16 +3,16 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 
 object FieldRefConstant extends ConstantEntry {
 
-  object FieldRef
+  object FieldRef extends Key
 
-  object FieldRefClassIndex
+  object FieldRefClassIndex extends Key
 
-  object FieldRefNameAndTypeIndex
+  object FieldRefNameAndTypeIndex extends Key
 
   def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new Node(FieldRef,
     FieldRefClassIndex -> classIndex,
@@ -26,12 +26,12 @@ object FieldRefConstant extends ConstantEntry {
 
   override def key: Any = FieldRef
 
-  def getFieldRefClassIndex(fieldRef: Node) = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
+  def getFieldRefClassIndex(fieldRef: Node): Int = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
-  def getNameAndTypeIndex(fieldRef: Node) = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
+  def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "field reference:" ~~> (integer <~ ".") ~ integer ^^
-    parseMap(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    ("field reference:" ~~> (integer <~ ".") ~ integer).asNode(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 }
