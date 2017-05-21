@@ -19,17 +19,17 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   val lineSeparator = System.lineSeparator()
 
   test("SimpleForLoop") {
-    val testFileContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("While") {
-    val testFileContent = TestUtils.getJavaTestFile("Whilee", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFileContents("Whilee", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Fibonacci") {
-    val testFileContent = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
+    val testFileContent = TestUtils.getJavaTestFileContents("Fibonacci", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
@@ -49,12 +49,13 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrintAfterImplicitAddition") {
-    val input = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
-    val expectation = TestUtils.getJavaTestFile("ExplicitFibonacci.java").slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci", Path(""))
+    val expectation = TestUtils.getJavaTestFileContents("ExplicitFibonacci.java")
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
     val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+
 
     val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
     val output = state.output
@@ -63,8 +64,8 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrettyPrintByteCode") {
-    val input = TestUtils.getJavaTestFile("Fibonacci", Path("")).slurp()
-    val expectation = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci", Path(""))
+    val expectation = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
 
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
@@ -73,7 +74,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrettyPrintAndParseByteCode") {
-    val input = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
+    val input = TestUtils.getJavaTestFile("Fibonacci.java", Path(""))
 
     val byteCodeTransformations = JavaCompiler.byteCodeTransformations
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
@@ -82,21 +83,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(byteCode).output
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
-    val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
-    val input = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(input).output
+    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }
 

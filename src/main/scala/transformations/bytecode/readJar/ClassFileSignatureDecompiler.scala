@@ -15,7 +15,7 @@ object ClassFileSignatureDecompiler {
   val byteCodeParticles: Seq[Delta] = Seq(UnParsedAttribute) ++ JavaCompiler.byteCodeWithoutTextualParser ++ Seq(DecodeByteCodeParser)
   val onlySignatureAttribute: Seq[Delta] = byteCodeParticles.
     filter(particle => !particle.isInstanceOf[ByteCodeAttribute] || particle == SignatureAttribute)
-  def getDecompiler = {
+  def getDecompiler: Seq[Delta] = {
     Seq(ParseKnownAttributes, DecompileByteCodeSignature) ++ onlySignatureAttribute
   }
 }

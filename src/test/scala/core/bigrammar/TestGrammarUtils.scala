@@ -6,6 +6,7 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import org.scalatest.{FlatSpec, FunSuite, Matchers}
 import transformations.javac.JavaCompiler
+import util.TestUtils
 
 import scala.util.parsing.input.CharArrayReader
 
@@ -49,7 +50,7 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
   def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
     val compiler = new CompilerFromParticles(getTransformations(grammarTransformer))
-    compiler.parse(input)
+    compiler.parse(TestUtils.stringToInputStream(input))
   }
 
   def getTransformations(key: Any) = {

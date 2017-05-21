@@ -18,15 +18,13 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
   }
 
   test("comparePrintResultWithoutComment") {
-    val testFile: File = getJavaTestFile("Whilee")
-    val input = testFile.slurp()
+    val input = getJavaTestFileContents("Whilee")
     val result = testGrammar.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
   test("comparePrintResult") {
-    val testFile: File = getJavaTestFile("WhileeWithComment.java")
-    val input = testFile.slurp()
+    val input = getJavaTestFileContents("WhileeWithComment.java")
     val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
@@ -40,8 +38,8 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
   test("javaToSimplified") {
     val initialCompiler = new CompilerFromParticles(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
-    val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("FibonacciWithComments.java"))
-    val expectedResult = utils.getTestFile("FibonacciWithCommentsByteCode.txt").slurp()
+    val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("FibonacciWithComments.java"))
+    val expectedResult = utils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
   }
 }

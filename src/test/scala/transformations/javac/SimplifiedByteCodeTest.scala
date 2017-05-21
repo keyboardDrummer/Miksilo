@@ -10,15 +10,15 @@ class SimplifiedByteCodeTest extends FunSuite {
 
   test("javaToSimplified") {
     val utils = new TestUtils(new CompilerFromParticles(PresetsPanel.getJavaToSimplifiedByteCodePreset.particles))
-    val result = utils.compileAndPrettyPrint(utils.getJavaTestFile("Fibonacci.java"))
-    val expectedResult = utils.getTestFile("FibonacciInSimplifiedByteCode.txt").slurp()
+    val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("Fibonacci.java"))
+    val expectedResult = utils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
     assertResult(expectedResult)(result)
   }
 
   test("simplifiedToByteCode") {
     val utils = new TestUtils(new CompilerFromParticles(PresetsPanel.getSimplifiedByteCodePreset.particles))
-    val result = utils.compileAndPrettyPrint(utils.getTestFile("FibonacciInSimplifiedByteCode.txt"))
-    val expectedResult = utils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val result = utils.compileAndPrettyPrint(utils.getTestFileContents("FibonacciInSimplifiedByteCode.txt"))
+    val expectedResult = utils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     assertResult(expectedResult)(result)
   }
 }

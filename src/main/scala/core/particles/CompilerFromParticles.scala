@@ -43,17 +43,13 @@ class CompilerFromParticles(val particles: Seq[Delta]) {
     state
   }
 
-  def parse(input: String): Node = {
+  def parse(input: InputStream): Node = {
     val state = buildState
-    state.program = state.parse(stringToInputStream(input))
+    state.program = state.parse(input)
     state.program
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-
-  def parseAndTransform(input: String): CompilationState = {
-    parseAndTransform(stringToInputStream(input))
-  }
 
   def parseAndTransform(input: InputStream): CompilationState = {
     val state = buildState

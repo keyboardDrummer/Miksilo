@@ -1,5 +1,8 @@
 package util
 
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.StandardCharsets
+
 import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.particles._
 import core.particles.node.{ComparisonOptions, Node}
@@ -8,6 +11,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.JavaCompiler
+
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
@@ -24,8 +28,8 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
   }
 
   def currentDir = new File(new java.io.File("."))
-  def rootOutput = currentDir / Path("testOutput")
-  def actualOutputDirectory = rootOutput / "actual"
+  def rootOutput: Path = currentDir / Path("testOutput")
+  def actualOutputDirectory: Path = rootOutput / "actual"
 
   def testInstructionEquivalence(expectedByteCode: Node, compiledCode: Node) {
     for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
@@ -33,7 +37,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     }
   }
 
-  def getMethodInstructions(method: Node) =
+  def getMethodInstructions(method: Node): Seq[Node] =
     CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method).head)
 
   def printByteCode(byteCode: Node): String = {
@@ -65,15 +69,23 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     runJavaClass(className, testDirectory)
   }
 
+  def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
-    val input: File = getJavaTestFile(className, inputDirectory)
-    compiler.parseAndTransform(input).program
+    val input: String = getJavaTestFileContents(className, inputDirectory)
+    compiler.parseAndTransform(stringToInputStream(input)).program
   }
 
   def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): File = {
     val className = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     getTestFile(relativeFilePath)
+  }
+
+  def getJavaTestFileContents(fileName: String, inputDirectory: Path = Path("")): String = {
+    val className = fileNameToClassName(fileName)
+    val relativeFilePath = inputDirectory / (className + ".java")
+    getTestFileContents(relativeFilePath)
   }
 
   def getTestFile(relativeFilePath: Path): File = {
@@ -91,6 +103,10 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     File(testResources.getPath)
   }
 
+  def getTestFileContents(relativeFilePath: Path): String = {
+    getTestFile(relativeFilePath).slurp().replaceAll("\r\n","\n").replaceAll("\n", System.lineSeparator())
+  }
+
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
@@ -102,13 +118,17 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     TestUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
-  def compileAndPrettyPrint(fileName: File): String = {
+  def compileAndPrettyPrint(input: String): String = {
+    compileAndPrettyPrint(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
+  }
+
+  def compileAndPrettyPrint(input: InputStream): String = {
 
     val prettyPrint = PrettyPrint(recover = true)
     val splicedParticles = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
     val newCompiler = new CompilerFromParticles(splicedParticles)
 
-    val state = newCompiler.parseAndTransform(fileName)
+    val state = newCompiler.parseAndTransform(input)
     state.output
   }
 

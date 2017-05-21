@@ -17,59 +17,59 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getComparisonOptimization = {
-    val content = TestUtils.getTestFile("ComparisonOptimization.java").slurp()
+    val content = TestUtils.getTestFileContents("ComparisonOptimization.java")
     new Example("ComparisonOptimization", content)
   }
 
   def getFibonacciSimplifiedByteCode = {
-    val content = TestUtils.getTestFile("FibonacciInSimplifiedByteCode.txt").slurp()
+    val content = TestUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
     new Example("Fibonacci Simplified Bytecode", content)
   }
 
   def getFibonacci = {
-    val fibonacciContent = TestUtils.getJavaTestFile("Fibonacci.java", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFileContents("Fibonacci.java", Path(""))
     new Example("Fibonacci", fibonacciContent)
   }
 
   def getFibonacciByteCode = {
-    val fibonacciContent = TestUtils.getTestFile("FibonacciByteCodePrettyPrinted.txt").slurp()
+    val fibonacciContent = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     new Example("Fibonacci Basic Bytecode", fibonacciContent)
   }
 
   def getForLoop = {
-    val fibonacciContent = TestUtils.getJavaTestFile("SimpleForLoop", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
     new Example("For Loop", fibonacciContent)
   }
 
   def getWhile = {
-    val fibonacciContent = TestUtils.getJavaTestFile("Whilee", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFileContents("Whilee", Path(""))
     new Example("While", fibonacciContent)
   }
 
   def getFibonacciExpressionMethod = {
-    val fibonacciContent = TestUtils.getJavaTestFile("FibonacciWithExpressionMethod", Path("")).slurp()
+    val fibonacciContent = TestUtils.getJavaTestFileContents("FibonacciWithExpressionMethod", Path(""))
     new Example("Fibonacci with expression method", fibonacciContent)
   }
 
   def getRevealSyntaxSugar = {
-    new Example("Filled with syntax sugar", TestUtils.getJavaTestFile("RevealSyntaxSugar.java").slurp())
+    new Example("Filled with syntax sugar", TestUtils.getJavaTestFileContents("RevealSyntaxSugar.java"))
   }
 
   def getVariableAlreadyDefined = {
-    new Example("Variable defined twice", TestUtils.getJavaTestFile("VariableAlreadyDefined", Path("")).slurp())
+    new Example("Variable defined twice", TestUtils.getJavaTestFileContents("VariableAlreadyDefined", Path("")))
   }
 
   def getFibonacciWithComments = {
-    new Example("Fibonacci with comments", TestUtils.getJavaTestFile("FibonacciWithComments.java").slurp())
+    new Example("Fibonacci with comments", TestUtils.getJavaTestFileContents("FibonacciWithComments.java"))
   }
 
   def getMethodOverloading = {
-    val content = TestUtils.getTestFile("MethodOverloading.java").slurp()
+    val content = TestUtils.getTestFileContents("MethodOverloading.java")
     new Example("MethodOverloading", content)
   }
 
   def getFibonacciWithLabelledLocations = {
-    val content = TestUtils.getTestFile("FibonacciWithLabelledLocations.txt").slurp()
+    val content = TestUtils.getTestFileContents("FibonacciWithLabelledLocations.txt")
     new Example("Fibonacci with labelled locations", content)
   }
 

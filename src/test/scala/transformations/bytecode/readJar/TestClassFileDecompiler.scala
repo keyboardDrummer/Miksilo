@@ -74,62 +74,57 @@ class TestClassFileDecompiler extends FunSuite {
   }
 
   test("ObjectClassUnParsedAttributes") {
-    val inputStream = getInputStream("Object.class")
+    val inputStream = TestUtils.getTestFile("Object.class")
     val compiler: CompilerFromParticles = new CompilerFromParticles(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
     val state = compiler.parseAndTransform(inputStream)
 
-    val expected = TestUtils.getTestFile("DecodedObjectClassPrettyPrint.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecodedObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassParsedAttributes") {
     val compiler = new CompilerFromParticles(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
       ClassFileSignatureDecompiler.onlySignatureAttribute)
-    val state = compiler.parseAndTransform(getInputStream("Object.class"))
+    val state = compiler.parseAndTransform(TestUtils.getTestFile("Object.class"))
 
-    val expected = TestUtils.getTestFile("DecodedWithAttributesObjectClassPrettyPrint.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecodedWithAttributesObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(getInputStream("Object.class"))
+    val state = compiler.parseAndTransform(TestUtils.getTestFile("Object.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledObjectClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecompiledObjectClassFileSignature.txt")
     assertResult(expected)(outputState.output)
   }
 
   test("StringClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(getInputStream("String.class"))
+    val state = compiler.parseAndTransform(TestUtils.getTestFile("String.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledStringClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecompiledStringClassFileSignature.txt")
     assertResult(expected)(outputState.output)
   }
 
   test("SystemClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(getInputStream("System.class"))
+    val state = compiler.parseAndTransform(TestUtils.getTestFile("System.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledSystemClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecompiledSystemClassFileSignature.txt")
     assertResult(expected)(outputState.output)
   }
 
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(getInputStream("PrintStream.class"))
+    val state = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class"))
     val outputState = new CompilerFromParticles(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transformReturnState(state.program)
 
-    val expected = TestUtils.getTestFile("DecompiledPrintStreamClassFileSignature.txt").slurp()
+    val expected = TestUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
     assertResult(expected)(outputState.output)
-  }
-
-  def getInputStream(fileName: Path): InputStream = {
-    val file = TestUtils.getTestFile(fileName)
-    file.inputStream()
   }
 
   test("ParseByteCodeType3") {

@@ -10,10 +10,10 @@ import util.TestUtils
 object JavaLang {
 
   val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
-  val systemClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("System.class").inputStream()).program
-  val printStreamClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class").inputStream()).program
-  val objectClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("Object.class").inputStream()).program
-  val stringClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("String.class").inputStream()).program
+  val systemClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("System.class")).program
+  val printStreamClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class")).program
+  val objectClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("Object.class")).program
+  val stringClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("String.class")).program
 
   def initialise(compiler: MyCompiler) {
     new ClassCompiler(objectClass, compiler)
