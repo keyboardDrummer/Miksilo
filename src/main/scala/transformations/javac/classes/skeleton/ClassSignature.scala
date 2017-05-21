@@ -20,7 +20,7 @@ case class ClassSignature(parent: PackageSignature, name: String,
       methods(key)
     } catch
     {
-      case e: NoSuchElementException => throw new NoSuchElementException(s"couldn't find $key in map ${methods.toString}") //TODO remove?
+      case e: NoSuchElementException => throw new NoSuchElementException(s"for class $name, couldn't find $key in map ${methods.toString}") //TODO remove?
     }
   }
 
@@ -28,13 +28,13 @@ case class ClassSignature(parent: PackageSignature, name: String,
 
   def getQualifiedName: QualifiedClassName = new QualifiedClassName(parent.getQualifiedName.parts ++ Seq(name))
 
-  def newFieldInfo(name: String, _type: Node, _static: Boolean = false) = {
+  def newFieldInfo(name: String, _type: Node, _static: Boolean = false): FieldInfo = {
     val result = new FieldInfo(this, name, _static, _type)
     fields(name) = result
     result
   }
 
-  def newMethodInfo(name: String, methodType: Node, _static: Boolean) = {
+  def newMethodInfo(name: String, methodType: Node, _static: Boolean): MethodInfo = {
     val result = new MethodInfo(methodType, _static)
     methods(new MethodClassKey(name, methodType.parameterTypes.toVector)) = result
     result

@@ -34,7 +34,7 @@ class TestEmptyClassCompilation extends FunSuite {
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }
 
-  def getEmptyClassByteCode = {
+  def getEmptyClassByteCode: Node = {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
       ClassRefConstant.classRef(11),
       ClassRefConstant.classRef(12),
@@ -42,8 +42,8 @@ class TestEmptyClassCompilation extends FunSuite {
       MethodTypeC.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       NameAndType.nameAndType(4, 5),
-      new QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
-      new QualifiedClassName(Seq("java", "lang", "Object")))
+      QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
+      QualifiedClassName(Seq("java", "lang", "Object")))
     )
     val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
