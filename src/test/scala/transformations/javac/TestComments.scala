@@ -23,13 +23,13 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
     assertResult(input)( result)
   }
 
-  ignore("comparePrintResult") { //TODO fix
+  test("comparePrintResult") {
     val input = getJavaTestFileContents("WhileeWithComment.java")
     val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
-  ignore("FullPipeline") { //TODO fix
+  test("FullPipeline") {
     val inputDirectory = Path("")
     val output: String = compileAndRun("WhileeWithComment.java", inputDirectory)
     assertResult("3")( output)

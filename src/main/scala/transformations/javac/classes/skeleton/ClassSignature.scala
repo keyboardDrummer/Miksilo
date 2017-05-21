@@ -13,10 +13,10 @@ case class ClassSignature(parent: PackageSignature, name: String,
                           fields: mutable.Map[String, FieldInfo] = mutable.Map())
   extends PackageMember(Some(parent), name) {
   
-  def getMethod(query: MethodQuery) = {
+  def getMethod(query: MethodQuery): MethodInfo = {
+    val key: MethodClassKey = new MethodClassKey(query.methodName, query.argumentTypes)
     try
     {
-      val key: MethodClassKey = new MethodClassKey(query.methodName, query.argumentTypes)
       methods(key)
     } catch
     {
