@@ -1,5 +1,8 @@
 package transformations.javac.classes
 
+import java.util
+import java.util.NoSuchElementException
+
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton.ByteCode
 import transformations.bytecode.constants.{FieldRefConstant, MethodRefConstant, NameAndType}
@@ -33,7 +36,16 @@ case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
 
   def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
 
-  def fullyQualify(className: String): QualifiedClassName = classNames(className)
+  def fullyQualify(className: String): QualifiedClassName = {
+    try
+      {
+        classNames(className)
+      }
+    catch {
+      case (_:NoSuchElementException) =>
+        throw new NoSuchElementException(s"Could not find $className in $classNames")
+    }
+  }
 
   def getMethodRefIndex(methodKey: MethodQuery): Int = {
     val classRefIndex = constantPool.getClassRef(methodKey.className)
