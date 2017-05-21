@@ -6,7 +6,7 @@ import transformations.javac.types.MethodTypeC._
 
 import scala.collection.mutable
 
-case class MethodClassKey(methodName: String, parameterTypes: Seq[Node])
+case class MethodClassKey(methodName: String, parameterTypes: Vector[Node])
 
 case class ClassSignature(parent: PackageSignature, name: String, 
                           methods: mutable.Map[MethodClassKey, MethodInfo] = mutable.Map(),
@@ -14,7 +14,7 @@ case class ClassSignature(parent: PackageSignature, name: String,
   extends PackageMember(Some(parent), name) {
   
   def getMethod(query: MethodQuery): MethodInfo = {
-    val key: MethodClassKey = new MethodClassKey(query.methodName, query.argumentTypes)
+    val key: MethodClassKey = new MethodClassKey(query.methodName, query.argumentTypes.toVector)
     try
     {
       methods(key)
@@ -36,7 +36,7 @@ case class ClassSignature(parent: PackageSignature, name: String,
 
   def newMethodInfo(name: String, methodType: Node, _static: Boolean) = {
     val result = new MethodInfo(methodType, _static)
-    methods(new MethodClassKey(name, methodType.parameterTypes)) = result
+    methods(new MethodClassKey(name, methodType.parameterTypes.toVector)) = result
     result
   }
 }

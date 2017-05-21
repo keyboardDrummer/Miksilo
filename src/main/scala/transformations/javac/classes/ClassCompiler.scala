@@ -30,11 +30,11 @@ case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
     new ByteCode(currentClass).constantPool = new ConstantPool()
   }
 
-  def constantPool = currentClass.constantPool
+  def constantPool: ConstantPool = currentClass.constantPool
 
-  lazy val classNames = getClassMapFromImports(currentClass.imports)
+  lazy val classNames: Map[String, QualifiedClassName] = getClassMapFromImports(currentClass.imports)
 
-  def findClass(className: String) = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
+  def findClass(className: String): ClassSignature = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
 
   def fullyQualify(className: String): QualifiedClassName = {
     try

@@ -70,7 +70,7 @@ trait GenericCall extends ExpressionInstance {
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val callArguments = CallC.getCallArguments(call)
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compiler.state)(argument))
+    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionSkeleton.getType(compiler.state)(argument))
 
     val member = MemberSelector.getSelectorMember(callCallee)
     new MethodQuery(kind.info.getQualifiedName, member, callTypes)
