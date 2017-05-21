@@ -8,11 +8,6 @@ import util.TestUtils
 
 class TestUnqualifiedString extends FunSuite {
 
-  test("sequenceEquality") {
-    val result: Boolean = MethodClassKey("print",Vector[Node](IntTypeC.intType)).equals(MethodClassKey("print",List[Node](IntTypeC.intType)))
-    assert(result)
-  }
-
   test("basic") {
     TestUtils.compareWithJavacAfterRunning("UnqualifiedString")
   }

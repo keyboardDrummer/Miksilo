@@ -51,7 +51,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
       val _type = MethodTypeC.construct(method.returnType, parameterTypes)
-      val key = new MethodClassKey(methodName, parameterTypes)
+      val key = new MethodClassKey(methodName, parameterTypes.toVector)
       classInfo.methods(key) = new MethodInfo(_type, MethodC.getMethodStatic(method))
     }
   }
