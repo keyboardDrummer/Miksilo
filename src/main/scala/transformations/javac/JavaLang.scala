@@ -9,14 +9,13 @@ import util.TestUtils
 
 object JavaLang {
 
-
   def initialise(compiler2: MyCompiler) {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val systemClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("System.class")).program
     val printStreamClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class")).program
     val objectClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("Object.class")).program
     val stringClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("String.class")).program
-    
+
     new ClassCompiler(objectClass, compiler2)
     new ClassCompiler(stringClass, compiler2)
     new ClassCompiler(systemClass, compiler2)
