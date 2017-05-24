@@ -23,11 +23,6 @@ class PackageSignature(val parent: Option[PackageSignature], val name: String, v
    })
   }
 
-  def addClass(state: CompilationState, signature: ClassSignature, clazz: Node) {
-   for (member <- getState(state).members)
-     member.bind(state, signature, clazz)
-  }
-
   def findPackageSignature(clazz: Node): PackageSignature = {
    clazz._package.foldLeft(this)((currentPackage, packageName) => currentPackage.findOrCreate(packageName))
   }
@@ -36,7 +31,7 @@ class PackageSignature(val parent: Option[PackageSignature], val name: String, v
    content.getOrElseUpdate(packageName, new PackageSignature(Some(this), packageName)).asInstanceOf[PackageSignature]
   }
 
-  def newPackageInfo(packageName: String) = {
+  def newPackageInfo(packageName: String): PackageSignature = {
    val result = new PackageSignature(Some(this), packageName)
    content(packageName) = result
    result

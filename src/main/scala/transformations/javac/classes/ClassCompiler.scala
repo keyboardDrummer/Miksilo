@@ -3,6 +3,7 @@ package transformations.javac.classes
 import java.util
 import java.util.NoSuchElementException
 
+import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton.ByteCode
 import transformations.bytecode.constants.{FieldRefConstant, MethodRefConstant, NameAndType}
@@ -17,18 +18,18 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
 case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
-  val state = compiler.state
-  val className = currentClass.name
-  val myPackage = compiler.getPackage(currentClass._package.toList)
-  val currentClassInfo = new ClassSignature(myPackage, className)
+  val state: CompilationState = compiler.state
+  val className: String = currentClass.name
+  val myPackage: PackageSignature = compiler.getPackage(currentClass._package.toList)
+  val currentClassInfo = ClassSignature(myPackage, className)
   myPackage.content(className) = currentClassInfo
 
-  initialise()
-  def initialise(): Unit = {
-    getState(state).classCompiler = this
-    myPackage.addClass(state, currentClassInfo, currentClass)
-    new ByteCode(currentClass).constantPool = new ConstantPool()
-  }
+  getState(state).classCompiler = this
+
+  for (member <- getState(state).members)
+    member.bind(state, currentClassInfo, currentClass)
+
+  currentClass.constantPool = new ConstantPool()
 
   def constantPool: ConstantPool = currentClass.constantPool
 
