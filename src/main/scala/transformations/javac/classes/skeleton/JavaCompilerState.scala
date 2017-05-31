@@ -4,7 +4,7 @@ import core.particles.CompilationState
 import transformations.javac.JavaLang
 import transformations.javac.classes.{MethodInfo, MethodQuery}
 
-case class MyCompiler(state: CompilationState) {
+case class JavaCompilerState(state: CompilationState) {
   val classPath: PackageSignature = JavaLang.classPath
 
   def getPackage(parts: List[String]): PackageSignature = classPath.getPackage(parts)

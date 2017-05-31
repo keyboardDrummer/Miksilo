@@ -17,7 +17,7 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
-case class ClassCompiler(currentClass: Node, compiler: MyCompiler) {
+case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   val state: CompilationState = compiler.state
   val className: String = currentClass.name
   val myPackage: PackageSignature = compiler.getPackage(currentClass._package.toList)
