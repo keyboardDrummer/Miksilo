@@ -39,7 +39,7 @@ trait Grammar extends GrammarWriter {
     case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
   }
 
-  def ~(other: Grammar) = new Sequence(this, other)
+  def ~(other: Grammar): Grammar = new Sequence(this, other)
 
   def ~>(right: Grammar) = new IgnoreLeft(this, right)
 

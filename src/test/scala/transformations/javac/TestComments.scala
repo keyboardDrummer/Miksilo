@@ -2,8 +2,15 @@ package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar.TestGrammarUtils
-import core.particles.CompilerFromParticles
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.{CompilerFromParticles, DeltaWithGrammar}
 import org.junit.{Assert, Test}
+import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
+import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
+import transformations.javac.expressions.{ExpressionSkeleton, ParenthesisC, TernaryC}
+import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
+import transformations.javac.expressions.prefix.NotC
+import transformations.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
 import util.TestUtils
 
 import scala.reflect.io.{File, Path}
@@ -15,6 +22,66 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
   test("BasicClass") {
     val input = "/* jooo */"
     TestGrammarUtils.parseAndPrintSame(input, None, JavaStyleCommentsC.getCommentGrammar)
+  }
+
+  object ExpressionAsRoot extends DeltaWithGrammar
+  {
+    override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+      grammars.create(ProgramGrammar, grammars.find(ExpressionSkeleton.ExpressionGrammar))
+    }
+
+    override def description: String = ""
+  }
+
+  test("relational") {
+    val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+      JavaCompiler.javaCompilerTransformations))
+    val grammarUtils = TestGrammarUtils(utils.compiler.particles)
+
+    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
+  }
+//Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
+  test("addition") {
+    val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+      Seq(AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+      JavaCompiler.allByteCodeTransformations))
+    val grammarUtils = TestGrammarUtils(utils.compiler.particles)
+
+    grammarUtils.compareInputWithPrint("2 + 1")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+  }
+
+  test("addition2") {
+    val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+      Seq(AdditionC, SubtractionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+      JavaCompiler.allByteCodeTransformations))
+    val grammarUtils = TestGrammarUtils(utils.compiler.particles)
+
+    grammarUtils.compareInputWithPrint("2 + 1")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+  }
+
+  test("addition3") {
+    val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+      Seq(SubtractionC, AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+    JavaCompiler.allByteCodeTransformations))
+    val grammarUtils = TestGrammarUtils(utils.compiler.particles)
+
+    grammarUtils.compareInputWithPrint("2 + 1")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+  }
+
+  test("addition4") {
+    val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+      JavaCompiler.javaCompilerTransformations))
+    val grammarUtils = TestGrammarUtils(utils.compiler.particles)
+
+    grammarUtils.compareInputWithPrint("2 + 1")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
   }
 
   test("comparePrintResultWithoutComment") {

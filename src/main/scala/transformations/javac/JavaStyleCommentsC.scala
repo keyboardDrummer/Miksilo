@@ -14,7 +14,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   object CommentKey extends Key
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar.as(CommentKey))
+    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants.
       filter(path => path.get.isInstanceOf[NodeGrammar]))
@@ -43,9 +43,12 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
   def getCommentsGrammar: BiGrammar = {
     val commentGrammar = getCommentGrammar
-    commentGrammar.manyVertical ^^
-      (comments => CommentCollection(comments.asInstanceOf[Seq[String]]),
-        commentCollection => Some(commentCollection.asInstanceOf[CommentCollection].comments))
+    val comments = commentGrammar.manyVertical ^^
+      (comments => CommentCollection(comments.asInstanceOf[Seq[String]]), {
+        case c: CommentCollection => Some(c.comments)
+        case _ => None
+      })
+    comments.as(CommentKey)
   }
 
   def getCommentGrammar: BiGrammar = {

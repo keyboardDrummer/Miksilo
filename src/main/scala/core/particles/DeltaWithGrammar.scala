@@ -1,6 +1,6 @@
 package core.particles
 
-import core.bigrammar._
+import core.bigrammar.{MapGrammar, _}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
@@ -31,11 +31,18 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
 
   implicit class GrammarForAst(grammar: BiGrammar)
   {
+    def parseMap(key: Key, fields: Key*): BiGrammar = {
+      new MapGrammar(grammar,
+        input => construct(input.asInstanceOf[WithMap], key, fields.toList),
+        obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
+    }
+
     def asNode(key: Key, fields: Key*) = new NodeGrammar(grammar, key, fields.toSeq)
     def as(field: Key) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }
 
   def nodeGrammar(inner: BiGrammar, key: Key, fields: Key*) = new NodeGrammar(inner, key, fields.toSeq)
+
 
   class NodeGrammar(inner: BiGrammar, val key: Key, val fields: Seq[Key])
     extends MapGrammar(inner,

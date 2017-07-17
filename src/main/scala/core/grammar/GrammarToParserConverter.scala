@@ -33,6 +33,9 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
     phrase(convertInner(grammar))
   }
 
+  /*
+  This function does not loop because the implicit calls that wraps parsers into packrat parsers take their argument lazily.
+   */
   def convertInner(grammar: Grammar): PackratParser[Any] = {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
