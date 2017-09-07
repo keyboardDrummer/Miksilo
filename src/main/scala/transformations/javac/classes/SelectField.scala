@@ -28,7 +28,7 @@ object SelectField extends ExpressionInstance {
   override def toByteCode(selector: Path, state: CompilationState): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
-    val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
+    val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
       Seq(GetStaticC.getStatic(fieldRefIndex))
     else
@@ -39,10 +39,10 @@ object SelectField extends ExpressionInstance {
     }
   }
 
-  def getFieldRefIndex(selector: Node, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Int = {
+  def getFieldRef(selector: Node, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference) = {
     val member = getSelectorMember(selector)
     val fieldInfo = classOrObjectReference.info.getField(member)
-    val fieldRef = compiler.getFieldRefIndex(fieldInfo)
+    val fieldRef = compiler.getFieldRef(fieldInfo)
     fieldRef
   }
 

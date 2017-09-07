@@ -4,7 +4,7 @@ import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.{ClassRefConstant, QualifiedClassNameConstant}
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -53,8 +53,8 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
       val clazz = state.program
       val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
       val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[Node]
-      val className = constantPool.getValue(ClassRefConstant.getNameIndex(clazzRef)).asInstanceOf[QualifiedClassName]
-      Seq(ObjectTypeC.objectType(className)) ++ methodParameters
+      val className = constantPool.getValue(ClassRefConstant.getNameIndex(clazzRef)).asInstanceOf[Node]
+      Seq(ObjectTypeC.objectType(className(QualifiedClassNameConstant.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }
 }

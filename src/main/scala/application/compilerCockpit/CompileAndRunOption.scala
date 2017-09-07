@@ -5,7 +5,7 @@ import java.io.InputStream
 import core.particles.node.Node
 import core.particles._
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.{ClassRefConstant, QualifiedClassNameConstant}
 import transformations.javac.classes.skeleton.QualifiedClassName
 import util.TestUtils
 import transformations.bytecode.ByteCodeSkeleton._
@@ -17,7 +17,7 @@ object RunWithJVM extends DeltaWithPhase
     val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
     val constantPool = clazz.constantPool
     val classNameIndex = ClassRefConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[Node])
-    val className = constantPool.getValue(classNameIndex).asInstanceOf[QualifiedClassName].toString
+    val className = QualifiedClassNameConstant.get(constantPool.getValue(classNameIndex).asInstanceOf[Node]).toString
     state.output = TestUtils.runByteCode(className, clazz)
   }
 

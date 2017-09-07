@@ -21,7 +21,8 @@ object ParseKnownAttributes extends DeltaWithPhase {
         {
           parseAttribute(typedNode, attributeType)
         }
-      case _ =>
+        true
+      case _ => true
     })
   }
 

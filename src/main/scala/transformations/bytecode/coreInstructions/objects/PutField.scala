@@ -12,7 +12,7 @@ object PutField extends InstructionC {
   object PutFieldKey extends Key
   override val key: Key = PutFieldKey
 
-  def putField(index: Int) = CodeAttribute.instruction(PutFieldKey, Seq(index))
+  def putField(index: Any) = CodeAttribute.instruction(PutFieldKey, Seq(index))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)

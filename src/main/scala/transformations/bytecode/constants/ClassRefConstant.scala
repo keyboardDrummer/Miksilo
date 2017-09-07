@@ -5,6 +5,8 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ClassRefConstant extends ConstantEntry {
 
@@ -12,6 +14,7 @@ object ClassRefConstant extends ConstantEntry {
 
   object ClassRefName extends Key
 
+  def classRef(name: QualifiedClassName): Node = new Node(ClassRefKey, ClassRefName -> QualifiedClassNameConstant.create(name))
   def classRef(classRefNameIndex: Int): Node = new Node(ClassRefKey, ClassRefName -> classRefNameIndex)
 
   def getNameIndex(classRef: Node) = classRef(ClassRefName).asInstanceOf[Int]
@@ -22,7 +25,7 @@ object ClassRefConstant extends ConstantEntry {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~> integer asNode(ClassRefKey, ClassRefName)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~> grammars.find(ConstantPoolIndexGrammar) asNode(ClassRefKey, ClassRefName)
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

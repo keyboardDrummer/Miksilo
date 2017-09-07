@@ -9,6 +9,7 @@ import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementSkeleton
 import transformations.javac.statements.locals.LocalsAnalysis
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.javac.classes.ClassCompiler
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
 }
@@ -40,16 +41,17 @@ case class VariablePool(state: CompilationState, typedVariables: Map[String, Nod
 }
 
 case class MethodCompiler(state: CompilationState, method: Node) {
-  val parameters = getMethodParameters(method)
-  val classCompiler = JavaClassSkeleton.getClassCompiler(state)
+  val parameters: Seq[Node] = getMethodParameters(method)
+  val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(state)
 
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(state, method)
-  val firstInstruction = getMethodBody[Path](PathRoot(method)).head
-  val variablesPerStatement = localAnalysis.run(firstInstruction, initialVariables)
+  private val intermediate = getMethodBody[Path](PathRoot(method))
+  val firstInstruction: Path = intermediate.head
+  val variablesPerStatement: Map[Path, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
 
-  def getInitialVariables = {
+  def getInitialVariables: VariablePool = {
     var result = VariablePool(state)
     if (!getMethodStatic(method))
       result = result.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))

@@ -3,9 +3,10 @@ package transformations.bytecode
 import core.bigrammar.{BiGrammar, MapGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, FromMap, DeltaWithGrammar}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar, FromMap}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
@@ -58,8 +59,8 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
     val methodHeader: BiGrammar = Seq[BiGrammar]("method =>" ~~
-      "nameIndex:" ~> integer,
-      "descriptorIndex:" ~> integer,
+      "nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar),
+      "descriptorIndex:" ~> grammars.find(ConstantPoolIndexGrammar),
       "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
       reduce((l, r) => (l <~ ",") ~~ r)
     val inner = methodHeader % attributesGrammar

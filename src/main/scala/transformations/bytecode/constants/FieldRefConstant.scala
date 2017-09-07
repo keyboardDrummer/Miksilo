@@ -5,6 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object FieldRefConstant extends ConstantEntry {
 
@@ -13,6 +14,10 @@ object FieldRefConstant extends ConstantEntry {
   object FieldRefClassIndex extends Key
 
   object FieldRefNameAndTypeIndex extends Key
+
+  def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,
+    FieldRefClassIndex -> classConstant,
+    FieldRefNameAndTypeIndex -> nameAndType)
 
   def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new Node(FieldRef,
     FieldRefClassIndex -> classIndex,
@@ -31,7 +36,7 @@ object FieldRefConstant extends ConstantEntry {
   def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("field reference:" ~~> (integer <~ ".") ~ integer).asNode(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+    ("field reference:" ~~> (grammars.find(ConstantPoolIndexGrammar) <~ ".") ~ grammars.find(ConstantPoolIndexGrammar)).asNode(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 }

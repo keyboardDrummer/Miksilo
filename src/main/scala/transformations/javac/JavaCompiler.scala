@@ -14,7 +14,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
 import transformations.bytecode.coreInstructions.objects._
 import transformations.bytecode.extraBooleanInstructions._
-import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, RemoveConstantPool}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
 import transformations.javac.classes.skeleton.JavaClassSkeleton
@@ -66,7 +66,7 @@ object JavaCompiler {
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 
-  def simpleByteCodeTransformations = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
+  def simpleByteCodeTransformations: Seq[Delta] = Seq(RemoveConstantPool, PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
@@ -99,7 +99,7 @@ object JavaCompiler {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
+  def constantEntryParticles = Seq(QualifiedClassNameConstant, Utf8Constant, DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
     ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant, MethodHandleConstant, MethodTypeConstant,
     InvokeDynamicConstant)
   

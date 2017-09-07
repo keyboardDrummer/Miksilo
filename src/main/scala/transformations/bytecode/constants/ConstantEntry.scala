@@ -2,10 +2,12 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
+
+object ConstantEntryKey extends Key
 
 trait ConstantEntry extends DeltaWithGrammar {
   def key: Any
@@ -13,6 +15,7 @@ trait ConstantEntry extends DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
+    ByteCodeSkeleton.getState(state).constantTypes.put(key, this)
     ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
   }
 

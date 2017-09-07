@@ -15,7 +15,7 @@ object IntLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
 
-  override def transformGrammars(grammars: GrammarCatalogue) = {
+  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
     val parseNumber = inner.asNode(IntLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -33,12 +33,11 @@ object IntLiteralC extends ExpressionInstance {
     }
     else
     {
-      val reference = state.program.constantPool.store(IntegerConstant.construct(value))
-      Seq(LoadConstantIntC.integerConstant(reference))
+      Seq(LoadConstantIntC.integerConstant(IntegerConstant.construct(value)))
     }
   }
 
-  def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Int]
+  def getValue(literal: Node): Int = literal(ValueKey).asInstanceOf[Int]
 
   override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
 

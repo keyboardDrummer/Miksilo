@@ -10,11 +10,11 @@ object InvokeVirtualC extends InvokeC {
 
   override val key: Key = InvokeVirtual
 
-  def invokeVirtual(methodRefIndex: Int) = CodeAttribute.instruction(InvokeVirtual, Seq(methodRefIndex))
+  def invokeVirtual(methodRefIndex: Any) = CodeAttribute.instruction(InvokeVirtual, Seq(methodRefIndex))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
-    hexToBytes("b6") ++ shortToBytes(arguments(0))
+    hexToBytes("b6") ++ shortToBytes(arguments.head)
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {

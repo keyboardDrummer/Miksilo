@@ -13,7 +13,7 @@ object LoadConstantIntC extends InstructionC
   object LoadConstantKey extends Key
   override val key = LoadConstantKey
 
-  def integerConstant(value: Int) = {
+  def integerConstant(value: Any) = {
     CodeAttribute.instruction(LoadConstantKey, Seq(value))
   }
 

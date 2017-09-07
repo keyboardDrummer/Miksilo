@@ -13,7 +13,7 @@ case class FieldValue(parent: Path, field: Any) extends OriginWithParent {
     case _ => false
   }
 
-  override def replaceWith(replacement: Node): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
+  override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
   override def pathAsString: String = s"${parent.pathAsString}.$field"
 }

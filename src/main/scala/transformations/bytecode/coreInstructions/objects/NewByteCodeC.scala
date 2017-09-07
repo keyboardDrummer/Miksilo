@@ -5,7 +5,7 @@ import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.{ClassRefConstant, QualifiedClassNameConstant}
 import transformations.bytecode.coreInstructions.{InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.ObjectTypeC
@@ -15,7 +15,7 @@ object NewByteCodeC extends InstructionC {
 
   object NewByteCodeKey extends Key
   
-  def newInstruction(classRefIndex: Int) = CodeAttribute.instruction(NewByteCodeKey, Seq(classRefIndex))
+  def newInstruction(classRef: Any) = CodeAttribute.instruction(NewByteCodeKey, Seq(classRef))
   
   override val key: Key = NewByteCodeKey
 
@@ -29,7 +29,7 @@ object NewByteCodeC extends InstructionC {
     val constantPool = state.program.constantPool
     val location = CodeAttribute.getInstructionArguments(instruction).head
     val classRef = constantPool.getValue(location).asInstanceOf[Node]
-    val className = constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[QualifiedClassName]
+    val className = QualifiedClassNameConstant.get(constantPool.getValue(ClassRefConstant.getNameIndex(classRef)).asInstanceOf[Node])
     val classType = ObjectTypeC.objectType(className)
     InstructionSignature(Seq.empty, Seq(classType))
   }

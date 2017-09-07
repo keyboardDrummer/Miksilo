@@ -1,13 +1,10 @@
 package transformations.javac.expressions
 
-import core.particles.exceptions.CompilerException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike, NodeWrapper}
+import core.particles.node.{Node, NodeWrapper}
 import core.particles.path.Path
 import transformations.bytecode.types.TypeSkeleton
-
-import scala.util.Try
 
 object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 

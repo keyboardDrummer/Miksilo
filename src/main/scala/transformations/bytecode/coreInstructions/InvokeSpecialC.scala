@@ -12,7 +12,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 object InvokeSpecialC extends InvokeC {
   override val key: Key = InvokeSpecialKey
 
-  def invokeSpecial(location: Int): Node = CodeAttribute.instruction(InvokeSpecialKey, Seq(location))
+  def invokeSpecial(location: Any): Node = CodeAttribute.instruction(InvokeSpecialKey, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)

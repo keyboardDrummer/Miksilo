@@ -13,7 +13,7 @@ object GetStaticC extends InstructionC {
 
   override val key: Key = GetStaticKey
 
-  def getStatic(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
+  def getStatic(fieldRefIndex: Any): Node = CodeAttribute.instruction(GetStaticKey, Seq(fieldRefIndex))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)

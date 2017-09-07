@@ -8,11 +8,11 @@ object InvokeStaticC extends InvokeC {
 
   override val key: Key = InvokeStaticKey
 
-  def invokeStatic(constantIndex: Int): Node = CodeAttribute.instruction(InvokeStaticKey, Seq(constantIndex))
+  def invokeStatic(constantIndex: Any): Node = CodeAttribute.instruction(InvokeStaticKey, Seq(constantIndex))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
-    hexToBytes("b8") ++ shortToBytes(arguments(0))
+    hexToBytes("b8") ++ shortToBytes(arguments.head)
   }
 
   object InvokeStaticKey extends Key

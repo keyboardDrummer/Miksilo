@@ -22,18 +22,25 @@ trait NodeLike {
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
-    visit(node => result = node :: result)
+    visit(node => { result = node :: result; true })
     result
   }
 
-  def visit(beforeChildren: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
+  def visitOld(beforeChildren: Self => Unit): Unit = {
+    visit(node => { beforeChildren(node); true }, _ => {})
+  }
+
+  def visit(beforeChildren: Self => Boolean = _ => true,
+            afterChildren: Self => Unit = _ => {},
+            visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
 
     transformNode(this.asInstanceOf[Self])
     def transformNode(node: Self): Unit = {
       if (!visited.add(node))
         return
 
-      beforeChildren(node)
+      if (!beforeChildren(node))
+        return
 
       val children = node.dataView.values
       for(child <- children)
@@ -49,6 +56,8 @@ trait NodeLike {
           case _ =>
         }
       }
+
+      afterChildren(node)
     }
   }
 }

@@ -14,11 +14,11 @@ object GetFieldC extends InstructionC {
 
   override val key: Key = GetFieldKey
 
-  def construct(fieldRefIndex: Int): Node = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
+  def construct(fieldRefIndex: Any): Node = CodeAttribute.instruction(GetFieldKey, Seq(fieldRefIndex))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
-    hexToBytes("b4") ++ shortToBytes(arguments(0))
+    hexToBytes("b4") ++ shortToBytes(arguments.head)
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
@@ -28,7 +28,7 @@ object GetFieldC extends InstructionC {
   }
 
   def getReturnType(constantPool: ConstantPool, getField: Node): Node = {
-    val fieldRefIndex = CodeAttribute.getInstructionArguments(getField)(0)
+    val fieldRefIndex = CodeAttribute.getInstructionArguments(getField).head
     val fieldRef = constantPool.getValue(fieldRefIndex).asInstanceOf[Node]
     val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[Node]
     val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]

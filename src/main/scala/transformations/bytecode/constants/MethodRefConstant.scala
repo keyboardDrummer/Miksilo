@@ -5,6 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodRefConstant extends ConstantEntry {
 
@@ -22,6 +23,10 @@ object MethodRefConstant extends ConstantEntry {
 
   override def key: Any = MethodRefKey
 
+  def methodRef(classNameIndex: Node, methodNameAndTypeIndex: Node) = new Node(MethodRefKey,
+    MethodRefClassName -> classNameIndex,
+    MethodRefMethodName -> methodNameAndTypeIndex)
+
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(MethodRefKey,
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
@@ -30,7 +35,7 @@ object MethodRefConstant extends ConstantEntry {
 
   def getNameAndTypeIndex(methodRef: Node): Int = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("method reference:" ~~> (integer <~ ".") ~ integer).
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("method reference:" ~~> (grammars.find(ConstantPoolIndexGrammar) <~ ".") ~ grammars.find(ConstantPoolIndexGrammar)).
     asNode(MethodRefKey, MethodRefClassName, MethodRefMethodName)
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."

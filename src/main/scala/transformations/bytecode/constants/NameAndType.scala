@@ -5,6 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object NameAndType extends ConstantEntry {
 
@@ -13,6 +14,10 @@ object NameAndType extends ConstantEntry {
   object NameAndTypeName extends Key
 
   object NameAndTypeType extends Key
+
+  def nameAndType(nameIndex: Node, typeIndex: Node): Node = new Node(NameAndTypeKey,
+    NameAndTypeName -> nameIndex,
+    NameAndTypeType -> typeIndex)
 
   def nameAndType(nameIndex: Int, typeIndex: Int): Node = new Node(NameAndTypeKey,
     NameAndTypeName -> nameIndex,
@@ -29,8 +34,9 @@ object NameAndType extends ConstantEntry {
       shortToBytes(getTypeIndex(constant))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("name and type:" ~~> (integer <~ ":") ~ integer).
-    asNode(NameAndTypeKey, NameAndTypeName, NameAndTypeType)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    ((grammars.find(ConstantPoolIndexGrammar).as(NameAndTypeName) <~ ":") ~ grammars.find(ConstantPoolIndexGrammar).as(NameAndTypeType)).
+    asNode(NameAndTypeKey)
 
   override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."
 }

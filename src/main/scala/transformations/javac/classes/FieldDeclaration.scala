@@ -55,14 +55,13 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
   }
   
   def convertField(field: Node, classCompiler: ClassCompiler, state: CompilationState) {
-    val constantPool = classCompiler.constantPool
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
     field.clazz = ByteCodeFieldInfo.FieldKey
 
-    val fieldDescriptorIndex = constantPool.store(FieldDescriptorConstant.constructor(getFieldType(field)))
-    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptorIndex
+    val fieldDescriptor = FieldDescriptorConstant.constructor(getFieldType(field))
+    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
     field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
     field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
 

@@ -2,10 +2,12 @@ package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.particles.DeltaWithGrammar
-import core.particles.grammars.{KeyGrammar, GrammarCatalogue}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.Key
-import transformations.bytecode.attributes.{InstructionArgumentsKey, CodeAttribute}
+import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 
+object ConstantPoolIndexGrammar
+object InstructionArgumentsGrammar
 trait InstructionWithGrammar extends DeltaWithGrammar
 {
   val key: Key
@@ -16,6 +18,9 @@ trait InstructionWithGrammar extends DeltaWithGrammar
   }
 
   def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    (name ~> integer.manySeparated(",").inParenthesis).asNode(key, InstructionArgumentsKey)
+    val constantPoolIndex: BiGrammar = grammars.findOrCreate(ConstantPoolIndexGrammar, number)
+    val arguments = grammars.findOrCreate(InstructionArgumentsGrammar,
+      constantPoolIndex.manySeparated(",").inParenthesis.as(InstructionArgumentsKey))
+    (name ~> arguments).asNode(key)
   }
 }

@@ -7,6 +7,8 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.attributes.ByteCodeAttribute
+import transformations.bytecode.constants.ConstantEntry
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 
@@ -51,6 +53,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   class State {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new ClassRegistry[ByteCodeAttribute]
+    val constantTypes = new ClassRegistry[Delta]
   }
 
   object AttributeKey
@@ -85,12 +88,13 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   object MembersGrammar
   object AttributesGrammar
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    grammars.create(ConstantPoolIndexGrammar, number)
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
-    val classIndexGrammar: BiGrammar = "class" ~~> integer
-    val parseIndexGrammar: BiGrammar = "extends" ~~> integer
+    val classIndexGrammar: BiGrammar = "class" ~~> grammars.find(ConstantPoolIndexGrammar)
+    val parseIndexGrammar: BiGrammar = "extends" ~~> grammars.find(ConstantPoolIndexGrammar)
     val attributesGrammar = grammars.create(AttributesGrammar, "attributes:" %> attributeGrammar.manyVertical.indent())
     val membersGrammar = grammars.create(MembersGrammar, print(Empty))
     val classGrammar = grammars.create(ClassFileKey,

@@ -14,6 +14,13 @@ class GrammarCatalogue {
 
   var grammars: Map[Any, Labelled] = Map.empty
 
+  def findOrCreate(key: AnyRef, inner: => BiGrammar): BiGrammar = {
+      grammars.get(key) match {
+        case Some(r) => r
+        case None => create(key, inner)
+      }
+  }
+
   def find(key: Any): Labelled = {
     try {
       grammars(key)
@@ -32,7 +39,7 @@ class GrammarCatalogue {
     val attributeGrammar = find(rootKey)
     val rootGrammar = new RootGrammar(attributeGrammar)
     val targetGrammar = find(grammarKeyToFind)
-    rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarReference => x }
+    rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).reverse.collect { case x: GrammarReference => x }
   }
 }
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)

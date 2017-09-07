@@ -7,6 +7,7 @@ import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
+import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC}
 import transformations.javac.JavaLang
@@ -46,10 +47,9 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
       val classRef = classCompiler.getClassRef(classInfo)
       clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
       val parentName = clazz.parent.get
-      val parentRef = classCompiler.constantPool.getClassRef(classCompiler.fullyQualify(parentName))
+      val parentRef = ClassRefConstant.classRef(classCompiler.fullyQualify(parentName))
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
-      clazz(ByteCodeSkeleton.ClassConstantPool) = classCompiler.constantPool
 
       for(member <- getState(state).members)
         member.compile(state, clazz)
