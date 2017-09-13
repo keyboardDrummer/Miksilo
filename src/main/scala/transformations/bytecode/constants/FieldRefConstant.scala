@@ -29,14 +29,16 @@ object FieldRefConstant extends ConstantEntry {
       shortToBytes(getNameAndTypeIndex(constant))
   }
 
-  override def key: Any = FieldRef
+  override def key = FieldRef
 
   def getFieldRefClassIndex(fieldRef: Node): Int = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
   def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("field reference:" ~~> (grammars.find(ConstantPoolIndexGrammar) <~ ".") ~ grammars.find(ConstantPoolIndexGrammar)).asNode(FieldRef, FieldRefClassIndex, FieldRefNameAndTypeIndex)
+    ("Fieldref:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ ",") ~~
+      grammars.find(ConstantPoolIndexGrammar).as(FieldRefNameAndTypeIndex)).
+      asNode(FieldRef)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 }

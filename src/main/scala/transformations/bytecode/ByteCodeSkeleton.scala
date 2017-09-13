@@ -5,7 +5,7 @@ import core.document.{BlankLine, Empty}
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.attributes.ByteCodeAttribute
 import transformations.bytecode.constants.ConstantEntry
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -54,6 +54,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new ClassRegistry[ByteCodeAttribute]
     val constantTypes = new ClassRegistry[Delta]
+    val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
   }
 
   object AttributeKey

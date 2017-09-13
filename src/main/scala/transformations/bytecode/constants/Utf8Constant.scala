@@ -3,7 +3,7 @@ import core.bigrammar.BiGrammar
 import core.grammar.StringLiteral
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton.identifier
 import transformations.bytecode.PrintByteCode
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -11,8 +11,8 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 object Utf8Constant extends ConstantEntry {
   override def key = Utf8ConstantKey
 
-  object Utf8ConstantKey extends Key
-  object Value extends Key
+  object Utf8ConstantKey extends NodeClass
+  object Value extends NodeField
   def create(value: String) = new Node(key, Value -> value)
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] =

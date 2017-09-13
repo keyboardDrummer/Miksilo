@@ -1,6 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.particles.CompilationState
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
@@ -30,6 +31,8 @@ object GetStaticC extends InstructionC {
     val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]
     fieldType
   }
+
+  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(FieldRefConstant.key)
 
   override def getInstructionSize: Int = 3
 

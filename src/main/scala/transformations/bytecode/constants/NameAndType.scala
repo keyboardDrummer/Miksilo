@@ -3,17 +3,17 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object NameAndType extends ConstantEntry {
 
-  object NameAndTypeKey extends Key
+  object NameAndTypeKey extends NodeClass
 
-  object NameAndTypeName extends Key
+  object NameAndTypeName extends NodeField
 
-  object NameAndTypeType extends Key
+  object NameAndTypeType extends NodeField
 
   def nameAndType(nameIndex: Node, typeIndex: Node): Node = new Node(NameAndTypeKey,
     NameAndTypeName -> nameIndex,
@@ -27,7 +27,7 @@ object NameAndType extends ConstantEntry {
 
   def getTypeIndex(nameAndType: Node): Int = nameAndType(NameAndTypeType).asInstanceOf[Int]
 
-  override def key: Any = NameAndTypeKey
+  override def key = NameAndTypeKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(12) ++ shortToBytes(getName(constant)) ++
