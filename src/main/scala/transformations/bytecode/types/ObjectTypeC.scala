@@ -69,7 +69,7 @@ object ObjectTypeC extends TypeInstance with StackType {
   object ObjectTypeKey extends Key
 
   override def getStackType(_type: Node, state: CompilationState): Node = {
-    ObjectTypeC.stackObjectType(state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+     ObjectTypeC.stackObjectType(42) //TODO replace 42 with something. //state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
   }
 
   override def description: String = "Defines the object type."

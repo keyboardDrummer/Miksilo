@@ -8,6 +8,7 @@ import core.particles.path.{OriginWithParent, PathRoot}
 import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton.{ClassConstantPool, ConstantPoolGrammar, ConstantPoolItemContentGrammar}
+import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.classes.ConstantPool
@@ -18,18 +19,23 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     val pool = new ConstantPool()
     program(ByteCodeSkeleton.ClassConstantPool) = pool
     val constantTypes = ByteCodeSkeleton.getState(state).constantTypes
-    PathRoot(program).visit(beforeChildren = node => {
-      if (TypeSkeleton.getState(state).instances.contains(node.clazz)) {
+    PathRoot(program).visit(afterChildren = node => if (constantTypes.contains(node.clazz)) {
           val index = pool.store(node.current)
           node.asInstanceOf[OriginWithParent].replaceWith(index)
-        false
-      }
-      else
-        true
-    }, afterChildren = node => if (constantTypes.contains(node.clazz)) {
-      val index = pool.store(node.current)
-      node.asInstanceOf[OriginWithParent].replaceWith(index)
-    })
+        }, beforeChildren = node => {
+          if (node.clazz == FieldDescriptorConstant.key) { //TODO replace this method with something based on constantReferences
+            val index = pool.store(node.current)
+            node.asInstanceOf[OriginWithParent].replaceWith(index)
+            false
+          }
+          else if (TypeSkeleton.getState(state).instances.contains(node.clazz)) {
+              val index = pool.store(node.current)
+              node.asInstanceOf[OriginWithParent].replaceWith(index)
+            false
+          }
+          else
+            true
+        })
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {

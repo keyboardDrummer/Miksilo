@@ -17,7 +17,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar
   }
 
   def argumentsGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val constantPoolIndex: BiGrammar = grammars.find(ConstantPoolIndexGrammar, number)
+    val constantPoolIndex: BiGrammar = grammars.find(ConstantPoolIndexGrammar)
     constantPoolIndex.manySeparated(",")
   }
 

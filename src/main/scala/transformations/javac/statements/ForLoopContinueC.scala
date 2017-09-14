@@ -13,7 +13,7 @@ object ForLoopContinueC extends DeltaWithPhase {
 
   override def transform(program: Node, state: CompilationState): Unit = {
     val beforeIncrementLabels = new scala.collection.mutable.HashMap[Node, String]()
-    PathRoot(program).visitOld(path => path.clazz match {
+    PathRoot(program).visit(path => path.clazz match {
       case WhileContinueC.ContinueKey => transformContinue(path, beforeIncrementLabels, state)
       case _ =>
     })

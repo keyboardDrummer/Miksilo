@@ -13,7 +13,7 @@ object CodeConstantEntry extends ConstantEntry //TODO deze kan toch helemaal weg
 
   def entry = new Node(CodeAttributeId)
 
-  override def key: Any = CodeAttributeId
+  override def key = CodeAttributeId
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     PrintByteCode.toUTF8ConstantEntry("Code")

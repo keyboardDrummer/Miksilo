@@ -14,7 +14,7 @@ object MethodHandleConstant extends ConstantEntry {
 
   def construct(kind: Int, index: Int) = new Node(MethodHandleKey, MethodHandleReference -> kind, MethodHandleIndex -> index)
 
-  override def key: Any = MethodHandleKey
+  override def key = MethodHandleKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(15) ++ byteToBytes(constant(MethodHandleReference).asInstanceOf[Int]) ++ shortToBytes(constant(MethodHandleIndex).asInstanceOf[Int])

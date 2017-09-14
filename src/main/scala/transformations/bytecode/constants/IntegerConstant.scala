@@ -13,7 +13,7 @@ object IntegerConstant extends ConstantEntry {
 
   def construct(index: Int) = new Node(IntegerKey, IntegerValue -> index)
 
-  override def key: Any = IntegerKey
+  override def key = IntegerKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(3) ++
     PrintByteCode.intToBytes(constant(IntegerValue).asInstanceOf[Int])

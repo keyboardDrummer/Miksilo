@@ -13,7 +13,7 @@ object StringConstant extends ConstantEntry {
 
   def construct(index: Int) = new Node(StringKey, StringIndex -> index)
 
-  override def key: Any = StringKey
+  override def key = StringKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(8) ++
     PrintByteCode.shortToBytes(constant(StringIndex).asInstanceOf[Int])

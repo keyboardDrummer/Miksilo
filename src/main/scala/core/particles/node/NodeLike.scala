@@ -22,16 +22,16 @@ trait NodeLike {
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
-    visit(node => { result = node :: result; true })
+    visit(node => result = node :: result)
     result
   }
 
   def visitOld(beforeChildren: Self => Unit): Unit = {
-    visit(node => { beforeChildren(node); true }, _ => {})
+    visit(beforeChildren)
   }
 
-  def visit(beforeChildren: Self => Boolean = _ => true,
-            afterChildren: Self => Unit = _ => {},
+  def visit(afterChildren: (Self) => Unit = _ => {},
+            beforeChildren: (Self) => Boolean = _ => true,
             visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
 
     transformNode(this.asInstanceOf[Self])

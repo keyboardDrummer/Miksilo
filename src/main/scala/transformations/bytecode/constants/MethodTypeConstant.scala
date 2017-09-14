@@ -10,7 +10,7 @@ object MethodTypeConstant extends ConstantEntry {
 
   object MethodTypeConstantKey extends Key
   object MethodTypeDescriptorIndex extends Key
-  override def key: Any = MethodTypeConstantKey
+  override def key = MethodTypeConstantKey
 
   def construct(descriptorIndex: Int) = new Node(MethodTypeConstantKey, MethodTypeDescriptorIndex -> descriptorIndex)
 

@@ -17,7 +17,7 @@ object LongConstantEntryC extends ConstantEntry {
 
   object LongEntryKey extends Key
   object LongEntryValue extends Key
-  override def key: Any = LongEntryKey
+  override def key = LongEntryKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.longToBytes(constant.value)
 

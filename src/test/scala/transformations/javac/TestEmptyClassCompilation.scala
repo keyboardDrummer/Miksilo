@@ -4,7 +4,7 @@ import core.particles.node.Node
 import org.junit.Test
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
-import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -38,12 +38,12 @@ class TestEmptyClassCompilation extends FunSuite {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
       ClassRefConstant.classRef(11),
       ClassRefConstant.classRef(12),
-      SuperCallExpression.constructorName,
+      Utf8Constant.create(SuperCallExpression.constructorName),
       MethodTypeC.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       NameAndType.nameAndType(4, 5),
-      QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
-      QualifiedClassName(Seq("java", "lang", "Object")))
+      QualifiedClassNameConstant.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
+      QualifiedClassNameConstant.create(QualifiedClassName(Seq("java", "lang", "Object"))))
     )
     val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))

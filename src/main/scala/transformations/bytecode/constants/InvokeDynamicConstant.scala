@@ -15,7 +15,7 @@ object InvokeDynamicConstant extends ConstantEntry {
 
   def construct(kind: Int, index: Int) = new Node(InvokeDynamicKey, InvokeDynamicBootstrapMethodIndex -> kind, InvokeDynamicNameAndTypeIndex -> index)
 
-  override def key: Any = InvokeDynamicKey
+  override def key = InvokeDynamicKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(18) ++ byteToBytes(constant(InvokeDynamicBootstrapMethodIndex).asInstanceOf[Int]) ++ shortToBytes(constant(InvokeDynamicNameAndTypeIndex).asInstanceOf[Int])

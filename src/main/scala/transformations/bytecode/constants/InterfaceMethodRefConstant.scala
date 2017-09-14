@@ -20,7 +20,7 @@ object InterfaceMethodRefConstant extends ConstantEntry {
       shortToBytes(getNameIndex(constant))
   }
 
-  override def key: Any = InterfaceMethodRefConstantKey
+  override def key = InterfaceMethodRefConstantKey
 
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(InterfaceMethodRefConstantKey,
     MethodRefClassName -> classNameIndex,
