@@ -3,8 +3,9 @@ package transformations.bytecode.types
 import core.bigrammar.{BiGrammar, Keyword, Labelled}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.constants.ClassRefConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance with StackType {
@@ -64,12 +65,16 @@ object ObjectTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ObjectTypeName  extends Key
+  object ObjectTypeName  extends NodeField
 
-  object ObjectTypeKey extends Key
+  object ObjectTypeKey extends NodeClass
 
   override def getStackType(_type: Node, state: CompilationState): Node = {
-     ObjectTypeC.stackObjectType(42) //TODO replace 42 with something. //state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+    if (state.program.data.contains(ClassConstantPool))
+      stackObjectType(state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+    else
+      ObjectTypeKey.create(ObjectTypeName -> ClassRefConstant.classRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+    //TODO FIX THIS
   }
 
   override def description: String = "Defines the object type."

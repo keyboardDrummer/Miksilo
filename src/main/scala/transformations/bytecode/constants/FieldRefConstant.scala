@@ -36,7 +36,7 @@ object FieldRefConstant extends ConstantEntry {
   def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("Fieldref:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ ",") ~~
+    ("field reference:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ ".") ~
       grammars.find(ConstantPoolIndexGrammar).as(FieldRefNameAndTypeIndex)).
       asNode(FieldRef)
 

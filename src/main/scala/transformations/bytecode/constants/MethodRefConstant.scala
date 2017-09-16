@@ -36,9 +36,9 @@ object MethodRefConstant extends ConstantEntry {
 
   def getNameAndTypeIndex(methodRef: Node): Int = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "MethodRef" ~~>
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "method reference:" ~~>
     (grammars.find(ConstantPoolIndexGrammar).as(MethodRefClassName) <~ "." ~
-    grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)).inParenthesis asNode MethodRefKey
+    grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)) asNode MethodRefKey
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 

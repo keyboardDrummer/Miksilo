@@ -31,8 +31,8 @@ object ClassRefConstant extends ConstantEntry {
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRefName -> Utf8Constant.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "ClassRef" ~~>
-    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName).inParenthesis asNode ClassRefKey
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~>
+    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName) asNode ClassRefKey
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

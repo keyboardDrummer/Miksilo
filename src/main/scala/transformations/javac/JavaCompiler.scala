@@ -64,9 +64,10 @@ object JavaCompiler {
 
   def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
-    simpleByteCodeTransformations
+    simplestByteCodeTransformations
 
-  def simpleByteCodeTransformations: Seq[Delta] = Seq(RemoveConstantPool, PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
+  def simplestByteCodeTransformations = Seq(RemoveConstantPool) ++ simpleByteCodeTransformations
+  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 

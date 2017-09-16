@@ -8,6 +8,7 @@ import core.particles.path.{OriginWithParent, PathRoot}
 import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton.{ClassConstantPool, ConstantPoolGrammar, ConstantPoolItemContentGrammar}
+import transformations.bytecode.attributes.StackMapTableAttribute.SameLocals1StackItem
 import transformations.bytecode.constants.FieldDescriptorConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.types.TypeSkeleton
@@ -23,7 +24,9 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
           val index = pool.store(node.current)
           node.asInstanceOf[OriginWithParent].replaceWith(index)
         }, beforeChildren = node => {
-          if (node.clazz == FieldDescriptorConstant.key) { //TODO replace this method with something based on constantReferences
+          if (node.clazz == SameLocals1StackItem)
+            false
+          else if (node.clazz == FieldDescriptorConstant.key) { //TODO replace this method with something based on constantReferences
             val index = pool.store(node.current)
             node.asInstanceOf[OriginWithParent].replaceWith(index)
             false

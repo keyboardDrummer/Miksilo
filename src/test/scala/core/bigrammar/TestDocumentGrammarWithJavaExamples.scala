@@ -100,10 +100,4 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }
-
-  test("PrettyAddressLoad") {
-    val grammar = LoadAddressC.getGrammarForThisInstruction(new GrammarCatalogue())
-    val addressLoad = LoadAddressC.addressLoad(0)
-    BiGrammarToPrinter.toDocument(addressLoad, grammar)
-  }
 }

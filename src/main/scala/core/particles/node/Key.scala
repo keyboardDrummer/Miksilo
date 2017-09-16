@@ -3,6 +3,8 @@ package core.particles.node
 trait Key extends AnyRef
 {
   override def toString: String = Node.classDebugRepresentation(this)
+
+  override def hashCode(): Int = this.getClass.toString.hashCode
 }
 
 /**
@@ -13,4 +15,8 @@ trait NodeField extends Key
 /**
   * Defines a new Node class
   */
-trait NodeClass extends Key
+trait NodeClass extends Key {
+  def create(values: (NodeField, Any)*): Node = {
+    new Node(this, values: _*)
+  }
+}

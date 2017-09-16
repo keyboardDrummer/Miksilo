@@ -19,7 +19,7 @@ object Utf8Constant extends ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    (identifier | StringLiteral : BiGrammar).asNode(Utf8ConstantKey, Value)
+    (StringLiteral : BiGrammar).as(Value).asNode(Utf8ConstantKey)
 
   override def description: String = "A string constant"
 }

@@ -32,8 +32,6 @@ object GetStaticC extends InstructionC {
     fieldType
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(FieldRefConstant.key)
-
   override def getInstructionSize: Int = 3
 
   object GetStaticKey extends Key
