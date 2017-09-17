@@ -3,13 +3,13 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 
 object MethodTypeConstant extends ConstantEntry {
 
-  object MethodTypeConstantKey extends Key
-  object MethodTypeDescriptorIndex extends Key
+  object MethodTypeConstantKey extends NodeClass
+  object MethodTypeDescriptorIndex extends NodeField
   override def key = MethodTypeConstantKey
 
   def construct(descriptorIndex: Int) = new Node(MethodTypeConstantKey, MethodTypeDescriptorIndex -> descriptorIndex)

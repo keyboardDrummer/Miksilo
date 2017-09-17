@@ -1,16 +1,17 @@
 package transformations.bytecode
 
-import core.bigrammar.MapGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, FromMap, DeltaWithGrammar}
-import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, ClassFileKey}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields}
+import transformations.bytecode.constants.{FieldDescriptorConstant, Utf8Constant}
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
-  object FieldKey extends Key
-  object NameIndex extends Key
-  object DescriptorIndex extends Key
-  object FieldAttributes extends Key
+  object FieldKey extends NodeClass
+  object NameIndex extends NodeField
+  object DescriptorIndex extends NodeField
+  object FieldAttributes extends NodeField
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -28,12 +29,16 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(FieldKey) = field => emitField(field, state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(FieldKey, Map(
+      NameIndex -> Utf8Constant.key,
+      DescriptorIndex -> FieldDescriptorConstant.key))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue): Unit = {
     val attributesGrammar = grammars.find(AttributesGrammar)
-    val fieldGrammar = nodeGrammar((("nameIndex:" ~> integer) ~~ (", descriptorIndex" ~> integer) <~ ", attributes") % attributesGrammar,
-      FieldKey, NameIndex, DescriptorIndex, FieldAttributes)
+    val constantIndex = grammars.find(ConstantPoolIndexGrammar)
+    val fieldGrammar = ((("nameIndex:" ~> constantIndex).as(NameIndex) ~~
+      (", descriptorIndex" ~> integer.as(DescriptorIndex)) <~ ", attributes") % attributesGrammar.as(FieldAttributes)).asNode(FieldKey)
     val parseFields = ("fields:" %> fieldGrammar.manyVertical.indent()).as(ClassFields)
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)

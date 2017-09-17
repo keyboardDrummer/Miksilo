@@ -1,19 +1,20 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.{Key, Node}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass, NodeField}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object FieldRefConstant extends ConstantEntry {
 
-  object FieldRef extends Key
+  object FieldRef extends NodeClass
 
-  object FieldRefClassIndex extends Key
+  object FieldRefClassIndex extends NodeField
 
-  object FieldRefNameAndTypeIndex extends Key
+  object FieldRefNameAndTypeIndex extends NodeField
 
   def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,
     FieldRefClassIndex -> classConstant,
@@ -27,6 +28,13 @@ object FieldRefConstant extends ConstantEntry {
     byteToBytes(9) ++
       shortToBytes(getFieldRefClassIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
+  }
+
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
+      FieldRefClassIndex -> ClassRefConstant.key,
+      FieldRefNameAndTypeIndex -> NameAndType.key))
   }
 
   override def key = FieldRef

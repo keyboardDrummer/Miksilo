@@ -3,9 +3,8 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
-import transformations.bytecode.constants.LongConstantEntryC.LongEntryValue
 
 object DoubleConstantEntryC extends ConstantEntry {
 

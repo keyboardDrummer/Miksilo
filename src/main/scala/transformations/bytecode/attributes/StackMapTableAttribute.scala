@@ -3,16 +3,17 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, FromMap}
+import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.types.ObjectTypeC.ObjectTypeName
 import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC, TypeSkeleton}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, StackMapTableEntry)
 
   object FrameOffset extends Key
 
@@ -40,12 +41,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object StackMapTableMaps extends Key
 
-  def stackMapTableId = new Node(StackMapTableId)
-
-  private object StackMapTableId
-
   def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(StackMapTableKey,
-    ByteCodeSkeleton.AttributeNameKey -> nameIndex,
+    AttributeNameKey -> nameIndex,
     StackMapTableMaps -> stackMaps)
 
   def getStackMapTableEntries(stackMapTable: Node) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[Node]]
@@ -69,7 +66,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).getBytes(StackMapTableId) = _ => toUTF8ConstantEntry("StackMapTable")
+    ByteCodeSkeleton.getState(state).constantReferences.put(StackMapTableKey, Map(AttributeNameKey -> StackMapTableEntry.key))
   }
 
   def getStackMapTableBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
@@ -121,10 +118,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   val offsetGrammarKey = KeyGrammar(FrameOffset)
   object StackMapFrameGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    var constantPoolIndex = grammars.find(ConstantPoolIndexGrammar)
     val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
-    val stackMapTableAttributeConstantGrammar = "StackMapTable" ~> produce(stackMapTableId)
-    val constantPoolItemContent = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
-    constantPoolItemContent.addOption(stackMapTableAttributeConstantGrammar)
 
     val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %> parseType.indent()).
@@ -134,8 +129,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
 
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
-    val stackMapTableGrammar = ("stackMap nameIndex:" ~> integer % stackMapGrammar.manyVertical.indent()).
-      asNode(StackMapTableKey, ByteCodeSkeleton.AttributeNameKey, StackMapTableMaps)
+    val stackMapTableGrammar = ("stackMap nameIndex:" ~> constantPoolIndex.as(AttributeNameKey) % stackMapGrammar.manyVertical.indent().as(StackMapTableMaps)).
+      asNode(StackMapTableKey)
 
     grammars.create(StackMapTableGrammar, stackMapTableGrammar)
   }

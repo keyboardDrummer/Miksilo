@@ -1,7 +1,6 @@
 package transformations.bytecode
 
 import core.particles.node.Node
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
@@ -31,7 +30,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       CodeConstantEntry.entry,
       LineNumberTable.constantPoolKey,
       "whilee",
-      StackMapTableAttribute.stackMapTableId,
+      StackMapTableEntry.entry,
       SourceFileAttribute.constantPoolKey,
       "Whilee.java",
       NameAndType.nameAndType(4, 5),

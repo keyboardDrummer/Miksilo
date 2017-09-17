@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
-import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
+import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}

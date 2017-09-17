@@ -88,7 +88,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
       MethodTypeC.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
-      StackMapTableAttribute.stackMapTableId,
+      StackMapTableEntry.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
       NameAndType.nameAndType(7, 8),

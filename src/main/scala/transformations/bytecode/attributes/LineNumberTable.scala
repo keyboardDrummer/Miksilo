@@ -14,7 +14,7 @@ object LineNumberTable extends ByteCodeAttribute {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def lineNumberTable(nameIndex: Int, lines: Seq[LineNumberRef]) = new Node(LineNumberTableKey,
-    ByteCodeSkeleton.AttributeNameKey -> nameIndex,
+    AttributeNameKey -> nameIndex,
     LineNumberTableLines -> lines)
 
   override def inject(state: CompilationState): Unit = {

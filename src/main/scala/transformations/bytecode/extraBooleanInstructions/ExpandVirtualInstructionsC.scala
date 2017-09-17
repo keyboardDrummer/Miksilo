@@ -28,7 +28,7 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
+    def processCodeAnnotation(codeAnnotation: Node): Unit = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val newInstructions: Seq[Node] = getNewInstructions(instructions)
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions

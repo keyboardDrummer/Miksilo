@@ -4,6 +4,10 @@ trait Key extends AnyRef
 {
   override def toString: String = Node.classDebugRepresentation(this)
 
+  /**
+    * This hashcode does not change over runs, while the default hashcode does.
+    * This makes the compilation process more deterministic.
+    */
   override def hashCode(): Int = this.getClass.toString.hashCode
 }
 

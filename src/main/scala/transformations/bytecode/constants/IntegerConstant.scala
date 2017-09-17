@@ -3,13 +3,13 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 
 object IntegerConstant extends ConstantEntry {
 
-  object IntegerKey extends Key
-  object IntegerValue extends Key
+  object IntegerKey extends NodeClass
+  object IntegerValue extends NodeField
 
   def construct(index: Int) = new Node(IntegerKey, IntegerValue -> index)
 

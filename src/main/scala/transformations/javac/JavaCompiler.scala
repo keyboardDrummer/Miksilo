@@ -64,10 +64,10 @@ object JavaCompiler {
 
   def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
-    simplestByteCodeTransformations
+    Seq(RemoveConstantPool) ++ simpleByteCodeTransformations
 
-  def simplestByteCodeTransformations = Seq(RemoveConstantPool) ++ simpleByteCodeTransformations
-  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++ Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
+  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
+    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
@@ -101,7 +101,7 @@ object JavaCompiler {
     SignatureAttribute)
 
   def constantEntryParticles = Seq(QualifiedClassNameConstant, Utf8Constant, DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
-    ClassRefConstant, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant, MethodHandleConstant, MethodTypeConstant,
+    ClassRefConstant, StackMapTableEntry, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant, MethodHandleConstant, MethodTypeConstant,
     InvokeDynamicConstant)
   
   def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,

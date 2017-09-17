@@ -8,8 +8,8 @@ import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
-import transformations.bytecode.attributes.StackMapTableAttribute.{offsetGrammarKey, StackMapFrameGrammar}
-import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
+import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
+import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute, StackMapTableEntry}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC, InstructionSignature}
@@ -74,7 +74,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
+    def processCodeAnnotation(codeAnnotation: Node): Unit = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
@@ -118,7 +118,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       locationAfterPreviousFrame = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableAttribute.stackMapTableId)
+      val nameIndex = constantPool.store(StackMapTableEntry.entry)
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else

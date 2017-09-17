@@ -2,10 +2,12 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import core.particles.{CompilationState, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.readJar.ClassFileParser
+
+object AttributeNameKey extends NodeField //TODO give this a proper place
 trait ByteCodeAttribute extends DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {

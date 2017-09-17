@@ -1,9 +1,10 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass, NodeField}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
@@ -32,6 +33,13 @@ object NameAndType extends ConstantEntry {
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     byteToBytes(12) ++ shortToBytes(getName(constant)) ++
       shortToBytes(getTypeIndex(constant))
+  }
+
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
+      NameAndTypeName -> Utf8Constant.key,
+      NameAndTypeType -> Utf8Constant.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

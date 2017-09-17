@@ -1,13 +1,13 @@
 package transformations.bytecode
 
-import core.bigrammar.{BiGrammar, Consume, UndefinedDestructuringValue}
-import core.document.{BlankLine, Empty}
+import core.bigrammar.BiGrammar
+import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Key, Node, NodeClass, NodeField}
-import transformations.bytecode.attributes.ByteCodeAttribute
-import transformations.bytecode.constants.ConstantEntry
+import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
+import transformations.bytecode.constants.ClassRefConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -57,25 +57,30 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
   }
 
-  object AttributeKey
 
-  object AttributeNameKey extends Key
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(ClassFileKey, Map(
+      //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
+      ClassParentIndex -> ClassRefConstant.key,
+      ClassNameIndexKey -> ClassRefConstant.key))
+  }
 
-  object ClassFileKey extends Key
+  object ClassFileKey extends NodeClass
 
   object ClassMethodsKey extends Key
 
-  object ClassNameIndexKey extends Key
+  object ClassNameIndexKey extends NodeField
 
-  object ClassParentIndex extends Key
+  object ClassParentIndex extends NodeField
 
-  object ClassConstantPool extends Key
+  object ClassConstantPool extends NodeField
 
-  object ClassInterfaces extends Key
+  object ClassInterfaces extends NodeField
 
   object ClassFields extends Key
 
-  object ClassAttributes extends Key
+  object ClassAttributes extends NodeField
 
   private object EnrichedClassConstantEntry extends Key
 

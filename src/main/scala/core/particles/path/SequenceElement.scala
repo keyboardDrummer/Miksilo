@@ -9,7 +9,7 @@ case class SequenceElement(parent: Path, field: Any, index: Int) extends OriginW
   def next: Path = sequence(index + 1)
   def hasNext: Boolean = sequence.length > (index + 1)
 
-  def replaceWith(replacements: Seq[Any]): Option[Any] = {
+  def replaceWith(replacements: Seq[Any]): Unit = {
     val originalSequence = parent.current(field).asInstanceOf[Seq[Path]]
     val newSequence = originalSequence.take(index) ++ replacements ++ originalSequence.drop(index + 1)
     parent.current(field) = newSequence

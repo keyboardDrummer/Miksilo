@@ -18,11 +18,11 @@ trait InstructionWithGrammar extends DeltaWithGrammar
 
   def argumentsGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val constantPoolIndex: BiGrammar = grammars.find(ConstantPoolIndexGrammar)
-    constantPoolIndex.manySeparated(",")
+    (constantPoolIndex | integer).manySeparated(",").as(InstructionArgumentsKey)
   }
 
   def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
-    val arguments = argumentsGrammar(grammars).inParenthesis.as(InstructionArgumentsKey)
+    val arguments = argumentsGrammar(grammars).inParenthesis
     (name ~> arguments).asNode(key)
   }
 }

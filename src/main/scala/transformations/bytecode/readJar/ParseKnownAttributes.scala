@@ -3,8 +3,7 @@ package transformations.bytecode.readJar
 import core.particles.node.Node
 import core.particles.{CompilationState, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton.AttributeNameKey
-import transformations.bytecode.attributes.{ByteCodeAttribute, UnParsedAttribute}
+import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute, UnParsedAttribute}
 import transformations.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
 import transformations.bytecode.ByteCodeSkeleton._
 
