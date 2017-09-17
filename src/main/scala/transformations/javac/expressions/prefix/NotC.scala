@@ -22,7 +22,7 @@ object NotC extends ExpressionInstance {
     ExpressionSkeleton.getToInstructions(state)(expression(NotExpression).asInstanceOf[Path]) ++ Seq(NotInstructionC.not)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     coreGrammar.addOption("!" ~> coreGrammar asNode(NotKey, NotExpression))
   }

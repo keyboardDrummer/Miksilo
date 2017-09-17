@@ -32,7 +32,7 @@ object IfThenElseC extends StatementInstance {
 
   object ElseKey extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
     val ifThenGrammar = grammars.find(IfThenC)

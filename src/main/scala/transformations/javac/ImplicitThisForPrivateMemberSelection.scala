@@ -70,7 +70,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
         })
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val callee = grammars.find(CallC.CallCallee)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     callee.inner = expression

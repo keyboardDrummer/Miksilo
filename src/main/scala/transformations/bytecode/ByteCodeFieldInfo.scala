@@ -34,7 +34,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
       DescriptorIndex -> FieldDescriptorConstant.key))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val constantIndex = grammars.find(ConstantPoolIndexGrammar)
     val fieldGrammar = ((("nameIndex:" ~> constantIndex).as(NameIndex) ~~

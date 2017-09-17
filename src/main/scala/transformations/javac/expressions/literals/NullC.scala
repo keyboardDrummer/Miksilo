@@ -11,7 +11,7 @@ object NullC extends ExpressionInstance {
 
   val _null = new Node(NullKey)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseNull = "null" ~> produce(_null)
     expressionGrammar.inner = expressionGrammar.inner | parseNull

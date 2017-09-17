@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node.{Key, Node, NodeField, NodeLike}
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -34,7 +34,7 @@ object WhileC extends StatementInstance with WithState {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
@@ -48,9 +48,9 @@ object WhileC extends StatementInstance with WithState {
 
   object WhileKey extends core.particles.node.Key
 
-  object Condition extends Key
+  object Condition extends NodeField
 
-  object Body extends Key
+  object Body extends NodeField
 
   override def description: String = "Enables using the while construct."
 

@@ -3,14 +3,14 @@ package transformations.bytecode.attributes
 import core.bigrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
-object InstructionArgumentsKey extends Key
+object InstructionArgumentsKey extends NodeField
 
 object CodeAttribute extends ByteCodeAttribute with WithState {
 
@@ -102,15 +102,15 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object CodeKey extends NodeClass
 
-  object CodeMaxStackKey extends Key
+  object CodeMaxStackKey extends NodeField
 
-  object CodeMaxLocalsKey extends Key
+  object CodeMaxLocalsKey extends NodeField
 
-  object CodeInstructionsKey extends Key
+  object CodeInstructionsKey extends NodeField
 
-  object CodeExceptionTableKey extends Key
+  object CodeExceptionTableKey extends NodeField
 
-  object CodeAttributesKey extends Key
+  object CodeAttributesKey extends NodeField
 
   object InstructionGrammar
 

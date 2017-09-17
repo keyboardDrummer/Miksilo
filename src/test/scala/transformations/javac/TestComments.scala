@@ -3,7 +3,7 @@ package transformations.javac
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar.TestGrammarUtils
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.{CompilerFromParticles, DeltaWithGrammar}
+import core.particles.{CompilationState, CompilerFromParticles, DeltaWithGrammar}
 import org.junit.{Assert, Test}
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
@@ -26,7 +26,7 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
 
   object ExpressionAsRoot extends DeltaWithGrammar
   {
-    override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
       grammars.create(ProgramGrammar, grammars.find(ExpressionSkeleton.ExpressionGrammar))
     }
 

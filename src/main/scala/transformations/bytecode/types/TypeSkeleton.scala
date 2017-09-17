@@ -73,7 +73,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithState {
   }
 
   object ByteCodeTypeGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     grammars.create(JavaTypeGrammar)
     grammars.create(ByteCodeTypeGrammar)
   }

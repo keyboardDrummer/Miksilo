@@ -22,7 +22,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 
   def getToInstructionsRegistry(state: CompilationState) = getState(state).instances
 
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     val core = grammars.create(CoreGrammar)
     grammars.create(ExpressionGrammar, core)
   }

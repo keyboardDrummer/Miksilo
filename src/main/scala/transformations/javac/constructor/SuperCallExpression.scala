@@ -43,7 +43,7 @@ object SuperCallExpression extends ExpressionInstance {
     Seq(LoadAddressC.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialC.invokeSpecial(methodRefIndex))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
     val superCallGrammar = "super" ~> callArguments asNode(SuperCall, CallC.CallArguments)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)

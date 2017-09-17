@@ -69,7 +69,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     field.data.remove(FieldType)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 

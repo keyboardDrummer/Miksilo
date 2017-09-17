@@ -29,7 +29,7 @@ object ThisCallExpression extends ExpressionInstance {
     SuperCallExpression.transformToByteCode(call, state, clazz.name)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments asNode(ThisCall, CallC.CallArguments)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)

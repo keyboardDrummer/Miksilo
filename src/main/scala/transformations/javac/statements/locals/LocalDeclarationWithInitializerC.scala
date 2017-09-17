@@ -17,7 +17,7 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
 
   def getInitializer(withInitializer: Node) = withInitializer(InitializerKey).asInstanceOf[Node]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)

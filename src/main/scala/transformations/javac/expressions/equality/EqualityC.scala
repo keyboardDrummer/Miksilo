@@ -17,7 +17,7 @@ object EqualityC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](equality: T) = equality(SecondKey).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
     val parseEquality = ((equalityGrammar <~ "==") ~ equalityGrammar).asNode(EqualityKey, FirstKey, SecondKey)
     equalityGrammar.addOption(parseEquality)

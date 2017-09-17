@@ -6,17 +6,16 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.javac.classes.skeleton.JavaClassSkeleton._
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.javac.types.{MethodTypeC, TypeAbstraction}
 
 object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
@@ -153,7 +152,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   object StaticGrammar
   object ReturnTypeGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)

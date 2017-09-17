@@ -19,7 +19,7 @@ trait ByteCodeAttribute extends DeltaWithGrammar {
   def getGrammar(grammars: GrammarCatalogue): BiGrammar
   def constantPoolKey: String
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val grammar = getGrammar(grammars)
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
     attributeGrammar.addOption(grammar)

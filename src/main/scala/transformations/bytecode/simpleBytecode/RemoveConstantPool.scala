@@ -1,12 +1,12 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.GrammarReference
+import core.bigrammar.{As, GrammarReference}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.PathRoot
 import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton.{ConstantPoolGrammar, ConstantPoolItemContentGrammar}
+import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 
@@ -25,10 +25,16 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     }))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
-    val constantEntry = grammars.find(ConstantPoolItemContentGrammar)
-    for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar))
-      path.set(constantEntry)
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+    val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
+    val allFields: Map[NodeField, NodeClass] = constantReferences.values.reduce((a, b) => a ++ b)
+
+    for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar)) {
+      val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head
+      allFields.get(surroundingAs.key).foreach(constantClass => {
+        path.set(grammars.find(constantClass))
+      })
+    }
 
     val constantPoolGrammar = grammars.findPathsToKey(ConstantPoolGrammar).head
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()

@@ -29,7 +29,7 @@ trait TypeInstance extends DeltaWithGrammar with ConstantEntry {
   }
 
   def byteCodeGrammarKey = KeyGrammar(key)
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
@@ -38,7 +38,7 @@ trait TypeInstance extends DeltaWithGrammar with ConstantEntry {
     val byteCodeGrammar = grammars.create(byteCodeGrammarKey, getByteCodeGrammar(grammars))
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     byteCodeType.addOption(byteCodeGrammar)
-    super.transformGrammars(grammars)
+    super.transformGrammars(grammars, state)
   }
 
   def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar

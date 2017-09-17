@@ -19,7 +19,7 @@ trait ConstantEntry extends DeltaWithGrammar {
     ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val itemContent = grammars.find(ConstantPoolItemContentGrammar)
     itemContent.addOption(grammars.create(key, getConstantEntryGrammar(grammars)))
   }

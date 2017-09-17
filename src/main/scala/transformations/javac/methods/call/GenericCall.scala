@@ -37,7 +37,7 @@ trait GenericCall extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MemberSelector)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)

@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.constants.ClassRefConstant
@@ -75,7 +75,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)
@@ -109,15 +109,15 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
 
   object ClassGrammar
 
-  object ClassPackage extends Key
+  object ClassPackage extends NodeField
 
-  object ClassImports extends Key
+  object ClassImports extends NodeField
 
-  object ClassParent extends Key
+  object ClassParent extends NodeField
 
   object Members extends Key
 
-  object ClassName extends Key
+  object ClassName extends NodeField
 
   override def description: String = "Defines a skeleton for the Java class."
 }

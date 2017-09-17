@@ -4,7 +4,7 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import org.scalatest.{FlatSpec, FunSuite, Matchers}
+import org.scalatest.FunSuite
 import transformations.javac.JavaCompiler
 import util.TestUtils
 
@@ -58,7 +58,7 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   class SelectorTransformation(key: Any) extends DeltaWithGrammar {
-    override def transformGrammars(grammars: GrammarCatalogue) {
+    override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
       if (key != ProgramGrammar)
         grammars.find(ProgramGrammar).inner = grammars.find(key)
     }

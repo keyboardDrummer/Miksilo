@@ -68,7 +68,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   object ClassFileKey extends NodeClass
 
-  object ClassMethodsKey extends Key
+  object ClassMethodsKey extends NodeField
 
   object ClassNameIndexKey extends NodeField
 
@@ -78,7 +78,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   object ClassInterfaces extends NodeField
 
-  object ClassFields extends Key
+  object ClassFields extends NodeField
 
   object ClassAttributes extends NodeField
 
@@ -93,7 +93,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   object AttributeGrammar
   object MembersGrammar
   object AttributesGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val constantIndexGrammar = grammars.create(ConstantPoolIndexGrammar, integer)
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)

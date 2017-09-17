@@ -35,7 +35,7 @@ object ReturnExpressionC extends StatementInstance {
 
   def getReturnValue[T <: NodeLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 

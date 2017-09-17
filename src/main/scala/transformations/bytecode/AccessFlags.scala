@@ -1,6 +1,6 @@
 package transformations.bytecode
 
-import core.particles.node.{Node, Key}
+import core.particles.node.{Key, Node, NodeField}
 import transformations.bytecode.PrintByteCode._
 
 trait AccessFlags {
@@ -12,7 +12,7 @@ trait AccessFlags {
 
   object PrivateAccess extends MethodAccessFlag
 
-  object AccessFlagsKey extends Key
+  object AccessFlagsKey extends NodeField
 
   private val accessCodesToByteCode = Map(
     PublicAccess -> "0001",

@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
-import core.particles.DeltaWithGrammar
+import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.Key
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
@@ -11,7 +11,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar
 {
   val key: Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
     instructionGrammar.addOption(grammars.create(KeyGrammar(key), getGrammarForThisInstruction(grammars)))
   }

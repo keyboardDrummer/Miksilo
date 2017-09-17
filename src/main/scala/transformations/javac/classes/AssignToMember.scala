@@ -29,7 +29,7 @@ object AssignToMember extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val assignTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
 
     val variableGrammar = grammars.find(VariableC.VariableGrammar)

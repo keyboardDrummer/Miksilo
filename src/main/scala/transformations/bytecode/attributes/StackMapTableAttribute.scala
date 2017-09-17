@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -15,7 +15,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, StackMapTableEntry)
 
-  object FrameOffset extends Key
+  object FrameOffset extends NodeField
 
   object SameLocals1StackItem extends Key
 
@@ -23,7 +23,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object AppendFrame extends Key
 
-  object AppendFrameTypes extends Key
+  object AppendFrameTypes extends NodeField
 
   object FullFrame
 
@@ -39,7 +39,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object StackMapTableKey extends Key
 
-  object StackMapTableMaps extends Key
+  object StackMapTableMaps extends NodeField
 
   def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(StackMapTableKey,
     AttributeNameKey -> nameIndex,

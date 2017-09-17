@@ -22,7 +22,7 @@ object JustJavaGoto extends StatementInstance {
 
   def getTarget(node: Node) = node(Target).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(grammars.create(JavaGotoGrammar, "goto" ~~> identifier <~ ";").asNode(GotoKey, Target))
   }

@@ -17,7 +17,7 @@ object ReturnVoidC extends StatementInstance {
     Seq(VoidReturnInstructionC.voidReturn)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = ("return" ~ ";") ~> produce(_return)

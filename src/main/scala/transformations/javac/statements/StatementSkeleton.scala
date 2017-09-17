@@ -18,7 +18,7 @@ object StatementSkeleton extends DeltaWithGrammar with WithState {
     statement => getState(state).instances(statement.clazz).toByteCode(statement, state)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     grammars.create(StatementGrammar)
   }
 

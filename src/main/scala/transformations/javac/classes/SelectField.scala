@@ -46,7 +46,7 @@ object SelectField extends ExpressionInstance {
     fieldRef
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     core.addOption(grammars.find(SelectGrammar))
   }
