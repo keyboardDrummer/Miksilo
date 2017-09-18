@@ -14,6 +14,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
 import transformations.bytecode.coreInstructions.objects._
 import transformations.bytecode.extraBooleanInstructions._
+import transformations.bytecode.extraConstants.{TypeConstant, QualifiedClassNameConstant}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, RemoveConstantPool}
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac.classes._
@@ -64,9 +65,9 @@ object JavaCompiler {
 
   def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
-    Seq(RemoveConstantPool) ++ simpleByteCodeTransformations
+    simpleByteCodeTransformations
 
-  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
+  def simpleByteCodeTransformations: Seq[Delta] = Seq(RemoveConstantPool, PoptimizeC) ++
     Seq(InferredStackFrames, InferredMaxStack, LabelledLocations) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
@@ -100,12 +101,12 @@ object JavaCompiler {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(QualifiedClassNameConstant, Utf8Constant, DoubleConstantEntryC, LongConstantEntryC, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndType,
-    ClassRefConstant, StackMapTableEntry, CodeConstantEntry, FieldDescriptorConstant, IntegerConstant, StringConstant, MethodHandleConstant, MethodTypeConstant,
+  def constantEntryParticles = Seq(QualifiedClassNameConstant, TypeConstant, Utf8Constant, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
+    ClassInfoConstant, StackMapTableEntry, CodeConstantEntry, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
   
   def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
-    SuperTypeArgument, TypeApplication, MethodTypeC) ++
+    SuperTypeArgument, TypeApplication, MethodType) ++
     Seq(ObjectTypeC, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
       ShortTypeC, TypeSkeleton)
 

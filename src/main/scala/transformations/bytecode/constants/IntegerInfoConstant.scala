@@ -6,7 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 
-object IntegerConstant extends ConstantEntry {
+object IntegerInfoConstant extends ConstantEntry {
 
   object IntegerKey extends NodeClass
   object IntegerValue extends NodeField

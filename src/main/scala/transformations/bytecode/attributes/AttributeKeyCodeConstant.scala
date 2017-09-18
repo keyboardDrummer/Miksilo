@@ -7,13 +7,13 @@ import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 
-trait AttributeKeyCodeConstant extends ConstantEntry {
+trait AttributeKeyCodeConstant extends ConstantEntry { //TODO moet dit hele ding niet weg?
 
-  object Key extends NodeClass
+  object Key2 extends NodeClass
 
   def entry = new Node(key)
 
-  override def key = Key
+  override def key = Key2
 
   def name: String
 

@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.IntegerConstant
+import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
@@ -30,7 +30,7 @@ object LoadConstantIntC extends InstructionC
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerConstant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerInfoConstant.key))
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(IntegerConstantIndex)

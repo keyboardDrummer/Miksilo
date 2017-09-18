@@ -4,7 +4,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields}
-import transformations.bytecode.constants.{FieldDescriptorConstant, Utf8Constant}
+import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
@@ -31,7 +31,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
     ByteCodeSkeleton.getState(state).getBytes(FieldKey) = field => emitField(field, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(FieldKey, Map(
       NameIndex -> Utf8Constant.key,
-      DescriptorIndex -> FieldDescriptorConstant.key))
+      DescriptorIndex -> Utf8Constant.key))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {

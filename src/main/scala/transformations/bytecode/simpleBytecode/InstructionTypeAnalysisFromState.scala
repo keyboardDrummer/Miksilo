@@ -4,15 +4,16 @@ import core.particles.CompilationState
 import core.particles.node.Node
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
-import transformations.bytecode.constants.{ClassRefConstant, QualifiedClassNameConstant}
+import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.types.MethodTypeC
-import MethodTypeC._
+import transformations.javac.types.MethodType
+import MethodType._
 import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
 
 class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   val constantPool = state.program.constantPool
@@ -44,7 +45,7 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   
   private def getMethodParameters = {
     val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
-    val methodType = constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node]
+    val methodType = TypeConstant.getValue(constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node])
     val methodParameters = methodType.parameterTypes
     if (methodIsStatic) {
       methodParameters
@@ -53,7 +54,7 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
       val clazz = state.program
       val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
       val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[Node]
-      val className = constantPool.getValue(ClassRefConstant.getNameIndex(clazzRef)).asInstanceOf[Node]
+      val className = constantPool.getValue(ClassInfoConstant.getNameIndex(clazzRef)).asInstanceOf[Node]
       Seq(ObjectTypeC.objectType(className(QualifiedClassNameConstant.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }

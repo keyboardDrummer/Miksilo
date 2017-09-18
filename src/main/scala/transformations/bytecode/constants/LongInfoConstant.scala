@@ -5,9 +5,8 @@ import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
-import transformations.bytecode.constants.LongConstantEntryC.{LongEntryKey, LongEntryValue}
 
-object LongConstantEntryC extends ConstantEntry {
+object LongInfoConstant extends ConstantEntry {
 
   implicit class LongConstantEntry(node: Node) {
     def value: Long = node(LongEntryValue).asInstanceOf[Long]
@@ -19,7 +18,7 @@ object LongConstantEntryC extends ConstantEntry {
   object LongEntryValue extends Key
   override def key = LongEntryKey
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.longToBytes(constant.value)
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(5) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "long:" ~~> number asNode(LongEntryKey, LongEntryValue)
 

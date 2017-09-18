@@ -9,6 +9,7 @@ import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, CodeConstantEntry}
 import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -16,7 +17,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.javac.types.{MethodTypeC, TypeAbstraction}
+import transformations.javac.types.{MethodType, TypeAbstraction}
 
 object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
@@ -50,7 +51,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val methodName: String = MethodC.getMethodName(method)
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
-      val _type = MethodTypeC.construct(method.returnType, parameterTypes)
+      val _type = MethodType.construct(method.returnType, parameterTypes)
       val key = new MethodClassKey(methodName, parameterTypes.toVector)
       classInfo.methods(key) = new MethodInfo(_type, MethodC.getMethodStatic(method))
     }
@@ -67,7 +68,8 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   def getMethodDescriptor(method: Node, classCompiler: ClassCompiler): Node = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)
-    MethodTypeC.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    val methodType = MethodType.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    TypeConstant.constructor(methodType)
   }
 
   def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {

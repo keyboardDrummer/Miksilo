@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.IntegerConstant
+import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantIntC, SmallIntegerConstantC}
 import transformations.bytecode.types.IntTypeC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -33,7 +33,7 @@ object IntLiteralC extends ExpressionInstance {
     }
     else
     {
-      Seq(LoadConstantIntC.integerConstant(IntegerConstant.construct(value)))
+      Seq(LoadConstantIntC.integerConstant(IntegerInfoConstant.construct(value)))
     }
   }
 

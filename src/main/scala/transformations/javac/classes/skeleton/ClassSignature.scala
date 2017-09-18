@@ -2,7 +2,7 @@ package transformations.javac.classes.skeleton
 
 import core.particles.node.Node
 import transformations.javac.classes.{MethodQuery, FieldInfo, MethodInfo}
-import transformations.javac.types.MethodTypeC._
+import transformations.javac.types.MethodType._
 
 import scala.collection.mutable
 

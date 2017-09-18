@@ -8,7 +8,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
-object NameAndType extends ConstantEntry {
+object NameAndTypeConstant extends ConstantEntry {
 
   object NameAndTypeKey extends NodeClass
 

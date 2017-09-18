@@ -1,9 +1,9 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -45,7 +45,7 @@ object MethodRefConstant extends ConstantEntry {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key,
-      Map(MethodRefClassName -> ClassRefConstant.key, MethodRefMethodName -> NameAndType.key))
+      Map(MethodRefClassName -> ClassInfoConstant.key, MethodRefMethodName -> NameAndTypeConstant.key))
   }
 }
 

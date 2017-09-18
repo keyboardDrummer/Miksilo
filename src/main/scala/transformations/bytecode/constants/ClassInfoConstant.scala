@@ -1,15 +1,16 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.CompilationState
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import transformations.bytecode.extraConstants.QualifiedClassNameConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
-object ClassRefConstant extends ConstantEntry {
+object ClassInfoConstant extends ConstantEntry {
 
   object ClassRefKey extends NodeClass
 
@@ -28,7 +29,7 @@ object ClassRefConstant extends ConstantEntry {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRefName -> Utf8Constant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRefName -> QualifiedClassNameConstant.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~>

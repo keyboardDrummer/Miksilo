@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes._
-import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC, SmallIntegerConstantC, StoreIntegerC}
@@ -11,7 +11,7 @@ import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.types.MethodTypeC
+import transformations.javac.types.MethodType
 import util.TestUtils
 
 class TestPrintByteCodeWhile extends FunSuite {
@@ -23,17 +23,17 @@ class TestPrintByteCodeWhile extends FunSuite {
 
   def getByteCode: Node = {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 12),
-      ClassRefConstant.classRef(13),
-      ClassRefConstant.classRef(14),
+      ClassInfoConstant.classRef(13),
+      ClassInfoConstant.classRef(14),
       "<init>",
-      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
+      MethodType.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       LineNumberTable.constantPoolKey,
       "whilee",
       StackMapTableEntry.entry,
       SourceFileAttribute.constantPoolKey,
       "Whilee.java",
-      NameAndType.nameAndType(4, 5),
+      NameAndTypeConstant.nameAndType(4, 5),
       new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
       new QualifiedClassName(Seq("java", "lang", "Object"))))
     val constructor: Node = getConstructor

@@ -1,12 +1,11 @@
 package transformations.javac.classes
 
-import java.util
 import java.util.NoSuchElementException
 
 import core.particles.CompilationState
 import core.particles.node.Node
-import transformations.bytecode.ByteCodeSkeleton.ByteCode
 import transformations.bytecode.constants._
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
@@ -45,14 +44,14 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getMethodRefIndex(methodKey: MethodQuery) = {
-    val classRef = ClassRefConstant.classRef(methodKey.className)
+    val classRef = ClassInfoConstant.classRef(methodKey.className)
     val nameAndTypeIndex = getMethodNameAndTypeIndex(methodKey)
     MethodRefConstant.methodRef(classRef, nameAndTypeIndex)
   }
 
   def getMethodNameAndTypeIndex(methodKey: MethodQuery) = {
     val methodNameIndex = getNameIndex(methodKey.methodName)
-    NameAndType.nameAndType(methodNameIndex, compiler.find(methodKey)._type)
+    NameAndTypeConstant.nameAndType(methodNameIndex, TypeConstant.constructor(compiler.find(methodKey)._type))
   }
 
   def getNameIndex(methodName: String) = {
@@ -66,12 +65,12 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getClassRef(info: ClassSignature) = {
-    ClassRefConstant.classRef(info.getQualifiedName)
+    ClassInfoConstant.classRef(info.getQualifiedName)
   }
 
   def getFieldNameAndType(info: FieldInfo) = {
     val fieldNameIndex = Utf8Constant.create(info.name)
-    NameAndType.nameAndType(fieldNameIndex, info._type)
+    NameAndTypeConstant.nameAndType(fieldNameIndex, TypeConstant.constructor(info._type))
   }
 
   def findClass(objectType: Node): ClassSignature = {

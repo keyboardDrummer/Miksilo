@@ -1,12 +1,12 @@
 package transformations.bytecode
 
-import core.bigrammar.{BiGrammar, MapGrammar}
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar, FromMap}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.{MethodTypeConstant, Utf8Constant}
+import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
@@ -37,7 +37,8 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8Constant.key, MethodDescriptorIndex -> MethodTypeConstant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8Constant.key,
+      MethodDescriptorIndex -> Utf8Constant.key))
   }
 
   def getMethodByteCode(methodInfo: Node, state: CompilationState) = {

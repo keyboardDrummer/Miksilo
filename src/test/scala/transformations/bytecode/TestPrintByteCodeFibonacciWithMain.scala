@@ -13,7 +13,7 @@ import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.constructor.SuperCallExpression
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
-import transformations.javac.types.MethodTypeC
+import transformations.javac.types.MethodType
 import util.TestUtils
 
 import scala.collection.mutable.ArrayBuffer
@@ -77,26 +77,26 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       FieldRefConstant.fieldRef(19, 20),
       MethodRefConstant.methodRef(5, 21),
       MethodRefConstant.methodRef(22, 23),
-      ClassRefConstant.classRef(24),
-      ClassRefConstant.classRef(25),
+      ClassInfoConstant.classRef(24),
+      ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
-      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
+      MethodType.construct(VoidTypeC.voidType, Seq()),
       CodeConstantEntry.entry,
       LineNumberTable.constantPoolKey,
       "main",
-      MethodTypeC.construct(VoidTypeC.voidType, Seq(
+      MethodType.construct(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
-      MethodTypeC.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
+      MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
       StackMapTableEntry.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
-      NameAndType.nameAndType(7, 8),
-      ClassRefConstant.classRef(26),
-      NameAndType.nameAndType(27, 28),
-      NameAndType.nameAndType(13, 14),
-      ClassRefConstant.classRef(29),
-      NameAndType.nameAndType(30, 31),
+      NameAndTypeConstant.nameAndType(7, 8),
+      ClassInfoConstant.classRef(26),
+      NameAndTypeConstant.nameAndType(27, 28),
+      NameAndTypeConstant.nameAndType(13, 14),
+      ClassInfoConstant.classRef(29),
+      NameAndTypeConstant.nameAndType(30, 31),
       "Fibonacci",
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
@@ -104,7 +104,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
       "java/io/PrintStream",
       "print",
-      MethodTypeC.construct(VoidTypeC.voidType, Seq(IntTypeC.intType))
+      MethodType.construct(VoidTypeC.voidType, Seq(IntTypeC.intType))
     )
     new ConstantPool(constantPool)
   }

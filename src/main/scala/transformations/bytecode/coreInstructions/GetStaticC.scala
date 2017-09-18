@@ -7,7 +7,8 @@ import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.{FieldRefConstant, NameAndType}
+import transformations.bytecode.constants.{FieldRefConstant, NameAndTypeConstant}
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
@@ -30,7 +31,7 @@ object GetStaticC extends InstructionC {
     val location = getStatic(FieldRef).asInstanceOf[Int]
     val fieldRef = constantPool.getValue(location).asInstanceOf[Node]
     val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[Node]
-    val fieldType = constantPool.getValue(NameAndType.getTypeIndex(nameAndType)).asInstanceOf[Node]
+    val fieldType = TypeConstant.getValue(constantPool.getValue(NameAndTypeConstant.getTypeIndex(nameAndType)).asInstanceOf[Node])
     fieldType
   }
 

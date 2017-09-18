@@ -1,7 +1,6 @@
 package core.particles.path
 
 import core.particles.node.{Key, Node}
-import transformations.bytecode.constants.ConstantEntryKey
 
 case class PathRoot(current: Node) extends Path with Key {
 

@@ -5,7 +5,7 @@ import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node, NodeField}
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
-import transformations.javac.types.MethodTypeC.MethodTypeKey
+import transformations.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
 

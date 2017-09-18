@@ -3,9 +3,9 @@ package transformations.bytecode.types
 import core.bigrammar.{BiGrammar, Keyword, Labelled}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.ClassInfoConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeC extends TypeInstance with StackType {
@@ -71,9 +71,9 @@ object ObjectTypeC extends TypeInstance with StackType {
 
   override def getStackType(_type: Node, state: CompilationState): Node = {
     if (state.program.data.contains(ClassConstantPool))
-      stackObjectType(state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+      stackObjectType(state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get)) //TODO dit wegwerken en getClassRef weggooien.
     else
-      ObjectTypeKey.create(ObjectTypeName -> ClassRefConstant.classRef(ObjectTypeC.getObjectTypeName(_type).right.get))
+      ObjectTypeKey.create(ObjectTypeName -> ClassInfoConstant.classRef(ObjectTypeC.getObjectTypeName(_type).right.get))
     //TODO FIX THIS
   }
 

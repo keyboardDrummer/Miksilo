@@ -7,7 +7,7 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -62,8 +62,8 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(ClassFileKey, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
-      ClassParentIndex -> ClassRefConstant.key,
-      ClassNameIndexKey -> ClassRefConstant.key))
+      ClassParentIndex -> ClassInfoConstant.key,
+      ClassNameIndexKey -> ClassInfoConstant.key))
   }
 
   object ClassFileKey extends NodeClass

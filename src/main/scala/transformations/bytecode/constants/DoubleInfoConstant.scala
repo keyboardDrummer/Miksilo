@@ -6,7 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 
-object DoubleConstantEntryC extends ConstantEntry {
+object DoubleInfoConstant extends ConstantEntry {
 
   implicit class LongConstantEntry(node: Node) {
     def value: Long = node(DoubleEntryValue).asInstanceOf[Long]
@@ -18,7 +18,7 @@ object DoubleConstantEntryC extends ConstantEntry {
   object DoubleEntryValue extends NodeField
   override def key = DoubleEntryKey
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.longToBytes(constant.value)
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(6) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     ("double:" ~~> number).asNode(DoubleEntryKey, DoubleEntryValue)

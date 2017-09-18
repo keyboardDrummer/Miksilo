@@ -9,7 +9,7 @@ import transformations.javac.classes.{ClassCompiler, ClassOrObjectReference, Met
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MemberSelector
 import transformations.javac.methods.call.CallC.CallArgumentsGrammar
-import transformations.javac.types.MethodTypeC._
+import transformations.javac.types.MethodType._
 
 object CallC
 {

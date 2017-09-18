@@ -3,7 +3,7 @@ package transformations.bytecode.readJar
 import core.particles.node.Node
 import core.particles.{CompilationState, DeltaWithPhase}
 import transformations.bytecode.attributes.SignatureAttribute
-import transformations.bytecode.constants.ClassRefConstant
+import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
@@ -11,7 +11,7 @@ import transformations.javac.classes.{ConstantPool, FieldDeclaration}
 import transformations.javac.methods.MethodC
 import transformations.javac.methods.MethodC.{Visibility, DefaultVisibility}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.javac.types.{MethodTypeC, TypeAbstraction}
+import transformations.javac.types.{MethodType, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -19,7 +19,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
   override def transform(program: Node, state: CompilationState): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
-    val nameIndex = classReference(ClassRefConstant.ClassRefName).asInstanceOf[Int]
+    val nameIndex = classReference(ClassInfoConstant.ClassRefName).asInstanceOf[Int]
     val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
 //    val parentClassReference = constantPool.getNode(program(ByteCodeSkeleton.ClassParentIndex).asInstanceOf[Int])
@@ -62,8 +62,8 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
           (TypeAbstraction.getBody(_type),TypeAbstraction.getParameters(_type))
         else
           (_type,Seq.empty)
-      val returnType = methodType(MethodTypeC.ReturnType).asInstanceOf[Node]
-      val parameterTypes = methodType(MethodTypeC.Parameters).asInstanceOf[Seq[Node]]
+      val returnType = methodType(MethodType.ReturnType).asInstanceOf[Node]
+      val parameterTypes = methodType(MethodType.Parameters).asInstanceOf[Seq[Node]]
 	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
         MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 
