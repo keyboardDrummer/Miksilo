@@ -7,6 +7,7 @@ import core.particles.path.PathRoot
 import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants.ClassInfoConstant.{ClassRefKey, ClassRefName}
 import transformations.bytecode.constants.FieldRefConstant.{FieldRefClassIndex, FieldRefNameAndTypeIndex}
 import transformations.bytecode.constants.MethodRefConstant.{MethodRefClassName, MethodRefKey, MethodRefMethodName}
@@ -33,7 +34,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
-    val allFields: Map[NodeField, NodeClass] = constantReferences.values.reduce((a, b) => a ++ b)
+    val allFields: Map[NodeField, NodeClass] = constantReferences.values.reduce((a, b) => a ++ b) //TODO misschien toch wel de class meenemen an niet alleen de field key
 
     for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar)) {
       val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head

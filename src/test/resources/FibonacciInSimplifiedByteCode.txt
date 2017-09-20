@@ -6,7 +6,7 @@ fields:
 methods:
   method => nameIndex:"<init>", descriptorIndex:()V, flags:ACC_PUBLIC
   attributes:
-    code: nameIndex:Key2, maxLocal:1
+    code: nameIndex:"Code", maxLocal:1
     instructions:
       load address(0)
       invoke special(java.lang.Object."<init>" ()V)
@@ -15,7 +15,7 @@ methods:
     exceptions:
   method => nameIndex:"main", descriptorIndex:([Ljava/lang/String;)V, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
-    code: nameIndex:Key2, maxLocal:1
+    code: nameIndex:"Code", maxLocal:1
     instructions:
       get static(java.lang.System/"out" Ljava/io/PrintStream;)
       small integer constant(5)
@@ -26,7 +26,7 @@ methods:
     exceptions:
   method => nameIndex:"fibonacci", descriptorIndex:(I)I, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
-    code: nameIndex:Key2, maxLocal:1
+    code: nameIndex:"Code", maxLocal:1
     instructions:
       load integer(0)
       small integer constant(2)

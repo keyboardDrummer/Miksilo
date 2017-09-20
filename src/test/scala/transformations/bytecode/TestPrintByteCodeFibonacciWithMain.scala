@@ -1,7 +1,6 @@
 package transformations.bytecode
 
 import core.particles.node.Node
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
@@ -9,10 +8,10 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.constructor.SuperCallExpression
-import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.types.MethodType
 import util.TestUtils
 
@@ -81,14 +80,14 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
       MethodType.construct(VoidTypeC.voidType, Seq()),
-      CodeConstantEntry.entry,
+      CodeAttribute.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
       MethodType.construct(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
       fibonacciMethodName,
       MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
-      StackMapTableEntry.entry,
+      StackMapTableAttribute.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
       NameAndTypeConstant.nameAndType(7, 8),

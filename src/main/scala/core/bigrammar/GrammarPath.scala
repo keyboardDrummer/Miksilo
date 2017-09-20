@@ -1,50 +1,60 @@
 package core.bigrammar
 
-import util.{GraphBasics, ExtendedType, Property}
+import util.{ExtendedType, GraphBasics, Property}
+
+import scala.util.hashing.Hashing
 
 
 trait GrammarPath {
   def get: BiGrammar
-  def children: Seq[GrammarReference] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
-    val clazz: Class[_ <: BiGrammar] = get.getClass
-    new ExtendedType(clazz).properties.
+  lazy val children: Seq[GrammarReference] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
+    new ExtendedType(get.getClass).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
       map(property => {
         new GrammarReference(this, property.asInstanceOf[Property[BiGrammar, AnyRef]])
       })
   }
 
+  def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
-  def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this), path => path.children)
+  def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this),
+    path => path.children.filter(c => !path.ancestorGrammars.contains(c.get)))
 }
 
-class RootGrammar(value: BiGrammar) extends GrammarPath
+class RootGrammar(val value: BiGrammar) extends GrammarPath
 {
   override def get: BiGrammar = value
 
+
+  override def ancestorGrammars = Set(value)
+
   override def ancestors: Seq[GrammarPath] = Seq.empty
 
-  override def hashCode(): Int = 1 //TODO obj.hashCode
+  override def hashCode(): Int = value.hashCode()
 
-  override def equals(obj: Any): Boolean = obj.isInstanceOf[RootGrammar] //TODO && obj.equals..
+  override def equals(obj: Any): Boolean = obj match {
+    case other: RootGrammar => value.equals(other.value)
+    case _ => false
+  }
 }
 
 class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, AnyRef]) extends GrammarPath
 {
-  val parent = previous.get
+  val parent: BiGrammar = previous.get
 
   def set(value: BiGrammar): Unit = {
     property.set(parent, value)
   }
 
-  override def hashCode(): Int = parent.hashCode() * get.hashCode()
+  override def hashCode(): Int = Hashing.default.hash((previous.hashCode(), property.hashCode()))
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case other: GrammarReference => other.parent.equals(parent) && other.get.equals(get)
+    case other: GrammarReference =>
+      other.property.equals(property) && other.previous.equals(previous)
     case _ => false
   }
 
-  override def get: BiGrammar = {
+  lazy val get: BiGrammar = {
     property.get(parent).asInstanceOf[BiGrammar]
   }
   
@@ -65,4 +75,6 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
   override def toString = s"GrammarSelection($get)"
 
   override def ancestors: Seq[GrammarPath] = Seq(previous) ++ previous.ancestors
+
+  override def ancestorGrammars: Set[BiGrammar] = previous.ancestorGrammars + get
 }

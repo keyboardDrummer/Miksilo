@@ -5,6 +5,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -26,7 +27,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, CodeConstantEntry)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
                     instructions: Seq[Node],
@@ -61,11 +62,13 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
+  def constantEntry = Utf8Constant.create("Code")
+
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
-      AttributeNameKey -> CodeConstantEntry.key))
+      AttributeNameKey -> Utf8Constant.key))
   }
 
   def getCodeAttributeBytes(attribute: Node, state: CompilationState): Seq[Byte] = {

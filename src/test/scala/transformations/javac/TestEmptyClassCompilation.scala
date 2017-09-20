@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.particles.node.Node
 import org.scalatest.FunSuite
-import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
+import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
@@ -40,7 +40,7 @@ class TestEmptyClassCompilation extends FunSuite {
       ClassInfoConstant.classRef(12),
       Utf8Constant.create(SuperCallExpression.constructorName),
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
-      CodeConstantEntry.entry,
+      CodeAttribute.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
       QualifiedClassNameConstant.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
       QualifiedClassNameConstant.create(QualifiedClassName(Seq("java", "lang", "Object"))))

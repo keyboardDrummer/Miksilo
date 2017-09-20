@@ -7,7 +7,7 @@ import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
-import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, CodeConstantEntry}
+import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -94,7 +94,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val codeAttributes = Seq[Node]()
       val maxLocalCount: Int = getMethodCompiler(state).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
       val codeAttribute = new Node(CodeAttribute.CodeKey,
-        AttributeNameKey -> CodeConstantEntry.entry,
+        AttributeNameKey -> CodeAttribute.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
         CodeInstructionsKey -> instructions,
         CodeExceptionTableKey -> exceptionTable,

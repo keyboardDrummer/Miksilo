@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
-import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute, StackMapTableEntry}
+import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoC, InstructionC, InstructionSignature}
@@ -118,7 +118,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       locationAfterPreviousFrame = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableEntry.entry)
+      val nameIndex = constantPool.store(StackMapTableAttribute.entry)
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else

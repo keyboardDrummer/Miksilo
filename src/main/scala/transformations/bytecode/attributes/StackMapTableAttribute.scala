@@ -6,6 +6,7 @@ import core.particles.node.{Key, Node, NodeField}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.types.ObjectTypeC.ObjectTypeName
@@ -13,7 +14,8 @@ import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC, TypeSke
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, StackMapTableEntry)
+  def entry = Utf8Constant.create("StackMapTable")
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   object FrameOffset extends NodeField
 
@@ -66,7 +68,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(StackMapTableKey, Map(AttributeNameKey -> StackMapTableEntry.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(StackMapTableKey, Map(AttributeNameKey -> Utf8Constant.key))
   }
 
   def getStackMapTableBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
