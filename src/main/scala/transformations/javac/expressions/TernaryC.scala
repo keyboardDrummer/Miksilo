@@ -20,7 +20,7 @@ object TernaryC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
 
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseTernary = ((expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar).
       asNode(TernaryKey, ConditionKey, TrueKey, FalseKey)

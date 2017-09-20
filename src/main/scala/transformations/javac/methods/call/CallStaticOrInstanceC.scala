@@ -16,16 +16,16 @@ object CallStaticOrInstanceC extends GenericCall {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methodKey: MethodQuery = getMethodKey(call, compiler)
-    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
+    val methodRef = compiler.getMethodRefIndex(methodKey)
 
     val methodInfo = compiler.compiler.find(methodKey)
     val staticCall = methodInfo._static
     if (staticCall)
     {
-      CallStaticC.getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
+      CallStaticC.getInstructionsGivenMethodRefIndex(call, state, methodRef)
     } else
     {
-      CallInstanceC.getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
+      CallInstanceC.getInstructionsGivenMethodRefIndex(call, state, methodRef)
     }
   }
 }

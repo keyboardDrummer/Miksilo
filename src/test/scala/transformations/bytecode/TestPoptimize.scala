@@ -2,17 +2,17 @@ package transformations.bytecode
 
 import core.particles.CompilerFromParticles
 import core.particles.node.Node
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.{SmallIntegerConstantC, StoreIntegerC}
 import transformations.bytecode.coreInstructions.longs.PushLongC
 import transformations.bytecode.coreInstructions.{Pop2C, PopC, VoidReturnInstructionC}
+import transformations.bytecode.extraConstants.TypeConstant
+import transformations.bytecode.types.VoidTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import transformations.bytecode.types.VoidTypeC
-import transformations.javac.types.MethodTypeC
+import transformations.javac.types.MethodType
 
 class TestPoptimize extends FunSuite {
 
@@ -71,7 +71,7 @@ class TestPoptimize extends FunSuite {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.methodInfo(0, 1, Seq(codeAnnotation))
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq(MethodTypeC.construct(VoidTypeC.voidType,Seq.empty))), Seq(method))
+    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq(TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)))), Seq(method))
     val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)

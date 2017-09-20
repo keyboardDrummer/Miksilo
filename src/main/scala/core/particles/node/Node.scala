@@ -47,7 +47,7 @@ class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike {
 
   def apply(key: Any) = data(key)
 
-  def update(key: Any, value: Any) = {
+  def update(key: Any, value: Any): Unit = {
     value match //TODO maybe throw this check away.
     {
       case wrong: Path => throwInsertedWithOriginIntoRegularMetaObject()

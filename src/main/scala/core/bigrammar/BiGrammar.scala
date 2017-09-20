@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.document.{BlankLine, WhiteSpace}
 import core.grammar.{Grammar, PrintGrammar, ~}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeField}
 import core.responsiveDocument.ResponsiveDocument
 
 /*
@@ -155,7 +155,7 @@ case class Print(document: ResponsiveDocument) extends BiGrammar
 
 case class Produce(result: Any) extends BiGrammar
 
-case class As(var inner: BiGrammar, key: Key) extends BiGrammar
+case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 object Get extends BiGrammar
 
 object BiFailure extends BiGrammar

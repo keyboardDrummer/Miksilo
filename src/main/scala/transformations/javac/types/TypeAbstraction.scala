@@ -1,11 +1,11 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.DeltaWithGrammar
+import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
-import transformations.javac.types.MethodTypeC.MethodTypeKey
+import transformations.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
 
@@ -13,9 +13,9 @@ object TypeAbstraction extends DeltaWithGrammar {
   object Body extends Key
   object Parameters extends Key
   object ParameterKey extends Key
-  object ParameterName extends Key
-  object ParameterClassBound extends Key
-  object ParameterInterfaceBound extends Key
+  object ParameterName extends NodeField
+  object ParameterClassBound extends NodeField
+  object ParameterInterfaceBound extends NodeField
 
   def getBody(_type: Node): Node = {
     _type(TypeAbstraction.Body).asInstanceOf[Node]
@@ -26,7 +26,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   object TypeParametersGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     transformByteCodeGrammar(grammars)
     transformJavaGrammar(grammars)
   }

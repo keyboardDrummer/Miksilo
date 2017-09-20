@@ -1,7 +1,7 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.DeltaWithGrammar
+import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Key
 import transformations.bytecode.types.ObjectTypeC.ObjectTypeByteCodeGrammarInner
@@ -13,7 +13,7 @@ object TypeApplication extends DeltaWithGrammar {
   object TypeApplicationFunc extends Key
   object TypeApplicationArgument extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     transformByteCodeGrammars(grammars)
     transformJavaGrammars(grammars)
   }

@@ -33,7 +33,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
       case LabelKey => 0
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     grammars.findPathsToKey(CodeAttribute.MaxStackGrammar).head.removeMeFromSequence()
   }
 

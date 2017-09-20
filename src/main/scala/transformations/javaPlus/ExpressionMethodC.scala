@@ -16,7 +16,7 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
   object ExpressionMethodKey extends Key
   object ExpressionMethodExpression extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar)
     val parseStatic = grammars.find(MethodC.StaticGrammar)
     val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar)

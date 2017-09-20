@@ -1,15 +1,12 @@
 package transformations.bytecode.types
 
-import application.compilerCockpit.MarkOutputGrammar
 import core.bigrammar.TestGrammarUtils
 import core.particles.Delta
 import core.particles.node.Node
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.bytecode.attributes.CodeAttribute.CodeKey
-import transformations.bytecode.attributes.CodeConstantEntry.CodeAttributeId
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.skeleton.QualifiedClassName

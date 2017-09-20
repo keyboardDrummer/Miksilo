@@ -12,7 +12,7 @@ object WildcardImportC extends DeltaWithGrammar {
 
   def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val importPath = grammars.find(ImportPathGrammar)
     importPath.addOption((identifier.someSeparated(".") <~ ".*").asNode(WildcardImportKey, ElementsKey))
   }

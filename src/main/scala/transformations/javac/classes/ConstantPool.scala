@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.node.Node
-import transformations.bytecode.constants.{DoubleConstantEntryC, LongConstantEntryC, ClassRefConstant}
+import transformations.bytecode.constants.{DoubleInfoConstant, LongInfoConstant, ClassInfoConstant}
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 import scala.collection.mutable
@@ -17,7 +17,7 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
 
   def getClassRef(nameParts: QualifiedClassName): Int = {
     val nameIndex = store(nameParts)
-    store(ClassRefConstant.classRef(nameIndex))
+    store(ClassInfoConstant.classRef(nameIndex))
   }
 
   def store(ref: Any): Int = {
@@ -29,8 +29,8 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
     })
     ref match {
       case node:Node => node.clazz match {
-        case LongConstantEntryC.LongEntryKey => store(new Hole())
-        case DoubleConstantEntryC.DoubleEntryKey => store(new Hole())
+        case LongInfoConstant.LongEntryKey => store(new Hole())
+        case DoubleInfoConstant.DoubleEntryKey => store(new Hole())
         case _ =>
       }
       case _ =>

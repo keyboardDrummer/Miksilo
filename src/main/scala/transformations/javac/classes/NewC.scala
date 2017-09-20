@@ -17,7 +17,7 @@ object NewC extends ExpressionInstance {
   object NewCallKey extends Key
   object NewObject extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
     val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).

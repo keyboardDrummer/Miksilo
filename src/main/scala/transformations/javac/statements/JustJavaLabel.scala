@@ -22,7 +22,7 @@ object JustJavaLabel extends StatementInstance {
 
   object JavaLabelGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(grammars.create(JavaLabelGrammar, ("label" ~~> identifier <~ ";").asNode(LabelKey, Name)))
   }

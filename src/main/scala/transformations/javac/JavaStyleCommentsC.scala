@@ -2,18 +2,19 @@ package transformations.javac
 
 import core.bigrammar._
 import core.grammar.RegexG
-import core.particles.DeltaWithGrammar
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.Key
+import core.particles.node.NodeField
+import core.particles.{CompilationState, DeltaWithGrammar}
+
 import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
   case class CommentCollection(comments: Seq[String])
 
-  object CommentKey extends Key
+  object CommentKey extends NodeField
   object CommentGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants.

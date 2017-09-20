@@ -17,7 +17,7 @@ object WhileContinueC extends StatementInstance {
     Seq(LabelledLocations.goTo(startLabel))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey, Seq.empty))
   }

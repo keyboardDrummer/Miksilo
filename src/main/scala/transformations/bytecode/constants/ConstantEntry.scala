@@ -8,7 +8,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
 trait ConstantEntry extends DeltaWithGrammar {
-  def key: Any
+  def key: AnyRef
   def getByteCode(constant: Node, state: CompilationState): Seq[Byte]
 
   override def inject(state: CompilationState): Unit = {
@@ -16,9 +16,9 @@ trait ConstantEntry extends DeltaWithGrammar {
     ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val itemContent = grammars.find(ConstantPoolItemContentGrammar)
-    itemContent.addOption(getConstantEntryGrammar(grammars))
+    itemContent.addOption(grammars.create(key, getConstantEntryGrammar(grammars)))
   }
   
   def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar

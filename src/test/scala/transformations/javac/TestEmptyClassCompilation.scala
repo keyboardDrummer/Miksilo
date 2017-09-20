@@ -1,18 +1,18 @@
 package transformations.javac
 
 import core.particles.node.Node
-import org.junit.Test
 import org.scalatest.FunSuite
-import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
-import transformations.bytecode.constants.{ClassRefConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
 import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
-import transformations.javac.classes.ConstantPool
-import transformations.javac.constructor.SuperCallExpression
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
 import transformations.bytecode.types.VoidTypeC
-import transformations.javac.types.MethodTypeC
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.ConstantPool
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import transformations.javac.constructor.SuperCallExpression
+import transformations.javac.types.MethodType
 import util.TestUtils
 
 class TestEmptyClassCompilation extends FunSuite {
@@ -36,14 +36,14 @@ class TestEmptyClassCompilation extends FunSuite {
 
   def getEmptyClassByteCode: Node = {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
-      ClassRefConstant.classRef(11),
-      ClassRefConstant.classRef(12),
-      SuperCallExpression.constructorName,
-      MethodTypeC.construct(VoidTypeC.voidType, Seq()),
-      CodeConstantEntry.entry,
-      NameAndType.nameAndType(4, 5),
-      QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass")),
-      QualifiedClassName(Seq("java", "lang", "Object")))
+      ClassInfoConstant.classRef(11),
+      ClassInfoConstant.classRef(12),
+      Utf8Constant.create(SuperCallExpression.constructorName),
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
+      CodeAttribute.constantEntry,
+      NameAndTypeConstant.nameAndType(4, 5),
+      QualifiedClassNameConstant.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
+      QualifiedClassNameConstant.create(QualifiedClassName(Seq("java", "lang", "Object"))))
     )
     val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))

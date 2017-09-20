@@ -3,7 +3,7 @@ package transformations.bytecode.readJar
 import core.particles.node.Node
 import transformations.bytecode.attributes.UnParsedAttribute
 import transformations.bytecode.constants._
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeFieldInfo, PrintByteCode, ByteCodeSkeleton}
+import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import transformations.javac.classes.ConstantPool
 
 import scala.util.parsing.combinator.PackratParsers
@@ -76,7 +76,7 @@ object ClassFileParser extends ByteParsers with PackratParsers {
 
   def accessFlagParser: Parser[Short] = ParseShort
 
-  def classReferenceParser: Parser[Node] = ParseShort.map(s => ClassRefConstant.classRef(s))
+  def classReferenceParser: Parser[Node] = ParseShort.map(s => ClassInfoConstant.classRef(s))
 
   def fieldReferenceParser: Parser[Node] = for {
     classRefIndex <- ParseShort
@@ -99,13 +99,13 @@ object ClassFileParser extends ByteParsers with PackratParsers {
   def nameAndTypeParser: Parser[Node] = for {
     nameIndex <- ParseShort
     descriptorIndex <- ParseShort
-  } yield NameAndType.nameAndType(nameIndex, descriptorIndex)
+  } yield NameAndTypeConstant.nameAndType(nameIndex, descriptorIndex)
 
   def stringParser = ParseShort.map(index => StringConstant.construct(index))
 
-  def integerParser = ParseInteger.map(integer => IntegerConstant.construct(integer))
-  def longParser = ParseLong.map(long => LongConstantEntryC.construct(long))
-  def doubleParser = ParseDouble.map(double => DoubleConstantEntryC.construct(double))
+  def integerParser = ParseInteger.map(integer => IntegerInfoConstant.construct(integer))
+  def longParser = ParseLong.map(long => LongInfoConstant.construct(long))
+  def doubleParser = ParseDouble.map(double => DoubleInfoConstant.construct(double))
 
   case class ConstantParseResult(constant: Any, entriesConsumed: Int)
   def consumeOne(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 1))

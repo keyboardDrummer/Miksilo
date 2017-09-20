@@ -1,12 +1,11 @@
 package transformations.javac.classes
 
-import java.util
 import java.util.NoSuchElementException
 
 import core.particles.CompilationState
 import core.particles.node.Node
-import transformations.bytecode.ByteCodeSkeleton.ByteCode
-import transformations.bytecode.constants.{FieldRefConstant, MethodRefConstant, NameAndType}
+import transformations.bytecode.constants._
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
@@ -29,10 +28,6 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   for (member <- getState(state).members)
     member.bind(state, currentClassInfo, currentClass)
 
-  currentClass.constantPool = new ConstantPool()
-
-  def constantPool: ConstantPool = currentClass.constantPool
-
   lazy val classNames: Map[String, QualifiedClassName] = getClassMapFromImports(currentClass.imports)
 
   def findClass(className: String): ClassSignature = compiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
@@ -48,38 +43,34 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
     }
   }
 
-  def getMethodRefIndex(methodKey: MethodQuery): Int = {
-    val classRefIndex = constantPool.getClassRef(methodKey.className)
+  def getMethodRefIndex(methodKey: MethodQuery) = {
+    val classRef = ClassInfoConstant.classRef(methodKey.className)
     val nameAndTypeIndex = getMethodNameAndTypeIndex(methodKey)
-    constantPool.store(MethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex))
+    MethodRefConstant.methodRef(classRef, nameAndTypeIndex)
   }
 
-  def getMethodNameAndTypeIndex(methodKey: MethodQuery): Int = {
+  def getMethodNameAndTypeIndex(methodKey: MethodQuery) = {
     val methodNameIndex = getNameIndex(methodKey.methodName)
-    val descriptorIndex = constantPool.store(compiler.find(methodKey)._type)
-    val result: Node = NameAndType.nameAndType(methodNameIndex, descriptorIndex)
-    constantPool.store(result)
+    NameAndTypeConstant.nameAndType(methodNameIndex, TypeConstant.constructor(compiler.find(methodKey)._type))
   }
 
-  def getNameIndex(methodName: String): Int = {
-    constantPool.storeUtf8(methodName)
+  def getNameIndex(methodName: String) = {
+    Utf8Constant.create(methodName)
   }
 
-  def getFieldRefIndex(info: FieldInfo): Int = {
+  def getFieldRef(info: FieldInfo) = {
     val classRef = getClassRef(info.parent)
-    val fieldNameAndTypeIndex = getFieldNameAndTypeIndex(info)
-    constantPool.store(FieldRefConstant.fieldRef(classRef, fieldNameAndTypeIndex))
+    val fieldNameAndType = getFieldNameAndType(info)
+    FieldRefConstant.fieldRef(classRef, fieldNameAndType)
   }
 
-  def getClassRef(info: ClassSignature): Int = {
-    constantPool.getClassRef(info.getQualifiedName)
+  def getClassRef(info: ClassSignature) = {
+    ClassInfoConstant.classRef(info.getQualifiedName)
   }
 
-  def getFieldNameAndTypeIndex(info: FieldInfo): Int = {
-    val fieldNameIndex = constantPool.storeUtf8(info.name)
-    val typeIndex =   constantPool.store(info._type)
-    val result: Node = NameAndType.nameAndType(fieldNameIndex, typeIndex)
-    constantPool.store(result)
+  def getFieldNameAndType(info: FieldInfo) = {
+    val fieldNameIndex = Utf8Constant.create(info.name)
+    NameAndTypeConstant.nameAndType(fieldNameIndex, TypeConstant.constructor(info._type))
   }
 
   def findClass(objectType: Node): ClassSignature = {

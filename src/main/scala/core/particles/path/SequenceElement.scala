@@ -4,12 +4,12 @@ import core.particles.node.Node
 
 case class SequenceElement(parent: Path, field: Any, index: Int) extends OriginWithParent
 {
-  val current = parent.current(field).asInstanceOf[Seq[Node]](index)
+  val current: Node = parent.current(field).asInstanceOf[Seq[Node]](index)
   def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]
-  def next = sequence(index + 1)
-  def hasNext = sequence.length > (index + 1)
+  def next: Path = sequence(index + 1)
+  def hasNext: Boolean = sequence.length > (index + 1)
 
-  def replaceWith(replacements: Seq[Node]) = {
+  def replaceWith(replacements: Seq[Any]): Unit = {
     val originalSequence = parent.current(field).asInstanceOf[Seq[Path]]
     val newSequence = originalSequence.take(index) ++ replacements ++ originalSequence.drop(index + 1)
     parent.current(field) = newSequence
@@ -25,7 +25,7 @@ case class SequenceElement(parent: Path, field: Any, index: Int) extends OriginW
   }
 
 
-  override def replaceWith(replacement: Node): Unit = replaceWith(Seq(replacement))
+  override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
   override def pathAsString: String = s"${parent.pathAsString}.$field[$index]"
 }

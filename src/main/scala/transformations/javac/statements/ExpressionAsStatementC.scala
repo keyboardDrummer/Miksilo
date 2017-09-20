@@ -33,7 +33,7 @@ object ExpressionAsStatementC extends StatementInstance {
     statement(ExpressionKey).asInstanceOf[T]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val inner = expressionGrammar <~ ";"

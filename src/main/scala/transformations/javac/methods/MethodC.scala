@@ -1,34 +1,35 @@
 package transformations.javac.methods
 
-import core.bigrammar.{TopBottom, BiGrammar}
+import core.bigrammar.{BiGrammar, TopBottom}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.javac.classes.skeleton.JavaClassSkeleton._
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
-import transformations.bytecode.attributes.{CodeAttribute, CodeConstantEntry}
+import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
+import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
 import transformations.javac.statements.{BlockC, StatementSkeleton}
-import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
-import transformations.javac.types.{MethodTypeC, TypeAbstraction}
+import transformations.javac.types.{MethodType, TypeAbstraction}
 
 object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
   implicit class Method(node: Node) {
     def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]
-    def returnType_=(value: Node) = node(ReturnTypeKey) = value
+    def returnType_=(value: Node): Unit = node(ReturnTypeKey) = value
 
     def parameters: Seq[Node] = node(MethodParametersKey).asInstanceOf[Seq[Node]]
-    def parameters_=(value: Seq[Node]) = node(MethodParametersKey) = value
+    def parameters_=(value: Seq[Node]): Unit = node(MethodParametersKey) = value
   }
 
-  def compile(state: CompilationState, clazz: Node) = {
+  def compile(state: CompilationState, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -50,7 +51,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val methodName: String = MethodC.getMethodName(method)
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
-      val _type = MethodTypeC.construct(method.returnType, parameterTypes)
+      val _type = MethodType.construct(method.returnType, parameterTypes)
       val key = new MethodClassKey(methodName, parameterTypes.toVector)
       classInfo.methods(key) = new MethodInfo(_type, MethodC.getMethodStatic(method))
     }
@@ -67,19 +68,17 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   def getMethodDescriptor(method: Node, classCompiler: ClassCompiler): Node = {
     val returnType = getMethodReturnType(method)
     val parameters = getMethodParameters(method)
-    MethodTypeC.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    val methodType = MethodType.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+    TypeConstant.constructor(methodType)
   }
 
   def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
-    val constantPool = state.program.constantPool
-    def getMethodDescriptorIndex(method: Node): Int = constantPool.store(getMethodDescriptor(method, classCompiler))
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
-    val methodNameIndex: Int = classCompiler.getNameIndex(getMethodName(method))
-    method(ByteCodeMethodInfo.MethodNameIndex) = methodNameIndex
+    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8Constant.create(getMethodName(method))
     method.data.remove(MethodNameKey)
-    val methodDescriptorIndex = getMethodDescriptorIndex(method)
+    val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
     addCodeAnnotation(new PathRoot(method))
     method.data.remove(ReturnTypeKey)
@@ -91,12 +90,11 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       method.current.data.remove(MethodBodyKey)
       val statementToInstructions = StatementSkeleton.getToInstructions(state)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
-      val codeIndex = constantPool.store(CodeConstantEntry.entry)
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
       val maxLocalCount: Int = getMethodCompiler(state).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
       val codeAttribute = new Node(CodeAttribute.CodeKey,
-        AttributeNameKey -> codeIndex,
+        AttributeNameKey -> CodeAttribute.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
         CodeInstructionsKey -> instructions,
         CodeExceptionTableKey -> exceptionTable,
@@ -156,7 +154,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   object StaticGrammar
   object ReturnTypeGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue) {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)

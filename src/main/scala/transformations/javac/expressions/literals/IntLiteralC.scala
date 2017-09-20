@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.IntegerConstant
+import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantIntC, SmallIntegerConstantC}
 import transformations.bytecode.types.IntTypeC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -15,7 +15,7 @@ object IntLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
 
-  override def transformGrammars(grammars: GrammarCatalogue) = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
     val parseNumber = inner.asNode(IntLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -33,12 +33,11 @@ object IntLiteralC extends ExpressionInstance {
     }
     else
     {
-      val reference = state.program.constantPool.store(IntegerConstant.construct(value))
-      Seq(LoadConstantIntC.integerConstant(reference))
+      Seq(LoadConstantIntC.integerConstant(IntegerInfoConstant.construct(value)))
     }
   }
 
-  def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Int]
+  def getValue(literal: Node): Int = literal(ValueKey).asInstanceOf[Int]
 
   override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
 

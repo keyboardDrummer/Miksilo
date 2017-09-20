@@ -3,11 +3,10 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
-import transformations.bytecode.constants.LongConstantEntryC.LongEntryValue
 
-object DoubleConstantEntryC extends ConstantEntry {
+object DoubleInfoConstant extends ConstantEntry {
 
   implicit class LongConstantEntry(node: Node) {
     def value: Long = node(DoubleEntryValue).asInstanceOf[Long]
@@ -15,11 +14,11 @@ object DoubleConstantEntryC extends ConstantEntry {
 
   def construct(value: Double) = new Node(DoubleEntryKey, DoubleEntryValue -> value)
 
-  object DoubleEntryKey extends Key
-  object DoubleEntryValue extends Key
-  override def key: Any = DoubleEntryKey
+  object DoubleEntryKey extends NodeClass
+  object DoubleEntryValue extends NodeField
+  override def key = DoubleEntryKey
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.longToBytes(constant.value)
+  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(6) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     ("double:" ~~> number).asNode(DoubleEntryKey, DoubleEntryValue)

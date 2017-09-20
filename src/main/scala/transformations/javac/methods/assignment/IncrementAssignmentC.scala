@@ -14,7 +14,7 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
   def incrementAssignment(target: Node, value: Node) =
     new Node(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val assignmentGrammar = grammars.find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val incrementAssignmentGrammar = assignmentTarget ~~ ("+=" ~~> assignmentGrammar) asNode(IncrementAssignmentKey, TargetKey, ValueKey)

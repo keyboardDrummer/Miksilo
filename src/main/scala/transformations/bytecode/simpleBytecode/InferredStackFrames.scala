@@ -75,7 +75,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Generates a stack frame for each label instruction. " +
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val labelMapPath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
     val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]

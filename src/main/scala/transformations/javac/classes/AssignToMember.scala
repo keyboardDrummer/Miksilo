@@ -20,7 +20,7 @@ object AssignToMember extends DeltaWithGrammar {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: Path) => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
-      val fieldRefIndex = getFieldRefIndex(selector, compiler, classOrObjectReference)
+      val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
 
       val _object = MemberSelector.getSelectorObject(selector)
       val objectInstructions = ExpressionSkeleton.getToInstructions(state)(_object)
@@ -29,7 +29,7 @@ object AssignToMember extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val assignTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
 
     val variableGrammar = grammars.find(VariableC.VariableGrammar)

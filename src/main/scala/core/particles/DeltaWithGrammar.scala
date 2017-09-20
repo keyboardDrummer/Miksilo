@@ -3,7 +3,7 @@ package core.particles
 import core.bigrammar.{MapGrammar, _}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node.{Key, Node, NodeField, NodeLike}
 
 /*
 Used as a field key when mapping a grammar to a node, to indicate that value at this location is mapped not using a regular field key,
@@ -13,11 +13,11 @@ object FromMap extends Key
 
 trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
-  def transformGrammars(grammars: GrammarCatalogue)
+  def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    transformGrammars(state.grammarCatalogue)
+    transformGrammars(state.grammarCatalogue, state)
   }
 
   def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
@@ -38,7 +38,7 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
     }
 
     def asNode(key: Key, fields: Key*) = new NodeGrammar(grammar, key, fields.toSeq)
-    def as(field: Key) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
+    def as(field: NodeField) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }
 
   def nodeGrammar(inner: BiGrammar, key: Key, fields: Key*) = new NodeGrammar(inner, key, fields.toSeq)

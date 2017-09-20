@@ -21,12 +21,12 @@ object CallInstanceC extends GenericCall {
     getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
   }
 
-  def getInstructionsGivenMethodRefIndex(call: Path, state: CompilationState, methodRefIndex: Int): Seq[Node] = {
+  def getInstructionsGivenMethodRefIndex(call: Path, state: CompilationState, methodRef: Node): Seq[Node] = {
     val callCallee = CallC.getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val calleeInstructions = expressionToInstruction(objectExpression)
-    val invokeInstructions = Seq(InvokeVirtualC.invokeVirtual(methodRefIndex))
+    val invokeInstructions = Seq(InvokeVirtualC.invokeVirtual(methodRef))
     getGenericCallInstructions(call, state, calleeInstructions, invokeInstructions)
   }
 

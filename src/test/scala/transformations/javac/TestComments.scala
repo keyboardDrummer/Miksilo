@@ -3,17 +3,13 @@ package transformations.javac
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar.TestGrammarUtils
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.{CompilerFromParticles, DeltaWithGrammar}
-import org.junit.{Assert, Test}
+import core.particles.{CompilationState, CompilerFromParticles, DeltaWithGrammar}
+import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
-import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
-import transformations.javac.expressions.{ExpressionSkeleton, ParenthesisC, TernaryC}
-import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
-import transformations.javac.expressions.prefix.NotC
-import transformations.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
+import transformations.javac.expressions.literals.IntLiteralC
 import util.TestUtils
 
-import scala.reflect.io.{File, Path}
+import scala.reflect.io.Path
 
 class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
 
@@ -26,7 +22,7 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
 
   object ExpressionAsRoot extends DeltaWithGrammar
   {
-    override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+    override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
       grammars.create(ProgramGrammar, grammars.find(ExpressionSkeleton.ExpressionGrammar))
     }
 
@@ -102,7 +98,7 @@ class TestComments extends TestUtils(new CompilerFromParticles(Seq(JavaStyleComm
     assertResult("3")( output)
   }
 
-  test("javaToSimplified") {
+  test("comments are maintained in bytecode") {
     val initialCompiler = new CompilerFromParticles(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(new CompilerFromParticles(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("FibonacciWithComments.java"))

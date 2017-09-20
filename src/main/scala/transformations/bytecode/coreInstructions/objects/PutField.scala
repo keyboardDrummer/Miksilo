@@ -1,22 +1,24 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.CompilationState
-import core.particles.node.{Key, Node}
-import transformations.bytecode.PrintByteCode
-import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.{ByteCodeTypeException, InstructionC, InstructionSignature}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Key, Node, NodeClass, NodeField}
+import transformations.bytecode.constants.FieldRefConstant
+import transformations.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionC, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
+import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 object PutField extends InstructionC {
 
-  object PutFieldKey extends Key
+  object PutFieldKey extends NodeClass
+  object FieldRef extends NodeField
   override val key: Key = PutFieldKey
 
-  def putField(index: Int) = CodeAttribute.instruction(PutFieldKey, Seq(index))
+  def putField(index: Any) = PutFieldKey.create(FieldRef -> index)
 
+  override def getInstructionSize: Int = 3
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    val arguments = CodeAttribute.getInstructionArguments(instruction)
-    PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(arguments(0))
+    PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
@@ -32,4 +34,11 @@ object PutField extends InstructionC {
 
     new InstructionSignature(Seq.empty, Seq(valueType, objectType))
   }
+
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
+  }
+
+  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(FieldRef)
 }

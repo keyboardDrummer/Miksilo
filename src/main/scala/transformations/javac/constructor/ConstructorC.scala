@@ -50,7 +50,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   object ConstructorClassNameKey extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)

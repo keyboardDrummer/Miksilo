@@ -38,7 +38,7 @@ object AssignToVariable extends DeltaWithGrammar {
     }
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
     targetGrammar.addOption(variableGrammar)

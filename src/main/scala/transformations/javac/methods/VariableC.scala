@@ -17,7 +17,7 @@ object VariableC extends ExpressionInstance {
 
   def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val variableGrammar = grammars.create(VariableGrammar, nodeGrammar(identifier, VariableKey, VariableNameKey))
     core.addOption(variableGrammar)

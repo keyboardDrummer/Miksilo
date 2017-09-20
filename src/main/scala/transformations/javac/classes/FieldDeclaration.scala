@@ -3,7 +3,7 @@ package transformations.javac.classes
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
-import transformations.bytecode.constants.FieldDescriptorConstant
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.classes.skeleton.{ClassMemberC, ClassSignature, JavaClassSkeleton}
@@ -15,7 +15,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
   object FieldType extends Key
   object FieldName extends Key
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, FieldDescriptorConstant)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, TypeConstant)
 
   def field(_type: Node, name: String) = new Node(FieldKey, FieldType -> _type, FieldName -> name)
   
@@ -55,14 +55,13 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
   }
   
   def convertField(field: Node, classCompiler: ClassCompiler, state: CompilationState) {
-    val constantPool = classCompiler.constantPool
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
     field.clazz = ByteCodeFieldInfo.FieldKey
 
-    val fieldDescriptorIndex = constantPool.store(FieldDescriptorConstant.constructor(getFieldType(field)))
-    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptorIndex
+    val fieldDescriptor = TypeConstant.constructor(getFieldType(field))
+    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
     field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
     field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
 
@@ -70,7 +69,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     field.data.remove(FieldType)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 

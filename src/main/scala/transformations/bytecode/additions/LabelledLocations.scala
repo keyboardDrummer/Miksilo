@@ -3,12 +3,12 @@ package transformations.bytecode.additions
 import core.bigrammar.{BiGrammar, Consume}
 import core.grammar.StringLiteral
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
-import transformations.bytecode.attributes.StackMapTableAttribute.{offsetGrammarKey, StackMapFrameGrammar}
+import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
@@ -74,7 +74,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Node): Option[Any] = {
+    def processCodeAnnotation(codeAnnotation: Node): Unit = {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
@@ -118,7 +118,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       locationAfterPreviousFrame = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableAttribute.stackMapTableId)
+      val nameIndex = constantPool.store(StackMapTableAttribute.entry)
       Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
     }
     else
@@ -150,16 +150,16 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     override def description: String = "Used to mark a specific point in an instruction list."
   }
 
-  object LabelKey extends Key
+  object LabelKey extends NodeClass
 
-  object LabelName extends Key
+  object LabelName extends NodeField
 
-  object LabelStackFrame extends Key
+  object LabelStackFrame extends NodeField
 
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     overrideJumpGrammars(grammars)
     overrideStackMapFrameGrammars(grammars)
   }

@@ -1,21 +1,23 @@
 package transformations.bytecode
 
-import core.bigrammar.{BiGrammar, MapGrammar}
+import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, FromMap, DeltaWithGrammar}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
-  object MethodInfoKey extends Key
+  object MethodInfoKey extends NodeClass
 
-  object MethodNameIndex extends Key
+  object MethodNameIndex extends NodeField
 
-  object MethodDescriptorIndex extends Key
+  object MethodDescriptorIndex extends NodeField
 
-  object MethodAttributes extends Key
+  object MethodAttributes extends NodeField
 
   def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[Node], flags: Set[MethodAccessFlag] = Set()) =
     new Node(MethodInfoKey,
@@ -35,6 +37,8 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8Constant.key,
+      MethodDescriptorIndex -> Utf8Constant.key))
   }
 
   def getMethodByteCode(methodInfo: Node, state: CompilationState) = {
@@ -45,7 +49,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     }
 
   object MethodsGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2).as(ClassMethodsKey))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
@@ -58,12 +62,12 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
     val methodHeader: BiGrammar = Seq[BiGrammar]("method =>" ~~
-      "nameIndex:" ~> integer,
-      "descriptorIndex:" ~> integer,
-      "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet).
+      "nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(MethodNameIndex),
+      "descriptorIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptorIndex),
+      "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey)).
       reduce((l, r) => (l <~ ",") ~~ r)
-    val inner = methodHeader % attributesGrammar
-    val methodInfoGrammar: BiGrammar = nodeGrammar(inner, MethodInfoKey, MethodNameIndex, MethodDescriptorIndex, AccessFlagsKey, MethodAttributes)
+    val inner = methodHeader % attributesGrammar.as(MethodAttributes)
+    val methodInfoGrammar: BiGrammar = inner.asNode(MethodInfoKey)
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 

@@ -19,9 +19,9 @@ object CallStaticC extends GenericCall {
     getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
   }
 
-  def getInstructionsGivenMethodRefIndex(call: Path, state: CompilationState, methodRefIndex: Int): Seq[Node] = {
+  def getInstructionsGivenMethodRefIndex(call: Path, state: CompilationState, methodRef: Node): Seq[Node] = {
     val calleeInstructions = Seq[Node]()
-    val invokeInstructions = Seq(InvokeStaticC.invokeStatic(methodRefIndex))
+    val invokeInstructions = Seq(InvokeStaticC.invokeStatic(methodRef))
     getGenericCallInstructions(call, state, calleeInstructions, invokeInstructions)
   }
 

@@ -3,17 +3,17 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 
-object IntegerConstant extends ConstantEntry {
+object IntegerInfoConstant extends ConstantEntry {
 
-  object IntegerKey extends Key
-  object IntegerValue extends Key
+  object IntegerKey extends NodeClass
+  object IntegerValue extends NodeField
 
   def construct(index: Int) = new Node(IntegerKey, IntegerValue -> index)
 
-  override def key: Any = IntegerKey
+  override def key = IntegerKey
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(3) ++
     PrintByteCode.intToBytes(constant(IntegerValue).asInstanceOf[Int])

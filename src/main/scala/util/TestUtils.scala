@@ -220,7 +220,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem =>
         ComparisonOptions(compareIntegers = false,takeAllLeftKeys = false,takeAllRightKeys = true).deepEquality(compiledItem, expectedItem))
       hasEquivalent
-    }))
+    }), s"${expectedConstantPoolSet} was not ${compiledConstantPoolSet}")
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {

@@ -1,6 +1,6 @@
 package transformations.bytecode.attributes
 
-import core.particles.DeltaWithGrammar
+import core.particles.{CompilationState, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
@@ -21,7 +21,7 @@ object UnParsedAttribute extends DeltaWithGrammar {
   object UnParsedAttributeName extends Key
   object UnParsedAttributeData extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val grammar = "UnParsed attribute with nameIndex:" ~~> integer asNode(UnParsedAttributeKey, UnParsedAttributeName)
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }

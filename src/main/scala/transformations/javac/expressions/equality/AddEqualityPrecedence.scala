@@ -1,14 +1,14 @@
 package transformations.javac.expressions.equality
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Contract, DeltaWithGrammar}
+import core.particles.{CompilationState, Contract, DeltaWithGrammar}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddEqualityPrecedence extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  override def transformGrammars(grammars: GrammarCatalogue) = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val equalityGrammar = grammars.create(EqualityExpressionGrammar, expressionGrammar.inner)
     expressionGrammar.inner = equalityGrammar

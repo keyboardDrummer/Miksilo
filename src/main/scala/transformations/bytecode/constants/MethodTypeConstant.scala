@@ -3,14 +3,16 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
+import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodTypeConstant extends ConstantEntry {
 
-  object MethodTypeConstantKey extends Key
-  object MethodTypeDescriptorIndex extends Key
-  override def key: Any = MethodTypeConstantKey
+  object MethodTypeConstantKey extends NodeClass
+  object MethodTypeDescriptorIndex extends NodeField
+  override def key = MethodTypeConstantKey
 
   def construct(descriptorIndex: Int) = new Node(MethodTypeConstantKey, MethodTypeDescriptorIndex -> descriptorIndex)
 
@@ -18,8 +20,13 @@ object MethodTypeConstant extends ConstantEntry {
     byteToBytes(16) ++ shortToBytes(constant(MethodTypeDescriptorIndex).asInstanceOf[Int])
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = ("method type constant:" ~~> integer).
-    asNode(MethodTypeConstantKey, MethodTypeDescriptorIndex)
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8Constant.key))
+  }
+
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    ("method type:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex)).asNode(MethodTypeConstantKey)
 
   override def description: String = "Add the method type constant"
 }

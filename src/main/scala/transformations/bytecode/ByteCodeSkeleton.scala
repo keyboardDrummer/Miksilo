@@ -1,12 +1,14 @@
 package transformations.bytecode
 
-import core.bigrammar.{BiGrammar, Consume, UndefinedDestructuringValue}
-import core.document.{BlankLine, Empty}
+import core.bigrammar.BiGrammar
+import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node}
-import transformations.bytecode.attributes.ByteCodeAttribute
+import core.particles.node.{Key, Node, NodeClass, NodeField}
+import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
+import transformations.bytecode.constants.ClassInfoConstant
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 
@@ -51,27 +53,33 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   class State {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new ClassRegistry[ByteCodeAttribute]
+    val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
   }
 
-  object AttributeKey
 
-  object AttributeNameKey extends Key
+  override def inject(state: CompilationState): Unit = {
+    super.inject(state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(ClassFileKey, Map(
+      //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
+      ClassParentIndex -> ClassInfoConstant.key,
+      ClassNameIndexKey -> ClassInfoConstant.key))
+  }
 
-  object ClassFileKey extends Key
+  object ClassFileKey extends NodeClass
 
-  object ClassMethodsKey extends Key
+  object ClassMethodsKey extends NodeField
 
-  object ClassNameIndexKey extends Key
+  object ClassNameIndexKey extends NodeField
 
-  object ClassParentIndex extends Key
+  object ClassParentIndex extends NodeField
 
-  object ClassConstantPool extends Key
+  object ClassConstantPool extends NodeField
 
-  object ClassInterfaces extends Key
+  object ClassInterfaces extends NodeField
 
-  object ClassFields extends Key
+  object ClassFields extends NodeField
 
-  object ClassAttributes extends Key
+  object ClassAttributes extends NodeField
 
   private object EnrichedClassConstantEntry extends Key
 
@@ -84,13 +92,14 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   object AttributeGrammar
   object MembersGrammar
   object AttributesGrammar
-  override def transformGrammars(grammars: GrammarCatalogue): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+    val constantIndexGrammar = grammars.create(ConstantPoolIndexGrammar, integer)
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
-    val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (number *).inParenthesis
-    val classIndexGrammar: BiGrammar = "class" ~~> integer
-    val parseIndexGrammar: BiGrammar = "extends" ~~> integer
+    val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (constantIndexGrammar *).inParenthesis
+    val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
+    val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
     val attributesGrammar = grammars.create(AttributesGrammar, "attributes:" %> attributeGrammar.manyVertical.indent())
     val membersGrammar = grammars.create(MembersGrammar, print(Empty))
     val classGrammar = grammars.create(ClassFileKey,

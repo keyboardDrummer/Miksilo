@@ -26,14 +26,17 @@ trait NodeLike {
     result
   }
 
-  def visit(beforeChildren: Self => Unit, visited: mutable.Set[Self] = new mutable.HashSet[Self]()) = {
+  def visit(afterChildren: (Self) => Unit = _ => {},
+            beforeChildren: (Self) => Boolean = _ => true,
+            visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
 
     transformNode(this.asInstanceOf[Self])
     def transformNode(node: Self): Unit = {
       if (!visited.add(node))
         return
 
-      beforeChildren(node)
+      if (!beforeChildren(node))
+        return
 
       val children = node.dataView.values
       for(child <- children)
@@ -49,6 +52,8 @@ trait NodeLike {
           case _ =>
         }
       }
+
+      afterChildren(node)
     }
   }
 }
