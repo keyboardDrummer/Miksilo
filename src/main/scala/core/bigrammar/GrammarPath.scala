@@ -76,5 +76,5 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
 
   override def ancestors: Seq[GrammarPath] = Seq(previous) ++ previous.ancestors
 
-  override def ancestorGrammars: Set[BiGrammar] = previous.ancestorGrammars + get
+  lazy val ancestorGrammars: Set[BiGrammar] = previous.ancestorGrammars + get
 }

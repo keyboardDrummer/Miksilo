@@ -13,7 +13,6 @@ trait ConstantEntry extends DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantTypes.put(key, this)
     ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
   }
 

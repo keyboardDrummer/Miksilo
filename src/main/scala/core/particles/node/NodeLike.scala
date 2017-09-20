@@ -26,10 +26,6 @@ trait NodeLike {
     result
   }
 
-  def visitOld(beforeChildren: Self => Unit): Unit = {
-    visit(beforeChildren)
-  }
-
   def visit(afterChildren: (Self) => Unit = _ => {},
             beforeChildren: (Self) => Boolean = _ => true,
             visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
