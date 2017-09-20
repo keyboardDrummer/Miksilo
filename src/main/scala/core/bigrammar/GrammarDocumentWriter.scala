@@ -16,13 +16,13 @@ trait GrammarDocumentWriter {
 
   def failure: BiGrammar = BiFailure
 
-  def produce(value: Any): BiGrammar = new Produce(value)
+  def produce(value: Any): BiGrammar = new ValueGrammar(value)
 
   def space: BiGrammar = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)
 
-  implicit def consume(grammar: Grammar): BiGrammar = new Consume(grammar)
+  implicit def consume(grammar: Grammar): BiGrammar = new FromIdentityGrammar(grammar)
 
   implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 

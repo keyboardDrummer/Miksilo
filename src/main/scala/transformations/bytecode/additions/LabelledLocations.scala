@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{BiGrammar, Consume}
+import core.bigrammar.{BiGrammar, FromIdentityGrammar}
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
@@ -176,7 +176,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(KeyGrammar(jump.key))
-      grammar.inner = jump.name ~> Consume(StringLiteral).manySeparated(",").inParenthesis.as(InstructionArgumentsKey) asNode jump.key
+      grammar.inner = jump.name ~> FromIdentityGrammar(StringLiteral).manySeparated(",").inParenthesis.as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }

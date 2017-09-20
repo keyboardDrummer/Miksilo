@@ -25,8 +25,8 @@ class BiGrammarToPrinter {
 
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
-      case Consume(StringLiteral) => Try("\"" + withMap.value + "\"")
-      case Consume(consume) => Try(withMap.value.toString)
+      case FromIdentityGrammar(StringLiteral) => Try("\"" + withMap.value + "\"")
+      case FromIdentityGrammar(consume) => Try(withMap.value.toString)
       case Keyword(keyword, _) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled => labelToDocument(withMap, labelled)
@@ -36,7 +36,7 @@ class BiGrammarToPrinter {
       case topBottom: TopBottom => foldProduct(withMap, topBottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
       case mapGrammar: MapGrammar => mapGrammarToDocument(withMap, mapGrammar)
       case BiFailure => failureToGrammar(withMap, grammar)
-      case Produce(producedValue) => produceToDocument(withMap, grammar, producedValue)
+      case ValueGrammar(producedValue) => produceToDocument(withMap, grammar, producedValue)
       case Print(document) => Try(document)
       case As(inner, key) => if (withMap.state.contains(key)) toDocumentCached(WithMap(withMap.state(key), withMap.state), inner) else Try(Empty)
     }
