@@ -1,12 +1,11 @@
 package core.particles
 
 import core.bigrammar.{BiGrammarToGrammar, Labelled}
-import core.grammar.{ParseException, GrammarToParserConverter}
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.grammar.{GrammarToParserConverter, ParseException}
 
 import scala.util.parsing.input.CharArrayReader
 
-class ParticlesToParserConverter extends GrammarToParserConverter {
+class DeltasToParserConverter extends GrammarToParserConverter {
   def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
     val programGrammar: Labelled = new CompilerFromParticles(transformations).getGrammar
     buildParser(programGrammar)

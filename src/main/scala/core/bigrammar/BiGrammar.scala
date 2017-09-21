@@ -103,10 +103,11 @@ case class Delimiter(value: String) extends BiGrammar
 case class Keyword(value: String, reserved: Boolean = true) extends BiGrammar
 
 /**
-  * Takes a grammar that does not transform the input it consumes,
+  * Takes a grammar for parsing, and uses toString for printing.
   * so the result of the grammar is exactly what has been consumed.
+  * @verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
-case class FromIdentityGrammar(grammar: Grammar) extends BiGrammar
+case class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = false) extends BiGrammar
 
 abstract class Many(var inner: BiGrammar) extends BiGrammar
 {

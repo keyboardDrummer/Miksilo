@@ -6,7 +6,7 @@ import java.io.InputStream
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
 import core.particles.node.Node
-import core.particles.{CompilerFromParticles, ParticlesToParserConverter}
+import core.particles.{CompilerFromParticles, DeltasToParserConverter}
 import org.junit.{Assert, Ignore, Test}
 import org.scalatest.FunSuite
 import transformations.bytecode.types.TypeSkeleton
@@ -24,7 +24,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildState
 
-    val manager = new ParticlesToParserConverter()
+    val manager = new DeltasToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
   }
 
@@ -33,7 +33,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildState
 
-    val manager = new ParticlesToParserConverter()
+    val manager = new DeltasToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
@@ -42,7 +42,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildState
 
-    val manager = new ParticlesToParserConverter()
+    val manager = new DeltasToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
@@ -51,7 +51,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildState
 
-    val manager = new ParticlesToParserConverter()
+    val manager = new DeltasToParserConverter()
     val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 

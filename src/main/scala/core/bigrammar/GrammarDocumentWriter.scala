@@ -22,7 +22,7 @@ trait GrammarDocumentWriter {
 
   def keyword(word: String): BiGrammar = new Keyword(word)
 
-  implicit def consume(grammar: Grammar): BiGrammar = new FromIdentityGrammar(grammar)
+  implicit def consume(grammar: Grammar): BiGrammar = new FromGrammarWithToString(grammar)
 
   implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 

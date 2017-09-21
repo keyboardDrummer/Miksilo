@@ -4,9 +4,10 @@ import java.util.Objects
 
 import core.bigrammar._
 import core.document.Empty
-import core.grammar.{StringLiteral, ~}
+import core.grammar.{GrammarToParserConverter, StringLiteral, ~}
 import core.responsiveDocument.ResponsiveDocument
 
+import scala.util.parsing.input.CharArrayReader
 import scala.util.{Failure, Success, Try}
 
 object BiGrammarToPrinter {
@@ -25,8 +26,18 @@ class BiGrammarToPrinter {
 
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
-      case FromIdentityGrammar(StringLiteral) => Try("\"" + withMap.value + "\"")
-      case FromIdentityGrammar(consume) => Try(withMap.value.toString)
+      case FromGrammarWithToString(StringLiteral, _) => Try("\"" + withMap.value + "\"") //TODO remove this and create a BiStringLiteral
+      case FromGrammarWithToString(consume, verifyWhenPrinting) =>
+        val string = withMap.value.toString
+        if (!verifyWhenPrinting)
+          Success(string)
+        else {
+          val parseResult = new GrammarToParserConverter().convert(consume)(new CharArrayReader(string.toCharArray))
+          if (parseResult.successful)
+            Success(string)
+          else
+            fail("From identity grammar could not parse string")
+        }
       case Keyword(keyword, _) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled => labelToDocument(withMap, labelled)

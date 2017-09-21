@@ -4,29 +4,29 @@ class Fibonacci extends java.lang.Object with interfaces: ()
 fields:
 
 methods:
-  method => nameIndex:"<init>", descriptorIndex:()V, flags:ACC_PUBLIC
+  method => nameIndex:<init>, descriptorIndex:()V, flags:ACC_PUBLIC
   attributes:
-    code: nameIndex:"Code", maxLocal:1
+    code: nameIndex:Code, maxLocal:1
     instructions:
       load address(0)
-      invoke special(java.lang.Object."<init>" ()V)
+      invoke special(java.lang.Object.<init> ()V)
       void return instruction()
     attributes:
     exceptions:
-  method => nameIndex:"main", descriptorIndex:([Ljava/lang/String;)V, flags:ACC_STATIC, ACC_PUBLIC
+  method => nameIndex:main, descriptorIndex:([Ljava/lang/String;)V, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
-    code: nameIndex:"Code", maxLocal:1
+    code: nameIndex:Code, maxLocal:1
     instructions:
-      get static(java.lang.System/"out" Ljava/io/PrintStream;)
+      get static(java.lang.System/out Ljava/io/PrintStream;)
       small integer constant(5)
-      invoke static(Fibonacci."fibonacci" (I)I)
-      invoke virtual(java.io.PrintStream."print" (I)V)
+      invoke static(Fibonacci.fibonacci (I)I)
+      invoke virtual(java.io.PrintStream.print (I)V)
       void return instruction()
     attributes:
     exceptions:
-  method => nameIndex:"fibonacci", descriptorIndex:(I)I, flags:ACC_STATIC, ACC_PUBLIC
+  method => nameIndex:fibonacci, descriptorIndex:(I)I, flags:ACC_STATIC, ACC_PUBLIC
   attributes:
-    code: nameIndex:"Code", maxLocal:1
+    code: nameIndex:Code, maxLocal:1
     instructions:
       load integer(0)
       small integer constant(2)
@@ -37,11 +37,11 @@ methods:
       load integer(0)
       small integer constant(1)
       subtract integer()
-      invoke static(Fibonacci."fibonacci" (I)I)
+      invoke static(Fibonacci.fibonacci (I)I)
       load integer(0)
       small integer constant(2)
       subtract integer()
-      invoke static(Fibonacci."fibonacci" (I)I)
+      invoke static(Fibonacci.fibonacci (I)I)
       add integers()
       label("end4437113781045784766")
       integer return instruction()
