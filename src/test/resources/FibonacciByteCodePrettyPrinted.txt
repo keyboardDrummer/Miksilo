@@ -1,34 +1,34 @@
 class 5 extends 25 with interfaces: ()
 
 constant pool:
-  #1: java.lang.Object
-  #2: Fibonacci
-  #3: "fibonacci"
-  #4: (I)I
-  #5: class reference: 2
-  #6: name and type: 3:4
-  #7: method reference: 5.6
-  #8: "Code"
-  #9: "print"
-  #10: (I)V
-  #11: java.io.PrintStream
-  #12: class reference: 11
-  #13: name and type: 9:10
-  #14: method reference: 12.13
-  #15: "out"
-  #16: Ljava/io/PrintStream;
-  #17: java.lang.System
-  #18: class reference: 17
-  #19: name and type: 15:16
-  #20: field reference: 18.19
-  #21: "main"
-  #22: ([Ljava/lang/String;)V
-  #23: "<init>"
-  #24: ()V
-  #25: class reference: 1
-  #26: name and type: 23:24
-  #27: method reference: 25.26
-  #28: "StackMapTable"
+  #1: Utf8 java/lang/Object
+  #2: Utf8 Fibonacci
+  #3: Utf8 fibonacci
+  #4: Utf8 (I)I
+  #5: Class 2
+  #6: NameAndType 3:4
+  #7: Methodref 5.6
+  #8: Utf8 Code
+  #9: Utf8 print
+  #10: Utf8 (I)V
+  #11: Utf8 java/io/PrintStream
+  #12: Class 11
+  #13: NameAndType 9:10
+  #14: Methodref 12.13
+  #15: Utf8 out
+  #16: Utf8 Ljava/io/PrintStream;
+  #17: Utf8 java/lang/System
+  #18: Class 17
+  #19: NameAndType 15:16
+  #20: Fieldref field reference: 18.19
+  #21: Utf8 main
+  #22: Utf8 ([Ljava/lang/String;)V
+  #23: Utf8 <init>
+  #24: Utf8 ()V
+  #25: Class 1
+  #26: NameAndType 23:24
+  #27: Methodref 25.26
+  #28: Utf8 StackMapTable
 
 fields:
 

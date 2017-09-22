@@ -29,7 +29,7 @@ object BiGrammarToGrammar {
           else
             mapGrammar.construct
         )
-      case BiFailure => core.grammar.FailureG()
+      case BiFailure(message) => core.grammar.FailureG(message)
       case Print(document) => core.grammar.Produce(Unit) ^^ addState //TODO really want unit here?
       case ValueGrammar(value) => core.grammar.Produce(value) ^^ addState
       case As(inner, key) => recursive(inner) ^^

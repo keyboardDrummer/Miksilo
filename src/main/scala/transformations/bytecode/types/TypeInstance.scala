@@ -4,10 +4,9 @@ import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
-import transformations.bytecode.constants.ConstantEntry
-import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.ByteCodeSkeleton
 
-trait TypeInstance extends DeltaWithGrammar with ConstantEntry {
+trait TypeInstance extends DeltaWithGrammar {
   val key: Key
 
   override def inject(state: CompilationState): Unit = {
@@ -24,10 +23,6 @@ trait TypeInstance extends DeltaWithGrammar with ConstantEntry {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
-    PrintByteCode.toUTF8ConstantEntry(TypeSkeleton.getByteCodeString(state)(constant))
-  }
-
   def byteCodeGrammarKey = KeyGrammar(key)
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
@@ -38,12 +33,7 @@ trait TypeInstance extends DeltaWithGrammar with ConstantEntry {
     val byteCodeGrammar = grammars.create(byteCodeGrammarKey, getByteCodeGrammar(grammars))
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     byteCodeType.addOption(byteCodeGrammar)
-    super.transformGrammars(grammars, state)
   }
 
   def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar
-
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    "T" ~> grammars.find(byteCodeGrammarKey)
-  }
 }

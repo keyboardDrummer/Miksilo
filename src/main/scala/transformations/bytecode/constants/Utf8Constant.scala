@@ -23,4 +23,6 @@ object Utf8Constant extends ConstantEntry {
       StringLiteral : BiGrammar).as(Value).asNode(Utf8ConstantKey)
 
   override def description: String = "A string constant"
+
+  override def getName = "Utf8"
 }

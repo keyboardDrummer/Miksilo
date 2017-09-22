@@ -23,7 +23,7 @@ class GrammarCatalogue {
     }
   }
 
-  def create(key: AnyRef, inner: BiGrammar = BiFailure): Labelled = {
+  def create(key: AnyRef, inner: BiGrammar = BiFailure()): Labelled = {
     val result = new Labelled(key, inner)
     grammars += key -> result
     result

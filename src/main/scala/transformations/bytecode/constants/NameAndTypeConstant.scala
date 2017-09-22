@@ -43,9 +43,11 @@ object NameAndTypeConstant extends ConstantEntry {
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("name and type:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(NameAndTypeName) <~ ":") ~
+    ((grammars.find(ConstantPoolIndexGrammar).as(NameAndTypeName) <~ ":") ~
       grammars.find(ConstantPoolIndexGrammar).as(NameAndTypeType)).
     asNode(NameAndTypeKey)
 
   override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."
+
+  override def getName = "NameAndType"
 }

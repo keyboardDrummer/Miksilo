@@ -8,6 +8,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
 import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -79,14 +80,14 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       ClassInfoConstant.classRef(24),
       ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
-      MethodType.construct(VoidTypeC.voidType, Seq()),
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
       CodeAttribute.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
-      MethodType.construct(VoidTypeC.voidType, Seq(
-        ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))))),
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(
+        ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
-      MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType)),
+      TypeConstant.constructor(MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType))),
       StackMapTableAttribute.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
@@ -100,10 +101,10 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream"))),
+      TypeConstant.constructor(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
-      MethodType.construct(VoidTypeC.voidType, Seq(IntTypeC.intType))
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(IntTypeC.intType)))
     )
     new ConstantPool(constantPool)
   }

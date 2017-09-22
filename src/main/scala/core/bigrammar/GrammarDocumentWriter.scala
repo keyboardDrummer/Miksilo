@@ -14,7 +14,7 @@ trait GrammarDocumentWriter {
 
   def integer = number ^^ ((s: Any) => Integer.parseInt(s.asInstanceOf[String]), (i: Any) => Some(i.toString))
 
-  def failure: BiGrammar = BiFailure
+  def failure: BiGrammar = BiFailure()
 
   def produce(value: Any): BiGrammar = new ValueGrammar(value)
 

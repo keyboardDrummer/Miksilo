@@ -29,7 +29,7 @@ class CompilationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
-  grammarCatalogue.create(ProgramGrammar, BiFailure)
+  grammarCatalogue.create(ProgramGrammar, BiFailure())
   var program: Node = null
   var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = null

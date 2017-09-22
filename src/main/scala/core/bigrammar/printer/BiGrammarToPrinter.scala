@@ -46,7 +46,7 @@ class BiGrammarToPrinter {
       case sequence: Sequence => foldProduct(withMap, sequence, (left, right) => left ~ right)
       case topBottom: TopBottom => foldProduct(withMap, topBottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
       case mapGrammar: MapGrammar => mapGrammarToDocument(withMap, mapGrammar)
-      case BiFailure => failureToGrammar(withMap, grammar)
+      case BiFailure(message) => failureToGrammar(message, withMap, grammar)
       case ValueGrammar(producedValue) => produceToDocument(withMap, grammar, producedValue)
       case Print(document) => Try(document)
       case As(inner, key) => if (withMap.state.contains(key)) toDocumentCached(WithMap(withMap.state(key), withMap.state), inner) else Try(Empty)
@@ -55,7 +55,7 @@ class BiGrammarToPrinter {
     nestError(result)
   }
 
-  def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {
+  def failureToGrammar(message: String, value: Any, grammar: BiGrammar): Failure[Nothing] = {
     fail("encountered failure", -10000)
   }
 

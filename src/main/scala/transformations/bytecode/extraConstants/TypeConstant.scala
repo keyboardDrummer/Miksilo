@@ -49,4 +49,6 @@ object TypeConstant extends ConstantEntry {
   }
 
   override def description: String = "Adds the field descriptor constant. It contains the type of a field."
+
+  override def getName = "Utf8" //TODO do I want this?
 }

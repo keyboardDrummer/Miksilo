@@ -141,7 +141,7 @@ class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruc
   override def children = Seq(inner)
 } //TODO deze nog wat meer typed maken met WithState
 
-class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGrammar {
+class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
   def addOption(addition: BiGrammar) {
     inner = inner | addition
@@ -168,4 +168,4 @@ case class ValueGrammar(value: Any) extends BiGrammar
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 
-object BiFailure extends BiGrammar
+case class BiFailure(message: String = "") extends BiGrammar
