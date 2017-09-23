@@ -1,6 +1,7 @@
 package transformations.bytecode
 
 import core.bigrammar.BiGrammar
+import core.document.BlankLine
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
@@ -51,7 +52,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   object MethodsGrammar
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
-    val methods = grammars.create(MethodsGrammar, "methods:" %> methodInfoGrammar.manyVertical.indent(2).as(ClassMethodsKey))
+    val methods = grammars.create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = membersGrammar.inner %% methods
   }
@@ -59,15 +60,18 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   object AccessFlagGrammar
   object MethodInfoGrammar
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(AttributesGrammar)
-    val parseAccessFlag = grammars.create(AccessFlagGrammar, "ACC_PUBLIC" ~> produce(PublicAccess) | "ACC_STATIC" ~> produce(StaticAccess) | "ACC_PRIVATE" ~> produce(PrivateAccess))
-    val methodHeader: BiGrammar = Seq[BiGrammar]("method =>" ~~
-      "nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(MethodNameIndex),
-      "descriptorIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptorIndex),
-      "flags:" ~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey)).
-      reduce((l, r) => (l <~ ",") ~~ r)
-    val inner = methodHeader % attributesGrammar.as(MethodAttributes)
-    val methodInfoGrammar: BiGrammar = inner.asNode(MethodInfoKey)
+    val attributesGrammar = grammars.find(AttributesGrammar).as(MethodAttributes)
+    val parseAccessFlag = grammars.create(AccessFlagGrammar,
+        "ACC_PUBLIC" ~> produce(PublicAccess) |
+        "ACC_STATIC" ~> produce(StaticAccess) |
+        "ACC_PRIVATE" ~> produce(PrivateAccess))
+
+    val methodInfoGrammar: BiGrammar = "Method;" %>
+      ("name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
+      "descriptor:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptorIndex) %
+      "flags:" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
+      attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
+
     grammars.create(MethodInfoGrammar, methodInfoGrammar)
   }
 

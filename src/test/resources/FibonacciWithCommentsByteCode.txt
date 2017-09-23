@@ -1,86 +1,89 @@
 class 5 extends 25 with interfaces: ()
 
-constant pool:
-  #1: java.lang.Object
-  #2: Fibonacci
-  #3: "fibonacci"
-  #4: (I)I
-  #5: class reference: 2
-  #6: name and type: 3:4
-  #7: method reference: 5.6
-  #8: "Code"
-  #9: "print"
-  #10: (I)V
-  #11: java.io.PrintStream
-  #12: class reference: 11
-  #13: name and type: 9:10
-  #14: method reference: 12.13
-  #15: "out"
-  #16: Ljava/io/PrintStream;
-  #17: java.lang.System
-  #18: class reference: 17
-  #19: name and type: 15:16
-  #20: field reference: 18.19
-  #21: "main"
-  #22: ([Ljava/lang/String;)V
-  #23: "<init>"
-  #24: ()V
-  #25: class reference: 1
-  #26: name and type: 23:24
-  #27: method reference: 25.26
-  #28: "StackMapTable"
+Constant pool:
+  Utf8 java/lang/Object
+  Utf8 Fibonacci
+  Utf8 fibonacci
+  Utf8 (I)I
+  Class 2
+  NameAndType 3:4
+  Methodref 5.6
+  Utf8 Code
+  Utf8 print
+  Utf8 (I)V
+  Utf8 java/io/PrintStream
+  Class 11
+  NameAndType 9:10
+  Methodref 12.13
+  Utf8 out
+  Utf8 Ljava/io/PrintStream;
+  Utf8 java/lang/System
+  Class 17
+  NameAndType 15:16
+  Fieldref field reference: 18.19
+  Utf8 main
+  Utf8 ([Ljava/lang/String;)V
+  Utf8 <init>
+  Utf8 ()V
+  Class 1
+  NameAndType 23:24
+  Methodref 25.26
+  Utf8 StackMapTable
+{
 
-fields:
+  Method;
+    name:23
+    descriptor:24
+    flags:ACC_PUBLIC
+    Code:
+      name:8, maxStack:1, maxLocal:1
+        load address(0)
+        invoke special(27)
+        void return instruction()
+      exceptions:
 
-methods:
-  method => nameIndex:23, descriptorIndex:24, flags:ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:1, maxLocal:1
-    instructions:
-      load address(0)
-      invoke special(27)
-      void return instruction()
-    attributes:
-    exceptions:
+  Method;
   /* hello */
   /* bye */
   /* PS */
-  method => nameIndex:21, descriptorIndex:22, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:2, maxLocal:1
-    instructions:
-      get static(20)
-      small integer constant(5)
-      invoke static(7)
-      invoke virtual(14)
-      void return instruction()
-    attributes:
-    exceptions:
-  method => nameIndex:3, descriptorIndex:4, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:3, maxLocal:1
-    instructions:
-      load integer(0)
-      /* here comes two */
-      small integer constant(2)
-      if integer compare greater or equal(7)
-      small integer constant(1)
-      goto(16)
-      load integer(0)
-      small integer constant(1)
-      subtract integer()
-      invoke static(7)
-      load integer(0)
-      small integer constant(2)
-      subtract integer()
-      invoke static(7)
-      add integers()
-      integer return instruction()
-    attributes:
+    name:21
+    descriptor:22
+    flags:ACC_STATIC, ACC_PUBLIC
+    Code:
+      name:8, maxStack:2, maxLocal:1
+        get static(20)
+        small integer constant(5)
+        invoke static(7)
+        invoke virtual(14)
+        void return instruction()
+      exceptions:
+
+  Method;
+    name:3
+    descriptor:4
+    flags:ACC_STATIC, ACC_PUBLIC
+    Code:
+      name:8, maxStack:3, maxLocal:1
+        load integer(0)
+        /* here comes two */
+        small integer constant(2)
+        if integer compare greater or equal(7)
+        small integer constant(1)
+        goto(16)
+        load integer(0)
+        small integer constant(1)
+        subtract integer()
+        invoke static(7)
+        load integer(0)
+        small integer constant(2)
+        subtract integer()
+        invoke static(7)
+        add integers()
+        integer return instruction()
       stackMap nameIndex:28
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int
-    exceptions:
+      exceptions:
 
-attributes:
+}

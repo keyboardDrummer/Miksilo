@@ -124,18 +124,19 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object MaxStackGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
+    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, ("," ~~> "maxStack:" ~> integer).as(CodeMaxStackKey))
-    val maxLocalGrammar = ("," ~~> "maxLocal:" ~> integer).as(CodeMaxLocalsKey)
-    val header: BiGrammar = ("code: nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)) ~ maxStackGrammar ~ maxLocalGrammar
-    val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
-    val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val codeAttributeGrammar = header %
-      instructionsGrammar.as(CodeInstructionsKey) %
-      attributesGrammar.as(CodeAttributesKey) %
-      exceptionTableGrammar.as(CodeExceptionTableKey) asNode CodeKey
-    grammars.create(CodeGrammar, codeAttributeGrammar)
+    val maxStackGrammar = grammars.create(MaxStackGrammar, "stack:" ~> integer.as(CodeMaxStackKey))
+    val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
+    val nameGrammar = "name:" ~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(CodeInstructionsKey)
+    val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
+    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ "," ~~ maxLocalGrammar %
+      instructionsGrammar %
+      attributesGrammar %
+      exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
+    val codeGrammar: BiGrammar = ("Code:" %> body).asNode(CodeKey)
+    grammars.create(CodeGrammar, codeGrammar)
   }
 
   override def constantPoolKey: String = "Code"
