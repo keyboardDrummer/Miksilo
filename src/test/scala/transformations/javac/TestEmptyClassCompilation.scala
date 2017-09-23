@@ -4,8 +4,8 @@ import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants._
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
+import transformations.bytecode.coreInstructions.{InvokeSpecialDelta$, VoidReturnInstructionDelta$}
 import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
 import transformations.bytecode.types.VoidTypeC
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -45,7 +45,7 @@ class TestEmptyClassCompilation extends FunSuite {
       QualifiedClassNameConstant.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
       QualifiedClassNameConstant.create(QualifiedClassName(Seq("java", "lang", "Object"))))
     )
-    val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(LoadAddressDelta$.addressLoad(0), InvokeSpecialDelta$.invokeSpecial(1), VoidReturnInstructionDelta$.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCodeMethodInfo.methodInfo(3, 4, codeAttribute, Set(ByteCodeMethodInfo.PublicAccess))
     ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))

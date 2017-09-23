@@ -4,15 +4,15 @@ import core.particles.node.{Key, Node}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta$
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroDelta$
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 object NotInstructionC extends ExpandInstruction {
 
   def not = CodeAttribute.instruction(NotInstructionKey)
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfZeroC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfZeroDelta$)
 
   object NotInstructionKey extends Key
 
@@ -22,10 +22,10 @@ object NotInstructionC extends ExpandInstruction {
     val falseStartLabel = state.getUniqueLabel("falseStart")
     val endLabel = state.getUniqueLabel("end")
     Seq(LabelledLocations.ifZero(falseStartLabel),
-      SmallIntegerConstantC.integerConstant(0),
+      SmallIntegerConstantDelta$.integerConstant(0),
       LabelledLocations.goTo(endLabel),
       InferredStackFrames.label(falseStartLabel),
-      SmallIntegerConstantC.integerConstant(1),
+      SmallIntegerConstantDelta$.integerConstant(1),
       InferredStackFrames.label(endLabel))
   }
 

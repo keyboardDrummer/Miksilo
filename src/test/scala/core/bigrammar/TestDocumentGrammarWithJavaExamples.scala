@@ -5,7 +5,7 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.particles.grammars.GrammarCatalogue
 import core.particles.{CompilerFromParticles, Delta}
 import org.scalatest.{FunSpec, FunSuite}
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.{ExpressionSkeleton, TernaryC}
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}

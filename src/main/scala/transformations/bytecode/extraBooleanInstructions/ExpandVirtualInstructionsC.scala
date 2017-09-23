@@ -5,7 +5,7 @@ import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantC
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta$
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 

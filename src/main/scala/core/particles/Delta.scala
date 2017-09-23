@@ -4,7 +4,7 @@ import core.particles.node.Key
 
 trait Delta extends Contract with Key {
 
-  def inject(state: CompilationState) = {  }
+  def inject(state: CompilationState): Unit = {  }
 
   final def dependencies2: Set[Delta] = dependencies.collect({case x: Delta => x})
 

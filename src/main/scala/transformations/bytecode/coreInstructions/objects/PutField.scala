@@ -4,11 +4,11 @@ import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.constants.FieldRefConstant
-import transformations.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionC, InstructionSignature}
+import transformations.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
-object PutField extends InstructionC {
+object PutField extends InstructionDelta {
 
   object PutFieldKey extends NodeClass
   object FieldRef extends NodeField
