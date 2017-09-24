@@ -41,7 +41,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
     val fieldGrammar = "Field" ~> ("name:" ~> constantIndex.as(NameIndex) %
       ("descriptor" ~> integer.as(DescriptorIndex)) %
       attributesGrammar.as(FieldAttributes)).asNode(FieldKey)
-    val parseFields = fieldGrammar.manySeparatedVertical(BlankLine).as(ClassFields)
+    val parseFields = (fieldGrammar <~ BlankLine).manyVertical.as(ClassFields)
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~ membersGrammar.inner

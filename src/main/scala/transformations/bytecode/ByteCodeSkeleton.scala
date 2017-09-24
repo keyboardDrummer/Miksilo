@@ -96,9 +96,9 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
     val attributesGrammar = grammars.create(AttributesGrammar, attributeGrammar.manyVertical)
     val membersGrammar = grammars.create(MembersGrammar, print(Empty))
-    val bodyGrammar = "{" % (membersGrammar %% attributesGrammar.as(ClassAttributes)).indent() % "}"
+    val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
     val classGrammar = grammars.create(ClassFileKey,
-      (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %%
+      (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
         constantPool.as(ClassConstantPool) % bodyGrammar).asNode(ClassFileKey))
 
     program.inner = classGrammar

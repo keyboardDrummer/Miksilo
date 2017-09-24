@@ -38,7 +38,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
-    LabelDelta$.inject(state)
+    LabelDelta.inject(state)
   }
 
   def transform(program: Node, state: CompilationState): Unit = {
@@ -131,7 +131,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
 
-  object LabelDelta$ extends InstructionDelta {
+  object LabelDelta extends InstructionDelta {
     override val key: Key = LabelKey
 
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()

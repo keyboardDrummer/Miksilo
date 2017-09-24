@@ -35,7 +35,7 @@ class CompilationState {
   var parse: InputStream => Node = null
 
   var random = new Random(0)
-  def getUniqueLabel(prefix: String) = prefix + getGUID
+  def getUniqueLabel(prefix: String): String = prefix + getGUID
 
   def getGUID: Long = random.nextLong()
 

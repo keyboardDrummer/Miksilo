@@ -54,7 +54,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = membersGrammar.inner %% methods
+    membersGrammar.inner = membersGrammar.inner % methods
   }
 
   object AccessFlagGrammar
