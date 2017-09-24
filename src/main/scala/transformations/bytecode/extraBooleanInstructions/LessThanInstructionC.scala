@@ -16,9 +16,9 @@ object LessThanInstructionC extends ExpandInstruction {
 
   override val key = LessThanInstructionKey
 
-  override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
-    val trueLabel = state.getUniqueLabel("true")
-    val endLabel = state.getUniqueLabel("end")
+  override def expand(instruction: Node, methodInfo: Node, state: CompilationState): Seq[Node] = {
+    val trueLabel = LabelledLocations.getUniqueLabel("true", methodInfo, state)
+    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
     Seq(LabelledLocations.ifIntegerCompareLess(trueLabel),
       SmallIntegerConstantDelta.integerConstant(0),
       LabelledLocations.goTo(endLabel),

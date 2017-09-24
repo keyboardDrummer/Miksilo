@@ -1,8 +1,10 @@
 package transformations.javac.statements
 
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
+import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import transformations.bytecode.additions.LabelledLocations
+import transformations.javac.methods.MethodC
 import transformations.javac.statements.ForLoopC.ForLoop
 
 import scala.collection.mutable
@@ -29,7 +31,8 @@ object ForLoopContinueC extends DeltaWithPhase {
 
   def transformForLoop(forLoopPath: Path, state: CompilationState): String = {
     val forLoop = forLoopPath.current
-    val beforeIncrementLabel = state.getUniqueLabel("beforeIncrement")
+    val method = forLoopPath.findAncestorClass(MethodC.MethodKey)
+    val beforeIncrementLabel = LabelledLocations.getUniqueLabel("beforeIncrement", method, state)
     forLoop(ForLoopC.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel
   }

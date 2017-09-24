@@ -5,7 +5,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -19,7 +19,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
   }
   
-  def getMethods(clazz: Node) = clazz(ClassMethodsKey).asInstanceOf[Seq[Node]]
+  def getMethods[T <: NodeLike](clazz: T) = clazz(ClassMethodsKey).asInstanceOf[Seq[T]]
 
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
 

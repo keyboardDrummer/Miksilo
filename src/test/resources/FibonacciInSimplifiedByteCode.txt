@@ -32,10 +32,10 @@ class Fibonacci extends java/lang/Object with interfaces: ()
       locals:1
         iload 0
         iconst 2
-        if_icmpge "false-4962768465676381896"
+        if_icmpge "<false>"
         iconst 1
-        goto "end4437113781045784766"
-        label "false-4962768465676381896"
+        goto "<end>"
+        label "<false>"
         iload 0
         iconst 1
         isub
@@ -45,7 +45,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
         isub
         invokestatic Fibonacci.fibonacci (I)I
         iadd
-        label "end4437113781045784766"
+        label "<end>"
         ireturn
       Exceptions:
 }

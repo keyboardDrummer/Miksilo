@@ -3,7 +3,8 @@ package transformations.bytecode.attributes
 import core.bigrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
+import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
@@ -87,7 +88,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   }
 
 
-  def getCodeAnnotations(clazz: Node): Seq[Node] = {
+  def getCodeAnnotations[T <: NodeLike](clazz: T): Seq[T] = {
     ByteCodeSkeleton.getMethods(clazz)
       .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)

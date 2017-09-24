@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeField, NodeLike}
 import core.particles.path.{Path, SequenceElement}
+import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -13,8 +14,9 @@ object WhileC extends StatementInstance with WithState {
   override val key: Key = WhileKey
 
   override def toByteCode(_while: Path, state: CompilationState): Seq[Node] = {
-    val startLabel = state.getUniqueLabel("start")
-    val endLabel = state.getUniqueLabel("end")
+    val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val startLabel = LabelledLocations.getUniqueLabel("start", methodInfo, state)
+    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
 
     val conditionInstructions = ExpressionSkeleton.getToInstructions(state)(getCondition(_while))
     getState(state).whileStartLabels += _while.current -> startLabel

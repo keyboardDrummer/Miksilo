@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
+import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.bytecode.types.TypeSkeleton
@@ -61,10 +62,11 @@ object TernaryC extends ExpressionInstance {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
-    val falseLabelName = state.getUniqueLabel("false")
+    val methodInfo = _ternary.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val falseLabelName = LabelledLocations.getUniqueLabel("false", methodInfo, state)
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
-    val endLabelName = state.getUniqueLabel("end")
+    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, state)
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledLocations.goTo(endLabelName)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)

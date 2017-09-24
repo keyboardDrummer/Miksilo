@@ -18,9 +18,9 @@ object NotInstructionC extends ExpandInstruction {
 
   override val key = NotInstructionKey
 
-  override def expand(instruction: Node, state: CompilationState): Seq[Node] = {
-    val falseStartLabel = state.getUniqueLabel("falseStart")
-    val endLabel = state.getUniqueLabel("end")
+  override def expand(instruction: Node, methodInfo: Node, state: CompilationState): Seq[Node] = {
+    val falseStartLabel = LabelledLocations.getUniqueLabel("falseStart", methodInfo, state)
+    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
     Seq(LabelledLocations.ifZero(falseStartLabel),
       SmallIntegerConstantDelta.integerConstant(0),
       LabelledLocations.goTo(endLabel),

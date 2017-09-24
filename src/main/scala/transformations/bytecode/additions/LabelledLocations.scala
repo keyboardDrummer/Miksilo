@@ -19,7 +19,7 @@ import transformations.javac.classes.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
+object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithState {
   def ifZero(target: String) = instruction(IfZeroDelta.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
@@ -35,6 +35,24 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def label(name: String, stackFrame: Node) = new Node(LabelKey,
     LabelName -> name,
     LabelStackFrame -> stackFrame)
+
+
+  override def createState = mutable.Map.empty
+  type State = mutable.Map[Node, mutable.Set[String]]
+
+  def getUniqueLabel(suggestion: String, methodInfo: Node, state: CompilationState): String = {
+    val methodCounters = getState(state)
+    val taken: mutable.Set[String] = methodCounters.getOrElse(methodInfo, mutable.Set.empty)
+    var result = suggestion
+    var increment = 0
+    while(taken.contains(result))
+    {
+      increment += 1
+      result = suggestion + "_" + increment
+    }
+    taken.add(result)
+    "<" + result + ">"
+  }
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -68,7 +86,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     val clazz = program
     val constantPool = clazz.constantPool
-    val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)
+    val codeAnnotations = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
