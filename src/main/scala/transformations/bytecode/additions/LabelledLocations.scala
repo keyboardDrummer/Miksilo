@@ -12,7 +12,7 @@ import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrame
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
-import transformations.bytecode.coreInstructions.{GotoDelta$, InstructionDelta, InstructionSignature}
+import transformations.bytecode.coreInstructions.{GotoDelta, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.javac.classes.ConstantPool
 
@@ -20,17 +20,17 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
-  def ifZero(target: String) = instruction(IfZeroDelta$.IfZeroKey, Seq(target))
+  def ifZero(target: String) = instruction(IfZeroDelta.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
-  def goTo(target: String) = instruction(GotoDelta$.GoToKey, Seq(target))
+  def goTo(target: String) = instruction(GotoDelta.GoToKey, Seq(target))
 
-  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualDelta$.IfIntegerCompareGreaterEqualKey, Seq(target))
-  def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessDelta$.key, Seq(target))
+  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualDelta.IfIntegerCompareGreaterEqualKey, Seq(target))
+  def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessDelta.key, Seq(target))
   def ifIntegerCompareGreater(target: String) = instruction(IfIntegerCompareGreaterDelta$.key, Seq(target))
-  def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualDelta$.key, Seq(target))
-  def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualDelta$.key, Seq(target))
-  def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualDelta$.key, Seq(target))
+  def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualDelta.key, Seq(target))
+  def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualDelta.key, Seq(target))
+  def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualDelta.key, Seq(target))
 
   def label(name: String, stackFrame: Node) = new Node(LabelKey,
     LabelName -> name,
@@ -129,7 +129,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   def getLabelName(label: Node) = label(LabelName).asInstanceOf[String]
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta$, GotoDelta$, IfZeroDelta$)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
 
   object LabelDelta$ extends InstructionDelta {
     override val key: Key = LabelKey
@@ -144,10 +144,13 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
-      name ~> StringLiteral.inParenthesis.as(LabelName) % stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
+      grammarName ~~> (StringLiteral : BiGrammar).as(LabelName) %
+        stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
     override def description: String = "Used to mark a specific point in an instruction list."
+
+    override def grammarName: String = "label"
   }
 
   object LabelKey extends NodeClass
@@ -170,13 +173,13 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def overrideJumpGrammars(grammars: GrammarCatalogue) = {
-    val jumps = Seq[InstructionDelta](IfZeroDelta$, IfNotZero, GotoDelta$,
-      IfIntegerCompareGreaterOrEqualDelta$,
-      IfIntegerCompareLessDelta$, IfIntegerCompareEqualDelta$, IfIntegerCompareNotEqualDelta$)
+    val jumps = Seq[InstructionDelta](IfZeroDelta, IfNotZero, GotoDelta,
+      IfIntegerCompareGreaterOrEqualDelta,
+      IfIntegerCompareLessDelta, IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
     for(jump <- jumps)
     {
       val grammar = grammars.find(KeyGrammar(jump.key))
-      grammar.inner = jump.name ~> FromGrammarWithToString(StringLiteral).manySeparated(",").inParenthesis.as(InstructionArgumentsKey) asNode jump.key
+      grammar.inner = jump.grammarName ~~> FromGrammarWithToString(StringLiteral).manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }

@@ -7,8 +7,8 @@ import org.scalatest.FunSuite
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta$
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta$, LoadIntegerDelta$, SmallIntegerConstantDelta$, StoreIntegerDelta$}
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.bytecode.types.IntTypeC
@@ -30,13 +30,13 @@ class TestByteCodeGoTo extends FunSuite {
 
   def getExpectedJumpWhile: Node = {
     val instructions = Seq(
-      SmallIntegerConstantDelta$.integerConstant(0),
-      StoreIntegerDelta$.integerStore(0),
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(3),
-      IfIntegerCompareGreaterOrEqualDelta$.ifIntegerCompareGreater(9),
-      IncrementIntegerDelta$.integerIncrement(0, 1),
-      GotoDelta$.goTo(-8))
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
+      IfIntegerCompareGreaterOrEqualDelta.ifIntegerCompareGreater(9),
+      IncrementIntegerDelta.integerIncrement(0, 1),
+      GotoDelta.goTo(-8))
 
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
@@ -46,14 +46,14 @@ class TestByteCodeGoTo extends FunSuite {
 
   def getLabelledJumpWhile: Node = {
     val instructions = Seq(
-      SmallIntegerConstantDelta$.integerConstant(0),
-      StoreIntegerDelta$.integerStore(0),
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
       LabelledLocations.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(3),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
       LabelledLocations.ifIntegerCompareGreaterEquals("end"),
-      IncrementIntegerDelta$.integerIncrement(0, 1),
+      IncrementIntegerDelta.integerIncrement(0, 1),
       LabelledLocations.goTo("start"),
       LabelledLocations.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )

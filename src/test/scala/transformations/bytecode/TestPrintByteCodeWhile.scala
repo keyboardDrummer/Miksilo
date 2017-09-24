@@ -5,9 +5,9 @@ import org.scalatest.FunSuite
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta$
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta$, LoadIntegerDelta$, SmallIntegerConstantDelta$, StoreIntegerDelta$}
-import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
@@ -48,9 +48,9 @@ class TestPrintByteCodeWhile extends FunSuite {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeMethodInfo.methodInfo(4, 5, Seq(
       CodeAttribute.codeAttribute(6, 1, 1, Seq(
-        LoadAddressDelta$.addressLoad(0),
-        InvokeSpecialDelta$.invokeSpecial(1),
-        VoidReturnInstructionDelta$.voidReturn
+        LoadAddressDelta.addressLoad(0),
+        InvokeSpecialDelta.invokeSpecial(1),
+        VoidReturnInstructionDelta.voidReturn
       ), Seq(), Seq(lineNumberTable))))
     constructor
   }
@@ -65,14 +65,14 @@ class TestPrintByteCodeWhile extends FunSuite {
     val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
-      SmallIntegerConstantDelta$.integerConstant(0),
-      StoreIntegerDelta$.integerStore(0),
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(3),
-      IfIntegerCompareGreaterOrEqualDelta$.ifIntegerCompareGreater(9),
-      IncrementIntegerDelta$.integerIncrement(0, 1),
-      GotoDelta$.goTo(-8),
-      VoidReturnInstructionDelta$.voidReturn
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
+      IfIntegerCompareGreaterOrEqualDelta.ifIntegerCompareGreater(9),
+      IncrementIntegerDelta.integerIncrement(0, 1),
+      GotoDelta.goTo(-8),
+      VoidReturnInstructionDelta.voidReturn
     ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     _while
   }

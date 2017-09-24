@@ -126,12 +126,12 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, "stack:" ~> integer.as(CodeMaxStackKey))
+    val maxStackGrammar = grammars.create(MaxStackGrammar, "," ~~ "stack:" ~> integer.as(CodeMaxStackKey))
     val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
-    val nameGrammar = "name:" ~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val nameGrammar = produce(constantEntry).as(AttributeNameKey)
     val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(CodeInstructionsKey)
     val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
-    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ "," ~~ maxLocalGrammar %
+    val body = (nameGrammar ~ maxStackGrammar ~ maxLocalGrammar %
       instructionsGrammar %
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()

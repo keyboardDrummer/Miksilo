@@ -5,9 +5,9 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta$
-import transformations.bytecode.coreInstructions.objects.StoreAddressDelta$
-import transformations.bytecode.coreInstructions.{Duplicate2InstructionDelta$, DuplicateInstructionDelta$}
+import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
+import transformations.bytecode.coreInstructions.objects.StoreAddressDelta
+import transformations.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateInstructionDelta}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MethodC
 import transformations.bytecode.types.TypeSkeleton
@@ -18,7 +18,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   def getAssignmentValue[T <: NodeLike](assignment: T) = assignment(AssignmentValue).asInstanceOf[T]
 
-  override def dependencies: Set[Contract] = Set(MethodC, StoreAddressDelta$, StoreIntegerDelta$, AssignmentPrecedence)
+  override def dependencies: Set[Contract] = Set(MethodC, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure())
@@ -58,8 +58,8 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
     val valueType = ExpressionSkeleton.getType(state)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, state) match
     {
-      case 1 => DuplicateInstructionDelta$.duplicate
-      case 2 =>  Duplicate2InstructionDelta$.duplicate
+      case 1 => DuplicateInstructionDelta.duplicate
+      case 2 =>  Duplicate2InstructionDelta.duplicate
     }
     valueInstructions ++ Seq(duplicateInstruction) ++ assignInstructions
   }

@@ -6,15 +6,15 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
-import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta$
-import transformations.bytecode.coreInstructions.longs.PushLongDelta$
+import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
+import transformations.bytecode.coreInstructions.longs.PushLongDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.LongTypeC
 
 object LongLiteralC extends ExpressionInstance {
   val key = LongLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta$)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
   def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
@@ -28,7 +28,7 @@ object LongLiteralC extends ExpressionInstance {
   def literal(value: Long) = new Node(LongLiteralKey, ValueKey -> value)
 
   override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
-    Seq(PushLongDelta$.constant(getValue(literal).toInt))
+    Seq(PushLongDelta.constant(getValue(literal).toInt))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Long]

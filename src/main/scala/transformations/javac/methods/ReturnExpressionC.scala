@@ -4,17 +4,17 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta$
-import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta$
-import transformations.bytecode.coreInstructions.longs.LongReturnInstructionDelta$
-import transformations.bytecode.coreInstructions.objects.AddressReturnInstructionDelta$
+import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
+import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
+import transformations.bytecode.coreInstructions.longs.LongReturnInstructionDelta
+import transformations.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import transformations.bytecode.types._
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 
 object ReturnExpressionC extends StatementInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionDelta$)
+  override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionDelta)
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
@@ -24,11 +24,11 @@ object ReturnExpressionC extends StatementInstance {
     val getType = ExpressionSkeleton.getType(compiler.state)
     returnValueInstructions ++ (getType(returnValue) match
     {
-      case x if x == IntTypeC.intType => Seq(IntegerReturnInstructionDelta$.integerReturn)
-      case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta$.longReturn)
-      case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta$.create)
-      case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta$.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeC.rootObjectType) => Seq(AddressReturnInstructionDelta$.create)
+      case x if x == IntTypeC.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
+      case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta.longReturn)
+      case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
+      case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
+      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeC.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
   }

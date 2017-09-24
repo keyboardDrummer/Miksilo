@@ -3,7 +3,7 @@ package transformations.javac.methods.call
 import core.particles.node.Node
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
-import transformations.bytecode.coreInstructions.InvokeVirtualDelta$
+import transformations.bytecode.coreInstructions.InvokeVirtualDelta
 import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
@@ -26,9 +26,9 @@ object CallInstanceC extends GenericCall {
     val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val calleeInstructions = expressionToInstruction(objectExpression)
-    val invokeInstructions = Seq(InvokeVirtualDelta$.invokeVirtual(methodRef))
+    val invokeInstructions = Seq(InvokeVirtualDelta.invokeVirtual(methodRef))
     getGenericCallInstructions(call, state, calleeInstructions, invokeInstructions)
   }
 
-  override def dependencies: Set[Contract] = Set(InvokeVirtualDelta$) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(InvokeVirtualDelta) ++ super.dependencies
 }

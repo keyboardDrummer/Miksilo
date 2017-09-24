@@ -6,8 +6,8 @@ import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta$
-import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
@@ -48,21 +48,21 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
 
   def getFibonacciMethod: Node = {
     val instructions = Seq(
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(2),
-      IfIntegerCompareGreaterOrEqualDelta$.ifIntegerCompareGreater(7),
-      SmallIntegerConstantDelta$.integerConstant(1),
-      GotoDelta$.goTo(16),
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(1),
-      SubtractIntegerDelta$.subtractInteger,
-      InvokeStaticDelta$.invokeStatic(3),
-      LoadIntegerDelta$.load(0),
-      SmallIntegerConstantDelta$.integerConstant(2),
-      SubtractIntegerDelta$.subtractInteger,
-      InvokeStaticDelta$.invokeStatic(3),
-      AddIntegersDelta$.addIntegers,
-      IntegerReturnInstructionDelta$.integerReturn
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(2),
+      IfIntegerCompareGreaterOrEqualDelta.ifIntegerCompareGreater(7),
+      SmallIntegerConstantDelta.integerConstant(1),
+      GotoDelta.goTo(16),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(1),
+      SubtractIntegerDelta.subtractInteger,
+      InvokeStaticDelta.invokeStatic(3),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(2),
+      SubtractIntegerDelta.subtractInteger,
+      InvokeStaticDelta.invokeStatic(3),
+      AddIntegersDelta.addIntegers,
+      IntegerReturnInstructionDelta.integerReturn
     )
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = StackMapTableAttribute.stackMapTable(15, Seq(StackMapTableAttribute.sameFrame(9),
@@ -110,19 +110,19 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
   }
 
   def getConstructorByteCode: Node = {
-    val instructions = Seq(LoadAddressDelta$.addressLoad(0),
-      InvokeSpecialDelta$.invokeSpecial(1), VoidReturnInstructionDelta$.voidReturn)
+    val instructions = Seq(LoadAddressDelta.addressLoad(0),
+      InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
     val codeAttribute = Seq(CodeAttribute.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
     ByteCodeMethodInfo.methodInfo(7, 8, codeAttribute, Set())
   }
 
   def getMainByteCode: Node = {
-    val instructions = Seq(GetStaticDelta$.getStatic(2),
-      SmallIntegerConstantDelta$.integerConstant(5),
-      InvokeStaticDelta$.invokeStatic(3),
-      InvokeVirtualDelta$.invokeVirtual(4),
-      VoidReturnInstructionDelta$.voidReturn)
+    val instructions = Seq(GetStaticDelta.getStatic(2),
+      SmallIntegerConstantDelta.integerConstant(5),
+      InvokeStaticDelta.invokeStatic(3),
+      InvokeVirtualDelta.invokeVirtual(4),
+      VoidReturnInstructionDelta.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
     ByteCodeMethodInfo.methodInfo(11, 12, Seq(CodeAttribute.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))

@@ -4,8 +4,8 @@ import core.particles._
 import core.particles.exceptions.BadInputException
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import transformations.bytecode.coreInstructions.InvokeSpecialDelta$
-import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
+import transformations.bytecode.coreInstructions.InvokeSpecialDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
@@ -16,7 +16,7 @@ import transformations.javac.statements.BlockC
 
 object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialDelta$, LoadAddressDelta$, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 

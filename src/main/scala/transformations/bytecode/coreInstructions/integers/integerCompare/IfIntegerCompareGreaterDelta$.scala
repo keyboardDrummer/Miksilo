@@ -24,4 +24,5 @@ object IfIntegerCompareGreaterDelta$ extends JumpInstruction {
 
   object IfIntegerCompareGreaterKey extends Key
 
+  override def grammarName = "if_icmpgt"
 }

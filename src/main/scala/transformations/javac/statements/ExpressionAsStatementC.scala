@@ -4,7 +4,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
 import core.particles.CompilationState
-import transformations.bytecode.coreInstructions.{Pop2Delta$, PopDelta$}
+import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.bytecode.types.TypeSkeleton
 
@@ -23,8 +23,8 @@ object ExpressionAsStatementC extends StatementInstance {
     val _type = ExpressionSkeleton.getType(state)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, state) match {
       case 0 => Seq.empty
-      case 1 => Seq(PopDelta$.pop)
-      case 2 => Seq(Pop2Delta$.pop2)
+      case 1 => Seq(PopDelta.pop)
+      case 2 => Seq(Pop2Delta.pop2)
     }
     ExpressionSkeleton.getToInstructions(state)(expression) ++ extra
   }

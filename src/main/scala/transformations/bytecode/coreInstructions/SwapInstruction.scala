@@ -22,4 +22,6 @@ object SwapInstruction extends InstructionDelta {
   }
 
   override def description: String = "Defines the swap instruction, which swap the top two values on the stack."
+
+  override def grammarName = "swap"
 }

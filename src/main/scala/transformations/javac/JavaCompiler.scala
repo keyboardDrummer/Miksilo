@@ -7,8 +7,8 @@ import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.doubles.DoubleReturnInstructionDelta$
-import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta$
+import transformations.bytecode.coreInstructions.doubles.DoubleReturnInstructionDelta
+import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
 import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
@@ -73,23 +73,23 @@ object JavaCompiler {
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 
   def byteCodeInstructions: Seq[InstructionDelta] = {
-    Seq(Pop2Delta$, PopDelta$, GetStaticDelta$, GotoDelta$, IfIntegerCompareLessDelta$, IfIntegerCompareLessOrEqualDelta$,
-      IfZeroDelta$, IfNotZero, InvokeSpecialDelta$, InvokeVirtualDelta$, InvokeStaticDelta$, NewByteCodeDelta$, Duplicate2InstructionDelta$, DuplicateInstructionDelta$) ++
-      objectInstructions ++ Seq(PushNullDelta$, StoreIntegerDelta$, SubtractIntegerDelta$, VoidReturnInstructionDelta$,
-      SwapInstruction, GetFieldDelta$, PutField) ++
+    Seq(Pop2Delta, PopDelta, GetStaticDelta, GotoDelta, IfIntegerCompareLessDelta, IfIntegerCompareLessOrEqualDelta,
+      IfZeroDelta, IfNotZero, InvokeSpecialDelta, InvokeVirtualDelta, InvokeStaticDelta, NewByteCodeDelta, Duplicate2InstructionDelta, DuplicateInstructionDelta) ++
+      objectInstructions ++ Seq(PushNullDelta, StoreIntegerDelta, SubtractIntegerDelta, VoidReturnInstructionDelta,
+      SwapInstruction, GetFieldDelta, PutField) ++
       integerInstructions ++ longInstructions ++ floatInstructions ++ doubleInstructions
   }
 
-  def objectInstructions = Seq(LoadAddressDelta$, AddressReturnInstructionDelta$, StoreAddressDelta$)
+  def objectInstructions = Seq(LoadAddressDelta, AddressReturnInstructionDelta, StoreAddressDelta)
 
-  def doubleInstructions = Seq(DoubleReturnInstructionDelta$)
+  def doubleInstructions = Seq(DoubleReturnInstructionDelta)
 
-  def floatInstructions = Seq(FloatReturnInstructionDelta$)
+  def floatInstructions = Seq(FloatReturnInstructionDelta)
 
-  def longInstructions = Seq(LongReturnInstructionDelta$, AddLongsDelta$, CompareLongDelta$, PushLongDelta$, LoadLongDelta$, StoreLongDelta$)
+  def longInstructions = Seq(LongReturnInstructionDelta, AddLongsDelta, CompareLongDelta, PushLongDelta, LoadLongDelta, StoreLongDelta)
 
-  def integerInstructions = Seq(AddIntegersDelta$, SmallIntegerConstantDelta$, LoadConstantIntDelta$, IncrementIntegerDelta$, IntegerReturnInstructionDelta$, LoadIntegerDelta$, IfIntegerCompareGreaterOrEqualDelta$,
-    IfIntegerCompareEqualDelta$, IfIntegerCompareNotEqualDelta$)
+  def integerInstructions = Seq(AddIntegersDelta, SmallIntegerConstantDelta, LoadConstantDelta, IncrementIntegerDelta, IntegerReturnInstructionDelta, LoadIntegerDelta, IfIntegerCompareGreaterOrEqualDelta,
+    IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
 
   def byteCodeWithoutInstructions = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
 

@@ -23,4 +23,5 @@ object IfNotZero extends JumpInstruction {
 
   object IfNotZeroKey extends Key
 
+  override def grammarName = "ifne"
 }

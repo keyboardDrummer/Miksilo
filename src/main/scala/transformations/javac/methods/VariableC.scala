@@ -4,16 +4,16 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta$
-import transformations.bytecode.coreInstructions.longs.LoadLongDelta$
-import transformations.bytecode.coreInstructions.objects.LoadAddressDelta$
+import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
+import transformations.bytecode.coreInstructions.longs.LoadLongDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC}
 import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerDelta$)
+  override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerDelta)
 
   def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
@@ -46,10 +46,10 @@ object VariableC extends ExpressionInstance {
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
     Seq(_type.clazz match {
-      case BooleanTypeC.BooleanTypeKey => LoadIntegerDelta$.load(variableAddress)
-      case IntTypeC.IntTypeKey => LoadIntegerDelta$.load(variableAddress)
-      case LongTypeC.LongTypeKey => LoadLongDelta$.load(variableAddress)
-      case ObjectTypeC.ObjectTypeKey => LoadAddressDelta$.addressLoad(variableAddress)
+      case BooleanTypeC.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
+      case IntTypeC.IntTypeKey => LoadIntegerDelta.load(variableAddress)
+      case LongTypeC.LongTypeKey => LoadLongDelta.load(variableAddress)
+      case ObjectTypeC.ObjectTypeKey => LoadAddressDelta.addressLoad(variableAddress)
     })
   }
 

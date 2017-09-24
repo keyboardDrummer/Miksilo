@@ -41,4 +41,6 @@ object PutField extends InstructionDelta {
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(FieldRef)
+
+  override def grammarName = "putfield"
 }

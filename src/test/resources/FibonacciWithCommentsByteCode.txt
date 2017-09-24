@@ -32,58 +32,58 @@ Constant pool:
 {
 
   Method;
-    name:23
-    descriptor:24
-    flags:ACC_PUBLIC
+    name: 23
+    descriptor: 24
+    flags: ACC_PUBLIC
     Code:
-      name:8, maxStack:1, maxLocal:1
-        load address(0)
-        invoke special(27)
-        void return instruction()
-      exceptions:
+      name:8, stack:1, locals:1
+        aload 0
+        invokespecial 27
+        return
+      Exceptions:
 
   Method;
   /* hello */
   /* bye */
   /* PS */
-    name:21
-    descriptor:22
-    flags:ACC_STATIC, ACC_PUBLIC
+    name: 21
+    descriptor: 22
+    flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name:8, maxStack:2, maxLocal:1
-        get static(20)
-        small integer constant(5)
-        invoke static(7)
-        invoke virtual(14)
-        void return instruction()
-      exceptions:
+      name:8, stack:2, locals:1
+        getstatic 20
+        iconst 5
+        invokestatic 7
+        invokevirtual 14
+        return
+      Exceptions:
 
   Method;
-    name:3
-    descriptor:4
-    flags:ACC_STATIC, ACC_PUBLIC
+    name: 3
+    descriptor: 4
+    flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name:8, maxStack:3, maxLocal:1
-        load integer(0)
+      name:8, stack:3, locals:1
+        iload 0
         /* here comes two */
-        small integer constant(2)
-        if integer compare greater or equal(7)
-        small integer constant(1)
-        goto(16)
-        load integer(0)
-        small integer constant(1)
-        subtract integer()
-        invoke static(7)
-        load integer(0)
-        small integer constant(2)
-        subtract integer()
-        invoke static(7)
-        add integers()
-        integer return instruction()
+        iconst 2
+        if_icmpge 7
+        iconst 1
+        goto 16
+        iload 0
+        iconst 1
+        isub
+        invokestatic 7
+        iload 0
+        iconst 2
+        isub
+        invokestatic 7
+        iadd
+        ireturn
       stackMap nameIndex:28
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int
-      exceptions:
+      Exceptions:
 
 }
