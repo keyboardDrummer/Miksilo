@@ -1,6 +1,6 @@
 package transformations.bytecode.constants
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
@@ -20,7 +20,9 @@ object StringConstant extends ConstantEntry {
     PrintByteCode.shortToBytes(constant(StringIndex).asInstanceOf[Int])
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("string at index:" ~~> grammars.find(ConstantPoolIndexGrammar).as(StringIndex)).asNode(StringKey)
+    grammars.find(ConstantPoolIndexGrammar).as(StringIndex).asNode(StringKey)
 
   override def description: String = "Adds the string constant entry."
+
+  override def getName = Keyword("String", reserved = false) //TODO all die getNames moeten geen reserved keywords zijn. Misschien de default van keyword switchen.
 }

@@ -36,7 +36,7 @@ object MethodRefConstant extends ConstantEntry {
 
   def getNameAndTypeIndex(methodRef: Node): Int = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "method reference:" ~~>
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     (grammars.find(ConstantPoolIndexGrammar).as(MethodRefClassName) <~ "." ~
     grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)) asNode MethodRefKey
 
@@ -47,6 +47,8 @@ object MethodRefConstant extends ConstantEntry {
     ByteCodeSkeleton.getState(state).constantReferences.put(key,
       Map(MethodRefClassName -> ClassInfoConstant.key, MethodRefMethodName -> NameAndTypeConstant.key))
   }
+
+  override def getName = "Methodref"
 }
 
 

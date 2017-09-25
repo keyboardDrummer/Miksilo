@@ -2,7 +2,7 @@ package core.particles.node
 
 trait Key extends AnyRef
 {
-  override def toString: String = Node.classDebugRepresentation(this)
+  override lazy val toString: String = Node.classDebugRepresentation(this)
 
   /**
     * This hashcode does not change over runs, while the default hashcode does.

@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.node.{NodeLike, Node}
+import core.particles.node.{Node, NodeClass, NodeLike}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
@@ -14,6 +14,7 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
   def pathAsString: String
   def parentOption: Option[Path]
   def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
+  def findAncestorClass(clazz: NodeClass): Node = ancestors.find(p => p.clazz == clazz).get
   def root = ancestors.last
   def clazz = current.clazz
   def apply(key: Any) = get(key).get

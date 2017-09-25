@@ -38,7 +38,7 @@ object MethodType extends TypeInstance {
 
   override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure ///Deze heeft helemaal geen Java grammar.
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure()
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

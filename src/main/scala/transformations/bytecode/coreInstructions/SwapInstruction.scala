@@ -6,7 +6,7 @@ import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
-object SwapInstruction extends InstructionC {
+object SwapInstruction extends InstructionDelta {
   object SwapKey extends Key
   def swap = CodeAttribute.instruction(SwapKey)
 
@@ -22,4 +22,6 @@ object SwapInstruction extends InstructionC {
   }
 
   override def description: String = "Defines the swap instruction, which swap the top two values on the stack."
+
+  override def grammarName = "swap"
 }

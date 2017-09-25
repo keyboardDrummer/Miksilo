@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.bigrammar.{BiGrammar, TopBottom}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
@@ -194,7 +194,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       TypeParameters -> typeParameters)
   }
 
-  object ParameterKey extends Key
+  object ParameterKey extends NodeClass
   def parameter(name: String, _type: Any) = {
     new Node(ParameterKey,
       ParameterNameKey -> name,
@@ -206,29 +206,29 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     var methodCompiler: MethodCompiler = null
   }
 
-  class Visibility extends Key
+  class Visibility extends NodeClass
 
-  object MethodKey extends Key
+  object MethodKey extends NodeClass
 
   object MethodGrammar
 
-  object MethodBodyKey extends Key
+  object MethodBodyKey extends NodeField
 
-  object ParameterNameKey extends Key
+  object ParameterNameKey extends NodeField
 
-  object StaticKey extends Key
+  object StaticKey extends NodeField
 
-  object VisibilityKey extends Key
+  object VisibilityKey extends NodeField
 
-  object ReturnTypeKey extends Key
+  object ReturnTypeKey extends NodeField
 
-  object MethodNameKey extends Key
+  object MethodNameKey extends NodeField
 
-  object MethodParametersKey extends Key
+  object MethodParametersKey extends NodeField
 
-  object TypeParameters extends Key
+  object TypeParameters extends NodeField
 
-  object ParameterTypeKey extends Key
+  object ParameterTypeKey extends NodeField
 
   object PublicVisibility extends Visibility
 

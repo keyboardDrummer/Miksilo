@@ -32,7 +32,7 @@ object QualifiedClassNameConstant extends ConstantEntry {
         val stringIds = ids.collect({ case v: String => v})
         QualifiedClassName(stringIds)
     }
-    val parseQualifiedClassName = identifier.someSeparated(".") ^^(construct, {
+    val parseQualifiedClassName = identifier.someSeparated("/") ^^ (construct, {
       case QualifiedClassName(stringIds) => Some(stringIds)
       case _ => None
     })
@@ -40,4 +40,6 @@ object QualifiedClassNameConstant extends ConstantEntry {
   }
 
   override def description: String = "A qualified class name constant"
+
+  override def getName = "Utf8" //TODO do I want this?
 }

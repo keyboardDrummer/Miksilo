@@ -4,9 +4,10 @@ import java.util.Objects
 
 import core.bigrammar._
 import core.document.Empty
-import core.grammar.{StringLiteral, ~}
+import core.grammar.{GrammarToParserConverter, StringLiteral, ~}
 import core.responsiveDocument.ResponsiveDocument
 
+import scala.util.parsing.input.CharArrayReader
 import scala.util.{Failure, Success, Try}
 
 object BiGrammarToPrinter {
@@ -25,8 +26,18 @@ class BiGrammarToPrinter {
 
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
-      case Consume(StringLiteral) => Try("\"" + withMap.value + "\"")
-      case Consume(consume) => Try(withMap.value.toString)
+      case FromGrammarWithToString(StringLiteral, _) => Try("\"" + withMap.value + "\"") //TODO remove this and create a BiStringLiteral
+      case FromGrammarWithToString(consume, verifyWhenPrinting) =>
+        val string = withMap.value.toString
+        if (!verifyWhenPrinting)
+          Success(string)
+        else {
+          val parseResult = new GrammarToParserConverter().convert(consume)(new CharArrayReader(string.toCharArray))
+          if (parseResult.successful)
+            Success(string)
+          else
+            fail("From identity grammar could not parse string")
+        }
       case Keyword(keyword, _) => Try(keyword)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled => labelToDocument(withMap, labelled)
@@ -35,8 +46,8 @@ class BiGrammarToPrinter {
       case sequence: Sequence => foldProduct(withMap, sequence, (left, right) => left ~ right)
       case topBottom: TopBottom => foldProduct(withMap, topBottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
       case mapGrammar: MapGrammar => mapGrammarToDocument(withMap, mapGrammar)
-      case BiFailure => failureToGrammar(withMap, grammar)
-      case Produce(producedValue) => produceToDocument(withMap, grammar, producedValue)
+      case BiFailure(message) => failureToGrammar(message, withMap, grammar)
+      case ValueGrammar(producedValue) => produceToDocument(withMap, grammar, producedValue)
       case Print(document) => Try(document)
       case As(inner, key) => if (withMap.state.contains(key)) toDocumentCached(WithMap(withMap.state(key), withMap.state), inner) else Try(Empty)
     }
@@ -44,7 +55,7 @@ class BiGrammarToPrinter {
     nestError(result)
   }
 
-  def failureToGrammar(value: Any, grammar: BiGrammar): Failure[Nothing] = {
+  def failureToGrammar(message: String, value: Any, grammar: BiGrammar): Failure[Nothing] = {
     fail("encountered failure", -10000)
   }
 

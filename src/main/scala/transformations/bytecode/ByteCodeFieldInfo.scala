@@ -1,5 +1,6 @@
 package transformations.bytecode
 
+import core.document.BlankLine
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{CompilationState, Contract, DeltaWithGrammar}
@@ -37,9 +38,10 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val constantIndex = grammars.find(ConstantPoolIndexGrammar)
-    val fieldGrammar = ((("nameIndex:" ~> constantIndex).as(NameIndex) ~~
-      (", descriptorIndex" ~> integer.as(DescriptorIndex)) <~ ", attributes") % attributesGrammar.as(FieldAttributes)).asNode(FieldKey)
-    val parseFields = ("fields:" %> fieldGrammar.manyVertical.indent()).as(ClassFields)
+    val fieldGrammar = "Field" ~> ("name:" ~> constantIndex.as(NameIndex) %
+      ("descriptor" ~> integer.as(DescriptorIndex)) %
+      attributesGrammar.as(FieldAttributes)).asNode(FieldKey)
+    val parseFields = (fieldGrammar <~ BlankLine).manyVertical.as(ClassFields)
 
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~ membersGrammar.inner

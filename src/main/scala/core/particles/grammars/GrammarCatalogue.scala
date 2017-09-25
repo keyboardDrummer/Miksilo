@@ -23,7 +23,7 @@ class GrammarCatalogue {
     }
   }
 
-  def create(key: AnyRef, inner: BiGrammar = BiFailure): Labelled = {
+  def create(key: AnyRef, inner: BiGrammar = BiFailure()): Labelled = {
     val result = new Labelled(key, inner)
     grammars += key -> result
     result
@@ -36,6 +36,7 @@ class GrammarCatalogue {
     rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarReference => x }
   }
 }
+
 case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)
 {
   override def toString = s"Could not find grammar $key."

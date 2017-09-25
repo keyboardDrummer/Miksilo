@@ -5,7 +5,7 @@ import core.document.Empty
 import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -19,7 +19,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
   }
   
-  def getMethods(clazz: Node) = clazz(ClassMethodsKey).asInstanceOf[Seq[Node]]
+  def getMethods[T <: NodeLike](clazz: T) = clazz(ClassMethodsKey).asInstanceOf[Seq[T]]
 
   def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
 
@@ -81,12 +81,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   object ClassAttributes extends NodeField
 
-  private object EnrichedClassConstantEntry extends Key
-
-  private object ClassConstantEntryIndex extends Key
-
-  private object ClassConstantEntryContent extends Key
-
   object ConstantPoolItemContentGrammar
 
   object AttributeGrammar
@@ -100,11 +94,12 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (constantIndexGrammar *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
     val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
-    val attributesGrammar = grammars.create(AttributesGrammar, "attributes:" %> attributeGrammar.manyVertical.indent())
+    val attributesGrammar = grammars.create(AttributesGrammar, attributeGrammar.manyVertical)
     val membersGrammar = grammars.create(MembersGrammar, print(Empty))
+    val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
     val classGrammar = grammars.create(ClassFileKey,
-      (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %%
-        constantPool.as(ClassConstantPool) %% membersGrammar %% attributesGrammar.as(ClassAttributes)).asNode(ClassFileKey))
+      (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
+        constantPool.as(ClassConstantPool) % bodyGrammar).asNode(ClassFileKey))
 
     program.inner = classGrammar
   }
@@ -112,37 +107,12 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   object ConstantPoolGrammar
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val utf8 = StringLiteral ^^ parseMapPrimitive(classOf[String])
-    val qualifiedClassName: BiGrammar = getQualifiedClassNameParser
-    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar, utf8 | qualifiedClassName)
-    val constantPoolItem = (("#" ~> number <~ ":") ~~ constantPoolItemContent).
-      asNode(EnrichedClassConstantEntry, ClassConstantEntryIndex, ClassConstantEntryContent)
-    val entries = constantPoolItem.manyVertical.indent() ^^ biMapClassConstantEntryEnrichment
-    val result = "constant pool:" %> entries ^^ (
+    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar)
+    val entries = constantPoolItemContent.manyVertical.indent()
+    val result = "Constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
     grammars.create(ConstantPoolGrammar, result)
-  }
-
-  def getQualifiedClassNameParser: BiGrammar = {
-    val construct: Any => Any = {
-      case ids: Seq[Any] =>
-        val stringIds = ids.collect({ case v: String => v})
-        new QualifiedClassName(stringIds)
-    }
-    val parseQualifiedClassName = identifier.someSeparated(".") ^^(construct, {
-      case QualifiedClassName(stringIds) => Some(stringIds)
-      case _ => None
-    })
-    parseQualifiedClassName
-  }
-
-  def biMapClassConstantEntryEnrichment = {
-    val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[Node]].map(i => i(ClassConstantEntryContent))
-    val addIndexForPrinting: (Any) => Some[Seq[Node]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map(p => new Node(EnrichedClassConstantEntry,
-      ClassConstantEntryIndex -> (p._2.asInstanceOf[Int] + 1),
-      ClassConstantEntryContent -> p._1)))
-    ( removeIndexForParsing, addIndexForPrinting )
   }
 
   override def description: String = "Defines a skeleton for bytecode."

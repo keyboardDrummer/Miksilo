@@ -6,14 +6,14 @@ import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.IntegerInfoConstant
-import transformations.bytecode.coreInstructions.integers.{LoadConstantIntC, SmallIntegerConstantC}
+import transformations.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
 import transformations.bytecode.types.IntTypeC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object IntLiteralC extends ExpressionInstance {
   val key = IntLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
@@ -28,12 +28,12 @@ object IntLiteralC extends ExpressionInstance {
     val value: Int = getValue(literal)
     if (-1 <= value && value <= 5) {
       val node = literal.current.shallowClone
-      node.replaceWith(SmallIntegerConstantC.integerConstant(value), keepData = true)
+      node.replaceWith(SmallIntegerConstantDelta.integerConstant(value), keepData = true)
       Seq(node) //TODO dit mooier maken. Maak de nieuwe node gewoon en en schuif deze over de oude node.
     }
     else
     {
-      Seq(LoadConstantIntC.integerConstant(IntegerInfoConstant.construct(value)))
+      Seq(LoadConstantDelta.integerConstant(IntegerInfoConstant.construct(value)))
     }
   }
 

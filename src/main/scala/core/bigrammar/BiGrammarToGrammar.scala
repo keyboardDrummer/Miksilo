@@ -15,7 +15,7 @@ object BiGrammarToGrammar {
       case sequence: SequenceLike => core.grammar.Sequence(recursive(sequence.first), recursive(sequence.second)) ^^
         { case ~(WithMap(l,sl),WithMap(r,sr)) => WithMap(core.grammar.~(l,r), sl ++ sr)}
       case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right), choice.firstBeforeSecond)
-      case Consume(consume) => consume ^^ addState
+      case FromGrammarWithToString(consume, _) => consume ^^ addState
       case Keyword(keyword, reserved) => core.grammar.Keyword(keyword, reserved) ^^ addState
       case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ addState
       case many:Many => core.grammar.Many(recursive(many.inner)) ^^
@@ -29,11 +29,11 @@ object BiGrammarToGrammar {
           else
             mapGrammar.construct
         )
-      case BiFailure => core.grammar.FailureG()
+      case BiFailure(message) => core.grammar.FailureG(message)
       case Print(document) => core.grammar.Produce(Unit) ^^ addState //TODO really want unit here?
-      case Produce(value) => core.grammar.Produce(value) ^^ addState
+      case ValueGrammar(value) => core.grammar.Produce(value) ^^ addState
       case As(inner, key) => recursive(inner) ^^
-        { case WithMap(v, state) => WithMap(inner, state ++ Map(key -> v))} //TODO really want unit here?
+        { case WithMap(v, state) => WithMap(inner, state ++ Map(key -> v))}
     }
 
     override def labelledLeave(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner

@@ -1,9 +1,11 @@
 package transformations.bytecode.attributes
 
-import core.bigrammar.{BiGrammar, ManyVertical}
+import core.bigrammar.{BiGrammar, Choice, ManyVertical}
+import core.document.Empty
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
+import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
@@ -62,7 +64,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
-  def constantEntry = Utf8Constant.create("Code")
+  val constantEntry = Utf8Constant.create("Code")
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -87,7 +89,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   }
 
 
-  def getCodeAnnotations(clazz: Node): Seq[Node] = {
+  def getCodeAnnotations[T <: NodeLike](clazz: T): Seq[T] = {
     ByteCodeSkeleton.getMethods(clazz)
       .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
@@ -124,18 +126,19 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object MaxStackGrammar
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
+    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, ("," ~~> "maxStack:" ~> integer).as(CodeMaxStackKey))
-    val maxLocalGrammar = ("," ~~> "maxLocal:" ~> integer).as(CodeMaxLocalsKey)
-    val header: BiGrammar = ("code: nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)) ~ maxStackGrammar ~ maxLocalGrammar
-    val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
-    val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val codeAttributeGrammar = header %
-      instructionsGrammar.as(CodeInstructionsKey) %
-      attributesGrammar.as(CodeAttributesKey) %
-      exceptionTableGrammar.as(CodeExceptionTableKey) asNode CodeKey
-    grammars.create(CodeGrammar, codeAttributeGrammar)
+    val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer <~ ", ").as(CodeMaxStackKey))
+    val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
+    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(CodeInstructionsKey)
+    val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
+    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ maxLocalGrammar %
+      instructionsGrammar %
+      attributesGrammar %
+      exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
+    val codeGrammar: BiGrammar = ("Code:" %> body).asNode(CodeKey)
+    grammars.create(CodeGrammar, codeGrammar)
   }
 
   override def constantPoolKey: String = "Code"

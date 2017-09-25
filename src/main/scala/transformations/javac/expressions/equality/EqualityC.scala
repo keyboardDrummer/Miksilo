@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.longs.CompareLongC
+import transformations.bytecode.coreInstructions.longs.CompareLongDelta
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
@@ -46,7 +46,7 @@ object EqualityC extends ExpressionInstance {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val inputType = TypeSkeleton.toStackType(getInputType(equality,state),state)
     val equalityInstructions: Seq[Node] = inputType.clazz match {
-      case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
+      case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions

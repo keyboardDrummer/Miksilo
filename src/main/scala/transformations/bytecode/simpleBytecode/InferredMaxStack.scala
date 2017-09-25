@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.additions.LabelledLocations
@@ -34,7 +34,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
-    grammars.findPathsToKey(CodeAttribute.MaxStackGrammar).head.removeMeFromSequence()
+    grammars.findPathsToKey(CodeAttribute.MaxStackGrammar).head.removeMeFromSequence() //TODO dit laat nog een , staan.
   }
 
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."

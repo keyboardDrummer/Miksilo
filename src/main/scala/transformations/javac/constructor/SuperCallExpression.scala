@@ -4,8 +4,8 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
 import core.particles.{CompilationState, Contract}
-import transformations.bytecode.coreInstructions.InvokeSpecialC
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.InvokeSpecialDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -40,7 +40,7 @@ object SuperCallExpression extends ExpressionInstance {
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(new MethodQuery(qualifiedName, constructorName, callTypes))
     val argumentInstructions = callArguments.flatMap(argument => StatementSkeleton.getToInstructions(state)(argument))
-    Seq(LoadAddressC.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialC.invokeSpecial(methodRefIndex))
+    Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {

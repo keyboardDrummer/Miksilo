@@ -10,7 +10,7 @@ import transformations.bytecode.types.TypeSkeleton
 
 object PoptimizeC extends DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(PopC)
+  override def dependencies: Set[Contract] = Set(PopDelta)
 
   private def getSignatureInOutLengths(state: CompilationState, signature: InstructionSignature): (Int, Int) = {
     val inputLength = signature.inputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
@@ -36,12 +36,12 @@ object PoptimizeC extends DeltaWithPhase {
 
       def processInstruction(instructionIndex: Int) {
         val instruction = instructions(instructionIndex)
-        if (instruction.clazz == PopC.PopKey) {
+        if (instruction.clazz == PopDelta.PopKey) {
           consumptions ::= true
           return
         }
 
-        if (instruction.clazz == Pop2C.Pop2Key) {
+        if (instruction.clazz == Pop2Delta.Pop2Key) {
           consumptions = List(true,true) ++ consumptions
           return
         }
@@ -59,8 +59,8 @@ object PoptimizeC extends DeltaWithPhase {
         val hasSideEffect = guessIfInstructionHasSideEffect(out)
         val keepInstruction = outConsumption != 0 || hasSideEffect
         if (keepInstruction) {
-          val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2C.pop2).toList
-          val pop1Instructions: ((Nothing) => Any) with Iterable[Node] = if (outPop % 2 == 1) Seq(PopC.pop) else Set.empty
+          val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2Delta.pop2).toList
+          val pop1Instructions: ((Nothing) => Any) with Iterable[Node] = if (outPop % 2 == 1) Seq(PopDelta.pop) else Set.empty
           newInstructions = pop2Instructions ++ pop1Instructions ++ newInstructions
           consumptions = 0.until(in).map(_ => false).toList ++ consumptions
           newInstructions = instruction :: newInstructions

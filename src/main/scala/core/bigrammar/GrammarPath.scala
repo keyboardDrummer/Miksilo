@@ -17,6 +17,7 @@ trait GrammarPath {
 
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
+  def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = selfAndDescendants.find(predicate) //TODO maak dit sneller.
   def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this),
     path => path.children.filter(c => !path.ancestorGrammars.contains(c.get)))
 }

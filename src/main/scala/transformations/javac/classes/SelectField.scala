@@ -4,8 +4,8 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.GetStaticC
-import transformations.bytecode.coreInstructions.objects.GetFieldC
+import transformations.bytecode.coreInstructions.GetStaticDelta
+import transformations.bytecode.coreInstructions.objects.GetFieldDelta
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MemberSelector
 import MemberSelector._
@@ -15,7 +15,7 @@ object SelectField extends ExpressionInstance {
 
   override val key: Key = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC, MemberSelector)
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
   override def getType(selector: Path, state: CompilationState): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
@@ -30,12 +30,12 @@ object SelectField extends ExpressionInstance {
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
-      Seq(GetStaticC.getStatic(fieldRefIndex))
+      Seq(GetStaticDelta.getStatic(fieldRefIndex))
     else
     {
       val obj = getSelectorObject(selector)
       val objInstructions = ExpressionSkeleton.getToInstructions(state)(obj)
-      objInstructions ++ Seq(GetFieldC.construct(fieldRefIndex))
+      objInstructions ++ Seq(GetFieldDelta.construct(fieldRefIndex))
     }
   }
 

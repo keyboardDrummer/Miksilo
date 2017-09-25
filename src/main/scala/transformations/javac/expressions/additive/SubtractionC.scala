@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
+import transformations.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
@@ -17,7 +17,7 @@ object SubtractionC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
 
-  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerC)
+  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerDelta)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
@@ -47,7 +47,7 @@ object SubtractionC extends ExpressionInstance {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
-    firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerC.subtractInteger)
+    firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)
   }
 
   override def description: String = "Adds the - operator."

@@ -21,7 +21,9 @@ object DoubleInfoConstant extends ConstantEntry {
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = PrintByteCode.byteToBytes(6) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("double:" ~~> number).asNode(DoubleEntryKey, DoubleEntryValue)
+    number.as(DoubleEntryValue).asNode(DoubleEntryKey)
 
   override def description: String = "Add the double constant entry."
+
+  override def getName = "Double"
 }

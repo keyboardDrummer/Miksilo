@@ -4,9 +4,9 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles._
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.StoreIntegerC
-import transformations.bytecode.coreInstructions.longs.StoreLongC
-import transformations.bytecode.coreInstructions.objects.StoreAddressC
+import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
+import transformations.bytecode.coreInstructions.longs.StoreLongDelta
+import transformations.bytecode.coreInstructions.objects.StoreAddressDelta
 import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
 import transformations.bytecode.types.IntTypeC.IntTypeKey
@@ -31,10 +31,10 @@ object AssignToVariable extends DeltaWithGrammar {
 
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.clazz match {
-      case IntTypeKey => StoreIntegerC.integerStore(variableInfo.offset)
-      case ObjectTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-      case ArrayTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-      case LongTypeKey => StoreLongC.longStore(variableInfo.offset)
+      case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
+      case ObjectTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
+      case ArrayTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
+      case LongTypeKey => StoreLongDelta.longStore(variableInfo.offset)
     }
   }
 

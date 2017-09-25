@@ -5,9 +5,9 @@ import core.particles.{CompilationState, Contract, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualC
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualDelta
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroC.IfZeroKey
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroDelta.IfZeroKey
 import transformations.bytecode.extraBooleanInstructions.GreaterThanInstructionC.GreaterThanInstructionKey
 import transformations.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
@@ -17,7 +17,7 @@ import scala.collection.mutable
 
 object OptimizeComparisonInstructionsC extends DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualC,
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
     NotInstructionC, IntegerEqualsInstructionC)
 
   override def transform(program: Node, state: CompilationState): Unit = {

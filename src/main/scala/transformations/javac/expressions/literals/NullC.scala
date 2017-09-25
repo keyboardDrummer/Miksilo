@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.objects.PushNullC
+import transformations.bytecode.coreInstructions.objects.PushNullDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object NullC extends ExpressionInstance {
@@ -17,7 +17,7 @@ object NullC extends ExpressionInstance {
     expressionGrammar.inner = expressionGrammar.inner | parseNull
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullC)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullDelta)
 
   object NullKey extends Key
 
@@ -26,7 +26,7 @@ object NullC extends ExpressionInstance {
   override def getType(expression: Path, state: CompilationState): Node = ???
 
   override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = {
-    Seq(PushNullC.pushNull)
+    Seq(PushNullDelta.pushNull)
   }
 
   override def description: String = "Adds the usage of 'null'"

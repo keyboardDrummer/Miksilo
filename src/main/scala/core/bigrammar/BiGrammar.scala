@@ -20,7 +20,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def <~~(right: BiGrammar) = this <~ (space ~ right)
 
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | Produce(Seq.empty[Any])
+  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
 
   def |(other: BiGrammar) = new Choice(this, other)
 
@@ -33,7 +33,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manyVertical = new ManyVertical(this)
 
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | Produce(Seq.empty[Node])
+  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
 
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | produce(None)
   def some: BiGrammar = this ~ (this*) ^^ someMap
@@ -102,7 +102,12 @@ case class Delimiter(value: String) extends BiGrammar
 
 case class Keyword(value: String, reserved: Boolean = true) extends BiGrammar
 
-case class Consume(grammar: Grammar) extends BiGrammar
+/**
+  * Takes a grammar for parsing, and uses toString for printing.
+  * so the result of the grammar is exactly what has been consumed.
+  * @verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
+  */
+case class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = false) extends BiGrammar
 
 abstract class Many(var inner: BiGrammar) extends BiGrammar
 {
@@ -136,7 +141,7 @@ class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruc
   override def children = Seq(inner)
 } //TODO deze nog wat meer typed maken met WithState
 
-class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGrammar {
+class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
   def addOption(addition: BiGrammar) {
     inner = inner | addition
@@ -146,16 +151,21 @@ class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure) extends BiGra
 }
 
 class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike {
-  override lazy val height = first.height + second.height
+  override lazy val height: Int = first.height + second.height
 
   override def children = Seq(first, second)
 }
 
+/**
+  * Prints a value, but parses nothing.
+  */
 case class Print(document: ResponsiveDocument) extends BiGrammar
 
-case class Produce(result: Any) extends BiGrammar
+/**
+  * Does not consume or produce any syntax, but simply produces or consumes a value.
+  */
+case class ValueGrammar(value: Any) extends BiGrammar
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
-object Get extends BiGrammar
 
-object BiFailure extends BiGrammar
+case class BiFailure(message: String = "") extends BiGrammar

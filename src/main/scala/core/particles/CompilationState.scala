@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends Delta {
     val grammarCatalogue = state.grammarCatalogue
     state.parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
-      val manager = new ParticlesToParserConverter()
+      val manager = new DeltasToParserConverter()
       manager.parse(grammarCatalogue.find(ProgramGrammar), inputString).asInstanceOf[Node]
     }
   }
@@ -29,18 +29,18 @@ class CompilationState {
   var output: String = null
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
-  grammarCatalogue.create(ProgramGrammar, BiFailure)
+  grammarCatalogue.create(ProgramGrammar, BiFailure())
   var program: Node = null
   var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = null
 
   var random = new Random(0)
-  def getUniqueLabel(prefix: String) = prefix + getGUID
+  def getUniqueLabel(prefix: String): String = prefix + getGUID
 
   def getGUID: Long = random.nextLong()
 
   def parseString(input: String): Unit = {
-    val manager = new ParticlesToParserConverter()
+    val manager = new DeltasToParserConverter()
     program = manager.parse(grammarCatalogue.find(ProgramGrammar), input).asInstanceOf[Node]
   }
 

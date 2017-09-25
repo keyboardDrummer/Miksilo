@@ -42,13 +42,17 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
       })
     }
 
+    grammars.find(Utf8Constant.key).inner = Utf8Constant.getConstantEntryGrammar(grammars)
+    grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
+    grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
     grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(MethodRefClassName) <~ "." ~
       grammars.find(NameAndTypeConstant.key).as(MethodRefMethodName)) asNode MethodRefKey
     grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassRefName) asNode ClassRefKey
-    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "/" ~
+    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "." ~
       grammars.find(NameAndTypeConstant.key).as(FieldRefNameAndTypeIndex) asNode FieldRefConstant.key
     grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeName) ~~
       grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeKey
+    grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
 
     val constantPoolGrammar = grammars.findPathsToKey(ConstantPoolGrammar).head
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()

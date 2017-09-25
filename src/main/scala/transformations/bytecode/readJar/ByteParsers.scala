@@ -2,10 +2,13 @@ package transformations.bytecode.readJar
 
 import java.nio.ByteBuffer
 
+import core.particles.node.Node
+import transformations.bytecode.constants.Utf8Constant
+
 trait ByteParsers extends scala.util.parsing.combinator.Parsers {
   type Elem = Byte
 
-  val parseUtf8 = ParseShort.into(length => new ParseString(length))
+  val parseUtf8: Parser[Node] = ParseShort.into(length => new ParseString(length)).map(s => Utf8Constant.create(s))
   class ParseString(length: Int) extends Parser[String] {
      override def apply(in: Input): ParseResult[String] = {
        val (bytes, rest) = splitInput(in, length)       

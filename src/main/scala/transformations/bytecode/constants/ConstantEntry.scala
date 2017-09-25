@@ -18,9 +18,10 @@ trait ConstantEntry extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
     val itemContent = grammars.find(ConstantPoolItemContentGrammar)
-    itemContent.addOption(grammars.create(key, getConstantEntryGrammar(grammars)))
+    itemContent.addOption(grammars.create(key, getName ~~> getConstantEntryGrammar(grammars)))
   }
-  
+
+  def getName: BiGrammar
   def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies

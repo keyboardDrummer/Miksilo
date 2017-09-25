@@ -1,51 +1,51 @@
-class Fibonacci extends java.lang.Object with interfaces: ()
+class Fibonacci extends java/lang/Object with interfaces: ()
+{
+  Method;
+    name: <init>
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      name: Code, locals:1
+        aload 0
+        invokespecial java/lang/Object.<init> ()V
+        return
+      Exceptions:
 
+  Method;
+    name: main
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_STATIC, ACC_PUBLIC
+    Code:
+      name: Code, locals:1
+        getstatic java/lang/System.out Ljava/io/PrintStream;
+        iconst 5
+        invokestatic Fibonacci.fibonacci (I)I
+        invokevirtual java/io/PrintStream.print (I)V
+        return
+      Exceptions:
 
-fields:
-
-methods:
-  method => nameIndex:"<init>", descriptorIndex:()V, flags:ACC_PUBLIC
-  attributes:
-    code: nameIndex:"Code", maxLocal:1
-    instructions:
-      load address(0)
-      invoke special(java.lang.Object."<init>" ()V)
-      void return instruction()
-    attributes:
-    exceptions:
-  method => nameIndex:"main", descriptorIndex:([Ljava/lang/String;)V, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:"Code", maxLocal:1
-    instructions:
-      get static(java.lang.System/"out" Ljava/io/PrintStream;)
-      small integer constant(5)
-      invoke static(Fibonacci."fibonacci" (I)I)
-      invoke virtual(java.io.PrintStream."print" (I)V)
-      void return instruction()
-    attributes:
-    exceptions:
-  method => nameIndex:"fibonacci", descriptorIndex:(I)I, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:"Code", maxLocal:1
-    instructions:
-      load integer(0)
-      small integer constant(2)
-      if integer compare greater or equal("false-4962768465676381896")
-      small integer constant(1)
-      goto("end4437113781045784766")
-      label("false-4962768465676381896")
-      load integer(0)
-      small integer constant(1)
-      subtract integer()
-      invoke static(Fibonacci."fibonacci" (I)I)
-      load integer(0)
-      small integer constant(2)
-      subtract integer()
-      invoke static(Fibonacci."fibonacci" (I)I)
-      add integers()
-      label("end4437113781045784766")
-      integer return instruction()
-    attributes:
-    exceptions:
-
-attributes:
+  Method;
+    name: fibonacci
+    descriptor: (I)I
+    flags: ACC_STATIC, ACC_PUBLIC
+    Code:
+      name: Code, locals:1
+        iload 0
+        iconst 2
+        if_icmpge "<false>"
+        iconst 1
+        goto "<end>"
+        label "<false>"
+        iload 0
+        iconst 1
+        isub
+        invokestatic Fibonacci.fibonacci (I)I
+        iload 0
+        iconst 2
+        isub
+        invokestatic Fibonacci.fibonacci (I)I
+        iadd
+        label "<end>"
+        ireturn
+      Exceptions:
+}

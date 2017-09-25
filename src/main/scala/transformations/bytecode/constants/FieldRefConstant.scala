@@ -49,4 +49,6 @@ object FieldRefConstant extends ConstantEntry {
       asNode(FieldRef)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
+
+  override def getName = "Fieldref"
 }

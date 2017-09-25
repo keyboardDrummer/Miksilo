@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, SequenceElement}
+import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -22,7 +23,8 @@ object IfThenC extends StatementInstance {
 
   override def toByteCode(ifThen: Path, state: CompilationState): Seq[Node] = {
     val condition = getCondition(ifThen)
-    val endLabelName = state.getUniqueLabel("end")
+    val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val endLabelName = LabelledLocations.getUniqueLabel("end", method, state)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 

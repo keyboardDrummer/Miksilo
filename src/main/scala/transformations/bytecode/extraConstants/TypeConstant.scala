@@ -13,13 +13,13 @@ import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton, PrintByteCode}
 
 object TypeConstant extends ConstantEntry {
-  object MyKey extends NodeClass
+  object Key extends NodeClass
   object Type extends NodeField
 
-  def constructor(_type: Node) = new Node(MyKey, Type -> _type)
+  def constructor(_type: Node) = new Node(Key, Type -> _type)
   def getValue(constant: Node) = constant(Type).asInstanceOf[Node]
 
-  override def key = MyKey
+  override def key = Key
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
     val _type: Node = constant(Type).asInstanceOf[Node]
@@ -49,4 +49,6 @@ object TypeConstant extends ConstantEntry {
   }
 
   override def description: String = "Adds the field descriptor constant. It contains the type of a field."
+
+  override def getName = "Utf8" //TODO do I want this?
 }

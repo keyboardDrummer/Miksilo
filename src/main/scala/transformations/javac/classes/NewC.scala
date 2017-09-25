@@ -4,8 +4,8 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles._
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.objects.NewByteCodeC
-import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
+import transformations.bytecode.coreInstructions.objects.NewByteCodeDelta
+import transformations.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -26,7 +26,7 @@ object NewC extends ExpressionInstance {
     expressionGrammar.addOption(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeC, InvokeSpecialC) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
   override val key: Key = NewCallKey
 
@@ -45,8 +45,8 @@ object NewC extends ExpressionInstance {
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
 
     val methodKey = new MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
-    Seq(NewByteCodeC.newInstruction(classRef), DuplicateInstructionC.duplicate) ++ argumentInstructions ++
-      Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
+    Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
+      Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }
 
   def getNewObject[T <: NodeLike](expression: T): T = {
