@@ -5,7 +5,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
     descriptor: ()V
     flags: ACC_PUBLIC
     Code:
-      Code, locals:1
+      name: Code, locals:1
         aload 0
         invokespecial java/lang/Object.<init> ()V
         return
@@ -16,7 +16,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
     descriptor: ([Ljava/lang/String;)V
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      Code, locals:1
+      name: Code, locals:1
         getstatic java/lang/System.out Ljava/io/PrintStream;
         iconst 5
         invokestatic Fibonacci.fibonacci (I)I
@@ -29,7 +29,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
     descriptor: (I)I
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      Code, locals:1
+      name: Code, locals:1
         iload 0
         iconst 2
         if_icmpge "<false>"

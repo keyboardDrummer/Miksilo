@@ -42,7 +42,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
 
   def getUniqueLabel(suggestion: String, methodInfo: Node, state: CompilationState): String = {
     val methodCounters = getState(state)
-    val taken: mutable.Set[String] = methodCounters.getOrElse(methodInfo, mutable.Set.empty)
+    val taken: mutable.Set[String] = methodCounters.getOrElseUpdate(methodInfo, mutable.Set.empty)
     var result = suggestion
     var increment = 0
     while(taken.contains(result))

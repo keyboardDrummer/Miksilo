@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.{BiGrammar, FromGrammarWithToString}
-import core.grammar.{Identifier, StringLiteral}
+import core.grammar.{Identifier, Keyword, StringLiteral}
 import core.particles.CompilationState
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
@@ -20,8 +20,11 @@ object Utf8Constant extends ConstantEntry {
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     (FromGrammarWithToString(Identifier, verifyWhenPrinting = true) |
-      "<init>" | "<cinit>" | //TODO misschien een aparte constant maken voor 'Names'
-      StringLiteral : BiGrammar).as(Value).asNode(Utf8ConstantKey)
+      FromGrammarWithToString(Keyword("<init>", false), verifyWhenPrinting = true) |
+      FromGrammarWithToString(Keyword("<clinit>", false), verifyWhenPrinting = true) |
+      (StringLiteral : BiGrammar)
+      //TODO misschien een aparte constant maken voor 'Names'
+      ).as(Value).asNode(Utf8ConstantKey)
 
   override def description: String = "A string constant"
 
