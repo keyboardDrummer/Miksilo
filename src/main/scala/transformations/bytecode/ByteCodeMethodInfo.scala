@@ -60,7 +60,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   object AccessFlagGrammar
   object MethodInfoGrammar
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(AttributesGrammar).as(MethodAttributes)
+    val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar,
         "ACC_PUBLIC" ~> produce(PublicAccess) |
         "ACC_STATIC" ~> produce(StaticAccess) |

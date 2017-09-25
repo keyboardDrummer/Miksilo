@@ -13,6 +13,7 @@ object Utf8Constant extends ConstantEntry {
   object Utf8ConstantKey extends NodeClass
   object Value extends NodeField
   def create(value: String) = new Node(key, Value -> value)
+  def get(constant: Node): String = constant(Value).asInstanceOf[String]
 
   override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])

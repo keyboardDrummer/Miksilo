@@ -11,16 +11,28 @@ object Node {
     case anyRef: AnyRef =>
       try
       {
-        val simpleName: String = anyRef.getClass.getSimpleName
-        if (simpleName.last == '$')
-          return simpleName.dropRight(1)
-        simpleName
+        val clazz = anyRef.getClass
+        getClassName(clazz)
       }
       catch
       {
         case e: java.lang.InternalError => "internalError"
       }
     case _ => _clazz.toString
+  }
+
+  private def getClassName(clazz: Class[_]): String = {
+    val enclosing = clazz.getEnclosingClass
+    val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
+    addition + getDirectClassName(clazz)
+  }
+
+  private def getDirectClassName(clazz: Class[_]): String = {
+    val simpleName: String = clazz.getSimpleName
+    if (simpleName.last == '$')
+      simpleName.dropRight(1)
+    else
+      simpleName
   }
 }
 

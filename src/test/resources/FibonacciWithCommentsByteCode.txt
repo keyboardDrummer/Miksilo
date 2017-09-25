@@ -1,5 +1,4 @@
 class 5 extends 25 with interfaces: ()
-
 Constant pool:
   Utf8 java/lang/Object
   Utf8 Fibonacci
@@ -30,13 +29,12 @@ Constant pool:
   Methodref 25.26
   Utf8 StackMapTable
 {
-
   Method;
     name: 23
     descriptor: 24
     flags: ACC_PUBLIC
     Code:
-      name:8, stack:1, locals:1
+      name: 8, stack:1, locals:1
         aload 0
         invokespecial 27
         return
@@ -50,7 +48,7 @@ Constant pool:
     descriptor: 22
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name:8, stack:2, locals:1
+      name: 8, stack:2, locals:1
         getstatic 20
         iconst 5
         invokestatic 7
@@ -63,7 +61,7 @@ Constant pool:
     descriptor: 4
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name:8, stack:3, locals:1
+      name: 8, stack:3, locals:1
         iload 0
         /* here comes two */
         iconst 2
@@ -80,10 +78,9 @@ Constant pool:
         invokestatic 7
         iadd
         ireturn
-      stackMap nameIndex:28
+      StackMapTable: 28
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int
       Exceptions:
-
 }

@@ -6,15 +6,15 @@ import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.{CompilationState, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.attributes.CodeAttribute.constantEntry
 import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.types.ObjectTypeC.ObjectTypeName
 import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC, TypeSkeleton}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
-  def entry = Utf8Constant.create("StackMapTable")
+  val entry = Utf8Constant.create("StackMapTable")
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   object FrameOffset extends NodeField
@@ -128,7 +128,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val appendFrameGrammar = ("append frame" ~ offsetGrammar % parseType.manyVertical.indent().as(AppendFrameTypes)) asNode AppendFrame
     val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
-    val nameGrammar = produce(constantEntry).as(AttributeNameKey)
+    val nameGrammar = grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(StackMapTableMaps)).
       asNode(StackMapTableKey)

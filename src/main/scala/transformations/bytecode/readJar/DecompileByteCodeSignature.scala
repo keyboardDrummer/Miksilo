@@ -47,15 +47,15 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
-          val signatureTypeString = constantPool.getValue(signatureIndex).asInstanceOf[String]
+          val signatureTypeString = constantPool.getUtf8(signatureIndex)
           TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
         case None =>
           val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptorIndex).asInstanceOf[Int]
-          val descriptor = constantPool.getValue(methodDescriptorIndex).asInstanceOf[String]
+          val descriptor = constantPool.getUtf8(methodDescriptorIndex)
           val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
           descriptorType
       }
-      val name: String = constantPool.getValue(nameIndex).asInstanceOf[String]
+      val name: String = constantPool.getUtf8(nameIndex)
 
       val (methodType, typeParameters) =
         if (_type.clazz == TypeAbstraction.TypeAbstractionKey)
@@ -68,7 +68,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
         MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 
       val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
-      val foundVisibilities: Set[Visibility] = accessFlags.map(f => accessFlagsToVisibility.get(f)).flatMap(s => s)
+      val foundVisibilities: Set[Visibility] = accessFlags.flatMap(f => accessFlagsToVisibility.get(f))
       val visibility: Visibility = (foundVisibilities ++ Seq(DefaultVisibility)).head
       val static: Boolean = false //TODO fix.
       MethodC.method(name, returnType, parameters, Seq.empty, static, visibility, typeParameters)
@@ -83,15 +83,15 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
-          val signatureTypeString = constantPool.getValue(signatureIndex).asInstanceOf[String]
+          val signatureTypeString = constantPool.getUtf8(signatureIndex)
           TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
         case None =>
           val fieldDescriptorIndex = fieldInfo(ByteCodeFieldInfo.DescriptorIndex).asInstanceOf[Int]
-          val descriptor = constantPool.getValue(fieldDescriptorIndex).asInstanceOf[String]
+          val descriptor = constantPool.getUtf8(fieldDescriptorIndex)
           val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
           descriptorType
       }
-      val name: String = constantPool.getValue(nameIndex).asInstanceOf[String]
+      val name: String = constantPool.getUtf8(nameIndex)
       FieldDeclaration.field(_type, name)      
     })
   }

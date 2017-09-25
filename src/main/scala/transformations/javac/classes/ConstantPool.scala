@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.node.Node
-import transformations.bytecode.constants.{DoubleInfoConstant, LongInfoConstant, ClassInfoConstant}
+import transformations.bytecode.constants.{ClassInfoConstant, DoubleInfoConstant, LongInfoConstant, Utf8Constant}
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
   items.foreach(store)
 
   def getNode(index: Int) = getValue(index).asInstanceOf[Node]
-  def getUtf8(index: Int) = getValue(index).asInstanceOf[String]
+  def getUtf8(index: Int) = Utf8Constant.get(getValue(index).asInstanceOf[Node])
   def getValue(index: Int) = constants(index - 1)
 
   def getClassRef(nameParts: QualifiedClassName): Int = {

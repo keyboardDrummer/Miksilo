@@ -1,6 +1,7 @@
 package transformations.bytecode.attributes
 
-import core.bigrammar.{BiGrammar, ManyVertical}
+import core.bigrammar.{BiGrammar, Choice, ManyVertical}
+import core.document.Empty
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
@@ -63,7 +64,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
-  def constantEntry = Utf8Constant.create("Code")
+  val constantEntry = Utf8Constant.create("Code")
 
   override def inject(state: CompilationState): Unit = {
     super.inject(state)
@@ -127,12 +128,12 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, "," ~~ "stack:" ~> integer.as(CodeMaxStackKey))
+    val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer <~ ", ").as(CodeMaxStackKey))
     val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
-    val nameGrammar = produce(constantEntry).as(AttributeNameKey)
+    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(CodeInstructionsKey)
     val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
-    val body = (nameGrammar ~ maxStackGrammar ~ maxLocalGrammar %
+    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ maxLocalGrammar %
       instructionsGrammar %
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()

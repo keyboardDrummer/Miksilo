@@ -94,7 +94,7 @@ object ClassFileParser extends ByteParsers with PackratParsers {
     nameAndTypeIndex <- ParseShort
   } yield InterfaceMethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex)
 
-  def utf8Parser: Parser[String] = parseUtf8
+  def utf8Parser: Parser[Node] = parseUtf8
 
   def nameAndTypeParser: Parser[Node] = for {
     nameIndex <- ParseShort
