@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.{CompilationState, FromMap}
+import core.particles.{Language, FromMap}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, SequenceElement}
@@ -12,7 +12,7 @@ import transformations.javac.statements.IfThenC._
 
 object IfThenElseC extends StatementInstance {
 
-  override def toByteCode(ifThenElse: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(ifThenElse: Path, state: Language): Seq[Node] = {
     val condition = getCondition(ifThenElse)
     val methodInfo = ifThenElse.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
     val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, state)
@@ -34,7 +34,7 @@ object IfThenElseC extends StatementInstance {
 
   object ElseKey extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
     val ifThenGrammar = grammars.find(IfThenC)

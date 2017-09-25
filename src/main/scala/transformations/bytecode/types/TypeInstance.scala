@@ -3,28 +3,28 @@ package transformations.bytecode.types
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton
 
 trait TypeInstance extends DeltaWithGrammar {
   val key: Key
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
     TypeSkeleton.getState(state).instances.put(key, this)
     super.inject(state)
   }
 
-  def getSuperTypes(_type: Node, state: CompilationState): Seq[Node]
+  def getSuperTypes(_type: Node, state: Language): Seq[Node]
 
-  def getStackType(_type: Node, state: CompilationState) = _type
+  def getStackType(_type: Node, state: Language): Node = _type
 
   def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
   def byteCodeGrammarKey = KeyGrammar(key)
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)

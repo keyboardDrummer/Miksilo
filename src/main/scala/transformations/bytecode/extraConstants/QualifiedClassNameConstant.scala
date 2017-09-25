@@ -1,7 +1,7 @@
 package transformations.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
@@ -20,7 +20,7 @@ object QualifiedClassNameConstant extends ConstantEntry {
   def create(value: QualifiedClassName) = new Node(key, Value -> value)
   def get(node: Node): QualifiedClassName = node(Value).asInstanceOf[QualifiedClassName]
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] =
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[QualifiedClassName].parts.mkString("/"))
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

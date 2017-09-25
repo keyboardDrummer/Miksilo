@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -21,7 +21,7 @@ object StoreAddressDelta extends InstructionDelta {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "StoreAddress")
     InstructionSignature(Seq(stackTop), Seq())

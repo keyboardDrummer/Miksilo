@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeField}
 import transformations.bytecode.PrintByteCode._
@@ -16,7 +16,7 @@ object MethodHandleConstant extends ConstantEntry {
 
   override def key = MethodHandleKey
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(15) ++ byteToBytes(constant(MethodHandleReference).asInstanceOf[Int]) ++ shortToBytes(constant(MethodHandleIndex).asInstanceOf[Int])
   }
 

@@ -6,7 +6,7 @@ import core.particles.path.{Path, PathRoot}
 import transformations.javac.methods.MethodC
 import util.DataFlowAnalysis
 
-abstract class StatementFlowAnalysis[State](state: CompilationState, method: Node)
+abstract class StatementFlowAnalysis[State](state: Language, method: Node)
   extends DataFlowAnalysis[Path, State]
 {
   val instances = StatementSkeleton.getState(state).instances

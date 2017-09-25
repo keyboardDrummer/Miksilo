@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -24,7 +24,7 @@ object GetStaticDelta extends InstructionDelta {
     hexToBytes("b2") ++ shortToBytes(arguments)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     new InstructionSignature(Seq(), Seq(getReturnType(state.program.constantPool, instruction)))
 
   def getReturnType(constantPool: ConstantPool, getStatic: Node): Node = {
@@ -36,7 +36,7 @@ object GetStaticDelta extends InstructionDelta {
   }
 
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }

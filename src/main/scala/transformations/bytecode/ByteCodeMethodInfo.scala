@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import core.particles.{Language, Contract, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
@@ -35,14 +35,14 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8Constant.key,
       MethodDescriptorIndex -> Utf8Constant.key))
   }
 
-  def getMethodByteCode(methodInfo: Node, state: CompilationState) = {
+  def getMethodByteCode(methodInfo: Node, state: Language) = {
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(getMethodNameIndex(methodInfo)) ++
         shortToBytes(getMethodDescriptorIndex(methodInfo)) ++
@@ -50,7 +50,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     }
 
   object MethodsGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
     val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)

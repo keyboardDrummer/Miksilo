@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.constants.FieldRefConstant
@@ -21,7 +21,7 @@ object PutField extends InstructionDelta {
     PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
 
     if (stackTop.size != 2)
@@ -35,7 +35,7 @@ object PutField extends InstructionDelta {
     new InstructionSignature(Seq.empty, Seq(valueType, objectType))
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }

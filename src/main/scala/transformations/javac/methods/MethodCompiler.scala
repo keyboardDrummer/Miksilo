@@ -3,7 +3,7 @@ package transformations.javac.methods
 import core.particles.exceptions.BadInputException
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
-import core.particles.CompilationState
+import core.particles.Language
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementSkeleton
@@ -16,7 +16,7 @@ case class VariableDoesNotExist(name: String) extends BadInputException {
 
 case class VariableInfo(offset: Integer, _type: Node)
 
-case class VariablePool(state: CompilationState, typedVariables: Map[String, Node] = Map.empty) {
+case class VariablePool(state: Language, typedVariables: Map[String, Node] = Map.empty) {
   private var variables = Map.empty[String, VariableInfo]
   var offset = 0
   for(typedVariable <- typedVariables)
@@ -40,7 +40,7 @@ case class VariablePool(state: CompilationState, typedVariables: Map[String, Nod
   }
 }
 
-case class MethodCompiler(state: CompilationState, method: Node) {
+case class MethodCompiler(state: Language, method: Node) {
   val parameters: Seq[Node] = getMethodParameters(method)
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(state)
 

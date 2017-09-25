@@ -1,7 +1,7 @@
 package transformations.bytecode.types
 
 import core.bigrammar.{BiGrammar, Keyword, Labelled}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton._
@@ -13,7 +13,7 @@ object ObjectTypeC extends TypeInstance with StackType {
   val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
   val rootObjectType = objectType(new QualifiedClassName(Seq("java", "lang", "Object")))
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = {
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = {
     Seq.empty //TODO extend
   }
 
@@ -69,9 +69,9 @@ object ObjectTypeC extends TypeInstance with StackType {
 
   object ObjectTypeKey extends NodeClass
 
-  override def getStackType(_type: Node, state: CompilationState): Node = {
-    if (state.program.data.contains(ClassConstantPool))
-      stackObjectType(state.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get)) //TODO dit wegwerken en getClassRef weggooien.
+  override def getStackType(_type: Node, state: Language): Node = {
+    if (state.cheatCompilation.program.data.contains(ClassConstantPool))
+      stackObjectType(state.cheatCompilation.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get)) //TODO dit wegwerken en getClassRef weggooien.
     else
       ObjectTypeKey.create(ObjectTypeName -> ClassInfoConstant.classRef(ObjectTypeC.getObjectTypeName(_type).right.get))
     //TODO FIX THIS

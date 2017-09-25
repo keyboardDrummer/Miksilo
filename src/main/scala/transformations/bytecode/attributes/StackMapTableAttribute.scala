@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node, NodeClass, NodeField}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Language, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
@@ -65,13 +65,13 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object StackMapTableGrammar
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(StackMapTableKey, Map(AttributeNameKey -> Utf8Constant.key))
   }
 
-  def getStackMapTableBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
+  def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {
 
     def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)
@@ -102,7 +102,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
-  def getVerificationInfoBytes(_type: Node, state: CompilationState): Seq[Byte] = {
+  def getVerificationInfoBytes(_type: Node, state: Language): Seq[Byte] = {
     _type.clazz match {
       case IntTypeC.IntTypeKey => hexToBytes("01")
       case LongTypeC.LongTypeKey => hexToBytes("04")

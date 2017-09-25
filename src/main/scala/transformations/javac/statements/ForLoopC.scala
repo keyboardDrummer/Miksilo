@@ -26,7 +26,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(WhileC)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
@@ -48,7 +48,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   object Body extends Key
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     PathRoot(program).visit(path => path.clazz match {
       case ForLoopType => transformForLoop(path)
       case _ =>

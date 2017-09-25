@@ -15,10 +15,19 @@ import transformations.javac.JavaCompiler
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object TestUtils extends TestUtils(JavaCompiler.getCompiler) {
+object CompilerBuilder {
+  var compilers : Map[Seq[Delta], CompilerFromDeltas] = Map.empty
+  def build(deltas: Seq[Delta], description: String = "testing"): CompilerFromDeltas = {
+    val result = compilers.getOrElse(deltas, new CompilerFromDeltas(deltas, description))
+    compilers += (deltas -> result)
+    result
+  }
 }
 
-class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
+object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompiler.javaCompilerTransformations)) {
+}
+
+class TestUtils(val compiler: CompilerFromDeltas) extends FunSuite {
 
   def toFile(program: String): String = {
     val fileName = File.makeTemp(suffix = ".java")
@@ -47,7 +56,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
     val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
-    new CompilerFromParticles(particles).transform(byteCode)
+    CompilerBuilder.build(particles).transform(byteCode)
     output
   }
 
@@ -126,7 +135,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
     val prettyPrint = PrettyPrint(recover = true)
     val splicedParticles = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
-    val newCompiler = new CompilerFromParticles(splicedParticles)
+    val newCompiler = CompilerBuilder.build(splicedParticles)
 
     val state = newCompiler.parseAndTransform(input)
     state.output
@@ -140,15 +149,15 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
-    val javaCompilerOutput = runJavaC(currentDir, input, expectedOutputDirectory)
+    val javaCompilerOutput = profile("javac", runJavaC(currentDir, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
 
-    val state = compiler.compile(input, Directory(actualOutputDirectory / inputDirectory))
+    val state = profile("blender compile", compiler.compile(input, Directory(actualOutputDirectory / inputDirectory)))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
-    val expectedOutput = TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory)
+    val expectedOutput = profile("run expected", TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
     try {
-      val actualOutput = TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
+      val actualOutput = profile("run actual", TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
       assertResult(expectedOutput)(actualOutput)
     }
     catch {
@@ -157,18 +166,26 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     }
   }
 
+  def profile[T](description: String, action: => T): T = {
+    val start = System.nanoTime()
+    val result = action
+    val end = System.nanoTime()
+    System.out.println(s"$description took ${(end - start)/1000000}s")
+    result
+  }
+
   def fileNameToClassName(fileName: String): String = {
     if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
   }
 
-  def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: CompilationState, e: AssertionError): String = {
+  def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: Compilation, e: AssertionError): String = {
     val relativeClassPath = inputDirectory / (className + ".class")
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = new CompilerFromParticles(Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations)
-    val prettyPrintState = prettyPrintByteCodeCompiler.transformReturnState(state.program)
-    val prettyPrintActualByteCode = prettyPrintState.output
+    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations)
+    val output = prettyPrintByteCodeCompiler.transform(state.program).output
+    val prettyPrintActualByteCode = output
 
     val originalMessage = e.getMessage
     val errorMessage: String = s"Output comparison failed with message: \n$originalMessage \n\n" +
@@ -224,7 +241,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
-    override def transform(program: Node, state: CompilationState): Unit = {
+    override def transform(program: Node, state: Compilation): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }
 

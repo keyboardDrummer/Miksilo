@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -20,7 +20,7 @@ object IncrementIntegerDelta extends InstructionDelta {
       byteToBytes(arguments(1))
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq.empty, Seq.empty)
 
   override def getInstructionSize(): Int = 3

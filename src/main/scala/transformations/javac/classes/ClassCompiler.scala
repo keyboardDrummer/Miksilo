@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import java.util.NoSuchElementException
 
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.Node
 import transformations.bytecode.constants._
 import transformations.bytecode.extraConstants.TypeConstant
@@ -17,7 +17,7 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
 case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
-  val state: CompilationState = compiler.state
+  val state: Language = compiler.state
   val className: String = currentClass.name
   val myPackage: PackageSignature = compiler.getPackage(currentClass._package.toList)
   val currentClassInfo = ClassSignature(myPackage, className)

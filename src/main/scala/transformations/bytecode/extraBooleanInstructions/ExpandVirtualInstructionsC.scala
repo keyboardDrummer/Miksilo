@@ -21,7 +21,7 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
     val expandInstruction = new ClassRegistry[ExpandInstruction]()
   }
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[Path] = CodeAttribute.getCodeAnnotations(PathRoot(clazz))
@@ -43,7 +43,7 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
 
       for (instruction <- instructions) {
 
-        val expandOption = getState(state).expandInstruction.get(instruction.clazz)
+        val expandOption = getState(state.language).expandInstruction.get(instruction.clazz)
         newInstructions ++= expandOption.fold(Seq(instruction))(expand => expand.expand(instruction, methodInfo, state))
       }
 

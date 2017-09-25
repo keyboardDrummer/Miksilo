@@ -1,7 +1,7 @@
 package transformations.javac
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
@@ -12,7 +12,7 @@ object ImplicitObjectSuperClass extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     if (program.parent.isEmpty) {
       program.parent = Some(objectName)
     }

@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -15,7 +15,7 @@ object AddLongsDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("61")
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = binary(LongTypeC.longType)
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = binary(LongTypeC.longType)
 
   override def getInstructionSize: Int = 1
 

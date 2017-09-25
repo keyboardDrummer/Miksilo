@@ -3,7 +3,7 @@ package transformations.javac.statements
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import core.particles.CompilationState
+import core.particles.Language
 import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.bytecode.types.TypeSkeleton
@@ -18,7 +18,7 @@ object ExpressionAsStatementC extends StatementInstance {
 
   override val key: Key = ExpressionAsStatementKey
 
-  override def toByteCode(statement: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(statement: Path, state: Language): Seq[Node] = {
     val expression = getExpression(statement)
     val _type = ExpressionSkeleton.getType(state)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, state) match {
@@ -33,7 +33,7 @@ object ExpressionAsStatementC extends StatementInstance {
     statement(ExpressionKey).asInstanceOf[T]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val inner = expressionGrammar <~ ";"

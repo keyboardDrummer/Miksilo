@@ -1,21 +1,20 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.CompilationState
+import core.particles.Compilation
 import core.particles.node.Node
+import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
-import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.bytecode.types.ObjectTypeC
-import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.types.MethodType
-import MethodType._
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
+import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import transformations.javac.classes.skeleton.QualifiedClassName
+import transformations.javac.types.MethodType._
 
-class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
+class InstructionTypeAnalysisFromState(state: Compilation, method: Node) {
   val constantPool = state.program.constantPool
 
   val typeAnalysis = getTypeAnalysis

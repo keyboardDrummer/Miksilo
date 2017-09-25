@@ -4,7 +4,7 @@ import core.bigrammar.{As, GrammarReference}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.PathRoot
-import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
+import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 import transformations.bytecode.constants.ClassInfoConstant.{ClassRefKey, ClassRefName}
@@ -17,7 +17,7 @@ import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, Type
 import transformations.javac.classes.ConstantPool
 
 object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val pool = new ConstantPool()
     program(ByteCodeSkeleton.ClassConstantPool) = pool
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
@@ -31,7 +31,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     }))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
 
     for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar)) {

@@ -13,9 +13,9 @@ object FromMap extends Key
 
 trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
-  def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit
+  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     transformGrammars(state.grammarCatalogue, state)
   }

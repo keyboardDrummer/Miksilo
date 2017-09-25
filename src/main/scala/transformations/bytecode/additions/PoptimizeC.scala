@@ -1,7 +1,7 @@
 package transformations.bytecode.additions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
@@ -12,13 +12,13 @@ object PoptimizeC extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopDelta)
 
-  private def getSignatureInOutLengths(state: CompilationState, signature: InstructionSignature): (Int, Int) = {
+  private def getSignatureInOutLengths(state: Language, signature: InstructionSignature): (Int, Int) = {
     val inputLength = signature.inputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     val outputLength = signature.outputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     (inputLength, outputLength)
   }
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: Compilation): Unit = {
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
@@ -26,9 +26,9 @@ object PoptimizeC extends DeltaWithPhase {
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state)(instruction.clazz)
+        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state.language)(instruction.clazz)
         val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
-        getSignatureInOutLengths(state, signature)
+        getSignatureInOutLengths(state.language, signature)
       }
 
       var newInstructions = List.empty[Node]

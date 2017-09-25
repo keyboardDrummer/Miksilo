@@ -2,6 +2,7 @@ package core.particles
 
 import java.io.InputStream
 
+import com.sun.tools.internal.xjc
 import core.bigrammar.BiFailure
 import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
@@ -11,7 +12,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 object ParseUsingTextualGrammar extends Delta {
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     val grammarCatalogue = state.grammarCatalogue
     state.parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
@@ -23,29 +24,41 @@ object ParseUsingTextualGrammar extends Delta {
   override def description: String = "Parses the input file using a textual grammar."
 }
 
-case class Phase(name: String, description: String, action: () => Unit)
+case class Phase(name: String, description: String, action: Compilation => Unit)
 
-class CompilationState {
-  var output: String = null
+object Compilation
+{
+  implicit def toLanguage(compilation: Compilation): Language = compilation.language //TODO remove this
+}
+
+class Compilation(val language: Language) {
+  language.cheatCompilation = this // TODO REMOVE
+  var program: Node = _
+  var output: String = _
+
+  def parseString(input: String): Unit = {
+    val manager = new DeltasToParserConverter()
+    program = manager.parse(language.grammarCatalogue.find(ProgramGrammar), input).asInstanceOf[Node]
+  }
+
+  def runPhases(): Unit = {
+    for(phase <- language.compilerPhases)
+      phase.action(this)
+  }
+
+}
+
+class Language {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
   grammarCatalogue.create(ProgramGrammar, BiFailure())
-  var program: Node = null
   var compilerPhases: List[Phase] = List.empty
-  var parse: InputStream => Node = null
+  var parse: InputStream => Node = _
 
   var random = new Random(0)
   def getUniqueLabel(prefix: String): String = prefix + getGUID
 
   def getGUID: Long = random.nextLong()
 
-  def parseString(input: String): Unit = {
-    val manager = new DeltasToParserConverter()
-    program = manager.parse(grammarCatalogue.find(ProgramGrammar), input).asInstanceOf[Node]
-  }
-
-  def runPhases() = {
-    for(phase <- compilerPhases)
-      phase.action()
-  }
+  var cheatCompilation: Compilation = _
 }

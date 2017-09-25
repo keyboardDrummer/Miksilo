@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton._
@@ -25,7 +25,7 @@ object NewByteCodeDelta extends InstructionDelta {
   }
   override def getInstructionSize: Int = 3
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val constantPool = state.program.constantPool
     val location = instruction(ClassRef).asInstanceOf[Int]
     val classRef = constantPool.getValue(location).asInstanceOf[Node]
@@ -35,7 +35,7 @@ object NewByteCodeDelta extends InstructionDelta {
   }
 
   object ClassRef extends NodeField
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRef -> ClassInfoConstant.key))
   }

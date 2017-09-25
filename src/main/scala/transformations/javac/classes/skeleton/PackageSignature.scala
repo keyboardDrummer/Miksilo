@@ -1,6 +1,6 @@
 package transformations.javac.classes.skeleton
 
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.Node
 import JavaClassSkeleton._
 import scala.collection.mutable

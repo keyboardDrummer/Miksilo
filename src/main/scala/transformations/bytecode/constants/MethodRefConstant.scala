@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -16,7 +16,7 @@ object MethodRefConstant extends ConstantEntry {
 
   object MethodRefMethodName extends NodeField
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
@@ -42,7 +42,7 @@ object MethodRefConstant extends ConstantEntry {
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key,
       Map(MethodRefClassName -> ClassInfoConstant.key, MethodRefMethodName -> NameAndTypeConstant.key))

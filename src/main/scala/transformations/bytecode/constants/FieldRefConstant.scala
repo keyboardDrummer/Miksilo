@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -24,13 +24,13 @@ object FieldRefConstant extends ConstantEntry {
     FieldRefClassIndex -> classIndex,
     FieldRefNameAndTypeIndex -> nameAndTypeIndex)
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(9) ++
       shortToBytes(getFieldRefClassIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
       FieldRefClassIndex -> ClassInfoConstant.key,

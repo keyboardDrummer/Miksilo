@@ -40,7 +40,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
   override def createState = mutable.Map.empty
   type State = mutable.Map[Node, mutable.Set[String]]
 
-  def getUniqueLabel(suggestion: String, methodInfo: Node, state: CompilationState): String = {
+  def getUniqueLabel(suggestion: String, methodInfo: Node, state: Language): String = {
     val methodCounters = getState(state)
     val taken: mutable.Set[String] = methodCounters.getOrElseUpdate(methodInfo, mutable.Set.empty)
     var result = suggestion
@@ -54,15 +54,15 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
     "<" + result + ">"
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     LabelDelta.inject(state)
   }
 
-  def transform(program: Node, state: CompilationState): Unit = {
+  def transform(program: Node, state: Compilation): Unit = {
 
-    val jumpRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
-    def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(state)(instruction.clazz)
+    val jumpRegistry = CodeAttribute.getState(state.language).jumpBehaviorRegistry
+    def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(state.language)(instruction.clazz)
 
     def getNewInstructions(instructions: Seq[Node], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
       var newInstructions = mutable.ArrayBuffer[Node]()
@@ -154,7 +154,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
 
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
-    override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+    override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
       InstructionSignature(Seq.empty, Seq.empty)
     }
 
@@ -180,7 +180,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     overrideJumpGrammars(grammars)
     overrideStackMapFrameGrammars(grammars)
   }

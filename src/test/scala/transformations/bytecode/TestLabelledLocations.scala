@@ -1,30 +1,27 @@
 package transformations.bytecode
 
-import application.compilerBuilder.PresetsPanel
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromParticles, Delta}
-import org.junit.{Assert, Test}
+import core.particles.Delta
 import org.scalatest.FunSuite
-import transformations.bytecode.additions.{LabelledLocations, PoptimizeC}
-import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import transformations.bytecode.additions.LabelledLocations
 import transformations.javac.JavaCompiler
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 class TestLabelledLocations extends FunSuite {
 
   val labelledParticles: Seq[Delta] = Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations
 
   test("javaToLabelled") {
-    val particles: Seq[Delta] = JavaCompiler.spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
-    val utils = new TestUtils(new CompilerFromParticles(particles))
+    val particles: Seq[Delta] = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
+    val utils = new TestUtils(CompilerBuilder.build(particles))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("Fibonacci.java"))
     val expectedResult = utils.getTestFileContents("FibonacciInLabelledByteCode.txt")
     assertResult(expectedResult)(result)
   }
 
   test("labelledToByteCode") {
-    val labelledByteCodeCompiler = new CompilerFromParticles(labelledParticles)
-    val utils = new TestUtils(new CompilerFromParticles(labelledByteCodeCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))))
+    val labelledByteCodeCompiler = CompilerBuilder.build(labelledParticles)
+    val utils = new TestUtils(CompilerBuilder.build(labelledByteCodeCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))))
     val result = utils.compileAndPrettyPrint(utils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
     val expectedResult = utils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     assertResult(expectedResult)(result)

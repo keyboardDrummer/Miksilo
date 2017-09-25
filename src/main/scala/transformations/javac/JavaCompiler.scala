@@ -37,7 +37,7 @@ import transformations.javac.types._
 
 object JavaCompiler {
 
-  def getCompiler = new CompilerFromParticles(javaCompilerTransformations)
+  def getCompiler = new CompilerFromDeltas(javaCompilerTransformations)
 
   def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC, JavaGotoC)
 
@@ -117,7 +117,7 @@ object JavaCompiler {
     getCompiler.spliceAfterTransformations(implicits, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler = {
-    new CompilerFromParticles(spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint)))
+    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint)))
   }
 }
 

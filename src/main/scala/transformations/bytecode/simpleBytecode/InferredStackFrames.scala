@@ -3,7 +3,7 @@ package transformations.bytecode.simpleBytecode
 import core.bigrammar.{As, GrammarReference, Labelled}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
+import core.particles._
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
@@ -17,7 +17,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
@@ -75,7 +75,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Generates a stack frame for each label instruction. " +
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val labelMapPath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey)).head
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
     val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]

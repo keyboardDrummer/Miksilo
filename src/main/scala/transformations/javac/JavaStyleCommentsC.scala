@@ -4,7 +4,7 @@ import core.bigrammar._
 import core.grammar.RegexG
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.NodeField
-import core.particles.{CompilationState, DeltaWithGrammar}
+import core.particles.{Language, DeltaWithGrammar}
 
 import scala.util.matching.Regex
 
@@ -14,7 +14,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
   object CommentKey extends NodeField
   object CommentGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     for(path <- new RootGrammar(grammars.find(ProgramGrammar)).selfAndDescendants.

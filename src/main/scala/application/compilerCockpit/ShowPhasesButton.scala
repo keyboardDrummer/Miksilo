@@ -8,7 +8,7 @@ import core.particles.Phase
 class ShowPhasesButton(compilerCockpit: CompilerCockpit) extends JButton("Show phases") {
   addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
-      val state = compilerCockpit.compiler.buildState
+      val state = compilerCockpit.compiler.buildLanguage
       val text: String = state.compilerPhases.zipWithIndex.
         map(indexedPhase => getIndexedPhaseDescription(indexedPhase)).
         reduce((a,b) => a + "\n\n" + b)

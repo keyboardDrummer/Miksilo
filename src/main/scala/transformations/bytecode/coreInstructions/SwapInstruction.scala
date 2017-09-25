@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
@@ -16,7 +16,7 @@ object SwapInstruction extends InstructionDelta {
     PrintByteCode.hexToBytes("5f")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }

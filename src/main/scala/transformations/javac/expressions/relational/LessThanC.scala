@@ -16,7 +16,7 @@ object GreaterThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
 
-  override def toByteCode(lessThan: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(lessThan: Path, state: Language): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
@@ -27,7 +27,7 @@ object GreaterThanC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](lessThan: T) = lessThan(GreaterThanSecond).asInstanceOf[T]
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -36,7 +36,7 @@ object GreaterThanC extends ExpressionInstance {
     BooleanTypeC.booleanType
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar <~~ ">") ~~ relationalGrammar).asNode(GreaterThanKey, GreaterThanFirst, GreaterThanSecond)
     relationalGrammar.addOption(parseLessThan)
@@ -59,7 +59,7 @@ object LessThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
 
-  override def toByteCode(lessThan: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(lessThan: Path, state: Language): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
@@ -70,7 +70,7 @@ object LessThanC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -79,7 +79,7 @@ object LessThanC extends ExpressionInstance {
     BooleanTypeC.booleanType
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar <~~ "<") ~~ relationalGrammar).asNode(LessThanKey, LessThanFirst, LessThanSecond)
     relationalGrammar.addOption(parseLessThan)

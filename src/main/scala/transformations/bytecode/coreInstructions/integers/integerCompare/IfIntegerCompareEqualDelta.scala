@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
@@ -19,7 +19,7 @@ object IfIntegerCompareEqualDelta extends JumpInstruction {
     hexToBytes("9f") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   object IfIntegerCompareEqualKey extends Key

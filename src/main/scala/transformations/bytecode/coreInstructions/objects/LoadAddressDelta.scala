@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
@@ -22,7 +22,7 @@ object LoadAddressDelta extends InstructionDelta {
       PrintByteCode.byteToBytes(PrintByteCode.hexToInt("2a") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
 

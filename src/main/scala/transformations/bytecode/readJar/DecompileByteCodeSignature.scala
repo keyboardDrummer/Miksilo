@@ -1,22 +1,22 @@
 package transformations.bytecode.readJar
 
 import core.particles.node.Node
-import core.particles.{CompilationState, DeltaWithPhase}
+import core.particles.{Compilation, DeltaWithPhase, Language}
 import transformations.bytecode.attributes.SignatureAttribute
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.javac.classes.skeleton.{QualifiedClassName, JavaClassSkeleton}
+import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.classes.{ConstantPool, FieldDeclaration}
 import transformations.javac.methods.MethodC
-import transformations.javac.methods.MethodC.{Visibility, DefaultVisibility}
+import transformations.javac.methods.MethodC.{DefaultVisibility, Visibility}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.types.{MethodType, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
     val nameIndex = classReference(ClassInfoConstant.ClassRefName).asInstanceOf[Int]
@@ -39,7 +39,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
 
   val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = MethodC.visibilityAccessFlagLinks.
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
-  def getMethods(state: CompilationState, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
+  def getMethods(state: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
       val attributes = methodInfo(ByteCodeMethodInfo.MethodAttributes).asInstanceOf[Seq[Node]]
@@ -75,7 +75,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     })
   }
 
-  def getFields(state: CompilationState, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
+  def getFields(state: Language, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
     fieldInfos.map(fieldInfo => {
       val nameIndex: Int = fieldInfo(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]
       val attributes = fieldInfo(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[Node]]

@@ -9,7 +9,7 @@ import transformations.javac.methods.MemberSelector.SelectorKey
 object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     MemberSelector.getReferenceKindRegistry(state).put(SelectorKey, selector => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(selector, compiler)

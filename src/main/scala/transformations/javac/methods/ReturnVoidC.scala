@@ -17,7 +17,7 @@ object ReturnVoidC extends StatementInstance {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = ("return" ~ ";") ~> produce(_return)
@@ -30,7 +30,7 @@ object ReturnVoidC extends StatementInstance {
 
   override val key: Key = ReturnVoidKey
 
-  override def toByteCode(_return: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(_return: Path, state: Language): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }
 

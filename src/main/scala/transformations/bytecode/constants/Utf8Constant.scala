@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.{BiGrammar, FromGrammarWithToString}
 import core.grammar.{Identifier, Keyword, StringLiteral}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
@@ -15,7 +15,7 @@ object Utf8Constant extends ConstantEntry {
   def create(value: String) = new Node(key, Value -> value)
   def get(constant: Node): String = constant(Value).asInstanceOf[String]
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] =
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -14,7 +14,7 @@ import transformations.javac.types.MethodType._
 
 abstract class InvokeDelta extends InstructionDelta {
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val constantPool: ConstantPool = state.program.constantPool
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getNameAndTypeIndex(methodRef)).asInstanceOf[Node]
@@ -22,7 +22,7 @@ abstract class InvokeDelta extends InstructionDelta {
     getMethodStackModification(descriptor, constantPool, state)
   }
 
-  def getInstanceInstructionSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  def getInstanceInstructionSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val constantPool = state.program.constantPool
     val methodRef = getInvokeTargetMethodRef(instruction, constantPool)
     val nameAndType = constantPool.getValue(MethodRefConstant.getNameAndTypeIndex(methodRef)).asInstanceOf[Node]
@@ -35,14 +35,14 @@ abstract class InvokeDelta extends InstructionDelta {
   }
 
   object MethodRef extends NodeField
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(MethodRef -> MethodRefConstant.key))
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(MethodRef)
 
-  def getMethodStackModification(methodType: Node, constantPool: ConstantPool, state: CompilationState): InstructionSignature = {
+  def getMethodStackModification(methodType: Node, constantPool: ConstantPool, state: Compilation): InstructionSignature = {
     val ins = methodType.parameterTypes.map(_type => TypeSkeleton.toStackType(_type, state))
     val outs = Seq(TypeSkeleton.toStackType(methodType.returnType, state))
     InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))

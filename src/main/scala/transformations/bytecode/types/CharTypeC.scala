@@ -1,7 +1,7 @@
 package transformations.bytecode.types
 
 import core.bigrammar.{Keyword, BiGrammar}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 
@@ -11,7 +11,7 @@ object CharTypeC extends TypeInstance
   override val key: Key = CharTypeKey
   val me = new Node(CharTypeKey)
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "char" ~> produce(me)
 

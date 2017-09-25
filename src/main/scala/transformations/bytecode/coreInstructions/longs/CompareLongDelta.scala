@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -19,7 +19,7 @@ object CompareLongDelta extends InstructionDelta {
     PrintByteCode.hexToBytes("94")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(LongTypeC.longType, LongTypeC.longType), Seq(IntTypeC.intType))
 
   override def grammarName = "lcmp"

@@ -33,7 +33,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     def parent_=(value: Option[String]) = node(ClassParent) = value
   }
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(clazz: Node) {
@@ -66,7 +66,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     case _ =>
   }
 
-  def getClassCompiler(state: CompilationState) = getState(state).classCompiler
+  def getClassCompiler(state: Language) = getState(state).classCompiler
 
   def getQualifiedClassName(clazz: Node): QualifiedClassName = {
     QualifiedClassName(clazz._package ++ Seq(clazz.name))
@@ -75,7 +75,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)

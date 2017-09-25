@@ -25,9 +25,9 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     instruction(InstructionArgumentsKey) = arguments
   }
 
-  def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
+  def getInstructionSizeRegistry(state: Language) = getState(state).getInstructionSizeRegistry
 
-  def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
+  def getInstructionSignatureRegistry(state: Language) = getState(state).getInstructionSignatureRegistry
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -46,7 +46,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   trait InstructionSignatureProvider
   {
-    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: Compilation): InstructionSignature
   }
 
   trait InstructionSideEffectProvider
@@ -66,14 +66,14 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   val constantEntry = Utf8Constant.create("Code")
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
       AttributeNameKey -> Utf8Constant.key))
   }
 
-  def getCodeAttributeBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
+  def getCodeAttributeBytes(attribute: Node, state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Node): Seq[Byte] = {
       ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)

@@ -13,7 +13,7 @@ import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.types.MethodType
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 class TestEmptyClassCompilation extends FunSuite {
   val className: String = "EmptyClass"
@@ -22,14 +22,14 @@ class TestEmptyClassCompilation extends FunSuite {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

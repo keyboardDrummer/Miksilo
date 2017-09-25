@@ -1,13 +1,13 @@
 package transformations.javac.types
 
-import core.particles.{CompilationState, DeltaWithGrammar}
+import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 
 object WildcardTypeArgument extends DeltaWithGrammar {
 
   object WildcardArgumentKey
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val byteCodeArgumentGrammar = grammars.find(TypeApplication.ByteCodeTypeArgumentGrammar)
     byteCodeArgumentGrammar.addOption("*" ~> produce(new Node(WildcardArgumentKey)))
 

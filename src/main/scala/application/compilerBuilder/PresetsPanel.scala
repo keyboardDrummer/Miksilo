@@ -8,7 +8,7 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromParticles, Delta}
+import core.particles.{CompilerFromDeltas, Delta}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.javaPlus.ExpressionMethodC
 import transformations.javac._
@@ -22,7 +22,7 @@ import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset = {
-    new Preset("Simplified bytecode", new CompilerFromParticles(JavaCompiler.simpleByteCodeTransformations).
+    new Preset("Simplified bytecode", new CompilerFromDeltas(JavaCompiler.simpleByteCodeTransformations).
       spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar)),
       "Simplified JVM bytecode.")
   }

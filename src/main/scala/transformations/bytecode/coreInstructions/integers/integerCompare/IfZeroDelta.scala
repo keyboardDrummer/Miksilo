@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
@@ -18,7 +18,7 @@ object IfZeroDelta extends JumpInstruction {
     hexToBytes("99") ++ shortToBytes(arguments.head)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)

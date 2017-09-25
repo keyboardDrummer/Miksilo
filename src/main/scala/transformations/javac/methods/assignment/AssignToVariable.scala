@@ -18,7 +18,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Path) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
@@ -38,7 +38,7 @@ object AssignToVariable extends DeltaWithGrammar {
     }
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
     targetGrammar.addOption(variableGrammar)

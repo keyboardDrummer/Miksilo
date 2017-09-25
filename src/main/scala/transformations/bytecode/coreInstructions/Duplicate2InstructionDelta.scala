@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
@@ -17,7 +17,7 @@ object Duplicate2InstructionDelta extends InstructionDelta {
     PrintByteCode.hexToBytes("5c")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val input: Node = typeState.stackTypes.last
     assertDoubleWord(state, input)
     new InstructionSignature(Seq(input),Seq(input, input))

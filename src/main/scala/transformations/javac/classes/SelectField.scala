@@ -17,7 +17,7 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
-  override def getType(selector: Path, state: CompilationState): Node = {
+  override def getType(selector: Path, state: Language): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -25,7 +25,7 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(selector: Path, state: Language): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
@@ -46,7 +46,7 @@ object SelectField extends ExpressionInstance {
     fieldRef
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     core.addOption(grammars.find(SelectGrammar))
   }

@@ -1,12 +1,12 @@
 package transformations.javac.methods
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
     val methods = MethodC.getMethods(clazz)
     for (method <- methods) {

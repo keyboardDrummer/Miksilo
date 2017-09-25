@@ -3,7 +3,7 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import com.google.common.primitives.{Ints, Longs}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.Node
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.bytecode.ByteCodeSkeleton._
@@ -19,7 +19,7 @@ object PrintByteCode {
 
   val versionNumber: Seq[Byte] = intToBytes(0x00000033)
 
-  def getBytes(byteCode: Node, state: CompilationState): Seq[Byte] = {
+  def getBytes(byteCode: Node, state: Language): Seq[Byte] = {
 
     val clazz = byteCode
     def getBytes(byteCode: Node): Seq[Byte] = {
@@ -95,7 +95,7 @@ object PrintByteCode {
 
   def getExceptionByteCode(exception: Node): Seq[Byte] = ???
 
-  def getAttributesByteCode(state: CompilationState, attributes: Seq[Node]): Seq[Byte] = {
+  def getAttributesByteCode(state: Language, attributes: Seq[Node]): Seq[Byte] = {
 
     def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++

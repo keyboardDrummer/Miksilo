@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -24,7 +24,7 @@ object GetFieldDelta extends InstructionDelta {
     hexToBytes("b4") ++ shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
     new InstructionSignature(Seq(stackTop), Seq(getReturnType(state.program.constantPool, instruction)))
@@ -38,7 +38,7 @@ object GetFieldDelta extends InstructionDelta {
     fieldType
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }

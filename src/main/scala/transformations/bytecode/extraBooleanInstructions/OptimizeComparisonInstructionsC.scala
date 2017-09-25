@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
@@ -20,7 +20,7 @@ object OptimizeComparisonInstructionsC extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
     NotInstructionC, IntegerEqualsInstructionC)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)

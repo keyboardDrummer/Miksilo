@@ -1,7 +1,7 @@
 package transformations.bytecode.readJar
 
 import core.particles.node.Node
-import core.particles.{CompilationState, DeltaWithPhase}
+import core.particles.{Compilation, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute, UnParsedAttribute}
 import transformations.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.Utf8Constant
 
 object ParseKnownAttributes extends DeltaWithPhase {
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     program.visit(node => node.clazz match {
           case UnParsedAttribute.UnParsedAttributeKey =>

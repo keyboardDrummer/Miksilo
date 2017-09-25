@@ -4,10 +4,10 @@ import java.io.{BufferedInputStream, InputStream}
 
 import core.grammar.ParseException
 import core.particles.node.Node
-import core.particles.{CompilationState, Delta}
+import core.particles.{Language, Delta}
 
 object DecodeByteCodeParser extends Delta {
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     state.parse = decodeStream
   }
 
