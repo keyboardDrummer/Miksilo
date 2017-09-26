@@ -19,7 +19,7 @@ import transformations.javac.classes.ConstantPool
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithState {
+object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifZero(target: String) = instruction(IfZeroDelta.IfZeroKey, Seq(target))
   def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
 
@@ -36,13 +36,10 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
     LabelName -> name,
     LabelStackFrame -> stackFrame)
 
-
-  override def createState = mutable.Map.empty
-  type State = mutable.Map[Node, mutable.Set[String]]
-
+  object GeneratedLabels extends NodeField
   def getUniqueLabel(suggestion: String, methodInfo: Node, state: Language): String = {
-    val methodCounters = getState(state)
-    val taken: mutable.Set[String] = methodCounters.getOrElseUpdate(methodInfo, mutable.Set.empty)
+    val taken: mutable.Set[String] = methodInfo.data.getOrElseUpdate(GeneratedLabels, mutable.Set.empty).
+      asInstanceOf[mutable.Set[String]]
     var result = suggestion
     var increment = 0
     while(taken.contains(result))
