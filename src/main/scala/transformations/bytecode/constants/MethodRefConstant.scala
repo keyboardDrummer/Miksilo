@@ -3,14 +3,12 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodRefConstant extends ConstantEntry {
-
-  object MethodRefKey extends NodeClass
 
   object MethodRefClassName extends NodeField
 
@@ -22,13 +20,11 @@ object MethodRefConstant extends ConstantEntry {
       shortToBytes(getNameAndTypeIndex(constant))
   }
 
-  override def key = MethodRefKey
-
-  def methodRef(classNameIndex: Node, methodNameAndTypeIndex: Node) = new Node(MethodRefKey,
+  def methodRef(classNameIndex: Node, methodNameAndTypeIndex: Node) = new Node(key,
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
 
-  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(MethodRefKey,
+  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(key,
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
 
@@ -38,7 +34,7 @@ object MethodRefConstant extends ConstantEntry {
 
   def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     (grammars.find(ConstantPoolIndexGrammar).as(MethodRefClassName) <~ "." ~
-    grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)) asNode MethodRefKey
+    grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)) asNode key
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 

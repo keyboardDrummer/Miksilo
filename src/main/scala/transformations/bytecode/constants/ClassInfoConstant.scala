@@ -16,12 +16,10 @@ object ClassInfoConstant extends ConstantEntry {
 
   object ClassRefName extends NodeField
 
-  def classRef(name: QualifiedClassName): Node = new Node(ClassRefKey, ClassRefName -> QualifiedClassNameConstant.create(name))
-  def classRef(classRefNameIndex: Int): Node = new Node(ClassRefKey, ClassRefName -> classRefNameIndex)
+  def classRef(name: QualifiedClassName): Node = new Node(key, ClassRefName -> QualifiedClassNameConstant.create(name))
+  def classRef(classRefNameIndex: Int): Node = new Node(key, ClassRefName -> classRefNameIndex)
 
   def getNameIndex(classRef: Node): Int = classRef(ClassRefName).asInstanceOf[Int]
-
-  override def key = ClassRefKey
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
@@ -33,7 +31,7 @@ object ClassInfoConstant extends ConstantEntry {
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName) asNode ClassRefKey
+    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName) asNode key
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

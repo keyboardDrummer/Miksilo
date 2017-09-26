@@ -2,12 +2,10 @@ package transformations.bytecode.constants
 
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeField}
 import transformations.bytecode.PrintByteCode._
 
 object InterfaceMethodRefConstant extends ConstantEntry {
-
-  object InterfaceMethodRefConstantKey extends NodeClass
 
   object MethodRefClassName extends NodeField
 
@@ -19,9 +17,7 @@ object InterfaceMethodRefConstant extends ConstantEntry {
       shortToBytes(getNameIndex(constant))
   }
 
-  override def key = InterfaceMethodRefConstantKey
-
-  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(InterfaceMethodRefConstantKey,
+  def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(key,
     MethodRefClassName -> classNameIndex,
     MethodRefMethodName -> methodNameAndTypeIndex)
 
@@ -30,7 +26,7 @@ object InterfaceMethodRefConstant extends ConstantEntry {
   def getNameIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
   def getConstantEntryGrammar(grammars: GrammarCatalogue) = ((integer.as(MethodRefClassName) <~ ".") ~ integer.as(MethodRefMethodName)).
-    asNode(InterfaceMethodRefConstantKey)
+    asNode(key)
 
   override def description: String = "Defines the interface method reference constant, " +
     "which refers to a method by class name, method name and signature."

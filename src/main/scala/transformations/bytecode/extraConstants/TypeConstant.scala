@@ -3,7 +3,7 @@ package transformations.bytecode.extraConstants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeField}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptorIndex, MethodInfoKey, MethodNameIndex}
 import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
@@ -13,13 +13,11 @@ import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
 object TypeConstant extends ConstantEntry {
-  object Key extends NodeClass
+
   object Type extends NodeField
 
-  def constructor(_type: Node) = new Node(Key, Type -> _type)
+  def constructor(_type: Node) = new Node(key, Type -> _type)
   def getValue(constant: Node) = constant(Type).asInstanceOf[Node]
-
-  override def key = Key
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     val _type: Node = constant(Type).asInstanceOf[Node]

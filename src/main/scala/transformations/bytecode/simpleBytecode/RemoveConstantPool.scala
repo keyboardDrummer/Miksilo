@@ -9,8 +9,8 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 import transformations.bytecode.constants.ClassInfoConstant.{ClassRefKey, ClassRefName}
 import transformations.bytecode.constants.FieldRefConstant.{FieldRefClassIndex, FieldRefNameAndTypeIndex}
-import transformations.bytecode.constants.MethodRefConstant.{MethodRefClassName, MethodRefKey, MethodRefMethodName}
-import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeKey, NameAndTypeName, NameAndTypeType}
+import transformations.bytecode.constants.MethodRefConstant.{MethodRefClassName, MethodRefMethodName}
+import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeName, NameAndTypeType}
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
@@ -49,12 +49,12 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
     grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(MethodRefClassName) <~ "." ~
-      grammars.find(NameAndTypeConstant.key).as(MethodRefMethodName)) asNode MethodRefKey
+      grammars.find(NameAndTypeConstant.key).as(MethodRefMethodName)) asNode MethodRefConstant.key
     grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassRefName) asNode ClassRefKey
     grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "." ~
       grammars.find(NameAndTypeConstant.key).as(FieldRefNameAndTypeIndex) asNode FieldRefConstant.key
     grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeName) ~~
-      grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeKey
+      grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeConstant.key
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
 
     val constantPoolGrammar = grammars.findPathsToKey(ConstantPoolGrammar).head
