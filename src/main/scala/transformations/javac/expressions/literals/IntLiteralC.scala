@@ -2,9 +2,8 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import core.particles.path.Path
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
 import transformations.bytecode.types.IntTypeC
@@ -28,6 +27,7 @@ object IntLiteralC extends ExpressionInstance {
     val value: Int = getValue(literal)
     if (-1 <= value && value <= 5) {
       val node = literal.current.shallowClone
+      node.data.remove(ValueKey)
       node.replaceWith(SmallIntegerConstantDelta.integerConstant(value), keepData = true)
       Seq(node) //TODO dit mooier maken. Maak de nieuwe node gewoon en en schuif deze over de oude node.
     }
@@ -43,7 +43,7 @@ object IntLiteralC extends ExpressionInstance {
 
   object IntLiteralKey extends Key
 
-  object ValueKey extends Key
+  object ValueKey extends NodeField
 
   override def description: String = "Adds the usage of int literals."
 }

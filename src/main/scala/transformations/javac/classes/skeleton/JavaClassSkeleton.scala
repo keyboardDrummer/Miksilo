@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node, NodeField}
+import core.particles.node.{Key, Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.constants.ClassInfoConstant
@@ -16,18 +16,18 @@ import transformations.javac.statements.BlockC
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithState {
 
-  implicit class JavaClass(val node: Node) extends AnyVal {
+  implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
     def _package = node(ClassPackage).asInstanceOf[Seq[String]]
     def _package_=(value: Seq[String]) = node(ClassPackage) = value
 
-    def imports = node(ClassImports).asInstanceOf[Seq[Node]]
-    def imports_=(value: Seq[Node]) = node(ClassImports) = value
+    def imports = node(ClassImports).asInstanceOf[Seq[T]]
+    def imports_=(value: Seq[T]) = node(ClassImports) = value
 
     def name = node(ClassName).asInstanceOf[String]
     def name_=(value: String) = node(ClassName) = value
 
-    def members = node(Members).asInstanceOf[Seq[Node]]
-    def members_=(value: Seq[Node]) = node(Members) = value
+    def members = node(Members).asInstanceOf[Seq[T]]
+    def members_=(value: Seq[T]) = node(Members) = value
 
     def parent = node(ClassParent).asInstanceOf[Option[String]]
     def parent_=(value: Option[String]) = node(ClassParent) = value
