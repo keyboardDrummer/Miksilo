@@ -3,22 +3,24 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object FieldRefConstant extends ConstantEntry {
 
+  object FieldRef extends NodeClass
+
   object FieldRefClassIndex extends NodeField
 
   object FieldRefNameAndTypeIndex extends NodeField
 
-  def fieldRef(classConstant: Node, nameAndType: Node) = new Node(key,
+  def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,
     FieldRefClassIndex -> classConstant,
     FieldRefNameAndTypeIndex -> nameAndType)
 
-  def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new Node(key,
+  def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new Node(FieldRef,
     FieldRefClassIndex -> classIndex,
     FieldRefNameAndTypeIndex -> nameAndTypeIndex)
 
@@ -34,6 +36,9 @@ object FieldRefConstant extends ConstantEntry {
       FieldRefClassIndex -> ClassInfoConstant.key,
       FieldRefNameAndTypeIndex -> NameAndTypeConstant.key))
   }
+
+  override def key = FieldRef
+
   def getFieldRefClassIndex(fieldRef: Node): Int = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
   def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
@@ -41,7 +46,7 @@ object FieldRefConstant extends ConstantEntry {
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     ("field reference:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ ".") ~
       grammars.find(ConstantPoolIndexGrammar).as(FieldRefNameAndTypeIndex)).
-      asNode(key)
+      asNode(FieldRef)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 

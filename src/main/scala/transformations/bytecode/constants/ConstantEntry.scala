@@ -9,8 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
 trait ConstantEntry extends DeltaWithGrammar {
 
-  object Clazz extends NodeClass
-  val key = Clazz //TODO inlinen
+  def key: AnyRef
   def getByteCode(constant: Node, state: Language): Seq[Byte]
 
   override def inject(state: Language): Unit = {

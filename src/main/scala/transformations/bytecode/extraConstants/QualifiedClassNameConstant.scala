@@ -3,7 +3,7 @@ package transformations.bytecode.extraConstants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -12,7 +12,9 @@ import transformations.javac.classes.skeleton.QualifiedClassName
   * This is a virtual constant that translates into a UTF8Constant.
   */
 object QualifiedClassNameConstant extends ConstantEntry {
+  override def key = Key
 
+  object Key extends NodeClass
   object Value extends NodeField
 
   def create(value: QualifiedClassName) = new Node(key, Value -> value)
