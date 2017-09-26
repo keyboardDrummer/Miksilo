@@ -24,7 +24,7 @@ trait GrammarPath {
 
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
-  def findGrammar(grammar: BiGrammar) = find(p => p.get == grammar)
+  def findGrammar(grammar: BiGrammar): Option[GrammarPath] = find(p => p.get == grammar)
   def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = {
     var result: Option[GrammarPath] = None
     GraphBasics.traverseBreadth[GrammarPath](Seq(this),

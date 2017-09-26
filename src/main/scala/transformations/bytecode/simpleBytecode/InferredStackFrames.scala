@@ -76,13 +76,13 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val labelMapPath = grammars.findPathsToKey(LabelledLocations.LabelKey).head
+    val labelMapPath = grammars.findPathToKey(LabelledLocations.LabelKey)
     val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
     val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
     val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
     labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
 
-    val stackMapTablePath = grammars.findPathsToKey(StackMapTableAttribute.StackMapFrameGrammar, LabelledLocations.LabelKey).head
+    val stackMapTablePath = grammars.findPathToKey(StackMapTableAttribute.StackMapFrameGrammar, LabelledLocations.LabelKey)
     stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

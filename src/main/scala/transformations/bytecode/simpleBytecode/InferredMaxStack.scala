@@ -34,7 +34,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    grammars.findPathsToKey(CodeAttribute.MaxStackGrammar).head.removeMeFromSequence() //TODO dit laat nog een , staan.
+    grammars.findPathToKey(CodeAttribute.MaxStackGrammar).removeMeFromSequence()
   }
 
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."
