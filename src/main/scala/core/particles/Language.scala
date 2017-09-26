@@ -2,11 +2,9 @@ package core.particles
 
 import java.io.InputStream
 
-import com.sun.tools.internal.xjc
 import core.bigrammar.BiFailure
-import core.grammar.ParseException
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Node, Node$}
+import core.particles.node.Node
 
 import scala.collection.mutable
 import scala.util.Random
