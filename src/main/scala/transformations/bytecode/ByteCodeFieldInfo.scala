@@ -39,7 +39,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val constantIndex = grammars.find(ConstantPoolIndexGrammar)
     val fieldGrammar = "Field" ~> ("name:" ~> constantIndex.as(NameIndex) %
-      ("descriptor" ~> integer.as(DescriptorIndex)) %
+      ("descriptor" ~> constantIndex.as(DescriptorIndex)) %
       attributesGrammar.as(FieldAttributes)).asNode(FieldKey)
     val parseFields = (grammars.create(FieldKey, fieldGrammar) <~ BlankLine).manyVertical.as(ClassFields) //TODO add method to in one go create a label and a node grammar for a NodeClass
 

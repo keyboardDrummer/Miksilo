@@ -29,6 +29,13 @@ class GrammarCatalogue {
     result
   }
 
+  def findPathToKey(grammarKeyToFind: Any, rootKey: Any = ProgramGrammar): GrammarReference = {
+    val attributeGrammar = find(rootKey)
+    val rootGrammar = new RootGrammar(attributeGrammar)
+    val targetGrammar = find(grammarKeyToFind)
+    rootGrammar.find(path => path.get == targetGrammar).get.asInstanceOf[GrammarReference]
+  }
+
   def findPathsToKey(grammarKeyToFind: Any, rootKey: Any = ProgramGrammar): Seq[GrammarReference] = {
     val attributeGrammar = find(rootKey)
     val rootGrammar = new RootGrammar(attributeGrammar)

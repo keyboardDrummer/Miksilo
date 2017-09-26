@@ -1,6 +1,6 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarReference}
+import core.bigrammar.{As, GrammarReference, RootGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.PathRoot
@@ -34,14 +34,18 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
 
+    val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
     for(containerEntry <- constantReferences) {
       val key: Any = containerEntry._1
-      for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar, key)) { //TODO Dit kan nog steeds heel diep gaan. Eigenlijk hoeft die er maar 1 te vinden toch? Degene die niet door een andere NodeGrammar gaat. Een limited breadth first search kan dit wel.
-        val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head
-        val constantFields: Map[NodeField, NodeClass] = containerEntry._2
-        constantFields.get(surroundingAs.key).foreach(constantClass => {
-          path.set(grammars.find(constantClass))
-        })
+      val constantFields: Map[NodeField, NodeClass] = containerEntry._2
+      val keyGrammar = new RootGrammar(grammars.find(key))
+      for(field <- constantFields) {
+        val asGrammar = keyGrammar.find(p => p.get match {
+          case as: As => as.key == field._1
+          case _ => false
+        }).get
+        val constantRef = asGrammar.findGrammar(constantPoolIndexGrammar).get.asInstanceOf[GrammarReference]
+        constantRef.set(grammars.find(field._2))
       }
     }
 
@@ -57,7 +61,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
       grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeKey
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
 
-    val constantPoolGrammar = grammars.findPathsToKey(ConstantPoolGrammar).head
+    val constantPoolGrammar = grammars.findPathToKey(ConstantPoolGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 
