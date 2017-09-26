@@ -58,7 +58,6 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   }
 
   object AccessFlagGrammar
-  object MethodInfoGrammar
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar,
@@ -72,7 +71,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       "flags:" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
       attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
 
-    grammars.create(MethodInfoGrammar, methodInfoGrammar)
+    grammars.create(MethodInfoKey, methodInfoGrammar)
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies

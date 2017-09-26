@@ -15,19 +15,11 @@ import transformations.javac.JavaCompiler
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object CompilerBuilder {
-  var compilers : Map[Seq[Delta], CompilerFromDeltas] = Map.empty
-  def build(deltas: Seq[Delta], description: String = "testing"): CompilerFromDeltas = {
-    val result = compilers.getOrElse(deltas, new CompilerFromDeltas(deltas, description))
-    compilers += (deltas -> result)
-    result
-  }
-}
 
 object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompiler.javaCompilerTransformations)) {
 }
 
-class TestUtils(val compiler: CompilerFromDeltas) extends FunSuite {
+class TestUtils(val compiler: TestingCompiler) extends FunSuite {
 
   def toFile(program: String): String = {
     val fileName = File.makeTemp(suffix = ".java")
@@ -149,15 +141,15 @@ class TestUtils(val compiler: CompilerFromDeltas) extends FunSuite {
 
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
-    val javaCompilerOutput = profile("javac", runJavaC(currentDir, input, expectedOutputDirectory))
+    val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaC(currentDir, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
 
     val state = profile("blender compile", compiler.compile(input, Directory(actualOutputDirectory / inputDirectory)))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
-    val expectedOutput = profile("run expected", TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
+    val expectedOutput = profile("Java run expected", TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
     try {
-      val actualOutput = profile("run actual", TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
+      val actualOutput = profile("Java run actual", TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
       assertResult(expectedOutput)(actualOutput)
     }
     catch {
@@ -166,13 +158,7 @@ class TestUtils(val compiler: CompilerFromDeltas) extends FunSuite {
     }
   }
 
-  def profile[T](description: String, action: => T): T = {
-    val start = System.nanoTime()
-    val result = action
-    val end = System.nanoTime()
-    System.out.println(s"$description took ${(end - start)/1000000}s")
-    result
-  }
+  def profile[T](description: String, action: => T): T = CompilerBuilder.profile(description, action)
 
   def fileNameToClassName(fileName: String): String = {
     if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName

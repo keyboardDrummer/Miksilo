@@ -10,7 +10,7 @@ import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescripto
 import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeName, NameAndTypeType}
 import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8Constant}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
 object TypeConstant extends ConstantEntry {
   object Key extends NodeClass
@@ -42,6 +42,8 @@ object TypeConstant extends ConstantEntry {
       NameAndTypeName -> Utf8Constant.key,
       NameAndTypeType -> TypeConstant.key))
   }
+
+  override def dependencies = Set(MethodTypeConstant, NameAndTypeConstant, ByteCodeMethodInfo, ByteCodeFieldInfo)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

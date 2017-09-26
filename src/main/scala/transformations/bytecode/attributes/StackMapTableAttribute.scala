@@ -63,8 +63,6 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def sameFrame(offset: Int) = new Node(SameFrameKey, FrameOffset -> offset)
 
-  object StackMapTableGrammar
-
   override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
@@ -133,7 +131,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(StackMapTableMaps)).
       asNode(StackMapTableKey)
 
-    grammars.create(StackMapTableGrammar, stackMapTableGrammar)
+    grammars.create(StackMapTableKey, stackMapTableGrammar)
   }
 
   override def constantPoolKey: String = "StackMapTable"

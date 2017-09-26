@@ -57,7 +57,7 @@ class TestClassFileDecompiler extends FunSuite {
     val currentDir = new File(new io.File("."))
     val testResources = currentDir / Path("resources") / "rtUnzipped"
     val allCassFiles = testResources.toDirectory.deepFiles
-    val compiler: CompilerFromDeltas = CompilerBuilder.build(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
+    val compiler = CompilerBuilder.build(/*Seq(new PrettyPrint()) ++*/ ClassFileSignatureDecompiler.getDecompiler)
     var counter = 0
     val start = 17453
     for(file <- allCassFiles) {
@@ -73,7 +73,7 @@ class TestClassFileDecompiler extends FunSuite {
 
   test("ObjectClassUnParsedAttributes") {
     val inputStream = TestUtils.getTestFile("Object.class")
-    val compiler: CompilerFromDeltas = CompilerBuilder.build(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
+    val compiler = CompilerBuilder.build(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
     val state = compiler.parseAndTransform(inputStream)
 
     val expected = TestUtils.getTestFileContents("DecodedObjectClassPrettyPrint.txt")

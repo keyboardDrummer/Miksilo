@@ -3,7 +3,7 @@ package transformations.bytecode.additions
 import core.bigrammar.{BiGrammar, FromGrammarWithToString}
 import core.grammar.StringLiteral
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
@@ -196,7 +196,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar with WithS
       IfIntegerCompareLessDelta, IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
     for(jump <- jumps)
     {
-      val grammar = grammars.find(KeyGrammar(jump.key))
+      val grammar = grammars.find(jump.key)
       grammar.inner = jump.grammarName ~~> FromGrammarWithToString(StringLiteral).manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
     }
   }

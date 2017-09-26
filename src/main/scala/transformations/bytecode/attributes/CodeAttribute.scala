@@ -120,8 +120,6 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object InstructionGrammar
 
-  object CodeGrammar
-
   override def key: Key = CodeKey
 
   object MaxStackGrammar
@@ -138,7 +136,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
     val codeGrammar: BiGrammar = ("Code:" %> body).asNode(CodeKey)
-    grammars.create(CodeGrammar, codeGrammar)
+    grammars.create(CodeKey, codeGrammar)
   }
 
   override def constantPoolKey: String = "Code"

@@ -13,7 +13,7 @@ import scala.reflect.io.{Directory, File}
 class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
 
   validateDependencies(deltas)
-  lazy val language: Language = profile("build language", buildLanguage)
+  lazy val language: Language = buildLanguage
 
   def getGrammar: Labelled = {
     language.grammarCatalogue.find(ProgramGrammar)
@@ -39,7 +39,7 @@ class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
   }
 
   private def runPhases(state: Compilation) = {
-    profile("running phases", state.runPhases())
+    state.runPhases()
   }
 
   def parse(input: InputStream): Node = {
@@ -49,7 +49,7 @@ class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
   }
 
   private def justParse(input: InputStream, state: Compilation): Unit = {
-    profile("parse", state.program = language.parse(input))
+    state.program = language.parse(input)
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
@@ -97,13 +97,5 @@ class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
   def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
     val implicitsSet = implicits.toSet
     implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
-  }
-
-  def profile[T](description: String, action: => T): T = {
-    val start = System.nanoTime()
-    val result = action
-    val end = System.nanoTime()
-    System.out.println(s"$compilerName: $description took ${(end - start)/1000000}s")
-    result
   }
 }

@@ -2,7 +2,7 @@ package transformations.bytecode.simpleBytecode
 
 import core.bigrammar.{As, GrammarReference}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -34,12 +34,15 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
 
-    for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar)) {
-      val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head
-      val surroundingNode: NodeGrammar = path.ancestors.map(a => a.get).collect({case as:NodeGrammar => as}).head
-      constantReferences.get(surroundingNode.key).flatMap(m => m.get(surroundingAs.key)).foreach(constantClass => {
-        path.set(grammars.find(constantClass))
-      })
+    for(containerEntry <- constantReferences) {
+      val key: Any = containerEntry._1
+      for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar, key)) { //TODO Dit kan nog steeds heel diep gaan. Eigenlijk hoeft die er maar 1 te vinden toch? Degene die niet door een andere NodeGrammar gaat. Een limited breadth first search kan dit wel.
+        val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head
+        val constantFields: Map[NodeField, NodeClass] = containerEntry._2
+        constantFields.get(surroundingAs.key).foreach(constantClass => {
+          path.set(grammars.find(constantClass))
+        })
+      }
     }
 
     grammars.find(Utf8Constant.key).inner = Utf8Constant.getConstantEntryGrammar(grammars)

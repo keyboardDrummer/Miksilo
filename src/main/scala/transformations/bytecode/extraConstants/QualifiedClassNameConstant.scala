@@ -12,9 +12,9 @@ import transformations.javac.classes.skeleton.QualifiedClassName
   * This is a virtual constant that translates into a UTF8Constant.
   */
 object QualifiedClassNameConstant extends ConstantEntry {
-  override def key = QualifiedClassNameKey
+  override def key = Key
 
-  object QualifiedClassNameKey extends NodeClass
+  object Key extends NodeClass
   object Value extends NodeField
 
   def create(value: QualifiedClassName) = new Node(key, Value -> value)
