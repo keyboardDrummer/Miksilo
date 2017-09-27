@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.particles.node.Node
 import org.scalatest.FunSuite
-import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.methods.MethodC._
@@ -29,7 +29,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
     method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }

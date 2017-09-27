@@ -3,7 +3,7 @@ package core.grammar
 import core.bigrammar.TestGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
-import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.{JavaStyleCommentsC, JavaCompiler}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions._
@@ -117,7 +117,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val fibonacciCall = CallC.call(VariableC.variable("fibonacci"), Seq(IntLiteralC.literal(5)))
     val printCall = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
-    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeC.stringType))),
+    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.stringType))),
       Seq(ExpressionAsStatementC.create(printCall)), static = true, MethodC.PublicVisibility)
   }
 

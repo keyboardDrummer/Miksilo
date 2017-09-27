@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
-import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
+import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoDelta, InstructionDelta, InstructionSignature}
@@ -82,7 +82,6 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     }
 
     val clazz = program
-    val constantPool = clazz.constantPool
     val codeAnnotations = CodeAttribute.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
@@ -93,7 +92,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
-        getStackMapTable(constantPool, targetLocations, instructions)
+        getStackMapTable(targetLocations, instructions)
 
       val newInstructions: Seq[Node] = getNewInstructions(instructions, targetLocations)
       codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
@@ -118,7 +117,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     getInstructionArguments(instruction).head.asInstanceOf[String]
   }
 
-  def getStackMapTable(constantPool: ConstantPool, labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
+  def getStackMapTable(labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
     val framesPerLocation = instructions.filter(i => i.clazz == LabelKey).
       map(i => (labelLocations(getLabelName(i)), getLabelStackFrame(i))).toMap
     var locationAfterPreviousFrame = 0
@@ -133,8 +132,9 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       locationAfterPreviousFrame = location + 1
     }
     if (stackFrames.nonEmpty) {
-      val nameIndex = constantPool.store(StackMapTableAttribute.entry)
-      Seq(StackMapTableAttribute.stackMapTable(nameIndex, stackFrames))
+      Seq(StackMapTableAttribute.Clazz.create(
+        AttributeNameKey -> StackMapTableAttribute.entry,
+        StackMapTableAttribute.Maps -> stackFrames))
     }
     else
       Seq.empty[Node]

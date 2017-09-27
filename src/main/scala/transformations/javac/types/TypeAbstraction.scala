@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node, NodeField}
-import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
@@ -41,7 +41,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     val methodTypeGrammar = grammars.find(KeyGrammar(MethodTypeKey))
-    val objectTypeGrammar = grammars.find(ObjectTypeC.ObjectTypeByteCodeGrammar)
+    val objectTypeGrammar = grammars.find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier.as(ParameterName) ~
       (":" ~> classBound.option).as(ParameterClassBound) ~~

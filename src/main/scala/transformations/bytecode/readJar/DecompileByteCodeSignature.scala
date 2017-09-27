@@ -19,7 +19,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
   override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
-    val nameIndex = classReference(ClassInfoConstant.ClassRefName).asInstanceOf[Int]
+    val nameIndex = classReference(ClassInfoConstant.Name).asInstanceOf[Int]
     val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
 //    val parentClassReference = constantPool.getNode(program(ByteCodeSkeleton.ClassParentIndex).asInstanceOf[Int])

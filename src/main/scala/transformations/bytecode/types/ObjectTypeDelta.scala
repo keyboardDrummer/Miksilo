@@ -4,11 +4,10 @@ import core.bigrammar.{BiGrammar, Keyword, Labelled}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
-object ObjectTypeC extends TypeInstance with StackType {
+object ObjectTypeDelta extends TypeInstance with StackType {
   override val key = ObjectTypeKey
   val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
   val rootObjectType = objectType(new QualifiedClassName(Seq("java", "lang", "Object")))
@@ -17,7 +16,7 @@ object ObjectTypeC extends TypeInstance with StackType {
     Seq.empty //TODO extend
   }
 
-  def stackObjectType(constantPoolClassRef: Int) = new Node(ObjectTypeKey, ObjectTypeName -> constantPoolClassRef)
+  def stackObjectType(constantPoolClassRef: Int) = new Node(ObjectTypeKey, Name -> constantPoolClassRef)
 
   object ObjectTypeJavaGrammar
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = {
@@ -34,15 +33,15 @@ object ObjectTypeC extends TypeInstance with StackType {
       case Left(string) => Seq(string)
     })
     val parseObjectType = grammars.create(ObjectTypeJavaGrammar,
-      (identifier.someSeparated(".") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, ObjectTypeName))
+      (identifier.someSeparated(".") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
     parseObjectType
   }
 
   def objectType(name: QualifiedClassName) = new Node(ObjectTypeKey,
-    ObjectTypeName -> Right(name))
+    Name -> Right(name))
 
   def objectType(className: String) = new Node(ObjectTypeKey,
-    ObjectTypeName -> Left(className))
+    Name -> Left(className))
 
   object ObjectTypeByteCodeGrammar
   object ObjectTypeByteCodeGrammarInner
@@ -56,25 +55,21 @@ object ObjectTypeC extends TypeInstance with StackType {
       case Right(QualifiedClassName(stringIds)) => stringIds
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
-      (identifier.someSeparated("/") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, ObjectTypeName))
+      (identifier.someSeparated("/") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
     val grammar: BiGrammar = new Keyword("L",false) ~> inner <~ ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 
-  def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(ObjectTypeName).asInstanceOf[Either[String, QualifiedClassName]]
+  def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(Name).asInstanceOf[Either[String, QualifiedClassName]]
 
   override def getStackSize: Int = 1
 
-  object ObjectTypeName  extends NodeField
+  object Name  extends NodeField
 
   object ObjectTypeKey extends NodeClass
 
   override def getStackType(_type: Node, state: Language): Node = {
-    if (state.cheatCompilation.program.data.contains(ClassConstantPool))
-      stackObjectType(state.cheatCompilation.program.constantPool.getClassRef(ObjectTypeC.getObjectTypeName(_type).right.get)) //TODO dit wegwerken en getClassRef weggooien.
-    else
-      ObjectTypeKey.create(ObjectTypeName -> ClassInfoConstant.classRef(ObjectTypeC.getObjectTypeName(_type).right.get))
-    //TODO FIX THIS
+    ObjectTypeKey.create(Name -> ClassInfoConstant.classRef(ObjectTypeDelta.getObjectTypeName(_type).right.get))
   }
 
   override def description: String = "Defines the object type."

@@ -3,7 +3,7 @@ package transformations.javac.types
 import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Key
-import transformations.bytecode.types.ObjectTypeC.ObjectTypeByteCodeGrammarInner
+import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 
 object SelectInnerClassC extends DeltaWithGrammar {
 

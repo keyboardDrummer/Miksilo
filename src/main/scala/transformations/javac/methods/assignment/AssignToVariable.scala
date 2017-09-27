@@ -11,7 +11,7 @@ import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
 import transformations.bytecode.types.IntTypeC.IntTypeKey
 import transformations.bytecode.types.LongTypeC.LongTypeKey
-import transformations.bytecode.types.ObjectTypeC.ObjectTypeKey
+import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeKey
 import transformations.bytecode.types.TypeSkeleton
 
 object AssignToVariable extends DeltaWithGrammar {

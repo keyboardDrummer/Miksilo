@@ -9,7 +9,7 @@ import core.particles.node.{Key, Node}
 object ArrayTypeC extends TypeInstance with StackType {
   override val key = ArrayTypeKey
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(ObjectTypeC.rootObjectType)
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(ObjectTypeDelta.rootObjectType)
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

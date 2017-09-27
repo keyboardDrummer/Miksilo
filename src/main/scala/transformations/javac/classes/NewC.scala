@@ -10,7 +10,7 @@ import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
 
@@ -18,7 +18,7 @@ object NewC extends ExpressionInstance {
   object NewObject extends Key
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
+    val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
     val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).
       asNode(NewCallKey, NewObject, CallC.CallArguments)

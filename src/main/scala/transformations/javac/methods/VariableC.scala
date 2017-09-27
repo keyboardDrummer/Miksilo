@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
 import transformations.bytecode.coreInstructions.longs.LoadLongDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC}
+import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
@@ -49,7 +49,7 @@ object VariableC extends ExpressionInstance {
       case BooleanTypeC.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
       case IntTypeC.IntTypeKey => LoadIntegerDelta.load(variableAddress)
       case LongTypeC.LongTypeKey => LoadLongDelta.load(variableAddress)
-      case ObjectTypeC.ObjectTypeKey => LoadAddressDelta.addressLoad(variableAddress)
+      case ObjectTypeDelta.ObjectTypeKey => LoadAddressDelta.addressLoad(variableAddress)
     })
   }
 

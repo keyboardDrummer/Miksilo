@@ -6,7 +6,7 @@ import core.particles.Language
 import core.particles.node.Node
 import transformations.bytecode.constants._
 import transformations.bytecode.extraConstants.TypeConstant
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 
@@ -74,7 +74,7 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def findClass(objectType: Node): ClassSignature = {
-    val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
+    val qualifiedName = ObjectTypeDelta.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
     }

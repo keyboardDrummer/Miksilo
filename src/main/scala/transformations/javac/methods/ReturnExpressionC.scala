@@ -28,7 +28,7 @@ object ReturnExpressionC extends StatementInstance {
       case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta.longReturn)
       case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
       case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeC.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
+      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
   }

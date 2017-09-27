@@ -8,7 +8,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MethodC._
 import transformations.javac.statements.StatementSkeleton
 import transformations.javac.statements.locals.LocalsAnalysis
-import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.classes.ClassCompiler
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
@@ -54,7 +54,7 @@ case class MethodCompiler(state: Language, method: Node) {
   def getInitialVariables: VariablePool = {
     var result = VariablePool(state)
     if (!getMethodStatic(method))
-      result = result.add("this", ObjectTypeC.objectType(classCompiler.currentClassInfo.name))
+      result = result.add("this", ObjectTypeDelta.objectType(classCompiler.currentClassInfo.name))
     for (parameter <- parameters)
       result = result.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
     result

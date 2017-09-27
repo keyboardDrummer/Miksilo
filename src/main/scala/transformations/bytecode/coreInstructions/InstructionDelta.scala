@@ -6,7 +6,7 @@ import transformations.bytecode._
 import transformations.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
@@ -24,7 +24,7 @@ trait InstructionDelta extends InstructionWithGrammar with InstructionSignatureP
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
-    if (stackTop.clazz != ObjectTypeC.ObjectTypeKey)
+    if (stackTop.clazz != ObjectTypeDelta.ObjectTypeKey)
       throw new ByteCodeTypeException(s"$name requires an object on top of the stack and not a $stackTop.")
   }
 

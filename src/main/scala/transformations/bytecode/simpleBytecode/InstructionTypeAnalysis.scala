@@ -4,7 +4,7 @@ import core.particles.exceptions.BadInputException
 import core.particles.node.Node
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 
 case class ProgramTypeState(stackTypes: Seq[Node], variableTypes: Map[Int, Node])
 
@@ -75,7 +75,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Node])
 
   def convertObjectTypesToObjectKey(input: Seq[Node]): Seq[Object] = {
     input.map(_type => _type.clazz match {
-      case ObjectTypeC.ObjectTypeKey => ObjectTypeC.ObjectTypeKey
+      case ObjectTypeDelta.ObjectTypeKey => ObjectTypeDelta.ObjectTypeKey
       case _ => _type
     })
   }

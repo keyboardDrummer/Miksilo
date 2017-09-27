@@ -1,16 +1,15 @@
 package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
-import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.FieldRefConstant.NameAndType
 import transformations.bytecode.constants.{FieldRefConstant, NameAndTypeConstant}
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 object GetStaticDelta extends InstructionDelta {
 
@@ -25,16 +24,14 @@ object GetStaticDelta extends InstructionDelta {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
-    new InstructionSignature(Seq(), Seq(getReturnType(state.program.constantPool, instruction)))
+    new InstructionSignature(Seq(), Seq(getReturnType(instruction)))
 
-  def getReturnType(constantPool: ConstantPool, getStatic: Node): Node = {
-    val location = getStatic(FieldRef).asInstanceOf[Int]
-    val fieldRef = constantPool.getValue(location).asInstanceOf[Node]
-    val nameAndType = constantPool.getValue(FieldRefConstant.getNameAndTypeIndex(fieldRef)).asInstanceOf[Node]
-    val fieldType = TypeConstant.getValue(constantPool.getValue(NameAndTypeConstant.getTypeIndex(nameAndType)).asInstanceOf[Node])
+  def getReturnType(getStatic: Node): Node = {
+    val fieldRef = getStatic(FieldRef).asInstanceOf[Node]
+    val nameAndType = fieldRef(NameAndType).asInstanceOf[Node]
+    val fieldType = TypeConstant.getValue(nameAndType(NameAndTypeConstant.Type).asInstanceOf[Node])
     fieldType
   }
-
 
   override def inject(state: Language): Unit = {
     super.inject(state)

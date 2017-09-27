@@ -30,7 +30,6 @@ object Compilation
 }
 
 class Compilation(val language: Language) {
-  language.cheatCompilation = this // TODO REMOVE
   var program: Node = _
   var output: String = _
 
@@ -57,6 +56,4 @@ class Language {
   def getUniqueLabel(prefix: String): String = prefix + getGUID
 
   def getGUID: Long = random.nextLong()
-
-  var cheatCompilation: Compilation = _
 }

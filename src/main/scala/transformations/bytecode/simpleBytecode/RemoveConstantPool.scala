@@ -7,10 +7,9 @@ import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
-import transformations.bytecode.constants.ClassInfoConstant.{ClassRefKey, ClassRefName}
-import transformations.bytecode.constants.FieldRefConstant.{FieldRefClassIndex, FieldRefNameAndTypeIndex}
-import transformations.bytecode.constants.MethodRefConstant.{MethodRefClassName, MethodRefKey, MethodRefMethodName}
-import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeKey, NameAndTypeName, NameAndTypeType}
+import transformations.bytecode.constants.FieldRefConstant.FieldRefClassIndex
+import transformations.bytecode.constants.MethodRefConstant.{ClassRef, MethodRefKey}
+import transformations.bytecode.constants.NameAndTypeConstant.Type
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
@@ -24,9 +23,10 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
     PathRoot(program).visit(afterChildren = node => constantReferences.get(node.clazz).foreach(reference => {
       for (entry <- reference) {
-        val fieldValue = node.current(entry._1)
-        val index = pool.store(fieldValue)
-        node.current.data.put(entry._1, index)
+        node.current.get(entry._1).foreach(fieldValue => {
+          val index = pool.store(fieldValue)
+          node.current.data.put(entry._1, index)
+        })
       }
     }))
   }
@@ -52,13 +52,13 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(Utf8Constant.key).inner = Utf8Constant.getConstantEntryGrammar(grammars)
     grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
-    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(MethodRefClassName) <~ "." ~
-      grammars.find(NameAndTypeConstant.key).as(MethodRefMethodName)) asNode MethodRefKey
-    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassRefName) asNode ClassRefKey
+    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) <~ "." ~
+      grammars.find(NameAndTypeConstant.key).as(MethodRefConstant.NameAndType)) asNode MethodRefKey
+    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
     grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "." ~
-      grammars.find(NameAndTypeConstant.key).as(FieldRefNameAndTypeIndex) asNode FieldRefConstant.key
-    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeName) ~~
-      grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeKey
+      grammars.find(NameAndTypeConstant.key).as(FieldRefConstant.NameAndType) asNode FieldRefConstant.key
+    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeConstant.Name) ~~
+      grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
 
     val constantPoolGrammar = grammars.findPathToKey(ConstantPoolGrammar)

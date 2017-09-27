@@ -12,16 +12,16 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ClassInfoConstant extends ConstantEntry {
 
-  object ClassRefKey extends NodeClass
+  object Clazz extends NodeClass
 
-  object ClassRefName extends NodeField
+  object Name extends NodeField
 
-  def classRef(name: QualifiedClassName): Node = new Node(ClassRefKey, ClassRefName -> QualifiedClassNameConstant.create(name))
-  def classRef(classRefNameIndex: Int): Node = new Node(ClassRefKey, ClassRefName -> classRefNameIndex)
+  def classRef(name: QualifiedClassName): Node = new Node(Clazz, Name -> QualifiedClassNameConstant.create(name))
+  def classRef(classRefNameIndex: Int): Node = new Node(Clazz, Name -> classRefNameIndex)
 
-  def getNameIndex(classRef: Node): Int = classRef(ClassRefName).asInstanceOf[Int]
+  def getNameIndex(classRef: Node): Int = classRef(Name).asInstanceOf[Int]
 
-  override def key = ClassRefKey
+  override def key = Clazz
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
@@ -29,11 +29,11 @@ object ClassInfoConstant extends ConstantEntry {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRefName -> QualifiedClassNameConstant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstant.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName) asNode ClassRefKey
+    grammars.find(ConstantPoolIndexGrammar).as(Name) asNode Clazz
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

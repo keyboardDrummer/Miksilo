@@ -3,7 +3,7 @@ package core.particles
 import core.bigrammar.{MapGrammar, _}
 import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeField, NodeLike}
+import core.particles.node._
 
 /*
 Used as a field key when mapping a grammar to a node, to indicate that value at this location is mapped not using a regular field key,
@@ -24,6 +24,10 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
     (x => x, x => if (clazz.isInstance(x)) Some(x) else None)
   }
 
+  def createNode(grammars: GrammarCatalogue, key: NodeClass, inner: BiGrammar): Labelled = {
+    grammars.create(key, inner.asNode(key))
+  }
+
   case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException
   {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
@@ -37,6 +41,7 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
         obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
     }
 
+    def asLabelledNode(grammars: GrammarCatalogue, key: Key): Labelled = grammars.create(key, this.asNode(key))
     def asNode(key: Key, fields: Key*) = new NodeGrammar(grammar, key, fields.toSeq)
     def as(field: NodeField) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
   }

@@ -4,8 +4,8 @@ import core.bigrammar.BiGrammar
 import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Key
-import transformations.bytecode.types.ObjectTypeC.ObjectTypeByteCodeGrammarInner
-import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
 object TypeApplication extends DeltaWithGrammar {
 
@@ -22,7 +22,7 @@ object TypeApplication extends DeltaWithGrammar {
   def transformJavaGrammars(grammars: GrammarCatalogue): Unit = {
     val typeArgumentGrammar = grammars.create(JavaTypeArgumentGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val objectInner = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
+    val objectInner = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
     typeArgumentGrammar.addOption(typeGrammar)
     val typeApplication: BiGrammar = (objectInner.inner ~ ("<" ~> typeArgumentGrammar.someSeparated(",") <~ ">")).
       asNode(TypeApplicationKey, TypeApplicationFunc, TypeApplicationArgument)

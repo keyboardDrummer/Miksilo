@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC}
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
 import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
@@ -60,9 +60,9 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
 
   def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {
     case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
-    case ObjectTypeC.ObjectTypeKey =>
-      val newName = ObjectTypeC.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
-      _type(ObjectTypeC.ObjectTypeName) = newName
+    case ObjectTypeDelta.ObjectTypeKey =>
+      val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
+      _type(ObjectTypeDelta.Name) = newName
     case _ =>
   }
 
