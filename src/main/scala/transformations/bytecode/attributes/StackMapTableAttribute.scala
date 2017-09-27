@@ -52,7 +52,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def sameLocals1StackItem(frameOffset: Int, _type: Node) = new Node(SameLocals1StackItem,
     FrameOffset -> frameOffset,
-    SameLocals1StackItemType -> _type)
+    SameLocals1StackItemType -> typeToVerificationInfo(_type))
 
   def getSameLocals1StackItemType(sameLocals1StackItem: Node) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[Node]
 
