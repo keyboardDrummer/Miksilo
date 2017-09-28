@@ -8,23 +8,23 @@ import scala.util.hashing.Hashing
 object GrammarPath {
   val cache: mutable.Map[Class[_], List[Property[BiGrammar, AnyRef]]] = mutable.Map.empty
 
-  def get(clazz: Class[_]): List[Property[BiGrammar, AnyRef]] = {
+  def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar, AnyRef]] = {
     cache.getOrElseUpdate(clazz, new ExtendedType(clazz).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
       map(p => p.asInstanceOf[Property[BiGrammar, AnyRef]]).toList)
   }
 }
 
-
 trait GrammarPath {
   def get: BiGrammar
-  lazy val children: Seq[GrammarReference] = { //TODO dit zonder reflectie doen, is gevaarlijk omdat je setters kan vergeten en dan vind je de properties niet.
-    GrammarPath.get(get.getClass).map(property => new GrammarReference(this, property))
+  lazy val children: Seq[GrammarReference] = {
+    GrammarPath.getBiGrammarProperties(get.getClass).map(property => new GrammarReference(this, property))
   }
 
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
   def findGrammar(grammar: BiGrammar): Option[GrammarPath] = find(p => p.get == grammar)
+
   def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = {
     var result: Option[GrammarPath] = None
     GraphBasics.traverseBreadth[GrammarPath](Seq(this),

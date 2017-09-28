@@ -9,7 +9,7 @@ import util.TestUtils
 
 object JavaLang {
 
-  val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler, "ClassFile")
+  val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
   val systemClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("System.class")).program
   val printStreamClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class")).program
   val objectClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("Object.class")).program

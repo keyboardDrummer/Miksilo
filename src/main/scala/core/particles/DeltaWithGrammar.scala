@@ -21,11 +21,7 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
   }
 
   def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
-    (x => x, x => if (clazz.isInstance(x)) Some(x) else None)
-  }
-
-  def createNode(grammars: GrammarCatalogue, key: NodeClass, inner: BiGrammar): Labelled = {
-    grammars.create(key, inner.asNode(key))
+    (x => x, x => Some(x).filter(clazz.isInstance))
   }
 
   case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException

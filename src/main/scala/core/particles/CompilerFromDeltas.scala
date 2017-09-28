@@ -10,7 +10,7 @@ import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
 
-class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
+class CompilerFromDeltas(val deltas: Seq[Delta]) {
 
   validateDependencies(deltas)
   lazy val language: Language = buildLanguage
@@ -34,30 +34,22 @@ class CompilerFromDeltas(val deltas: Seq[Delta], compilerName: String = "") {
   def transform(program: Node): Compilation = {
     val state = new Compilation(language)
     state.program = program
-    runPhases(state)
-    state
-  }
-
-  private def runPhases(state: Compilation) = {
     state.runPhases()
+    state
   }
 
   def parse(input: InputStream): Node = {
     val state = new Compilation(language)
-    justParse(input, state)
-    state.program
-  }
-
-  private def justParse(input: InputStream, state: Compilation): Unit = {
     state.program = language.parse(input)
+    state.program
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(input: InputStream): Compilation = {
     val state = new Compilation(language)
-    justParse(input, state)
-    runPhases(state)
+    state.program = language.parse(input)
+    state.runPhases()
     state
   }
 
