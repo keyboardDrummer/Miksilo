@@ -4,19 +4,20 @@ import application.compilerCockpit.MarkOutputGrammar
 import core.particles.Delta
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.simpleBytecode.RemoveConstantPool
 import transformations.javac.JavaCompiler
 import util.{CompilerBuilder, TestUtils}
 
 class TestLabelledLocations extends FunSuite {
 
-  val labelledParticles: Seq[Delta] = Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations
+  val labelledParticles: Seq[Delta] = Seq(LabelledLocations, RemoveConstantPool) ++ JavaCompiler.byteCodeTransformations
 
   test("javaToLabelled") {
     val particles: Seq[Delta] = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))
     val utils = new TestUtils(CompilerBuilder.build(particles))
     val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("Fibonacci.java"))
     val expectedResult = utils.getTestFileContents("FibonacciInLabelledByteCode.txt")
-    assertResult(expectedResult)(result)
+      assertResult(expectedResult)(result)
   }
 
   test("labelledToByteCode") {

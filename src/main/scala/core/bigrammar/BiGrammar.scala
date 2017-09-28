@@ -100,7 +100,7 @@ trait SequenceLike extends BiGrammar {
 
 case class Delimiter(value: String) extends BiGrammar
 
-case class Keyword(value: String, reserved: Boolean = true) extends BiGrammar
+case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammar
 
 /**
   * Takes a grammar for parsing, and uses toString for printing.

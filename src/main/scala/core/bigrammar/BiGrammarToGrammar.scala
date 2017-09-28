@@ -16,7 +16,7 @@ object BiGrammarToGrammar {
         { case ~(WithMap(l,sl),WithMap(r,sr)) => WithMap(core.grammar.~(l,r), sl ++ sr)}
       case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right), choice.firstBeforeSecond)
       case FromGrammarWithToString(consume, _) => consume ^^ addState
-      case Keyword(keyword, reserved) => core.grammar.Keyword(keyword, reserved) ^^ addState
+      case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ addState
       case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ addState
       case many:Many => core.grammar.Many(recursive(many.inner)) ^^
         { case elements: Seq[Any] =>

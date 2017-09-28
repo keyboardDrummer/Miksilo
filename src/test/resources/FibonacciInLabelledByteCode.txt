@@ -1,63 +1,35 @@
-class 5 extends 25 with interfaces: ()
-Constant pool:
-  Utf8 java/lang/Object
-  Utf8 Fibonacci
-  Utf8 fibonacci
-  Utf8 (I)I
-  Class 2
-  NameAndType 3:4
-  Methodref 5.6
-  Utf8 Code
-  Utf8 print
-  Utf8 (I)V
-  Utf8 java/io/PrintStream
-  Class 11
-  NameAndType 9:10
-  Methodref 12.13
-  Utf8 out
-  Utf8 Ljava/io/PrintStream;
-  Utf8 java/lang/System
-  Class 17
-  NameAndType 15:16
-  Fieldref field reference: 18.19
-  Utf8 main
-  Utf8 ([Ljava/lang/String;)V
-  Utf8 <init>
-  Utf8 ()V
-  Class 1
-  NameAndType 23:24
-  Methodref 25.26
+class Fibonacci extends java/lang/Object with interfaces: ()
 {
   Method;
-    name: 23
-    descriptor: 24
+    name: <init>
+    descriptor: ()V
     flags: ACC_PUBLIC
     Code:
-      name: 8, stack:1, locals:1
+      name: Code, stack:1, locals:1
         aload 0
-        invokespecial 27
+        invokespecial java/lang/Object.<init> ()V
         return
       Exceptions:
 
   Method;
-    name: 21
-    descriptor: 22
+    name: main
+    descriptor: ([Ljava/lang/String;)V
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 8, stack:2, locals:1
-        getstatic 20
+      name: Code, stack:2, locals:1
+        getstatic java/lang/System.out Ljava/io/PrintStream;
         iconst 5
-        invokestatic 7
-        invokevirtual 14
+        invokestatic Fibonacci.fibonacci (I)I
+        invokevirtual java/io/PrintStream.print (I)V
         return
       Exceptions:
 
   Method;
-    name: 3
-    descriptor: 4
+    name: fibonacci
+    descriptor: (I)I
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 8, stack:3, locals:1
+      name: Code, stack:3, locals:1
         iload 0
         iconst 2
         if_icmpge "<false>"
@@ -68,11 +40,11 @@ Constant pool:
         iload 0
         iconst 1
         isub
-        invokestatic 7
+        invokestatic Fibonacci.fibonacci (I)I
         iload 0
         iconst 2
         isub
-        invokestatic 7
+        invokestatic Fibonacci.fibonacci (I)I
         iadd
         label "<end>"
           same locals, 1 stack item

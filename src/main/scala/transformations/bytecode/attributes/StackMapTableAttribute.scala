@@ -67,7 +67,6 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8Constant.key))
-
     ByteCodeSkeleton.getState(state).constantReferences.put(VerificationInfo, Map(VerificationObjectIndex -> ClassInfoConstant.key))
   }
 
@@ -123,14 +122,14 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
 
     val verificationGrammar : BiGrammar = getVerificationInfoGrammar(grammars)
-    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~> offsetGrammar) %
+    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %
       verificationGrammar.as(SameLocals1StackItemType).indent()).
       asLabelledNode(grammars, SameLocals1StackItem)
     val appendFrameGrammar = ("append frame" ~ offsetGrammar % verificationGrammar.manyVertical.indent().as(AppendFrameTypes)).
       asLabelledNode(grammars, AppendFrame)
     val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
-    val nameGrammar = grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
       asNode(Clazz)
@@ -150,7 +149,13 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   object VerificationInfo extends NodeClass
   def getVerificationInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val index = grammars.find(ConstantPoolIndexGrammar)
-    val basic = ("top" | "int" | "float" | "long" | "double" | "null" | "uninitializedThis").as(VerificationName)
+    val basic = (keywordClass("top") |
+      keywordClass("int") |
+      keywordClass("float") |
+      keywordClass("long") |
+      keywordClass("double") |
+      keywordClass("null") |
+      keywordClass("uninitializedThis")).as(VerificationName)
     val objectReference = ("class": BiGrammar).as(VerificationName) ~~ index.as(VerificationObjectIndex)
     (basic | objectReference).asLabelledNode(grammars, VerificationInfo)
   }

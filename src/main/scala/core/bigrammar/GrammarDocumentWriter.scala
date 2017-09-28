@@ -18,6 +18,8 @@ trait GrammarDocumentWriter {
 
   def produce(value: Any): BiGrammar = new ValueGrammar(value)
 
+  def keywordClass(value: String) = new Keyword(value, false, true)
+
   def space: BiGrammar = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)

@@ -1,42 +1,42 @@
-class 5 extends 25 with interfaces: ()
+class 6 extends 26 with interfaces: ()
 Constant pool:
   Utf8 java/lang/Object
   Utf8 Fibonacci
+  Utf8 StackMapTable
   Utf8 fibonacci
   Utf8 (I)I
   Class 2
-  NameAndType 3:4
-  Methodref 5.6
+  NameAndType 4:5
+  Methodref 6.7
   Utf8 Code
   Utf8 print
   Utf8 (I)V
   Utf8 java/io/PrintStream
-  Class 11
-  NameAndType 9:10
-  Methodref 12.13
+  Class 12
+  NameAndType 10:11
+  Methodref 13.14
+  Utf8 java/lang/System
   Utf8 out
   Utf8 Ljava/io/PrintStream;
-  Utf8 java/lang/System
-  Class 17
-  NameAndType 15:16
-  Fieldref field reference: 18.19
+  Class 16
+  NameAndType 17:18
+  Fieldref 19.20
   Utf8 main
   Utf8 ([Ljava/lang/String;)V
   Utf8 <init>
   Utf8 ()V
   Class 1
-  NameAndType 23:24
-  Methodref 25.26
-  Utf8 StackMapTable
+  NameAndType 24:25
+  Methodref 26.27
 {
   Method;
-    name: 23
-    descriptor: 24
+    name: 24
+    descriptor: 25
     flags: ACC_PUBLIC
     Code:
-      name: 8, stack:1, locals:1
+      name: 9, stack:1, locals:1
         aload 0
-        invokespecial 27
+        invokespecial 28
         return
       Exceptions:
 
@@ -44,24 +44,24 @@ Constant pool:
   /* hello */
   /* bye */
   /* PS */
-    name: 21
-    descriptor: 22
+    name: 22
+    descriptor: 23
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 8, stack:2, locals:1
-        getstatic 20
+      name: 9, stack:2, locals:1
+        getstatic 21
         iconst 5
-        invokestatic 7
-        invokevirtual 14
+        invokestatic 8
+        invokevirtual 15
         return
       Exceptions:
 
   Method;
-    name: 3
-    descriptor: 4
+    name: 4
+    descriptor: 5
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 8, stack:3, locals:1
+      name: 9, stack:3, locals:1
         iload 0
         /* here comes two */
         iconst 2
@@ -71,14 +71,14 @@ Constant pool:
         iload 0
         iconst 1
         isub
-        invokestatic 7
+        invokestatic 8
         iload 0
         iconst 2
         isub
-        invokestatic 7
+        invokestatic 8
         iadd
         ireturn
-      StackMapTable: 28
+      StackMapTable: name: 3
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int
