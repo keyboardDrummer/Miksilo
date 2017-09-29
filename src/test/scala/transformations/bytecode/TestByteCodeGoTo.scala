@@ -1,18 +1,16 @@
 package transformations.bytecode
 
-import core.particles.CompilerFromParticles
 import core.particles.node.Node
-import org.junit.Test
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
+import transformations.bytecode.types.IntTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import transformations.bytecode.types.IntTypeC
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 class TestByteCodeGoTo extends FunSuite {
 
@@ -23,7 +21,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = new CompilerFromParticles(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
+    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }

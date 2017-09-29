@@ -4,36 +4,36 @@ import core.bigrammar.{BiGrammar, MapGrammar}
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node, NodeField}
+import core.particles.node.{Key, Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC}
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
 import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithState {
 
-  implicit class JavaClass(val node: Node) extends AnyVal {
+  implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
     def _package = node(ClassPackage).asInstanceOf[Seq[String]]
     def _package_=(value: Seq[String]) = node(ClassPackage) = value
 
-    def imports = node(ClassImports).asInstanceOf[Seq[Node]]
-    def imports_=(value: Seq[Node]) = node(ClassImports) = value
+    def imports = node(ClassImports).asInstanceOf[Seq[T]]
+    def imports_=(value: Seq[T]) = node(ClassImports) = value
 
     def name = node(ClassName).asInstanceOf[String]
     def name_=(value: String) = node(ClassName) = value
 
-    def members = node(Members).asInstanceOf[Seq[Node]]
-    def members_=(value: Seq[Node]) = node(Members) = value
+    def members = node(Members).asInstanceOf[Seq[T]]
+    def members_=(value: Seq[T]) = node(Members) = value
 
     def parent = node(ClassParent).asInstanceOf[Option[String]]
     def parent_=(value: Option[String]) = node(ClassParent) = value
   }
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(clazz: Node) {
@@ -60,13 +60,13 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
 
   def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {
     case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
-    case ObjectTypeC.ObjectTypeKey =>
-      val newName = ObjectTypeC.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
-      _type(ObjectTypeC.ObjectTypeName) = newName
+    case ObjectTypeDelta.ObjectTypeKey =>
+        val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
+      _type(ObjectTypeDelta.Name) = newName
     case _ =>
   }
 
-  def getClassCompiler(state: CompilationState) = getState(state).classCompiler
+  def getClassCompiler(state: Language) = getState(state).classCompiler
 
   def getQualifiedClassName(clazz: Node): QualifiedClassName = {
     QualifiedClassName(clazz._package ++ Seq(clazz.name))
@@ -75,7 +75,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)

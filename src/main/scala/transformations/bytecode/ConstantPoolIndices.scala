@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.bigrammar._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{CompilationState, DeltaWithGrammar}
+import core.particles.{Language, DeltaWithGrammar}
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 
 object ConstantPoolIndices extends DeltaWithGrammar {
@@ -14,7 +14,7 @@ object ConstantPoolIndices extends DeltaWithGrammar {
 
   private object Content extends NodeField
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val previousConstantPoolItem = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     val constantPoolItem = (("#" ~> number.as(Index) <~~ "=") ~~ previousConstantPoolItem.inner.as(Content)).
       asNode(WithIndexClass)

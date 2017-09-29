@@ -21,7 +21,7 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(ifThen: Path, state: Language): Seq[Node] = {
     val condition = getCondition(ifThen)
     val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
     val endLabelName = LabelledLocations.getUniqueLabel("end", method, state)
@@ -45,7 +45,7 @@ object IfThenC extends StatementInstance {
     ifThen(ThenKey).asInstanceOf[Seq[T]]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)

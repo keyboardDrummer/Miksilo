@@ -1,7 +1,7 @@
 package transformations.javac.types
 
 import core.bigrammar.{BiFailure, BiGrammar}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
@@ -36,7 +36,7 @@ object MethodType extends TypeInstance {
 
   override def description: String = "Defines the method type."
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure()
 

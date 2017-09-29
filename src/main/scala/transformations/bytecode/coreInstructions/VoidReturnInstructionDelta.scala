@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.node.{Key, Node}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
@@ -17,7 +17,7 @@ object VoidReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("b1")
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize: Int = 1

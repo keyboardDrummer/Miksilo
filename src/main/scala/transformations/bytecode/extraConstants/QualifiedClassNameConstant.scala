@@ -1,7 +1,7 @@
 package transformations.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
@@ -12,15 +12,15 @@ import transformations.javac.classes.skeleton.QualifiedClassName
   * This is a virtual constant that translates into a UTF8Constant.
   */
 object QualifiedClassNameConstant extends ConstantEntry {
-  override def key = QualifiedClassNameKey
+  override def key = Key
 
-  object QualifiedClassNameKey extends NodeClass
+  object Key extends NodeClass
   object Value extends NodeField
 
   def create(value: QualifiedClassName) = new Node(key, Value -> value)
   def get(node: Node): QualifiedClassName = node(Value).asInstanceOf[QualifiedClassName]
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] =
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[QualifiedClassName].parts.mkString("/"))
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

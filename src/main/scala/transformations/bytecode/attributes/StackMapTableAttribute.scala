@@ -3,14 +3,14 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.particles.node.{Key, Node, NodeClass, NodeField}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.{ClassInfoConstant, Utf8Constant}
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
-import transformations.bytecode.types.ObjectTypeC.ObjectTypeName
-import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.ObjectTypeDelta.ObjectStackType
+import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
@@ -39,15 +39,15 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object SameFrameKey extends NodeClass
 
-  object StackMapTableKey extends NodeClass
+  object Clazz extends NodeClass
 
-  object StackMapTableMaps extends NodeField
+  object Maps extends NodeField
 
-  def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(StackMapTableKey,
+  def stackMapTable(nameIndex: Int, stackMaps: Seq[Node]) = new Node(Clazz,
     AttributeNameKey -> nameIndex,
-    StackMapTableMaps -> stackMaps)
+    Maps -> stackMaps)
 
-  def getStackMapTableEntries(stackMapTable: Node) = stackMapTable(StackMapTableMaps).asInstanceOf[Seq[Node]]
+  def getStackMapTableEntries(stackMapTable: Node) = stackMapTable(Maps).asInstanceOf[Seq[Node]]
 
   def getFrameOffset(frame: Node) = frame(FrameOffset).asInstanceOf[Int]
 
@@ -57,21 +57,21 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getSameLocals1StackItemType(sameLocals1StackItem: Node) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[Node]
 
-  def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, FrameOffset -> offset, AppendFrameTypes -> newLocalTypes)
+  def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, FrameOffset -> offset,
+    AppendFrameTypes -> newLocalTypes)
 
   def getAppendFrameTypes(appendFrame: Node) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[Node]]
 
   def sameFrame(offset: Int) = new Node(SameFrameKey, FrameOffset -> offset)
 
-  object StackMapTableGrammar
-
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(StackMapTableKey) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(StackMapTableKey, Map(AttributeNameKey -> Utf8Constant.key))
+    ByteCodeSkeleton.getState(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
+    ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8Constant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
   }
 
-  def getStackMapTableBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
+  def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {
 
     def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)
@@ -102,11 +102,11 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
-  def getVerificationInfoBytes(_type: Node, state: CompilationState): Seq[Byte] = {
+  def getVerificationInfoBytes(_type: Node, state: Language): Seq[Byte] = {
     _type.clazz match {
-      case IntTypeC.IntTypeKey => hexToBytes("01")
-      case LongTypeC.LongTypeKey => hexToBytes("04")
-      case ObjectTypeC.ObjectTypeKey => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeName).asInstanceOf[Int])
+      case IntTypeC.key => hexToBytes("01")
+      case LongTypeC.key => hexToBytes("04")
+      case ObjectTypeDelta.ObjectStackType => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeDelta.Name).asInstanceOf[Int])
     }
   }
 
@@ -115,25 +115,35 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     "Each stack from provides information on the current types on the stack and in the local registers." +
     "Given a frame at and the frames before it, all stack and local types are fully defined at the location of that frame."
 
-  override def key: Key = StackMapTableKey
+  override def key: Key = Clazz
 
   val offsetGrammarKey = KeyGrammar(FrameOffset)
-  object StackMapFrameGrammar
+  object StackMapFrameGrammar extends Key
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
 
-    val parseType : BiGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %> parseType.indent()).
-      asNode(SameLocals1StackItem, SameLocals1StackItemType)
-    val appendFrameGrammar = ("append frame" ~ offsetGrammar % parseType.manyVertical.indent().as(AppendFrameTypes)) asNode AppendFrame
+    val verificationGrammar : BiGrammar = getVerificationInfoGrammar(grammars)
+    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %
+      verificationGrammar.as(SameLocals1StackItemType).indent()).
+      asLabelledNode(grammars, SameLocals1StackItem)
+    val appendFrameGrammar = ("append frame" ~ offsetGrammar % verificationGrammar.manyVertical.indent().as(AppendFrameTypes)).
+      asLabelledNode(grammars, AppendFrame)
     val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer) asNode(ChopFrame, ChopFrameCount)
-    val nameGrammar = grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
-    val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(StackMapTableMaps)).
-      asNode(StackMapTableKey)
+    val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
+      asNode(Clazz)
 
-    grammars.create(StackMapTableGrammar, stackMapTableGrammar)
+    grammars.create(Clazz, stackMapTableGrammar)
+  }
+
+  def getVerificationInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    val index = grammars.find(ConstantPoolIndexGrammar)
+    val basic = grammars.find(IntTypeC.key) |  grammars.find(LongTypeC.key)
+    val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(grammars, ObjectStackType)
+
+    basic | objectReference
   }
 
   override def constantPoolKey: String = "StackMapTable"

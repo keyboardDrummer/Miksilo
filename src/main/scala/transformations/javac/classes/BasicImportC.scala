@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import core.particles.{Language, Contract, DeltaWithGrammar}
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
 object BasicImportC extends DeltaWithGrammar {
@@ -14,7 +14,7 @@ object BasicImportC extends DeltaWithGrammar {
 
   def _import(elements: Seq[String]) = new Node(ImportKey, ElementsKey -> elements)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".").asNode(ImportKey, ElementsKey))
     val basicImport = "import" ~~> importPath <~ ";"
     grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
@@ -22,7 +22,7 @@ object BasicImportC extends DeltaWithGrammar {
 
   def getParts(_import: Node) = _import(ElementsKey).asInstanceOf[Seq[String]]
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     JavaClassSkeleton.getState(state).importToClassMap.put(ImportKey, _import => {
       val elements = getParts(_import)
       val packageParts = elements.dropRight(1)

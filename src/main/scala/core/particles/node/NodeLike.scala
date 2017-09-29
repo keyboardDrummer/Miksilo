@@ -17,6 +17,7 @@ trait NodeLike {
   type Self <: NodeLike
   def get(key: Any): Option[Any]
   def apply(key: Any): Any
+  def update(key: Any, value: Any): Unit
   def clazz: Any
   def dataView: Map[Any, Any]
 

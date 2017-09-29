@@ -10,15 +10,15 @@ import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
 
   object NewCallKey extends Key
   object NewObject extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
-    val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
     val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).
       asNode(NewCallKey, NewObject, CallC.CallArguments)
@@ -30,11 +30,11 @@ object NewC extends ExpressionInstance {
 
   override val key: Key = NewCallKey
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     expression(NewObject).asInstanceOf[Path]
   }
 
-  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+  override def toByteCode(expression: Path, state: Language): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val objectType = getNewObject(expression)

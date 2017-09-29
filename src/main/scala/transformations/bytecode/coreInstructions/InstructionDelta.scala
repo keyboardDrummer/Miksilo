@@ -6,7 +6,7 @@ import transformations.bytecode._
 import transformations.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.types.{ObjectTypeC, TypeSkeleton}
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
@@ -14,7 +14,7 @@ class ByteCodeTypeException(message: String) extends Exception(message)
 
 trait InstructionDelta extends InstructionWithGrammar with InstructionSignatureProvider with InstructionSideEffectProvider {
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     CodeAttribute.getInstructionSignatureRegistry(state).put(key, this)
     ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
@@ -24,17 +24,17 @@ trait InstructionDelta extends InstructionWithGrammar with InstructionSignatureP
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
-    if (stackTop.clazz != ObjectTypeC.ObjectTypeKey)
+    if (stackTop.clazz != ObjectTypeDelta.ObjectTypeKey)
       throw new ByteCodeTypeException(s"$name requires an object on top of the stack and not a $stackTop.")
   }
 
-  def assertDoubleWord(state: CompilationState, input: Node): Unit = {
+  def assertDoubleWord(state: Language, input: Node): Unit = {
     if (TypeSkeleton.getTypeSize(input, state) != 2) {
       throw new ByteCodeTypeException("expected double word input")
     }
   }
 
-  def assertSingleWord(state: CompilationState, input: Node): Unit = {
+  def assertSingleWord(state: Language, input: Node): Unit = {
     if (TypeSkeleton.getTypeSize(input, state) != 1) {
       throw new ByteCodeTypeException("expected single word input")
     }
@@ -44,7 +44,7 @@ trait InstructionDelta extends InstructionWithGrammar with InstructionSignatureP
 
 
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
-  def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature
+  def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature
 
   def jumpBehavior: JumpBehavior = new JumpBehavior(true, false)
 

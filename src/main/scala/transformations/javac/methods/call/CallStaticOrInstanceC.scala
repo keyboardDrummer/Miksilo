@@ -12,7 +12,7 @@ object CallStaticOrInstanceC extends GenericCall {
 
   override def dependencies: Set[Contract] = CallStaticC.dependencies ++ CallInstanceC.dependencies
 
-  override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(call: Path, state: Language): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methodKey: MethodQuery = getMethodKey(call, compiler)

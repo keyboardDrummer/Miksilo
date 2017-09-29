@@ -17,7 +17,7 @@ object LocalDeclarationC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val parseDeclaration = typeGrammar ~~ identifier <~ ";" asNode(DeclarationKey, DeclarationType, DeclarationName)
@@ -40,11 +40,11 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key: Key = DeclarationKey
 
-  override def toByteCode(declaration: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(declaration: Path, state: Language): Seq[Node] = {
     Seq.empty[Node]
   }
 
-  override def definedVariables(state: CompilationState, declaration: Node): Map[String, Node] = {
+  override def definedVariables(state: Language, declaration: Node): Map[String, Node] = {
     val _type = getDeclarationType(declaration)
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(state))
     val name: String = getDeclarationName(declaration)

@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -19,7 +19,7 @@ object IntegerReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ac")
 

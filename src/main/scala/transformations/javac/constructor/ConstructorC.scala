@@ -20,7 +20,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: Compilation): Unit = {
     val className = clazz.name
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
@@ -50,7 +50,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   object ConstructorClassNameKey extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)

@@ -38,7 +38,11 @@ class BiGrammarToPrinter {
           else
             fail("From identity grammar could not parse string")
         }
-      case Keyword(keyword, _) => Try(keyword)
+      case Keyword(keyword, _, verify) =>
+        if (!verify || withMap.value == keyword)
+          Try(keyword)
+        else
+          failureToGrammar("keyword didn't match", withMap.value, grammar)
       case Delimiter(keyword) => Try(keyword)
       case labelled: Labelled => labelToDocument(withMap, labelled)
       case many: ManyHorizontal => foldSequence(withMap, many.inner, (left, right) => left ~ right)

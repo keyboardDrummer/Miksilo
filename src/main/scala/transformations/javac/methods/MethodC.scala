@@ -29,7 +29,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     def parameters_=(value: Seq[Node]): Unit = node(MethodParametersKey) = value
   }
 
-  def compile(state: CompilationState, clazz: Node): Unit = {
+  def compile(state: Language, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -39,7 +39,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     })
   }
 
-  def bind(state: CompilationState, signature: ClassSignature, clazz: Node): Unit = {
+  def bind(state: Language, signature: ClassSignature, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
@@ -72,7 +72,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     TypeConstant.constructor(methodType)
   }
 
-  def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
+  def convertMethod(method: Node, classCompiler: ClassCompiler, state: Language): Unit = {
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
@@ -103,7 +103,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     }
   }
 
-  def setMethodCompiler(method: Node, state: CompilationState) {
+  def setMethodCompiler(method: Node, state: Language) {
     val methodCompiler = new MethodCompiler(state, method)
     getState(state).methodCompiler = methodCompiler
   }
@@ -137,7 +137,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
   def getMethodStatic(method: Node) = method(StaticKey).asInstanceOf[Boolean]
 
-  def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
+  def getMethodCompiler(state: Language) = getState(state).methodCompiler
 
   def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
@@ -154,7 +154,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   object StaticGrammar
   object ReturnTypeGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)

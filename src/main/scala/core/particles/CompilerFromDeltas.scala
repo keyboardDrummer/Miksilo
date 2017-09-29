@@ -10,89 +10,84 @@ import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
 
-class CompilerFromParticles(val particles: Seq[Delta]) {
+class CompilerFromDeltas(val deltas: Seq[Delta]) {
 
-  validateDependencies(particles)
+  validateDependencies(deltas)
+  lazy val language: Language = buildLanguage
 
   def getGrammar: Labelled = {
-    val state = buildState
-    state.grammarCatalogue.find(ProgramGrammar)
+    language.grammarCatalogue.find(ProgramGrammar)
   }
 
-  def parseAndTransform(input: File): CompilationState = {
-    val state: CompilationState = parseAndTransform(input.inputStream())
+  def parseAndTransform(input: File): Compilation = {
+    val state: Compilation = parseAndTransform(input.inputStream())
     state
   }
 
-  def compile(input: File, outputDirectory: Directory): CompilationState = {
-    val state: CompilationState = parseAndTransform(input.inputStream())
+  def compile(input: File, outputDirectory: Directory): Compilation = {
+    val state: Compilation = parseAndTransform(input.inputStream())
 
     PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
     state
   }
 
-  def transform(program: Node): Node = {
-    val state: CompilationState = transformReturnState(program)
-    state.program
-  }
-
-  def transformReturnState(program: Node): CompilationState = {
-    val state = buildState
+  def transform(program: Node): Compilation = {
+    val state = new Compilation(language)
     state.program = program
     state.runPhases()
     state
   }
 
   def parse(input: InputStream): Node = {
-    val state = buildState
-    state.program = state.parse(input)
+    val state = new Compilation(language)
+    state.program = language.parse(input)
     state.program
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
-  def parseAndTransform(input: InputStream): CompilationState = {
-    val state = buildState
-    state.program = state.parse(input)
+  def parseAndTransform(input: InputStream): Compilation = {
+    val state = new Compilation(language)
+    state.program = language.parse(input)
     state.runPhases()
     state
   }
 
-  def buildState: CompilationState = {
-    val state = new CompilationState()
-    for(particle <- particles.reverse)
+  def buildLanguage: Language = {
+    val result = new Language()
+    for(particle <- deltas.reverse)
     {
-      particle.inject(state)
+      particle.inject(result)
     }
-    state
+    result
   }
 
   //Bad order error
   //All missing dependencies.
-  def validateDependencies(transformations: Seq[Delta]) = {
+  def validateDependencies(transformations: Seq[Delta]): Unit = {
     var available = Set.empty[Contract]
     for (transformation <- transformations.reverse) {
       transformation.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
-          throw new ParticleDependencyViolation(dependency, transformation)
+          throw ParticleDependencyViolation(dependency, transformation)
       )
       available += transformation
     }
   }
 
   def replace(marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
-    val pivot = particles.indexWhere(particle => marker == particle)
-    val (before,after) = particles.splitAt(pivot)
+    val pivot = deltas.indexWhere(particle => marker == particle)
+    val (before,after) = deltas.splitAt(pivot)
     before ++ splice ++ after.drop(1)
   }
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
     val implicitsSet = implicits.toSet
-    particles.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+    deltas.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
   }
 
   def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
     val implicitsSet = implicits.toSet
-    implicits ++ splice ++ particles.filter(t => !implicitsSet.contains(t))
+    implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
   }
 }

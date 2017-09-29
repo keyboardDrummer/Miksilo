@@ -2,7 +2,7 @@ package transformations.javac.methods.call
 
 import core.particles.node.Node
 import core.particles.path.Path
-import core.particles.{CompilationState, Contract}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.coreInstructions.InvokeVirtualDelta
 import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
@@ -13,7 +13,7 @@ object CallInstanceC extends GenericCall {
 
   override def description: String = "Enables calling instance methods."
 
-  override def toByteCode(call: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(call: Path, state: Language): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methodKey: MethodQuery = getMethodKey(call, compiler)
@@ -21,7 +21,7 @@ object CallInstanceC extends GenericCall {
     getInstructionsGivenMethodRefIndex(call, state, methodRefIndex)
   }
 
-  def getInstructionsGivenMethodRefIndex(call: Path, state: CompilationState, methodRef: Node): Seq[Node] = {
+  def getInstructionsGivenMethodRefIndex(call: Path, state: Language, methodRef: Node): Seq[Node] = {
     val callCallee = CallC.getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorObject(callCallee)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)

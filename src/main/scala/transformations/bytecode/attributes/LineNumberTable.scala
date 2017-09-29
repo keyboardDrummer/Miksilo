@@ -3,7 +3,7 @@ package transformations.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Language, Contract}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
@@ -17,7 +17,7 @@ object LineNumberTable extends ByteCodeAttribute {
     AttributeNameKey -> nameIndex,
     LineNumberTableLines -> lines)
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
   }

@@ -2,9 +2,8 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeField}
 import core.particles.path.Path
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
 import transformations.bytecode.types.IntTypeC
@@ -15,7 +14,7 @@ object IntLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
     val parseNumber = inner.asNode(IntLiteralKey, ValueKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
@@ -24,10 +23,11 @@ object IntLiteralC extends ExpressionInstance {
 
   def literal(value: Int) = new Node(IntLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(literal: Path, state: Language): Seq[Node] = {
     val value: Int = getValue(literal)
     if (-1 <= value && value <= 5) {
       val node = literal.current.shallowClone
+      node.data.remove(ValueKey)
       node.replaceWith(SmallIntegerConstantDelta.integerConstant(value), keepData = true)
       Seq(node) //TODO dit mooier maken. Maak de nieuwe node gewoon en en schuif deze over de oude node.
     }
@@ -39,11 +39,11 @@ object IntLiteralC extends ExpressionInstance {
 
   def getValue(literal: Node): Int = literal(ValueKey).asInstanceOf[Int]
 
-  override def getType(expression: Path, state: CompilationState): Node = IntTypeC.intType
+  override def getType(expression: Path, state: Language): Node = IntTypeC.intType
 
   object IntLiteralKey extends Key
 
-  object ValueKey extends Key
+  object ValueKey extends NodeField
 
   override def description: String = "Adds the usage of int literals."
 }

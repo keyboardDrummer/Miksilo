@@ -1,14 +1,14 @@
 package transformations.javac.constructor
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.methods.MethodC.PublicVisibility
 
 object DefaultConstructorC extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
-  def transform(clazz: Node, state: CompilationState): Unit = {
+  def transform(clazz: Node, state: Compilation): Unit = {
     val noConstructors = clazz.members.filter(member => member.clazz == ConstructorC.ConstructorKey).isEmpty
     if (noConstructors) {
       val defaultConstructor = ConstructorC.constructor(clazz.name, Seq(), Seq(), PublicVisibility)

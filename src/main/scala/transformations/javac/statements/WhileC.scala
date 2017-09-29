@@ -13,7 +13,7 @@ object WhileC extends StatementInstance with WithState {
 
   override val key: Key = WhileKey
 
-  override def toByteCode(_while: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(_while: Path, state: Language): Seq[Node] = {
     val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
     val startLabel = LabelledLocations.getUniqueLabel("start", methodInfo, state)
     val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
@@ -36,7 +36,7 @@ object WhileC extends StatementInstance with WithState {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)

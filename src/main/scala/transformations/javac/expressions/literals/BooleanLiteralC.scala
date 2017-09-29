@@ -13,7 +13,7 @@ object BooleanLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val parseNumber = "true" ~> produce(literal(true)) | "false" ~> produce(literal(false))
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
@@ -21,13 +21,13 @@ object BooleanLiteralC extends ExpressionInstance {
 
   def literal(value: Boolean) = new Node(LiteralBooleanKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(literal: Path, state: Language): Seq[Node] = {
     Seq(SmallIntegerConstantDelta.integerConstant(if (getValue(literal)) 1 else 0))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Boolean]
 
-  override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
 
   object LiteralBooleanKey
 

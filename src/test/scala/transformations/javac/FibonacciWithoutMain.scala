@@ -1,20 +1,17 @@
 package transformations.javac
 
 import core.particles.node.Node
-import org.junit.Test
-import transformations.javac.classes.skeleton.JavaClassSkeleton
-import JavaClassSkeleton._
+import transformations.bytecode.types.IntTypeC
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.expressions.relational.LessThanC
-import transformations.javac.methods.call.CallC
-import CallC._
 import transformations.javac.methods.MethodC._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
-import transformations.bytecode.types.IntTypeC
-import util.TestUtils
+import transformations.javac.methods.call.CallC._
+import util.{CompilerBuilder, TestUtils}
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"
@@ -24,7 +21,7 @@ class FibonacciWithoutMain {
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
-    val byteCode = JavaCompiler.getCompiler.transform(fibonacci)
+    val byteCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(fibonacci).program
     TestUtils.printByteCode(byteCode)
   }
 

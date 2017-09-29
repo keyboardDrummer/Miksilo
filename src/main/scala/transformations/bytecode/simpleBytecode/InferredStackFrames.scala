@@ -1,11 +1,11 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarReference, Labelled}
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar, ProgramGrammar}
+import core.bigrammar.GrammarPath._
+import core.bigrammar.GrammarReference
+import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
 import transformations.bytecode.additions.LabelledLocations
-import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.types.TypeSkeleton
@@ -17,7 +17,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
     for (method <- ByteCodeSkeleton.getMethods(clazz)) {
       val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
@@ -58,13 +58,15 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
         new Node(StackMapTableAttribute.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new Node(StackMapTableAttribute.SameLocals1StackItem, StackMapTableAttribute.SameLocals1StackItemType -> stack.head)
+        new Node(StackMapTableAttribute.SameLocals1StackItem,
+          StackMapTableAttribute.SameLocals1StackItemType -> stack.head)
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
         new Node(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new Node(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes -> addedLocals.map(toStackType))
+        new Node(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes ->
+          addedLocals.map(l => toStackType(l)))
       }
       else {
         new Node(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
@@ -75,14 +77,9 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Generates a stack frame for each label instruction. " +
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
-    val labelMapPath = grammars.findPathsToKey(KeyGrammar(LabelledLocations.LabelKey)).head
-    val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
-    val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
-    val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
-    labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
-
-    val stackMapTablePath = grammars.findPathsToKey(StackMapTableAttribute.StackMapFrameGrammar, KeyGrammar(LabelledLocations.LabelKey)).head
-    stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    grammars.find(LabelledLocations.LabelKey).
+      findAs(LabelledLocations.LabelStackFrame).
+      asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

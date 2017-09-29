@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Language, Contract}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -18,7 +18,7 @@ object NotInstructionC extends ExpandInstruction {
 
   override val key = NotInstructionKey
 
-  override def expand(instruction: Node, methodInfo: Node, state: CompilationState): Seq[Node] = {
+  override def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node] = {
     val falseStartLabel = LabelledLocations.getUniqueLabel("falseStart", methodInfo, state)
     val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
     Seq(LabelledLocations.ifZero(falseStartLabel),

@@ -9,7 +9,7 @@ import transformations.bytecode.coreInstructions.integers._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.extraConstants.TypeConstant
-import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeC, VoidTypeC}
+import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.constructor.SuperCallExpression
@@ -85,7 +85,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       LineNumberTable.constantPoolKey,
       "main",
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(
-        ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))),
+        ArrayTypeC.arrayType(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
       TypeConstant.constructor(MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType))),
       StackMapTableAttribute.entry,
@@ -101,7 +101,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       new QualifiedClassName(Seq("java", "lang", "Object")),
       new QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      TypeConstant.constructor(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
+      TypeConstant.constructor(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(IntTypeC.intType)))

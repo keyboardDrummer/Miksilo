@@ -42,7 +42,7 @@ class TestParseTypes extends FunSuite {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        same frame\n iload 2 \n    Exceptions:"
     val result = TestGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompiler.byteCodeTransformations).
-      getGrammarResult(input, CodeAttribute.CodeGrammar)
+      getGrammarResult(input, CodeAttribute.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)
   }
 
@@ -50,7 +50,7 @@ class TestParseTypes extends FunSuite {
     val input = "code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        append frame int int\n iload 2 \n    Exceptions:"
     val result = TestGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompiler.byteCodeTransformations).
-      getGrammarResult(input, CodeAttribute.CodeGrammar)
+      getGrammarResult(input, CodeAttribute.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)
   }
 
@@ -69,14 +69,14 @@ class TestParseTypes extends FunSuite {
   test("ObjectType") {
     val input = "java.lang.String"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(objectType)(result)
   }
 
   test("ArrayType2") {
     val input = "java.lang.String[]"
     val result = TestGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(ArrayTypeC.arrayType(objectType))(result)
   }
 }

@@ -8,7 +8,7 @@ object EmitByteCode extends CompileOption {
 
   override def perform(cockpit: CompilerCockpit, input: InputStream): TextWithGrammar = {
     val state = cockpit.compiler.parseAndTransform(input)
-    val bytes = PrintByteCode.getBytes(state.program, state).toArray
+    val bytes = PrintByteCode.getBytes(state.program, state.language).toArray
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }
 

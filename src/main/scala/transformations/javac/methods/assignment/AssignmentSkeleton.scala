@@ -20,7 +20,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   override def dependencies: Set[Contract] = Set(MethodC, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val assignmentInner = (targetGrammar <~~ "=") ~~ expressionGrammar
@@ -40,7 +40,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   override val key: Key = AssignmentKey
 
-  override def getType(assignment: Path, state: CompilationState): Node = {
+  override def getType(assignment: Path, state: Language): Node = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(state)(target)
   }
@@ -50,7 +50,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
     val assignFromStackByteCodeRegistry = new ClassRegistry[Path => Seq[Node]]
   }
 
-  override def toByteCode(assignment: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(assignment: Path, state: Language): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(state)(value)
     val target = getAssignmentTarget(assignment)

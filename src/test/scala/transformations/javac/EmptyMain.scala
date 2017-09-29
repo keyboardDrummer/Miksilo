@@ -1,13 +1,12 @@
 package transformations.javac
 
 import core.particles.node.Node
-import org.junit.Test
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
-import JavaClassSkeleton._
 import org.scalatest.FunSuite
+import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
+import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.methods.MethodC._
-import transformations.bytecode.types.{ArrayTypeC, ObjectTypeC, VoidTypeC}
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 class EmptyMain extends FunSuite {
   val className = "EmptyMain"
@@ -21,7 +20,7 @@ class EmptyMain extends FunSuite {
 
   def getByteCode: Node = {
     val java = getJava
-    val byteCode = JavaCompiler.getCompiler.transform(java)
+    val byteCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(java).program
     byteCode
   }
 
@@ -30,7 +29,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeC.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
     method("main", VoidTypeC.voidType, parameters, body, static = true, PublicVisibility)
   }

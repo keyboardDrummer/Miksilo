@@ -6,14 +6,14 @@ import core.particles.path.{Path, SequenceElement}
 
 trait StatementInstance extends DeltaWithGrammar {
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     StatementSkeleton.getState(state).instances.put(key, this)
     super.inject(state)
   }
 
   val key: Key = this
 
-  def toByteCode(statement: Path, state: CompilationState): Seq[Node]
+  def toByteCode(statement: Path, state: Language): Seq[Node]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
 
@@ -37,5 +37,5 @@ trait StatementInstance extends DeltaWithGrammar {
 
   def getLabels(obj: Path): Map[Any, Path] = Map.empty
 
-  def definedVariables(state: CompilationState, obj: Node): Map[String, Node] = Map.empty
+  def definedVariables(state: Language, obj: Node): Map[String, Node] = Map.empty
 }

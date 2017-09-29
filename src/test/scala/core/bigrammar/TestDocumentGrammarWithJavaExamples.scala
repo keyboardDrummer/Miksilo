@@ -1,17 +1,14 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.bigrammar.printer.BiGrammarToPrinter
-import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilerFromParticles, Delta}
-import org.scalatest.{FunSpec, FunSuite}
-import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
+import core.particles.Delta
+import org.scalatest.FunSuite
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.expressions.{ExpressionSkeleton, TernaryC}
+import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
 import transformations.javac.statements.BlockC
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompiler}
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 import scala.reflect.io.Path
 
@@ -54,10 +51,10 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
-    val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+    val newTransformations = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
 
-    val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
+    val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)
     val output = state.output
 
     assertResult(expectation)(output)
@@ -83,21 +80,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
     val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }
 }

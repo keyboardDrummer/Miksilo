@@ -2,14 +2,14 @@ package transformations.bytecode.types
 
 import core.bigrammar.{Keyword, BiGrammar}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.{Key, Node}
 
 object VoidTypeC extends TypeInstance with StackType {
 
   override val key = VoidTypeKey
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = Keyword("V", false) ~> produce(voidType)
 

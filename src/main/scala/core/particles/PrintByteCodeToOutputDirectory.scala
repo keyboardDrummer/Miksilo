@@ -7,8 +7,8 @@ import scala.reflect.io.{Directory, File, Path}
 
 object PrintByteCodeToOutputDirectory {
 
-  def perform(inputFile: File, outputDirectory: Directory, state: CompilationState): Unit = {
-    val bytes = PrintByteCode.getBytes(state.program, state).toArray
+  def perform(inputFile: File, outputDirectory: Directory, state: Compilation): Unit = {
+    val bytes = PrintByteCode.getBytes(state.program, state.language).toArray
     val fileName = FileNameUtils.removeExtension(inputFile.name)
     outputDirectory.createDirectory()
     val byteCodeFile = File.apply(outputDirectory / Path(fileName).addExtension("class"))

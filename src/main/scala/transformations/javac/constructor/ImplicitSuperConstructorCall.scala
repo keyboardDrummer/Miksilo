@@ -1,14 +1,14 @@
 package transformations.javac.constructor
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.javac.methods.MethodC
 import transformations.javac.statements.ExpressionAsStatementC
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: Compilation): Unit = {
 
     for (constructor <- ConstructorC.getConstructors(clazz)) {
       val statements = MethodC.getMethodBody(constructor)

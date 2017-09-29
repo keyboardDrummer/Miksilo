@@ -3,10 +3,10 @@ package core.particles
 import core.particles.node.Node
 
 trait DeltaWithPhase extends Delta {
-  def transform(program: Node, state: CompilationState)
+  def transform(program: Node, state: Compilation): Unit
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
-    state.compilerPhases ::= new Phase(this.name, description, () => transform(state.program, state))
+    state.compilerPhases ::= new Phase(this.name, description, compilation => transform(compilation.program, compilation))
   }
 }

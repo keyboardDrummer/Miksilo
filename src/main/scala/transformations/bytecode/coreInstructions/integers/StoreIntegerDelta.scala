@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -23,7 +23,7 @@ object StoreIntegerDelta extends InstructionDelta {
       byteToBytes(hexToInt("3b") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =

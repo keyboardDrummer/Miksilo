@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.particles.CompilerFromParticles
+import core.particles.CompilerFromDeltas
 import core.particles.node.Node
 import transformations.bytecode.readJar.ClassFileSignatureDecompiler
 import transformations.javac.classes.ClassCompiler
@@ -9,7 +9,7 @@ import util.TestUtils
 
 object JavaLang {
 
-  val compiler = new CompilerFromParticles(ClassFileSignatureDecompiler.getDecompiler)
+  val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
   val systemClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("System.class")).program
   val printStreamClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class")).program
   val objectClass: Node = compiler.parseAndTransform(TestUtils.getTestFile("Object.class")).program

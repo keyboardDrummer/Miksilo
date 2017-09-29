@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -14,38 +14,38 @@ object FieldRefConstant extends ConstantEntry {
 
   object FieldRefClassIndex extends NodeField
 
-  object FieldRefNameAndTypeIndex extends NodeField
+  object NameAndType extends NodeField
 
   def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,
     FieldRefClassIndex -> classConstant,
-    FieldRefNameAndTypeIndex -> nameAndType)
+    NameAndType -> nameAndType)
 
   def fieldRef(classIndex: Int, nameAndTypeIndex: Int) = new Node(FieldRef,
     FieldRefClassIndex -> classIndex,
-    FieldRefNameAndTypeIndex -> nameAndTypeIndex)
+    NameAndType -> nameAndTypeIndex)
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(9) ++
       shortToBytes(getFieldRefClassIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
       FieldRefClassIndex -> ClassInfoConstant.key,
-      FieldRefNameAndTypeIndex -> NameAndTypeConstant.key))
+      NameAndType -> NameAndTypeConstant.key))
   }
 
   override def key = FieldRef
 
   def getFieldRefClassIndex(fieldRef: Node): Int = fieldRef(FieldRefClassIndex).asInstanceOf[Int]
 
-  def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(FieldRefNameAndTypeIndex).asInstanceOf[Int]
+  def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(NameAndType).asInstanceOf[Int]
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ("field reference:" ~~> (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ ".") ~
-      grammars.find(ConstantPoolIndexGrammar).as(FieldRefNameAndTypeIndex)).
+    (grammars.find(ConstantPoolIndexGrammar).as(FieldRefClassIndex) <~ "." ~
+      grammars.find(ConstantPoolIndexGrammar).as(NameAndType)).
       asNode(FieldRef)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."

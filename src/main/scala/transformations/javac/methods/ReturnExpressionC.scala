@@ -28,14 +28,14 @@ object ReturnExpressionC extends StatementInstance {
       case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta.longReturn)
       case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
       case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeC.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
+      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
   }
 
   def getReturnValue[T <: NodeLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
@@ -51,7 +51,7 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key: Key = ReturnInteger
 
-  override def toByteCode(_return: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(_return: Path, state: Language): Seq[Node] = {
     val methodCompiler = MethodC.getMethodCompiler(state)
     returnToLines(_return, methodCompiler)
   }

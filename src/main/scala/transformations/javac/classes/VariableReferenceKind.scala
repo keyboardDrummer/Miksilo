@@ -7,7 +7,7 @@ import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.VariableC.VariableKey
 
 object VariableReferenceKind extends Delta {
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     MemberSelector.getReferenceKindRegistry(state).put(VariableKey, variable => {
       val compiler = JavaClassSkeleton.getClassCompiler(state)
       getReferenceKind(variable, compiler)

@@ -1,6 +1,6 @@
 package transformations.bytecode.constants
 
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
@@ -13,7 +13,7 @@ object InterfaceMethodRefConstant extends ConstantEntry {
 
   object MethodRefMethodName extends NodeField
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(11) ++
       shortToBytes(getClassRefIndex(constant)) ++
       shortToBytes(getNameIndex(constant))

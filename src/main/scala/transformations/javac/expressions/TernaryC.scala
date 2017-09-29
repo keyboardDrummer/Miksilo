@@ -21,7 +21,7 @@ object TernaryC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val parseTernary = ((expressionGrammar <~~ "?") ~~ (expressionGrammar <~~ ":") ~~ expressionGrammar).
       asNode(TernaryKey, ConditionKey, TrueKey, FalseKey)
@@ -46,7 +46,7 @@ object TernaryC extends ExpressionInstance {
 
   override val key: Key = TernaryKey
 
-  override def getType(_ternary: Path, state: CompilationState): Node = {
+  override def getType(_ternary: Path, state: Language): Node = {
     val getExpressionType = ExpressionSkeleton.getType(state)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
@@ -58,7 +58,7 @@ object TernaryC extends ExpressionInstance {
     TypeSkeleton.union(state)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(_ternary: Path, state: Language): Seq[Node] = {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)

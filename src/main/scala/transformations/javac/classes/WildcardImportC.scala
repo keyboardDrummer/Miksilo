@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import core.particles.{Language, Contract, DeltaWithGrammar}
 import transformations.javac.classes.BasicImportC._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
 
@@ -12,12 +12,12 @@ object WildcardImportC extends DeltaWithGrammar {
 
   def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val importPath = grammars.find(ImportPathGrammar)
     importPath.addOption((identifier.someSeparated(".") <~ ".*").asNode(WildcardImportKey, ElementsKey))
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     JavaClassSkeleton.getState(state).importToClassMap.put(WildcardImportKey, wildcardImport => {
       val packageParts = getParts(wildcardImport)
       val classCompiler = JavaClassSkeleton.getState(state).classCompiler

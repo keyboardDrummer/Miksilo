@@ -57,7 +57,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   }
 
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(ClassFileKey, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
@@ -86,7 +86,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   object AttributeGrammar
   object MembersGrammar
   object AttributesGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val constantIndexGrammar = grammars.create(ConstantPoolIndexGrammar, integer)
     val program = grammars.find(ProgramGrammar)
     val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
@@ -104,7 +104,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     program.inner = classGrammar
   }
 
-  object ConstantPoolGrammar
+  object ConstantPoolGrammar extends Key
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar)

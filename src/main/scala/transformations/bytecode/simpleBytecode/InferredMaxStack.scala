@@ -2,7 +2,7 @@ package transformations.bytecode.simpleBytecode
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithGrammar, DeltaWithPhase}
+import core.particles._
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
@@ -12,7 +12,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
 
     def getMaxStack(method: Node): Integer = {
@@ -33,8 +33,8 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
       case LabelKey => 0
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
-    grammars.findPathsToKey(CodeAttribute.MaxStackGrammar).head.removeMeFromSequence() //TODO dit laat nog een , staan.
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    grammars.find(CodeAttribute.CodeKey).findLabelled(CodeAttribute.MaxStackGrammar).removeMeFromSequence()
   }
 
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."

@@ -2,12 +2,12 @@ package transformations.javac.statements.locals
 
 import core.particles.node.Node
 import core.particles.path.Path
-import core.particles.CompilationState
+import core.particles.Language
 import transformations.javac.methods.VariablePool
 import transformations.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 
-class LocalsAnalysis(compilationState: CompilationState, method: Node)
-  extends StatementFlowAnalysis[VariablePool](compilationState: CompilationState, method: Node) {
+class LocalsAnalysis(compilationState: Language, method: Node)
+  extends StatementFlowAnalysis[VariablePool](compilationState: Language, method: Node) {
   
   override def updateState(state: VariablePool, node: Path): VariablePool = {
     val instances = StatementSkeleton.getState(compilationState).instances

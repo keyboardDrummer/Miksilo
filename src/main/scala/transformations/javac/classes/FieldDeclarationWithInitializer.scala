@@ -18,7 +18,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(ClassMemberGrammar)
     val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC).asNode(FieldWithInitializerKey, FromMap)
     memberGrammar.addOption(fieldDeclarationWithInitializer)
@@ -27,7 +27,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   object FieldWithInitializerKey extends Key
   override def description: String = "Enables fields to have initialisers."
 
-  def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: CompilationState): Unit = {
+  def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
     val name: String = LocalDeclarationC.getDeclarationName(fieldWithInitialiser)
     val _type = LocalDeclarationC.getDeclarationType(fieldWithInitialiser)
     val declaration = FieldDeclaration.field(_type, name)
@@ -38,7 +38,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     fieldWithInitialiser.replaceWith(declaration)
   }
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
     new PathRoot(program).visit(obj => obj.clazz match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)

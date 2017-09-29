@@ -1,10 +1,10 @@
 package transformations.bytecode
 
-import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, StoreIntegerDelta}
 import transformations.bytecode.coreInstructions.longs.PushLongDelta
 import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
@@ -13,6 +13,7 @@ import transformations.bytecode.types.VoidTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.javac.types.MethodType
+import util.CompilerBuilder
 
 class TestPoptimize extends FunSuite {
 
@@ -69,10 +70,14 @@ class TestPoptimize extends FunSuite {
 
   def transformInstructions(instructions: Seq[Node]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
-    val method = ByteCodeMethodInfo.methodInfo(0, 1, Seq(codeAnnotation))
+    val method = ByteCodeMethodInfo.MethodInfoKey.create(
+      ByteCodeMethodInfo.MethodNameIndex -> Utf8Constant.create("name"),
+      ByteCodeMethodInfo.MethodDescriptorIndex -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),
+      ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation))
+
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq(TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)))), Seq(method))
-    val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
+    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
+    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
     CodeAttribute.getCodeInstructions(codeAnnotation)
   }

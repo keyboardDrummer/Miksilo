@@ -1,6 +1,6 @@
 package transformations.bytecode.types
 
-import core.particles.{CompilationState, Delta}
+import core.particles.{Language, Delta}
 import core.particles.node.Key
 
 trait StackType extends Delta
@@ -8,7 +8,7 @@ trait StackType extends Delta
   val key: Key
   def getStackSize: Int
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
     super.inject(state)
   }

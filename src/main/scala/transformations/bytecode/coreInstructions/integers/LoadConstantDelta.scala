@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
@@ -18,7 +18,7 @@ object LoadConstantDelta extends InstructionDelta
 
   def integerConstant(value: Any) = LoadConstantKey.create(IntegerConstantIndex -> value)
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: CompilationState): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
     InstructionSignature(Seq.empty, Seq(IntTypeC.intType))
   }
 
@@ -28,7 +28,7 @@ object LoadConstantDelta extends InstructionDelta
   }
   override def getInstructionSize: Int = 2
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerInfoConstant.key))
   }

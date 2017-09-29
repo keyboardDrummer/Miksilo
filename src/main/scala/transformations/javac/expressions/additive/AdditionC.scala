@@ -13,7 +13,7 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(addition: Path, state: Language): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
@@ -24,7 +24,7 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
     })
   }
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -49,7 +49,7 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val parseAddition = ((additiveGrammar <~~ "+") ~~ additiveGrammar).parseMap(AdditionClazz, FirstKey, SecondKey) //TODO for some reason I have to use parseMap here instead of asNode, otherwise the JavaStyleComments tests fail
     additiveGrammar.addOption(parseAddition)
