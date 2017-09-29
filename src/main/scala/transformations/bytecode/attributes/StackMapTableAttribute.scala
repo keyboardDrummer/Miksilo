@@ -9,6 +9,7 @@ import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.{ClassInfoConstant, Utf8Constant}
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
+import transformations.bytecode.types.ObjectTypeDelta.ObjectStackType
 import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
@@ -52,12 +53,12 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def sameLocals1StackItem(frameOffset: Int, _type: Node) = new Node(SameLocals1StackItem,
     FrameOffset -> frameOffset,
-    SameLocals1StackItemType -> typeToVerificationInfo(_type))
+    SameLocals1StackItemType -> _type)
 
   def getSameLocals1StackItemType(sameLocals1StackItem: Node) = sameLocals1StackItem(SameLocals1StackItemType).asInstanceOf[Node]
 
   def appendFrame(offset: Int, newLocalTypes: Seq[Node]) = new Node(AppendFrame, FrameOffset -> offset,
-    AppendFrameTypes -> newLocalTypes.map(t => typeToVerificationInfo(t)).toList)
+    AppendFrameTypes -> newLocalTypes)
 
   def getAppendFrameTypes(appendFrame: Node) = appendFrame(AppendFrameTypes).asInstanceOf[Seq[Node]]
 
@@ -67,7 +68,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8Constant.key))
-    ByteCodeSkeleton.getState(state).constantReferences.put(VerificationInfo, Map(VerificationObjectIndex -> ClassInfoConstant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
   }
 
   def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {
@@ -102,10 +103,10 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   }
 
   def getVerificationInfoBytes(_type: Node, state: Language): Seq[Byte] = {
-    _type(VerificationName).asInstanceOf[String] match {
-      case "int" => hexToBytes("01")
-      case "long" => hexToBytes("04")
-      case "class" => hexToBytes("07") ++ shortToBytes(_type(VerificationObjectIndex).asInstanceOf[Int])
+    _type.clazz match {
+      case IntTypeC.key => hexToBytes("01")
+      case LongTypeC.key => hexToBytes("04")
+      case ObjectTypeDelta.ObjectStackType => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeDelta.Name).asInstanceOf[Int])
     }
   }
 
@@ -137,27 +138,12 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     grammars.create(Clazz, stackMapTableGrammar)
   }
 
-  def typeToVerificationInfo(_type: Node): Node = _type.clazz match {
-    case IntTypeC.key => VerificationInfo.create(VerificationName -> "int")
-    case LongTypeC.key => VerificationInfo.create(VerificationName -> "long")
-    case ObjectTypeDelta.key => VerificationInfo.create(VerificationName -> "class",
-      VerificationObjectIndex -> _type(ObjectTypeDelta.Name).asInstanceOf[Node])
-  }
-
-  object VerificationName extends NodeField
-  object VerificationObjectIndex extends NodeField
-  object VerificationInfo extends NodeClass
   def getVerificationInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val index = grammars.find(ConstantPoolIndexGrammar)
-    val basic = (keywordClass("top") |
-      keywordClass("int") |
-      keywordClass("float") |
-      keywordClass("long") |
-      keywordClass("double") |
-      keywordClass("null") |
-      keywordClass("uninitializedThis")).as(VerificationName)
-    val objectReference = ("class": BiGrammar).as(VerificationName) ~~ index.as(VerificationObjectIndex)
-    (basic | objectReference).asLabelledNode(grammars, VerificationInfo)
+    val basic = grammars.find(IntTypeC.key) |  grammars.find(LongTypeC.key)
+    val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(grammars, ObjectStackType)
+
+    basic | objectReference
   }
 
   override def constantPoolKey: String = "StackMapTable"

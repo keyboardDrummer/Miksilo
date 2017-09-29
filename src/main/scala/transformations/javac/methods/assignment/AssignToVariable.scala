@@ -1,18 +1,17 @@
 package transformations.javac.methods.assignment
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
 import transformations.bytecode.coreInstructions.longs.StoreLongDelta
 import transformations.bytecode.coreInstructions.objects.StoreAddressDelta
-import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
 import transformations.bytecode.types.IntTypeC.IntTypeKey
 import transformations.bytecode.types.LongTypeC.LongTypeKey
-import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeKey
-import transformations.bytecode.types.TypeSkeleton
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
 
@@ -32,7 +31,7 @@ object AssignToVariable extends DeltaWithGrammar {
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.clazz match {
       case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
-      case ObjectTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
+      case ObjectTypeDelta.ObjectStackType => StoreAddressDelta.addressStore(variableInfo.offset)
       case ArrayTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
       case LongTypeKey => StoreLongDelta.longStore(variableInfo.offset)
     }

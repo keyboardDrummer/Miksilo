@@ -68,8 +68,10 @@ object ObjectTypeDelta extends TypeInstance with StackType {
 
   object ObjectTypeKey extends NodeClass
 
+  object ObjectStackType extends NodeClass
+
   override def getStackType(_type: Node, state: Language): Node = {
-    ObjectTypeKey.create(Name -> ClassInfoConstant.classRef(ObjectTypeDelta.getObjectTypeName(_type).right.get))
+    ObjectStackType.create(Name -> ClassInfoConstant.classRef(ObjectTypeDelta.getObjectTypeName(_type).right.get))
   }
 
   override def description: String = "Defines the object type."

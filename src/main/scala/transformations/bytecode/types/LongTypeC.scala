@@ -1,9 +1,9 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass}
 
 object LongTypeC extends TypeInstance with StackType {
 
@@ -21,7 +21,7 @@ object LongTypeC extends TypeInstance with StackType {
 
   val longType = new Node(LongTypeKey)
 
-  object LongTypeKey extends Key
+  object LongTypeKey extends NodeClass
 
   override def description: String = "Defines the long type."
 }

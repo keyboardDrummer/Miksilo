@@ -59,14 +59,14 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
       }
       else if (unchangedLocals && stack.size == 1) {
         new Node(StackMapTableAttribute.SameLocals1StackItem,
-          StackMapTableAttribute.SameLocals1StackItemType -> StackMapTableAttribute.typeToVerificationInfo(stack.head))
+          StackMapTableAttribute.SameLocals1StackItemType -> stack.head)
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
         new Node(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
         new Node(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes ->
-          addedLocals.map(l => StackMapTableAttribute.typeToVerificationInfo(toStackType(l))))
+          addedLocals.map(l => toStackType(l)))
       }
       else {
         new Node(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
