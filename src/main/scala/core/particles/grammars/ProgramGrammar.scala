@@ -1,3 +1,5 @@
 package core.particles.grammars
 
-object ProgramGrammar
+import core.particles.node.Key
+
+object ProgramGrammar extends Key

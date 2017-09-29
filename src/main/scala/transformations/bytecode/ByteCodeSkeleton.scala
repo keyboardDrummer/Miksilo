@@ -104,7 +104,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     program.inner = classGrammar
   }
 
-  object ConstantPoolGrammar
+  object ConstantPoolGrammar extends Key
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar)

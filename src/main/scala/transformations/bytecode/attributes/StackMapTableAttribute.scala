@@ -117,7 +117,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def key: Key = Clazz
 
   val offsetGrammarKey = KeyGrammar(FrameOffset)
-  object StackMapFrameGrammar
+  object StackMapFrameGrammar extends Key
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
 

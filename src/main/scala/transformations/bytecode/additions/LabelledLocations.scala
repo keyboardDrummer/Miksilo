@@ -6,7 +6,6 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.attributes.CodeAttribute._
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
@@ -14,7 +13,6 @@ import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZe
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoDelta, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.javac.classes.ConstantPool
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -183,11 +181,11 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
-    val offsetGrammarPaths = grammars.findPathsToKey(offsetGrammarKey, StackMapFrameGrammar)
+    val offsetGrammarPaths = grammars.findPaths(offsetGrammarKey, StackMapFrameGrammar)
     offsetGrammarPaths.foreach(delta => delta.removeMeFromSequence())
   }
 
-  def overrideJumpGrammars(grammars: GrammarCatalogue) = {
+  def overrideJumpGrammars(grammars: GrammarCatalogue): Unit = {
     val jumps = Seq[InstructionDelta](IfZeroDelta, IfNotZero, GotoDelta,
       IfIntegerCompareGreaterOrEqualDelta,
       IfIntegerCompareLessDelta, IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)

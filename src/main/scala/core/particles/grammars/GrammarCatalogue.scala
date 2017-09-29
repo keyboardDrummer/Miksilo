@@ -5,9 +5,9 @@ import java.util.NoSuchElementException
 import core.bigrammar._
 import core.particles.node.Key
 
-case class KeyGrammar(key: Key)
+case class KeyGrammar(key: Key) extends Key
 {
-  override def toString = key.toString
+  override lazy val toString = key.toString
 }
 
 class GrammarCatalogue {
@@ -29,17 +29,17 @@ class GrammarCatalogue {
     result
   }
 
-  def findPathToKey(grammarKeyToFind: Any, rootKey: Any = ProgramGrammar): GrammarReference = {
-    val attributeGrammar = find(rootKey)
+  def findPath(to: Key, from: Key): GrammarReference = {
+    val attributeGrammar = find(from)
     val rootGrammar = new RootGrammar(attributeGrammar)
-    val targetGrammar = find(grammarKeyToFind)
+    val targetGrammar = find(to)
     rootGrammar.find(path => path.get == targetGrammar).get.asInstanceOf[GrammarReference]
   }
 
-  def findPathsToKey(grammarKeyToFind: Any, rootKey: Any = ProgramGrammar): Seq[GrammarReference] = {
-    val attributeGrammar = find(rootKey)
+  def findPaths(to: Key, from: Key): Seq[GrammarReference] = {
+    val attributeGrammar = find(from)
     val rootGrammar = new RootGrammar(attributeGrammar)
-    val targetGrammar = find(grammarKeyToFind)
+    val targetGrammar = find(to)
     rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarReference => x }
   }
 }

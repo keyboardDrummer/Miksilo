@@ -5,6 +5,7 @@ import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.constants.ClassInfoConstant
+import transformations.bytecode.extraConstants.QualifiedClassNameConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeDelta extends TypeInstance with StackType {
@@ -47,16 +48,15 @@ object ObjectTypeDelta extends TypeInstance with StackType {
   object ObjectTypeByteCodeGrammarInner
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val construct: Any => Any = {
-      case ids: Seq[Any] =>
-        val stringIds = ids.collect({ case v: String => v})
-        Right(new QualifiedClassName(stringIds))
+      case name: QualifiedClassName =>
+        Right(name)
     }
     def deconstruct(value: Any): Option[Any] = Some(value match {
-      case Right(QualifiedClassName(stringIds)) => stringIds
+      case Right(name) => name
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
-      (identifier.someSeparated("/") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
-    val grammar: BiGrammar = new Keyword("L",false) ~> inner <~ ";"
+      (QualifiedClassNameConstant.getQualifiedClassNameParser ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
+    val grammar: BiGrammar = Keyword("L", false) ~> inner <~ ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 

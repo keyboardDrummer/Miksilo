@@ -1,11 +1,11 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarReference, Labelled}
+import core.bigrammar.GrammarPath._
+import core.bigrammar.GrammarReference
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import transformations.bytecode.additions.LabelledLocations
-import transformations.bytecode.additions.LabelledLocations.LabelStackFrame
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.types.TypeSkeleton
@@ -78,13 +78,8 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val labelMapPath = grammars.findPathToKey(LabelledLocations.LabelKey)
-    val labelLabel: Labelled = labelMapPath.get.asInstanceOf[Labelled]
-    val labelMap = labelLabel.inner.asInstanceOf[NodeGrammar]
-    val newFields = labelMap.fields.filter(field => field != LabelStackFrame)
-    labelLabel.inner = new NodeGrammar(labelMap.inner, labelMap.key, newFields)
-
-    val stackMapTablePath = grammars.findPathToKey(StackMapTableAttribute.StackMapFrameGrammar, LabelledLocations.LabelKey)
-    stackMapTablePath.ancestors.find(a => a.get.isInstanceOf[As]).get.asInstanceOf[GrammarReference].removeMeFromSequence()
+    grammars.find(LabelledLocations.LabelKey).
+      findAs(LabelledLocations.LabelStackFrame).
+      asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 }

@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarReference, RootGrammar}
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.{GrammarReference, RootGrammar}
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
@@ -40,10 +40,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
       val constantFields: Map[NodeField, NodeClass] = containerEntry._2
       val keyGrammar = new RootGrammar(grammars.find(key))
       for(field <- constantFields) {
-        val asGrammar = keyGrammar.find(p => p.get match {
-          case as: As => as.key == field._1
-          case _ => false
-        }).get
+        val asGrammar = keyGrammar.findAs(field._1)
         val constantRef = asGrammar.findGrammar(constantPoolIndexGrammar).get.asInstanceOf[GrammarReference]
         constantRef.set(grammars.find(field._2))
       }
@@ -61,7 +58,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
       grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
     grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
 
-    val constantPoolGrammar = grammars.findPathToKey(ConstantPoolGrammar)
+    val constantPoolGrammar = grammars.findPath(ConstantPoolGrammar, ProgramGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 

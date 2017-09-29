@@ -61,7 +61,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
   def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {
     case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
     case ObjectTypeDelta.ObjectTypeKey =>
-      val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
+        val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
       _type(ObjectTypeDelta.Name) = newName
     case _ =>
   }

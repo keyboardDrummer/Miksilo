@@ -122,7 +122,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   override def key: Key = CodeKey
 
-  object MaxStackGrammar
+  object MaxStackGrammar extends Key
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
