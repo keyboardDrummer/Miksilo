@@ -13,6 +13,8 @@ object FromMap extends Key
 
 trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
   implicit val postfixOps = language.postfixOps
+
+  implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
   def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
 
   override def inject(state: Language): Unit = {

@@ -26,7 +26,7 @@ case class Phase(name: String, description: String, action: Compilation => Unit)
 
 object Compilation
 {
-  implicit def toLanguage(compilation: Compilation): Language = compilation.language //TODO remove this
+  implicit def toLanguage(compilation: Compilation): Language = compilation.language
 }
 
 class Compilation(val language: Language) {

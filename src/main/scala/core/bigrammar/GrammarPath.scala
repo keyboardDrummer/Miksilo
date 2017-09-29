@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.particles.node.NodeField
+import core.particles.node.{Key, NodeField}
 import util.{ExtendedType, GraphBasics, Property}
 
 import scala.collection.mutable
@@ -14,8 +14,6 @@ object GrammarPath {
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
       map(p => p.asInstanceOf[Property[BiGrammar, AnyRef]]).toList)
   }
-
-  implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
 }
 
 trait GrammarPath {
@@ -30,6 +28,10 @@ trait GrammarPath {
 
   def findAs(field: NodeField): GrammarReference = {
     find(p => p.get match { case as:As => as.key == field; case _ => false}).get.asInstanceOf[GrammarReference]
+  }
+
+  def findLabelled(label: Key): GrammarReference = {
+    find(p => p.get match { case as:Labelled => as.name == label; case _ => false}).get.asInstanceOf[GrammarReference]
   }
 
   def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = {
@@ -47,6 +49,8 @@ trait GrammarPath {
     )
     result
   }
+
+  def descendants: Seq[GrammarReference] = selfAndDescendants.drop(1).collect { case x:GrammarReference => x }
   def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this),
     path => path.children.filter(c => !path.ancestorGrammars.contains(c.get)))
 }

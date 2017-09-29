@@ -30,17 +30,8 @@ class GrammarCatalogue {
   }
 
   def findPath(to: Key, from: Key): GrammarReference = {
-    val attributeGrammar = find(from)
-    val rootGrammar = new RootGrammar(attributeGrammar)
-    val targetGrammar = find(to)
-    rootGrammar.find(path => path.get == targetGrammar).get.asInstanceOf[GrammarReference]
-  }
-
-  def findPaths(to: Key, from: Key): Seq[GrammarReference] = {
-    val attributeGrammar = find(from)
-    val rootGrammar = new RootGrammar(attributeGrammar)
-    val targetGrammar = find(to)
-    rootGrammar.selfAndDescendants.filter(path => path.get == targetGrammar).collect { case x: GrammarReference => x }
+    val rootGrammar = new RootGrammar(find(from))
+    rootGrammar.findLabelled(to)
   }
 }
 
