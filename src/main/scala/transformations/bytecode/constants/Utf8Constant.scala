@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, FromGrammarWithToString}
 import core.grammar.{Identifier, Keyword, StringLiteral}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
 import transformations.bytecode.PrintByteCode
 
 object Utf8Constant extends ConstantEntry {
@@ -14,6 +14,11 @@ object Utf8Constant extends ConstantEntry {
   object Value extends NodeField
   def create(value: String) = new Node(key, Value -> value)
   def get(constant: Node): String = constant(Value).asInstanceOf[String]
+
+  implicit class Utf8ConstantWrapper(val node: Node) extends NodeWrapper {
+    def value: String = node(Value).asInstanceOf[String]
+    def value_=(value: String): Unit = node(Value) = value
+  }
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])

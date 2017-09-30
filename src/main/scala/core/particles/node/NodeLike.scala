@@ -9,8 +9,14 @@ object NodeWrapper
   implicit def unwrap(wrapper: NodeWrapper): Node = wrapper.node
 }
 
-trait NodeWrapper extends Any {
+trait NodeWrapper {
   def node: Node
+
+  def get(key: Any): Option[Any] = node.get(key)
+  def apply(key: Any): Any = node.apply(key)
+  def update(key: Any, value: Any): Unit = node.update(key, value)
+  def clazz: Any = node.clazz
+  def dataView: Map[Any, Any] = node.dataView
 }
 
 trait NodeLike {

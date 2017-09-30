@@ -2,18 +2,18 @@ package transformations.bytecode.simpleBytecode
 
 import core.particles.Compilation
 import core.particles.node.Node
+import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.extraConstants.QualifiedClassNameConstant
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.types.ObjectTypeDelta
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.types.MethodType._
 
-class InstructionTypeAnalysisFromState(state: Compilation, method: Node) {
+class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMethodInfoWrapper) {
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters
   val initialVariables = parameters.zipWithIndex.map(p => p._2 -> p._1).toMap
@@ -22,7 +22,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: Node) {
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
   private def getTypeAnalysis = {
-    val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+    val codeAnnotation = method.attributes.find(a => a.clazz == CodeAttribute.CodeKey).get
     val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
     new InstructionTypeAnalysis(instructions) {
@@ -40,9 +40,8 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: Node) {
   }
   
   private def getMethodParameters = {
-    val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
-    val methodType = TypeConstant.getValue(method(ByteCodeMethodInfo.MethodDescriptorIndex).asInstanceOf[Node])
-    val methodParameters = methodType.parameterTypes
+    val methodIsStatic: Boolean = method.accessFlags.contains(ByteCodeMethodInfo.StaticAccess)
+    val methodParameters = method._type.parameterTypes
     if (methodIsStatic) {
       methodParameters
     }

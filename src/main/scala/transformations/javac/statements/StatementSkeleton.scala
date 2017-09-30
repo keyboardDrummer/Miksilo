@@ -9,8 +9,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object StatementSkeleton extends DeltaWithGrammar with WithState {
 
-  implicit class Statement(val node: Node) extends AnyVal with NodeWrapper {
-  }
+  implicit class Statement(val node: Node) extends NodeWrapper { }
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 

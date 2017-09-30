@@ -3,12 +3,14 @@ package transformations.bytecode
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node._
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import transformations.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
+import transformations.javac.types.MethodType.MethodTypeWrapper
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
@@ -29,11 +31,30 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   def getMethodAttributes[T <: NodeLike](method: T) = method(MethodAttributes).asInstanceOf[Seq[T]]
 
-  def getMethodAccessFlags(method: Node) = method(AccessFlagsKey).asInstanceOf[Set[MethodAccessFlag]]
+    def getMethodAccessFlags(method: Node) = method(AccessFlagsKey).asInstanceOf[Set[MethodAccessFlag]]
 
   def getMethodNameIndex(methodInfo: Node) = methodInfo(MethodNameIndex).asInstanceOf[Int]
 
   def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
+
+  implicit class ByteCodeMethodInfoWrapper[T <: NodeLike](val node: Node) extends NodeWrapper {
+    def _type: MethodTypeWrapper = new MethodTypeWrapper(typeConstant.value)
+
+    def nameIndex: Int = node(MethodNameIndex).asInstanceOf[Int]
+    def nameIndex_=(value: Int): Unit = node(MethodNameIndex) = value
+
+    def typeIndex: Int = node(MethodDescriptorIndex).asInstanceOf[Int]
+    def typeIndex_=(value: Int): Unit = node(Int) = value
+
+    def typeConstant: TypeConstantWrapper = node(MethodDescriptorIndex).asInstanceOf[Node]
+    def typeConstant_=(value: TypeConstantWrapper): Unit = node(MethodDescriptorIndex) = value
+
+    def accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] =
+      node(ByteCodeMethodInfo.AccessFlagsKey).asInstanceOf[Set[ByteCodeMethodInfo.MethodAccessFlag]]
+    def accessFlags_=(value: Node): Unit = node(ByteCodeMethodInfo.AccessFlagsKey) = value
+
+    def attributes: Seq[Node] = node(MethodAttributes).asInstanceOf[Seq[Node]]
+  }
 
   override def inject(state: Language): Unit = {
     super.inject(state)
@@ -42,11 +63,11 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       MethodDescriptorIndex -> Utf8Constant.key))
   }
 
-  def getMethodByteCode(methodInfo: Node, state: Language) = {
+  def getMethodByteCode(methodInfo: ByteCodeMethodInfoWrapper, state: Language) = {
     getAccessFlagsByteCode(methodInfo) ++
-        shortToBytes(getMethodNameIndex(methodInfo)) ++
-        shortToBytes(getMethodDescriptorIndex(methodInfo)) ++
-      getAttributesByteCode(state, ByteCodeMethodInfo.getMethodAttributes(methodInfo))
+        shortToBytes(methodInfo.nameIndex) ++
+        shortToBytes(methodInfo.typeIndex) ++
+      getAttributesByteCode(state, methodInfo.attributes)
     }
 
   object MethodsGrammar

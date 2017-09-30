@@ -9,8 +9,7 @@ import transformations.javac.statements.StatementSkeleton.Statement
 
 object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
-  implicit class ForLoop(val node: Node)
-    extends AnyVal with NodeWrapper {
+  implicit class ForLoop(val node: Node) extends NodeWrapper {
     def initializer: Statement = node(Initializer).asInstanceOf[Node]
     def initializer_=(value: Node) = node(Initializer) = value
 

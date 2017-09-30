@@ -3,9 +3,10 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodRefConstant extends ConstantEntry {
@@ -20,6 +21,11 @@ object MethodRefConstant extends ConstantEntry {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
+  }
+
+  implicit class MethodRefWrapper(val node: Node) extends NodeWrapper {
+    def nameAndType: NameAndTypeConstantWrapper = node(NameAndType).asInstanceOf[Node]
+    def nameAndType_=(value: NameAndTypeConstantWrapper): Unit = node(NameAndType) = value
   }
 
   override def key = MethodRefKey

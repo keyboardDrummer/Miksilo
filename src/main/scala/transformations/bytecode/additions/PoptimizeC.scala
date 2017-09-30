@@ -2,10 +2,10 @@ package transformations.bytecode.additions
 
 import core.particles.node.Node
 import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 
 object PoptimizeC extends DeltaWithPhase {
@@ -18,10 +18,11 @@ object PoptimizeC extends DeltaWithPhase {
     (inputLength, outputLength)
   }
 
-  override def transform(clazz: Node, state: Compilation): Unit = {
-    for (method <- ByteCodeSkeleton.getMethods(clazz)) {
+  override def transform(_clazz: Node, state: Compilation): Unit = {
+    val clazz = new ByteCodeWrapper(_clazz)
+    for (method <- clazz.methods) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
-      val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
+      val codeAnnotation = method.attributes.find(a => a.clazz == CodeAttribute.CodeKey).get
       val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
 
       def getInOutSizes(instructionIndex: Int) = {

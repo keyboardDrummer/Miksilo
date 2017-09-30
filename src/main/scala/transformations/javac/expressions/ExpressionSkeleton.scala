@@ -10,7 +10,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
-  implicit class Expression(val node: Node) extends AnyVal with NodeWrapper
+  implicit class Expression(val node: Node) extends NodeWrapper
 
   def getType(state: Language): Path => Node = expression => {
     getState(state).instances(expression.clazz).getType(expression, state)

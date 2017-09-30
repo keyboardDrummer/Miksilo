@@ -6,9 +6,9 @@ import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.{FieldRefConstant, NameAndTypeConstant}
+import transformations.bytecode.constants.FieldRefConstant
+import transformations.bytecode.constants.FieldRefConstant.FieldRefWrapper
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
-import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object GetFieldDelta extends InstructionDelta {
@@ -29,10 +29,8 @@ object GetFieldDelta extends InstructionDelta {
   }
 
   def getReturnType(getField: Node): Node = {
-    val fieldRef = getField(FieldRef).asInstanceOf[Node]
-    val nameAndType = fieldRef(FieldRefConstant.NameAndType).asInstanceOf[Node]
-    val fieldType = TypeConstant.getValue(nameAndType(NameAndTypeConstant.Type).asInstanceOf[Node])
-    fieldType
+    val fieldRef: FieldRefWrapper = getField(FieldRef).asInstanceOf[Node]
+    fieldRef.nameAndType._type.value
   }
 
   override def inject(state: Language): Unit = {

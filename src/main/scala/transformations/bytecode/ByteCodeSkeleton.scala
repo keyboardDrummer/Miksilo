@@ -2,21 +2,22 @@ package transformations.bytecode
 
 import core.bigrammar.BiGrammar
 import core.document.Empty
-import core.grammar.StringLiteral
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node._
+import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
-import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
-  implicit class ByteCode(node: Node) {
+  implicit class ByteCodeWrapper[T <: NodeLike](node: T) {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
     def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
+
+    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = node(ClassMethodsKey).asInstanceOf[Seq[Node]]
   }
   
   def getMethods[T <: NodeLike](clazz: T) = clazz(ClassMethodsKey).asInstanceOf[Seq[T]]

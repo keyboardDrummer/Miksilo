@@ -16,7 +16,11 @@ object TypeConstant extends ConstantEntry {
   object Type extends NodeField
 
   def constructor(_type: Node) = new Node(Key, Type -> _type)
-  def getValue(constant: Node) = constant(Type).asInstanceOf[Node]
+
+  implicit class TypeConstantWrapper(node: Node) {
+    def value: Node = node(Type).asInstanceOf[Node]
+    def value_=(value: Node): Unit = node(Type) = value
+  }
 
   override def key = Key
 

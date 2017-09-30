@@ -2,17 +2,19 @@ package transformations.bytecode.simpleBytecode
 
 import core.bigrammar.{GrammarReference, RootGrammar}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
-import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeMethodInfo.MethodDescriptorIndex
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
-import transformations.bytecode.constants.FieldRefConstant.FieldRefClassIndex
+import transformations.bytecode.constants.FieldRefConstant.ClassInfo
 import transformations.bytecode.constants.MethodRefConstant.{ClassRef, MethodRefKey}
 import transformations.bytecode.constants.NameAndTypeConstant.Type
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import transformations.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 
 object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
@@ -52,7 +54,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) <~ "." ~
       grammars.find(NameAndTypeConstant.key).as(MethodRefConstant.NameAndType)) asNode MethodRefKey
     grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
-    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "." ~
+    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(ClassInfo) ~ "." ~
       grammars.find(NameAndTypeConstant.key).as(FieldRefConstant.NameAndType) asNode FieldRefConstant.key
     grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeConstant.Name) ~~
       grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
