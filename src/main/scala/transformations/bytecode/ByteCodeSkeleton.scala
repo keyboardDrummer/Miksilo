@@ -5,6 +5,7 @@ import core.document.Empty
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node._
+import transformations.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import transformations.bytecode.constants.ClassInfoConstant
@@ -16,6 +17,19 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
   implicit class ByteCodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
     def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
+
+    def parentIndex: Int = node(ClassParentIndex).asInstanceOf[Int]
+    def parentIndex_=(index: Int) = node(ClassParentIndex) = index
+
+    def classInfoIndex: Int = node(ClassNameIndexKey).asInstanceOf[Int]
+    def classInfoIndex_=(index: Int) = node(ClassNameIndexKey) = index
+
+    def interfaceIndices = node(ClassInterfaces).asInstanceOf[Seq[Int]]
+    def interfaceIndices_=(indices: Seq[Int]) = node(ClassInterfaces) = indices
+
+    def fields: Seq[FieldInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassFields).asInstanceOf[Seq[T]])
+
+    def attributes: Seq[T] = node(ClassAttributes).asInstanceOf[Seq[T]]
 
     def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassMethodsKey).asInstanceOf[Seq[T]])
   }
@@ -35,16 +49,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     ClassAttributes ->  attributes
   )
 
-  def getParentIndex(clazz: Node) = clazz(ClassParentIndex).asInstanceOf[Int]
-
-  def getClassNameIndex(clazz: Node) = clazz(ClassNameIndexKey).asInstanceOf[Int]
-
-  def getClassInterfaces(clazz: Node) = clazz(ClassInterfaces).asInstanceOf[Seq[Int]]
-
-  def getClassFields(clazz: Node) = clazz(ClassFields).asInstanceOf[Seq[Node]]
-
-  def getClassAttributes(clazz: Node) = clazz(ClassAttributes).asInstanceOf[Seq[Node]]
-
   override def dependencies: Set[Contract] = Set.empty
 
   class State {
@@ -52,7 +56,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
     val attributes = new ClassRegistry[ByteCodeAttribute]
     val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
   }
-
 
   override def inject(state: Language): Unit = {
     super.inject(state)

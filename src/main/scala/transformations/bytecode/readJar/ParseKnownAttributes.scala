@@ -6,7 +6,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute, UnParsedAttribute}
 import transformations.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 
 object ParseKnownAttributes extends DeltaWithPhase {
   override def transform(program: Node, state: Compilation): Unit = {
@@ -16,7 +16,7 @@ object ParseKnownAttributes extends DeltaWithPhase {
             val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
             val index = typedNode.nameIndex
             val name = constantPool.getValue(index).asInstanceOf[Node]
-            val attributeTypeOption = ByteCodeSkeleton.getState(state).attributes.get(Utf8Constant.get(name))
+            val attributeTypeOption = ByteCodeSkeleton.getState(state).attributes.get(Utf8ConstantDelta.get(name))
             for(attributeType <- attributeTypeOption)
             {
               parseAttribute(typedNode, attributeType)

@@ -8,7 +8,7 @@ import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
 import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, Instructions, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
@@ -76,7 +76,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
-    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8Constant.create(getMethodName(method))
+    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex

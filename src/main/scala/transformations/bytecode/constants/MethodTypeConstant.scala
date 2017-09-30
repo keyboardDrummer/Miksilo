@@ -22,7 +22,7 @@ object MethodTypeConstant extends ConstantEntry {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8Constant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8ConstantDelta.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

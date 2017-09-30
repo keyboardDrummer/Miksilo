@@ -14,7 +14,7 @@ import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.longs._
 import transformations.bytecode.coreInstructions.objects._
 import transformations.bytecode.extraBooleanInstructions._
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, RemoveConstantPool}
 import transformations.bytecode.types._
 import transformations.javaPlus.ExpressionMethodC
@@ -101,7 +101,7 @@ object JavaCompiler {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(QualifiedClassNameConstant, TypeConstant) ++ Seq(MethodTypeConstant, Utf8Constant, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
+  def constantEntryParticles = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
   

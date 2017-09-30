@@ -6,7 +6,7 @@ import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import transformations.bytecode.constants._
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.types.MethodType._
@@ -25,7 +25,7 @@ abstract class InvokeDelta extends InstructionDelta {
     val nameAndType = methodRef.nameAndType
     val classRef = methodRef(MethodRefConstant.ClassRef).asInstanceOf[Node]
     val className = classRef(ClassInfoConstant.Name).asInstanceOf[Node]
-    val classType = ObjectTypeDelta.objectType(QualifiedClassNameConstant.get(className))
+    val classType = ObjectTypeDelta.objectType(QualifiedClassNameConstantDelta.get(className))
     val descriptor = nameAndType._type.value
     val InstructionSignature(ins, outs) = getMethodStackModification(descriptor, state)
     InstructionSignature(Seq(classType) ++ ins, outs)

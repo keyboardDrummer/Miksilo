@@ -6,7 +6,7 @@ import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.{ClassInfoConstant, Utf8Constant}
+import transformations.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.types.ObjectTypeDelta.ObjectStackType
@@ -14,7 +14,7 @@ import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
-  val entry = Utf8Constant.create("StackMapTable")
+  val entry = Utf8ConstantDelta.create("StackMapTable")
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   object FrameOffset extends NodeField
@@ -67,7 +67,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8Constant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8ConstantDelta.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
   }
 

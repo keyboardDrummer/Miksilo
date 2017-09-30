@@ -5,7 +5,7 @@ import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.constants.ClassInfoConstant
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeDelta extends TypeInstance with StackType {
@@ -55,7 +55,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
       case Right(name) => name
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
-      (QualifiedClassNameConstant.getQualifiedClassNameParser ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
+      (QualifiedClassNameConstantDelta.getQualifiedClassNameParser ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
     val grammar: BiGrammar = Keyword("L", false) ~> inner <~ ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }

@@ -4,20 +4,19 @@ import java.io.InputStream
 
 import core.particles._
 import core.particles.node.Node
-import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.ClassInfoConstant
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import util.TestUtils
 
 object RunWithJVM extends DeltaWithPhase
 {
   override def transform(program: Node, state: Compilation): Unit = {
-    val clazz: Node = state.program
-    val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
+    val clazz: ByteCodeWrapper[Node] = state.program
+    val classRefIndex = clazz.classInfoIndex
     val constantPool = clazz.constantPool
-    val classNameIndex = ClassInfoConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[Node])
-    val className = QualifiedClassNameConstant.get(constantPool.getValue(classNameIndex).asInstanceOf[Node]).toString
+    val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex
+    val className = new QualifiedClassNameConstant(constantPool.getValue(classNameIndex).asInstanceOf[Node]).value.toString
     state.output = TestUtils.runByteCode(className, clazz)
   }
 

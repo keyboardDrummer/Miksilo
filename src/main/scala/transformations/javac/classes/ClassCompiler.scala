@@ -55,7 +55,7 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getNameIndex(methodName: String) = {
-    Utf8Constant.create(methodName)
+    Utf8ConstantDelta.create(methodName)
   }
 
   def getFieldRef(info: FieldInfo) = {
@@ -69,7 +69,7 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getFieldNameAndType(info: FieldInfo) = {
-    val fieldNameIndex = Utf8Constant.create(info.name)
+    val fieldNameIndex = Utf8ConstantDelta.create(info.name)
     NameAndTypeConstant.nameAndType(fieldNameIndex, TypeConstant.constructor(info._type))
   }
 

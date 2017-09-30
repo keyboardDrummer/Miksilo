@@ -20,6 +20,12 @@ object FieldRefConstant extends ConstantEntry {
   implicit class FieldRefWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def nameAndType: NameAndTypeConstantWrapper[T] = node(NameAndType).asInstanceOf[T]
     def nameAndType_=(value: NameAndTypeConstantWrapper[T]): Unit = node(NameAndType) = value
+
+    def nameAndTypeIndex: Int = node(NameAndType).asInstanceOf[Int]
+    def nameAndTypeIndex_=(value: Int): Unit = node(NameAndType) = value
+
+    def classIndex: Int = node(ClassInfo).asInstanceOf[Int]
+    def classIndex_=(value: Int): Unit = node(ClassInfo) = value
   }
 
   def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,
@@ -31,9 +37,10 @@ object FieldRefConstant extends ConstantEntry {
     NameAndType -> nameAndTypeIndex)
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+    val fieldRef: FieldRefWrapper[Node] = constant
     byteToBytes(9) ++
-      shortToBytes(getFieldRefClassIndex(constant)) ++
-      shortToBytes(getNameAndTypeIndex(constant))
+      shortToBytes(fieldRef.classIndex) ++
+      shortToBytes(fieldRef.nameAndTypeIndex)
   }
 
   override def inject(state: Language): Unit = {
@@ -44,10 +51,6 @@ object FieldRefConstant extends ConstantEntry {
   }
 
   override def key = FieldRef
-
-  def getFieldRefClassIndex(fieldRef: Node): Int = fieldRef(ClassInfo).asInstanceOf[Int]
-
-  def getNameAndTypeIndex(fieldRef: Node): Int = fieldRef(NameAndType).asInstanceOf[Int]
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     (grammars.find(ConstantPoolIndexGrammar).as(ClassInfo) <~ "." ~

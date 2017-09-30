@@ -9,7 +9,7 @@ import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptorIndex}
 import transformations.bytecode.ByteCodeSkeleton.{ByteCodeWrapper, ClassMethodsKey}
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -74,13 +74,13 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
-  val constantEntry = Utf8Constant.create("Code")
+  val constantEntry = Utf8ConstantDelta.create("Code")
 
   override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
-      AttributeNameKey -> Utf8Constant.key))
+      AttributeNameKey -> Utf8ConstantDelta.key))
   }
 
   def getCodeAttributeBytes(attribute: CodeWrapper[Node], state: Language): Seq[Byte] = {

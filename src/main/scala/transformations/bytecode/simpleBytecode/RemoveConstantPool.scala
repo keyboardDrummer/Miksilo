@@ -13,7 +13,7 @@ import transformations.bytecode.constants.NameAndTypeConstant.Type
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 
@@ -48,17 +48,17 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
       }
     }
 
-    grammars.find(Utf8Constant.key).inner = Utf8Constant.getConstantEntryGrammar(grammars)
+    grammars.find(Utf8ConstantDelta.key).inner = Utf8ConstantDelta.getConstantEntryGrammar(grammars)
     grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
-    grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
+    grammars.find(QualifiedClassNameConstantDelta.key).inner = QualifiedClassNameConstantDelta.getConstantEntryGrammar(grammars)
     grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) <~ "." ~
       grammars.find(NameAndTypeConstant.key).as(MethodRefConstant.NameAndType)) asNode MethodRefKey
-    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
+    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstantDelta.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
     grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(ClassInfo) ~ "." ~
       grammars.find(NameAndTypeConstant.key).as(FieldRefConstant.NameAndType) asNode FieldRefConstant.key
-    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeConstant.Name) ~~
+    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8ConstantDelta.key).as(NameAndTypeConstant.Name) ~~
       grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
-    grammars.find(QualifiedClassNameConstant.key).inner = QualifiedClassNameConstant.getConstantEntryGrammar(grammars)
+    grammars.find(QualifiedClassNameConstantDelta.key).inner = QualifiedClassNameConstantDelta.getConstantEntryGrammar(grammars)
 
     val constantPoolGrammar = grammars.find(ProgramGrammar).findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()

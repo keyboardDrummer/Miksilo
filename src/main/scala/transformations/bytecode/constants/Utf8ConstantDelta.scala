@@ -7,7 +7,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import transformations.bytecode.PrintByteCode
 
-object Utf8Constant extends ConstantEntry {
+object Utf8ConstantDelta extends ConstantEntry {
   override def key = Utf8ConstantKey
 
   object Utf8ConstantKey extends NodeClass
@@ -15,7 +15,7 @@ object Utf8Constant extends ConstantEntry {
   def create(value: String) = new Node(key, Value -> value)
   def get(constant: Node): String = constant(Value).asInstanceOf[String]
 
-  implicit class Utf8ConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class Utf8Constant[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def value: String = node(Value).asInstanceOf[String]
     def value_=(value: String): Unit = node(Value) = value
   }

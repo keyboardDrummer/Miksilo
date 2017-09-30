@@ -6,7 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.Utf8Constant.Utf8ConstantWrapper
+import transformations.bytecode.constants.Utf8ConstantDelta.Utf8Constant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 
@@ -36,8 +36,8 @@ object NameAndTypeConstant extends ConstantEntry {
     def _type: TypeConstantWrapper[T] = node(Type).asInstanceOf[T]
     def _type_=(value: TypeConstantWrapper[T]): Unit = node(Type) = value
 
-    def name: Utf8ConstantWrapper[T] = node(Name).asInstanceOf[T]
-    def name_=(value: Utf8ConstantWrapper[T]): Unit = node(Name) = value
+    def name: Utf8Constant[T] = node(Name).asInstanceOf[T]
+    def name_=(value: Utf8Constant[T]): Unit = node(Name) = value
   }
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
@@ -48,8 +48,8 @@ object NameAndTypeConstant extends ConstantEntry {
   override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
-      Name -> Utf8Constant.key,
-      Type -> Utf8Constant.key))
+      Name -> Utf8ConstantDelta.key,
+      Type -> Utf8ConstantDelta.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

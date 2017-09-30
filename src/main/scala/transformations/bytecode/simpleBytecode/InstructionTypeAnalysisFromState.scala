@@ -7,7 +7,7 @@ import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import transformations.bytecode.types.ObjectTypeDelta
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -49,7 +49,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
       val clazz = state.program
       val clazzRef = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
       val className = clazzRef(ClassInfoConstant.Name).asInstanceOf[Node]
-      Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstant.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
+      Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }
 }

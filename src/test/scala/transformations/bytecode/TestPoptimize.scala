@@ -4,7 +4,7 @@ import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, StoreIntegerDelta}
 import transformations.bytecode.coreInstructions.longs.PushLongDelta
 import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
@@ -71,7 +71,7 @@ class TestPoptimize extends FunSuite {
   def transformInstructions(instructions: Seq[Node]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.MethodInfoKey.create(
-      ByteCodeMethodInfo.MethodNameIndex -> Utf8Constant.create("name"),
+      ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
       ByteCodeMethodInfo.MethodDescriptorIndex -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),
       ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
 

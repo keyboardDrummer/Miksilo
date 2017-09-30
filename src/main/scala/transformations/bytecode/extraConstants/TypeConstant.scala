@@ -7,7 +7,7 @@ import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptorIndex, MethodInfoKey, MethodNameIndex}
 import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
-import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8Constant}
+import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
@@ -34,15 +34,15 @@ object TypeConstant extends ConstantEntry {
     super.inject(state)
 
     ByteCodeSkeleton.getState(state).constantReferences.put(ByteCodeFieldInfo.FieldKey, Map(
-      NameIndex -> Utf8Constant.key,
+      NameIndex -> Utf8ConstantDelta.key,
       DescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(
-      MethodNameIndex -> Utf8Constant.key,
+      MethodNameIndex -> Utf8ConstantDelta.key,
       MethodDescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodTypeConstant.key, Map(
       MethodTypeDescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(NameAndTypeConstant.key, Map(
-      NameAndTypeConstant.Name -> Utf8Constant.key,
+      NameAndTypeConstant.Name -> Utf8ConstantDelta.key,
       NameAndTypeConstant.Type -> TypeConstant.key))
   }
 
