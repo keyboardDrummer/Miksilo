@@ -26,7 +26,7 @@ object GetStaticDelta extends InstructionDelta {
     new InstructionSignature(Seq(), Seq(getReturnType(instruction)))
 
   def getReturnType(getStatic: Node): Node = {
-    val fieldRef: FieldRefWrapper = getStatic(FieldRef).asInstanceOf[Node]
+    val fieldRef: FieldRefWrapper[Node] = getStatic(FieldRef).asInstanceOf[Node]
     fieldRef.nameAndType._type.value
   }
 

@@ -29,7 +29,7 @@ object GetFieldDelta extends InstructionDelta {
   }
 
   def getReturnType(getField: Node): Node = {
-    val fieldRef: FieldRefWrapper = getField(FieldRef).asInstanceOf[Node]
+    val fieldRef: FieldRefWrapper[Node] = getField(FieldRef).asInstanceOf[Node]
     fieldRef.nameAndType._type.value
   }
 

@@ -13,11 +13,11 @@ import transformations.javac.classes.ConstantPool
 
 object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
-  implicit class ByteCodeWrapper[T <: NodeLike](node: T) {
+  implicit class ByteCodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
     def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
 
-    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = node(ClassMethodsKey).asInstanceOf[Seq[Node]]
+    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassMethodsKey).asInstanceOf[Seq[T]])
   }
   
   def getMethods[T <: NodeLike](clazz: T) = clazz(ClassMethodsKey).asInstanceOf[Seq[T]]

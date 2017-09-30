@@ -13,7 +13,7 @@ import transformations.bytecode.types.ObjectTypeDelta
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.QualifiedClassName
 
-class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMethodInfoWrapper) {
+class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMethodInfoWrapper[Node]) {
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters
   val initialVariables = parameters.zipWithIndex.map(p => p._2 -> p._1).toMap

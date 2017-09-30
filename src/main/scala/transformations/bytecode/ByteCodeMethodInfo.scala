@@ -37,8 +37,8 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
 
-  implicit class ByteCodeMethodInfoWrapper[T <: NodeLike](val node: Node) extends NodeWrapper {
-    def _type: MethodTypeWrapper = new MethodTypeWrapper(typeConstant.value)
+  implicit class ByteCodeMethodInfoWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def _type: MethodTypeWrapper[T] = new MethodTypeWrapper[T](typeConstant.value)
 
     def nameIndex: Int = node(MethodNameIndex).asInstanceOf[Int]
     def nameIndex_=(value: Int): Unit = node(MethodNameIndex) = value
@@ -46,14 +46,14 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     def typeIndex: Int = node(MethodDescriptorIndex).asInstanceOf[Int]
     def typeIndex_=(value: Int): Unit = node(Int) = value
 
-    def typeConstant: TypeConstantWrapper = node(MethodDescriptorIndex).asInstanceOf[Node]
-    def typeConstant_=(value: TypeConstantWrapper): Unit = node(MethodDescriptorIndex) = value
+    def typeConstant: TypeConstantWrapper[T] = node(MethodDescriptorIndex).asInstanceOf[T]
+    def typeConstant_=(value: TypeConstantWrapper[T]): Unit = node(MethodDescriptorIndex) = value
 
     def accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] =
       node(ByteCodeMethodInfo.AccessFlagsKey).asInstanceOf[Set[ByteCodeMethodInfo.MethodAccessFlag]]
     def accessFlags_=(value: Node): Unit = node(ByteCodeMethodInfo.AccessFlagsKey) = value
 
-    def attributes: Seq[Node] = node(MethodAttributes).asInstanceOf[Seq[Node]]
+    def attributes: Seq[T] = node(MethodAttributes).asInstanceOf[Seq[T]]
   }
 
   override def inject(state: Language): Unit = {
@@ -63,7 +63,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       MethodDescriptorIndex -> Utf8Constant.key))
   }
 
-  def getMethodByteCode(methodInfo: ByteCodeMethodInfoWrapper, state: Language) = {
+  def getMethodByteCode(methodInfo: ByteCodeMethodInfoWrapper[Node], state: Language) = {
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(methodInfo.nameIndex) ++
         shortToBytes(methodInfo.typeIndex) ++

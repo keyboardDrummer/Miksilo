@@ -3,6 +3,7 @@ package transformations.bytecode.simpleBytecode
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles._
+import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
@@ -16,7 +17,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
     val clazz = program
 
     def getMaxStack(method: Node): Integer = {
-      val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, method)
+      val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, new ByteCodeMethodInfoWrapper(method))
 
       val maxStack = stackLayoutAnalysis.typeStatePerInstruction.values.map(
         stackLayout => stackLayout.stackTypes.map(_type => TypeSkeleton.getTypeSize(_type,state)).sum).max

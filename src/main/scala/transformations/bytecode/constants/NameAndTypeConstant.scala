@@ -3,7 +3,7 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
+import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant.Utf8ConstantWrapper
@@ -32,12 +32,12 @@ object NameAndTypeConstant extends ConstantEntry {
 
   override def key = Clazz
 
-  implicit class NameAndTypeConstantWrapper(val node: Node) extends NodeWrapper {
-    def _type: TypeConstantWrapper = node(Type).asInstanceOf[Node]
-    def _type_=(value: TypeConstantWrapper): Unit = node(Type) = value
+  implicit class NameAndTypeConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def _type: TypeConstantWrapper[T] = node(Type).asInstanceOf[T]
+    def _type_=(value: TypeConstantWrapper[T]): Unit = node(Type) = value
 
-    def name: Utf8ConstantWrapper = node(Name).asInstanceOf[Node]
-    def name_=(value: Utf8ConstantWrapper): Unit = node(Name) = value
+    def name: Utf8ConstantWrapper[T] = node(Name).asInstanceOf[T]
+    def name_=(value: Utf8ConstantWrapper[T]): Unit = node(Name) = value
   }
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {

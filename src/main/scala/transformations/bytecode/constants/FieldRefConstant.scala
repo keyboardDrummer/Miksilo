@@ -3,7 +3,7 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
+import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
@@ -17,9 +17,9 @@ object FieldRefConstant extends ConstantEntry {
 
   object NameAndType extends NodeField
 
-  implicit class FieldRefWrapper(val node: Node) extends NodeWrapper {
-    def nameAndType: NameAndTypeConstantWrapper = node(NameAndType).asInstanceOf[Node]
-    def nameAndType_=(value: NameAndTypeConstantWrapper): Unit = node(NameAndType) = value
+  implicit class FieldRefWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def nameAndType: NameAndTypeConstantWrapper[T] = node(NameAndType).asInstanceOf[T]
+    def nameAndType_=(value: NameAndTypeConstantWrapper[T]): Unit = node(NameAndType) = value
   }
 
   def fieldRef(classConstant: Node, nameAndType: Node) = new Node(FieldRef,

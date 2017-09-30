@@ -4,13 +4,14 @@ import scala.collection.mutable
 
 object NodeWrapper
 {
-  implicit def wrapList[TNodeWrapper](list: Seq[Node])(implicit wrap: Node => TNodeWrapper): Seq[TNodeWrapper] = list.map(n => wrap(n))
-  implicit def unwrapList(list: Seq[NodeWrapper]): Seq[Node] = list.map(n => n.node)
-  implicit def unwrap(wrapper: NodeWrapper): Node = wrapper.node
+  implicit def wrapList[TNodeWrapper, T <: NodeLike](list: Seq[T])(implicit wrap: T => TNodeWrapper): Seq[TNodeWrapper] =
+    list.map(n => wrap(n))
+  implicit def unwrapList[T <: NodeLike](list: Seq[NodeWrapper[T]]): Seq[T] = list.map(n => n.node)
+  implicit def unwrap[T <: NodeLike] (wrapper: NodeWrapper[T]): T = wrapper.node
 }
 
-trait NodeWrapper {
-  def node: Node
+trait NodeWrapper[T <: NodeLike] {
+  def node: T
 
   def get(key: Any): Option[Any] = node.get(key)
   def apply(key: Any): Any = node.apply(key)

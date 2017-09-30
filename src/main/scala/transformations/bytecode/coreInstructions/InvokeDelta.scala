@@ -6,7 +6,7 @@ import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import transformations.bytecode.constants._
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.extraConstants.QualifiedClassNameConstant
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.types.MethodType._
@@ -45,7 +45,7 @@ abstract class InvokeDelta extends InstructionDelta {
     InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))
   }
 
-  def getInvokeTargetMethodRef(instruction: Node): MethodRefWrapper = {
+  def getInvokeTargetMethodRef(instruction: Node): MethodRefWrapper[Node] = {
     instruction(MethodRef).asInstanceOf[Node]
   }
 

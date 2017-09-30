@@ -3,7 +3,7 @@ package transformations.bytecode.extraConstants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptorIndex, MethodInfoKey, MethodNameIndex}
 import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
@@ -17,9 +17,9 @@ object TypeConstant extends ConstantEntry {
 
   def constructor(_type: Node) = new Node(Key, Type -> _type)
 
-  implicit class TypeConstantWrapper(node: Node) {
-    def value: Node = node(Type).asInstanceOf[Node]
-    def value_=(value: Node): Unit = node(Type) = value
+  implicit class TypeConstantWrapper[T <: NodeLike](node: T) {
+    def value: T = node(Type).asInstanceOf[T]
+    def value_=(value: T): Unit = node(Type) = value
   }
 
   override def key = Key
