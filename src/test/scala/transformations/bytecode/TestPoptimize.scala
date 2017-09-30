@@ -73,13 +73,13 @@ class TestPoptimize extends FunSuite {
     val method = ByteCodeMethodInfo.MethodInfoKey.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8Constant.create("name"),
       ByteCodeMethodInfo.MethodDescriptorIndex -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),
-      ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation))
+      ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
     val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
-    CodeAttribute.getCodeInstructions(codeAnnotation)
+    codeAnnotation.instructions
   }
 
   test("Pop2") {

@@ -19,10 +19,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
     def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassMethodsKey).asInstanceOf[Seq[T]])
   }
-  
-  def getMethods[T <: NodeLike](clazz: T) = clazz(ClassMethodsKey).asInstanceOf[Seq[T]]
-
-  def constantPoolGet(constantPool: ConstantPool, index: Int) = constantPool.getValue(index)
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]
 

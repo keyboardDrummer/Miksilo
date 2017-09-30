@@ -6,6 +6,7 @@ import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.attributes.CodeAttribute.CodeWrapper
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import transformations.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import transformations.bytecode.simpleBytecode.InferredStackFrames
@@ -30,11 +31,11 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Path): Unit = {
+    def processCodeAnnotation(codeAnnotation: CodeWrapper[Path]): Unit = {
       val methodInfo = codeAnnotation.ancestors.find(p => p.current.clazz == ByteCodeMethodInfo.MethodInfoKey).get
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+      val instructions = codeAnnotation.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions, methodInfo)
-      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAttribute.Instructions) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[Node], methodInfo: Node) = {

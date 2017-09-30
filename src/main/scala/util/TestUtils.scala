@@ -7,9 +7,9 @@ import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.particles._
 import core.particles.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
+import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.PrintByteCode
 import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}
@@ -32,14 +32,13 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
   def rootOutput: Path = currentDir / Path("testOutput")
   def actualOutputDirectory: Path = rootOutput / "actual"
 
-  def testInstructionEquivalence(expectedByteCode: Node, compiledCode: Node) {
-    for (methodPair <- ByteCodeSkeleton.getMethods(expectedByteCode).zip(ByteCodeSkeleton.getMethods(compiledCode))) {
+  def testInstructionEquivalence(expectedByteCode: ByteCodeWrapper[Node], compiledCode: ByteCodeWrapper[Node]) {
+    for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
       assert(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }
   }
 
-  def getMethodInstructions(method: Node): Seq[Node] =
-    CodeAttribute.getCodeInstructions(ByteCodeMethodInfo.getMethodAttributes(method).head)
+  def getMethodInstructions(method: ByteCodeMethodInfoWrapper[Node]): Seq[Node] = method.codeAttribute.instructions
 
   def printByteCode(byteCode: Node): String = {
     PrintByteCode.printBytes(getBytes(byteCode))

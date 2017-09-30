@@ -4,6 +4,7 @@ import core.particles.node.{Node, NodeClass, NodeLike}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
+  implicit def castList(list: Seq[Path]): Seq[Node] = list.map(x => x.current)
 }
 
 trait Path extends NodeLike { //TODO rename path to something that imports more easily.

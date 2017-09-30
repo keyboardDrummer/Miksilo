@@ -43,8 +43,8 @@ object PrintByteCode {
       result
     }
 
-    def getMethodsByteCode(clazz: Node): Seq[Byte] = {
-      val methods = ByteCodeSkeleton.getMethods(clazz)
+    def getMethodsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
+      val methods = clazz.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
         ByteCodeSkeleton.getState(state).getBytes(method.clazz)(method)
       })

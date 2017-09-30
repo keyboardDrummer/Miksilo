@@ -22,8 +22,8 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
   private def getTypeAnalysis = {
-    val codeAnnotation = method.attributes.find(a => a.clazz == CodeAttribute.CodeKey).get
-    val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+    val codeAnnotation = method.codeAttribute
+    val instructions = codeAnnotation.instructions
 
     new InstructionTypeAnalysis(instructions) {
       val instructionVariableUpdateRegistry = CodeAttribute.getState(state).localUpdates

@@ -1,15 +1,14 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.GrammarPath._
 import core.bigrammar.GrammarReference
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.additions.LabelledLocations
+import transformations.bytecode.attributes.StackMapTableAttribute
 import transformations.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
-import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -18,10 +17,10 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
   override def transform(program: Node, state: Compilation): Unit = {
-    val clazz = program
-    for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+    val clazz: ByteCodeWrapper[Node] = program
+    for (method <- clazz.methods) {
+      val codeAnnotation = method.codeAttribute
+      val instructions = codeAnnotation.instructions
 
       val stackLayouts = new InstructionTypeAnalysisFromState(state, method)
       var previousStack = stackLayouts.initialStack

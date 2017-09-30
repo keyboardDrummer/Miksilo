@@ -22,8 +22,8 @@ object PoptimizeC extends DeltaWithPhase {
     val clazz = new ByteCodeWrapper(_clazz)
     for (method <- clazz.methods) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
-      val codeAnnotation = method.attributes.find(a => a.clazz == CodeAttribute.CodeKey).get
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+      val codeAnnotation = method.codeAttribute
+      val instructions = codeAnnotation.instructions
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
@@ -71,7 +71,7 @@ object PoptimizeC extends DeltaWithPhase {
       for (instructionIndex <- instructions.indices.reverse) {
         processInstruction(instructionIndex)
       }
-      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions.toSeq
+      codeAnnotation(CodeAttribute.Instructions) = newInstructions.toSeq
     }
   }
 

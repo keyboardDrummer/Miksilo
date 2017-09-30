@@ -6,7 +6,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
+import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, Instructions, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.extraConstants.TypeConstant
@@ -96,7 +96,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val codeAttribute = new Node(CodeAttribute.CodeKey,
         AttributeNameKey -> CodeAttribute.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
-        CodeInstructionsKey -> instructions,
+        Instructions -> instructions,
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
       method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)

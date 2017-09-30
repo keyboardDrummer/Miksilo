@@ -1,32 +1,32 @@
 package transformations.bytecode.simpleBytecode
 
+import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
-import core.particles._
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.additions.LabelledLocations.LabelKey
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.types.TypeSkeleton
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
   override def transform(program: Node, state: Compilation): Unit = {
-    val clazz = program
+    val clazz: ByteCodeWrapper[Node] = program
 
-    def getMaxStack(method: Node): Integer = {
-      val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, new ByteCodeMethodInfoWrapper(method))
+    def getMaxStack(method: ByteCodeMethodInfoWrapper[Node]): Int = {
+      val stackLayoutAnalysis = new InstructionTypeAnalysisFromState(state, method)
 
       val maxStack = stackLayoutAnalysis.typeStatePerInstruction.values.map(
         stackLayout => stackLayout.stackTypes.map(_type => TypeSkeleton.getTypeSize(_type,state)).sum).max
       maxStack
     }
 
-    for (method <- ByteCodeSkeleton.getMethods(clazz)) {
-      val code = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
-      code(CodeAttribute.CodeMaxStackKey) = getMaxStack(method)
+    for (method <- clazz.methods) {
+      val code = method.codeAttribute
+      code.maxStack = getMaxStack(method)
     }
   }
 

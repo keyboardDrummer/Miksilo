@@ -86,14 +86,14 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Node): Unit = {
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+    def processCodeAnnotation(codeAnnotation: CodeWrapper[Node]): Unit = {
+      val instructions = codeAnnotation.instructions
       val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
       codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
         getStackMapTable(targetLocations, instructions)
 
       val newInstructions: Seq[Node] = getNewInstructions(instructions, targetLocations)
-      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
+      codeAnnotation(CodeAttribute.Instructions) = newInstructions
     }
 
     def determineTargetLocations(instructions: Seq[Node]): Map[String, Int] = {

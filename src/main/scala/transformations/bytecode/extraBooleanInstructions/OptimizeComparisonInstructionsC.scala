@@ -1,10 +1,11 @@
 package transformations.bytecode.extraBooleanInstructions
 
 import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import core.particles.{Compilation, Contract, DeltaWithPhase}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.attributes.CodeAttribute.CodeWrapper
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareNotEqualDelta
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfZeroDelta.IfZeroKey
@@ -29,10 +30,10 @@ object OptimizeComparisonInstructionsC extends DeltaWithPhase {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: Node): Unit = {
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+    def processCodeAnnotation(codeAnnotation: CodeWrapper[Node]): Unit = {
+      val instructions = codeAnnotation.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions)
-      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions
+      codeAnnotation.instructions = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[Node]) = {

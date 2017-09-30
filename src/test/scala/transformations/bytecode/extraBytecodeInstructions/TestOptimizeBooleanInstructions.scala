@@ -3,7 +3,6 @@ package transformations.bytecode.extraBytecodeInstructions
 import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
-import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import transformations.javac.JavaCompiler
 import util.{CompilerBuilder, TestUtils}
@@ -25,10 +24,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
   }
 
   def getFibonacciInstructions(clazz: ByteCodeWrapper[Node]) = {
-    clazz.methods
-      .flatMap(methodInfo => methodInfo.attributes)
-      .flatMap(annotation => if (annotation.clazz == CodeAttribute.CodeKey) Some(annotation) else None)
-      .flatMap(codeAnnotation => CodeAttribute.getCodeInstructions(codeAnnotation))
+    clazz.methods.flatMap(methodInfo => methodInfo.codeAttribute.instructions)
   }
 }
 

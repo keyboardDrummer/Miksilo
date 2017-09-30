@@ -6,7 +6,8 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
-import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptorIndex}
+import transformations.bytecode.ByteCodeSkeleton.{ByteCodeWrapper, ClassMethodsKey}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8Constant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
@@ -17,6 +18,14 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 object InstructionArgumentsKey extends NodeField
 
 object CodeAttribute extends ByteCodeAttribute with WithState {
+
+  implicit class CodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def maxStack: Int = node(MaxStack).asInstanceOf[Int]
+    def maxStack_=(value: Int): Unit = node(MaxStack) = value
+
+    def instructions: Seq[T] = node(Instructions).asInstanceOf[Seq[T]]
+    def instructions_=(value: Seq[T]): Unit = node(Instructions) = value
+  }
 
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
@@ -35,12 +44,12 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
                     instructions: Seq[Node],
                     exceptionTable: Seq[Node],
-                    attributes: Seq[Node]) = {
+                    attributes: Seq[Node]): CodeWrapper[Node] = {
     new Node(CodeKey,
       AttributeNameKey -> nameIndex,
-      CodeMaxStackKey -> maxStack,
+      MaxStack -> maxStack,
       CodeMaxLocalsKey -> maxLocals,
-      CodeInstructionsKey -> instructions,
+      Instructions -> instructions,
       CodeExceptionTableKey -> exceptionTable,
       CodeAttributesKey -> attributes)
   }
@@ -74,16 +83,16 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
       AttributeNameKey -> Utf8Constant.key))
   }
 
-  def getCodeAttributeBytes(attribute: Node, state: Language): Seq[Byte] = {
+  def getCodeAttributeBytes(attribute: CodeWrapper[Node], state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Node): Seq[Byte] = {
       ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
     }
 
     val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)
-    shortToBytes(CodeAttribute.getCodeMaxStack(attribute)) ++
+    shortToBytes(attribute.maxStack) ++
       shortToBytes(CodeAttribute.getCodeMaxLocals(attribute)) ++
-      prefixWithIntLength(() => CodeAttribute.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+      prefixWithIntLength(() => attribute.instructions.flatMap(getInstructionByteCode)) ++
       shortToBytes(exceptionTable.length) ++
       exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
       getAttributesByteCode(state, CodeAttribute.getCodeAttributes(attribute))
@@ -96,7 +105,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
   }
 
-  def getCodeMaxStack(code: Node) = code(CodeMaxStackKey).asInstanceOf[Int]
+  def getCodeMaxStack(code: Node) = code(MaxStack).asInstanceOf[Int]
 
   def getCodeMaxLocals(code: Node) = code(CodeMaxLocalsKey).asInstanceOf[Int]
 
@@ -104,16 +113,13 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   def getCodeAttributes(code: Node) = code(CodeAttributesKey).asInstanceOf[Seq[Node]]
 
-  def getCodeInstructions(code: Node) = code(CodeInstructionsKey).asInstanceOf[Seq[Node]]
-
-
   object CodeKey extends NodeClass
 
-  object CodeMaxStackKey extends NodeField
+  object MaxStack extends NodeField
 
   object CodeMaxLocalsKey extends NodeField
 
-  object CodeInstructionsKey extends NodeField
+  object Instructions extends NodeField
 
   object CodeExceptionTableKey extends NodeField
 
@@ -127,10 +133,10 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer <~ ", ").as(CodeMaxStackKey))
+    val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer <~ ", ").as(MaxStack))
     val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
     val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
-    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(CodeInstructionsKey)
+    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(Instructions)
     val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
     val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ maxLocalGrammar %
       instructionsGrammar %
