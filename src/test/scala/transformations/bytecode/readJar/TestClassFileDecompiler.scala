@@ -4,14 +4,14 @@ import java.io
 
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestGrammarUtils
+import core.particles.DeltasToParserConverter
 import core.particles.node.Node
-import core.particles.{CompilerFromDeltas, DeltasToParserConverter}
 import org.scalatest.FunSuite
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import transformations.javac.JavaCompiler
 import transformations.javac.types.TypeAbstraction
-import util.{CompilerBuilder, TestUtils}
+import util.{CompilerBuilder, SourceUtils}
 
 import scala.reflect.io.{File, Path}
 
@@ -72,56 +72,56 @@ class TestClassFileDecompiler extends FunSuite {
   }
 
   test("ObjectClassUnParsedAttributes") {
-    val inputStream = TestUtils.getTestFile("Object.class")
+    val inputStream = SourceUtils.getTestFile("Object.class")
     val compiler = CompilerBuilder.build(Seq(new PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
     val state = compiler.parseAndTransform(inputStream)
 
-    val expected = TestUtils.getTestFileContents("DecodedObjectClassPrettyPrint.txt")
+    val expected = SourceUtils.getTestFileContents("DecodedObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassParsedAttributes") {
     val compiler = CompilerBuilder.build(Seq(ParseKnownAttributes) ++ Seq(new PrettyPrint()) ++
       ClassFileSignatureDecompiler.onlySignatureAttribute)
-    val state = compiler.parseAndTransform(TestUtils.getTestFile("Object.class"))
+    val state = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class"))
 
-    val expected = TestUtils.getTestFileContents("DecodedWithAttributesObjectClassPrettyPrint.txt")
+    val expected = SourceUtils.getTestFileContents("DecodedWithAttributesObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(TestUtils.getTestFile("Object.class"))
+    val state = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class"))
     val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
 
-    val expected = TestUtils.getTestFileContents("DecompiledObjectClassFileSignature.txt")
+    val expected = SourceUtils.getTestFileContents("DecompiledObjectClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("StringClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(TestUtils.getTestFile("String.class"))
+    val state = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class"))
     val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
 
-    val expected = TestUtils.getTestFileContents("DecompiledStringClassFileSignature.txt")
+    val expected = SourceUtils.getTestFileContents("DecompiledStringClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("SystemClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(TestUtils.getTestFile("System.class"))
+    val state = compiler.parseAndTransform(SourceUtils.getTestFile("System.class"))
     val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
 
-    val expected = TestUtils.getTestFileContents("DecompiledSystemClassFileSignature.txt")
+    val expected = SourceUtils.getTestFileContents("DecompiledSystemClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.parseAndTransform(TestUtils.getTestFile("PrintStream.class"))
+    val state = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class"))
     val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
 
-    val expected = TestUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
+    val expected = SourceUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
     assertResult(expected)(output)
   }
 

@@ -2,7 +2,8 @@ package transformations.javaPlus
 
 import org.scalatest.FunSuite
 import transformations.javac.JavaCompiler
-import util.{CompilerBuilder, TestUtils}
+import util.CompilerBuilder
+import util.TestUtils
 
 import scala.reflect.io.Path
 

@@ -1,6 +1,5 @@
 package transformations.javac
 
-import org.junit.Test
 import org.scalatest.FunSuite
 import util.TestUtils
 

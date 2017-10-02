@@ -7,7 +7,7 @@ import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
 import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
-import util.TestUtils
+import util.SourceUtils
 
 object RunWithJVM extends DeltaWithPhase
 {
@@ -17,7 +17,7 @@ object RunWithJVM extends DeltaWithPhase
     val constantPool = clazz.constantPool
     val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex
     val className = new QualifiedClassNameConstant(constantPool.getValue(classNameIndex).asInstanceOf[Node]).value.toString
-    state.output = TestUtils.runByteCode(className, clazz)
+    state.output = SourceUtils.runByteCode(className, clazz)
   }
 
   override def description: String = "Takes the bytecode program and runs it using the JVM."

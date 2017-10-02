@@ -6,7 +6,7 @@ import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.javac.methods.MethodC._
-import util.{CompilerBuilder, TestUtils}
+import util.{CompilerBuilder, TestUtils, SourceUtils}
 
 class EmptyMain extends FunSuite {
   val className = "EmptyMain"
@@ -15,7 +15,7 @@ class EmptyMain extends FunSuite {
 
   test("runCompiledCode") {
     val byteCode: Node = getByteCode
-    TestUtils.runByteCode(className, byteCode)
+    SourceUtils.runByteCode(className, byteCode)
   }
 
   def getByteCode: Node = {

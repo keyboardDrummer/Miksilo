@@ -4,17 +4,16 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
-import core.particles._
+import core.particles.Compilation
 import core.particles.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
-import transformations.bytecode.ByteCodeSkeleton._
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.PrintByteCode
 import transformations.javac.JavaCompiler
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.{Process, ProcessLogger}
-
 
 object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompiler.javaCompilerTransformations)) {
 }
@@ -41,81 +40,30 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
   def getMethodInstructions(method: ByteCodeMethodInfoWrapper[Node]): Seq[Node] = method.codeAttribute.instructions
 
   def printByteCode(byteCode: Node): String = {
-    PrintByteCode.printBytes(getBytes(byteCode))
-  }
-
-  def getBytes(byteCode: Node): Seq[Byte] = {
-    var output: Seq[Byte] = null
-    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
-    CompilerBuilder.build(particles).transform(byteCode)
-    output
+    PrintByteCode.printBytes(SourceUtils.getBytes(byteCode))
   }
 
   def runByteCode(className: String, code: Node, expectedResult: Int) {
-    val line = runByteCode(className, code)
+    val line = SourceUtils.runByteCode(className, code)
     assertResult(expectedResult)(Integer.parseInt(line))
-  }
-
-  def runByteCode(className: String, code: Node) : String = {
-    val bytes = getBytes(code).toArray
-    val currentDir = new File(new java.io.File("."))
-    val testDirectory = currentDir / Path("testOutput")
-    testDirectory.createDirectory()
-    val byteCodeFile = File.apply(testDirectory / Path(className).addExtension("class"))
-    val writer = byteCodeFile.outputStream(append = false)
-    writer.write(bytes)
-    writer.close()
-
-    runJavaClass(className, testDirectory)
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
-    val input: String = getJavaTestFileContents(className, inputDirectory)
+    val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
     compiler.parseAndTransform(stringToInputStream(input)).program
   }
 
-  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): File = {
-    val className = fileNameToClassName(fileName)
-    val relativeFilePath = inputDirectory / (className + ".java")
-    getTestFile(relativeFilePath)
-  }
-
-  def getJavaTestFileContents(fileName: String, inputDirectory: Path = Path("")): String = {
-    val className = fileNameToClassName(fileName)
-    val relativeFilePath = inputDirectory / (className + ".java")
-    getTestFileContents(relativeFilePath)
-  }
-
-  def getTestFile(relativeFilePath: Path): File = {
-    if (relativeFilePath.isAbsolute)
-      return File(relativeFilePath)
-
-    val fullPath = relativeFilePath
-    var testResources = ClassLoader.getSystemResource("/" + fullPath.path)
-    if (testResources == null)
-      testResources = getClass.getResource("/" + fullPath.path)
-    if (testResources == null)
-    {
-      throw new RuntimeException(s"Test file ${fullPath.path} not found")
-    }
-    File(testResources.getPath)
-  }
-
-  def getTestFileContents(relativeFilePath: Path): String = {
-    getTestFile(relativeFilePath).slurp().replaceAll("\r\n","\n").replaceAll("\n", System.lineSeparator())
-  }
-
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
-    val className: String = fileNameToClassName(fileName)
+    val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val currentDir = new File(new java.io.File("."))
     val testOutput = Directory(currentDir / Path("testOutput"))
-    val input: File = getTestFile(relativeFilePath)
+    val input: File = SourceUtils.getTestFile(relativeFilePath)
     compiler.compile(input, Directory(Path(testOutput.path) / inputDirectory))
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
-    TestUtils.runJavaClass(qualifiedClassName, testOutput)
+    SourceUtils.runJavaClass(qualifiedClassName, testOutput)
   }
 
   def compileAndPrettyPrint(input: String): String = {
@@ -133,10 +81,10 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
   }
 
   def compareWithJavacAfterRunning(fileName: String, inputDirectory: Path = Path("")) {
-    val className = fileNameToClassName(fileName)
+    val className = SourceUtils.fileNameToClassName(fileName)
 
     val relativeFilePath = inputDirectory / (className + ".java")
-    val input: File = getTestFile(relativeFilePath)
+    val input: File = SourceUtils.getTestFile(relativeFilePath)
 
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
@@ -146,9 +94,9 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     val state = profile("blender compile", compiler.compile(input, Directory(actualOutputDirectory / inputDirectory)))
     val qualifiedClassName: String = (inputDirectory / Path(className)).segments.reduce[String]((l, r) => l + "." + r)
 
-    val expectedOutput = profile("Java run expected", TestUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
+    val expectedOutput = profile("Java run expected", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
     try {
-      val actualOutput = profile("Java run actual", TestUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
+      val actualOutput = profile("Java run actual", SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
       assertResult(expectedOutput)(actualOutput)
     }
     catch {
@@ -159,9 +107,6 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
 
   def profile[T](description: String, action: => T): T = CompilerBuilder.profile(description, action)
 
-  def fileNameToClassName(fileName: String): String = {
-    if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
-  }
 
   def getErrorMessage(className: String, inputDirectory: Path, expectedOutputDirectory: Path, state: Compilation, e: AssertionError): String = {
     val relativeClassPath = inputDirectory / (className + ".class")
@@ -203,17 +148,6 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     line
   }
 
-
-  def runJavaClass(className: String, directory: Path): String = {
-    val processBuilder = Process.apply(s"java $className", directory.jfile)
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o,
-      (e: String) => line += e)
-    val exitValue = processBuilder ! logger
-    line
-  }
-
   def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
     val expectedConstantPoolSet = expectedByteCode.constantPool.constants
     val compiledConstantPoolSet = compiledCode.constantPool.constants
@@ -223,14 +157,6 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
         ComparisonOptions(compareIntegers = false,takeAllLeftKeys = false,takeAllRightKeys = true).deepEquality(compiledItem, expectedItem))
       hasEquivalent
     }), s"${expectedConstantPoolSet} was not ${compiledConstantPoolSet}")
-  }
-
-  class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
-    override def transform(program: Node, state: Compilation): Unit = {
-      write(PrintByteCode.getBytes(program, state))
-    }
-
-    override def description: String = "Writes the current program as JVM class file bytes to a function."
   }
 
 }

@@ -11,7 +11,8 @@ import transformations.javac.methods.MethodC._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
 import transformations.javac.methods.call.CallC._
-import util.{CompilerBuilder, TestUtils}
+import util.CompilerBuilder
+import util.TestUtils
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"

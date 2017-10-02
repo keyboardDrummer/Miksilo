@@ -7,7 +7,7 @@ import core.particles.{DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC
-import util.{CompilerBuilder, TestUtils}
+import util.{CompilerBuilder, TestUtils, SourceUtils}
 
 import scala.reflect.io.Path
 
@@ -81,13 +81,13 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   }
 
   test("comparePrintResultWithoutComment") {
-    val input = getJavaTestFileContents("Whilee")
+    val input = SourceUtils.getJavaTestFileContents("Whilee")
     val result = testGrammar.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
   test("comparePrintResult") {
-    val input = getJavaTestFileContents("WhileeWithComment.java")
+    val input = SourceUtils.getJavaTestFileContents("WhileeWithComment.java")
     val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
@@ -101,8 +101,8 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("comments are maintained in bytecode") {
     val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
-    val result = utils.compileAndPrettyPrint(utils.getJavaTestFileContents("FibonacciWithComments.java"))
-    val expectedResult = utils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
+    val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
+    val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
   }
 }

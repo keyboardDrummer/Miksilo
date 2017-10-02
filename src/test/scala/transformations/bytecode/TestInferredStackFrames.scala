@@ -1,6 +1,5 @@
 package transformations.bytecode
 
-import org.junit.Test
 import org.scalatest.FunSuite
 import util.TestUtils
 

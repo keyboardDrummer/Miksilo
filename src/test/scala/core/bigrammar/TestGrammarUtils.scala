@@ -6,7 +6,8 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import org.scalatest.FunSuite
 import transformations.javac.JavaCompiler
-import util.{CompilerBuilder, TestUtils}
+import util.CompilerBuilder
+import util.TestUtils
 
 import scala.util.parsing.input.CharArrayReader
 

@@ -5,7 +5,8 @@ import org.scalatest.FunSuite
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import transformations.javac.JavaCompiler
-import util.{CompilerBuilder, TestUtils}
+import util.CompilerBuilder
+import util.TestUtils
 
 import scala.reflect.io.Path
 

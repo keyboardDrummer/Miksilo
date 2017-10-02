@@ -10,7 +10,8 @@ import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta
 import transformations.bytecode.types.IntTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import util.{CompilerBuilder, TestUtils}
+import util.CompilerBuilder
+import util.TestUtils
 
 class TestByteCodeGoTo extends FunSuite {
 
