@@ -4,8 +4,8 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.AddIntegersC
-import transformations.bytecode.coreInstructions.longs.AddLongsC
+import transformations.bytecode.coreInstructions.integers.AddIntegersDelta
+import transformations.bytecode.coreInstructions.longs.AddLongsDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
@@ -13,18 +13,18 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(addition: Path, state: Language): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
     firstInstructions ++ secondInstructions ++ (getType(addition, state) match {
-      case x if x == IntTypeC.intType => Seq(AddIntegersC.addIntegers())
-      case x if x == LongTypeC.longType => Seq(AddLongsC.addLongs())
+      case x if x == IntTypeC.intType => Seq(AddIntegersDelta.addIntegers())
+      case x if x == LongTypeC.longType => Seq(AddLongsDelta.addLongs())
       case _ => throw new NotImplementedError()
     })
   }
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -47,9 +47,9 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   def getSecond[T <: NodeLike](addition: T) = addition(SecondKey).asInstanceOf[T]
 
-  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersC)
+  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val parseAddition = ((additiveGrammar <~~ "+") ~~ additiveGrammar).parseMap(AdditionClazz, FirstKey, SecondKey) //TODO for some reason I have to use parseMap here instead of asNode, otherwise the JavaStyleComments tests fail
     additiveGrammar.addOption(parseAddition)

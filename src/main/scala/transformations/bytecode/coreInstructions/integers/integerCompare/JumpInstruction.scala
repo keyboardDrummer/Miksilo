@@ -1,9 +1,9 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
-import transformations.bytecode.coreInstructions.InstructionC
+import transformations.bytecode.coreInstructions.InstructionDelta
 
-trait JumpInstruction extends InstructionC {
+trait JumpInstruction extends InstructionDelta {
 
   override def getInstructionSize: Int = 3
 

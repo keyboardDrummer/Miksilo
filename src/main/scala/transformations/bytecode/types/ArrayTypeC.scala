@@ -3,13 +3,13 @@ package transformations.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.{Key, Node}
 
 object ArrayTypeC extends TypeInstance with StackType {
   override val key = ArrayTypeKey
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq(ObjectTypeC.rootObjectType)
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(ObjectTypeDelta.rootObjectType)
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

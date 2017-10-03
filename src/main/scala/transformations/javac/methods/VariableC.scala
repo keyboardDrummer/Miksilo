@@ -4,20 +4,20 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.LoadIntegerC
-import transformations.bytecode.coreInstructions.longs.LoadLongC
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
+import transformations.bytecode.coreInstructions.longs.LoadLongDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeC}
+import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerC)
+  override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerDelta)
 
   def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val variableGrammar = grammars.create(VariableGrammar, nodeGrammar(identifier, VariableKey, VariableNameKey))
     core.addOption(variableGrammar)
@@ -33,23 +33,23 @@ object VariableC extends ExpressionInstance {
 
   override val key: Key = VariableKey
 
-  override def getType(variable: Path, state: CompilationState): Node = {
+  override def getType(variable: Path, state: Language): Node = {
     getVariableInfo(variable, state)._type
   }
 
-  def getVariableInfo(variable: Path, state: CompilationState): VariableInfo = {
+  def getVariableInfo(variable: Path, state: Language): VariableInfo = {
     MethodC.getMethodCompiler(state).getVariables(variable)(VariableC.getVariableName(variable))
   }
 
-  override def toByteCode(variable: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(variable: Path, state: Language): Seq[Node] = {
     val variableInfo: VariableInfo = getVariableInfo(variable, state)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
     Seq(_type.clazz match {
-      case BooleanTypeC.BooleanTypeKey => LoadIntegerC.load(variableAddress)
-      case IntTypeC.IntTypeKey => LoadIntegerC.load(variableAddress)
-      case LongTypeC.LongTypeKey => LoadLongC.load(variableAddress)
-      case ObjectTypeC.ObjectTypeKey => LoadAddressC.addressLoad(variableAddress)
+      case BooleanTypeC.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
+      case IntTypeC.IntTypeKey => LoadIntegerDelta.load(variableAddress)
+      case LongTypeC.LongTypeKey => LoadLongDelta.load(variableAddress)
+      case ObjectTypeDelta.ObjectTypeKey => LoadAddressDelta.addressLoad(variableAddress)
     })
   }
 

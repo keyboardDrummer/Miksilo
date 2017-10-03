@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
@@ -14,7 +14,7 @@ object JustJavaLabel extends StatementInstance {
 
   def label(name: String) = new Node(LabelKey, Name -> name)
 
-  override def toByteCode(statement: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(statement: Path, state: Language): Seq[Node] = {
     Seq(InferredStackFrames.label(getName(statement.current)))
   }
 
@@ -22,7 +22,7 @@ object JustJavaLabel extends StatementInstance {
 
   object JavaLabelGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(grammars.create(JavaLabelGrammar, ("label" ~~> identifier <~ ";").asNode(LabelKey, Name)))
   }

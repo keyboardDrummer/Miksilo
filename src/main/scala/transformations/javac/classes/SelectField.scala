@@ -4,8 +4,8 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.GetStaticC
-import transformations.bytecode.coreInstructions.objects.GetFieldC
+import transformations.bytecode.coreInstructions.GetStaticDelta
+import transformations.bytecode.coreInstructions.objects.GetFieldDelta
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.methods.MemberSelector
 import MemberSelector._
@@ -15,9 +15,9 @@ object SelectField extends ExpressionInstance {
 
   override val key: Key = SelectorKey
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticC, MemberSelector)
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
-  override def getType(selector: Path, state: CompilationState): Node = {
+  override def getType(selector: Path, state: Language): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -25,17 +25,17 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(selector: Path, state: Language): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
-      Seq(GetStaticC.getStatic(fieldRefIndex))
+      Seq(GetStaticDelta.getStatic(fieldRefIndex))
     else
     {
       val obj = getSelectorObject(selector)
       val objInstructions = ExpressionSkeleton.getToInstructions(state)(obj)
-      objInstructions ++ Seq(GetFieldC.construct(fieldRefIndex))
+      objInstructions ++ Seq(GetFieldDelta.construct(fieldRefIndex))
     }
   }
 
@@ -46,7 +46,7 @@ object SelectField extends ExpressionInstance {
     fieldRef
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     core.addOption(grammars.find(SelectGrammar))
   }

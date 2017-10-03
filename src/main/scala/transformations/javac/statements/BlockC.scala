@@ -8,7 +8,7 @@ object BlockC extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
   val indentAmount = 4
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val blockGrammar = grammars.create(BlockGrammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
     val statementAsBlockGrammar = grammars.create(StatementAsBlockGrammar, statementGrammar ^^(statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]].head)))

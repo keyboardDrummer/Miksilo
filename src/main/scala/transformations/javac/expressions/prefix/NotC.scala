@@ -3,7 +3,7 @@ package transformations.javac.expressions.prefix
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
 import core.particles.path.Path
-import core.particles.CompilationState
+import core.particles.{Compilation, Language}
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.types.BooleanTypeC
@@ -16,13 +16,13 @@ object NotC extends ExpressionInstance {
 
   override val key: Key = NotKey
 
-  override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
 
-  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(expression: Path, state: Language): Seq[Node] = {
     ExpressionSkeleton.getToInstructions(state)(expression(NotExpression).asInstanceOf[Path]) ++ Seq(NotInstructionC.not)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     coreGrammar.addOption("!" ~> coreGrammar asNode(NotKey, NotExpression))
   }

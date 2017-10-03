@@ -4,8 +4,8 @@ import core.particles._
 import core.particles.exceptions.BadInputException
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import transformations.bytecode.coreInstructions.InvokeSpecialC
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.InvokeSpecialDelta
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
@@ -16,11 +16,11 @@ import transformations.javac.statements.BlockC
 
 object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialC, LoadAddressC, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: Compilation): Unit = {
     val className = clazz.name
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
@@ -50,7 +50,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   object ConstructorClassNameKey extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
     val parseParameters = grammars.find(MethodC.ParametersGrammar)

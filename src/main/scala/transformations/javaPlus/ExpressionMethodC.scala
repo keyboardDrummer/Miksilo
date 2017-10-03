@@ -16,7 +16,7 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
   object ExpressionMethodKey extends Key
   object ExpressionMethodExpression extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar)
     val parseStatic = grammars.find(MethodC.StaticGrammar)
     val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar)
@@ -30,7 +30,7 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
     methodGrammar.addOption(expressionMethodGrammar)
   }
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
+  override def transform(clazz: Node, state: Compilation): Unit = {
     for(expressionMethod <- clazz.members.filter(method => method.clazz == ExpressionMethodKey))
     {
       val expression = expressionMethod(ExpressionMethodExpression).asInstanceOf[Node]

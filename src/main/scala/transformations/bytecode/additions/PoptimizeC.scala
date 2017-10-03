@@ -1,34 +1,35 @@
 package transformations.bytecode.additions
 
 import core.particles.node.Node
-import core.particles.{CompilationState, Contract, DeltaWithPhase}
+import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions._
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
 
 object PoptimizeC extends DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(PopC)
+  override def dependencies: Set[Contract] = Set(PopDelta)
 
-  private def getSignatureInOutLengths(state: CompilationState, signature: InstructionSignature): (Int, Int) = {
+  private def getSignatureInOutLengths(state: Language, signature: InstructionSignature): (Int, Int) = {
     val inputLength = signature.inputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     val outputLength = signature.outputs.map(_type => TypeSkeleton.getTypeSize(_type, state)).sum
     (inputLength, outputLength)
   }
 
-  override def transform(clazz: Node, state: CompilationState): Unit = {
-    for (method <- ByteCodeSkeleton.getMethods(clazz)) {
+  override def transform(_clazz: Node, state: Compilation): Unit = {
+    val clazz = new ByteCodeWrapper(_clazz)
+    for (method <- clazz.methods) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
-      val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
-      val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+      val codeAnnotation = method.codeAttribute
+      val instructions = codeAnnotation.instructions
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state)(instruction.clazz)
+        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state.language)(instruction.clazz)
         val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
-        getSignatureInOutLengths(state, signature)
+        getSignatureInOutLengths(state.language, signature)
       }
 
       var newInstructions = List.empty[Node]
@@ -36,12 +37,12 @@ object PoptimizeC extends DeltaWithPhase {
 
       def processInstruction(instructionIndex: Int) {
         val instruction = instructions(instructionIndex)
-        if (instruction.clazz == PopC.PopKey) {
+        if (instruction.clazz == PopDelta.PopKey) {
           consumptions ::= true
           return
         }
 
-        if (instruction.clazz == Pop2C.Pop2Key) {
+        if (instruction.clazz == Pop2Delta.Pop2Key) {
           consumptions = List(true,true) ++ consumptions
           return
         }
@@ -59,8 +60,8 @@ object PoptimizeC extends DeltaWithPhase {
         val hasSideEffect = guessIfInstructionHasSideEffect(out)
         val keepInstruction = outConsumption != 0 || hasSideEffect
         if (keepInstruction) {
-          val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2C.pop2).toList
-          val pop1Instructions: ((Nothing) => Any) with Iterable[Node] = if (outPop % 2 == 1) Seq(PopC.pop) else Set.empty
+          val pop2Instructions = 0.until(outPop / 2).map(_ => Pop2Delta.pop2).toList
+          val pop1Instructions: ((Nothing) => Any) with Iterable[Node] = if (outPop % 2 == 1) Seq(PopDelta.pop) else Set.empty
           newInstructions = pop2Instructions ++ pop1Instructions ++ newInstructions
           consumptions = 0.until(in).map(_ => false).toList ++ consumptions
           newInstructions = instruction :: newInstructions
@@ -70,7 +71,7 @@ object PoptimizeC extends DeltaWithPhase {
       for (instructionIndex <- instructions.indices.reverse) {
         processInstruction(instructionIndex)
       }
-      codeAnnotation(CodeAttribute.CodeInstructionsKey) = newInstructions.toSeq
+      codeAnnotation(CodeAttribute.Instructions) = newInstructions.toSeq
     }
   }
 

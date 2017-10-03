@@ -1,23 +1,19 @@
 package transformations.bytecode.simpleBytecode
 
-import core.particles.CompilationState
+import core.particles.Compilation
 import core.particles.node.Node
+import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.InstructionSignature
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import transformations.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
+import transformations.bytecode.types.ObjectTypeDelta
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import transformations.bytecode.types.ObjectTypeC
 import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.types.MethodType
-import MethodType._
-import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
 
-class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
-  val constantPool = state.program.constantPool
-
+class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMethodInfoWrapper[Node]) {
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters
   val initialVariables = parameters.zipWithIndex.map(p => p._2 -> p._1).toMap
@@ -26,8 +22,8 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   val typeStatePerInstruction = typeAnalysis.run(0, initialProgramTypeState)
 
   private def getTypeAnalysis = {
-    val codeAnnotation = ByteCodeMethodInfo.getMethodAttributes(method).find(a => a.clazz == CodeAttribute.CodeKey).get
-    val instructions = CodeAttribute.getCodeInstructions(codeAnnotation)
+    val codeAnnotation = method.codeAttribute
+    val instructions = codeAnnotation.instructions
 
     new InstructionTypeAnalysis(instructions) {
       val instructionVariableUpdateRegistry = CodeAttribute.getState(state).localUpdates
@@ -44,18 +40,16 @@ class InstructionTypeAnalysisFromState(state: CompilationState, method: Node) {
   }
   
   private def getMethodParameters = {
-    val methodIsStatic: Boolean = ByteCodeMethodInfo.getMethodAccessFlags(method).contains(ByteCodeMethodInfo.StaticAccess)
-    val methodType = TypeConstant.getValue(constantPool.getValue(ByteCodeMethodInfo.getMethodDescriptorIndex(method)).asInstanceOf[Node])
-    val methodParameters = methodType.parameterTypes
+    val methodIsStatic: Boolean = method.accessFlags.contains(ByteCodeMethodInfo.StaticAccess)
+    val methodParameters = method._type.parameterTypes
     if (methodIsStatic) {
       methodParameters
     }
     else {
       val clazz = state.program
-      val clazzRefIndex = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int]
-      val clazzRef = constantPool.getValue(clazzRefIndex).asInstanceOf[Node]
-      val className = constantPool.getValue(ClassInfoConstant.getNameIndex(clazzRef)).asInstanceOf[Node]
-      Seq(ObjectTypeC.objectType(className(QualifiedClassNameConstant.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
+      val clazzRef = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
+      val className = clazzRef(ClassInfoConstant.Name).asInstanceOf[Node]
+      Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }
 }

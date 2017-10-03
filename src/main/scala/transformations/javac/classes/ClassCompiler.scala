@@ -2,11 +2,11 @@ package transformations.javac.classes
 
 import java.util.NoSuchElementException
 
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.Node
 import transformations.bytecode.constants._
 import transformations.bytecode.extraConstants.TypeConstant
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 
@@ -17,7 +17,7 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
 case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
-  val state: CompilationState = compiler.state
+  val state: Language = compiler.state
   val className: String = currentClass.name
   val myPackage: PackageSignature = compiler.getPackage(currentClass._package.toList)
   val currentClassInfo = ClassSignature(myPackage, className)
@@ -55,7 +55,7 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getNameIndex(methodName: String) = {
-    Utf8Constant.create(methodName)
+    Utf8ConstantDelta.create(methodName)
   }
 
   def getFieldRef(info: FieldInfo) = {
@@ -69,12 +69,12 @@ case class ClassCompiler(currentClass: Node, compiler: JavaCompilerState) {
   }
 
   def getFieldNameAndType(info: FieldInfo) = {
-    val fieldNameIndex = Utf8Constant.create(info.name)
+    val fieldNameIndex = Utf8ConstantDelta.create(info.name)
     NameAndTypeConstant.nameAndType(fieldNameIndex, TypeConstant.constructor(info._type))
   }
 
   def findClass(objectType: Node): ClassSignature = {
-    val qualifiedName = ObjectTypeC.getObjectTypeName(objectType) match {
+    val qualifiedName = ObjectTypeDelta.getObjectTypeName(objectType) match {
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
     }

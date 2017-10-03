@@ -3,7 +3,7 @@ package transformations.javac.methods.call
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import core.particles.{CompilationState, Contract}
+import core.particles.{Language, Contract}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -37,7 +37,7 @@ trait GenericCall extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MemberSelector)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)
@@ -49,7 +49,7 @@ trait GenericCall extends ExpressionInstance {
 
   override val key: Key = CallC.CallKey
 
-  override def getType(call: Path, state: CompilationState): Node = {
+  override def getType(call: Path, state: Language): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.compiler.find(methodKey)
@@ -57,7 +57,7 @@ trait GenericCall extends ExpressionInstance {
     returnType
   }
 
-  def getGenericCallInstructions(call: Path, state: CompilationState, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
+  def getGenericCallInstructions(call: Path, state: Language, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val callArguments = CallC.getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))

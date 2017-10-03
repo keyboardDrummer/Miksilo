@@ -1,11 +1,15 @@
 package transformations.bytecode.attributes
 
-import core.bigrammar.{BiGrammar, ManyVertical}
+import core.bigrammar.{BiGrammar, Choice, ManyVertical}
+import core.document.Empty
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
+import core.particles.path.{Path, PathRoot}
+import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptorIndex}
+import transformations.bytecode.ByteCodeSkeleton.{ByteCodeWrapper, ClassMethodsKey}
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -15,6 +19,14 @@ object InstructionArgumentsKey extends NodeField
 
 object CodeAttribute extends ByteCodeAttribute with WithState {
 
+  implicit class CodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def maxStack: Int = node(MaxStack).asInstanceOf[Int]
+    def maxStack_=(value: Int): Unit = node(MaxStack) = value
+
+    def instructions: Seq[T] = node(Instructions).asInstanceOf[Seq[T]]
+    def instructions_=(value: Seq[T]): Unit = node(Instructions) = value
+  }
+
   def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
   def getInstructionArguments(instruction: Node) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
@@ -23,28 +35,28 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     instruction(InstructionArgumentsKey) = arguments
   }
 
-  def getInstructionSizeRegistry(state: CompilationState) = getState(state).getInstructionSizeRegistry
+  def getInstructionSizeRegistry(state: Language) = getState(state).getInstructionSizeRegistry
 
-  def getInstructionSignatureRegistry(state: CompilationState) = getState(state).getInstructionSignatureRegistry
+  def getInstructionSignatureRegistry(state: Language) = getState(state).getInstructionSignatureRegistry
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
                     instructions: Seq[Node],
                     exceptionTable: Seq[Node],
-                    attributes: Seq[Node]) = {
+                    attributes: Seq[Node]): CodeWrapper[Node] = {
     new Node(CodeKey,
       AttributeNameKey -> nameIndex,
-      CodeMaxStackKey -> maxStack,
+      MaxStack -> maxStack,
       CodeMaxLocalsKey -> maxLocals,
-      CodeInstructionsKey -> instructions,
+      Instructions -> instructions,
       CodeExceptionTableKey -> exceptionTable,
       CodeAttributesKey -> attributes)
   }
 
   trait InstructionSignatureProvider
   {
-    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: CompilationState): InstructionSignature
+    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: Compilation): InstructionSignature
   }
 
   trait InstructionSideEffectProvider
@@ -62,38 +74,38 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
-  def constantEntry = Utf8Constant.create("Code")
+  val constantEntry = Utf8ConstantDelta.create("Code")
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
-      AttributeNameKey -> Utf8Constant.key))
+      AttributeNameKey -> Utf8ConstantDelta.key))
   }
 
-  def getCodeAttributeBytes(attribute: Node, state: CompilationState): Seq[Byte] = {
+  def getCodeAttributeBytes(attribute: CodeWrapper[Node], state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Node): Seq[Byte] = {
       ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
     }
 
     val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)
-    shortToBytes(CodeAttribute.getCodeMaxStack(attribute)) ++
+    shortToBytes(attribute.maxStack) ++
       shortToBytes(CodeAttribute.getCodeMaxLocals(attribute)) ++
-      prefixWithIntLength(() => CodeAttribute.getCodeInstructions(attribute).flatMap(getInstructionByteCode)) ++
+      prefixWithIntLength(() => attribute.instructions.flatMap(getInstructionByteCode)) ++
       shortToBytes(exceptionTable.length) ++
       exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
       getAttributesByteCode(state, CodeAttribute.getCodeAttributes(attribute))
   }
 
 
-  def getCodeAnnotations(clazz: Node): Seq[Node] = {
-    ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
+  def getCodeAnnotations[T <: NodeLike](clazz: ByteCodeWrapper[T]): Seq[T] = {
+    clazz.methods
+      .flatMap(methodInfo => methodInfo.attributes)
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
   }
 
-  def getCodeMaxStack(code: Node) = code(CodeMaxStackKey).asInstanceOf[Int]
+  def getCodeMaxStack(code: Node) = code(MaxStack).asInstanceOf[Int]
 
   def getCodeMaxLocals(code: Node) = code(CodeMaxLocalsKey).asInstanceOf[Int]
 
@@ -101,16 +113,13 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   def getCodeAttributes(code: Node) = code(CodeAttributesKey).asInstanceOf[Seq[Node]]
 
-  def getCodeInstructions(code: Node) = code(CodeInstructionsKey).asInstanceOf[Seq[Node]]
-
-
   object CodeKey extends NodeClass
 
-  object CodeMaxStackKey extends NodeField
+  object MaxStack extends NodeField
 
   object CodeMaxLocalsKey extends NodeField
 
-  object CodeInstructionsKey extends NodeField
+  object Instructions extends NodeField
 
   object CodeExceptionTableKey extends NodeField
 
@@ -118,24 +127,23 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   object InstructionGrammar
 
-  object CodeGrammar
-
   override def key: Key = CodeKey
 
-  object MaxStackGrammar
+  object MaxStackGrammar extends Key
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar)
+    val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)
-    val maxStackGrammar = grammars.create(MaxStackGrammar, ("," ~~> "maxStack:" ~> integer).as(CodeMaxStackKey))
-    val maxLocalGrammar = ("," ~~> "maxLocal:" ~> integer).as(CodeMaxLocalsKey)
-    val header: BiGrammar = ("code: nameIndex:" ~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)) ~ maxStackGrammar ~ maxLocalGrammar
-    val instructionsGrammar = "instructions:" %> new ManyVertical(instructionGrammar).indent()
-    val exceptionTableGrammar = "exceptions:" %> produce(Seq.empty[Any])
-    val codeAttributeGrammar = header %
-      instructionsGrammar.as(CodeInstructionsKey) %
-      attributesGrammar.as(CodeAttributesKey) %
-      exceptionTableGrammar.as(CodeExceptionTableKey) asNode CodeKey
-    grammars.create(CodeGrammar, codeAttributeGrammar)
+    val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer <~ ", ").as(MaxStack))
+    val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
+    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(Instructions)
+    val exceptionTableGrammar = "Exceptions:" %> produce(Seq.empty[Any])
+    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ maxLocalGrammar %
+      instructionsGrammar %
+      attributesGrammar %
+      exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
+    val codeGrammar: BiGrammar = ("Code:" %> body).asNode(CodeKey)
+    grammars.create(CodeKey, codeGrammar)
   }
 
   override def constantPoolKey: String = "Code"

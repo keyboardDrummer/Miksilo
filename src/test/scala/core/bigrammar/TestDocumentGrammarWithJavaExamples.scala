@@ -1,16 +1,14 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.bigrammar.printer.BiGrammarToPrinter
-import core.particles.grammars.GrammarCatalogue
-import core.particles.{CompilerFromParticles, Delta}
-import org.scalatest.{FunSpec, FunSuite}
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import core.particles.Delta
+import org.scalatest.FunSuite
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.expressions.{ExpressionSkeleton, TernaryC}
+import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
 import transformations.javac.statements.BlockC
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompiler}
+import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -19,17 +17,17 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   val lineSeparator = System.lineSeparator()
 
   test("SimpleForLoop") {
-    val testFileContent = TestUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
+    val testFileContent = SourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("While") {
-    val testFileContent = TestUtils.getJavaTestFileContents("Whilee", Path(""))
+    val testFileContent = SourceUtils.getJavaTestFileContents("Whilee", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Fibonacci") {
-    val testFileContent = TestUtils.getJavaTestFileContents("Fibonacci", Path(""))
+    val testFileContent = SourceUtils.getJavaTestFileContents("Fibonacci", Path(""))
     TestGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
@@ -49,23 +47,23 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrintAfterImplicitAddition") {
-    val input = TestUtils.getJavaTestFile("Fibonacci", Path(""))
-    val expectation = TestUtils.getJavaTestFileContents("ExplicitFibonacci.java")
+    val input = SourceUtils.getJavaTestFile("Fibonacci", Path(""))
+    val expectation = SourceUtils.getJavaTestFileContents("ExplicitFibonacci.java")
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
-    val newTransformations = JavaCompiler.spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+    val newTransformations = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
 
-    val state = new CompilerFromParticles(newTransformations).parseAndTransform(input)
+    val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)
     val output = state.output
 
     assertResult(expectation)(output)
   }
 
   test("PrettyPrintByteCode") {
-    val input = TestUtils.getJavaTestFile("Fibonacci", Path(""))
-    val expectation = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val input = SourceUtils.getJavaTestFile("Fibonacci", Path(""))
+    val expectation = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
 
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
 
@@ -74,7 +72,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   }
 
   test("PrettyPrintAndParseByteCode") {
-    val input = TestUtils.getJavaTestFile("Fibonacci.java", Path(""))
+    val input = SourceUtils.getJavaTestFile("Fibonacci.java", Path(""))
 
     val byteCodeTransformations = JavaCompiler.byteCodeTransformations
     val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
@@ -83,21 +81,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
-    val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
-    val input = TestUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
-    val output = new CompilerFromParticles(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }
 }

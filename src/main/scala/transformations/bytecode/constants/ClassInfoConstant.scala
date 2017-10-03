@@ -1,40 +1,49 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ClassInfoConstant extends ConstantEntry {
 
-  object ClassRefKey extends NodeClass
+  object Clazz extends NodeClass
 
-  object ClassRefName extends NodeField
+  object Name extends NodeField
 
-  def classRef(name: QualifiedClassName): Node = new Node(ClassRefKey, ClassRefName -> QualifiedClassNameConstant.create(name))
-  def classRef(classRefNameIndex: Int): Node = new Node(ClassRefKey, ClassRefName -> classRefNameIndex)
+  def classRef(name: QualifiedClassName): Node = new Node(Clazz, Name -> QualifiedClassNameConstantDelta.create(name))
+  def classRef(classRefNameIndex: Int): Node = new Node(Clazz, Name -> classRefNameIndex)
 
-  def getNameIndex(classRef: Node): Int = classRef(ClassRefName).asInstanceOf[Int]
+  implicit class ClassInfoConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def nameIndex: Int = node(Name).asInstanceOf[Int]
+    def nameIndex_=(value: Int): Unit = node(Name) = value
 
-  override def key = ClassRefKey
-
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
-    byteToBytes(7) ++ shortToBytes(getNameIndex(constant))
+    def name: QualifiedClassNameConstant[T] = node(Name).asInstanceOf[T]
+    def name_=(value: QualifiedClassNameConstant[T]): Unit = node(Name) = value
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def key = Clazz
+
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+    byteToBytes(7) ++ shortToBytes(new ClassInfoConstantWrapper(constant).nameIndex)
+  }
+
+  override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRefName -> QualifiedClassNameConstant.key))
+    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "class reference:" ~~>
-    grammars.find(ConstantPoolIndexGrammar).as(ClassRefName) asNode ClassRefKey
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    grammars.find(ConstantPoolIndexGrammar).as(Name) asNode Clazz
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."
+
+  override def getName = "Class"
 }

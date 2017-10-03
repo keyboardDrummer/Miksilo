@@ -4,16 +4,16 @@ import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.constants._
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
-import transformations.bytecode.coreInstructions.{InvokeSpecialC, VoidReturnInstructionC}
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
+import transformations.bytecode.coreInstructions.{InvokeSpecialDelta, VoidReturnInstructionDelta}
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import transformations.bytecode.types.VoidTypeC
 import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.types.MethodType
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 class TestEmptyClassCompilation extends FunSuite {
   val className: String = "EmptyClass"
@@ -22,14 +22,14 @@ class TestEmptyClassCompilation extends FunSuite {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = JavaCompiler.getCompiler.transform(javaCode)
+    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }
@@ -38,14 +38,14 @@ class TestEmptyClassCompilation extends FunSuite {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
       ClassInfoConstant.classRef(11),
       ClassInfoConstant.classRef(12),
-      Utf8Constant.create(SuperCallExpression.constructorName),
+      Utf8ConstantDelta.create(SuperCallExpression.constructorName),
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
       CodeAttribute.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
-      QualifiedClassNameConstant.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
-      QualifiedClassNameConstant.create(QualifiedClassName(Seq("java", "lang", "Object"))))
+      QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
+      QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("java", "lang", "Object"))))
     )
-    val instructions = Seq(LoadAddressC.addressLoad(0), InvokeSpecialC.invokeSpecial(1), VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(LoadAddressDelta.addressLoad(0), InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
     val codeAttribute = Seq(CodeAttribute.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCodeMethodInfo.methodInfo(3, 4, codeAttribute, Set(ByteCodeMethodInfo.PublicAccess))
     ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))

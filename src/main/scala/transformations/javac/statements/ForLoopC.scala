@@ -1,7 +1,7 @@
 package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeWrapper}
+import core.particles.node.{Key, Node, NodeLike, NodeWrapper}
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.Expression
@@ -9,13 +9,12 @@ import transformations.javac.statements.StatementSkeleton.Statement
 
 object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
-  implicit class ForLoop(val node: Node)
-    extends AnyVal with NodeWrapper {
-    def initializer: Statement = node(Initializer).asInstanceOf[Node]
-    def initializer_=(value: Node) = node(Initializer) = value
+  implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def initializer: Statement[T] = node(Initializer).asInstanceOf[T]
+    def initializer_=(value: T) = node(Initializer) = value
 
     def condition: Expression = node(Condition).asInstanceOf[Node]
-    def condition_=(value: Node) = node(Condition) = value
+    def condition_=(value: T) = node(Condition) = value
 
     def increment: Expression = node(Increment).asInstanceOf[Node]
     def increment_=(value: Node) = node(Increment) = value
@@ -26,7 +25,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(WhileC)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
@@ -48,7 +47,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   object Body extends Key
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     PathRoot(program).visit(path => path.clazz match {
       case ForLoopType => transformForLoop(path)
       case _ =>
@@ -56,7 +55,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
   }
   
   def transformForLoop(forLoopPath: Path): Unit = {
-    val forLoop: ForLoop = forLoopPath.current
+    val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementC.create(forLoop.increment))
     val _while = WhileC.create(forLoop.condition, whileBody)

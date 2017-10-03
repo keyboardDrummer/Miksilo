@@ -5,9 +5,10 @@ import org.scalatest.FunSuite
 import transformations.bytecode.attributes._
 import transformations.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC, SmallIntegerConstantC, StoreIntegerC}
-import transformations.bytecode.coreInstructions.objects.LoadAddressC
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
+import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
+import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.{IntTypeC, VoidTypeC}
 import transformations.javac.classes.ConstantPool
 import transformations.javac.classes.skeleton.QualifiedClassName
@@ -26,7 +27,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(13),
       ClassInfoConstant.classRef(14),
       "<init>",
-      MethodType.construct(VoidTypeC.voidType, Seq()),
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
       CodeAttribute.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",
@@ -34,8 +35,8 @@ class TestPrintByteCodeWhile extends FunSuite {
       SourceFileAttribute.constantPoolKey,
       "Whilee.java",
       NameAndTypeConstant.nameAndType(4, 5),
-      new QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
-      new QualifiedClassName(Seq("java", "lang", "Object"))))
+      QualifiedClassName(Seq("languages", "bytecode", "testing", "Whilee")),
+      QualifiedClassName(Seq("java", "lang", "Object"))))
     val constructor: Node = getConstructor
     val _while: Node = getWhile
     val methods = Seq(constructor, _while)
@@ -47,9 +48,9 @@ class TestPrintByteCodeWhile extends FunSuite {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeMethodInfo.methodInfo(4, 5, Seq(
       CodeAttribute.codeAttribute(6, 1, 1, Seq(
-        LoadAddressC.addressLoad(0),
-        InvokeSpecialC.invokeSpecial(1),
-        VoidReturnInstructionC.voidReturn
+        LoadAddressDelta.addressLoad(0),
+        InvokeSpecialDelta.invokeSpecial(1),
+        VoidReturnInstructionDelta.voidReturn
       ), Seq(), Seq(lineNumberTable))))
     constructor
   }
@@ -64,14 +65,14 @@ class TestPrintByteCodeWhile extends FunSuite {
     val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
-      SmallIntegerConstantC.integerConstant(0),
-      StoreIntegerC.integerStore(0),
-      LoadIntegerC.load(0),
-      SmallIntegerConstantC.integerConstant(3),
-      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
-      IncrementIntegerC.integerIncrement(0, 1),
-      GotoC.goTo(-8),
-      VoidReturnInstructionC.voidReturn
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
+      IfIntegerCompareGreaterOrEqualDelta.ifIntegerCompareGreater(9),
+      IncrementIntegerDelta.integerIncrement(0, 1),
+      GotoDelta.goTo(-8),
+      VoidReturnInstructionDelta.voidReturn
     ), Seq(), Seq(lineNumberTable, stackMapTable))), Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     _while
   }

@@ -4,7 +4,8 @@ import scala.collection.mutable
 
 object GraphBasics {
 
-  def traverseBreadth[Node](roots: Seq[Node], getChildren: Node => Seq[Node]): Seq[Node] = {
+  def traverseBreadth[Node](roots: Seq[Node], getChildren: Node => Seq[Node],
+                            shouldContinue: Node => Boolean = (n: Node) => true): Seq[Node] = {
     val visited = mutable.Set.empty[Node]
     val queue = mutable.Queue.empty[Node]
     var result = List.empty[Node]
@@ -17,6 +18,10 @@ object GraphBasics {
 
       if (visited.add(value))
       {
+        result ::= value
+        if (!shouldContinue(value))
+          return result
+
         result ::= value
         for(child <- getChildren(value))
         {

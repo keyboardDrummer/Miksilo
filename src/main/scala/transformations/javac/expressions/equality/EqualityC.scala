@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.longs.CompareLongC
+import transformations.bytecode.coreInstructions.longs.CompareLongDelta
 import transformations.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
@@ -17,7 +17,7 @@ object EqualityC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](equality: T) = equality(SecondKey).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val equalityGrammar = grammars.find(AddEqualityPrecedence.EqualityExpressionGrammar)
     val parseEquality = ((equalityGrammar <~ "==") ~ equalityGrammar).asNode(EqualityKey, FirstKey, SecondKey)
     equalityGrammar.addOption(parseEquality)
@@ -33,20 +33,20 @@ object EqualityC extends ExpressionInstance {
 
   override val key: Key = EqualityKey
 
-  override def getType(expression: Path, state: CompilationState): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
 
-  def getInputType(equality: Path, state: CompilationState)  = {
+  def getInputType(equality: Path, state: Language)  = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(state)(first)
   }
 
-  override def toByteCode(equality: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(equality: Path, state: Language): Seq[Node] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val inputType = TypeSkeleton.toStackType(getInputType(equality,state),state)
     val equalityInstructions: Seq[Node] = inputType.clazz match {
-      case LongTypeC.LongTypeKey => Seq(CompareLongC.compareLong, NotInstructionC.not)
+      case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions

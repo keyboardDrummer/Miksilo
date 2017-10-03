@@ -14,15 +14,17 @@ trait GrammarDocumentWriter {
 
   def integer = number ^^ ((s: Any) => Integer.parseInt(s.asInstanceOf[String]), (i: Any) => Some(i.toString))
 
-  def failure: BiGrammar = BiFailure
+  def failure: BiGrammar = BiFailure()
 
-  def produce(value: Any): BiGrammar = new Produce(value)
+  def produce(value: Any): BiGrammar = new ValueGrammar(value)
+
+  def keywordClass(value: String) = new Keyword(value, false, true)
 
   def space: BiGrammar = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)
 
-  implicit def consume(grammar: Grammar): BiGrammar = new Consume(grammar)
+  implicit def consume(grammar: Grammar): BiGrammar = new FromGrammarWithToString(grammar)
 
   implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 

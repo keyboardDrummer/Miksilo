@@ -3,12 +3,12 @@ package transformations.javac.methods
 import core.bigrammar.{BiGrammar, TopBottom}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeInstructionsKey, CodeMaxLocalsKey}
+import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, Instructions, CodeMaxLocalsKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
-import transformations.bytecode.constants.Utf8Constant
+import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{TypeSkeleton, VoidTypeC}
@@ -29,7 +29,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     def parameters_=(value: Seq[Node]): Unit = node(MethodParametersKey) = value
   }
 
-  def compile(state: CompilationState, clazz: Node): Unit = {
+  def compile(state: Language, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val methods = getMethods(clazz)
@@ -39,7 +39,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     })
   }
 
-  def bind(state: CompilationState, signature: ClassSignature, clazz: Node): Unit = {
+  def bind(state: Language, signature: ClassSignature, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
     val classInfo = classCompiler.currentClassInfo
 
@@ -72,11 +72,11 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     TypeConstant.constructor(methodType)
   }
 
-  def convertMethod(method: Node, classCompiler: ClassCompiler, state: CompilationState): Unit = {
+  def convertMethod(method: Node, classCompiler: ClassCompiler, state: Language): Unit = {
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
     addMethodFlags(method)
-    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8Constant.create(getMethodName(method))
+    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
@@ -96,14 +96,14 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       val codeAttribute = new Node(CodeAttribute.CodeKey,
         AttributeNameKey -> CodeAttribute.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
-        CodeInstructionsKey -> instructions,
+        Instructions -> instructions,
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
       method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)
     }
   }
 
-  def setMethodCompiler(method: Node, state: CompilationState) {
+  def setMethodCompiler(method: Node, state: Language) {
     val methodCompiler = new MethodCompiler(state, method)
     getState(state).methodCompiler = methodCompiler
   }
@@ -137,7 +137,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
   def getMethodStatic(method: Node) = method(StaticKey).asInstanceOf[Boolean]
 
-  def getMethodCompiler(state: CompilationState) = getState(state).methodCompiler
+  def getMethodCompiler(state: Language) = getState(state).methodCompiler
 
   def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
 
@@ -154,7 +154,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
   object StaticGrammar
   object ReturnTypeGrammar
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
@@ -194,7 +194,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
       TypeParameters -> typeParameters)
   }
 
-  object ParameterKey extends Key
+  object ParameterKey extends NodeClass
   def parameter(name: String, _type: Any) = {
     new Node(ParameterKey,
       ParameterNameKey -> name,
@@ -206,29 +206,29 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     var methodCompiler: MethodCompiler = null
   }
 
-  class Visibility extends Key
+  class Visibility extends NodeClass
 
-  object MethodKey extends Key
+  object MethodKey extends NodeClass
 
   object MethodGrammar
 
-  object MethodBodyKey extends Key
+  object MethodBodyKey extends NodeField
 
-  object ParameterNameKey extends Key
+  object ParameterNameKey extends NodeField
 
-  object StaticKey extends Key
+  object StaticKey extends NodeField
 
-  object VisibilityKey extends Key
+  object VisibilityKey extends NodeField
 
-  object ReturnTypeKey extends Key
+  object ReturnTypeKey extends NodeField
 
-  object MethodNameKey extends Key
+  object MethodNameKey extends NodeField
 
-  object MethodParametersKey extends Key
+  object MethodParametersKey extends NodeField
 
-  object TypeParameters extends Key
+  object TypeParameters extends NodeField
 
-  object ParameterTypeKey extends Key
+  object ParameterTypeKey extends NodeField
 
   object PublicVisibility extends Visibility
 

@@ -1,13 +1,11 @@
 package transformations.bytecode.extraBytecodeInstructions
 
-import core.particles.CompilerFromParticles
 import core.particles.node.Node
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
-import transformations.bytecode.attributes.CodeAttribute
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.JavaCompiler
+import util.CompilerBuilder
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -17,7 +15,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
   test("ForFibonacci") {
     val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
-    val withoutOptimization = new TestUtils(new CompilerFromParticles(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
+    val withoutOptimization = new TestUtils(CompilerBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)
@@ -26,11 +24,8 @@ class TestOptimizeBooleanInstructions extends FunSuite {
       s"optimizedInstructions.size (${optimizedInstructions.size}) + 5 < unoptimizedInstructions.size (${unoptimizedInstructions.size})")
   }
 
-  def getFibonacciInstructions(clazz: Node) = {
-    ByteCodeSkeleton.getMethods(clazz)
-      .flatMap(methodInfo => ByteCodeMethodInfo.getMethodAttributes(methodInfo))
-      .flatMap(annotation => if (annotation.clazz == CodeAttribute.CodeKey) Some(annotation) else None)
-      .flatMap(codeAnnotation => CodeAttribute.getCodeInstructions(codeAnnotation))
+  def getFibonacciInstructions(clazz: ByteCodeWrapper[Node]) = {
+    clazz.methods.flatMap(methodInfo => methodInfo.codeAttribute.instructions)
   }
 }
 

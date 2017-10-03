@@ -4,7 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.SubtractIntegerC
+import transformations.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
@@ -17,9 +17,9 @@ object SubtractionC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
 
-  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerC)
+  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
     val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
     val parseSubtraction = ((additiveGrammar <~~ "-") ~~ withoutSubtraction).asNode(SubtractionKey, FirstKey, SecondKey)
@@ -34,7 +34,7 @@ object SubtractionC extends ExpressionInstance {
 
   override val key: Key = SubtractionKey
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -43,11 +43,11 @@ object SubtractionC extends ExpressionInstance {
     IntTypeC.intType
   }
 
-  override def toByteCode(subtraction: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(subtraction: Path, state: Language): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(state)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
-    firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerC.subtractInteger)
+    firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)
   }
 
   override def description: String = "Adds the - operator."

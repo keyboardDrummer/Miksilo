@@ -6,6 +6,7 @@ import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import org.scalatest.FunSuite
 import transformations.javac.JavaCompiler
+import util.CompilerBuilder
 import util.TestUtils
 
 import scala.util.parsing.input.CharArrayReader
@@ -45,11 +46,11 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   def getGrammarUsingTransformer(grammarTransformer: Any = ProgramGrammar): Labelled = {
-    new CompilerFromParticles(getTransformations(grammarTransformer)).getGrammar
+    CompilerBuilder.build(getTransformations(grammarTransformer)).getGrammar
   }
 
   def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
-    val compiler = new CompilerFromParticles(getTransformations(grammarTransformer))
+    val compiler = CompilerBuilder.build(getTransformations(grammarTransformer))
     compiler.parse(TestUtils.stringToInputStream(input))
   }
 
@@ -58,7 +59,7 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   class SelectorTransformation(key: Any) extends DeltaWithGrammar {
-    override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+    override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
       if (key != ProgramGrammar)
         grammars.find(ProgramGrammar).inner = grammars.find(key)
     }

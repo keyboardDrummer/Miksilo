@@ -1,20 +1,20 @@
 package transformations.javac.types
 
 import core.bigrammar.{BiFailure, BiGrammar}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
 import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
 
 
 object MethodType extends TypeInstance {
 
-  implicit class MethodTypeWrapper(node: Node) {
-    def returnType: Node = node(ReturnType).asInstanceOf[Node]
-    def returnType_=(value: Node) = node(ReturnType) = value
+  implicit class MethodTypeWrapper[T <: NodeLike](node: T) {
+    def returnType: T = node(ReturnType).asInstanceOf[T]
+    def returnType_=(value: T) = node(ReturnType) = value
 
-    def parameterTypes: Seq[Node] = node(Parameters).asInstanceOf[Seq[Node]]
-    def parameterTypes_=(value: Seq[Node]) = node(Parameters) = value
+    def parameterTypes: Seq[T] = node(Parameters).asInstanceOf[Seq[T]]
+    def parameterTypes_=(value: Seq[T]) = node(Parameters) = value
   }
 
   def construct(returnType: Node, parameterTypes: Seq[Node]) = {
@@ -36,9 +36,9 @@ object MethodType extends TypeInstance {
 
   override def description: String = "Defines the method type."
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = ???
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure ///Deze heeft helemaal geen Java grammar.
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure()
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

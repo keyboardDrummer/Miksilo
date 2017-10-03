@@ -16,7 +16,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)
 
-  def addThisToVariable(state: CompilationState, variable: Path) {
+  def addThisToVariable(state: Language, variable: Path) {
     val compiler = JavaClassSkeleton.getClassCompiler(state)
 
     val name = VariableC.getVariableName(variable)
@@ -54,7 +54,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val programWithOrigin = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.clazz match {
             case ByteCodeSkeleton.ClassFileKey =>
@@ -70,7 +70,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
         })
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val callee = grammars.find(CallC.CallCallee)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     callee.inner = expression

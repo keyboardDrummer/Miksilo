@@ -1,82 +1,82 @@
-class 5 extends 25 with interfaces: ()
+class 6 extends 26 with interfaces: ()
+Constant pool:
+  Utf8 java/lang/Object
+  Utf8 Fibonacci
+  Utf8 StackMapTable
+  Utf8 fibonacci
+  Utf8 (I)I
+  Class 2
+  NameAndType 4:5
+  Methodref 6.7
+  Utf8 Code
+  Utf8 print
+  Utf8 (I)V
+  Utf8 java/io/PrintStream
+  Class 12
+  NameAndType 10:11
+  Methodref 13.14
+  Utf8 java/lang/System
+  Utf8 out
+  Utf8 Ljava/io/PrintStream;
+  Class 16
+  NameAndType 17:18
+  Fieldref 19.20
+  Utf8 main
+  Utf8 ([Ljava/lang/String;)V
+  Utf8 <init>
+  Utf8 ()V
+  Class 1
+  NameAndType 24:25
+  Methodref 26.27
+{
+  Method;
+    name: 24
+    descriptor: 25
+    flags: ACC_PUBLIC
+    Code:
+      name: 9, stack:1, locals:1
+        aload 0
+        invokespecial 28
+        return
+      Exceptions:
 
-constant pool:
-  #1: java.lang.Object
-  #2: Fibonacci
-  #3: "fibonacci"
-  #4: (I)I
-  #5: class reference: 2
-  #6: name and type: 3:4
-  #7: method reference: 5.6
-  #8: "Code"
-  #9: "print"
-  #10: (I)V
-  #11: java.io.PrintStream
-  #12: class reference: 11
-  #13: name and type: 9:10
-  #14: method reference: 12.13
-  #15: "out"
-  #16: Ljava/io/PrintStream;
-  #17: java.lang.System
-  #18: class reference: 17
-  #19: name and type: 15:16
-  #20: field reference: 18.19
-  #21: "main"
-  #22: ([Ljava/lang/String;)V
-  #23: "<init>"
-  #24: ()V
-  #25: class reference: 1
-  #26: name and type: 23:24
-  #27: method reference: 25.26
-  #28: "StackMapTable"
+  Method;
+    name: 22
+    descriptor: 23
+    flags: ACC_STATIC, ACC_PUBLIC
+    Code:
+      name: 9, stack:2, locals:1
+        getstatic 21
+        iconst 5
+        invokestatic 8
+        invokevirtual 15
+        return
+      Exceptions:
 
-fields:
-
-methods:
-  method => nameIndex:23, descriptorIndex:24, flags:ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:1, maxLocal:1
-    instructions:
-      load address(0)
-      invoke special(27)
-      void return instruction()
-    attributes:
-    exceptions:
-  method => nameIndex:21, descriptorIndex:22, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:2, maxLocal:1
-    instructions:
-      get static(20)
-      small integer constant(5)
-      invoke static(7)
-      invoke virtual(14)
-      void return instruction()
-    attributes:
-    exceptions:
-  method => nameIndex:3, descriptorIndex:4, flags:ACC_STATIC, ACC_PUBLIC
-  attributes:
-    code: nameIndex:8, maxStack:3, maxLocal:1
-    instructions:
-      load integer(0)
-      small integer constant(2)
-      if integer compare greater or equal(7)
-      small integer constant(1)
-      goto(16)
-      load integer(0)
-      small integer constant(1)
-      subtract integer()
-      invoke static(7)
-      load integer(0)
-      small integer constant(2)
-      subtract integer()
-      invoke static(7)
-      add integers()
-      integer return instruction()
-    attributes:
-      stackMap nameIndex:28
+  Method;
+    name: 4
+    descriptor: 5
+    flags: ACC_STATIC, ACC_PUBLIC
+    Code:
+      name: 9, stack:3, locals:1
+        iload 0
+        iconst 2
+        if_icmpge 7
+        iconst 1
+        goto 16
+        iload 0
+        iconst 1
+        isub
+        invokestatic 8
+        iload 0
+        iconst 2
+        isub
+        invokestatic 8
+        iadd
+        ireturn
+      StackMapTable: name: 3
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int
-    exceptions:
-
-attributes:
+      Exceptions:
+}

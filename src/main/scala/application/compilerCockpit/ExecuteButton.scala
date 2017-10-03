@@ -1,14 +1,12 @@
 package application.compilerCockpit
 
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.ActionEvent
 import javax.swing.JButton
 
 class ExecuteButton(compilerCockpit: CompilerCockpit) extends JButton("Execute") {
 
-  addActionListener(new ActionListener {
-    override def actionPerformed(e: ActionEvent): Unit = {
-      compilerCockpit.execute(executeClicked)
-    }
+  addActionListener((e: ActionEvent) => {
+    compilerCockpit.execute(() => executeClicked())
   })
 
   def executeClicked(): Unit = {

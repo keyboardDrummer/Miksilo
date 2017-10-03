@@ -1,85 +1,90 @@
 package transformations.bytecode
 
-import core.particles.CompilerFromParticles
 import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.PoptimizeC
 import transformations.bytecode.attributes.CodeAttribute
-import transformations.bytecode.coreInstructions.integers.{SmallIntegerConstantC, StoreIntegerC}
-import transformations.bytecode.coreInstructions.longs.PushLongC
-import transformations.bytecode.coreInstructions.{Pop2C, PopC, VoidReturnInstructionC}
+import transformations.bytecode.constants.Utf8ConstantDelta
+import transformations.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, StoreIntegerDelta}
+import transformations.bytecode.coreInstructions.longs.PushLongDelta
+import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
 import transformations.javac.types.MethodType
+import util.CompilerBuilder
 
 class TestPoptimize extends FunSuite {
 
   test("Basic") {
-    val instructions = Seq(SmallIntegerConstantC.integerConstant(3), PopC.pop, VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3), PopDelta.pop, VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
-    assertResult(Seq(VoidReturnInstructionC.voidReturn))(newInstructions)
+    assertResult(Seq(VoidReturnInstructionDelta.voidReturn))(newInstructions)
   }
 
   test("Memory") {
-    val instructions = Seq(SmallIntegerConstantC.integerConstant(3),
-      SmallIntegerConstantC.integerConstant(2),
-      PopC.pop,
-      PopC.pop,
-      VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3),
+      SmallIntegerConstantDelta.integerConstant(2),
+      PopDelta.pop,
+      PopDelta.pop,
+      VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
-    assertResult(Seq(VoidReturnInstructionC.voidReturn))(newInstructions)
+    assertResult(Seq(VoidReturnInstructionDelta.voidReturn))(newInstructions)
   }
 
   test("Encapsulation") {
-    val middle = Seq(SmallIntegerConstantC.integerConstant(2), StoreIntegerC.integerStore(0))
-    val expected = middle ++ Seq(VoidReturnInstructionC.voidReturn)
-    val instructions = Seq(SmallIntegerConstantC.integerConstant(3)) ++ middle ++ Seq(PopC.pop, VoidReturnInstructionC.voidReturn)
+    val middle = Seq(SmallIntegerConstantDelta.integerConstant(2), StoreIntegerDelta.integerStore(0))
+    val expected = middle ++ Seq(VoidReturnInstructionDelta.voidReturn)
+    val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3)) ++ middle ++ Seq(PopDelta.pop, VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(expected)(newInstructions)
   }
 
   test("Advanced") {
-    val expected = Seq(SmallIntegerConstantC.integerConstant(3),
-      SmallIntegerConstantC.integerConstant(3),
-      StoreIntegerC.integerStore(0),
-      StoreIntegerC.integerStore(0),
-      VoidReturnInstructionC.voidReturn)
-    val instructions = Seq(SmallIntegerConstantC.integerConstant(3),
-      SmallIntegerConstantC.integerConstant(3),
-      SmallIntegerConstantC.integerConstant(3),
-      PopC.pop,
-      SmallIntegerConstantC.integerConstant(3),
-      SmallIntegerConstantC.integerConstant(3),
-      StoreIntegerC.integerStore(0),
-      PopC.pop,
-      StoreIntegerC.integerStore(0),
-      PopC.pop,
-      VoidReturnInstructionC.voidReturn)
+    val expected = Seq(SmallIntegerConstantDelta.integerConstant(3),
+      SmallIntegerConstantDelta.integerConstant(3),
+      StoreIntegerDelta.integerStore(0),
+      StoreIntegerDelta.integerStore(0),
+      VoidReturnInstructionDelta.voidReturn)
+    val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3),
+      SmallIntegerConstantDelta.integerConstant(3),
+      SmallIntegerConstantDelta.integerConstant(3),
+      PopDelta.pop,
+      SmallIntegerConstantDelta.integerConstant(3),
+      SmallIntegerConstantDelta.integerConstant(3),
+      StoreIntegerDelta.integerStore(0),
+      PopDelta.pop,
+      StoreIntegerDelta.integerStore(0),
+      PopDelta.pop,
+      VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(expected)(newInstructions)
   }
 
   test("Robustness"){
-    val instructions = Seq(SmallIntegerConstantC.integerConstant(3), VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3), VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(instructions)(newInstructions)
   }
 
   def transformInstructions(instructions: Seq[Node]) = {
     val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
-    val method = ByteCodeMethodInfo.methodInfo(0, 1, Seq(codeAnnotation))
+    val method = ByteCodeMethodInfo.MethodInfoKey.create(
+      ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
+      ByteCodeMethodInfo.MethodDescriptorIndex -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),
+      ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
+
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq(TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)))), Seq(method))
-    val compiler = new CompilerFromParticles(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
+    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
+    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
     compiler.transform(clazz)
-    CodeAttribute.getCodeInstructions(codeAnnotation)
+    codeAnnotation.instructions
   }
 
   test("Pop2") {
-    val instructions = Seq(PushLongC.constant(1), Pop2C.pop2, VoidReturnInstructionC.voidReturn)
-    val expected = Seq(VoidReturnInstructionC.voidReturn)
+    val instructions = Seq(PushLongDelta.constant(1), Pop2Delta.pop2, VoidReturnInstructionDelta.voidReturn)
+    val expected = Seq(VoidReturnInstructionDelta.voidReturn)
     val newInstructions = transformInstructions(instructions)
     assertResult(expected)(newInstructions)
   }

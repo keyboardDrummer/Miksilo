@@ -1,17 +1,16 @@
 package transformations.bytecode
 
-import core.particles.CompilerFromParticles
 import core.particles.node.Node
-import org.junit.Test
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import transformations.bytecode.coreInstructions._
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualC
-import transformations.bytecode.coreInstructions.integers.{IncrementIntegerC, LoadIntegerC, SmallIntegerConstantC, StoreIntegerC}
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
+import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
+import transformations.bytecode.types.IntTypeC
 import transformations.javac.JavaCompiler
 import transformations.javac.classes.ConstantPool
-import transformations.bytecode.types.IntTypeC
+import util.CompilerBuilder
 import util.TestUtils
 
 class TestByteCodeGoTo extends FunSuite {
@@ -23,20 +22,20 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = new CompilerFromParticles(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile)
+    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }
 
   def getExpectedJumpWhile: Node = {
     val instructions = Seq(
-      SmallIntegerConstantC.integerConstant(0),
-      StoreIntegerC.integerStore(0),
-      LoadIntegerC.load(0),
-      SmallIntegerConstantC.integerConstant(3),
-      IfIntegerCompareGreaterOrEqualC.ifIntegerCompareGreater(9),
-      IncrementIntegerC.integerIncrement(0, 1),
-      GotoC.goTo(-8))
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
+      IfIntegerCompareGreaterOrEqualDelta.ifIntegerCompareGreater(9),
+      IncrementIntegerDelta.integerIncrement(0, 1),
+      GotoDelta.goTo(-8))
 
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
@@ -46,14 +45,14 @@ class TestByteCodeGoTo extends FunSuite {
 
   def getLabelledJumpWhile: Node = {
     val instructions = Seq(
-      SmallIntegerConstantC.integerConstant(0),
-      StoreIntegerC.integerStore(0),
+      SmallIntegerConstantDelta.integerConstant(0),
+      StoreIntegerDelta.integerStore(0),
       LabelledLocations.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
-      LoadIntegerC.load(0),
-      SmallIntegerConstantC.integerConstant(3),
+      LoadIntegerDelta.load(0),
+      SmallIntegerConstantDelta.integerConstant(3),
       LabelledLocations.ifIntegerCompareGreaterEquals("end"),
-      IncrementIntegerC.integerIncrement(0, 1),
+      IncrementIntegerDelta.integerIncrement(0, 1),
       LabelledLocations.goTo("start"),
       LabelledLocations.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )

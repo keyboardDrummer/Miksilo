@@ -4,6 +4,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.{Path, SequenceElement}
+import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
@@ -20,9 +21,10 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: Path, state: CompilationState): Seq[Node] = {
+  override def toByteCode(ifThen: Path, state: Language): Seq[Node] = {
     val condition = getCondition(ifThen)
-    val endLabelName = state.getUniqueLabel("end")
+    val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val endLabelName = LabelledLocations.getUniqueLabel("end", method, state)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 
@@ -43,7 +45,7 @@ object IfThenC extends StatementInstance {
     ifThen(ThenKey).asInstanceOf[Seq[T]]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)

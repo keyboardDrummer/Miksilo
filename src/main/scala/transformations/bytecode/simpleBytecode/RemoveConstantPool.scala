@@ -1,56 +1,66 @@
 package transformations.bytecode.simpleBytecode
 
-import core.bigrammar.{As, GrammarReference}
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.bigrammar.{GrammarReference, RootGrammar}
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
 import core.particles.path.PathRoot
-import core.particles.{CompilationState, DeltaWithGrammar, DeltaWithPhase}
-import transformations.bytecode.ByteCodeSkeleton
+import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
+import transformations.bytecode.ByteCodeMethodInfo.MethodDescriptorIndex
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
-import transformations.bytecode.constants.ClassInfoConstant.{ClassRefKey, ClassRefName}
-import transformations.bytecode.constants.FieldRefConstant.{FieldRefClassIndex, FieldRefNameAndTypeIndex}
-import transformations.bytecode.constants.MethodRefConstant.{MethodRefClassName, MethodRefKey, MethodRefMethodName}
-import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeKey, NameAndTypeName, NameAndTypeType}
+import transformations.bytecode.constants.FieldRefConstant.ClassInfo
+import transformations.bytecode.constants.MethodRefConstant.{ClassRef, MethodRefKey}
+import transformations.bytecode.constants.NameAndTypeConstant.Type
 import transformations.bytecode.constants._
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
-import transformations.bytecode.extraConstants.{QualifiedClassNameConstant, TypeConstant}
+import transformations.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
+import transformations.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
+import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.ConstantPool
 
 object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
-  override def transform(program: Node, state: CompilationState): Unit = {
+  override def transform(program: Node, state: Compilation): Unit = {
     val pool = new ConstantPool()
     program(ByteCodeSkeleton.ClassConstantPool) = pool
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
 
     PathRoot(program).visit(afterChildren = node => constantReferences.get(node.clazz).foreach(reference => {
       for (entry <- reference) {
-        val fieldValue = node.current(entry._1)
-        val index = pool.store(fieldValue)
-        node.current.data.put(entry._1, index)
+        node.current.get(entry._1).foreach(fieldValue => {
+          val index = pool.store(fieldValue)
+          node.current.data.put(entry._1, index)
+        })
       }
     }))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
 
-    for(path <- grammars.findPathsToKey(ConstantPoolIndexGrammar)) {
-      val surroundingAs: As = path.ancestors.map(a => a.get).collect({case as:As => as}).head
-      val surroundingNode: NodeGrammar = path.ancestors.map(a => a.get).collect({case as:NodeGrammar => as}).head
-      constantReferences.get(surroundingNode.key).flatMap(m => m.get(surroundingAs.key)).foreach(constantClass => {
-        path.set(grammars.find(constantClass))
-      })
+    val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
+    for(containerEntry <- constantReferences) {
+      val key: Any = containerEntry._1
+      val constantFields: Map[NodeField, NodeClass] = containerEntry._2
+      val keyGrammar = new RootGrammar(grammars.find(key))
+      for(field <- constantFields) {
+        val asGrammar = keyGrammar.findAs(field._1)
+        val constantRef = asGrammar.findGrammar(constantPoolIndexGrammar).get.asInstanceOf[GrammarReference]
+        constantRef.set(grammars.find(field._2))
+      }
     }
 
-    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(MethodRefClassName) <~ "." ~
-      grammars.find(NameAndTypeConstant.key).as(MethodRefMethodName)) asNode MethodRefKey
-    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstant.key).as(ClassRefName) asNode ClassRefKey
-    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(FieldRefClassIndex) ~ "/" ~
-      grammars.find(NameAndTypeConstant.key).as(FieldRefNameAndTypeIndex) asNode FieldRefConstant.key
-    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8Constant.key).as(NameAndTypeName) ~~
-      grammars.find(TypeConstant.key).as(NameAndTypeType) asNode NameAndTypeKey
+    grammars.find(Utf8ConstantDelta.key).inner = Utf8ConstantDelta.getConstantEntryGrammar(grammars)
+    grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
+    grammars.find(QualifiedClassNameConstantDelta.key).inner = QualifiedClassNameConstantDelta.getConstantEntryGrammar(grammars)
+    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) <~ "." ~
+      grammars.find(NameAndTypeConstant.key).as(MethodRefConstant.NameAndType)) asNode MethodRefKey
+    grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstantDelta.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
+    grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(ClassInfo) ~ "." ~
+      grammars.find(NameAndTypeConstant.key).as(FieldRefConstant.NameAndType) asNode FieldRefConstant.key
+    grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8ConstantDelta.key).as(NameAndTypeConstant.Name) ~~
+      grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
+    grammars.find(QualifiedClassNameConstantDelta.key).inner = QualifiedClassNameConstantDelta.getConstantEntryGrammar(grammars)
 
-    val constantPoolGrammar = grammars.findPathsToKey(ConstantPoolGrammar).head
+    val constantPoolGrammar = grammars.find(ProgramGrammar).findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 

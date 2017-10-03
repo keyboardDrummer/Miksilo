@@ -4,7 +4,7 @@ import java.io.{BufferedInputStream, InputStream}
 
 import core.grammar.ParseException
 import core.particles.node.Node
-import core.particles.{CompilationState, Delta}
+import core.particles.{Language, Delta}
 import transformations.bytecode.attributes.{ByteCodeAttribute, SignatureAttribute, UnParsedAttribute}
 import transformations.javac.JavaCompiler
 

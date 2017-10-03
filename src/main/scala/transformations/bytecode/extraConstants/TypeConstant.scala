@@ -1,47 +1,52 @@
 package transformations.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptorIndex, MethodInfoKey, MethodNameIndex}
 import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
-import transformations.bytecode.constants.NameAndTypeConstant.{NameAndTypeName, NameAndTypeType}
-import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8Constant}
+import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton, PrintByteCode}
+import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
 object TypeConstant extends ConstantEntry {
-  object MyKey extends NodeClass
+  object Key extends NodeClass
   object Type extends NodeField
 
-  def constructor(_type: Node) = new Node(MyKey, Type -> _type)
-  def getValue(constant: Node) = constant(Type).asInstanceOf[Node]
+  def constructor(_type: Node) = new Node(Key, Type -> _type)
 
-  override def key = MyKey
+  implicit class TypeConstantWrapper[T <: NodeLike](node: T) {
+    def value: T = node(Type).asInstanceOf[T]
+    def value_=(value: T): Unit = node(Type) = value
+  }
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def key = Key
+
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     val _type: Node = constant(Type).asInstanceOf[Node]
     val typeString = TypeSkeleton.getByteCodeString(state)(_type)
     PrintByteCode.toUTF8ConstantEntry(typeString)
   }
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
 
     ByteCodeSkeleton.getState(state).constantReferences.put(ByteCodeFieldInfo.FieldKey, Map(
-      NameIndex -> Utf8Constant.key,
+      NameIndex -> Utf8ConstantDelta.key,
       DescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(
-      MethodNameIndex -> Utf8Constant.key,
+      MethodNameIndex -> Utf8ConstantDelta.key,
       MethodDescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodTypeConstant.key, Map(
       MethodTypeDescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(NameAndTypeConstant.key, Map(
-      NameAndTypeName -> Utf8Constant.key,
-      NameAndTypeType -> TypeConstant.key))
+      NameAndTypeConstant.Name -> Utf8ConstantDelta.key,
+      NameAndTypeConstant.Type -> TypeConstant.key))
   }
+
+  override def dependencies = Set(MethodTypeConstant, NameAndTypeConstant, ByteCodeMethodInfo, ByteCodeFieldInfo)
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
@@ -49,4 +54,6 @@ object TypeConstant extends ConstantEntry {
   }
 
   override def description: String = "Adds the field descriptor constant. It contains the type of a field."
+
+  override def getName = "Utf8" //TODO do I want this?
 }

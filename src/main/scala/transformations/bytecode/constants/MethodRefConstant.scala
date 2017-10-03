@@ -1,52 +1,60 @@
 package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
+import transformations.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodRefConstant extends ConstantEntry {
 
   object MethodRefKey extends NodeClass
 
-  object MethodRefClassName extends NodeField
+  object ClassRef extends NodeField
 
-  object MethodRefMethodName extends NodeField
+  object NameAndType extends NodeField
 
-  override def getByteCode(constant: Node, state: CompilationState): Seq[Byte] = {
+  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(10) ++
       shortToBytes(getMethodRefClassRefIndex(constant)) ++
       shortToBytes(getNameAndTypeIndex(constant))
   }
 
+  implicit class MethodRefWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def nameAndType: NameAndTypeConstantWrapper[T] = node(NameAndType).asInstanceOf[T]
+    def nameAndType_=(value: NameAndTypeConstantWrapper[T]): Unit = node(NameAndType) = value
+  }
+
   override def key = MethodRefKey
 
   def methodRef(classNameIndex: Node, methodNameAndTypeIndex: Node) = new Node(MethodRefKey,
-    MethodRefClassName -> classNameIndex,
-    MethodRefMethodName -> methodNameAndTypeIndex)
+    ClassRef -> classNameIndex,
+    NameAndType -> methodNameAndTypeIndex)
 
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(MethodRefKey,
-    MethodRefClassName -> classNameIndex,
-    MethodRefMethodName -> methodNameAndTypeIndex)
+    ClassRef -> classNameIndex,
+    NameAndType -> methodNameAndTypeIndex)
 
-  def getMethodRefClassRefIndex(methodRef: Node): Int = methodRef(MethodRefClassName).asInstanceOf[Int]
+  def getMethodRefClassRefIndex(methodRef: Node): Int = methodRef(ClassRef).asInstanceOf[Int]
 
-  def getNameAndTypeIndex(methodRef: Node): Int = methodRef(MethodRefMethodName).asInstanceOf[Int]
+  def getNameAndTypeIndex(methodRef: Node): Int = methodRef(NameAndType).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = "method reference:" ~~>
-    (grammars.find(ConstantPoolIndexGrammar).as(MethodRefClassName) <~ "." ~
-    grammars.find(ConstantPoolIndexGrammar).as(MethodRefMethodName)) asNode MethodRefKey
+  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    (grammars.find(ConstantPoolIndexGrammar).as(ClassRef) <~ "." ~
+    grammars.find(ConstantPoolIndexGrammar).as(NameAndType)) asNode MethodRefKey
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     super.inject(state)
     ByteCodeSkeleton.getState(state).constantReferences.put(key,
-      Map(MethodRefClassName -> ClassInfoConstant.key, MethodRefMethodName -> NameAndTypeConstant.key))
+      Map(ClassRef -> ClassInfoConstant.key, NameAndType -> NameAndTypeConstant.key))
   }
+
+  override def getName = "Methodref"
 }
 
 

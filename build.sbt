@@ -2,7 +2,7 @@ name := "ParticleCompilerSbt"
 
 version := "1.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.3"
 
 scalacOptions += "-deprecation"
 scalacOptions += "-feature"
@@ -19,11 +19,11 @@ libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5"
 
 libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" //TODO add test mode
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
-libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.11.8"
+libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.12.3"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
 

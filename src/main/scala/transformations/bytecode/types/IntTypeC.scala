@@ -1,15 +1,15 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
+import core.bigrammar.{BiGrammar, Keyword}
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.CompilationState
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass}
 
 object IntTypeC extends TypeInstance with StackType {
 
   override val key = IntTypeKey
 
-  override def getSuperTypes(_type: Node, state: CompilationState): Seq[Node] = Seq.empty //TODO extend. long ?
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty //TODO extend. long ?
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("I", false) ~> produce(intType)
 
@@ -21,7 +21,7 @@ object IntTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object IntTypeKey extends Key
+  object IntTypeKey extends NodeClass
 
   override def description: String = "Defines the integer type."
 }

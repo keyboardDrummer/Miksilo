@@ -4,21 +4,21 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles._
 import core.particles.node.{Key, Node, NodeLike}
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.objects.NewByteCodeC
-import transformations.bytecode.coreInstructions.{DuplicateInstructionC, InvokeSpecialC}
+import transformations.bytecode.coreInstructions.objects.NewByteCodeDelta
+import transformations.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
-import transformations.bytecode.types.ObjectTypeC
+import transformations.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
 
   object NewCallKey extends Key
   object NewObject extends Key
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
-    val objectGrammar = grammars.find(ObjectTypeC.ObjectTypeJavaGrammar)
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
     val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).
       asNode(NewCallKey, NewObject, CallC.CallArguments)
@@ -26,15 +26,15 @@ object NewC extends ExpressionInstance {
     expressionGrammar.addOption(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeC, InvokeSpecialC) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
   override val key: Key = NewCallKey
 
-  override def getType(expression: Path, state: CompilationState): Node = {
+  override def getType(expression: Path, state: Language): Node = {
     expression(NewObject).asInstanceOf[Path]
   }
 
-  override def toByteCode(expression: Path, state: CompilationState): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+  override def toByteCode(expression: Path, state: Language): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val compiler = JavaClassSkeleton.getClassCompiler(state)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
     val objectType = getNewObject(expression)
@@ -45,8 +45,8 @@ object NewC extends ExpressionInstance {
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
 
     val methodKey = new MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
-    Seq(NewByteCodeC.newInstruction(classRef), DuplicateInstructionC.duplicate) ++ argumentInstructions ++
-      Seq(InvokeSpecialC.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
+    Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
+      Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }
 
   def getNewObject[T <: NodeLike](expression: T): T = {

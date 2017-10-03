@@ -2,24 +2,22 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.particles.node.Node
 import core.particles._
-import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.constants.ClassInfoConstant
-import transformations.javac.classes.skeleton.QualifiedClassName
-import util.TestUtils
+import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.extraConstants.QualifiedClassNameConstant
+import transformations.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
+import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
+import util.SourceUtils
 
 object RunWithJVM extends DeltaWithPhase
 {
-  override def transform(program: Node, state: CompilationState): Unit = {
-    val clazz: Node = state.program
-    val classRefIndex = ByteCodeSkeleton.getClassNameIndex(clazz)
+  override def transform(program: Node, state: Compilation): Unit = {
+    val clazz: ByteCodeWrapper[Node] = state.program
+    val classRefIndex = clazz.classInfoIndex
     val constantPool = clazz.constantPool
-    val classNameIndex = ClassInfoConstant.getNameIndex(constantPool.getValue(classRefIndex).asInstanceOf[Node])
-    val className = QualifiedClassNameConstant.get(constantPool.getValue(classNameIndex).asInstanceOf[Node]).toString
-    state.output = TestUtils.runByteCode(className, clazz)
+    val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex
+    val className = new QualifiedClassNameConstant(constantPool.getValue(classNameIndex).asInstanceOf[Node]).value.toString
+    state.output = SourceUtils.runByteCode(className, clazz)
   }
 
   override def description: String = "Takes the bytecode program and runs it using the JVM."
@@ -28,7 +26,7 @@ object RunWithJVM extends DeltaWithPhase
 object CompileAndRunOption extends CompileOption {
 
   override def perform(cockpit: CompilerCockpit, inputStream: InputStream): TextWithGrammar = {
-    val compiler = new CompilerFromParticles(cockpit.particles ++ Seq(RunWithJVM))
+    val compiler = new CompilerFromDeltas(cockpit.particles ++ Seq(RunWithJVM))
     val state = compiler.parseAndTransform(inputStream)
 
     TextWithGrammar(state.output)

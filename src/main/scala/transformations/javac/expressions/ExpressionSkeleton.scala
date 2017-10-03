@@ -10,19 +10,19 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
-  implicit class Expression(val node: Node) extends AnyVal with NodeWrapper
+  implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
-  def getType(state: CompilationState): Path => Node = expression => {
+  def getType(state: Language): Path => Node = expression => {
     getState(state).instances(expression.clazz).getType(expression, state)
   }
 
-  def getToInstructions(state: CompilationState): Path => Seq[Node] = {
+  def getToInstructions(state: Language): Path => Seq[Node] = {
     expression => getState(state).instances(expression.clazz).toByteCode(expression, state)
   }
 
-  def getToInstructionsRegistry(state: CompilationState) = getState(state).instances
+  def getToInstructionsRegistry(state: Language) = getState(state).instances
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit =  {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val core = grammars.create(CoreGrammar)
     grammars.create(ExpressionGrammar, core)
   }

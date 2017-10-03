@@ -3,7 +3,7 @@ package transformations.bytecode
 import java.math.BigInteger
 
 import com.google.common.primitives.{Ints, Longs}
-import core.particles.CompilationState
+import core.particles.Language
 import core.particles.node.Node
 import transformations.javac.classes.skeleton.QualifiedClassName
 import transformations.bytecode.ByteCodeSkeleton._
@@ -19,9 +19,9 @@ object PrintByteCode {
 
   val versionNumber: Seq[Byte] = intToBytes(0x00000033)
 
-  def getBytes(byteCode: Node, state: CompilationState): Seq[Byte] = {
+  def getBytes(byteCode: Node, state: Language): Seq[Byte] = {
 
-    val clazz = byteCode
+    val clazz = new ByteCodeWrapper(byteCode)
     def getBytes(byteCode: Node): Seq[Byte] = {
       var result = List[Byte]()
 
@@ -34,24 +34,24 @@ object PrintByteCode {
         result ++= getConstantEntryByteCode(constantPoolEntry)
       }
       result ++= getAccessFlagsByteCode(clazz)
-      result ++= shortToBytes(ByteCodeSkeleton.getClassNameIndex(clazz))
-      result ++= shortToBytes(ByteCodeSkeleton.getParentIndex(clazz))
+      result ++= shortToBytes(clazz.classInfoIndex)
+      result ++= shortToBytes(clazz.parentIndex)
       result ++= getInterfacesByteCode(clazz)
       result ++= getFieldsByteCode(clazz)
       result ++= getMethodsByteCode(clazz)
-      result ++= getAttributesByteCode(state, ByteCodeSkeleton.getClassAttributes(clazz))
+      result ++= getAttributesByteCode(state, clazz.attributes)
       result
     }
 
-    def getMethodsByteCode(clazz: Node): Seq[Byte] = {
-      val methods = ByteCodeSkeleton.getMethods(clazz)
+    def getMethodsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
+      val methods = clazz.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
         ByteCodeSkeleton.getState(state).getBytes(method.clazz)(method)
       })
     }
 
-    def getFieldsByteCode(clazz: Node): Seq[Byte] = {
-      val fields = ByteCodeSkeleton.getClassFields(clazz)
+    def getFieldsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
+      val fields = clazz.fields
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
         ByteCodeSkeleton.getState(state).getBytes(field.clazz)(field)
       })
@@ -78,7 +78,7 @@ object PrintByteCode {
   }
 
   def getInterfacesByteCode(clazz: Node): Seq[Byte] = {
-    val interfaces = ByteCodeSkeleton.getClassInterfaces(clazz)
+    val interfaces = clazz.interfaceIndices
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
@@ -95,7 +95,7 @@ object PrintByteCode {
 
   def getExceptionByteCode(exception: Node): Seq[Byte] = ???
 
-  def getAttributesByteCode(state: CompilationState, attributes: Seq[Node]): Seq[Byte] = {
+  def getAttributesByteCode(state: Language, attributes: Seq[Node]): Seq[Byte] = {
 
     def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++

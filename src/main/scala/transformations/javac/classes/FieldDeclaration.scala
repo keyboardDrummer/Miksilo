@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, Node}
-import core.particles.{CompilationState, Contract, DeltaWithGrammar}
+import core.particles.{Language, Contract, DeltaWithGrammar}
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
@@ -19,7 +19,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
 
   def field(_type: Node, name: String) = new Node(FieldKey, FieldType -> _type, FieldName -> name)
   
-    def bind(state: CompilationState, signature: ClassSignature, clazz: Node): Unit = {
+    def bind(state: Language, signature: ClassSignature, clazz: Node): Unit = {
 
     val fields = getFields(clazz)
     for (field <- fields)
@@ -44,7 +44,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     clazz.members.filter(member => member.clazz == FieldKey)
   }
 
-  def compile(state: CompilationState, clazz: Node) = {
+  def compile(state: Language, clazz: Node) = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(state)
 
     val fields = getFields(clazz)
@@ -54,7 +54,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     })
   }
   
-  def convertField(field: Node, classCompiler: ClassCompiler, state: CompilationState) {
+  def convertField(field: Node, classCompiler: ClassCompiler, state: Language) {
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
@@ -69,7 +69,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     field.data.remove(FieldType)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 

@@ -1,24 +1,23 @@
 package transformations.javac.methods.assignment
 
-import core.particles.grammars.GrammarCatalogue
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.Node
 import core.particles.path.Path
-import transformations.bytecode.coreInstructions.integers.StoreIntegerC
-import transformations.bytecode.coreInstructions.longs.StoreLongC
-import transformations.bytecode.coreInstructions.objects.StoreAddressC
-import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
+import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
+import transformations.bytecode.coreInstructions.longs.StoreLongDelta
+import transformations.bytecode.coreInstructions.objects.StoreAddressDelta
 import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
 import transformations.bytecode.types.IntTypeC.IntTypeKey
 import transformations.bytecode.types.LongTypeC.LongTypeKey
-import transformations.bytecode.types.ObjectTypeC.ObjectTypeKey
-import transformations.bytecode.types.TypeSkeleton
+import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
-  override def inject(state: CompilationState): Unit = {
+  override def inject(state: Language): Unit = {
     AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Path) => {
       val methodCompiler = MethodC.getMethodCompiler(state)
       val target = VariableC.getVariableName(targetVariable)
@@ -31,14 +30,14 @@ object AssignToVariable extends DeltaWithGrammar {
 
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.clazz match {
-      case IntTypeKey => StoreIntegerC.integerStore(variableInfo.offset)
-      case ObjectTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-      case ArrayTypeKey => StoreAddressC.addressStore(variableInfo.offset)
-      case LongTypeKey => StoreLongC.longStore(variableInfo.offset)
+      case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
+      case ObjectTypeDelta.ObjectStackType => StoreAddressDelta.addressStore(variableInfo.offset)
+      case ArrayTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
+      case LongTypeKey => StoreLongDelta.longStore(variableInfo.offset)
     }
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
     targetGrammar.addOption(variableGrammar)

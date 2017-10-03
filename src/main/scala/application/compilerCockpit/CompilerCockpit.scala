@@ -12,7 +12,7 @@ import core.bigrammar.BiGrammarToGrammar
 import core.grammar.Grammar
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.particles.exceptions.CompileException
-import core.particles.{CompilerFromParticles, Delta}
+import core.particles.{CompilerFromDeltas, Delta}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import transformations.bytecode.ByteCodeSkeleton
@@ -26,7 +26,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Delta],
   extends Frame {
 
   this.title = name
-  val compiler = new CompilerFromParticles(particles)
+  val compiler = new CompilerFromDeltas(particles)
   val grammar = BiGrammarToGrammar.toGrammar(compiler.getGrammar)
   val factory = new TokenMakerFactoryFromGrammar(grammar)
 

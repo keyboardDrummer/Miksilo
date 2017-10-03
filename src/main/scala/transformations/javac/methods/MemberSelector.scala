@@ -14,7 +14,7 @@ object MemberSelector extends DeltaWithGrammar with WithState {
 
   def getSelectorMember(selector: Node) = selector(SelectorMember).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: CompilationState): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selection = (expression <~ ".") ~ identifier asNode(SelectorKey, SelectorObject, SelectorMember)
     grammars.create(SelectGrammar, selection)
@@ -53,7 +53,7 @@ object MemberSelector extends DeltaWithGrammar with WithState {
     new ClassOrObjectReference(classInfo, false)
   }
 
-  def getReferenceKindRegistry(state: CompilationState) = getState(state).referenceKindRegistry
+  def getReferenceKindRegistry(state: Language) = getState(state).referenceKindRegistry
   class State {
     val referenceKindRegistry = new ClassRegistry[Path => ReferenceKind]()
   }

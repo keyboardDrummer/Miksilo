@@ -7,5 +7,5 @@ trait WithState {
 
   type ClassRegistry[Registration] = mutable.HashMap[Any, Registration]
   def createState: State
-  def getState(state: CompilationState) = state.data.getOrElseUpdate(this, createState).asInstanceOf[State]
+  def getState(state: Language): State = state.data.getOrElseUpdate(this, createState).asInstanceOf[State]
 }

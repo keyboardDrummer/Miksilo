@@ -1,129 +1,165 @@
 class 52 extends 0 with interfaces: ()
-
-constant pool:
-  #1: integer: 500000
-  #2: integer: 999999
-  #3: string at index: 17
-  #4: string at index: 39
-  #5: string at index: 43
-  #6: "()I"
-  #7: "()Ljava/lang/Object;"
-  #8: "()Ljava/lang/String;"
-  #9: "()V"
-  #10: "(I)Ljava/lang/String;"
-  #11: "(J)V"
-  #12: "(JI)V"
-  #13: "(Ljava/lang/Object;)Z"
-  #14: "(Ljava/lang/String;)V"
-  #15: "<clinit>"
-  #16: "<init>"
-  #17: "@"
-  #18: "Code"
-  #19: "Exceptions"
-  #20: "LineNumberTable"
-  #21: "Signature"
-  #22: "SourceFile"
-  #23: "StackMapTable"
-  #24: "append"
-  #25: "clone"
-  #26: "equals"
-  #27: "finalize"
-  #28: "getClass"
-  #29: "getName"
-  #30: "hashCode"
-  #31: "java/lang/Class"
-  #32: "java/lang/CloneNotSupportedException"
-  #33: "java/lang/IllegalArgumentException"
-  #34: "java/lang/Integer"
-  #35: "java/lang/InterruptedException"
-  #36: "java/lang/Object"
-  #37: "java/lang/StringBuilder"
-  #38: "java/lang/Throwable"
-  #39: "nanosecond timeout value out of range"
-  #40: "notify"
-  #41: "notifyAll"
-  #42: "registerNatives"
-  #43: "timeout value is negative"
-  #44: "toHexString"
-  #45: "toString"
-  #46: "wait"
-  #47: class reference: 31
-  #48: class reference: 32
-  #49: class reference: 33
-  #50: class reference: 34
-  #51: class reference: 35
-  #52: class reference: 36
-  #53: class reference: 37
-  #54: class reference: 38
-  #55: "()Ljava/lang/Class;"
-  #56: "()Ljava/lang/Class<*>;"
-  #57: "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
-  #58: name and type: 30:6
-  #59: name and type: 16:9
-  #60: name and type: 42:9
-  #61: name and type: 46:11
-  #62: name and type: 28:55
-  #63: name and type: 29:8
-  #64: name and type: 45:8
-  #65: name and type: 44:10
-  #66: name and type: 16:14
-  #67: name and type: 24:57
-  #68: method reference: 47.63
-  #69: method reference: 49.66
-  #70: method reference: 50.65
-  #71: method reference: 52.58
-  #72: method reference: 52.60
-  #73: method reference: 52.61
-  #74: method reference: 52.62
-  #75: method reference: 53.59
-  #76: method reference: 53.64
-  #77: method reference: 53.67
-  #78: "Object.java"
-
-fields:
-
-methods:
-  method => nameIndex:16, descriptorIndex:9, flags:
-  attributes:
+Constant pool:
+  Integer 500000
+  Integer 999999
+  String 17
+  String 39
+  String 43
+  Utf8 "()I"
+  Utf8 "()Ljava/lang/Object;"
+  Utf8 "()Ljava/lang/String;"
+  Utf8 "()V"
+  Utf8 "(I)Ljava/lang/String;"
+  Utf8 "(J)V"
+  Utf8 "(JI)V"
+  Utf8 "(Ljava/lang/Object;)Z"
+  Utf8 "(Ljava/lang/String;)V"
+  Utf8 <clinit>
+  Utf8 <init>
+  Utf8 "@"
+  Utf8 Code
+  Utf8 Exceptions
+  Utf8 LineNumberTable
+  Utf8 Signature
+  Utf8 SourceFile
+  Utf8 StackMapTable
+  Utf8 append
+  Utf8 clone
+  Utf8 equals
+  Utf8 finalize
+  Utf8 getClass
+  Utf8 getName
+  Utf8 hashCode
+  Utf8 "java/lang/Class"
+  Utf8 "java/lang/CloneNotSupportedException"
+  Utf8 "java/lang/IllegalArgumentException"
+  Utf8 "java/lang/Integer"
+  Utf8 "java/lang/InterruptedException"
+  Utf8 "java/lang/Object"
+  Utf8 "java/lang/StringBuilder"
+  Utf8 "java/lang/Throwable"
+  Utf8 "nanosecond timeout value out of range"
+  Utf8 notify
+  Utf8 notifyAll
+  Utf8 registerNatives
+  Utf8 "timeout value is negative"
+  Utf8 toHexString
+  Utf8 toString
+  Utf8 wait
+  Class 31
+  Class 32
+  Class 33
+  Class 34
+  Class 35
+  Class 36
+  Class 37
+  Class 38
+  Utf8 "()Ljava/lang/Class;"
+  Utf8 "()Ljava/lang/Class<*>;"
+  Utf8 "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+  NameAndType 30:6
+  NameAndType 16:9
+  NameAndType 42:9
+  NameAndType 46:11
+  NameAndType 28:55
+  NameAndType 29:8
+  NameAndType 45:8
+  NameAndType 44:10
+  NameAndType 16:14
+  NameAndType 24:57
+  Methodref 47.63
+  Methodref 49.66
+  Methodref 50.65
+  Methodref 52.58
+  Methodref 52.60
+  Methodref 52.61
+  Methodref 52.62
+  Methodref 53.59
+  Methodref 53.64
+  Methodref 53.67
+  Utf8 "Object.java"
+{
+  Method;
+    name: 16
+    descriptor: 9
+    flags:
     UnParsed attribute with nameIndex: 18
-  method => nameIndex:42, descriptorIndex:9, flags:
-  attributes:
-  method => nameIndex:28, descriptorIndex:55, flags:
-  attributes:
+
+  Method;
+    name: 42
+    descriptor: 9
+    flags:
+
+  Method;
+    name: 28
+    descriptor: 55
+    flags:
     UnParsed attribute with nameIndex: 21
-  method => nameIndex:30, descriptorIndex:6, flags:
-  attributes:
-  method => nameIndex:26, descriptorIndex:13, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-  method => nameIndex:25, descriptorIndex:7, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 19
-  method => nameIndex:45, descriptorIndex:8, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-  method => nameIndex:40, descriptorIndex:9, flags:
-  attributes:
-  method => nameIndex:41, descriptorIndex:9, flags:
-  attributes:
-  method => nameIndex:46, descriptorIndex:11, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 19
-  method => nameIndex:46, descriptorIndex:12, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
-  method => nameIndex:46, descriptorIndex:9, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
-  method => nameIndex:27, descriptorIndex:9, flags:
-  attributes:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
-  method => nameIndex:15, descriptorIndex:9, flags:
-  attributes:
+
+  Method;
+    name: 30
+    descriptor: 6
+    flags:
+
+  Method;
+    name: 26
+    descriptor: 13
+    flags:
     UnParsed attribute with nameIndex: 18
 
-attributes:
+  Method;
+    name: 25
+    descriptor: 7
+    flags:
+    UnParsed attribute with nameIndex: 19
+
+  Method;
+    name: 45
+    descriptor: 8
+    flags:
+    UnParsed attribute with nameIndex: 18
+
+  Method;
+    name: 40
+    descriptor: 9
+    flags:
+
+  Method;
+    name: 41
+    descriptor: 9
+    flags:
+
+  Method;
+    name: 46
+    descriptor: 11
+    flags:
+    UnParsed attribute with nameIndex: 19
+
+  Method;
+    name: 46
+    descriptor: 12
+    flags:
+    UnParsed attribute with nameIndex: 18
+    UnParsed attribute with nameIndex: 19
+
+  Method;
+    name: 46
+    descriptor: 9
+    flags:
+    UnParsed attribute with nameIndex: 18
+    UnParsed attribute with nameIndex: 19
+
+  Method;
+    name: 27
+    descriptor: 9
+    flags:
+    UnParsed attribute with nameIndex: 18
+    UnParsed attribute with nameIndex: 19
+
+  Method;
+    name: 15
+    descriptor: 9
+    flags:
+    UnParsed attribute with nameIndex: 18
   UnParsed attribute with nameIndex: 22
+}
