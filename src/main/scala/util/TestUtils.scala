@@ -206,7 +206,10 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
     var line: String = ""
     val logger = ProcessLogger(
-      (o: String) => line += o,
+      (o: String) => {
+        if (!o.contains("Picked up _JAVA_OPTIONS"))
+          line += o
+      },
       (e: String) =>
         if (!e.contains("Picked up _JAVA_OPTIONS"))
           line += e
