@@ -25,9 +25,9 @@ libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
 libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.12.3"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
+libraryDependencies += "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "2.0.0-M2"
+libraryDependencies += "org.scala-lang.modules" % "scala-swing_2.12" % "2.0.0"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
 

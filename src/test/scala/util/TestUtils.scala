@@ -34,7 +34,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
 
   def testInstructionEquivalence(expectedByteCode: ByteCodeWrapper[Node], compiledCode: ByteCodeWrapper[Node]) {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
-      assert(new ComparisonOptions(false, true, false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
+      assert(ComparisonOptions(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }
   }
 
@@ -149,7 +149,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     assertResult(expectedConstantPoolSet.length)(compiledConstantPoolSet.length)
     assert(expectedConstantPoolSet.forall(expectedItem => {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem =>
-        ComparisonOptions(compareIntegers = false,takeAllLeftKeys = false,takeAllRightKeys = true).deepEquality(compiledItem, expectedItem))
+        ComparisonOptions(compareIntegers = false, takeAllLeftKeys = false).deepEquality(compiledItem, expectedItem))
       hasEquivalent
     }), s"$expectedConstantPoolSet was not $compiledConstantPoolSet")
   }
