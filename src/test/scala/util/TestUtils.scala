@@ -11,9 +11,10 @@ import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.PrintByteCode
 import transformations.javac.JavaCompiler
+import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
-import scala.sys.process.{Process, ProcessLogger}
+import scala.sys.process.Process
 
 object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompiler.javaCompilerTransformations)) {
 }
@@ -128,24 +129,18 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
 
   def runJavaP(input: File): String = {
     val processBuilder = Process.apply(s"javap -v $input")
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o + "\n",
-      (e: String) => line += e + "\n")
+    val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
-    assertResult(0, line)(exitValue)
-    line
+    assertResult(0, logger.line)(exitValue)
+    logger.line
   }
 
   def runJavaC(directory: Path, input: File, output: Path): String = {
     val processBuilder = Process.apply(s"javac -d $output $input", directory.jfile)
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o,
-      (e: String) => line += e)
+    val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
-    assertResult(0, s"Java compiler did not exit successfully.\nMessage was $line")(exitValue)
-    line
+    assertResult(0, s"Java compiler did not exit successfully.\nMessage was ${logger.line}")(exitValue)
+    logger.line
   }
 
   def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
@@ -156,7 +151,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem =>
         ComparisonOptions(compareIntegers = false,takeAllLeftKeys = false,takeAllRightKeys = true).deepEquality(compiledItem, expectedItem))
       hasEquivalent
-    }), s"${expectedConstantPoolSet} was not ${compiledConstantPoolSet}")
+    }), s"$expectedConstantPoolSet was not $compiledConstantPoolSet")
   }
 
 }

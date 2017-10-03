@@ -16,14 +16,31 @@ object SourceUtils {
     SourceUtils.getTestFile(relativeFilePath)
   }
 
+  class LineProcessLogger extends ProcessLogger {
+    var line = ""
+
+    /** Will be called with each line read from the process output stream.
+      */
+    def out(s: => String): Unit = {
+      if (!s.contains("Picked up _JAVA_OPTIONS"))
+        line += s
+    }
+
+    /** Will be called with each line read from the process error stream.
+      */
+    def err(s: => String): Unit = {
+      if (!s.contains("Picked up _JAVA_OPTIONS"))
+        line += s
+    }
+
+    def buffer[T](f: => T): T = f
+  }
+
   def runJavaClass(className: String, directory: Path): String = {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o,
-      (e: String) => line += e)
-    val exitValue = processBuilder ! logger
-    line
+    val logger = new LineProcessLogger()
+    processBuilder ! logger
+    logger.line
   }
 
   def getBytes(byteCode: Node): Seq[Byte] = {
