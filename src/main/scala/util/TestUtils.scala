@@ -218,6 +218,7 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
   def runJavaClass(className: String, directory: Path): String = {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
     val logger = new LineProcessLogger()
+    processBuilder ! logger
     logger.line
   }
 
