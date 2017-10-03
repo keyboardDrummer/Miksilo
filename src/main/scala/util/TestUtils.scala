@@ -181,41 +181,44 @@ class TestUtils(val compiler: CompilerFromParticles) extends FunSuite {
 
   def runJavaP(input: File): String = {
     val processBuilder = Process.apply(s"javap -v $input")
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o + "\n",
-      (e: String) => line += e + "\n")
+    val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
-    assertResult(0, line)(exitValue)
-    line
+    assertResult(0, logger.line)(exitValue)
+    logger.line
   }
 
   def runJavaC(directory: Path, input: File, output: Path): String = {
     val processBuilder = Process.apply(s"javac -d $output $input", directory.jfile)
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => line += o,
-      (e: String) => line += e)
+    val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
-    assertResult(0, s"Java compiler did not exit successfully.\nMessage was $line")(exitValue)
-    line
+    assertResult(0, s"Java compiler did not exit successfully.\nMessage was ${logger.line}")(exitValue)
+    logger.line
   }
 
+  class LineProcessLogger extends ProcessLogger {
+    var line = ""
+
+    /** Will be called with each line read from the process output stream.
+      */
+    def out(s: => String): Unit = {
+      if (!s.contains("Picked up _JAVA_OPTIONS"))
+        line += s
+    }
+
+    /** Will be called with each line read from the process error stream.
+      */
+    def err(s: => String): Unit = {
+      if (!s.contains("Picked up _JAVA_OPTIONS"))
+        line += s
+    }
+
+    def buffer[T](f: => T): T = f
+  }
 
   def runJavaClass(className: String, directory: Path): String = {
     val processBuilder = Process.apply(s"java $className", directory.jfile)
-    var line: String = ""
-    val logger = ProcessLogger(
-      (o: String) => {
-        if (!o.contains("Picked up _JAVA_OPTIONS"))
-          line += o
-      },
-      (e: String) =>
-        if (!e.contains("Picked up _JAVA_OPTIONS"))
-          line += e
-    )
-    val exitValue = processBuilder ! logger
-    line
+    val logger = new LineProcessLogger()
+    logger.line
   }
 
   def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
