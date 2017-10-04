@@ -161,7 +161,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType ~~ identifier asNode(ParameterKey, ParameterTypeKey, ParameterNameKey)
-    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") <~ ")")
+    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
     val parseStatic = grammars.create(StaticGrammar, "static" ~~> produce(true) | produce(false))
 
     val visibilityModifier = grammars.create(VisibilityGrammar,

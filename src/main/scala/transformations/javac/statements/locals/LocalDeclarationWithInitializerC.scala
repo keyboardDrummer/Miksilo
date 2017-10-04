@@ -21,7 +21,7 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseDeclarationWithInitializer = grammars.create(this, (typeGrammar ~~ identifier ~~ ("=" ~~> expression) <~ ";").
+    val parseDeclarationWithInitializer = grammars.create(this, (typeGrammar ~~ identifier ~~ ("=" ~~> expression) ~< ";").
       asNode(DeclarationWithInitializerKey, DeclarationType, DeclarationName, InitializerKey))
     statement.addOption(parseDeclarationWithInitializer)
   }

@@ -14,7 +14,7 @@ object SelectInnerClassC extends DeltaWithGrammar {
 
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {
     val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)
-    val selectInnerGrammar = (objectInner <~ "." ~~ objectInner).asNode(SelectInnerClass, ParentClass, ChildClass)
+    val selectInnerGrammar = (objectInner ~< "." ~~ objectInner).asNode(SelectInnerClass, ParentClass, ChildClass)
 
     objectInner.addOption(selectInnerGrammar)
   }

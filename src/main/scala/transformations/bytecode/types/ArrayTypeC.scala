@@ -21,7 +21,7 @@ object ArrayTypeC extends TypeInstance with StackType {
 
   override def getJavaGrammar(grammars: GrammarCatalogue): ArrayTypeC.NodeGrammar = {
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    (parseType <~ "[]").asNode(ArrayTypeKey, ArrayElementType)
+    (parseType ~< "[]").asNode(ArrayTypeKey, ArrayElementType)
   }
 
   def arrayType(elementType: Node): Node = {

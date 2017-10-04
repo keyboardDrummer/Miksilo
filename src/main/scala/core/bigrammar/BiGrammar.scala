@@ -16,16 +16,16 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   lazy val height = 1
 
-  def <~(right: BiGrammar) = new Sequence(this, right).ignoreRight
+  def ~<(right: BiGrammar) = new Sequence(this, right).ignoreRight
 
-  def <~~(right: BiGrammar) = this <~ (space ~ right)
+  def ~~<(right: BiGrammar) = this ~< (space ~ right)
 
   def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
 
   def |(other: BiGrammar) = new Choice(this, other)
 
   def ~~(right: BiGrammar): BiGrammar = {
-    (this <~ space) ~ right
+    (this ~< space) ~ right
   }
 
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
@@ -55,7 +55,7 @@ trait BiGrammar extends GrammarDocumentWriter {
     })
   def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))
 
-  def inParenthesis = ("(": BiGrammar) ~> this <~ ")"
+  def inParenthesis = ("(": BiGrammar) ~> this ~< ")"
 
   def ~(other: BiGrammar) = new Sequence(this, other)
 

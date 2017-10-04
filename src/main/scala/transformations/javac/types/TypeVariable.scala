@@ -23,7 +23,7 @@ object TypeVariable extends DeltaWithGrammar {
 
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    byteCodeType.addOption(new Keyword("T", false) ~> identifier <~ ";" asNode(TypeVariableKey, TypeVariableName))
+    byteCodeType.addOption(new Keyword("T", false) ~> identifier ~< ";" asNode(TypeVariableKey, TypeVariableName))
   }
 
   def getTypeVariableName(node: Node): String = {

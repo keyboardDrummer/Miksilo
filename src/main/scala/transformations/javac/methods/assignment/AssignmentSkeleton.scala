@@ -23,7 +23,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val assignmentInner = (targetGrammar <~~ "=") ~~ expressionGrammar
+    val assignmentInner = (targetGrammar ~~< "=") ~~ expressionGrammar
     val assignmentGrammar = nodeGrammar(assignmentInner, AssignmentKey, AssignmentTarget, AssignmentValue)
     expressionGrammar.addOption(assignmentGrammar)
   }

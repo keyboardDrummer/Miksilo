@@ -56,7 +56,7 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
 
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled("expression")
-    val parenthesis: BiGrammar = "(" ~> expression <~ ")"
+    val parenthesis: BiGrammar = "(" ~> expression ~< ")"
 
 
     val number: BiGrammar = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
@@ -65,7 +65,7 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
     })
 
     val multipleLabel = new Labelled("multiply")
-    val multiply = (multipleLabel <~~ "*") ~~ multipleLabel ^^( {
+    val multiply = (multipleLabel ~~< "*") ~~ multipleLabel ^^( {
       case core.grammar.~(l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
       case Multiply(l, r) => Some(core.grammar.~(l, r))
@@ -76,7 +76,7 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
     multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled("add")
-    val add: BiGrammar = (addLabel <~~ "+") ~~ addLabel ^^( {
+    val add: BiGrammar = (addLabel ~~< "+") ~~ addLabel ^^( {
       case core.grammar.~(l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
       case Add(l, r) => Some(core.grammar.~(l, r))

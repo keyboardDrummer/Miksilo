@@ -42,7 +42,7 @@ trait GenericCall extends ExpressionInstance {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)
     val calleeGrammar = grammars.create(CallC.CallCallee, selectorGrammar)
-    val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") <~ ")")
+    val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
     val parseCall = calleeGrammar ~ callArguments asNode(CallC.CallKey, CallC.CallCallee, CallC.CallArguments)
     core.addOption(parseCall)
   }

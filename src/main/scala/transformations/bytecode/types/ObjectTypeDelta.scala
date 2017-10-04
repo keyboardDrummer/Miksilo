@@ -56,7 +56,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
       (QualifiedClassNameConstantDelta.getQualifiedClassNameParser ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
-    val grammar: BiGrammar = Keyword("L", false) ~> inner <~ ";"
+    val grammar: BiGrammar = Keyword("L", false) ~> inner ~< ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 

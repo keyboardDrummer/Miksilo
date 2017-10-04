@@ -16,7 +16,7 @@ object BasicImportC extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".").asNode(ImportKey, ElementsKey))
-    val basicImport = "import" ~~> importPath <~ ";"
+    val basicImport = "import" ~~> importPath ~< ";"
     grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
   }
 

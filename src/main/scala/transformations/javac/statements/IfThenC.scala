@@ -49,7 +49,7 @@ object IfThenC extends StatementInstance {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
-    val ifThenGrammar = grammars.create(this, ("if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar).
+    val ifThenGrammar = grammars.create(this, ("if" ~> ("(" ~> expressionGrammar ~< ")") ~ bodyGrammar).
       asNode(IfThenKey, ConditionKey, ThenKey))
     statementGrammar.addOption(ifThenGrammar)
   }
