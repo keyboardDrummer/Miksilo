@@ -1,6 +1,6 @@
 package core.grammar
 
-import core.bigrammar.TestGrammarUtils
+import core.bigrammar.TestCompilerGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
@@ -16,12 +16,12 @@ import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
+  extends TestCompilerGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
 {
 
   test("BasicClass") {
     val input = "package bla; class Help {}"
-    val result = TestGrammarUtils.getGrammarResult(input)
+    val result = TestCompilerGrammarUtils.getGrammarResult(input)
     val expectation = JavaClassSkeleton.clazz(Seq("bla"), "Help")
     assertResult(expectation)(result)
   }
@@ -101,7 +101,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = TestGrammarUtils.getGrammarResult(input, MethodC.MethodGrammar)
+    val result = TestCompilerGrammarUtils.getGrammarResult(input, MethodC.MethodGrammar)
     result
   }
 

@@ -18,32 +18,32 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("SimpleForLoop") {
     val testFileContent = SourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
-    TestGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("While") {
     val testFileContent = SourceUtils.getJavaTestFileContents("Whilee", Path(""))
-    TestGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Fibonacci") {
     val testFileContent = SourceUtils.getJavaTestFileContents("Fibonacci", Path(""))
-    TestGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Ternary") {
     val input = "1 ? 2 : 3"
-    TestGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
   test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
-    TestGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
   }
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
   }
 
   test("PrintAfterImplicitAddition") {

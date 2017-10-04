@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
@@ -11,9 +12,9 @@ import util.TestUtils
 
 import scala.util.parsing.input.CharArrayReader
 
-object TestGrammarUtils extends TestGrammarUtils(JavaCompiler.javaCompilerTransformations)
+object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompiler.javaCompilerTransformations)
 
-case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
+object TestGrammarUtils extends FunSuite {
 
   def parseAndPrintSame(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar): Unit = {
     val documentResult: String = parseAndPrint(example, expectedOption, grammarDocument)
@@ -35,6 +36,9 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
     val documentResult = BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
     documentResult
   }
+}
+
+case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: Any = ProgramGrammar) {
     parseAndPrintSame(input, expected, getGrammarUsingTransformer(grammarTransformer))
@@ -54,7 +58,7 @@ case class TestGrammarUtils(particles: Seq[Delta]) extends FunSuite {
     compiler.parse(TestUtils.stringToInputStream(input))
   }
 
-  def getTransformations(key: Any) = {
+  def getTransformations(key: Any): Seq[Delta] = {
     Seq(new SelectorTransformation(key)) ++ particles
   }
 

@@ -1,6 +1,6 @@
 package transformations.javac.statement
 
-import core.bigrammar.TestGrammarUtils
+import core.bigrammar.TestCompilerGrammarUtils
 import core.particles.grammars.KeyGrammar
 import org.scalatest.FunSuite
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar

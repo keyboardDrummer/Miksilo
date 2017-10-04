@@ -1,19 +1,19 @@
 package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
-import core.bigrammar.TestGrammarUtils
+import core.bigrammar.{TestCompilerGrammarUtils, TestGrammarUtils}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC
-import util.{CompilerBuilder, TestUtils, SourceUtils}
+import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
 
 class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
 
-  val testGrammar = TestGrammarUtils(this.compiler.deltas)
+  val testGrammar = TestCompilerGrammarUtils(this.compiler.deltas)
 
   test("BasicClass") {
     val input = "/* jooo */"
@@ -32,7 +32,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("relational") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       JavaCompiler.javaCompilerTransformations))
-    val grammarUtils = TestGrammarUtils(utils.compiler.deltas)
+    val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
   }
@@ -41,7 +41,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
       JavaCompiler.allByteCodeTransformations))
-    val grammarUtils = TestGrammarUtils(utils.compiler.deltas)
+    val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -52,7 +52,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionC, SubtractionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
       JavaCompiler.allByteCodeTransformations))
-    val grammarUtils = TestGrammarUtils(utils.compiler.deltas)
+    val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -63,7 +63,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(SubtractionC, AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
     JavaCompiler.allByteCodeTransformations))
-    val grammarUtils = TestGrammarUtils(utils.compiler.deltas)
+    val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -73,7 +73,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("addition4") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       JavaCompiler.javaCompilerTransformations))
-    val grammarUtils = TestGrammarUtils(utils.compiler.deltas)
+    val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -82,13 +82,13 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("comparePrintResultWithoutComment") {
     val input = SourceUtils.getJavaTestFileContents("Whilee")
-    val result = testGrammar.parseAndPrint(input, None, TestGrammarUtils.getGrammarUsingTransformer())
+    val result = TestGrammarUtils.parseAndPrint(input, None, TestCompilerGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 
   test("comparePrintResult") {
     val input = SourceUtils.getJavaTestFileContents("WhileeWithComment.java")
-    val result = testGrammar.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
+    val result = TestGrammarUtils.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
 

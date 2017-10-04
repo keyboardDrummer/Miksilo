@@ -11,7 +11,7 @@ class TestMetaObject extends FunSuite {
   test("Equals") {
     val first = new Node(ClazzKey, FieldKey -> FieldValue)
     val second = new Node(ClazzKey, FieldKey -> FieldValue)
-    assertResult(first)( second)
+    assertResult(first)(second)
   }
 
   test("EqualsOnJavaModel") {
