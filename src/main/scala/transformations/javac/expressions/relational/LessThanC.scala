@@ -2,7 +2,7 @@ package transformations.javac.expressions.relational
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import transformations.bytecode.extraBooleanInstructions.{GreaterThanInstructionC, LessThanInstructionC}
@@ -44,11 +44,11 @@ object GreaterThanC extends ExpressionInstance {
 
   def lessThan(first: Node, second: Node) = new Node(GreaterThanKey, GreaterThanFirst -> first, GreaterThanSecond -> second)
 
-  object GreaterThanKey extends Key
+  object GreaterThanKey extends NodeClass
 
-  object GreaterThanFirst extends Key
+  object GreaterThanFirst extends NodeField
 
-  object GreaterThanSecond extends Key
+  object GreaterThanSecond extends NodeField
 
   override def description: String = "Adds the > operator."
 }
@@ -87,11 +87,11 @@ object LessThanC extends ExpressionInstance {
 
   def lessThan(first: Node, second: Node) = new Node(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
 
-  object LessThanKey extends Key
+  object LessThanKey extends NodeClass
 
-  object LessThanFirst extends Key
+  object LessThanFirst extends NodeField
 
-  object LessThanSecond extends Key
+  object LessThanSecond extends NodeField
 
   override def description: String = "Adds the < operator."
 }

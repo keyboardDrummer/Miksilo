@@ -2,16 +2,16 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import transformations.bytecode.types.{IntTypeC, TypeSkeleton}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SubtractionC extends ExpressionInstance {
-  object SubtractionKey extends Key
-  object FirstKey extends Key
-  object SecondKey extends Key
+  object SubtractionKey extends NodeClass
+  object FirstKey extends NodeField
+  object SecondKey extends NodeField
 
   def getFirst[T <: NodeLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
 
@@ -32,7 +32,7 @@ object SubtractionC extends ExpressionInstance {
     FirstKey -> first,
     SecondKey -> second)
 
-  override val key: Key = SubtractionKey
+  override val key = SubtractionKey
 
   override def getType(expression: Path, state: Language): Node = {
     val getType = ExpressionSkeleton.getType(state)

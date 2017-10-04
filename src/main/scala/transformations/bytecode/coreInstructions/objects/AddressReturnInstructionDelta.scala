@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -10,7 +10,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object AddressReturnInstructionDelta extends InstructionDelta {
 
-  override val key: Key = AddressReturn
+  override val key = AddressReturn
 
   def create: Node = CodeAttribute.instruction(AddressReturn)
 
@@ -23,7 +23,7 @@ object AddressReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("b0")
 
-  object AddressReturn extends Key
+  object AddressReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set()
 

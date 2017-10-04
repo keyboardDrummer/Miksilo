@@ -2,7 +2,7 @@ package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -12,7 +12,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object GetStaticDelta extends InstructionDelta {
 
-  override val key: Key = GetStaticKey
+  override val key = GetStaticKey
   object FieldRef extends NodeField
 
   def getStatic(fieldRefIndex: Any): Node = GetStaticKey.create(FieldRef -> fieldRefIndex)
@@ -23,7 +23,7 @@ object GetStaticDelta extends InstructionDelta {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
-    new InstructionSignature(Seq(), Seq(getReturnType(instruction)))
+    InstructionSignature(Seq(), Seq(getReturnType(instruction)))
 
   def getReturnType(getStatic: Node): Node = {
     val fieldRef: FieldRefWrapper[Node] = getStatic(FieldRef).asInstanceOf[Node]

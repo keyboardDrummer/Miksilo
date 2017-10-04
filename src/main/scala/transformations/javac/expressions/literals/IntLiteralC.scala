@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.constants.IntegerInfoConstant
 import transformations.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
@@ -41,7 +41,7 @@ object IntLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, state: Language): Node = IntTypeC.intType
 
-  object IntLiteralKey extends Key
+  object IntLiteralKey extends NodeClass
 
   object ValueKey extends NodeField
 

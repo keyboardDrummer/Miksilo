@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
 import transformations.bytecode.coreInstructions.longs.LoadLongDelta
@@ -27,11 +27,11 @@ object VariableC extends ExpressionInstance {
 
   def variable(name: String) = new Node(VariableKey, VariableNameKey -> name)
 
-  object VariableNameKey extends Key
+  object VariableNameKey extends NodeField
 
-  object VariableKey extends Key
+  object VariableKey extends NodeClass
 
-  override val key: Key = VariableKey
+  override val key = VariableKey
 
   override def getType(variable: Path, state: Language): Node = {
     getVariableInfo(variable, state)._type

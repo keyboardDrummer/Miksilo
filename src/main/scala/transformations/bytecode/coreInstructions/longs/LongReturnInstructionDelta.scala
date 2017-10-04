@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -11,7 +11,7 @@ import transformations.bytecode.types.LongTypeC
 
 object LongReturnInstructionDelta extends InstructionDelta {
 
-  override val key: Key = LongReturn
+  override val key = LongReturn
 
   def longReturn: Node = CodeAttribute.instruction(LongReturn)
 
@@ -24,7 +24,7 @@ object LongReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ad")
 
-  object LongReturn extends Key
+  object LongReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LongTypeC)
 

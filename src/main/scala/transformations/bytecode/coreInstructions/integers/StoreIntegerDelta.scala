@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,7 +10,7 @@ import transformations.bytecode.types.IntTypeC
 
 object StoreIntegerDelta extends InstructionDelta {
 
-  override val key: Key = IntegerStore
+  override val key = IntegerStore
 
   def integerStore(location: Int) = CodeAttribute.instruction(IntegerStore, Seq(location))
 
@@ -29,7 +29,7 @@ object StoreIntegerDelta extends InstructionDelta {
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 
-  object IntegerStore extends Key
+  object IntegerStore extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,7 +10,7 @@ import transformations.bytecode.types.LongTypeC
 
 object PushLongDelta extends InstructionDelta {
 
-  override val key: Key = LongConstantKey
+  override val key = LongConstantKey
 
   def constant(value: Int) = {
     require (0 <= value && value <= 1)
@@ -26,7 +26,7 @@ object PushLongDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  private object LongConstantKey extends Key
+  object LongConstantKey extends NodeClass
 
   override def grammarName = "lconst" //TODO lconst_0 & lconst_1
 }

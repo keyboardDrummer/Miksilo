@@ -2,15 +2,15 @@ package transformations.javac.statements
 
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {
-  override val key: Key = LabelKey
+  override val key = LabelKey
 
-  object LabelKey extends Key
-  object Name extends Key
+  object LabelKey extends NodeClass
+  object Name extends NodeField
 
   def label(name: String) = new Node(LabelKey, Name -> name)
 

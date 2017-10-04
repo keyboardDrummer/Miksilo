@@ -2,10 +2,10 @@ package transformations.javac.methods
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.javac.classes._
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
+import transformations.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends DeltaWithGrammar with WithState {
@@ -22,11 +22,11 @@ object MemberSelector extends DeltaWithGrammar with WithState {
 
   object SelectGrammar
 
-  object SelectorKey extends Key
+  object SelectorKey extends NodeClass
 
-  object SelectorObject  extends Key
+  object SelectorObject  extends NodeField
 
-  object SelectorMember extends Key
+  object SelectorMember extends NodeField
 
   def selector(_object: Any, member: Any): Node = selector(_object.asInstanceOf[Node], member.asInstanceOf[String])
 

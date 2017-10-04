@@ -50,7 +50,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
           val signatureTypeString = constantPool.getUtf8(signatureIndex)
           TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
         case None =>
-          val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptorIndex).asInstanceOf[Int]
+          val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptor).asInstanceOf[Int]
           val descriptor = constantPool.getUtf8(methodDescriptorIndex)
           val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
           descriptorType

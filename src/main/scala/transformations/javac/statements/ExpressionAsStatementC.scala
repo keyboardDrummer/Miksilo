@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import core.particles.Language
 import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta}
@@ -10,13 +10,13 @@ import transformations.bytecode.types.TypeSkeleton
 
 object ExpressionAsStatementC extends StatementInstance {
 
-  object ExpressionAsStatementKey extends Key
+  object ExpressionAsStatementKey extends NodeClass
 
-  object ExpressionKey extends Key
+  object ExpressionKey extends NodeField
 
   def create(expression: Node): Node = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
 
-  override val key: Key = ExpressionAsStatementKey
+  override val key = ExpressionAsStatementKey
 
   override def toByteCode(statement: Path, state: Language): Seq[Node] = {
     val expression = getExpression(statement)

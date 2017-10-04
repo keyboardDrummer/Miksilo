@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Key, Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object GotoDelta extends InstructionDelta {
 
-  override val key: Key = GoToKey
+  override val key = GoToKey
 
   def goTo(target: Int): Node = CodeAttribute.instruction(GoToKey, Seq(target))
 
@@ -24,7 +24,7 @@ object GotoDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 3
 
-  object GoToKey extends Key
+  object GoToKey extends NodeClass
 
   override def description: String = "Defines the goto instruction, which jumps to a target instruction."
 

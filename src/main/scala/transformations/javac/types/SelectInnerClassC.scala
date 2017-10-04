@@ -1,15 +1,15 @@
 package transformations.javac.types
 
-import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Key
+import core.particles.node.{NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 
 object SelectInnerClassC extends DeltaWithGrammar {
 
-  object SelectInnerClass extends Key
-  object ParentClass extends Key
-  object ChildClass extends Key
+  object SelectInnerClass extends NodeClass
+  object ParentClass extends NodeField
+  object ChildClass extends NodeField
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = transformByteCodeGrammars(grammars)
 
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {

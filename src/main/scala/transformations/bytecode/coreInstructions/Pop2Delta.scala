@@ -1,15 +1,15 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Key, Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object Pop2Delta extends InstructionDelta {
 
-  object Pop2Key extends Key
-  override val key: Key = Pop2Key
+  object Pop2Key extends NodeClass
+  override val key = Pop2Key
 
   def pop2 = CodeAttribute.instruction(Pop2Key)
 

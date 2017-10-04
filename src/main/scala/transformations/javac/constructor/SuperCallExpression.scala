@@ -1,21 +1,21 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass}
 import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.particles.{Contract, Language}
 import transformations.bytecode.coreInstructions.InvokeSpecialDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
+import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.MethodQuery
 import transformations.javac.classes.skeleton.JavaClassSkeleton
+import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.call.{CallC, CallStaticOrInstanceC}
 import transformations.javac.statements.StatementSkeleton
-import transformations.bytecode.types.VoidTypeC
-import transformations.javac.classes.skeleton.JavaClassSkeleton._
 
 object SuperCallExpression extends ExpressionInstance {
-  override val key: Key = SuperCall
+  override val key = SuperCall
   val constructorName: String = "<init>"
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC) ++ super.dependencies
@@ -50,7 +50,7 @@ object SuperCallExpression extends ExpressionInstance {
     expressionGrammar.addOption(superCallGrammar)
   }
 
-  object SuperCall extends Key
+  object SuperCall extends NodeClass
 
   override def description: String = "Enables calling a super constructor."
 }

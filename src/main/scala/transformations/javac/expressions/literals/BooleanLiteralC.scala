@@ -2,7 +2,7 @@ package transformations.javac.expressions.literals
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -29,9 +29,9 @@ object BooleanLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
 
-  object LiteralBooleanKey
+  object LiteralBooleanKey extends NodeClass
 
-  object ValueKey
+  object ValueKey extends NodeField
 
   override def description: String = "Adds the boolean literals 'true' and 'false'"
 }

@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object IncrementIntegerDelta extends InstructionDelta {
 
-  override val key: Key = IntegerIncrementKey
+  override val key = IntegerIncrementKey
 
   def integerIncrement(location: Int, amount: Int) = CodeAttribute.instruction(IntegerIncrementKey, Seq(location, amount))
 
@@ -25,7 +25,7 @@ object IncrementIntegerDelta extends InstructionDelta {
 
   override def getInstructionSize(): Int = 3
 
-  object IntegerIncrementKey extends Key
+  object IntegerIncrementKey extends NodeClass
 
   override def description: String = "Defines the increment integer instruction, which increments an integer variable by a specific amount."
 

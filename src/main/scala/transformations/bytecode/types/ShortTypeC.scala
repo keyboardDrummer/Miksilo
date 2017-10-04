@@ -1,9 +1,9 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.Language
-import core.particles.node.{Key, Node}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass}
 
 object ShortTypeC extends TypeInstance with StackType {
 
@@ -22,7 +22,7 @@ object ShortTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ShortTypeKey extends Key
+  object ShortTypeKey extends NodeClass
 
   override def description: String = "Defines the short type."
 }

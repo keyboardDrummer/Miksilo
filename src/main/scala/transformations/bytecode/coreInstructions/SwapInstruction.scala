@@ -1,16 +1,16 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Key, Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object SwapInstruction extends InstructionDelta {
-  object SwapKey extends Key
+  object SwapKey extends NodeClass
   def swap = CodeAttribute.instruction(SwapKey)
 
-  override val key: Key = SwapKey
+  override val key = SwapKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("5f")

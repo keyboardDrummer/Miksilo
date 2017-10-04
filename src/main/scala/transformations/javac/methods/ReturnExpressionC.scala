@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
 import transformations.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
@@ -45,11 +45,11 @@ object ReturnExpressionC extends StatementInstance {
 
   def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
 
-  object ReturnInteger extends Key
+  object ReturnInteger extends NodeClass
 
-  object ReturnValue extends Key
+  object ReturnValue extends NodeField
 
-  override val key: Key = ReturnInteger
+  override val key = ReturnInteger
 
   override def toByteCode(_return: Path, state: Language): Seq[Node] = {
     val methodCompiler = MethodC.getMethodCompiler(state)

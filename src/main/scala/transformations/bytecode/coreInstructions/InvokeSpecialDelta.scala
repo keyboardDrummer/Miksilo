@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
  * Invokes an instance method using static binding, so no dynamic dispatch is applied.
  */
 object InvokeSpecialDelta extends InvokeDelta {
-  override val key: Key = InvokeSpecialKey
+  override val key = InvokeSpecialKey
 
   def invokeSpecial(location: Any): Node = InvokeSpecialKey.create(MethodRef -> location)
 

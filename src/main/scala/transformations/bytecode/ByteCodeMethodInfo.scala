@@ -20,7 +20,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   object MethodNameIndex extends NodeField
 
-  object MethodDescriptorIndex extends NodeField
+  object MethodDescriptor extends NodeField
 
   object MethodAttributes extends NodeField
 
@@ -28,7 +28,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     new Node(MethodInfoKey,
       MethodAttributes -> attributes,
       MethodNameIndex -> nameIndex,
-      MethodDescriptorIndex -> descriptorIndex,
+      MethodDescriptor -> descriptorIndex,
       AccessFlagsKey -> flags)
 
   def getMethodAttributes[T <: NodeLike](method: T) = method(MethodAttributes).asInstanceOf[Seq[T]]
@@ -37,7 +37,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   def getMethodNameIndex(methodInfo: Node) = methodInfo(MethodNameIndex).asInstanceOf[Int]
 
-  def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptorIndex).asInstanceOf[Int]
+  def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptor).asInstanceOf[Int]
 
   implicit class ByteCodeMethodInfoWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: MethodTypeWrapper[T] = new MethodTypeWrapper[T](typeConstant.value)
@@ -45,11 +45,11 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     def nameIndex: Int = node(MethodNameIndex).asInstanceOf[Int]
     def nameIndex_=(value: Int): Unit = node(MethodNameIndex) = value
 
-    def typeIndex: Int = node(MethodDescriptorIndex).asInstanceOf[Int]
-    def typeIndex_=(value: Int): Unit = node(Int) = value
+    def typeIndex: Int = node(MethodDescriptor).asInstanceOf[Int]
+    def typeIndex_=(value: Int): Unit = node(MethodDescriptor) = value
 
-    def typeConstant: TypeConstantWrapper[T] = node(MethodDescriptorIndex).asInstanceOf[T]
-    def typeConstant_=(value: TypeConstantWrapper[T]): Unit = node(MethodDescriptorIndex) = value
+    def typeConstant: TypeConstantWrapper[T] = node(MethodDescriptor).asInstanceOf[T]
+    def typeConstant_=(value: TypeConstantWrapper[T]): Unit = node(MethodDescriptor) = value
 
     def accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] =
       node(ByteCodeMethodInfo.AccessFlagsKey).asInstanceOf[Set[ByteCodeMethodInfo.MethodAccessFlag]]
@@ -64,7 +64,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     super.inject(state)
     ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8ConstantDelta.key,
-      MethodDescriptorIndex -> Utf8ConstantDelta.key))
+      MethodDescriptor -> Utf8ConstantDelta.key))
   }
 
   def getMethodByteCode(methodInfo: ByteCodeMethodInfoWrapper[Node], state: Language) = {
@@ -92,7 +92,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
     val methodInfoGrammar: BiGrammar = "Method;" %>
       ("name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
-      "descriptor:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptorIndex) %
+      "descriptor:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
       "flags:" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
       attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
 

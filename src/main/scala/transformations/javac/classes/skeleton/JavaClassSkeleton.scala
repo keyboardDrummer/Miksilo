@@ -115,7 +115,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
 
   object ClassParent extends NodeField
 
-  object Members extends Key
+  object Members extends NodeField
 
   object ClassName extends NodeField
 

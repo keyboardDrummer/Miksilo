@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.javac.expressions.additive.AdditionC
 
@@ -21,11 +21,11 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
     assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
-  object IncrementAssignmentKey extends Key
+  object IncrementAssignmentKey extends NodeClass
 
-  object TargetKey extends Key
+  object TargetKey extends NodeField
 
-  object ValueKey extends Key
+  object ValueKey extends NodeField
 
   def transformIncrementAssignment(incrementAssignment: Path, state: Language): Unit = {
     val target = getTarget(incrementAssignment)

@@ -16,7 +16,7 @@ object NewByteCodeDelta extends InstructionDelta {
   
   def newInstruction(classRef: Any) = NewByteCodeKey.create(ClassRef -> classRef)
   
-  override val key: Key = NewByteCodeKey
+  override val key = NewByteCodeKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val location = instruction(ClassRef).asInstanceOf[Int]

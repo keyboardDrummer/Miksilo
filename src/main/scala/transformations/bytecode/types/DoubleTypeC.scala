@@ -1,9 +1,9 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass}
 
 object DoubleTypeC extends TypeInstance with StackType {
 
@@ -21,7 +21,7 @@ object DoubleTypeC extends TypeInstance with StackType {
 
   val doubleType = new Node(key)
 
-  object DoubleTypeKey extends Key
+  object DoubleTypeKey extends NodeClass
 
   override def description: String = "Defines the double type."
 }

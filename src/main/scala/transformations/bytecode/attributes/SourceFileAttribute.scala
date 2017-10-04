@@ -2,18 +2,18 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
-import ClassFileParser._
+import transformations.bytecode.readJar.ClassFileParser._
 
 object SourceFileAttribute extends ByteCodeAttribute {
 
-  object SourceFileAttributeKey extends Key
+  object SourceFileAttributeKey extends NodeClass
 
-  object SourceFileFileNameIndex
+  object SourceFileFileNameIndex extends NodeField
 
   def sourceFile(nameIndex: Int, fileNameIndex: Int): Node = new Node(SourceFileAttributeKey,
     SourceFileFileNameIndex -> fileNameIndex,
@@ -34,7 +34,7 @@ object SourceFileAttribute extends ByteCodeAttribute {
 
   override def description: String = "Defines the source file attribute. It identifies which source file a particular class file was compiled from."
 
-  override def key: Key = SourceFileAttributeKey
+  override def key = SourceFileAttributeKey
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ("Not implemented" : BiGrammar).asNode(key) // TODO implement.
 

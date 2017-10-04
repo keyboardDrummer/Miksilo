@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.floats
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -11,7 +11,7 @@ import transformations.bytecode.types.FloatTypeC
 
 object FloatReturnInstructionDelta extends InstructionDelta {
 
-  override val key: Key = FloatReturn
+  override val key = FloatReturn
 
   def create: Node = CodeAttribute.instruction(FloatReturn)
 
@@ -24,7 +24,7 @@ object FloatReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ae")
 
-  object FloatReturn extends Key
+  object FloatReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(FloatTypeC)
 

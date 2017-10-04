@@ -2,8 +2,8 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.readJar.ClassFileParser
@@ -33,14 +33,14 @@ object LineNumberTable extends ByteCodeAttribute {
 
   def getLineNumberTableEntries(lineNumberTable: Node) = lineNumberTable(LineNumberTableLines).asInstanceOf[Seq[LineNumberRef]]
 
-  object LineNumberTableKey extends Key
+  object LineNumberTableKey extends NodeClass
 
-  object LineNumberTableLines
+  object LineNumberTableLines extends NodeField
 
   override def description: String = "Defines the line number table attribute. " +
     "This table explains which source code line a particular instruction came from, and can be used to aid in debugging."
 
-  override def key: Key = LineNumberTableKey
+  override def key = LineNumberTableKey
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ("Not implemented" : BiGrammar).asNode(key) // TODO implement. Also figure out why I can't use failure here.
 

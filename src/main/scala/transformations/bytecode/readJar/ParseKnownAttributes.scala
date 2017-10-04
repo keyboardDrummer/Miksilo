@@ -12,7 +12,7 @@ object ParseKnownAttributes extends DeltaWithPhase {
   override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     program.visit(node => node.clazz match {
-          case UnParsedAttribute.UnParsedAttributeKey =>
+          case UnParsedAttribute.Clazz =>
             val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
             val index = typedNode.nameIndex
             val name = constantPool.getValue(index).asInstanceOf[Node]

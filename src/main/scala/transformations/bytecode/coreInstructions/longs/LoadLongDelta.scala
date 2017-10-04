@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,7 +10,7 @@ import transformations.bytecode.types.LongTypeC
 
 object LoadLongDelta extends InstructionDelta {
 
-  override val key: Key = LongLoad
+  override val key = LongLoad
 
   def load(location: Integer) = CodeAttribute.instruction(LongLoad, Seq(location))
 
@@ -26,7 +26,7 @@ object LoadLongDelta extends InstructionDelta {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
-  object LongLoad extends Key
+  object LongLoad extends NodeClass
 
   override def grammarName = "lload" //TODO lload_0 etc..
 }

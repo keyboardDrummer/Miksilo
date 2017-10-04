@@ -12,7 +12,7 @@ object PutField extends InstructionDelta {
 
   object PutFieldKey extends NodeClass
   object FieldRef extends NodeField
-  override val key: Key = PutFieldKey
+  override val key = PutFieldKey
 
   def putField(index: Any) = PutFieldKey.create(FieldRef -> index)
 

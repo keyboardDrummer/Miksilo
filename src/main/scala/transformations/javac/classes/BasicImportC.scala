@@ -1,14 +1,14 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
 object BasicImportC extends DeltaWithGrammar {
 
-  object ImportKey extends Key
-  object ElementsKey extends Key
+  object ImportKey extends NodeClass
+  object ElementsKey extends NodeField
 
   object ImportPathGrammar
 

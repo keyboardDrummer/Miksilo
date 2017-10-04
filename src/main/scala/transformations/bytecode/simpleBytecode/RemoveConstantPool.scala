@@ -5,7 +5,7 @@ import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField, NodeWrapper}
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
-import transformations.bytecode.ByteCodeMethodInfo.MethodDescriptorIndex
+import transformations.bytecode.ByteCodeMethodInfo.MethodDescriptor
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 import transformations.bytecode.constants.FieldRefConstant.ClassInfo
 import transformations.bytecode.constants.MethodRefConstant.{ClassRef, MethodRefKey}

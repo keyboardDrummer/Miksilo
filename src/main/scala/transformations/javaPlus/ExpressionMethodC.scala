@@ -2,7 +2,7 @@ package transformations.javaPlus
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions.ExpressionSkeleton
@@ -13,8 +13,8 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionC, MethodC, JavaClassSkeleton) ++ super.dependencies
 
-  object ExpressionMethodKey extends Key
-  object ExpressionMethodExpression extends Key
+  object ExpressionMethodKey extends NodeClass
+  object ExpressionMethodExpression extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar)

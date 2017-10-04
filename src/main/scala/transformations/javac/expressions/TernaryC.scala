@@ -2,7 +2,7 @@ package transformations.javac.expressions
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
@@ -34,17 +34,17 @@ object TernaryC extends ExpressionInstance {
     TrueKey -> trueBranch,
     ConditionKey -> condition)
 
-  object FalseKey extends Key
+  object FalseKey extends NodeField
 
-  object TrueKey extends Key
+  object TrueKey extends NodeField
 
-  object ConditionKey extends Key
+  object ConditionKey extends NodeField
 
-  object TernaryKey extends Key
+  object TernaryKey extends NodeClass
 
   object TernaryExpressionGrammar
 
-  override val key: Key = TernaryKey
+  override val key = TernaryKey
 
   override def getType(_ternary: Path, state: Language): Node = {
     val getExpressionType = ExpressionSkeleton.getType(state)

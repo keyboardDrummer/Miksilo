@@ -3,13 +3,13 @@ package transformations.javac.expressions.literals
 import core.bigrammar.BiGrammar
 import core.grammar.RegexG
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.particles.{Contract, Language}
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import transformations.bytecode.coreInstructions.longs.PushLongDelta
-import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.LongTypeC
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object LongLiteralC extends ExpressionInstance {
   val key = LongLiteralKey
@@ -35,9 +35,9 @@ object LongLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, state: Language): Node = LongTypeC.longType
 
-  object LongLiteralKey extends Key
+  object LongLiteralKey extends NodeClass
 
-  object ValueKey extends Key
+  object ValueKey extends NodeField
 
   override def description: String = "Adds the usage of long literals by putting an l after the number."
 }

@@ -1,18 +1,18 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Key, Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
 
-object IfIntegerCompareGreaterDelta$ extends JumpInstruction {
+object IfIntegerCompareGreaterDelta extends JumpInstruction {
 
-  override val key: Key = IfIntegerCompareGreaterKey
+  override val key = Clazz
 
-  def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(IfIntegerCompareGreaterKey, Seq(target))
+  def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(Clazz, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
@@ -22,7 +22,7 @@ object IfIntegerCompareGreaterDelta$ extends JumpInstruction {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
-  object IfIntegerCompareGreaterKey extends Key
+  object Clazz extends NodeClass
 
   override def grammarName = "if_icmpgt"
 }

@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
@@ -11,13 +11,13 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object IfThenC extends StatementInstance {
 
-  object IfThenKey extends Key
+  object IfThenKey extends NodeClass
 
-  object ConditionKey extends Key
+  object ConditionKey extends NodeField
 
-  object ThenKey extends Key
+  object ThenKey extends NodeField
 
-  override val key: Key = IfThenKey
+  override val key = IfThenKey
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 

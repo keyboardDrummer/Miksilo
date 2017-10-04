@@ -1,19 +1,19 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.extraConstants.TypeConstant
-import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.bytecode.types.TypeSkeleton
-import transformations.javac.classes.skeleton.{ClassMemberC, ClassSignature, JavaClassSkeleton}
+import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
+import transformations.javac.classes.skeleton.{ClassMemberC, ClassSignature, JavaClassSkeleton}
 
 object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
 
-  object FieldKey extends Key
-  object FieldType extends Key
-  object FieldName extends Key
+  object FieldKey extends NodeClass
+  object FieldType extends NodeField
+  object FieldName extends NodeField
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, TypeConstant)
 

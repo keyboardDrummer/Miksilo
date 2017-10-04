@@ -2,15 +2,15 @@ package transformations.javac.statements
 
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {
-  override val key: Key = GotoKey
+  override val key = GotoKey
 
-  object GotoKey extends Key
-  object Target extends Key
+  object GotoKey extends NodeClass
+  object Target extends NodeField
 
   def goto(label: String) = new Node(GotoKey, Target -> label)
 

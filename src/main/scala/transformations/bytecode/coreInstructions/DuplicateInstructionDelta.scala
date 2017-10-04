@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -9,10 +9,10 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object DuplicateInstructionDelta extends InstructionDelta {
 
-  object DuplicateKey extends Key
+  object DuplicateKey extends NodeClass
   def duplicate = CodeAttribute.instruction(DuplicateKey, Seq.empty)
 
-  override val key: Key = DuplicateKey
+  override val key = DuplicateKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("59")

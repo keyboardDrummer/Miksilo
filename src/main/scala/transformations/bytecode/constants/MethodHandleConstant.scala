@@ -3,12 +3,12 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 
 object MethodHandleConstant extends ConstantEntry {
 
-  object MethodHandleKey extends Key
+  object MethodHandleKey extends NodeClass
   object MethodHandleReference extends NodeField
   object MethodHandleIndex extends NodeField
 

@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Contract, Language}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -27,7 +27,7 @@ object GreaterThanInstructionC extends ExpandInstruction {
       InferredStackFrames.label(endLabel))
   }
 
-  object GreaterThanInstructionKey extends Key
+  object GreaterThanInstructionKey extends NodeClass
 
   override def description: String = "Defines a custom instruction which applies > to the top stack values."
 

@@ -7,7 +7,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object InvokeVirtualDelta extends InvokeDelta {
 
-  override val key: Key = InvokeVirtual
+  override val key = InvokeVirtual
 
   def invokeVirtual(methodRefIndex: Any) = InvokeVirtual.create(MethodRef -> methodRefIndex)
 

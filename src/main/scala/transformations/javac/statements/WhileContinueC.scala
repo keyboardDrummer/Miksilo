@@ -1,15 +1,15 @@
 package transformations.javac.statements
 
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
-import core.particles.path.{Path, PathRoot}
-import core.particles.{Language, DeltaWithPhase}
+import core.particles.node.{Key, Node, NodeClass}
+import core.particles.path.Path
 import transformations.bytecode.additions.LabelledLocations
 
 object WhileContinueC extends StatementInstance {
-  override val key: Key = ContinueKey
+  override val key = ContinueKey
 
-  object ContinueKey extends Key
+  object ContinueKey extends NodeClass
   def continue = new Node(ContinueKey)
 
   override def toByteCode(statement: Path, state: Language): Seq[Node] = {

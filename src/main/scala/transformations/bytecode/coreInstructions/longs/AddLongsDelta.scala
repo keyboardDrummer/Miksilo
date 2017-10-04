@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Key, Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.LongTypeC
 
 object AddLongsDelta extends InstructionDelta {
-  override val key: Key = AddLongsKey
+  override val key = AddLongsKey
 
   def addLongs() = CodeAttribute.instruction(AddLongsKey)
 
@@ -19,7 +19,7 @@ object AddLongsDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  object AddLongsKey extends Key
+  object AddLongsKey extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LongTypeC)
 

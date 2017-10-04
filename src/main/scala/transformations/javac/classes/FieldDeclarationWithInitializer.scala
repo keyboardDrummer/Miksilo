@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass}
 import core.particles.path.{Path, PathRoot}
 import core.particles._
 import transformations.bytecode.types.VoidTypeC
@@ -24,7 +24,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 
-  object FieldWithInitializerKey extends Key
+  object FieldWithInitializerKey extends NodeClass
   override def description: String = "Enables fields to have initialisers."
 
   def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {

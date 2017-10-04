@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Key, Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
 
 object SubtractIntegerDelta extends InstructionDelta {
-  override val key: Key = SubtractIntegerKey
+  override val key = SubtractIntegerKey
 
   def subtractInteger = CodeAttribute.instruction(SubtractIntegerKey)
 
@@ -19,7 +19,7 @@ object SubtractIntegerDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  object SubtractIntegerKey extends Key
+  object SubtractIntegerKey extends NodeClass
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 
   override def description: String = "Defines the subtract integer instruction, which subtracts the top two integer on the stack and places the result on the stack."

@@ -2,14 +2,14 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.readJar.ClassFileParser._
 
 object SignatureAttribute extends ByteCodeAttribute {
 
-  object SignatureKey extends Key
-  object SignatureIndex extends Key
+  object SignatureKey extends NodeClass
+  object SignatureIndex extends NodeField
   override def key: Key = SignatureKey
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {

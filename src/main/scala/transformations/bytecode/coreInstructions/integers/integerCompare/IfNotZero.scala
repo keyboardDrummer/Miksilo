@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
@@ -10,9 +10,9 @@ import transformations.bytecode.types.IntTypeC
 
 object IfNotZero extends JumpInstruction {
 
-  override val key: Key = IfNotZeroKey
+  override val key = Clazz
 
-  def ifZero(target: Int) = CodeAttribute.instruction(IfNotZeroKey, Seq(target))
+  def ifZero(target: Int) = CodeAttribute.instruction(Clazz, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
@@ -21,7 +21,7 @@ object IfNotZero extends JumpInstruction {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 
-  object IfNotZeroKey extends Key
+  object Clazz extends NodeClass
 
   override def grammarName = "ifne"
 }

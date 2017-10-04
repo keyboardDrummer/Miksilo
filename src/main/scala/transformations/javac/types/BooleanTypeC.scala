@@ -1,9 +1,9 @@
 package transformations.javac.types
 
 import core.bigrammar.{BiGrammar, Keyword}
-import core.particles.{Compilation, Language}
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.types.{IntTypeC, StackType, TypeInstance}
 
 object BooleanTypeC extends TypeInstance
@@ -24,7 +24,7 @@ object BooleanTypeC extends TypeInstance
   def booleanType = new Node(BooleanTypeKey)
 
 
-  object BooleanTypeKey extends Key
+  object BooleanTypeKey extends NodeClass
 
   override def description: String = "Defines the boolean type."
 

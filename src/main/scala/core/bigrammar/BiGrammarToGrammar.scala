@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.grammar.{Grammar, ~}
 
-case class WithMap(value: Any, state: Map[Any,Any])
+case class WithMap(value: Any, state: Map[Any, Any])
 {
 }
 

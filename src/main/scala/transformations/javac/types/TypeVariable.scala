@@ -1,15 +1,15 @@
 package transformations.javac.types
 
 import core.bigrammar.{BiGrammar, Keyword}
-import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.TypeSkeleton
 
 object TypeVariable extends DeltaWithGrammar {
 
-  object TypeVariableKey extends Key
-  object TypeVariableName extends Key
+  object TypeVariableKey extends NodeClass
+  object TypeVariableName extends NodeField
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     transformByteCodeGrammar(grammars)
     transformJavaGrammar(grammars)

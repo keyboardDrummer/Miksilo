@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object LoadAddressDelta extends InstructionDelta {
 
-  override val key: Key = AddressLoad
+  override val key = AddressLoad
 
   def addressLoad(location: Int): Node = CodeAttribute.instruction(AddressLoad, Seq(location))
 
@@ -29,7 +29,7 @@ object LoadAddressDelta extends InstructionDelta {
     InstructionSignature(Seq(), Seq(typeState.variableTypes(location)))
   }
 
-  object AddressLoad extends Key
+  object AddressLoad extends NodeClass
 
   override def grammarName = "aload" //TODO aload_0 etc..
 }

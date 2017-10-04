@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Key, Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -9,7 +9,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 import transformations.bytecode.types.IntTypeC
 
 object AddIntegersDelta extends InstructionDelta {
-  override val key: Key = AddIntegersKey
+  override val key = AddIntegersKey
 
   def addIntegers() = CodeAttribute.instruction(AddIntegersKey)
 
@@ -19,7 +19,7 @@ object AddIntegersDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  object AddIntegersKey extends Key
+  object AddIntegersKey extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

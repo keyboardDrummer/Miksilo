@@ -1,14 +1,14 @@
 package transformations.bytecode.coreInstructions.objects
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object StoreAddressDelta extends InstructionDelta {
-  override val key: Key = AddressStore
+  override val key = AddressStore
 
   def addressStore(location: Int): Node = CodeAttribute.instruction(AddressStore, Seq(location))
 
@@ -33,7 +33,7 @@ object StoreAddressDelta extends InstructionDelta {
     Map(variableLocation -> _type)
   }
 
-  object AddressStore extends Key
+  object AddressStore extends NodeClass
 
   override def grammarName = "astore" //TODO astore_0 etc..
 }

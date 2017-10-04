@@ -13,20 +13,20 @@ object NodeWrapper
 trait NodeWrapper[T <: NodeLike] {
   def node: T
 
-  def get(key: Any): Option[Any] = node.get(key)
-  def apply(key: Any): Any = node.apply(key)
-  def update(key: Any, value: Any): Unit = node.update(key, value)
-  def clazz: Any = node.clazz
-  def dataView: Map[Any, Any] = node.dataView
+  def get(key: NodeField): Option[Any] = node.get(key)
+  def apply(key: NodeField): Any = node.apply(key)
+  def update(key: NodeField, value: Any): Unit = node.update(key, value)
+  def clazz = node.clazz
+  def dataView: Map[NodeField, Any] = node.dataView
 }
 
 trait NodeLike {
   type Self <: NodeLike
-  def get(key: Any): Option[Any]
-  def apply(key: Any): Any
-  def update(key: Any, value: Any): Unit
-  def clazz: Any
-  def dataView: Map[Any, Any]
+  def get(key: NodeField): Option[Any]
+  def apply(key: NodeField): Any
+  def update(key: NodeField, value: Any): Unit
+  def clazz: NodeClass
+  def dataView: Map[NodeField, Any]
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]

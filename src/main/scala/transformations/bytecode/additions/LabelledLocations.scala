@@ -9,7 +9,7 @@ import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute._
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.IfNotZeroKey
+import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.Clazz
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoDelta, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -18,14 +18,14 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
-  def ifZero(target: String) = instruction(IfZeroDelta.IfZeroKey, Seq(target))
-  def ifNotZero(target: String) = instruction(IfNotZeroKey, Seq(target))
+  def ifZero(target: String) = instruction(IfZeroDelta.Clazz, Seq(target))
+  def ifNotZero(target: String) = instruction(IfNotZero.key, Seq(target))
 
   def goTo(target: String) = instruction(GotoDelta.GoToKey, Seq(target))
 
-  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualDelta.IfIntegerCompareGreaterEqualKey, Seq(target))
+  def ifIntegerCompareGreaterEquals(target: String) = instruction(IfIntegerCompareGreaterOrEqualDelta.Clazz, Seq(target))
   def ifIntegerCompareLess(target: String) = instruction(IfIntegerCompareLessDelta.key, Seq(target))
-  def ifIntegerCompareGreater(target: String) = instruction(IfIntegerCompareGreaterDelta$.key, Seq(target))
+  def ifIntegerCompareGreater(target: String) = instruction(IfIntegerCompareGreaterDelta.key, Seq(target))
   def ifIntegerCompareEquals(target: String) = instruction(IfIntegerCompareEqualDelta.key, Seq(target))
   def ifIntegerCompareNotEquals(target: String) = instruction(IfIntegerCompareNotEqualDelta.key, Seq(target))
   def ifIntegerCompareLessEquals(target: String) = instruction(IfIntegerCompareLessOrEqualDelta.key, Seq(target))
@@ -145,7 +145,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
 
   object LabelDelta extends InstructionDelta {
-    override val key: Key = LabelKey
+    override val key = LabelKey
 
     override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 

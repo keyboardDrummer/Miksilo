@@ -2,7 +2,7 @@ package transformations.javac.expressions.additive
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersDelta
 import transformations.bytecode.coreInstructions.longs.AddLongsDelta
@@ -57,11 +57,11 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   def addition(first: Node, second: Node) = new Node(AdditionClazz, FirstKey -> first, SecondKey -> second)
 
-  object AdditionClazz extends Key
+  object AdditionClazz extends NodeClass
 
-  object FirstKey extends Key
+  object FirstKey extends NodeField
 
-  object SecondKey extends Key
+  object SecondKey extends NodeField
 
   override def description: String = "Adds the + operator."
 }

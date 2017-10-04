@@ -1,7 +1,7 @@
 package transformations.bytecode.extraBooleanInstructions
 
-import core.particles.node.{Key, Node}
-import core.particles.{Language, Contract}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Contract, Language}
 import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -14,7 +14,7 @@ object NotInstructionC extends ExpandInstruction {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfZeroDelta)
 
-  object NotInstructionKey extends Key
+  object NotInstructionKey extends NodeClass
 
   override val key = NotInstructionKey
 

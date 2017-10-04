@@ -1,8 +1,8 @@
 package core.particles.path
 
-import core.particles.node.Node
+import core.particles.node.{Node, NodeField}
 
-case class FieldValue(parent: Path, field: Any) extends OriginWithParent {
+case class FieldValue(parent: Path, field: NodeField) extends OriginWithParent {
   val current = parent.current(field).asInstanceOf[Node]
   override def parentOption: Option[Path] = Some(parent)
 

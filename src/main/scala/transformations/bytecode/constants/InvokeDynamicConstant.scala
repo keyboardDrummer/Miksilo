@@ -3,15 +3,15 @@ package transformations.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.MethodHandleConstant.MethodHandleKey
 
 object InvokeDynamicConstant extends ConstantEntry {
 
-  object InvokeDynamicKey extends Key
-  object InvokeDynamicBootstrapMethodIndex extends Key
-  object InvokeDynamicNameAndTypeIndex extends Key
+  object InvokeDynamicKey extends NodeClass
+  object InvokeDynamicBootstrapMethodIndex extends NodeField
+  object InvokeDynamicNameAndTypeIndex extends NodeField
 
   def construct(kind: Int, index: Int) = new Node(InvokeDynamicKey, InvokeDynamicBootstrapMethodIndex -> kind, InvokeDynamicNameAndTypeIndex -> index)
 

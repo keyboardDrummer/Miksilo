@@ -1,9 +1,9 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.Language
-import core.particles.node.{Key, Node}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass}
 
 object VoidTypeC extends TypeInstance with StackType {
 
@@ -21,7 +21,7 @@ object VoidTypeC extends TypeInstance with StackType {
 
   def voidType = new Node(VoidTypeKey)
 
-  object VoidTypeKey extends Key
+  object VoidTypeKey extends NodeClass
 
   override def description: String = "Defines the void type."
 }

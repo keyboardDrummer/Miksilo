@@ -79,7 +79,7 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
-    method(ByteCodeMethodInfo.MethodDescriptorIndex) = methodDescriptorIndex
+    method(ByteCodeMethodInfo.MethodDescriptor) = methodDescriptorIndex
     addCodeAnnotation(new PathRoot(method))
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)

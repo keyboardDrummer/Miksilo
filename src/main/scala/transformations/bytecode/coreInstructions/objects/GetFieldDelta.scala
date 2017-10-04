@@ -13,7 +13,7 @@ import transformations.bytecode.simpleBytecode.ProgramTypeState
 
 object GetFieldDelta extends InstructionDelta {
 
-  override val key: Key = GetFieldKey
+  override val key = GetFieldKey
   object FieldRef extends NodeField
 
   def construct(fieldRefIndex: Any): Node = GetFieldKey.create(FieldRef -> fieldRefIndex)

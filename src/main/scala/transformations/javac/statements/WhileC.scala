@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeField, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
@@ -11,7 +11,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object WhileC extends StatementInstance with WithState {
 
-  override val key: Key = WhileKey
+  override val key = WhileKey
 
   override def toByteCode(_while: Path, state: Language): Seq[Node] = {
     val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
@@ -48,7 +48,7 @@ object WhileC extends StatementInstance with WithState {
 
   def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
 
-  object WhileKey extends core.particles.node.Key
+  object WhileKey extends NodeClass
 
   object Condition extends NodeField
 

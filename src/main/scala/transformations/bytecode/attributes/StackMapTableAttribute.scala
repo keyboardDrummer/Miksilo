@@ -27,7 +27,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   object AppendFrameTypes extends NodeField
 
-  object FullFrame
+  object FullFrame extends NodeClass
 
   object FullFrameLocals extends NodeField
 

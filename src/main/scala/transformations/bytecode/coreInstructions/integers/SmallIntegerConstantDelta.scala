@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,7 +10,7 @@ import transformations.bytecode.types.IntTypeC
 
 object SmallIntegerConstantDelta extends InstructionDelta {
 
-  override val key: Key = IntegerConstantKey
+  override val key = IntegerConstantKey
 
   def integerConstant(value: Int) = {
     require (value <= 5)
@@ -27,7 +27,7 @@ object SmallIntegerConstantDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  private object IntegerConstantKey extends Key
+  object IntegerConstantKey extends NodeClass
 
   override def description: String = "Defines the integer constant instruction, which places an integer between -1 and 5 on the stack."
 

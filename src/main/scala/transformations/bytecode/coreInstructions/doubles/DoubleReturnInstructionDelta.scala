@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.doubles
 
-import core.particles.node.{Key, Node}
-import core.particles.{Compilation, Contract, Language}
+import core.particles.node.{Node, NodeClass}
+import core.particles.{Compilation, Contract}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -11,7 +11,7 @@ import transformations.bytecode.types.DoubleTypeC
 
 object DoubleReturnInstructionDelta extends InstructionDelta {
 
-  override val key: Key = DoubleReturn
+  override val key = DoubleReturn
 
   def create: Node = CodeAttribute.instruction(DoubleReturn)
 
@@ -24,7 +24,7 @@ object DoubleReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("af")
 
-  object DoubleReturn extends Key
+  object DoubleReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(DoubleTypeC)
 

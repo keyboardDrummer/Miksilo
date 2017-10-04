@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -11,9 +11,9 @@ object CompareLongDelta extends InstructionDelta {
 
   val compareLong = new Node(CompareLongKey)
 
-  object CompareLongKey extends Key
+  object CompareLongKey extends NodeClass
 
-  override val key: Key = CompareLongKey
+  override val key = CompareLongKey
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("94")

@@ -1,18 +1,18 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
 
-  object TypeAbstractionKey extends Key
-  object Body extends Key
-  object Parameters extends Key
-  object ParameterKey extends Key
+  object TypeAbstractionKey extends NodeClass
+  object Body extends NodeField
+  object Parameters extends NodeField
+  object ParameterKey extends NodeClass
   object ParameterName extends NodeField
   object ParameterClassBound extends NodeField
   object ParameterInterfaceBound extends NodeField

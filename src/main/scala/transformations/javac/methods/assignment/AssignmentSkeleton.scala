@@ -3,7 +3,7 @@ package transformations.javac.methods.assignment
 import core.bigrammar.BiFailure
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
 import transformations.bytecode.coreInstructions.objects.StoreAddressDelta
@@ -32,13 +32,13 @@ object AssignmentSkeleton extends ExpressionInstance with WithState {
 
   def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
-  object AssignmentKey extends Key
+  object AssignmentKey extends NodeClass
 
-  object AssignmentTarget extends Key
+  object AssignmentTarget extends NodeField
 
-  object AssignmentValue extends Key
+  object AssignmentValue extends NodeField
 
-  override val key: Key = AssignmentKey
+  override val key = AssignmentKey
 
   override def getType(assignment: Path, state: Language): Node = {
     val target = getAssignmentTarget(assignment)

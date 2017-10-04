@@ -6,7 +6,7 @@ import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
-import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptorIndex}
+import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptor}
 import transformations.bytecode.ByteCodeSkeleton.{ByteCodeWrapper, ClassMethodsKey}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8ConstantDelta
@@ -27,7 +27,7 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     def instructions_=(value: Seq[T]): Unit = node(Instructions) = value
   }
 
-  def instruction(_type: AnyRef, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
+  def instruction(_type: NodeClass, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
   def getInstructionArguments(instruction: Node) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 

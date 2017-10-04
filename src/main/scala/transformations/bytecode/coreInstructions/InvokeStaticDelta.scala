@@ -5,7 +5,7 @@ import transformations.bytecode.PrintByteCode._
 
 object InvokeStaticDelta extends InvokeDelta {
 
-  override val key: Key = InvokeStaticKey
+  override val key = InvokeStaticKey
 
   def invokeStatic(constantIndex: Any): Node = InvokeStaticKey.create(MethodRef -> constantIndex)
 

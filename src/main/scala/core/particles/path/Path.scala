@@ -1,6 +1,6 @@
 package core.particles.path
 
-import core.particles.node.{Node, NodeClass, NodeLike}
+import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
@@ -20,9 +20,9 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
   def clazz = current.clazz
   def clazz_=(value: NodeClass): Unit = current.clazz = value
 
-  def apply(key: Any) = get(key).get
-  def update(key: Any, value: Any): Unit = current(key) = value
-  def get(key: Any): Option[Any] = current.data.get(key).map {
+  def apply(key: NodeField) = get(key).get
+  def update(key: NodeField, value: Any): Unit = current(key) = value
+  def get(key: NodeField): Option[Any] = current.data.get(key).map {
     case childObject: Node => new FieldValue(this, key)
     case sequence: Seq[_] => sequence.indices.map(index => {
       val element = sequence(index)
@@ -34,5 +34,5 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
     case child => child
   }
 
-  override def dataView: Map[Any, Any] = current.data.keys.map(key => (key,apply(key))).toMap
+  override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 }

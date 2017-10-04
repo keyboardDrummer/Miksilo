@@ -1,7 +1,7 @@
 package transformations.javac.statements
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike, NodeWrapper}
+import core.particles.node._
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.ExpressionSkeleton.Expression
@@ -37,15 +37,15 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
     new Node(ForLoopType, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
-  object ForLoopType extends Key
+  object ForLoopType extends NodeClass
 
-  object Initializer extends Key
+  object Initializer extends NodeField
 
-  object Condition extends Key
+  object Condition extends NodeField
 
-  object Increment extends Key
+  object Increment extends NodeField
 
-  object Body extends Key
+  object Body extends NodeField
 
   override def transform(program: Node, state: Compilation): Unit = {
     PathRoot(program).visit(path => path.clazz match {

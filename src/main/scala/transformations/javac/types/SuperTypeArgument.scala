@@ -1,16 +1,14 @@
 package transformations.javac.types
 
-import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Key
+import core.particles.node.{NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.TypeSkeleton
-
-import scala.swing.event.Key
 
 object SuperTypeArgument extends DeltaWithGrammar {
 
-  object SuperKey extends Key
-  object SuperBody extends Key
+  object SuperKey extends NodeClass
+  object SuperBody extends NodeField
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val byteCodeArgumentGrammar = grammars.find(TypeApplication.ByteCodeTypeArgumentGrammar)
     byteCodeArgumentGrammar.addOption(("-" ~~> byteCodeArgumentGrammar).asNode(SuperKey, SuperBody))

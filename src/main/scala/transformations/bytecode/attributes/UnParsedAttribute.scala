@@ -1,28 +1,28 @@
 package transformations.bytecode.attributes
 
-import core.particles.{Language, DeltaWithGrammar}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton
 
 object UnParsedAttribute extends DeltaWithGrammar {
 
   class UnParsedAttribute(val node: Node) {
-    def nameIndex: Int = node(UnParsedAttribute.UnParsedAttributeName).asInstanceOf[Int]
-    def nameIndex_=(value: Int) = node(UnParsedAttribute.UnParsedAttributeName) = value
+    def nameIndex: Int = node(UnParsedAttribute.Name).asInstanceOf[Int]
+    def nameIndex_=(value: Int) = node(UnParsedAttribute.Name) = value
 
-    def data = node(UnParsedAttribute.UnParsedAttributeData).asInstanceOf[Seq[Byte]]
-    def data_=(value: Seq[Byte]) = node(UnParsedAttribute.UnParsedAttributeData) = value
+    def data = node(UnParsedAttribute.Data).asInstanceOf[Seq[Byte]]
+    def data_=(value: Seq[Byte]) = node(UnParsedAttribute.Data) = value
   }
 
-  def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(UnParsedAttributeKey, UnParsedAttributeName -> nameIndex, UnParsedAttributeData -> bytes)
+  def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(Clazz, Name -> nameIndex, Data -> bytes)
 
-  object UnParsedAttributeKey extends Key
-  object UnParsedAttributeName extends Key
-  object UnParsedAttributeData extends Key
+  object Clazz extends NodeClass
+  object Name extends NodeField
+  object Data extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val grammar = "UnParsed attribute with nameIndex:" ~~> integer asNode(UnParsedAttributeKey, UnParsedAttributeName)
+    val grammar = "UnParsed attribute with nameIndex:" ~~> integer asNode(Clazz, Name)
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }
 

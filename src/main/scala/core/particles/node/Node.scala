@@ -36,7 +36,7 @@ object Node {
   }
 }
 
-class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike { 
+class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
   type Self = Node
 
   def shallowClone: Node = {
@@ -52,14 +52,14 @@ class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike {
     data ++= node.data
   }
 
-  val data: mutable.Map[Any, Any] = mutable.Map.empty
+  val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
   def dataView = data.toMap
 
-  def apply(key: Any) = data(key)
+  def apply(key: NodeField) = data(key)
 
-  def update(key: Any, value: Any): Unit = {
+  def update(key: NodeField, value: Any): Unit = {
     value match //TODO maybe throw this check away.
     {
       case wrong: Path => throwInsertedWithOriginIntoRegularMetaObject()
@@ -98,7 +98,7 @@ class Node(var clazz: AnyRef, entries: (Any, Any)*) extends NodeLike {
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 
-  override def get(key: Any): Option[Any] = data.get(key)
+  override def get(key: NodeField): Option[Any] = data.get(key)
 }
 
 

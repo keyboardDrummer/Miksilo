@@ -1,14 +1,14 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{Keyword, BiGrammar}
+import core.bigrammar.{BiGrammar, Keyword}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, Key}
+import core.particles.node.{Key, Node, NodeClass}
 
 object ByteTypeC extends TypeInstance
 {
-  object ByteTypeKey extends Key
-  override val key: Key = ByteTypeKey
+  object ByteTypeKey extends NodeClass
+  override val key = ByteTypeKey
   val me = new Node(ByteTypeKey)
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???

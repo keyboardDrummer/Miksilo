@@ -1,8 +1,8 @@
 package core.particles.path
 
-import core.particles.node.Node
+import core.particles.node.{Node, NodeField}
 
-case class SequenceElement(parent: Path, field: Any, index: Int) extends OriginWithParent
+case class SequenceElement(parent: Path, field: NodeField, index: Int) extends OriginWithParent
 {
   val current: Node = parent.current(field).asInstanceOf[Seq[Node]](index)
   def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]

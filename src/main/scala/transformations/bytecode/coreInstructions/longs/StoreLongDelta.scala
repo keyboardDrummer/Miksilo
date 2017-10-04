@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.longs
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,7 +10,7 @@ import transformations.bytecode.types.LongTypeC
 
 object StoreLongDelta  extends InstructionDelta {
 
-  override val key: Key = LongStore
+  override val key = LongStore
 
   def longStore(location: Int) = CodeAttribute.instruction(LongStore, Seq(location))
 
@@ -28,7 +28,7 @@ object StoreLongDelta  extends InstructionDelta {
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> LongTypeC.longType)
 
-  object LongStore extends Key
+  object LongStore extends NodeClass
 
   override def grammarName = "lstore"
 }

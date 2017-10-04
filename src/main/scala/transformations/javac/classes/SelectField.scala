@@ -13,7 +13,7 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 
 object SelectField extends ExpressionInstance {
 
-  override val key: Key = SelectorKey
+  override val key = SelectorKey
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 

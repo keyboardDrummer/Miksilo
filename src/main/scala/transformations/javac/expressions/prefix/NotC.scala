@@ -1,20 +1,20 @@
 package transformations.javac.expressions.prefix
 
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
-import core.particles.{Compilation, Language}
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.types.BooleanTypeC
 
 object NotC extends ExpressionInstance {
 
-  object NotKey extends Key
+  object NotKey extends NodeClass
 
-  object NotExpression extends Key
+  object NotExpression extends NodeField
 
-  override val key: Key = NotKey
+  override val key = NotKey
 
   override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
 

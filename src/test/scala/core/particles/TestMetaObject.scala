@@ -1,7 +1,6 @@
 package core.particles
 
-import core.particles.node.Node
-import org.junit.{Assert, Test}
+import core.particles.node.{Node, NodeClass, NodeField}
 import org.scalatest.FunSuite
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.methods.call.CallC
@@ -23,9 +22,9 @@ class TestMetaObject extends FunSuite {
     assertResult(first)(second)
   }
 
-  object ClazzKey
+  object ClazzKey extends NodeClass
 
-  object FieldKey
+  object FieldKey extends NodeField
 
-  object FieldValue
+  object FieldValue extends NodeField
 }

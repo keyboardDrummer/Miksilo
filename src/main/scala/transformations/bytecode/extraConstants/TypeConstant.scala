@@ -5,7 +5,7 @@ import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
-import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptorIndex, MethodInfoKey, MethodNameIndex}
+import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodInfoKey, MethodNameIndex}
 import transformations.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
 import transformations.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import transformations.bytecode.types.TypeSkeleton
@@ -38,7 +38,7 @@ object TypeConstant extends ConstantEntry {
       DescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(
       MethodNameIndex -> Utf8ConstantDelta.key,
-      MethodDescriptorIndex -> TypeConstant.key))
+      MethodDescriptor -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(MethodTypeConstant.key, Map(
       MethodTypeDescriptorIndex -> TypeConstant.key))
     ByteCodeSkeleton.getState(state).constantReferences.put(NameAndTypeConstant.key, Map(

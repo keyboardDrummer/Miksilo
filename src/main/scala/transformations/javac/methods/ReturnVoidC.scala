@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.VoidReturnInstructionDelta
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
@@ -26,9 +26,9 @@ object ReturnVoidC extends StatementInstance {
 
   def _return: Node = new Node(ReturnVoidKey)
 
-  object ReturnVoidKey extends Key
+  object ReturnVoidKey extends NodeClass
 
-  override val key: Key = ReturnVoidKey
+  override val key = ReturnVoidKey
 
   override def toByteCode(_return: Path, state: Language): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)

@@ -2,20 +2,20 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles._
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.objects.NewByteCodeDelta
 import transformations.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
-import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature}
+import transformations.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import transformations.javac.constructor.SuperCallExpression
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import transformations.javac.methods.call.{CallStaticOrInstanceC, CallC}
+import transformations.javac.methods.call.{CallC, CallStaticOrInstanceC}
 import transformations.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
 
-  object NewCallKey extends Key
-  object NewObject extends Key
+  object NewCallKey extends NodeClass
+  object NewObject extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
@@ -28,7 +28,7 @@ object NewC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
-  override val key: Key = NewCallKey
+  override val key = NewCallKey
 
   override def getType(expression: Path, state: Language): Node = {
     expression(NewObject).asInstanceOf[Path]

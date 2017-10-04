@@ -2,9 +2,9 @@ package transformations.bytecode.types
 
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
 import core.particles.Language
-import core.particles.node.{Key, Node}
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass, NodeField}
 
 object ArrayTypeC extends TypeInstance with StackType {
   override val key = ArrayTypeKey
@@ -30,9 +30,9 @@ object ArrayTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ArrayTypeKey extends Key
+  object ArrayTypeKey extends NodeClass
 
-  object ArrayElementType extends Key
+  object ArrayElementType extends NodeField
 
   override def description: String = "Defines the array type."
 }

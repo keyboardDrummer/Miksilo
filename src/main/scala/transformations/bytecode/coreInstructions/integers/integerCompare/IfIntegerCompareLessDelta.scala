@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.integers.integerCompare
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node}
+import core.particles.Compilation
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.coreInstructions.InstructionSignature
@@ -10,7 +10,7 @@ import transformations.bytecode.types.IntTypeC
 
 object IfIntegerCompareLessDelta extends JumpInstruction {
 
-  override val key: Key = IfIntegerCompareLessKey
+  override val key = IfIntegerCompareLessKey
 
   def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(IfIntegerCompareLessKey, Seq(target))
 
@@ -22,7 +22,7 @@ object IfIntegerCompareLessDelta extends JumpInstruction {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
-  object IfIntegerCompareLessKey extends Key
+  object IfIntegerCompareLessKey extends NodeClass
 
   override def grammarName = "if_icmplt"
 }

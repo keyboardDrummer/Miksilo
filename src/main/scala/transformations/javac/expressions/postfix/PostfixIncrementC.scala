@@ -1,17 +1,17 @@
 package transformations.javac.expressions.postfix
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.{Key, Node, NodeClass, NodeField}
 import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.particles.{Contract, Language}
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
+import transformations.bytecode.types.IntTypeC
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.methods.MethodC
-import transformations.bytecode.types.IntTypeC
 
 object PostFixIncrementC extends ExpressionInstance {
 
-  override val key: Key = PostfixIncrementKey
+  override val key = PostfixIncrementKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodC, IncrementIntegerDelta)
 
@@ -30,9 +30,9 @@ object PostFixIncrementC extends ExpressionInstance {
     coreGrammar.addOption(postFixIncrement)
   }
 
-  object PostfixIncrementKey extends Key
+  object PostfixIncrementKey extends NodeClass
 
-  object VariableKey extends Key
+  object VariableKey extends NodeField
 
   override def description: String = "Adds the postfix ++ operator."
 }

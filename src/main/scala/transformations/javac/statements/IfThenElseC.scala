@@ -1,8 +1,8 @@
 package transformations.javac.statements
 
-import core.particles.{Language, FromMap}
+import core.particles.{FromMap, Language}
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeLike}
+import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
 import transformations.bytecode.additions.LabelledLocations
@@ -32,7 +32,9 @@ object IfThenElseC extends StatementInstance {
       Seq(endLabel)
   }
 
-  object ElseKey extends Key
+  def key = Clazz
+  object Clazz extends NodeClass
+  object ElseKey extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
