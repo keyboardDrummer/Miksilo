@@ -1,6 +1,6 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{BiGrammar, BiStringLiteral}
+import core.bigrammar.{BiGrammar, StringLiteral}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
@@ -155,7 +155,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
-      grammarName ~~> BiStringLiteral.as(LabelName) %
+      grammarName ~~> StringLiteral.as(LabelName) %
         stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
@@ -191,7 +191,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(jump.key)
-      grammar.inner = jump.grammarName ~~> BiStringLiteral.manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
+      grammar.inner = jump.grammarName ~~> StringLiteral.manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }

@@ -1,7 +1,6 @@
 package core.bigrammar
 
-import core.grammar.{NumberG, ~}
-import org.junit.Test
+import core.grammar.~
 import org.scalatest.FunSuite
 
 class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
@@ -59,7 +58,7 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
     val parenthesis: BiGrammar = "(" ~> expression ~< ")"
 
 
-    val number: BiGrammar = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
+    val numberValue: BiGrammar = integer ^^ (v => Value(v.asInstanceOf[Int]), {
       case Value(i) => Some(i)
       case _ => None
     })
@@ -72,7 +71,7 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
       case _ => None
     })
     multipleLabel.addOption(multiply)
-    multipleLabel.addOption(number)
+    multipleLabel.addOption(numberValue)
     multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled("add")

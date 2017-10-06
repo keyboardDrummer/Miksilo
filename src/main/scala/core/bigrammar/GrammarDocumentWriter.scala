@@ -1,16 +1,16 @@
 package core.bigrammar
 
 import core.document.{Document, WhiteSpace}
-import core.grammar.{Grammar, Identifier, NumberG}
+import core.grammar.{Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
 
 trait GrammarDocumentWriter {
 
-  def identifier: BiGrammar = consume(Identifier) //FromGrammarWithToString(Identifier, verifyWhenPrinting = true)
+  def identifier: BiGrammar = new FromStringGrammar(Identifier)
 
-  def number: BiGrammar = consume(NumberG)
+  def number: BiGrammar = new FromGrammarWithToString(NumberG)
 
   def integer = number ^^ ((s: Any) => Integer.parseInt(s.asInstanceOf[String]), (i: Any) => Some(i.toString))
 
@@ -23,8 +23,6 @@ trait GrammarDocumentWriter {
   def space: BiGrammar = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)
-
-  implicit def consume(grammar: Grammar): BiGrammar = new FromGrammarWithToString(grammar)
 
   implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 

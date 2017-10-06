@@ -5,7 +5,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.{DeltaWithGrammar, Language}
 import org.scalatest.FunSuite
 
-class BiGrammar2 extends FunSuite with DeltaWithGrammar {
+class BiGrammarExample extends FunSuite with DeltaWithGrammar {
 
   test("test") {
     val expression: BiGrammar = "i"
@@ -34,7 +34,7 @@ class BiGrammar2 extends FunSuite with DeltaWithGrammar {
     val expression = new Labelled("expression")
     expression.addOption(identifier)
     expression.addOption(number)
-    val assignment = identifier ~~ "=" ~~ expression | identifier ~~ "+=" ~~ expression
+    val assignment = identifier ~~ keywordClass("=") ~~ expression | identifier ~~ keywordClass("+=") ~~ expression
     expression.addOption(assignment)
     expression.addOption(identifier ~ "--")
     expression.addOption(expression ~~ "-" ~~ expression)

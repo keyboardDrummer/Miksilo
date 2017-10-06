@@ -1,6 +1,5 @@
 package core.bigrammar
 
-import core.grammar.RegexG
 import org.scalatest.FunSuite
 import transformations.javac.JavaStyleCommentsC
 
@@ -147,7 +146,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, expression)
 
-    assertResult("~(~(2,+),3)")(result)
+    assertResult("2 + 3")(result)
   }
 
   test("RightRecursionUsingBiGrammarWithSubtraction") {
@@ -160,7 +159,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, expression)
 
-    assertResult("~(~(2,+),3)")(result)
+    assertResult("2 + 3")(result)
   }
 
   test("VerySimilarToCompilerAddSub") {
@@ -168,7 +167,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, expression)
 
-    assertResult("~(~(2,+),3)")(result)
+    assertResult("2 + 3")(result)
   }
 
   /*

@@ -1,10 +1,9 @@
 package transformations.javac
 
 import core.bigrammar._
-import core.grammar.RegexG
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.NodeField
-import core.particles.{Language, DeltaWithGrammar}
+import core.particles.{DeltaWithGrammar, Language}
 
 import scala.util.matching.Regex
 

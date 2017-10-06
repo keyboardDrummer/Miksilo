@@ -1,11 +1,14 @@
 package core.bigrammar
 
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.document.{BlankLine, WhiteSpace}
-import core.grammar.{Grammar, PrintGrammar, ~}
+import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
 import core.particles.node.{Node, NodeField}
 import core.responsiveDocument.ResponsiveDocument
 
-import scala.util.Try
+import scala.util.matching.Regex
+import scala.util.{Success, Try}
+import scala.util.parsing.input.CharArrayReader
 
 /*
 A grammar that maps to both a parser and a printer
@@ -85,7 +88,7 @@ trait BiGrammar extends GrammarDocumentWriter {
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
 }
 
-object BiStringLiteral extends Custom {
+object StringLiteral extends Custom {
   override def getGrammar = core.grammar.StringLiteral
   override def print(withMap: WithMap) = Try("\"" + withMap.value + "\"")
 }
@@ -99,10 +102,9 @@ trait SequenceLike extends BiGrammar {
   def first: BiGrammar
   def second: BiGrammar
   def ignoreLeft: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => {
-      val x = this
-      r
-    }}, r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
+    new MapGrammar(this,
+      { case ~(l, r) => r },
+      r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
   }
 
   def ignoreRight: MapGrammar = {
@@ -114,12 +116,45 @@ case class Delimiter(value: String) extends BiGrammar
 
 case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammar
 
+class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = true)
+  extends FromStringGrammar(grammar, verifyWhenPrinting) {
+
+  override def print(withMap: WithMap) = {
+    super.print(WithMap(withMap.value.toString, withMap.state))
+  }
+}
+
 /**
   * Takes a grammar for parsing, and uses toString for printing.
   * so the result of the grammar is exactly what has been consumed.
   * @verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
-case class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = false) extends BiGrammar
+class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
+  extends Custom
+{
+  override def getGrammar = grammar
+
+  lazy val parser = new GrammarToParserConverter().convert(grammar)
+
+  override def print(withMap: WithMap) = {
+    withMap.value match {
+      case string:String =>
+        if (verifyWhenPrinting) {
+          val parseResult = parser(new CharArrayReader(string.toCharArray))
+          if (parseResult.successful && parseResult.get.equals(withMap.value))
+            Success(string)
+          else
+            BiGrammarToPrinter.fail("FromGrammarWithToString could not parse string")
+        }
+        else
+          Success(string)
+
+      case _ => BiGrammarToPrinter.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
+    }
+  }
+}
+
+case class RegexG(regex: Regex) extends FromStringGrammar(core.grammar.RegexG(regex))
 
 abstract class Many(var inner: BiGrammar) extends BiGrammar
 {

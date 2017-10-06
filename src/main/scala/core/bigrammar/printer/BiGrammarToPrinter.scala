@@ -4,16 +4,17 @@ import java.util.Objects
 
 import core.bigrammar._
 import core.document.Empty
-import core.grammar.{GrammarToParserConverter, ~}
+import core.grammar.~
 import core.responsiveDocument.ResponsiveDocument
 
-import scala.util.parsing.input.CharArrayReader
 import scala.util.{Failure, Success, Try}
 
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     new BiGrammarToPrinter().toDocumentCached(WithMap(outerValue, Map.empty), grammar).get
   }
+
+  def fail(inner: Any, depth: Int = 0) = Failure(RootError(depth, Empty, inner))
 }
 
 class BiGrammarToPrinter {
@@ -27,17 +28,6 @@ class BiGrammarToPrinter {
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
       case custom:Custom => custom.print(withMap)
-      case FromGrammarWithToString(consume, verifyWhenPrinting) =>
-        val string = withMap.value.toString
-        if (!verifyWhenPrinting)
-          Success(string)
-        else {
-          val parseResult = new GrammarToParserConverter().convert(consume)(new CharArrayReader(string.toCharArray))
-          if (parseResult.successful && parseResult.get.equals(withMap.value))
-            Success(string)
-          else
-            fail("From identity grammar could not parse string")
-        }
       case Keyword(keyword, _, verify) =>
         if (!verify || withMap.value == keyword)
           Try(keyword)
@@ -60,7 +50,7 @@ class BiGrammarToPrinter {
   }
 
   def failureToGrammar(message: String, value: Any, grammar: BiGrammar): Failure[Nothing] = {
-    fail("encountered failure", -10000)
+    BiGrammarToPrinter.fail("encountered failure", -10000)
   }
 
   def mapGrammarToDocument(value: WithMap, mapGrammar: MapGrammar): Try[ResponsiveDocument] = {
@@ -82,7 +72,7 @@ class BiGrammarToPrinter {
       case Some(cachedValue) => cachedValue
       case None =>
         val oldCache = cache
-        cache += key -> fail(FoundDirectRecursionInLabel(labelled), -1000)
+        cache += key -> BiGrammarToPrinter.fail(FoundDirectRecursionInLabel(labelled), -1000)
         val result = toDocumentCached(withMap, labelled.inner)
         cache = oldCache + (key -> result)
         result
@@ -114,25 +104,23 @@ class BiGrammarToPrinter {
   
   def produceToDocument(withMap: WithMap, grammar: BiGrammar, producedValue: Any): Try[ResponsiveDocument] = {
     if (Objects.equals(producedValue, withMap.value)) Try(Empty)
-    else fail(ProduceWithDifferentValue(producedValue), -100)
+    else BiGrammarToPrinter.fail(ProduceWithDifferentValue(producedValue), -100)
   }
 
   def deconstructValue(value: WithMap, grammar: MapGrammar): Try[WithMap] = {
     if (grammar.showMap) {
       grammar.deconstruct(value) match {
         case Some(x) => Try(x.asInstanceOf[WithMap])
-        case None => fail("could not deconstruct value")
+        case None => BiGrammarToPrinter.fail("could not deconstruct value")
       }
     }
     else {
       grammar.deconstruct(value.value) match {
         case Some(x) => Try(WithMap(x, value.state))
-        case None => fail("could not deconstruct value")
+        case None => BiGrammarToPrinter.fail("could not deconstruct value")
       }
     }
   }
-
-  def fail(inner: Any, depth: Int = 0) = Failure(RootError(depth, Empty, inner))
 
   def combineTwo(first: Try[ResponsiveDocument], second: => Try[ResponsiveDocument],
                  combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument): Try[ResponsiveDocument] = {
@@ -141,12 +129,12 @@ class BiGrammarToPrinter {
 
   def extractSequence(withMap: WithMap): Try[Seq[Any]] = withMap.value match {
     case sequence: Seq[Any] => Try(sequence)
-    case _ => fail(s"value $withMap.value was not a sequence.")
+    case _ => BiGrammarToPrinter.fail(s"value $withMap.value was not a sequence.")
   }
 
   def extractProduct(withMap: WithMap, grammar: BiGrammar): Try[core.grammar.~[Any, Any]] = withMap.value match {
     case ~(left, right) => Try(core.grammar.~(left, right))
     case UndefinedDestructuringValue => Try(core.grammar.~(UndefinedDestructuringValue, UndefinedDestructuringValue)) //TODO is this really necessary?
-    case _ => fail("value was not a product.")
+    case _ => BiGrammarToPrinter.fail("value was not a product.")
   }
 }
