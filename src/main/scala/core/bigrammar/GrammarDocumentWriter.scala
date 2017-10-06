@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 
 trait GrammarDocumentWriter {
 
-  def identifier: BiGrammar = consume(Identifier)
+  def identifier: BiGrammar = consume(Identifier) //FromGrammarWithToString(Identifier, verifyWhenPrinting = true)
 
   def number: BiGrammar = consume(NumberG)
 

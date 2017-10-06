@@ -4,7 +4,7 @@ import java.util.Objects
 
 import core.bigrammar._
 import core.document.Empty
-import core.grammar.{GrammarToParserConverter, StringLiteral, ~}
+import core.grammar.{GrammarToParserConverter, ~}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.parsing.input.CharArrayReader
@@ -26,14 +26,14 @@ class BiGrammarToPrinter {
 
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
-      case FromGrammarWithToString(StringLiteral, _) => Try("\"" + withMap.value + "\"") //TODO remove this and create a BiStringLiteral
+      case custom:Custom => custom.print(withMap)
       case FromGrammarWithToString(consume, verifyWhenPrinting) =>
         val string = withMap.value.toString
         if (!verifyWhenPrinting)
           Success(string)
         else {
           val parseResult = new GrammarToParserConverter().convert(consume)(new CharArrayReader(string.toCharArray))
-          if (parseResult.successful)
+          if (parseResult.successful && parseResult.get.equals(withMap.value))
             Success(string)
           else
             fail("From identity grammar could not parse string")

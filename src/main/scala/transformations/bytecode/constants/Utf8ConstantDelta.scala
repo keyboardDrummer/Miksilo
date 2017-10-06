@@ -1,7 +1,7 @@
 package transformations.bytecode.constants
 
-import core.bigrammar.{BiGrammar, FromGrammarWithToString}
-import core.grammar.{Identifier, Keyword, StringLiteral}
+import core.bigrammar.{BiGrammar, BiStringLiteral, FromGrammarWithToString}
+import core.grammar.{Identifier, Keyword}
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
@@ -27,7 +27,7 @@ object Utf8ConstantDelta extends ConstantEntry {
     (FromGrammarWithToString(Identifier, verifyWhenPrinting = true) |
       FromGrammarWithToString(Keyword("<init>", false), verifyWhenPrinting = true) |
       FromGrammarWithToString(Keyword("<clinit>", false), verifyWhenPrinting = true) |
-      (StringLiteral : BiGrammar)
+      BiStringLiteral
       //TODO misschien een aparte constant maken voor 'Names'
       ).as(Value).asNode(Utf8ConstantKey)
 

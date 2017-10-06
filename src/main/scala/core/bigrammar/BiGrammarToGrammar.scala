@@ -7,7 +7,7 @@ case class WithMap(value: Any, state: Map[Any, Any])
 }
 
 object BiGrammarToGrammar {
-  def addState(value: Any) = WithMap(value, Map.empty)
+  def addEmptyState(value: Any) = WithMap(value, Map.empty)
   object Observer extends BiGrammarObserver[Grammar] {
     override def labelledEnter(name: AnyRef): Grammar = new core.grammar.Labelled(name)
 
@@ -15,9 +15,10 @@ object BiGrammarToGrammar {
       case sequence: SequenceLike => core.grammar.Sequence(recursive(sequence.first), recursive(sequence.second)) ^^
         { case ~(WithMap(l,sl),WithMap(r,sr)) => WithMap(core.grammar.~(l,r), sl ++ sr)}
       case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right), choice.firstBeforeSecond)
-      case FromGrammarWithToString(consume, _) => consume ^^ addState
-      case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ addState
-      case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ addState
+      case FromGrammarWithToString(consume, _) => consume ^^ addEmptyState
+      case custom:Custom => custom.getGrammar ^^ addEmptyState
+      case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ addEmptyState
+      case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ addEmptyState
       case many:Many => core.grammar.Many(recursive(many.inner)) ^^
         { case elements: Seq[Any] =>
           val WithMaps = elements.map({ case x:WithMap => x })
@@ -30,8 +31,8 @@ object BiGrammarToGrammar {
             mapGrammar.construct
         )
       case BiFailure(message) => core.grammar.FailureG(message)
-      case Print(document) => core.grammar.Produce(Unit) ^^ addState //TODO really want unit here?
-      case ValueGrammar(value) => core.grammar.Produce(value) ^^ addState
+      case Print(document) => core.grammar.Produce(Unit) ^^ addEmptyState //TODO really want unit here?
+      case ValueGrammar(value) => core.grammar.Produce(value) ^^ addEmptyState
       case As(inner, key) => recursive(inner) ^^
         { case WithMap(v, state) => WithMap(inner, state ++ Map(key -> v))}
     }

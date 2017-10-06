@@ -1,15 +1,13 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{BiGrammar, FromGrammarWithToString}
-import core.grammar.StringLiteral
+import core.bigrammar.{BiGrammar, BiStringLiteral}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute._
 import transformations.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
-import transformations.bytecode.coreInstructions.integers.integerCompare.IfNotZero.Clazz
 import transformations.bytecode.coreInstructions.integers.integerCompare._
 import transformations.bytecode.coreInstructions.{GotoDelta, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -157,7 +155,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
       val stackMapFrameGrammar = grammars.find(StackMapFrameGrammar)
-      grammarName ~~> (StringLiteral : BiGrammar).as(LabelName) %
+      grammarName ~~> BiStringLiteral.as(LabelName) %
         stackMapFrameGrammar.indent().as(LabelStackFrame) asNode LabelKey
     }
 
@@ -193,7 +191,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumps)
     {
       val grammar = grammars.find(jump.key)
-      grammar.inner = jump.grammarName ~~> FromGrammarWithToString(StringLiteral).manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
+      grammar.inner = jump.grammarName ~~> BiStringLiteral.manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
     }
   }
 }

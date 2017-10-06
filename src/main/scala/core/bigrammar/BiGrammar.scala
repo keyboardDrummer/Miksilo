@@ -5,6 +5,8 @@ import core.grammar.{Grammar, PrintGrammar, ~}
 import core.particles.node.{Node, NodeField}
 import core.responsiveDocument.ResponsiveDocument
 
+import scala.util.Try
+
 /*
 A grammar that maps to both a parser and a printer
  */
@@ -81,6 +83,16 @@ trait BiGrammar extends GrammarDocumentWriter {
   def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
+}
+
+object BiStringLiteral extends Custom {
+  override def getGrammar = core.grammar.StringLiteral
+  override def print(withMap: WithMap) = Try("\"" + withMap.value + "\"")
+}
+
+trait Custom extends BiGrammar {
+  def getGrammar: Grammar
+  def print(withMap: WithMap): Try[ResponsiveDocument]
 }
 
 trait SequenceLike extends BiGrammar {
