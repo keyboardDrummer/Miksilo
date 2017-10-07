@@ -11,10 +11,10 @@ object IntTypeC extends TypeInstance with StackType {
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty //TODO extend. long ?
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("I", false) ~> produce(intType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("I", false) ~> value(intType)
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
-    "int" ~> produce(intType)
+    "int" ~> value(intType)
   }
 
   val intType = new Node(IntTypeKey)

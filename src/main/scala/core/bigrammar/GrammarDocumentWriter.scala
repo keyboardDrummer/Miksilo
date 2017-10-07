@@ -12,11 +12,11 @@ trait GrammarDocumentWriter {
 
   def number: BiGrammar = new FromGrammarWithToString(NumberG)
 
-  def integer = number ^^ ((s: Any) => Integer.parseInt(s.asInstanceOf[String]), (i: Any) => Some(i.toString))
+  def integer = number.map(afterParsing = (s: String) => Integer.parseInt(s), (i: Int) => Some(i.toString))
 
   def failure: BiGrammar = BiFailure()
 
-  def produce(value: Any): BiGrammar = new ValueGrammar(value)
+  def value(value: Any): BiGrammar = new ValueGrammar(value)
 
   def keywordClass(value: String) = new Keyword(value, false, true)
 

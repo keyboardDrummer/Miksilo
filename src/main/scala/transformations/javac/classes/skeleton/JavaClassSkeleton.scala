@@ -80,7 +80,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical
-    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | produce(Seq.empty)
+    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty)
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"

@@ -40,7 +40,7 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
 
-  def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | produce(None)
+  def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
   def some: BiGrammar = this ~ (this*) ^^ someMap
   def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ someMap
   def children: Seq[BiGrammar] = Seq.empty
@@ -81,6 +81,10 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def %<(bottom: BiGrammar) = new TopBottom(this, bottom).ignoreRight
 
+  def map[T, U](afterParsing: T => U, beforePrinting: U => Option[T]) = new MapGrammar(this,
+    x => afterParsing(x.asInstanceOf[T]),
+    { case y: U => beforePrinting(y); case _ => None })
+
   def ^^(map: (Any => Any, Any => Option[Any])): BiGrammar = new MapGrammar(this, map._1, map._2)
 
   def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
@@ -98,7 +102,7 @@ trait Custom extends BiGrammar {
   def print(withMap: WithMap): Try[ResponsiveDocument]
 }
 
-trait SequenceLike extends BiGrammar {
+trait SequenceLike extends BiGrammar with Layout {
   def first: BiGrammar
   def second: BiGrammar
   def ignoreLeft: MapGrammar = {
@@ -134,7 +138,7 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
 {
   override def getGrammar = grammar
 
-  lazy val parser = new GrammarToParserConverter().convert(grammar)
+  lazy val parser = GrammarToParserConverter.convert(grammar)
 
   override def print(withMap: WithMap) = {
     withMap.value match {
@@ -156,14 +160,18 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
 
 case class RegexG(regex: Regex) extends FromStringGrammar(core.grammar.RegexG(regex))
 
-abstract class Many(var inner: BiGrammar) extends BiGrammar
+abstract class Many(var inner: BiGrammar) extends BiGrammar with Layout
 {
   override def children = Seq(inner)
 }
 
-class ManyVertical(inner: BiGrammar) extends Many(inner)
+class ManyVertical(inner: BiGrammar) extends Many(inner) {
+  override def horizontal = false
+}
 
-class ManyHorizontal(inner: BiGrammar) extends Many(inner)
+class ManyHorizontal(inner: BiGrammar) extends Many(inner) {
+  override def horizontal = true
+}
 
 /*
 Used in destructuring when a value is required as a result but it's not in the object to be destructured.
@@ -181,6 +189,8 @@ class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: B
 class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
 {
   override def children = Seq(first, second)
+
+  override def horizontal = true
 }
 
 class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any], val showMap: Boolean = false) extends BiGrammar
@@ -197,10 +207,16 @@ class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure()) extends BiG
   override def children = Seq(inner)
 }
 
+trait Layout {
+  def horizontal: Boolean
+}
+
 class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike {
   override lazy val height: Int = first.height + second.height
 
   override def children = Seq(first, second)
+
+  override def horizontal = false
 }
 
 /**

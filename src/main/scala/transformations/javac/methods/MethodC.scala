@@ -158,17 +158,17 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
+    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType ~~ identifier asNode(ParameterKey, ParameterTypeKey, ParameterNameKey)
     val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
-    val parseStatic = grammars.create(StaticGrammar, "static" ~~> produce(true) | produce(false))
+    val parseStatic = grammars.create(StaticGrammar, "static" ~~> value(true) | value(false))
 
     val visibilityModifier = grammars.create(VisibilityGrammar,
-      "public" ~~> produce(PublicVisibility) |
-        "protected" ~~> produce(ProtectedVisibility) |
-        "private" ~~> produce(PrivateVisibility) |
-        produce(DefaultVisibility))
+      "public" ~~> value(PublicVisibility) |
+        "protected" ~~> value(ProtectedVisibility) |
+        "private" ~~> value(PrivateVisibility) |
+        value(DefaultVisibility))
 
 
     val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)

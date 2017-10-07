@@ -14,7 +14,7 @@ object BooleanLiteralC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val parseNumber = "true" ~> produce(literal(true)) | "false" ~> produce(literal(false))
+    val parseNumber = "true" ~> value(literal(true)) | "false" ~> value(literal(false))
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }

@@ -24,21 +24,17 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   }
 
   def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, grammarReference: GrammarReference): Unit = {
-    val verticalNotHorizontal: Boolean = getCommentVerticalOrHorizontal(grammarReference)
-    val newGrammar = if (verticalNotHorizontal) commentsGrammar %> grammarReference.get
-                           else commentsGrammar ~> grammarReference.get
+    val horizontal: Boolean = getDirectionOfContainingLayout(grammarReference)
+    val newGrammar =  if (horizontal) commentsGrammar ~> grammarReference.get
+                      else commentsGrammar %> grammarReference.get
     grammarReference.set(newGrammar)
   }
 
-  def getCommentVerticalOrHorizontal(nodeMapPath: GrammarReference): Boolean = {
-    val growers = nodeMapPath.ancestors.map(path => path.get).
-      filter(grammar => grammar.isInstanceOf[TopBottom] || grammar.isInstanceOf[Sequence] || grammar.isInstanceOf[ManyVertical] || grammar.isInstanceOf[ManyHorizontal])
-
-    val verticalNotHorizontal = growers.nonEmpty && {
-      val firstGrower = growers.head
-      firstGrower.isInstanceOf[TopBottom] || firstGrower.isInstanceOf[ManyVertical]
-    }
-    verticalNotHorizontal
+  def getDirectionOfContainingLayout(nodeGrammarReference: GrammarReference): Boolean = {
+    nodeGrammarReference.ancestors.
+      map(path => path.get).
+      collect({ case layout: Layout => layout.horizontal }).
+      headOption.getOrElse(true)
   }
 
   def getCommentsGrammar: BiGrammar = {

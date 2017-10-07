@@ -13,9 +13,9 @@ object ByteTypeC extends TypeInstance
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "byte" ~> produce(me)
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "byte" ~> value(me)
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("B",false) ~> produce(me)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("B",false) ~> value(me)
 
   override def description: String = "Adds the byte type."
 }

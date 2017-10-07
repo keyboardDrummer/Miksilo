@@ -22,19 +22,26 @@ object TestGrammarUtils extends FunSuite {
   }
 
   def parseAndPrint(example: String, expectedOption: Option[Any], grammarDocument: BiGrammar): String = {
-    val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
-
-    val packrat: GrammarToParserConverter = new GrammarToParserConverter()
-    val packratParser = packrat.convert(grammar)
-    val parseResult = packratParser(new CharArrayReader(example.toCharArray))
+    val parseResult = parse(example, grammarDocument)
     assert(parseResult.successful, parseResult.toString)
 
     val result = parseResult.get
 
     expectedOption.foreach(expected => assertResult(expected)(result))
 
-    val documentResult = BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
-    documentResult
+    print(result, grammarDocument)
+  }
+
+  def print(result: Any, grammarDocument: BiGrammar): String = {
+    BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
+  }
+
+  def parse(example: String, grammarDocument: BiGrammar) = {
+    val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
+
+    val packratParser = GrammarToParserConverter.convert(grammar)
+    val parseResult = packratParser(new CharArrayReader(example.toCharArray))
+    parseResult
   }
 }
 

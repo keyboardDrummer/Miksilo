@@ -2,6 +2,7 @@ package core.particles
 
 import core.bigrammar.{BiGrammarToGrammar, Labelled}
 import core.grammar.{GrammarToParserConverter, ParseException}
+import org.fife.ui.rsyntaxtextarea.parser.ParseResult
 
 import scala.util.parsing.input.CharArrayReader
 

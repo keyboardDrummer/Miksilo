@@ -20,7 +20,7 @@ object ReturnVoidC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
-    val returnExpression = ("return" ~ ";") ~> produce(_return)
+    val returnExpression = ("return" ~ ";") ~> value(_return)
     statement.inner = statement.inner | returnExpression
   }
 
