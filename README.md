@@ -21,7 +21,7 @@ Once you're happy with your compiler you can play around with it in the compiler
 and do things like ask the compiler for its in- and output grammar.
 
 ### BiGrammar
-To allow writing both parsing and printing at the same time, Blender defines the [BiGrammar DSL](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-1:-unified-parsing-and-printing). The approach taken here is similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
+To allow writing both a parser and a printer at the same time, Blender defines the [BiGrammar DSL](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-1:-unified-parsing-and-printing). The approach taken here is similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
 A BiGrammar may be defined in a left recursive fashion, which can be contributed to the use of packrat parsing as described in
 '*Packrat Parsing: Simple, Powerful, Lazy, Linear Time*' to deal with problems associated with such grammars.
 
