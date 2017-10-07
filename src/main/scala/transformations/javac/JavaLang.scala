@@ -23,10 +23,12 @@ object JavaLang {
   }
 
   def initialise(javaCompilerState: JavaCompilerState) {
-    new ClassCompiler(objectClass, javaCompilerState)
-    new ClassCompiler(stringClass, javaCompilerState)
-    new ClassCompiler(systemClass, javaCompilerState)
-    new ClassCompiler(printStreamClass, javaCompilerState)
+    this.synchronized {
+      ClassCompiler(objectClass, javaCompilerState)
+      ClassCompiler(stringClass, javaCompilerState)
+      ClassCompiler(systemClass, javaCompilerState)
+      ClassCompiler(printStreamClass, javaCompilerState)
+    }
   }
 
   val classPath = new PackageSignature(None, "")
