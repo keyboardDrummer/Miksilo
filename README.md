@@ -16,7 +16,7 @@ Blender focuses purely on intermediate languages to achieve modularisation.
 By keeping the abstract syntax tree untyped, it becomes relatively simple to define a language as a sequence of language delta's.
 
 ### GUI
-Blender includes a GUI. You can use this to play around with the defined particles and construct a compiler from them.
+Blender includes a GUI. You can use this to play around with the defined deltas and construct a compiler from them.
 Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can run your compiler,
 and do things like ask the compiler for its in- and output grammar.
 
@@ -26,7 +26,7 @@ A BiGrammar may be defined in a left recursive fashion, which can be contributed
 '*Packrat Parsing: Simple, Powerful, Lazy, Linear Time*' to deal with problems associated with such grammars.
 
 ### State of the project
-Currently I'm only working on particles that enable a Java to JVM bytecode translation. I'm using JVM as a target because it's a relatively high level language so it's easy to compile to. My current goal is to finish or almost finish a Java compiler. I'd say it's about halfway done. After that I'd like to use very different languages for front- and back-end, say Haskell as a front-end and Javascript as a back-end. I'm curious what the similarities between these languages from different paradigms are and how many compiler particles can be reused between different languages.
+Currently I'm only working on deltas that enable a Java to JVM bytecode translation. I'm using JVM as a target because it's a relatively high level language so it's easy to compile to. My current goal is to finish or almost finish a Java compiler. I'd say it's about halfway done. After that I'd like to use very different languages for front- and back-end, say Haskell as a front-end and Javascript as a back-end. I'm curious what the similarities between these languages from different paradigms are and how many compiler deltas can be reused between different languages.
 
 ### Build instructions
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
