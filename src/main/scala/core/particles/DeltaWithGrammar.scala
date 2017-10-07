@@ -5,13 +5,7 @@ import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 
-/*
-Used as a field key when mapping a grammar to a node, to indicate that value at this location is mapped not using a regular field key,
-but as a map.
- */
-object FromMap extends NodeField // TODO moet deze weg?
-
-trait NodeGrammarWriter extends GrammarDocumentWriter {
+trait NodeGrammarWriter extends BiGrammarWriter {
 
   implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
   implicit val postfixOps = language.postfixOps
@@ -56,7 +50,7 @@ trait NodeGrammarWriter extends GrammarDocumentWriter {
     val node = value.asInstanceOf[NodeLike]
 
     if (node.clazz == key) {
-      val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
+      val fieldValues = fields.map(field => node.get(field).getOrElse(ValueNotFound(node, field)))
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
       if (fieldValues.isEmpty) {
         Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap))
@@ -69,10 +63,6 @@ trait NodeGrammarWriter extends GrammarDocumentWriter {
   }
 
   case class ValueNotFound(meta: NodeLike, field: Any)
-
-  def getFieldValueTakingFromMapIntoAccount(meta: NodeLike, key: NodeField): Any = {
-    if (key == FromMap) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
-  }
 
   def tildeValuesToSeq(value: Any): Seq[Any] = value match {
     case ~(l, r) => tildeValuesToSeq(l) ++ tildeValuesToSeq(r)
@@ -87,15 +77,7 @@ trait NodeGrammarWriter extends GrammarDocumentWriter {
     fields.zip(values).foreach(pair => {
       val field = pair._1
       val fieldValue: Any = pair._2
-      if (field == FromMap) {
-        fieldValue match {
-          case metaFieldValue: Node =>
-            result.data ++= fieldValue.asInstanceOf[Node].data
-          case _ =>
-        }
-      }
-      else
-        result(field) = fieldValue
+      result(field) = fieldValue
     })
     result.data ++= valueWithMap.state.collect { case (k: NodeField,v) => (k,v) }
     WithMap(result, Map.empty)

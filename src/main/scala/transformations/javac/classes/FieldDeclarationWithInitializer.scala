@@ -1,9 +1,9 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
-import core.particles.path.{Path, PathRoot}
 import core.particles._
+import core.particles.grammars.GrammarCatalogue
+import core.particles.node.{Node, NodeClass}
+import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.constructor.{ConstructorC, SuperCallExpression}
@@ -20,7 +20,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC).asNode(FieldWithInitializerKey, FromMap)
+    val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC.Clazz).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 

@@ -13,7 +13,7 @@ import scala.util.parsing.input.CharArrayReader
 /*
 A grammar that maps to both a parser and a printer
  */
-trait BiGrammar extends GrammarDocumentWriter {
+trait BiGrammar extends BiGrammarWriter {
 
   def getDescendantsAndSelf: Seq[BiGrammar] = ???
 

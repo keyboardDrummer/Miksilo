@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 
 import scala.collection.immutable.StringOps
 
-class TestRecursion extends FunSuite with GrammarDocumentWriter {
+class TestRecursion extends FunSuite with BiGrammarWriter {
 
   val input = "!!!!!"
 

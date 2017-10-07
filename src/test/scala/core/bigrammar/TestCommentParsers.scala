@@ -7,7 +7,7 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
 
-class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratParsers with GrammarDocumentWriter {
+class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratParsers with BiGrammarWriter {
 
   test("PlusMinus") {
     lazy val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
