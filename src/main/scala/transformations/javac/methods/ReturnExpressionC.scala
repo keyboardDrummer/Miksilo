@@ -39,7 +39,7 @@ object ReturnExpressionC extends StatementInstance {
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
 
-    val returnExpression = "return" ~~> expression <~ ";" asNode(ReturnInteger, ReturnValue)
+    val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
     statement.inner = statement.inner | returnExpression
   }
 

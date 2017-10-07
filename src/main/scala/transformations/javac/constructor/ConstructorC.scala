@@ -52,11 +52,10 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val visibilityModifier = grammars.find(MethodC.VisibilityGrammar)
-    val parseParameters = grammars.find(MethodC.ParametersGrammar)
-    val block = grammars.find(BlockC.BlockGrammar)
-    val constructorGrammar = (visibilityModifier ~~ identifier ~ parseParameters % block).
-      asNode(ConstructorKey, VisibilityKey, ConstructorClassNameKey, MethodParametersKey, MethodBodyKey)
+    val visibilityModifier = grammars.find(MethodC.VisibilityGrammar) as VisibilityKey
+    val parseParameters = grammars.find(MethodC.ParametersGrammar) as MethodParametersKey
+    val block = grammars.find(BlockC.BlockGrammar) as MethodBodyKey
+    val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)
   }
 

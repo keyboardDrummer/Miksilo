@@ -34,7 +34,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
     val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar <~ ">" <~ " ").option.optionToSeq)
+    grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< " ").option.optionToSeq)
   }
 
   object AbstractMethodTypeGrammar
@@ -47,8 +47,8 @@ object TypeAbstraction extends DeltaWithGrammar {
       (":" ~> classBound.option).as(ParameterClassBound) ~~
       ((":" ~> classBound)*).as(ParameterInterfaceBound) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar <~ ">") ~ methodTypeGrammar).
-      asNode(TypeAbstractionKey, Parameters, Body))
+    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
+      asNode(TypeAbstractionKey))
     byteCodeType.addOption(abstractMethodType)
   }
 

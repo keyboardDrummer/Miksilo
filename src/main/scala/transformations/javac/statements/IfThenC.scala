@@ -13,9 +13,9 @@ object IfThenC extends StatementInstance {
 
   object IfThenKey extends NodeClass
 
-  object ConditionKey extends NodeField
+  object Condition extends NodeField
 
-  object ThenKey extends NodeField
+  object Then extends NodeField
 
   override val key = IfThenKey
 
@@ -38,19 +38,19 @@ object IfThenC extends StatementInstance {
   }
 
   def getCondition[T <: NodeLike](ifThen: T): T = {
-    ifThen(ConditionKey).asInstanceOf[T]
+    ifThen(Condition).asInstanceOf[T]
   }
 
   def getThenStatements[T <: NodeLike](ifThen: T): Seq[T] = {
-    ifThen(ThenKey).asInstanceOf[Seq[T]]
+    ifThen(Then).asInstanceOf[Seq[T]]
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
-    val ifThenGrammar = grammars.create(this, ("if" ~> ("(" ~> expressionGrammar <~ ")") ~ bodyGrammar).
-      asNode(IfThenKey, ConditionKey, ThenKey))
+    val ifThenGrammar = grammars.create(IfThenKey, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") ~ bodyGrammar.as(Then)).
+      asNode(IfThenKey))
     statementGrammar.addOption(ifThenGrammar)
   }
 

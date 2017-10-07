@@ -2,13 +2,13 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
 import transformations.bytecode.coreInstructions.longs.LoadLongDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
-import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
+import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
@@ -19,7 +19,7 @@ object VariableC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val variableGrammar = grammars.create(VariableGrammar, nodeGrammar(identifier, VariableKey, VariableNameKey))
+    val variableGrammar = grammars.create(VariableGrammar, identifier.as(VariableNameKey) asNode VariableKey)
     core.addOption(variableGrammar)
   }
 

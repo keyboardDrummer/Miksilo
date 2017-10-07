@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.{FromMap, Language}
+import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
@@ -39,8 +39,8 @@ object IfThenElseC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = grammars.find(BlockC.BlockOrStatementGrammar)
-    val ifThenGrammar = grammars.find(IfThenC)
-    val ifThenElseGrammar = ifThenGrammar ~ ("else" ~> bodyGrammar) asNode(key, FromMap, ElseKey)
+    val ifThenGrammar = grammars.find(IfThenC.key)
+    val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode key
     statementGrammar.addOption(ifThenElseGrammar)
   }
 

@@ -10,13 +10,13 @@ import transformations.bytecode.types.TypeSkeleton
 
 object ExpressionAsStatementC extends StatementInstance {
 
-  object ExpressionAsStatementKey extends NodeClass
+  object Clazz extends NodeClass
 
-  object ExpressionKey extends NodeField
+  object Expression extends NodeField
 
-  def create(expression: Node): Node = new Node(ExpressionAsStatementKey, ExpressionKey -> expression)
+  def create(expression: Node): Node = new Node(Clazz, Expression -> expression)
 
-  override val key = ExpressionAsStatementKey
+  override val key = Clazz
 
   override def toByteCode(statement: Path, state: Language): Seq[Node] = {
     val expression = getExpression(statement)
@@ -30,14 +30,13 @@ object ExpressionAsStatementC extends StatementInstance {
   }
 
   def getExpression[T <: NodeLike](statement: T): T = {
-    statement(ExpressionKey).asInstanceOf[T]
+    statement(Expression).asInstanceOf[T]
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val inner = expressionGrammar <~ ";"
-    val expressionAsStatement = nodeGrammar(inner, ExpressionAsStatementKey, ExpressionKey)
+    val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Clazz
     statementGrammar.addOption(expressionAsStatement)
   }
 

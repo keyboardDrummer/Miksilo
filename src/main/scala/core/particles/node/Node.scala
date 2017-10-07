@@ -16,7 +16,7 @@ object Node {
       }
       catch
       {
-        case e: java.lang.InternalError => "internalError"
+        case e: java.lang.InternalError => e.toString
       }
     case _ => _clazz.toString
   }

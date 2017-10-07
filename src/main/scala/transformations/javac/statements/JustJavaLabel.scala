@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 
@@ -24,7 +24,7 @@ object JustJavaLabel extends StatementInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(grammars.create(JavaLabelGrammar, ("label" ~~> identifier <~ ";").asNode(LabelKey, Name)))
+    statementGrammar.addOption(grammars.create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode LabelKey))
   }
 
   override def description: String = "Adds a label statement"

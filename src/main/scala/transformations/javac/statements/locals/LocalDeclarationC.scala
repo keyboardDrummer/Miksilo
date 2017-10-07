@@ -11,21 +11,21 @@ import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 
 object LocalDeclarationC extends StatementInstance {
 
-  def getDeclarationType(declaration: Node) = declaration(DeclarationType).asInstanceOf[Node]
+  def getDeclarationType(declaration: Node) = declaration(Type).asInstanceOf[Node]
 
-  def getDeclarationName(declaration: Node) = declaration(DeclarationName).asInstanceOf[String]
+  def getDeclarationName(declaration: Node) = declaration(Name).asInstanceOf[String]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar ~~ identifier <~ ";" asNode(DeclarationKey, DeclarationType, DeclarationName)
+    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode DeclarationKey
     statement.addOption(parseDeclaration)
   }
 
   def declaration(name: String, _type: Node): Node = {
-    new Node(DeclarationKey, DeclarationName -> name, DeclarationType -> _type)
+    new Node(DeclarationKey, Name -> name, Type -> _type)
   }
 
   case class VariableAlreadyDefined(variable: String) extends BadInputException
@@ -34,9 +34,8 @@ object LocalDeclarationC extends StatementInstance {
   }
 
   object DeclarationKey extends NodeClass
-  object DeclarationName extends NodeField
-
-  object DeclarationType extends NodeField
+  object Name extends NodeField
+  object Type extends NodeField
 
   override val key = DeclarationKey
 

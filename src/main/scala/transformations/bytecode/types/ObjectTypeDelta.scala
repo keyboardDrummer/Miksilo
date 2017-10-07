@@ -25,7 +25,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})
         if (stringIds.size > 1)
-          Right(new QualifiedClassName(stringIds))
+          Right(QualifiedClassName(stringIds))
         else
           Left(stringIds.last)
     }
@@ -34,7 +34,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
       case Left(string) => Seq(string)
     })
     val parseObjectType = grammars.create(ObjectTypeJavaGrammar,
-      (identifier.someSeparated(".") ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
+      (identifier.someSeparated(".") ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
     parseObjectType
   }
 
@@ -55,8 +55,8 @@ object ObjectTypeDelta extends TypeInstance with StackType {
       case Right(name) => name
     })
     val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
-      (QualifiedClassNameConstantDelta.getQualifiedClassNameParser ^^ (construct, deconstruct)).asNode(ObjectTypeKey, Name))
-    val grammar: BiGrammar = Keyword("L", false) ~> inner <~ ";"
+      (QualifiedClassNameConstantDelta.getQualifiedClassNameParser ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
+    val grammar: BiGrammar = Keyword("L", reserved = false) ~> inner ~< ";"
     grammars.create(ObjectTypeByteCodeGrammar, grammar)
   }
 

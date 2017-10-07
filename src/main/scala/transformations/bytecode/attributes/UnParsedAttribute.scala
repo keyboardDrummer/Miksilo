@@ -22,7 +22,7 @@ object UnParsedAttribute extends DeltaWithGrammar {
   object Data extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val grammar = "UnParsed attribute with nameIndex:" ~~> integer asNode(Clazz, Name)
+    val grammar = "UnParsed attribute with nameIndex:" ~~> integer.as(Name) asNode Clazz
     grammars.find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }
 

@@ -43,7 +43,7 @@ object MethodType extends TypeInstance {
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     val throwsGrammar = ("^" ~> typeGrammar)*
-    val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) <~ ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(MethodTypeKey)
+    val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) ~< ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(MethodTypeKey)
     methodGrammar
   }
 }

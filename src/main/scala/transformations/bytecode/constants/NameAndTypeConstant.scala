@@ -53,7 +53,7 @@ object NameAndTypeConstant extends ConstantEntry {
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    ((grammars.find(ConstantPoolIndexGrammar).as(Name) <~ ":") ~
+    ((grammars.find(ConstantPoolIndexGrammar).as(Name) ~< ":") ~
       grammars.find(ConstantPoolIndexGrammar).as(Type)).
     asNode(Clazz)
 

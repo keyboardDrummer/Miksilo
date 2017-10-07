@@ -18,13 +18,11 @@ object JustJavaGoto extends StatementInstance {
     Seq(LabelledLocations.goTo(getTarget(statement.current)))
   }
 
-  object JavaGotoGrammar
-
   def getTarget(node: Node) = node(Target).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(grammars.create(JavaGotoGrammar, "goto" ~~> identifier <~ ";").asNode(GotoKey, Target))
+    statementGrammar.addOption("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set(labels(getTarget(obj.current)))

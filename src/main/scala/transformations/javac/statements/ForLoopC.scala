@@ -30,7 +30,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = grammars.find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
-      expressionGrammar.as(Condition) <~ ";" ~
+      expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %
       blockGrammar.as(Body) asNode ForLoopType
     statementGrammar.inner = statementGrammar.inner | forLoopGrammar

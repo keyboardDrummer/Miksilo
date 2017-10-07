@@ -1,61 +1,47 @@
 package core.particles
 
 import core.bigrammar.{MapGrammar, _}
-import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 
-/*
-Used as a field key when mapping a grammar to a node, to indicate that value at this location is mapped not using a regular field key,
-but as a map.
- */
-object FromMap extends NodeField // TODO moet deze weg?
-
-trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
-  implicit val postfixOps = language.postfixOps
+trait NodeGrammarWriter extends BiGrammarWriter {
 
   implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
-  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
-
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    transformGrammars(state.grammarCatalogue, state)
-  }
-
-  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
-    (x => x, x => Some(x).filter(clazz.isInstance))
-  }
+  implicit val postfixOps = language.postfixOps
 
   case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException
   {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
   }
 
+  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
+    (x => x, x => Some(x).filter(clazz.isInstance))
+  }
+
   implicit class GrammarForAst(grammar: BiGrammar)
   {
-    def parseMap(key: NodeClass, fields: NodeField*): BiGrammar = {
+    def parseMap(key: NodeClass): BiGrammar = {
       new MapGrammar(grammar,
-        input => construct(input.asInstanceOf[WithMap], key, fields.toList),
-        obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
+        input => construct(input.asInstanceOf[WithMap], key),
+        obj => destruct(obj.asInstanceOf[WithMap], key), showMap = true)
     }
 
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
-    def asNode(key: NodeClass, fields: NodeField*) = new NodeGrammar(grammar, key, fields.toSeq)
-    def as(field: NodeField) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
+    def asNode(key: NodeClass) = new NodeGrammar(grammar, key)
+    def as(field: NodeField) = As(grammar, field)
   }
 
-  def nodeGrammar(inner: BiGrammar, key: NodeClass, fields: NodeField*) = new NodeGrammar(inner, key, fields.toSeq)
+  def nodeGrammar(inner: BiGrammar, key: NodeClass) = new NodeGrammar(inner, key)
 
-
-  class NodeGrammar(inner: BiGrammar, val key: NodeClass, val fields: Seq[NodeField])
+  class NodeGrammar(inner: BiGrammar, val key: NodeClass)
     extends MapGrammar(inner,
-      input => construct(input.asInstanceOf[WithMap], key, fields.toList),
-      obj => destruct(obj.asInstanceOf[WithMap], key, fields.toList), showMap = true)
+      input => construct(input.asInstanceOf[WithMap], key),
+      obj => destruct(obj.asInstanceOf[WithMap], key), showMap = true)
   {
   }
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(withMap: WithMap, key: NodeClass, fields: List[NodeField]): Option[WithMap] = {
+  def destruct(withMap: WithMap, key: NodeClass): Option[WithMap] = {
     val value = withMap.value
     if (!value.isInstanceOf[NodeLike])
       return None
@@ -63,13 +49,8 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
     val node = value.asInstanceOf[NodeLike]
 
     if (node.clazz == key) {
-      val fieldValues = fields.map(field => getFieldValueTakingFromMapIntoAccount(node, field))
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      if (fieldValues.isEmpty) {
-        Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap))
-      } //Apparently this node maps onto grammars that are all ignored so it does not contain any values, however we have to return a value here.
-      else
-        Some(WithMap(fieldValues.reduce((a,b) => core.grammar.~(a,b)), dataViewAsGenericMap))
+      Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap))
     } else {
       None
     }
@@ -77,34 +58,20 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
 
   case class ValueNotFound(meta: NodeLike, field: Any)
 
-  def getFieldValueTakingFromMapIntoAccount(meta: NodeLike, key: NodeField): Any = {
-    if (key == FromMap) meta else meta.get(key).getOrElse(ValueNotFound(meta, key))
-  }
-
-  def tildeValuesToSeq(value: Any): Seq[Any] = value match {
-    case ~(l, r) => tildeValuesToSeq(l) ++ tildeValuesToSeq(r)
-    case _ => Seq(value)
-  }
-
-  def construct(valueWithMap: WithMap, key: NodeClass, fields: List[NodeField]): WithMap = {
-    val value = valueWithMap.value
-
+  def construct(withMap: WithMap, key: NodeClass): WithMap = {
     val result = new Node(key)
-    val values = tildeValuesToSeq(value)
-    fields.zip(values).foreach(pair => {
-      val field = pair._1
-      val fieldValue: Any = pair._2
-      if (field == FromMap) {
-        fieldValue match {
-          case metaFieldValue: Node =>
-            result.data ++= fieldValue.asInstanceOf[Node].data
-          case _ =>
-        }
-      }
-      else
-        result(field) = fieldValue
-    })
-    result.data ++= valueWithMap.state.collect { case (k: NodeField,v) => (k,v) }
+    result.data ++= withMap.state.collect { case (k: NodeField,v) => (k,v) }
     WithMap(result, Map.empty)
   }
+}
+
+trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
+
+  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
+
+  override def inject(state: Language): Unit = {
+    super.inject(state)
+    transformGrammars(state.grammarCatalogue, state)
+  }
+
 }

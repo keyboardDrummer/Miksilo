@@ -29,7 +29,7 @@ object InterfaceMethodRefConstant extends ConstantEntry {
 
   def getNameIndex(methodRef: Node) = methodRef(MethodRefMethodName).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue) = ((integer.as(MethodRefClassName) <~ ".") ~ integer.as(MethodRefMethodName)).
+  def getConstantEntryGrammar(grammars: GrammarCatalogue) = ((integer.as(MethodRefClassName) ~< ".") ~ integer.as(MethodRefMethodName)).
     asNode(InterfaceMethodRefConstantKey)
 
   override def description: String = "Defines the interface method reference constant, " +

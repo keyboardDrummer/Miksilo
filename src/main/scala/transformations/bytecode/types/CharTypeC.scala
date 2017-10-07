@@ -13,9 +13,9 @@ object CharTypeC extends TypeInstance
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "char" ~> produce(me)
+  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = "char" ~> value(me)
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("C",false) ~> produce(me)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("C",false) ~> value(me)
 
   override def description: String = "Adds the char type."
 }

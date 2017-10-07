@@ -79,14 +79,13 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
     val importGrammar = grammars.create(ImportGrammar)
-    val importsGrammar: BiGrammar = importGrammar.manyVertical
-    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") <~ ";") | produce(Seq.empty)
+    val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
+    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
-    val membersGrammar: MapGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}"
+    val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}" as Members
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
-    val classGrammar = grammars.create(ClassGrammar, (packageGrammar % importsGrammar % (nameAndParent %> membersGrammar)).
-      asNode(ClassFileKey, ClassPackage, ClassImports, Members))
+    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode ClassFileKey)
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 

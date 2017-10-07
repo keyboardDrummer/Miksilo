@@ -158,25 +158,24 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
     val block = grammars.find(BlockC.BlockGrammar)
 
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> produce(VoidTypeC.voidType) | parseType)
+    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
 
-    val parseParameter = parseType ~~ identifier asNode(ParameterKey, ParameterTypeKey, ParameterNameKey)
-    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") <~ ")")
-    val parseStatic = grammars.create(StaticGrammar, "static" ~~> produce(true) | produce(false))
+    val parseParameter = parseType.as(ParameterTypeKey) ~~ identifier.as(ParameterNameKey) asNode ParameterKey
+    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
+    val parseStatic = grammars.create(StaticGrammar, "static" ~~> value(true) | value(false))
 
     val visibilityModifier = grammars.create(VisibilityGrammar,
-      "public" ~~> produce(PublicVisibility) |
-        "protected" ~~> produce(ProtectedVisibility) |
-        "private" ~~> produce(PrivateVisibility) |
-        produce(DefaultVisibility))
+      "public" ~~> value(PublicVisibility) |
+        "protected" ~~> value(ProtectedVisibility) |
+        "private" ~~> value(PrivateVisibility) |
+        value(DefaultVisibility))
 
 
     val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodUnmapped: TopBottom = visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
-      parseReturnType ~~ identifier ~ parseParameters % block
-    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey, VisibilityKey, StaticKey,
-      TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+    val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
+      parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
+    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)

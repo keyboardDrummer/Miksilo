@@ -1,17 +1,18 @@
 package core.bigrammar
 
-import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
-import org.junit.{Assert, Ignore, Test}
+import core.bigrammar.printer.BiGrammarToPrinter
 import org.scalatest.FunSuite
 
-class TestRecursion extends FunSuite with GrammarDocumentWriter {
+import scala.collection.immutable.StringOps
+
+class TestRecursion extends FunSuite with BiGrammarWriter {
 
   val input = "!!!!!"
 
   test("RightRecursion") {
     val grammar: Labelled = new Labelled("leftRec")
     grammar.addOption("!" ~ grammar)
-    grammar.addOption(produce(null))
+    grammar.addOption(value(null))
 
     testUsingGrammar(grammar)
   }
@@ -20,7 +21,7 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
     val grammar: Labelled = new Labelled("leftRec")
     grammar.addOption("!" ~ grammar)
     grammar.addOption(grammar)
-    grammar.addOption(produce(null))
+    grammar.addOption(value(null))
 
     testUsingGrammar(grammar)
   }
@@ -30,12 +31,12 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
   }
 
   def getExpectedRightRecursiveResult: AnyRef = {
-    "!!!!!".map(s => s.toString).foldRight[AnyRef](null)((a, b) => core.grammar.~(a, b))
+    new StringOps("!!!!!").map(s => s.toString).foldRight[AnyRef](null)((a, b) => core.grammar.~(a, b))
   }
 
   ignore("LeftRecursion") {
     val grammar: Labelled = new Labelled("leftRec")
-    grammar.addOption(produce(null))
+    grammar.addOption(value(null))
     grammar.addOption(grammar ~ "!")
 
     testUsingGrammar(grammar)
@@ -44,7 +45,7 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
   test("LeftRecursionPrintOnly") {
     val grammarDocument: Labelled = new Labelled("leftRec")
     grammarDocument.addOption(grammarDocument ~ "!")
-    grammarDocument.addOption(produce(null))
+    grammarDocument.addOption(value(null))
 
     val result = getExpectedLeftRecursiveResult
 
@@ -54,14 +55,14 @@ class TestRecursion extends FunSuite with GrammarDocumentWriter {
   }
 
   def getExpectedLeftRecursiveResult: AnyRef = {
-    "!!!!!".map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
+    new StringOps("!!!!!").map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
   }
 
   test("PrintingIndirectLeftRecursion") {
     val inner = new Labelled("boep")
     val outer = new Labelled("woep", inner)
     inner.addOption(outer ~ "!")
-    inner.addOption(produce(null))
+    inner.addOption(value(null))
 
     val document = BiGrammarToPrinter.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()

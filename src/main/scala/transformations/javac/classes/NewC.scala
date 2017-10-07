@@ -20,8 +20,7 @@ object NewC extends ExpressionInstance {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
     val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
-    val newGrammar = ("new" ~~> objectGrammar ~ callArgumentsGrammar).
-      asNode(NewCallKey, NewObject, CallC.CallArguments)
+    val newGrammar = "new" ~~> objectGrammar.as(NewObject) ~ callArgumentsGrammar.as(CallC.CallArguments) asNode NewCallKey
     val expressionGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }

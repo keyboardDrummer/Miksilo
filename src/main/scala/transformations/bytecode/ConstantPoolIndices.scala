@@ -16,7 +16,7 @@ object ConstantPoolIndices extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val previousConstantPoolItem = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
-    val constantPoolItem = (("#" ~> number.as(Index) <~~ "=") ~~ previousConstantPoolItem.inner.as(Content)).
+    val constantPoolItem = (("#" ~> number.as(Index) ~~< "=") ~~ previousConstantPoolItem.inner.as(Content)).
       asNode(WithIndexClass)
     previousConstantPoolItem.inner = constantPoolItem
 

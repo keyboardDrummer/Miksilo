@@ -24,7 +24,7 @@ object NotC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
-    coreGrammar.addOption("!" ~> coreGrammar asNode(NotKey, NotExpression))
+    coreGrammar.addOption("!" ~> coreGrammar.as(NotExpression) asNode NotKey)
   }
 
   override def description: String = "Adds the ! (not) operator."

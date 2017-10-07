@@ -2,7 +2,7 @@ package transformations.javac.statements
 
 import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
+import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledLocations
 
@@ -19,7 +19,7 @@ object WhileContinueC extends StatementInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey, Seq.empty))
+    statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey))
   }
 
   override def description: String = "Jumps the program to the start of the loop."

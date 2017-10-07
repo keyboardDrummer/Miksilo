@@ -1,10 +1,9 @@
 package core.bigrammar
 
-import core.grammar.{NumberG, ~}
-import org.junit.Test
+import core.grammar.~
 import org.scalatest.FunSuite
 
-class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
+class TestSimpleExpressionLanguage extends FunSuite with BiGrammarWriter {
 
   test("SimpleAddition") {
     val example = "3 + 4"
@@ -56,27 +55,27 @@ class TestSimpleExpressionLanguage extends FunSuite with GrammarDocumentWriter {
 
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled("expression")
-    val parenthesis: BiGrammar = "(" ~> expression <~ ")"
+    val parenthesis: BiGrammar = "(" ~> expression ~< ")"
 
 
-    val number: BiGrammar = consume(NumberG) ^^(v => new Value(Integer.parseInt(v.asInstanceOf[String])), {
+    val numberValue: BiGrammar = integer ^^ (v => Value(v.asInstanceOf[Int]), {
       case Value(i) => Some(i)
       case _ => None
     })
 
     val multipleLabel = new Labelled("multiply")
-    val multiply = (multipleLabel <~~ "*") ~~ multipleLabel ^^( {
+    val multiply = (multipleLabel ~~< "*") ~~ multipleLabel ^^( {
       case core.grammar.~(l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
       case Multiply(l, r) => Some(core.grammar.~(l, r))
       case _ => None
     })
     multipleLabel.addOption(multiply)
-    multipleLabel.addOption(number)
+    multipleLabel.addOption(numberValue)
     multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled("add")
-    val add: BiGrammar = (addLabel <~~ "+") ~~ addLabel ^^( {
+    val add: BiGrammar = (addLabel ~~< "+") ~~ addLabel ^^( {
       case core.grammar.~(l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
       case Add(l, r) => Some(core.grammar.~(l, r))

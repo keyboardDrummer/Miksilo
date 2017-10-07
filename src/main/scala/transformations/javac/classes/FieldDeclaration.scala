@@ -73,7 +73,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
 
-    val fieldGrammar = (typeGrammar ~~ identifier <~ ";").asNode(FieldKey, FieldType, FieldName)
+    val fieldGrammar = (typeGrammar.as(FieldType) ~~ identifier.as(FieldName) ~< ";").asNode(FieldKey)
     memberGrammar.addOption(fieldGrammar)
   }
 

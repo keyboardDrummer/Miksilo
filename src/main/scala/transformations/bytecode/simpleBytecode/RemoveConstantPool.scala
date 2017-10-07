@@ -51,7 +51,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(Utf8ConstantDelta.key).inner = Utf8ConstantDelta.getConstantEntryGrammar(grammars)
     grammars.find(TypeConstant.key).inner = TypeConstant.getConstantEntryGrammar(grammars)
     grammars.find(QualifiedClassNameConstantDelta.key).inner = QualifiedClassNameConstantDelta.getConstantEntryGrammar(grammars)
-    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) <~ "." ~
+    grammars.find(MethodRefConstant.key).inner = (grammars.find(ClassInfoConstant.key).as(ClassRef) ~< "." ~
       grammars.find(NameAndTypeConstant.key).as(MethodRefConstant.NameAndType)) asNode MethodRefKey
     grammars.find(ClassInfoConstant.key).inner = grammars.find(QualifiedClassNameConstantDelta.key).as(ClassInfoConstant.Name) asNode ClassInfoConstant.Clazz
     grammars.find(FieldRefConstant.key).inner = grammars.find(ClassInfoConstant.key).as(ClassInfo) ~ "." ~

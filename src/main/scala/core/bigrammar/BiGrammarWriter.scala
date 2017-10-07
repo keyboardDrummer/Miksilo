@@ -1,30 +1,31 @@
 package core.bigrammar
 
 import core.document.{Document, WhiteSpace}
-import core.grammar.{Grammar, Identifier, NumberG}
+import core.grammar.{Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
 
-trait GrammarDocumentWriter {
+trait BiGrammarWriter {
 
-  def identifier: BiGrammar = consume(Identifier)
+  def identifier: BiGrammar = new FromStringGrammar(Identifier)
 
-  def number: BiGrammar = consume(NumberG)
+  def number: BiGrammar = new FromGrammarWithToString(NumberG)
 
-  def integer = number ^^ ((s: Any) => Integer.parseInt(s.asInstanceOf[String]), (i: Any) => Some(i.toString))
+  def integer = number ^^ (
+    (s: Any) => Integer.parseInt(s.asInstanceOf[String]),
+    (i: Any) => Some(i).filter(i => i.isInstanceOf[Int]).map(i => i.toString)
+  )
 
   def failure: BiGrammar = BiFailure()
 
-  def produce(value: Any): BiGrammar = new ValueGrammar(value)
+  def value(value: Any): BiGrammar = new ValueGrammar(value)
 
   def keywordClass(value: String) = new Keyword(value, false, true)
 
   def space: BiGrammar = print(new WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)
-
-  implicit def consume(grammar: Grammar): BiGrammar = new FromGrammarWithToString(grammar)
 
   implicit def print(document: ResponsiveDocument): BiGrammar = new Print(document)
 
