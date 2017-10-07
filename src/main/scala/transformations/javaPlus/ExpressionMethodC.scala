@@ -17,15 +17,14 @@ object ExpressionMethodC extends DeltaWithGrammar with DeltaWithPhase {
   object ExpressionMethodExpression extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar)
-    val parseStatic = grammars.find(MethodC.StaticGrammar)
-    val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar)
-    val parseParameters = grammars.find(MethodC.ParametersGrammar)
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val visibilityGrammar = grammars.find(MethodC.VisibilityGrammar).as(VisibilityKey)
+    val parseStatic = grammars.find(MethodC.StaticGrammar).as(StaticKey)
+    val parseReturnType = grammars.find(MethodC.ReturnTypeGrammar).as(ReturnTypeKey)
+    val parseParameters = grammars.find(MethodC.ParametersGrammar).as(MethodParametersKey)
+    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar).as(ExpressionMethodExpression)
     val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
-      identifier ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
-      asNode(ExpressionMethodKey, VisibilityKey, StaticKey, ReturnTypeKey, MethodNameKey,
-        MethodParametersKey, ExpressionMethodExpression)
+      identifier.as(MethodNameKey) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
+      asNode(ExpressionMethodKey)
     val methodGrammar = grammars.find(MethodC.MethodGrammar)
     methodGrammar.addOption(expressionMethodGrammar)
   }

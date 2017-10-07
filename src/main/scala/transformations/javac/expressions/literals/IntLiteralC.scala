@@ -16,7 +16,7 @@ object IntLiteralC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
-    val parseNumber = inner.asNode(IntLiteralKey, ValueKey)
+    val parseNumber = inner.as(ValueKey).asNode(IntLiteralKey)
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }

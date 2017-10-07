@@ -33,7 +33,7 @@ object BiGrammarToGrammar {
       case Print(document) => core.grammar.Produce(Unit) ^^ addEmptyState //TODO really want unit here?
       case ValueGrammar(value) => core.grammar.Produce(value) ^^ addEmptyState
       case As(inner, key) => recursive(inner) ^^
-        { case WithMap(v, state) => WithMap(inner, state ++ Map(key -> v))}
+        { case WithMap(v, state) => WithMap(inner, state + (key -> v)) }
     }
 
     override def labelledLeave(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner

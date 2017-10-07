@@ -28,7 +28,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
     }
 
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
-    def asNode(key: NodeClass, fields: NodeField*) = new NodeGrammar(grammar, key, fields.toSeq)
+    def asNode(key: NodeClass) = new NodeGrammar(grammar, key, Seq.empty)
     def as(field: NodeField) = As(grammar, field)
   }
 

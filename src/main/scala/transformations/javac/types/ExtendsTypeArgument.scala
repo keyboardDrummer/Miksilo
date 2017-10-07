@@ -11,11 +11,11 @@ object ExtendsTypeArgument extends DeltaWithGrammar {
   object ExtendsBody extends NodeField
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val byteCodeArgumentGrammar = grammars.find(TypeApplication.ByteCodeTypeArgumentGrammar)
-    byteCodeArgumentGrammar.addOption(("+" ~~> byteCodeArgumentGrammar).asNode(ExtendsKey, ExtendsBody))
+    byteCodeArgumentGrammar.addOption(("+" ~~> byteCodeArgumentGrammar.as(ExtendsBody)).asNode(ExtendsKey))
 
     val javaTypeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
     val javaArgumentGrammar = grammars.find(TypeApplication.JavaTypeArgumentGrammar)
-    javaArgumentGrammar.addOption(("?" ~~> "extends" ~~> javaTypeGrammar).asNode(ExtendsKey, ExtendsBody))
+    javaArgumentGrammar.addOption(("?" ~~> "extends" ~~> javaTypeGrammar.as(ExtendsBody)).asNode(ExtendsKey))
   }
 
   override def description: String = "Adds the 'extends' type function. Example: 'T extends U'."

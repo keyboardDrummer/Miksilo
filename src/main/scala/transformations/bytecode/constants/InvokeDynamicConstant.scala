@@ -21,8 +21,10 @@ object InvokeDynamicConstant extends ConstantEntry {
     byteToBytes(18) ++ byteToBytes(constant(InvokeDynamicBootstrapMethodIndex).asInstanceOf[Int]) ++ shortToBytes(constant(InvokeDynamicNameAndTypeIndex).asInstanceOf[Int])
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = (("bootstrap index:" ~~> integer ~< ", nameAndTypeIndex:") ~~ integer).
-    asNode(MethodHandleKey, InvokeDynamicBootstrapMethodIndex, InvokeDynamicNameAndTypeIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+    "bootstrap index:" ~~> integer.as(InvokeDynamicBootstrapMethodIndex) ~<
+      ", nameAndTypeIndex:" ~~
+      integer.as(InvokeDynamicNameAndTypeIndex) asNode MethodHandleKey
 
   override def description: String = "Adds the invoke dynamic constant"
 

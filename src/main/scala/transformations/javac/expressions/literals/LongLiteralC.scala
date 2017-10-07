@@ -19,7 +19,7 @@ object LongLiteralC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val longGrammar : BiGrammar = RegexG("""-?\d+l""".r) ^^
-      (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) asNode(LongLiteralKey, ValueKey)
+      (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) as ValueKey asNode LongLiteralKey
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(longGrammar)
   }

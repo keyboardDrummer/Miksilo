@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
+import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import core.particles.{Contract, Language}
 import transformations.bytecode.types.VoidTypeC
@@ -31,7 +31,7 @@ object ThisCallExpression extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
-    val thisCallGrammar = "this" ~> callArguments asNode(ThisCall, CallC.CallArguments)
+    val thisCallGrammar = "this" ~> callArguments.as(CallC.CallArguments) asNode ThisCall
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(thisCallGrammar)
   }

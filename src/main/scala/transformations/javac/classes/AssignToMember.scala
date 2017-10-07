@@ -33,7 +33,7 @@ object AssignToMember extends DeltaWithGrammar {
     val assignTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
 
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
-    val selectGrammar = ((variableGrammar ~< ".") ~ identifier).asNode(SelectorKey, SelectorObject, SelectorMember)
+    val selectGrammar = ((variableGrammar.as(SelectorObject) ~< ".") ~ identifier.as(SelectorMember)).asNode(SelectorKey)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addOption(selectGrammar)
   }

@@ -20,7 +20,7 @@ object LocalDeclarationC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val statement = grammars.find(StatementSkeleton.StatementGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar ~~ identifier ~< ";" asNode(DeclarationKey, Type, Name)
+    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode DeclarationKey
     statement.addOption(parseDeclaration)
   }
 

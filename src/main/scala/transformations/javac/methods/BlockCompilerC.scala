@@ -14,7 +14,7 @@ object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
   object ProgramStatements extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statements = grammars.find(StatementSkeleton.StatementGrammar).manyVertical.asNode(ProgramKey, ProgramStatements)
+    val statements = grammars.find(StatementSkeleton.StatementGrammar).manyVertical.as(ProgramStatements).asNode(ProgramKey)
     grammars.find(ProgramGrammar).inner = statements
   }
 

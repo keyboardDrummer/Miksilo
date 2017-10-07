@@ -1,7 +1,7 @@
 package transformations.javac.constructor
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
+import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import core.particles.{Contract, Language}
 import transformations.bytecode.coreInstructions.InvokeSpecialDelta
@@ -45,7 +45,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val callArguments = grammars.find(CallC.CallArgumentsGrammar)
-    val superCallGrammar = "super" ~> callArguments asNode(SuperCall, CallC.CallArguments)
+    val superCallGrammar = "super" ~> callArguments.as(CallC.CallArguments) asNode SuperCall
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(superCallGrammar)
   }
