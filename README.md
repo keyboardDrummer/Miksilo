@@ -21,10 +21,8 @@ Once you're happy with your compiler you can play around with it in the compiler
 and do things like ask the compiler for its in- and output grammar.
 
 ### BiGrammar
-To enable parsing and printing with little development effort, Blender uses a 'BiGrammar'.
-A BiGrammar defines a bidirectional mapping between text and an AST.
-The approach taken here is very similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
-A BiGrammar may be defined in a left recursive fashion because our implementation uses packrat parsing as described in
+To allow writing both parsing and printing at the same time, Blender defines the [BiGrammar DSL](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-1:-unified-parsing-and-printing). The approach taken here is similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
+A BiGrammar may be defined in a left recursive fashion, which can be contributed to the use of packrat parsing as described in
 '*Packrat Parsing: Simple, Powerful, Lazy, Linear Time*' to deal with problems associated with such grammars.
 
 ### State of the project
