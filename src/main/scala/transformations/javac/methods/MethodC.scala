@@ -173,10 +173,9 @@ object MethodC extends DeltaWithGrammar with WithState with ClassMemberC {
 
     val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodUnmapped: TopBottom = visibilityModifier ~ parseStatic ~ typeParametersGrammar ~
-      parseReturnType ~~ identifier ~ parseParameters % block
-    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey, VisibilityKey, StaticKey,
-      TypeParameters, ReturnTypeKey, MethodNameKey, MethodParametersKey, MethodBodyKey))
+    val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
+      parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
+    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
