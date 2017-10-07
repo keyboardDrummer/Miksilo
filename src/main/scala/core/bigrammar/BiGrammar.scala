@@ -34,18 +34,19 @@ trait BiGrammar extends GrammarDocumentWriter {
   }
 
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
-    this % new ManyVertical(separator %> this) ^^ someMap
+    someMap(this % new ManyVertical(separator %> this))
 
   def manyVertical = new ManyVertical(this)
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
 
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
-  def some: BiGrammar = this ~ (this*) ^^ someMap
-  def someSeparated(separator: BiGrammar): BiGrammar = this ~ ((separator ~> this) *) ^^ someMap
+  def some: BiGrammar = someMap(this ~ (this*))
+  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> this) *))
   def children: Seq[BiGrammar] = Seq.empty
 
-  private def someMap: ((Any) => Seq[Any], (Any) => Option[~[Any, Seq[Any]]]) = {
+  private def someMap(grammar: BiGrammar): BiGrammar = {
+    grammar ^^
     ( {
       case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
     }, {
@@ -81,11 +82,8 @@ trait BiGrammar extends GrammarDocumentWriter {
 
   def %<(bottom: BiGrammar) = new TopBottom(this, bottom).ignoreRight
 
-  def map[T, U](afterParsing: T => U, beforePrinting: U => Option[T]) = new MapGrammar(this,
-    x => afterParsing(x.asInstanceOf[T]),
-    { case y: U => beforePrinting(y); case _ => None })
-
-  def ^^(map: (Any => Any, Any => Option[Any])): BiGrammar = new MapGrammar(this, map._1, map._2)
+  def ^^(afterParsing: Any => Any, beforePrinting: Any => Option[Any]): BiGrammar =
+    new MapGrammar(this, afterParsing, beforePrinting)
 
   def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 

@@ -12,7 +12,10 @@ trait GrammarDocumentWriter {
 
   def number: BiGrammar = new FromGrammarWithToString(NumberG)
 
-  def integer = number.map(afterParsing = (s: String) => Integer.parseInt(s), (i: Int) => Some(i.toString))
+  def integer = number ^^ (
+    (s: Any) => Integer.parseInt(s.asInstanceOf[String]),
+    (i: Any) => Some(i).filter(i => i.isInstanceOf[Int]).map(i => i.toString)
+  )
 
   def failure: BiGrammar = BiFailure()
 

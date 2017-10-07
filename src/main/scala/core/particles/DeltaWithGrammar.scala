@@ -11,24 +11,19 @@ but as a map.
  */
 object FromMap extends NodeField // TODO moet deze weg?
 
-trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
-  implicit val postfixOps = language.postfixOps
+trait BlenderGrammarWriter extends GrammarDocumentWriter {
 
   implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
-  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
-
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    transformGrammars(state.grammarCatalogue, state)
-  }
-
-  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
-    (x => x, x => Some(x).filter(clazz.isInstance))
-  }
+  implicit val postfixOps = language.postfixOps
 
   case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException
   {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
+  }
+
+
+  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
+    (x => x, x => Some(x).filter(clazz.isInstance))
   }
 
   implicit class GrammarForAst(grammar: BiGrammar)
@@ -107,4 +102,15 @@ trait DeltaWithGrammar extends Delta with GrammarDocumentWriter {
     result.data ++= valueWithMap.state.collect { case (k: NodeField,v) => (k,v) }
     WithMap(result, Map.empty)
   }
+}
+
+trait DeltaWithGrammar extends Delta with BlenderGrammarWriter {
+
+  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
+
+  override def inject(state: Language): Unit = {
+    super.inject(state)
+    transformGrammars(state.grammarCatalogue, state)
+  }
+
 }
