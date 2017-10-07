@@ -16,9 +16,9 @@ object Node {
       }
       catch
       {
-        case e: java.lang.InternalError => "internalError: " + e.toString
+        case e: java.lang.InternalError => e.toString
       }
-//    case _ => _clazz.toString
+    case _ => _clazz.toString
   }
 
   private def getClassName(clazz: Class[_]): String = {
