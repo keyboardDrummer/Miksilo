@@ -27,7 +27,7 @@ class BiGrammarToPrinter {
 
     val result: Try[ResponsiveDocument] = grammar match {
       case choice:Choice => ToDocumentApplicative.or(toDocumentCached(withMap, choice.left), toDocumentCached(withMap, choice.right))
-      case custom:Custom => custom.print(withMap)
+      case custom:CustomGrammar => custom.print(withMap)
       case Keyword(keyword, _, verify) =>
         if (!verify || withMap.value == keyword)
           Try(keyword)

@@ -90,12 +90,12 @@ trait BiGrammar extends GrammarDocumentWriter {
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
 }
 
-object StringLiteral extends Custom {
+object StringLiteral extends CustomGrammar {
   override def getGrammar = core.grammar.StringLiteral
   override def print(withMap: WithMap) = Try("\"" + withMap.value + "\"")
 }
 
-trait Custom extends BiGrammar {
+trait CustomGrammar extends BiGrammar {
   def getGrammar: Grammar
   def print(withMap: WithMap): Try[ResponsiveDocument]
 }
@@ -132,7 +132,7 @@ class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = tr
   * @verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
 class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
-  extends Custom
+  extends CustomGrammar
 {
   override def getGrammar = grammar
 

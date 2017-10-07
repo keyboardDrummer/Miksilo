@@ -2,7 +2,7 @@ package example
 
 import core.bigrammar.{BiGrammar, Labelled, TestGrammarUtils}
 import core.grammar.~
-import core.particles.BlenderGrammarWriter
+import core.particles.NodeGrammarWriter
 import core.particles.node.{NodeClass, NodeField}
 import org.scalatest.FunSuite
 
@@ -36,7 +36,7 @@ object Constant {
 /**
   * Contains some examples for the wiki.
   */
-class BiGrammarExample extends FunSuite with BlenderGrammarWriter {
+class BiGrammarExample extends FunSuite with NodeGrammarWriter {
 
   test("whileWithAsNode") {
     val expression = new Labelled("expression")

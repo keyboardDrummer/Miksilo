@@ -11,7 +11,7 @@ but as a map.
  */
 object FromMap extends NodeField // TODO moet deze weg?
 
-trait BlenderGrammarWriter extends GrammarDocumentWriter {
+trait NodeGrammarWriter extends GrammarDocumentWriter {
 
   implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
   implicit val postfixOps = language.postfixOps
@@ -20,7 +20,6 @@ trait BlenderGrammarWriter extends GrammarDocumentWriter {
   {
     override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
   }
-
 
   def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
     (x => x, x => Some(x).filter(clazz.isInstance))
@@ -36,11 +35,10 @@ trait BlenderGrammarWriter extends GrammarDocumentWriter {
 
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
     def asNode(key: NodeClass, fields: NodeField*) = new NodeGrammar(grammar, key, fields.toSeq)
-    def as(field: NodeField) = As(grammar, field) //grammar, new NodeMap(grammar, MapInsideNode, fields.toSeq)
+    def as(field: NodeField) = As(grammar, field)
   }
 
   def nodeGrammar(inner: BiGrammar, key: NodeClass, fields: NodeField*) = new NodeGrammar(inner, key, fields.toSeq)
-
 
   class NodeGrammar(inner: BiGrammar, val key: NodeClass, val fields: Seq[NodeField])
     extends MapGrammar(inner,
@@ -104,7 +102,7 @@ trait BlenderGrammarWriter extends GrammarDocumentWriter {
   }
 }
 
-trait DeltaWithGrammar extends Delta with BlenderGrammarWriter {
+trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
 
   def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
 
