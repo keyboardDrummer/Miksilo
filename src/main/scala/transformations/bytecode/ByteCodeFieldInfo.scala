@@ -33,8 +33,8 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(FieldKey) = field => emitField(field, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(FieldKey, Map(
+    ByteCodeSkeleton.getRegistry(state).getBytes(FieldKey) = field => emitField(field, state)
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(FieldKey, Map(
       NameIndex -> Utf8ConstantDelta.key,
       DescriptorIndex -> Utf8ConstantDelta.key))
   }

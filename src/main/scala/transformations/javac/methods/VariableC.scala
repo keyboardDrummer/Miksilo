@@ -13,7 +13,7 @@ import transformations.javac.types.BooleanTypeC
 
 object VariableC extends ExpressionInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, LoadIntegerDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
 
   def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
@@ -33,16 +33,16 @@ object VariableC extends ExpressionInstance {
 
   override val key = VariableKey
 
-  override def getType(variable: Path, state: Language): Node = {
-    getVariableInfo(variable, state)._type
+  override def getType(variable: Path, compilation: Compilation): Node = {
+    getVariableInfo(variable, compilation)._type
   }
 
-  def getVariableInfo(variable: Path, state: Language): VariableInfo = {
-    MethodC.getMethodCompiler(state).getVariables(variable)(VariableC.getVariableName(variable))
+  def getVariableInfo(variable: Path, compilation: Compilation): VariableInfo = {
+    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(VariableC.getVariableName(variable))
   }
 
-  override def toByteCode(variable: Path, state: Language): Seq[Node] = {
-    val variableInfo: VariableInfo = getVariableInfo(variable, state)
+  override def toByteCode(variable: Path, compilation: Compilation): Seq[Node] = {
+    val variableInfo: VariableInfo = getVariableInfo(variable, compilation)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
     Seq(_type.clazz match {

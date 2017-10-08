@@ -23,7 +23,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.constructor._
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
-import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityC}
+import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.prefix.NotC
@@ -35,7 +35,7 @@ import transformations.javac.statements._
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 import transformations.javac.types._
 
-object JavaCompiler {
+object JavaCompilerDeltas {
 
   def getCompiler = new CompilerFromDeltas(javaCompilerTransformations)
 
@@ -54,12 +54,12 @@ object JavaCompiler {
   def javaMethod = Seq(ForLoopContinueC, JavaGotoC, ForLoopC, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodC) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
+    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockC,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
-  def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityC,
+  def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityDelta,
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
 
@@ -104,7 +104,7 @@ object JavaCompiler {
   def constantEntryParticles = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
-  
+
   def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
     SuperTypeArgument, TypeApplication, MethodType) ++
     Seq(ObjectTypeDelta, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
@@ -117,7 +117,7 @@ object JavaCompiler {
     getCompiler.spliceAfterTransformations(implicits, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler = {
-    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(new PrettyPrint)))
+    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(new PrettyPrint)))
   }
 }
 

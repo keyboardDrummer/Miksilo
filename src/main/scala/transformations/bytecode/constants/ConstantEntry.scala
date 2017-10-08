@@ -14,7 +14,7 @@ trait ConstantEntry extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
+    ByteCodeSkeleton.getRegistry(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {

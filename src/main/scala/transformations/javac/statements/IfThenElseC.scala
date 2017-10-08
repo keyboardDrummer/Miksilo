@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
@@ -12,18 +12,18 @@ import transformations.javac.statements.IfThenC._
 
 object IfThenElseC extends StatementInstance {
 
-  override def toByteCode(ifThenElse: Path, state: Language): Seq[Node] = {
+  override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
     val methodInfo = ifThenElse.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, state)
-    val elseLabelName = LabelledLocations.getUniqueLabel("else", methodInfo, state)
+    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
+    val elseLabelName = LabelledLocations.getUniqueLabel("else", methodInfo, compilation)
     val endLabel = InferredStackFrames.label(endLabelName)
     val elseLabel = InferredStackFrames.label(elseLabelName)
     val thenBody = getThenStatements(ifThenElse)
 
     val jumpToElseIfFalse = LabelledLocations.ifZero(elseLabelName)
-    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
-    val toInstructionsStatement = StatementSkeleton.getToInstructions(state)
+    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructionsStatement = StatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToElseIfFalse) ++
       thenBody.flatMap(toInstructionsStatement) ++

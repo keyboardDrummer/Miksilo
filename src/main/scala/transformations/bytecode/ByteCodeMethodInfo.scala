@@ -62,8 +62,8 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8ConstantDelta.key,
+    ByteCodeSkeleton.getRegistry(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8ConstantDelta.key,
       MethodDescriptor -> Utf8ConstantDelta.key))
   }
 

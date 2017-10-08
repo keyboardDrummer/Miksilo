@@ -4,7 +4,7 @@ import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
 import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.bytecode.additions.LabelledLocations
-import transformations.javac.methods.MethodC
+import transformations.javac.methods.MethodDelta
 import transformations.javac.statements.ForLoopC.ForLoop
 
 import scala.collection.mutable
@@ -31,7 +31,7 @@ object ForLoopContinueC extends DeltaWithPhase {
 
   def transformForLoop(forLoopPath: Path, state: Language): String = {
     val forLoop = forLoopPath.current
-    val method = forLoopPath.findAncestorClass(MethodC.MethodKey)
+    val method = forLoopPath.findAncestorClass(MethodDelta.MethodKey)
     val beforeIncrementLabel = LabelledLocations.getUniqueLabel("beforeIncrement", method, state)
     forLoop(ForLoopC.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel

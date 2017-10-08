@@ -8,7 +8,7 @@ import transformations.javac.classes._
 import transformations.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import transformations.javac.expressions.ExpressionSkeleton
 
-object MemberSelector extends DeltaWithGrammar with WithState {
+object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getSelectorObject[T <: NodeLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
 
@@ -42,23 +42,23 @@ object MemberSelector extends DeltaWithGrammar with WithState {
   }
 
   def getReferenceKind(classCompiler: ClassCompiler, expression: Path): ReferenceKind = {
-    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.state).get(expression.clazz)
+    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.compilation).get(expression.clazz)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
-    })(implementation => implementation(expression))
+    })(implementation => implementation(classCompiler.compilation, expression))
   }
 
   def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: Path): ClassOrObjectReference = {
-    val classInfo: ClassSignature = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.state)(expression))
-    new ClassOrObjectReference(classInfo, false)
+    val classInfo: ClassSignature = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.compilation)(expression))
+    ClassOrObjectReference(classInfo, wasClass = false)
   }
 
-  def getReferenceKindRegistry(state: Language) = getState(state).referenceKindRegistry
-  class State {
-    val referenceKindRegistry = new ClassRegistry[Path => ReferenceKind]()
+  def getReferenceKindRegistry(state: Language) = getRegistry(state).referenceKindRegistry
+  class Registry {
+    val referenceKindRegistry = new ClassRegistry[(Compilation, Path) => ReferenceKind]()
   }
 
-  override def createState = new State()
+  override def createRegistry = new Registry()
 
   override def description: String = "Defines the selector grammar <expression>.<identifier>"
 

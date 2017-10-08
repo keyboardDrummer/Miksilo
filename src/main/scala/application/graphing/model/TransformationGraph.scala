@@ -5,13 +5,13 @@ import com.google.common.collect.Lists
 import org.jgrapht.alg.{DijkstraShortestPath, StrongConnectivityInspector}
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.traverse.TopologicalOrderIterator
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 
 import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class TransformationGraph
-  extends GraphFromTransformations(JavaCompiler.allTransformations) {
+  extends GraphFromTransformations(JavaCompilerDeltas.allTransformations) {
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
     JavaSimpleStatement, JavaMethod, JavaC)

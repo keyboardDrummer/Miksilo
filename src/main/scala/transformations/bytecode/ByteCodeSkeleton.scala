@@ -12,7 +12,7 @@ import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
 
-object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
+object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   implicit class ByteCodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
@@ -36,7 +36,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]
 
-  def createState = new State()
+  def createRegistry = new Registry()
 
   def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
             classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(ClassFileKey,
@@ -51,7 +51,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   override def dependencies: Set[Contract] = Set.empty
 
-  class State {
+  class Registry {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new ClassRegistry[ByteCodeAttribute]
     val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
@@ -59,7 +59,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithState {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(ClassFileKey, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ClassFileKey, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
       ClassParentIndex -> ClassInfoConstant.key,
       ClassNameIndexKey -> ClassInfoConstant.key))

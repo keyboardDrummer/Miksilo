@@ -10,8 +10,8 @@ object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(SelectorKey, selector => {
-      val compiler = JavaClassSkeleton.getClassCompiler(state)
+    MemberSelector.getReferenceKindRegistry(state).put(SelectorKey, (compilation, selector) => {
+      val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(selector, compiler)
     })
   }
@@ -21,13 +21,13 @@ object SelectorReferenceKind extends Delta {
     val member = MemberSelector.getSelectorMember(selector)
     MemberSelector.getReferenceKind(compiler, obj) match {
       case PackageReference(info) => info.content(member) match {
-        case result: PackageSignature => new PackageReference(result)
-        case result: ClassSignature => new ClassOrObjectReference(result, true)
+        case result: PackageSignature => PackageReference(result)
+        case result: ClassSignature => ClassOrObjectReference(result, wasClass = true)
       }
       case ClassOrObjectReference(info, _) =>
         val field = info.getField(member)
         val fieldClassType = compiler.findClass(field._type)
-        new ClassOrObjectReference(fieldClassType, false)
+        ClassOrObjectReference(fieldClassType, wasClass = false)
     }
   }
 

@@ -12,6 +12,6 @@ trait ExpandInstruction extends Delta with InstructionWithGrammar {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ExpandVirtualInstructionsC.getState(state).expandInstruction.put(key, this)
+    ExpandVirtualInstructionsC.getRegistry(state).expandInstruction.put(key, this)
   }
 }

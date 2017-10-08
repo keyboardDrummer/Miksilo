@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
@@ -12,8 +12,8 @@ object WhileContinueC extends StatementInstance {
   object ContinueKey extends NodeClass
   def continue = new Node(ContinueKey)
 
-  override def toByteCode(statement: Path, state: Language): Seq[Node] = {
-    val startLabel = WhileC.getState(state).whileStartLabels(getWhileParent(statement))
+  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
+    val startLabel = WhileC.getRegistry(compilation).whileStartLabels(getWhileParent(statement))
     Seq(LabelledLocations.goTo(startLabel))
   }
 

@@ -1,10 +1,9 @@
 package transformations.javac.classes.skeleton
 
-import core.particles.Language
 import transformations.javac.JavaLang
 import transformations.javac.classes.{MethodInfo, MethodQuery}
 
-case class JavaCompilerState(state: Language) {
+class JavaCompiler {
   val classPath: PackageSignature = JavaLang.classPath
 
   def getPackage(parts: List[String]): PackageSignature = classPath.getPackage(parts)

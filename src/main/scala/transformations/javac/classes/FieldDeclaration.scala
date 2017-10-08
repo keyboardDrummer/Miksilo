@@ -2,14 +2,14 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{Contract, DeltaWithGrammar, Language}
+import core.particles.{Compilation, Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
-import transformations.javac.classes.skeleton.{ClassMemberC, ClassSignature, JavaClassSkeleton}
+import transformations.javac.classes.skeleton.{ClassMemberDelta, ClassSignature, JavaClassSkeleton}
 
-object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
+object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
 
   object FieldKey extends NodeClass
   object FieldType extends NodeField
@@ -19,7 +19,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
 
   def field(_type: Node, name: String) = new Node(FieldKey, FieldType -> _type, FieldName -> name)
   
-    def bind(state: Language, signature: ClassSignature, clazz: Node): Unit = {
+  def bind(compilation: Compilation, signature: ClassSignature, clazz: Node): Unit = {
 
     val fields = getFields(clazz)
     for (field <- fields)
@@ -44,12 +44,12 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberC {
     clazz.members.filter(member => member.clazz == FieldKey)
   }
 
-  def compile(state: Language, clazz: Node) = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
+  def compile(compilation: Compilation, clazz: Node): Unit = {
+    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val fields = getFields(clazz)
     clazz(ByteCodeSkeleton.ClassFields) = fields.map(field => {
-      convertField(field, classCompiler, state)
+      convertField(field, classCompiler, compilation)
       field
     })
   }

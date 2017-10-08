@@ -13,30 +13,30 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   val key = AdditionClazz
 
-  override def toByteCode(addition: Path, state: Language): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+  override def toByteCode(addition: Path, compilation: Compilation): Seq[Node] = {
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(addition))
     val secondInstructions = toInstructions(getSecond(addition))
-    firstInstructions ++ secondInstructions ++ (getType(addition, state) match {
+    firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {
       case x if x == IntTypeC.intType => Seq(AddIntegersDelta.addIntegers())
       case x if x == LongTypeC.longType => Seq(AddLongsDelta.addLongs())
       case _ => throw new NotImplementedError()
     })
   }
 
-  override def getType(expression: Path, state: Language): Node = {
-    val getType = ExpressionSkeleton.getType(state)
+  override def getType(expression: Path, compilation: Compilation): Node = {
+    val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
     firstType match
     {
       case x if x == IntTypeC.intType =>
-        TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
-        TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+        TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
+        TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
         IntTypeC.intType
       case x if x == LongTypeC.longType =>
-        TypeSkeleton.checkAssignableTo(state)(LongTypeC.longType, firstType)
-        TypeSkeleton.checkAssignableTo(state)(LongTypeC.longType, secondType)
+        TypeSkeleton.checkAssignableTo(compilation)(LongTypeC.longType, firstType)
+        TypeSkeleton.checkAssignableTo(compilation)(LongTypeC.longType, secondType)
         LongTypeC.longType
       case _ => throw new NotImplementedError()
     }

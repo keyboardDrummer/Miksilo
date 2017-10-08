@@ -8,8 +8,8 @@ import transformations.javac.methods.VariableC.VariableKey
 
 object VariableReferenceKind extends Delta {
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(VariableKey, variable => {
-      val compiler = JavaClassSkeleton.getClassCompiler(state)
+    MemberSelector.getReferenceKindRegistry(state).put(VariableKey, (compilation, variable) => {
+      val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(variable, compiler)
     })
   }
@@ -21,7 +21,7 @@ object VariableReferenceKind extends Delta {
     if (isClass)
       new ClassOrObjectReference(classCompiler.findClass(name), true)
     else {
-      val mbPackage = classCompiler.compiler.classPath.content.get(name)
+      val mbPackage = classCompiler.javaCompiler.classPath.content.get(name)
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
       else {

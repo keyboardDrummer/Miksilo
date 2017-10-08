@@ -21,16 +21,16 @@ object IfThenC extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
-  override def toByteCode(ifThen: Path, state: Language): Seq[Node] = {
+  override def toByteCode(ifThen: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
     val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelledLocations.getUniqueLabel("end", method, state)
+    val endLabelName = LabelledLocations.getUniqueLabel("end", method, compilation)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 
     val jumpToEndIfFalse = LabelledLocations.ifZero(endLabelName)
-    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(state)
-    val toInstructionsStatement = StatementSkeleton.getToInstructions(state)
+    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructionsStatement = StatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToEndIfFalse) ++
       body.flatMap(toInstructionsStatement) ++

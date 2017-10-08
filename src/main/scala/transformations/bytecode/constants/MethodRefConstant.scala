@@ -50,7 +50,7 @@ object MethodRefConstant extends ConstantEntry {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key,
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key,
       Map(ClassRef -> ClassInfoConstant.key, NameAndType -> NameAndTypeConstant.key))
   }
 

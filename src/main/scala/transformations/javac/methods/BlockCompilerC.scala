@@ -20,13 +20,13 @@ object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
 
   override def transform(program: Node, state: Compilation): Unit = {
     val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
-    val mainArgument: Node = MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType("String")))
-    val method = MethodC.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true,MethodC.PublicVisibility)
+    val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType("String")))
+    val method = MethodDelta.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true,MethodDelta.PublicVisibility)
     val clazz = JavaClassSkeleton.clazz(Seq.empty,"Block",Seq(method))
     program.replaceWith(clazz)
   }
 
-  override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodC)
+  override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)
 
   override def description: String = "Creates a language where the program is simply a Java block."
 }

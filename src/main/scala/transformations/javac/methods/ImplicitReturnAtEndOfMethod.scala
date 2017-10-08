@@ -8,13 +8,13 @@ object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
 
   override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
-    val methods = MethodC.getMethods(clazz)
+    val methods = MethodDelta.getMethods(clazz)
     for (method <- methods) {
-      val statements = MethodC.getMethodBody(method)
+      val statements = MethodDelta.getMethodBody(method)
       val hasNoReturn = statements.isEmpty ||
         (statements.last.clazz != ReturnExpressionC.ReturnInteger && statements.last.clazz != ReturnVoidC.ReturnVoidKey)
       if (hasNoReturn) {
-        method(MethodC.MethodBodyKey) = statements ++ Seq(ReturnVoidC._return)
+        method(MethodDelta.MethodBodyKey) = statements ++ Seq(ReturnVoidC._return)
       }
     }
   }

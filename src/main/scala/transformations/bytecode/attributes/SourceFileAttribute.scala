@@ -21,7 +21,7 @@ object SourceFileAttribute extends ByteCodeAttribute {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(SourceFileAttributeKey) = getSourceFileBytes
+    ByteCodeSkeleton.getRegistry(state).getBytes(SourceFileAttributeKey) = getSourceFileBytes
   }
 
   def getSourceFileBytes(sourceFile: Node) = {

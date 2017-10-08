@@ -1,6 +1,6 @@
 package transformations.javac.expressions.prefix
 
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
@@ -16,10 +16,10 @@ object NotC extends ExpressionInstance {
 
   override val key = NotKey
 
-  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
 
-  override def toByteCode(expression: Path, state: Language): Seq[Node] = {
-    ExpressionSkeleton.getToInstructions(state)(expression(NotExpression).asInstanceOf[Path]) ++ Seq(NotInstructionC.not)
+  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = {
+    ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionC.not)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {

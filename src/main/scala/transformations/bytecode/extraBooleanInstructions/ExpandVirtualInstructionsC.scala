@@ -14,11 +14,11 @@ import transformations.javac.classes.MethodInfo
 
 import scala.collection.mutable
 
-object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
+object ExpandVirtualInstructionsC extends DeltaWithPhase with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  class State {
+  class Registry {
     val expandInstruction = new ClassRegistry[ExpandInstruction]()
   }
 
@@ -44,7 +44,7 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
 
       for (instruction <- instructions) {
 
-        val expandOption = getState(state.language).expandInstruction.get(instruction.clazz)
+        val expandOption = getRegistry(state.language).expandInstruction.get(instruction.clazz)
         newInstructions ++= expandOption.fold(Seq(instruction))(expand => expand.expand(instruction, methodInfo, state))
       }
 
@@ -55,5 +55,5 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithState {
 
   override def description: String = "Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions."
 
-  override def createState: State = new State()
+  override def createRegistry: Registry = new Registry()
 }

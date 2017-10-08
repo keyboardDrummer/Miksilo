@@ -8,8 +8,8 @@ import transformations.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCode
 import transformations.bytecode.ByteCodeSkeleton._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import transformations.javac.classes.{ConstantPool, FieldDeclaration}
-import transformations.javac.methods.MethodC
-import transformations.javac.methods.MethodC.{DefaultVisibility, Visibility}
+import transformations.javac.methods.MethodDelta
+import transformations.javac.methods.MethodDelta.{DefaultVisibility, Visibility}
 import transformations.bytecode.types.TypeSkeleton
 import transformations.javac.types.{MethodType, TypeAbstraction}
 
@@ -37,7 +37,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     program.replaceWith(javaClazz)
   }
 
-  val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = MethodC.visibilityAccessFlagLinks.
+  val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = MethodDelta.visibilityAccessFlagLinks.
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
   def getMethods(state: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
     methodInfos.map(methodInfo => {
@@ -65,13 +65,13 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
       val returnType = methodType(MethodType.ReturnType).asInstanceOf[Node]
       val parameterTypes = methodType(MethodType.Parameters).asInstanceOf[Seq[Node]]
 	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
-        MethodC.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
+        MethodDelta.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 
       val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
       val foundVisibilities: Set[Visibility] = accessFlags.flatMap(f => accessFlagsToVisibility.get(f))
       val visibility: Visibility = (foundVisibilities ++ Seq(DefaultVisibility)).head
       val static: Boolean = false //TODO fix.
-      MethodC.method(name, returnType, parameters, Seq.empty, static, visibility, typeParameters)
+      MethodDelta.method(name, returnType, parameters, Seq.empty, static, visibility, typeParameters)
     })
   }
 

@@ -16,8 +16,8 @@ object GreaterThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
 
-  override def toByteCode(lessThan: Path, state: Language): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+  override def toByteCode(lessThan: Path, compilation: Compilation): Seq[Node] = {
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
     firstInstructions ++ secondInstructions ++ Seq(GreaterThanInstructionC.greaterThanInstruction)
@@ -27,12 +27,12 @@ object GreaterThanC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](lessThan: T) = lessThan(GreaterThanSecond).asInstanceOf[T]
 
-  override def getType(expression: Path, state: Language): Node = {
-    val getType = ExpressionSkeleton.getType(state)
+  override def getType(expression: Path, compilation: Compilation): Node = {
+    val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
     BooleanTypeC.booleanType
   }
 
@@ -59,8 +59,8 @@ object LessThanC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
 
-  override def toByteCode(lessThan: Path, state: Language): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+  override def toByteCode(lessThan: Path, compilation: Compilation): Seq[Node] = {
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
@@ -70,12 +70,12 @@ object LessThanC extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
 
-  override def getType(expression: Path, state: Language): Node = {
-    val getType = ExpressionSkeleton.getType(state)
+  override def getType(expression: Path, compilation: Compilation): Node = {
+    val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
     BooleanTypeC.booleanType
   }
 

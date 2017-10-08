@@ -1,10 +1,10 @@
 package transformations.javac.classes.skeleton
 
-import core.bigrammar.{BiGrammar, MapGrammar}
+import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Key, Node, NodeField, NodeLike}
+import core.particles.node.{Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
 import transformations.bytecode.constants.ClassInfoConstant
@@ -14,7 +14,8 @@ import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.statements.BlockC
 
-object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithState {
+object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
+  with WithLanguageRegistry with WithCompilationState {
 
   implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
     def _package = node(ClassPackage).asInstanceOf[Seq[String]]
@@ -33,14 +34,15 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     def parent_=(value: Option[String]) = node(ClassParent) = value
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transform(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(clazz: Node) {
-      val compiler = JavaCompilerState(state)
-      JavaLang.initialise(compiler)
-      val classCompiler: ClassCompiler = new ClassCompiler(clazz, compiler)
-      
+      JavaLang.loadIntoClassPath(compilation)
+      val classCompiler: ClassCompiler = ClassCompiler(clazz, compilation)
+      getState(compilation).classCompiler = classCompiler
+      classCompiler.bind()
+
       val classInfo = classCompiler.currentClassInfo
       clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
 
@@ -51,8 +53,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      for(member <- getState(state).members)
-        member.compile(state, clazz)
+      for(member <- getRegistry(compilation).members)
+        member.compile(compilation, clazz)
 
       clazz.data.remove(Members)
     }
@@ -66,7 +68,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     case _ =>
   }
 
-  def getClassCompiler(state: Language) = getState(state).classCompiler
+  def getClassCompiler(compilation: Compilation) = getState(compilation).classCompiler
 
   def getQualifiedClassName(clazz: Node): QualifiedClassName = {
     QualifiedClassName(clazz._package ++ Seq(clazz.name))
@@ -99,11 +101,16 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase with WithS
     ClassImports -> imports,
     ClassParent -> mbParent)
 
+  def createRegistry = new Registry()
+  class Registry {
+    var members = List.empty[ClassMemberDelta]
+    val importToClassMap = new ClassRegistry[(Compilation, Node) => Map[String, QualifiedClassName]]()
+  }
+
   def createState = new State()
-  class State() {
+  class State {
     var classCompiler: ClassCompiler = _
-    val importToClassMap = new ClassRegistry[Node => Map[String, QualifiedClassName]]()
-    var members = List.empty[ClassMemberC]
+    val javaCompiler: JavaCompiler = new JavaCompiler()
   }
 
   object ClassGrammar

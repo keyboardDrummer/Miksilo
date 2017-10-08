@@ -2,7 +2,7 @@ package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass}
-import core.particles.{Contract, DeltaWithGrammar, Language}
+import core.particles.{Compilation, Contract, DeltaWithGrammar, Language}
 import transformations.javac.classes.BasicImportC._
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
 
@@ -18,16 +18,16 @@ object WildcardImportC extends DeltaWithGrammar {
   }
 
   override def inject(state: Language): Unit = {
-    JavaClassSkeleton.getState(state).importToClassMap.put(WildcardImportKey, wildcardImport => {
+    JavaClassSkeleton.getRegistry(state).importToClassMap.put(WildcardImportKey, (compilation: Compilation, wildcardImport) => {
       val packageParts = getParts(wildcardImport)
-      val classCompiler = JavaClassSkeleton.getState(state).classCompiler
-      val compiler = classCompiler.compiler
+      val classCompiler = JavaClassSkeleton.getState(compilation).classCompiler
+      val compiler = classCompiler.javaCompiler
       val finalPackage = compiler.find(packageParts).asInstanceOf[PackageSignature]
 
       finalPackage.flattenContents().map(entry => {
         val className = entry._1.last
         val partiallyQualifiedClassName = entry._1
-        className -> new QualifiedClassName(packageParts ++ partiallyQualifiedClassName)
+        className -> QualifiedClassName(packageParts ++ partiallyQualifiedClassName)
       }).toMap
     })
     super.inject(state)

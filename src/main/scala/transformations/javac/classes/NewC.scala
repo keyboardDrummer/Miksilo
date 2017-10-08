@@ -29,21 +29,21 @@ object NewC extends ExpressionInstance {
 
   override val key = NewCallKey
 
-  override def getType(expression: Path, state: Language): Node = {
+  override def getType(expression: Path, compilation: Compilation): Node = {
     expression(NewObject).asInstanceOf[Path]
   }
 
-  override def toByteCode(expression: Path, state: Language): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
-    val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
+  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
     val objectType = getNewObject(expression)
     val classInfo: ClassSignature = compiler.findClass(objectType)
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = CallC.getCallArguments(expression)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
 
-    val methodKey = new MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
+    val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }

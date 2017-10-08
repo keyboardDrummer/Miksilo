@@ -11,7 +11,7 @@ import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
 
-class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompiler.javaCompilerTransformations)) {
+class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations)) {
 
   val testGrammar = TestCompilerGrammarUtils(this.compiler.deltas)
 
@@ -31,7 +31,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("relational") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
-      JavaCompiler.javaCompilerTransformations))
+      JavaCompilerDeltas.javaCompilerTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
@@ -40,7 +40,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("addition") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
-      JavaCompiler.allByteCodeTransformations))
+      JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -51,7 +51,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("addition2") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionC, SubtractionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
-      JavaCompiler.allByteCodeTransformations))
+      JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -62,7 +62,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
   test("addition3") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(SubtractionC, AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
-    JavaCompiler.allByteCodeTransformations))
+    JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -72,7 +72,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("addition4") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
-      JavaCompiler.javaCompilerTransformations))
+      JavaCompilerDeltas.javaCompilerTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -100,7 +100,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("comments are maintained in bytecode") {
     val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(JavaStyleCommentsC))))
+    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(JavaStyleCommentsC))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)

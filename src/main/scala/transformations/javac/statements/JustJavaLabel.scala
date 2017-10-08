@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
@@ -14,7 +14,7 @@ object JustJavaLabel extends StatementInstance {
 
   def label(name: String) = new Node(LabelKey, Name -> name)
 
-  override def toByteCode(statement: Path, state: Language): Seq[Node] = {
+  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
     Seq(InferredStackFrames.label(getName(statement.current)))
   }
 

@@ -30,7 +30,7 @@ object LoadConstantDelta extends InstructionDelta
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerInfoConstant.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerInfoConstant.key))
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(IntegerConstantIndex)

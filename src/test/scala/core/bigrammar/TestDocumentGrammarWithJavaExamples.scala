@@ -5,9 +5,9 @@ import core.particles.Delta
 import org.scalatest.FunSuite
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodC}
+import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import transformations.javac.statements.BlockC
-import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompiler}
+import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
 import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
 
@@ -38,7 +38,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, MethodC.MethodGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, MethodDelta.MethodGrammar)
   }
 
   test("Block") {
@@ -52,7 +52,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
-    val newTransformations = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+    val newTransformations = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
 
     val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)
@@ -65,7 +65,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val input = SourceUtils.getJavaTestFile("Fibonacci", Path(""))
     val expectation = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
 
-    val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
+    val prettyPrintCompiler = JavaCompilerDeltas.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)
     assertResult(expectation)(state.output)
@@ -74,8 +74,8 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   test("PrettyPrintAndParseByteCode") {
     val input = SourceUtils.getJavaTestFile("Fibonacci.java", Path(""))
 
-    val byteCodeTransformations = JavaCompiler.byteCodeTransformations
-    val prettyPrintCompiler = JavaCompiler.getPrettyPrintJavaToByteCodeCompiler
+    val byteCodeTransformations = JavaCompilerDeltas.byteCodeTransformations
+    val prettyPrintCompiler = JavaCompilerDeltas.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)
     val byteCode = state.output
@@ -87,14 +87,14 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
-    val parseTransformations = Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations
+    val parseTransformations = Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeTransformations
     val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
-    val parseTransformations = JavaCompiler.byteCodeTransformations ++ Seq(RunWithJVM)
+    val parseTransformations = JavaCompilerDeltas.byteCodeTransformations ++ Seq(RunWithJVM)
     val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }

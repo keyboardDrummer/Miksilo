@@ -3,7 +3,7 @@ package transformations.javac.constructor
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
-import core.particles.{Contract, Language}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.coreInstructions.InvokeSpecialDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.types.VoidTypeC
@@ -22,24 +22,24 @@ object SuperCallExpression extends ExpressionInstance {
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallC.CallArguments -> arguments)
 
-  override def getType(expression: Path, state: Language): Node = VoidTypeC.voidType
+  override def getType(expression: Path, compilation: Compilation): Node = VoidTypeC.voidType
 
-  override def toByteCode(call: Path, state: Language): Seq[Node] = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
-    transformSuperCall(classCompiler.currentClass, call, state)
+  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
+    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    transformSuperCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformSuperCall(clazz: Node, call: Path, state: Language): Seq[Node] = {
-    transformToByteCode(call, state, clazz.parent.get)
+  def transformSuperCall(clazz: Node, call: Path, compilation: Compilation): Seq[Node] = {
+    transformToByteCode(call, compilation, clazz.parent.get)
   }
 
-  def transformToByteCode(call: Path, state: Language, className: String): Seq[Node] = {
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
+  def transformToByteCode(call: Path, compilation: Compilation, className: String): Seq[Node] = {
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val callArguments = CallC.getCallArguments(call)
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(state)(argument))
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
-    val methodRefIndex = compiler.getMethodRefIndex(new MethodQuery(qualifiedName, constructorName, callTypes))
-    val argumentInstructions = callArguments.flatMap(argument => StatementSkeleton.getToInstructions(state)(argument))
+    val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
+    val argumentInstructions = callArguments.flatMap(argument => StatementSkeleton.getToInstructions(compilation)(argument))
     Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 

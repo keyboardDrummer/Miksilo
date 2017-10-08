@@ -26,7 +26,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
     val instructions = codeAnnotation.instructions
 
     new InstructionTypeAnalysis(instructions) {
-      val instructionVariableUpdateRegistry = CodeAttribute.getState(state).localUpdates
+      val instructionVariableUpdateRegistry = CodeAttribute.getRegistry(state).localUpdates
       override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
         instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)
 
@@ -34,7 +34,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
       override def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature =
         instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, state)
 
-      val jumpBehaviorRegistry = CodeAttribute.getState(state).jumpBehaviorRegistry
+      val jumpBehaviorRegistry = CodeAttribute.getRegistry(state).jumpBehaviorRegistry
       override def getJumpBehavior(instructionClazz: Any): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
     }
   }

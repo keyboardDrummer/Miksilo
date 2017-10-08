@@ -16,7 +16,7 @@ object ParseKnownAttributes extends DeltaWithPhase {
             val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
             val index = typedNode.nameIndex
             val name = constantPool.getValue(index).asInstanceOf[Node]
-            val attributeTypeOption = ByteCodeSkeleton.getState(state).attributes.get(Utf8ConstantDelta.get(name))
+            val attributeTypeOption = ByteCodeSkeleton.getRegistry(state).attributes.get(Utf8ConstantDelta.get(name))
             for(attributeType <- attributeTypeOption)
             {
               parseAttribute(typedNode, attributeType)

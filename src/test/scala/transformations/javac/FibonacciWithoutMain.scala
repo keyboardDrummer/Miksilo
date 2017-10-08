@@ -7,7 +7,7 @@ import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.expressions.relational.LessThanC
-import transformations.javac.methods.MethodC._
+import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
 import transformations.javac.methods.call.CallC._
@@ -22,7 +22,7 @@ class FibonacciWithoutMain {
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
-    val byteCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(fibonacci).program
+    val byteCode = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).transform(fibonacci).program
     TestUtils.printByteCode(byteCode)
   }
 

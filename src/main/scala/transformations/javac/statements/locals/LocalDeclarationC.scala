@@ -39,13 +39,13 @@ object LocalDeclarationC extends StatementInstance {
 
   override val key = DeclarationKey
 
-  override def toByteCode(declaration: Path, state: Language): Seq[Node] = {
+  override def toByteCode(declaration: Path, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]
   }
 
-  override def definedVariables(state: Language, declaration: Node): Map[String, Node] = {
+  override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
     val _type = getDeclarationType(declaration)
-    JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(state))
+    JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = getDeclarationName(declaration)
     Map(name -> _type)
   }

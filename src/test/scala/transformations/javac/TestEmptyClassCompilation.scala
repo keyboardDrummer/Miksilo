@@ -22,14 +22,14 @@ class TestEmptyClassCompilation extends FunSuite {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
+    val compiledCode = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).transform(javaCode).program
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(javaCode).program
+    val compiledCode = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).transform(javaCode).program
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

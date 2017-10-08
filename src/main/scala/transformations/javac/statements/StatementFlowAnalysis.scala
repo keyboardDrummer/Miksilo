@@ -3,13 +3,13 @@ package transformations.javac.statements
 import core.particles._
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
-import transformations.javac.methods.MethodC
+import transformations.javac.methods.MethodDelta
 import util.DataFlowAnalysis
 
 abstract class StatementFlowAnalysis[State](state: Language, method: Node)
   extends DataFlowAnalysis[Path, State]
 {
-  val instances = StatementSkeleton.getState(state).instances
+  val instances = StatementSkeleton.getRegistry(state).instances
   val labels = getLabels
 
   def getLabels: Map[Any, Path] = {

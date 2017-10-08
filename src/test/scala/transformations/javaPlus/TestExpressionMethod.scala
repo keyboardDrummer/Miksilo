@@ -1,7 +1,7 @@
 package transformations.javaPlus
 
 import org.scalatest.FunSuite
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import util.CompilerBuilder
 import util.TestUtils
 
@@ -11,7 +11,7 @@ class TestExpressionMethod extends FunSuite {
 
   test("basic") {
     val inputDirectory = Path("")
-    val compiler = CompilerBuilder.build(Seq(ExpressionMethodC) ++ JavaCompiler.javaCompilerTransformations)
+    val compiler = CompilerBuilder.build(Seq(ExpressionMethodC) ++ JavaCompilerDeltas.javaCompilerTransformations)
     val result = new TestUtils(compiler).compileAndRun("FibonacciWithExpressionMethod", inputDirectory)
     assertResult(8)(Integer.parseInt(result))
   }

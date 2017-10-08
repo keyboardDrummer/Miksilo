@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions._
 import transformations.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import transformations.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import transformations.bytecode.types.IntTypeC
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import transformations.javac.classes.ConstantPool
 import util.CompilerBuilder
 import util.TestUtils
@@ -22,7 +22,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompiler.byteCodeTransformations).transform(labelledWhile).program
+    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompilerDeltas.byteCodeTransformations).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }

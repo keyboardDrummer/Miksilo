@@ -2,14 +2,14 @@ package transformations.javac.classes
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node}
+import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticDelta
 import transformations.bytecode.coreInstructions.objects.GetFieldDelta
 import transformations.javac.classes.skeleton.JavaClassSkeleton
-import transformations.javac.methods.MemberSelector
-import MemberSelector._
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import transformations.javac.methods.MemberSelector
+import transformations.javac.methods.MemberSelector._
 
 object SelectField extends ExpressionInstance {
 
@@ -17,16 +17,16 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
-  override def getType(selector: Path, state: Language): Node = {
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
+  override def getType(selector: Path, compilation: Compilation): Node = {
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldInfo = classOrObjectReference.info.getField(member)
     fieldInfo._type
   }
 
-  override def toByteCode(selector: Path, state: Language): Seq[Node] = {
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
+  override def toByteCode(selector: Path, compilation: Compilation): Seq[Node] = {
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
     if (classOrObjectReference.wasClass)
@@ -34,7 +34,7 @@ object SelectField extends ExpressionInstance {
     else
     {
       val obj = getSelectorObject(selector)
-      val objInstructions = ExpressionSkeleton.getToInstructions(state)(obj)
+      val objInstructions = ExpressionSkeleton.getToInstructions(compilation)(obj)
       objInstructions ++ Seq(GetFieldDelta.construct(fieldRefIndex))
     }
   }

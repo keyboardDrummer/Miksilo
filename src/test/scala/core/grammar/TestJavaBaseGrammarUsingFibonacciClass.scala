@@ -4,7 +4,7 @@ import core.bigrammar.TestCompilerGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
-import transformations.javac.{JavaStyleCommentsC, JavaCompiler}
+import transformations.javac.{JavaStyleCommentsC, JavaCompilerDeltas}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
@@ -16,7 +16,7 @@ import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
+  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
 {
 
   test("BasicClass") {
@@ -101,7 +101,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = TestCompilerGrammarUtils.getGrammarResult(input, MethodC.MethodGrammar)
+    val result = TestCompilerGrammarUtils.getGrammarResult(input, MethodDelta.MethodGrammar)
     result
   }
 
@@ -117,13 +117,13 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val fibonacciCall = CallC.call(VariableC.variable("fibonacci"), Seq(IntLiteralC.literal(5)))
     val printCall = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
-    MethodC.method("main", VoidTypeC.voidType, Seq(MethodC.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.stringType))),
-      Seq(ExpressionAsStatementC.create(printCall)), static = true, MethodC.PublicVisibility)
+    MethodDelta.method("main", VoidTypeC.voidType, Seq(MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.stringType))),
+      Seq(ExpressionAsStatementC.create(printCall)), static = true, MethodDelta.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {
-    MethodC.method("fibonacci", IntTypeC.intType, Seq(MethodC.parameter("index", IntTypeC.intType)),
-      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodC.PublicVisibility)
+    MethodDelta.method("fibonacci", IntTypeC.intType, Seq(MethodDelta.parameter("index", IntTypeC.intType)),
+      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodDelta.PublicVisibility)
   }
 
   def getFibonacciExpression: Node = {

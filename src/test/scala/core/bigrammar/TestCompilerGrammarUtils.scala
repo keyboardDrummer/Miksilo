@@ -6,13 +6,13 @@ import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import org.scalatest.FunSuite
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import util.CompilerBuilder
 import util.TestUtils
 
 import scala.util.parsing.input.CharArrayReader
 
-object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompiler.javaCompilerTransformations)
+object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations)
 
 object TestGrammarUtils extends FunSuite {
 

@@ -10,7 +10,7 @@ import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 import transformations.javac.types.BooleanTypeC
 
-object EqualityC extends ExpressionInstance {
+object EqualityDelta extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
 
   def getFirst[T <: NodeLike](equality: T) = equality(FirstKey).asInstanceOf[T]
@@ -33,18 +33,18 @@ object EqualityC extends ExpressionInstance {
 
   override val key = EqualityKey
 
-  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
 
-  def getInputType(equality: Path, state: Language)  = {
+  def getInputType(equality: Path, compilation: Compilation) = {
     val first = getFirst(equality)
-    ExpressionSkeleton.getType(state)(first)
+    ExpressionSkeleton.getType(compilation)(first)
   }
 
-  override def toByteCode(equality: Path, state: Language): Seq[Node] = {
+  override def toByteCode(equality: Path, compilation: Compilation): Seq[Node] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
-    val inputType = TypeSkeleton.toStackType(getInputType(equality,state),state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
+    val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
     val equalityInstructions: Seq[Node] = inputType.clazz match {
       case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionC.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)

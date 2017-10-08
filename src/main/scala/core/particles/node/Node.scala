@@ -63,17 +63,16 @@ class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
   def update(key: NodeField, value: Any): Unit = {
     value match //TODO maybe throw this check away.
     {
-      case wrong: Path => throwInsertedWithOriginIntoRegularMetaObject()
+      case _: Path => throwInsertedWithOriginIntoRegularMetaObject()
       case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[Path]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }
-
     data.put(key, value)
   }
 
   def throwInsertedWithOriginIntoRegularMetaObject(): Unit = {
-    throw new scala.UnsupportedOperationException("Don't insert a Origin into a regular MetaObject.")
+    throw new scala.UnsupportedOperationException("Don't insert a Path into a Node.")
   }
 
   override def toString: String = {

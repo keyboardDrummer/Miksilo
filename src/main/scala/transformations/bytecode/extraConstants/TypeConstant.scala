@@ -33,15 +33,15 @@ object TypeConstant extends ConstantEntry {
   override def inject(state: Language): Unit = {
     super.inject(state)
 
-    ByteCodeSkeleton.getState(state).constantReferences.put(ByteCodeFieldInfo.FieldKey, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ByteCodeFieldInfo.FieldKey, Map(
       NameIndex -> Utf8ConstantDelta.key,
       DescriptorIndex -> TypeConstant.key))
-    ByteCodeSkeleton.getState(state).constantReferences.put(MethodInfoKey, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodInfoKey, Map(
       MethodNameIndex -> Utf8ConstantDelta.key,
       MethodDescriptor -> TypeConstant.key))
-    ByteCodeSkeleton.getState(state).constantReferences.put(MethodTypeConstant.key, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodTypeConstant.key, Map(
       MethodTypeDescriptorIndex -> TypeConstant.key))
-    ByteCodeSkeleton.getState(state).constantReferences.put(NameAndTypeConstant.key, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(NameAndTypeConstant.key, Map(
       NameAndTypeConstant.Name -> Utf8ConstantDelta.key,
       NameAndTypeConstant.Type -> TypeConstant.key))
   }

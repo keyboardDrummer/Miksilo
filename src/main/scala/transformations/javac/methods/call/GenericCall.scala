@@ -3,7 +3,7 @@ package transformations.javac.methods.call
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 import core.particles.path.Path
-import core.particles.{Contract, Language}
+import core.particles.{Compilation, Contract, Language}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -49,16 +49,16 @@ trait GenericCall extends ExpressionInstance {
 
   override val key = CallC.CallKey
 
-  override def getType(call: Path, state: Language): Node = {
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
+  override def getType(call: Path, compilation: Compilation): Node = {
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val methodKey = getMethodKey(call, compiler)
-    val methodInfo = compiler.compiler.find(methodKey)
+    val methodInfo = compiler.javaCompiler.find(methodKey)
     val returnType = methodInfo._type.returnType
     returnType
   }
 
-  def getGenericCallInstructions(call: Path, state: Language, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
-    val expressionToInstruction = ExpressionSkeleton.getToInstructions(state)
+  def getGenericCallInstructions(call: Path, compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
+    val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
     val callArguments = CallC.getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
@@ -70,7 +70,7 @@ trait GenericCall extends ExpressionInstance {
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val callArguments = CallC.getCallArguments(call)
-    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionSkeleton.getType(compiler.state)(argument))
+    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionSkeleton.getType(compiler.compilation)(argument))
 
     val member = MemberSelector.getSelectorMember(callCallee)
     new MethodQuery(kind.info.getQualifiedName, member, callTypes)
