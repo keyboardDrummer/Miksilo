@@ -16,9 +16,8 @@ A BiGrammar may be defined in a left recursive fashion, which can be contributed
 [Packrat Parsing: Simple, Powerful, Lazy, Linear Time](http://bford.info/pub/lang/packrat-icfp02.pdf) to deal with problems associated with such grammars.
 
 ### GUI
-Blender includes a GUI. You can use this to play around with the defined deltas and construct a compiler from them.
-Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can run your compiler,
-and do things like ask the compiler for its in- and output grammar.
+Blender includes a GUI. You can use this to play around with the defined deltas and construct a language from them.
+Once you're happy with your language you can play around with it in the language cockpit. Here you can run write programs in the language with IDE support, compile those programs and pretty print the target language, run those programs, determine which compilation phases the language's compiler has, and inspect the language's in- and output grammar.
 
 ### Build instructions
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
