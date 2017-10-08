@@ -11,40 +11,17 @@ object JavaLang {
 
   val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
-  var systemClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
-  var printStreamClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
-  var objectClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
-  var stringClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
-
-  val systemHash = systemClass.hashCode()
-  val printStreamHash = printStreamClass.hashCode()
-  val objectHash = objectClass.hashCode()
-  val stringHash = stringClass.hashCode()
+  val systemClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
+  val printStreamClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
+  val objectClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
+  val stringClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
 
   def initialise(javaCompilerState: JavaCompilerState) {
 
-    if (System.getenv("PLATFORM") == "travis") {
-      if (systemHash != systemClass.hashCode())
-        throw new Exception("system changed")
-      if (printStreamHash != printStreamClass.hashCode())
-        throw new Exception("printStreamClass changed")
-      if (objectHash != objectClass.hashCode())
-        throw new Exception("objectClass changed")
-      if (stringHash != stringClass.hashCode())
-        throw new Exception("stringClass changed")
-
-      systemClass = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
-      printStreamClass = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
-      objectClass = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
-      stringClass = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
-    }
-
-    this.synchronized {
-      ClassCompiler(objectClass, javaCompilerState)
-      ClassCompiler(stringClass, javaCompilerState)
-      ClassCompiler(systemClass, javaCompilerState)
-      ClassCompiler(printStreamClass, javaCompilerState)
-    }
+    ClassCompiler(objectClass, javaCompilerState).bind()
+    ClassCompiler(stringClass, javaCompilerState).bind()
+    ClassCompiler(systemClass, javaCompilerState).bind()
+    ClassCompiler(printStreamClass, javaCompilerState).bind()
   }
 
   val classPath = new PackageSignature(None, "")

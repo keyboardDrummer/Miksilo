@@ -20,14 +20,17 @@ case class ClassCompiler(currentClass: Node, javaCompilerState: JavaCompilerStat
   val className: String = currentClass.name
   val myPackage: PackageSignature = javaCompilerState.getPackage(currentClass._package.toList)
   val currentClassInfo = ClassSignature(myPackage, className)
-  myPackage.content(className) = currentClassInfo
-
-  getState(compilation).classCompiler = this
-
-  for (member <- getRegistry(compilation.language).members)
-    member.bind(compilation, currentClassInfo, currentClass)
-
   lazy val classNames: Map[String, QualifiedClassName] = getClassMapFromImports(currentClass.imports)
+
+  def bind() = {
+    val previous = getState(compilation).classCompiler
+    getState(compilation).classCompiler = this
+    myPackage.content(className) = currentClassInfo
+
+    for (member <- getRegistry(compilation.language).members)
+      member.bind(compilation, currentClassInfo, currentClass)
+    getState(compilation).classCompiler = previous
+  }
 
   def findClass(className: String): ClassSignature = javaCompilerState.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
 

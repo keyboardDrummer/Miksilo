@@ -34,14 +34,16 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]) = node(ClassParent) = value
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transform(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(clazz: Node) {
-      val compiler = JavaCompilerState(state)
+      val compiler = JavaCompilerState(compilation)
       JavaLang.initialise(compiler)
-      val classCompiler: ClassCompiler = new ClassCompiler(clazz, compiler)
-      
+      val classCompiler: ClassCompiler = ClassCompiler(clazz, compiler)
+      getState(compilation).classCompiler = classCompiler
+      classCompiler.bind()
+
       val classInfo = classCompiler.currentClassInfo
       clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
 
@@ -52,8 +54,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
       clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      for(member <- getRegistry(state).members)
-        member.compile(state, clazz)
+      for(member <- getRegistry(compilation).members)
+        member.compile(compilation, clazz)
 
       clazz.data.remove(Members)
     }
