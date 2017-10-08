@@ -1,7 +1,7 @@
 Blender [![Build Status](https://travis-ci.org/keyboardDrummer/Blender.svg?branch=master)](https://travis-ci.org/keyboardDrummer/Blender) [![Join the chat at https://gitter.im/LanguageBlender/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LanguageBlender/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============
 
-Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's MPS</a>. 
+Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>. 
 
 Blender's main goal is to enable creating modular and thus re-usable languages, allowing you to combine features from existing languages to create new ones. Blender gets modularity right by allowing you to both extend and constrain an existing language. Other language workbenches support only extension, which allows you to grow a small language into a bigger one, but not to transform between arbitrary ones. 
 
@@ -44,4 +44,4 @@ Some examples of cool features:
 - If you decide to contribute, it might help to reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.
 - Look through the open issues to see if you find something interesting
 - Start hacking ;-)
-- Once you're done submit a pull request and make sure the buildserver approves it.
+- Once you're done, submit a pull request and make sure the build server approves it.
