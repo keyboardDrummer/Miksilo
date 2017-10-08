@@ -39,3 +39,5 @@ Some examples of cool features:
 - Generating syntactic code completion from a grammar, as in the paper [Principled syntactic code completion using placeholders](http://delivery.acm.org/10.1145/3000000/2997374/p163-amorim.pdf?ip=145.129.111.38&id=2997374&acc=OA&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E77FCF3B2F09622E1&CFID=992904318&CFTOKEN=51306518&__acm__=1507451951_eb454d2173854f174d05e3c1e1526bbd)
 - Incremental compilation: incremental parsing, incremental type checking, etc.
 - Add a new language front-end or back-end.
+
+If you decide to contribute, it might help to reach out in the gitter channel, so we can help you out where the documentation is lacking.
