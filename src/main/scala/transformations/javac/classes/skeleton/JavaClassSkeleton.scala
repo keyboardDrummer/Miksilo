@@ -38,9 +38,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     transformClass(program)
 
     def transformClass(clazz: Node) {
-      val compiler = JavaCompilerState(compilation)
-      JavaLang.initialise(compiler)
-      val classCompiler: ClassCompiler = ClassCompiler(clazz, compiler)
+      JavaLang.loadIntoClassPath(compilation)
+      val classCompiler: ClassCompiler = ClassCompiler(clazz, compilation)
       getState(compilation).classCompiler = classCompiler
       classCompiler.bind()
 
@@ -111,6 +110,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   def createState = new State()
   class State {
     var classCompiler: ClassCompiler = _
+    val javaCompiler: JavaCompiler = new JavaCompiler()
   }
 
   object ClassGrammar

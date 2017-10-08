@@ -10,7 +10,7 @@ import transformations.bytecode.coreInstructions.longs.PushLongDelta
 import transformations.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
 import transformations.bytecode.extraConstants.TypeConstant
 import transformations.bytecode.types.VoidTypeC
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import transformations.javac.classes.ConstantPool
 import transformations.javac.types.MethodType
 import util.CompilerBuilder
@@ -77,7 +77,7 @@ class TestPoptimize extends FunSuite {
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
-    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompiler.byteCodeTransformations)
+    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompilerDeltas.byteCodeTransformations)
     compiler.transform(clazz)
     codeAnnotation.instructions
   }

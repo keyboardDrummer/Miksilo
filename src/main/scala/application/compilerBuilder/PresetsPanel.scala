@@ -22,20 +22,20 @@ import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset = {
-    new Preset("Simplified bytecode", new CompilerFromDeltas(JavaCompiler.simpleByteCodeTransformations).
-      spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar)),
+    new Preset("Simplified bytecode", new CompilerFromDeltas(JavaCompilerDeltas.simpleByteCodeTransformations).
+      spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(MarkOutputGrammar)),
       "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
     new Preset("Java to simplified bytecode",
-      JavaCompiler.spliceBeforeTransformations(JavaCompiler.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
+      JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
 
   def getJavaToExtendedByteCodePreset = {
     new Preset("Java to extended bytecode",
-      JavaCompiler.spliceBeforeTransformations(JavaCompiler.allByteCodeTransformations, Seq(MarkOutputGrammar)),
+      JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.allByteCodeTransformations, Seq(MarkOutputGrammar)),
       "Compiles Java into extended bytecode")
   }
 
@@ -44,11 +44,11 @@ object PresetsPanel
   }
 
   def getJavaCompilerParticles: Seq[Delta] = {
-    JavaCompiler.spliceBeforeTransformations(JavaCompiler.byteCodeTransformations, Seq(MarkOutputGrammar))
+    JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(MarkOutputGrammar))
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompiler.javaCompilerTransformations,
+    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompilerDeltas.javaCompilerTransformations,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
@@ -63,7 +63,7 @@ object PresetsPanel
   }
 
   def getByteCodePreset = {
-    new Preset("Basic bytecode", JavaCompiler.byteCodeTransformations,
+    new Preset("Basic bytecode", JavaCompilerDeltas.byteCodeTransformations,
       "Regular JVM bytecode.")
   }
 
@@ -71,7 +71,7 @@ object PresetsPanel
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
 
-    new Preset("Reveal Java Implicits", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
+    new Preset("Reveal Java Implicits", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getRevealSyntaxSugar: Preset = {
@@ -79,12 +79,12 @@ object PresetsPanel
       ConstructorC, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopContinueC, ForLoopC, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
-    new Preset("Reveal Syntax Sugar", JavaCompiler.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
+    new Preset("Reveal Syntax Sugar", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
       "Performs all compiler phases that still maintain a valid Java program.")
   }
 
   def getLabelledLocations = {
-    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompiler.byteCodeTransformations,
+    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeTransformations,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 

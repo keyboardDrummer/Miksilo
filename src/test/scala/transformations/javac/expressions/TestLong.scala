@@ -2,7 +2,7 @@ package transformations.javac.expressions
 
 import org.scalatest.FunSuite
 import transformations.bytecode.additions.PoptimizeC
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import util.{CompilerBuilder, TestUtils}
 
 class TestLong extends FunSuite {
@@ -12,7 +12,7 @@ class TestLong extends FunSuite {
   }
 
   test("longWithoutPoptimize") {
-    val regularParticles = JavaCompiler.javaCompilerTransformations
+    val regularParticles = JavaCompilerDeltas.javaCompilerTransformations
     val withoutPoptimize = regularParticles.filter(p => p != PoptimizeC)
     new TestUtils(CompilerBuilder.build(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
   }
@@ -38,7 +38,7 @@ class TestLong extends FunSuite {
         |    }
         |}""".stripMargin
 
-    val regularParticles = JavaCompiler.javaCompilerTransformations
+    val regularParticles = JavaCompilerDeltas.javaCompilerTransformations
     TestUtils.compareWithJavacAfterRunning(TestUtils.toFile(program))
   }
 

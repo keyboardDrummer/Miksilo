@@ -10,13 +10,13 @@ import org.scalatest.FunSuite
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.PrintByteCode
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompiler.javaCompilerTransformations)) {
+object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations)) {
 }
 
 class TestUtils(val compiler: TestingCompiler) extends FunSuite {
@@ -114,7 +114,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompiler.byteCodeTransformations)
+    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeTransformations)
     val output = prettyPrintByteCodeCompiler.transform(state.program).output
     val prettyPrintActualByteCode = output
 

@@ -22,7 +22,7 @@ class FibonacciWithoutMain {
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
-    val byteCode = CompilerBuilder.build(JavaCompiler.javaCompilerTransformations).transform(fibonacci).program
+    val byteCode = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).transform(fibonacci).program
     TestUtils.printByteCode(byteCode)
   }
 

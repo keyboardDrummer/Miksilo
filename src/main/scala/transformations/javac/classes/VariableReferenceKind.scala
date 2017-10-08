@@ -21,7 +21,7 @@ object VariableReferenceKind extends Delta {
     if (isClass)
       new ClassOrObjectReference(classCompiler.findClass(name), true)
     else {
-      val mbPackage = classCompiler.javaCompilerState.classPath.content.get(name)
+      val mbPackage = classCompiler.javaCompiler.classPath.content.get(name)
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
       else {

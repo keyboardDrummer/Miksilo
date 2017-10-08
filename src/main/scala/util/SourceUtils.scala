@@ -3,7 +3,7 @@ package util
 import core.particles._
 import core.particles.node.Node
 import transformations.bytecode.PrintByteCode
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
@@ -45,7 +45,7 @@ object SourceUtils {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompiler.byteCodeTransformations
+    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompilerDeltas.byteCodeTransformations
     CompilerBuilder.build(particles).transform(byteCode)
     output
   }

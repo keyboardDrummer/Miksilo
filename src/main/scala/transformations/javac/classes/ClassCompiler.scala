@@ -2,6 +2,7 @@ package transformations.javac.classes
 
 import java.util.NoSuchElementException
 
+import core.particles.Compilation
 import core.particles.node.Node
 import transformations.bytecode.constants._
 import transformations.bytecode.extraConstants.TypeConstant
@@ -15,10 +16,10 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
-case class ClassCompiler(currentClass: Node, javaCompilerState: JavaCompilerState) {
-  val compilation = javaCompilerState.state
+case class ClassCompiler(currentClass: Node, compilation: Compilation) {
+  val javaCompiler = JavaClassSkeleton.getState(compilation).javaCompiler
   val className: String = currentClass.name
-  val myPackage: PackageSignature = javaCompilerState.getPackage(currentClass._package.toList)
+  val myPackage: PackageSignature = javaCompiler.getPackage(currentClass._package.toList)
   val currentClassInfo = ClassSignature(myPackage, className)
   lazy val classNames: Map[String, QualifiedClassName] = getClassMapFromImports(currentClass.imports)
 
@@ -32,7 +33,7 @@ case class ClassCompiler(currentClass: Node, javaCompilerState: JavaCompilerStat
     getState(compilation).classCompiler = previous
   }
 
-  def findClass(className: String): ClassSignature = javaCompilerState.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
+  def findClass(className: String): ClassSignature = javaCompiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
 
   def fullyQualify(className: String): QualifiedClassName = {
     try
@@ -53,7 +54,7 @@ case class ClassCompiler(currentClass: Node, javaCompilerState: JavaCompilerStat
 
   def getMethodNameAndTypeIndex(methodKey: MethodQuery) = {
     val methodNameIndex = getNameIndex(methodKey.methodName)
-    NameAndTypeConstant.nameAndType(methodNameIndex, TypeConstant.constructor(javaCompilerState.find(methodKey)._type))
+    NameAndTypeConstant.nameAndType(methodNameIndex, TypeConstant.constructor(javaCompiler.find(methodKey)._type))
   }
 
   def getNameIndex(methodName: String) = {
@@ -80,7 +81,7 @@ case class ClassCompiler(currentClass: Node, javaCompilerState: JavaCompilerStat
       case Right(qualified) => qualified
       case Left(name) => fullyQualify(className)
     }
-    javaCompilerState.find(qualifiedName.parts).asInstanceOf[ClassSignature]
+    javaCompiler.find(qualifiedName.parts).asInstanceOf[ClassSignature]
   }
 
   private def getClassMapFromImports(imports: Seq[Node]): Map[String, QualifiedClassName] = {

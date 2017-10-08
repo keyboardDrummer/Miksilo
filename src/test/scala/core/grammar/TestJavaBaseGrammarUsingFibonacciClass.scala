@@ -4,7 +4,7 @@ import core.bigrammar.TestCompilerGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
 import org.junit.{Assert, Test}
 import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
-import transformations.javac.{JavaStyleCommentsC, JavaCompiler}
+import transformations.javac.{JavaStyleCommentsC, JavaCompilerDeltas}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
@@ -16,7 +16,7 @@ import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaCompiler.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
+  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
 {
 
   test("BasicClass") {

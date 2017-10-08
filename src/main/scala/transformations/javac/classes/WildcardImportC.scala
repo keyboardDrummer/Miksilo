@@ -21,7 +21,7 @@ object WildcardImportC extends DeltaWithGrammar {
     JavaClassSkeleton.getRegistry(state).importToClassMap.put(WildcardImportKey, (compilation: Compilation, wildcardImport) => {
       val packageParts = getParts(wildcardImport)
       val classCompiler = JavaClassSkeleton.getState(compilation).classCompiler
-      val compiler = classCompiler.javaCompilerState
+      val compiler = classCompiler.javaCompiler
       val finalPackage = compiler.find(packageParts).asInstanceOf[PackageSignature]
 
       finalPackage.flattenContents().map(entry => {

@@ -4,7 +4,7 @@ import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import util.CompilerBuilder
 import util.TestUtils
 
@@ -14,7 +14,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
 
   test("ForFibonacci") {
     val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
-    val withoutOptimizationTransformations = JavaCompiler.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
+    val withoutOptimizationTransformations = JavaCompilerDeltas.javaCompilerTransformations.filter(i => i != OptimizeComparisonInstructionsC)
     val withoutOptimization = new TestUtils(CompilerBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)

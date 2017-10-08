@@ -9,7 +9,7 @@ import core.particles.node.Node
 import org.scalatest.FunSuite
 import transformations.bytecode.types.TypeSkeleton
 import transformations.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
-import transformations.javac.JavaCompiler
+import transformations.javac.JavaCompilerDeltas
 import transformations.javac.types.TypeAbstraction
 import util.{CompilerBuilder, SourceUtils}
 
@@ -92,7 +92,7 @@ class TestClassFileDecompiler extends FunSuite {
   test("ObjectClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class"))
-    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
+    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompilerDeltas.javaCompilerTransformations).transform(state.program).output
 
     val expected = SourceUtils.getTestFileContents("DecompiledObjectClassFileSignature.txt")
     assertResult(expected)(output)
@@ -101,7 +101,7 @@ class TestClassFileDecompiler extends FunSuite {
   test("StringClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class"))
-    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
+    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompilerDeltas.javaCompilerTransformations).transform(state.program).output
 
     val expected = SourceUtils.getTestFileContents("DecompiledStringClassFileSignature.txt")
     assertResult(expected)(output)
@@ -110,7 +110,7 @@ class TestClassFileDecompiler extends FunSuite {
   test("SystemClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(SourceUtils.getTestFile("System.class"))
-    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
+    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompilerDeltas.javaCompilerTransformations).transform(state.program).output
 
     val expected = SourceUtils.getTestFileContents("DecompiledSystemClassFileSignature.txt")
     assertResult(expected)(output)
@@ -119,7 +119,7 @@ class TestClassFileDecompiler extends FunSuite {
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class"))
-    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompiler.javaCompilerTransformations).transform(state.program).output
+    val output = CompilerBuilder.build(Seq(new PrettyPrint()) ++ JavaCompilerDeltas.javaCompilerTransformations).transform(state.program).output
 
     val expected = SourceUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
     assertResult(expected)(output)

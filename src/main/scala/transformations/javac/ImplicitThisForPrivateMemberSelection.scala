@@ -7,7 +7,7 @@ import core.particles.path.{FieldValue, Path, PathRoot, SequenceElement}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.javac.classes.ClassCompiler
 import transformations.javac.classes.skeleton.JavaClassSkeleton.getState
-import transformations.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton, JavaCompilerState}
+import transformations.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.call.CallC
 import transformations.javac.methods.{MemberSelector, MethodDelta, VariableC}
@@ -59,10 +59,9 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     val programWithOrigin = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.clazz match {
             case ByteCodeSkeleton.ClassFileKey =>
-              val compiler = JavaCompilerState(compilation)
-              JavaLang.initialise(compiler)
+              JavaLang.loadIntoClassPath(compilation)
 
-              val classCompiler = ClassCompiler(obj, compiler)
+              val classCompiler = ClassCompiler(obj, compilation)
               getState(compilation).classCompiler = classCompiler
               classCompiler.bind()
 

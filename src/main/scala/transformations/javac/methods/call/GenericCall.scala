@@ -52,7 +52,7 @@ trait GenericCall extends ExpressionInstance {
   override def getType(call: Path, compilation: Compilation): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val methodKey = getMethodKey(call, compiler)
-    val methodInfo = compiler.javaCompilerState.find(methodKey)
+    val methodInfo = compiler.javaCompiler.find(methodKey)
     val returnType = methodInfo._type.returnType
     returnType
   }
