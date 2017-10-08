@@ -37,7 +37,7 @@ Some examples of cool features:
 - Add a new language front-end or back-end.
 
 #### How to contribute
-- If you decide to contribute, it might help to reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.
-- Look through the open issues to see if you find something interesting
-- Start hacking ;-)
-- Once you're done, submit a pull request and make sure the build server approves it.
+1. If you decide to contribute, it might help to reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.
+1. Look through the open issues to see if you find something interesting
+1. Start hacking ;-)
+1. Once you're done, submit a pull request and make sure the build server approves it.
