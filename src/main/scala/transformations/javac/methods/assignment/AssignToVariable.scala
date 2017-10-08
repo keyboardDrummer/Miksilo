@@ -11,15 +11,16 @@ import transformations.bytecode.types.ArrayTypeC.ArrayTypeKey
 import transformations.bytecode.types.IntTypeC.IntTypeKey
 import transformations.bytecode.types.LongTypeC.LongTypeKey
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
-import transformations.javac.methods.{MethodC, VariableC, VariableInfo}
+import transformations.javac.methods.{MethodDelta, VariableC, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableC)
 
   override def inject(state: Language): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey, (targetVariable: Path) => {
-      val methodCompiler = MethodC.getMethodCompiler(state)
+    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(VariableC.VariableKey,
+      (compilation, targetVariable: Path) => {
+      val methodCompiler = MethodDelta.getMethodCompiler(compilation)
       val target = VariableC.getVariableName(targetVariable)
       val variableInfo = methodCompiler.getVariables(targetVariable)(target)
       val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, state)

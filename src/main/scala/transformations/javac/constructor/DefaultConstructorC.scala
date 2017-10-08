@@ -3,7 +3,7 @@ package transformations.javac.constructor
 import core.particles.node.Node
 import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
-import transformations.javac.methods.MethodC.PublicVisibility
+import transformations.javac.methods.MethodDelta.PublicVisibility
 
 object DefaultConstructorC extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorC)

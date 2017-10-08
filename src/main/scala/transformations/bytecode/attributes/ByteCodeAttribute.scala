@@ -11,7 +11,7 @@ object AttributeNameKey extends NodeField //TODO give this a proper place
 trait ByteCodeAttribute extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
-    ByteCodeSkeleton.getState(state).attributes.put(constantPoolKey, this)
+    ByteCodeSkeleton.getRegistry(state).attributes.put(constantPoolKey, this)
     super.inject(state)
   }
 

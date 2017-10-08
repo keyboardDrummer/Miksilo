@@ -11,7 +11,7 @@ trait TypeInstance extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
-    TypeSkeleton.getState(state).instances.put(key, this)
+    TypeSkeleton.getRegistry(state).instances.put(key, this)
     super.inject(state)
   }
 

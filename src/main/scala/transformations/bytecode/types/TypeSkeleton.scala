@@ -16,17 +16,17 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
-object TypeSkeleton extends DeltaWithGrammar with WithState {
+object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getTypeFromByteCodeString(state: Language, typeString: String): Node = {
     val manager = new DeltasToParserConverter()
     manager.parse(state.grammarCatalogue.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
   }
 
   def toStackType(_type: Node, state: Language) : Node = {
-    getState(state).instances(_type.clazz).getStackType(_type, state)
+    getRegistry(state).instances(_type.clazz).getStackType(_type, state)
   }
 
-  def getTypeSize(_type: Node, state: Language): Int = getState(state).stackSize(_type.clazz)
+  def getTypeSize(_type: Node, state: Language): Int = getRegistry(state).stackSize(_type.clazz)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar)
@@ -51,7 +51,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithState {
   def getSuperTypes(state: Language)(_type: Node) = getSuperTypesRegistry(state)(_type.clazz)(_type)
 
   def getSuperTypesRegistry(state: Language) = {
-    getState(state).superTypes
+    getRegistry(state).superTypes
   }
 
   def union(state: Language)(first: Node, second: Node): Node = {
@@ -78,9 +78,9 @@ object TypeSkeleton extends DeltaWithGrammar with WithState {
     grammars.create(ByteCodeTypeGrammar)
   }
 
-  def createState = new State
+  def createRegistry = new Registry
   
-  class State {
+  class Registry {
     val superTypes = new ClassRegistry[Node => Seq[Node]]()
     val stackSize = new ClassRegistry[Int]()
     val instances = new ClassRegistry[TypeInstance]

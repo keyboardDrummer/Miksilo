@@ -7,7 +7,7 @@ import transformations.javac.expressions._
 import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralC
 import transformations.javac.expressions.relational.LessThanC
-import transformations.javac.methods.MethodC._
+import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.ReturnExpressionC
 import transformations.javac.methods.VariableC._
 import transformations.javac.methods.call.CallC._

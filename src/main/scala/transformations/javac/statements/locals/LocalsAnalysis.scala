@@ -2,17 +2,17 @@ package transformations.javac.statements.locals
 
 import core.particles.node.Node
 import core.particles.path.Path
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import transformations.javac.methods.VariablePool
 import transformations.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 
-class LocalsAnalysis(compilationState: Language, method: Node)
-  extends StatementFlowAnalysis[VariablePool](compilationState: Language, method: Node) {
+class LocalsAnalysis(compilation: Compilation, method: Node)
+  extends StatementFlowAnalysis[VariablePool](compilation: Language, method: Node) {
   
   override def updateState(state: VariablePool, node: Path): VariablePool = {
-    val instances = StatementSkeleton.getState(compilationState).instances
+    val instances = StatementSkeleton.getRegistry(compilation).instances
     var newState = state
-    for(entry <- instances(node.clazz).definedVariables(compilationState, node.current))
+    for(entry <- instances(node.clazz).definedVariables(compilation, node.current))
       newState = newState.add(entry._1,entry._2)
     newState
   }
@@ -21,6 +21,6 @@ class LocalsAnalysis(compilationState: Language, method: Node)
     if (first.typedVariables.keys == second.typedVariables.keys)
       return None
 
-    Some(new VariablePool(first.state, first.typedVariables.filterKeys(second.typedVariables.contains)))
+    Some(VariablePool(first.state, first.typedVariables.filterKeys(second.typedVariables.contains)))
   }
 }

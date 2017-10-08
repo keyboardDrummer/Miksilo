@@ -21,7 +21,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   override def transform(program: Node, state: Compilation): Unit = {
     val pool = new ConstantPool()
     program(ByteCodeSkeleton.ClassConstantPool) = pool
-    val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
+    val constantReferences = ByteCodeSkeleton.getRegistry(state).constantReferences
 
     PathRoot(program).visit(afterChildren = node => constantReferences.get(node.clazz).foreach(reference => {
       for (entry <- reference) {
@@ -34,7 +34,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val constantReferences = ByteCodeSkeleton.getState(state).constantReferences
+    val constantReferences = ByteCodeSkeleton.getRegistry(state).constantReferences
 
     val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
     for(containerEntry <- constantReferences) {

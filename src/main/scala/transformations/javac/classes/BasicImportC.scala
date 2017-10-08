@@ -23,12 +23,12 @@ object BasicImportC extends DeltaWithGrammar {
   def getParts(_import: Node) = _import(ElementsKey).asInstanceOf[Seq[String]]
 
   override def inject(state: Language): Unit = {
-    JavaClassSkeleton.getState(state).importToClassMap.put(ImportKey, _import => {
+    JavaClassSkeleton.getRegistry(state).importToClassMap.put(ImportKey, (compilation, _import) => {
       val elements = getParts(_import)
       val packageParts = elements.dropRight(1)
       val importedClassName = elements.last
 
-      val qualifiedClassName = new QualifiedClassName(packageParts ++ Seq(importedClassName))
+      val qualifiedClassName = QualifiedClassName(packageParts ++ Seq(importedClassName))
       val result = Seq((importedClassName, qualifiedClassName)).toMap
       result
     })

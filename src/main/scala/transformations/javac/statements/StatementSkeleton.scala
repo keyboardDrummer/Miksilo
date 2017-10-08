@@ -7,14 +7,14 @@ import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 
 
-object StatementSkeleton extends DeltaWithGrammar with WithState {
+object StatementSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   implicit class Statement[T <: NodeLike](val node: T) extends NodeWrapper[T] { }
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(state: Language): Path => Seq[Node] = {
-    statement => getState(state).instances(statement.clazz).toByteCode(statement, state)
+  def getToInstructions(compilation: Compilation): Path => Seq[Node] = {
+    statement => getRegistry(compilation).instances(statement.clazz).toByteCode(statement, compilation)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
@@ -25,9 +25,9 @@ object StatementSkeleton extends DeltaWithGrammar with WithState {
 
   override def description: String = "Defines the concept of a statement."
 
-  class State {
+  class Registry {
     val instances = new ClassRegistry[StatementInstance]
   }
 
-  override def createState: State = new State()
+  override def createRegistry: Registry = new Registry()
 }

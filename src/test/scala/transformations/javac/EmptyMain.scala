@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton.QualifiedClassName
-import transformations.javac.methods.MethodC._
+import transformations.javac.methods.MethodDelta._
 import util.{CompilerBuilder, TestUtils, SourceUtils}
 
 class EmptyMain extends FunSuite {

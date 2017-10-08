@@ -47,30 +47,30 @@ object TernaryC extends ExpressionInstance {
 
   override val key = TernaryKey
 
-  override def getType(_ternary: Path, state: Language): Node = {
-    val getExpressionType = ExpressionSkeleton.getType(state)
+  override def getType(_ternary: Path, compilation: Compilation): Node = {
+    val getExpressionType = ExpressionSkeleton.getType(compilation)
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
-    TypeSkeleton.checkAssignableTo(state)(BooleanTypeC.booleanType, getExpressionType(condition))
+    TypeSkeleton.checkAssignableTo(compilation)(BooleanTypeC.booleanType, getExpressionType(condition))
 
     val trueType = getExpressionType(truePath)
     val falseType = getExpressionType(falsePath)
-    TypeSkeleton.union(state)(trueType, falseType)
+    TypeSkeleton.union(compilation)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Path, state: Language): Seq[Node] = {
+  override def toByteCode(_ternary: Path, compilation: Compilation): Seq[Node] = {
     val condition = TernaryC.getCondition(_ternary)
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
     val methodInfo = _ternary.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val falseLabelName = LabelledLocations.getUniqueLabel("false", methodInfo, state)
+    val falseLabelName = LabelledLocations.getUniqueLabel("false", methodInfo, compilation)
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
-    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, state)
+    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledLocations.goTo(endLabelName)
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     toInstructions(condition) ++
       Seq(conditionalBranch) ++
       toInstructions(truePath) ++

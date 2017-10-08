@@ -9,14 +9,14 @@ import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
-import transformations.javac.methods.MethodC
-import transformations.javac.methods.MethodC._
+import transformations.javac.methods.MethodDelta
+import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements.BlockC
 
 object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodC, CallStaticOrInstanceC, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceC, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
@@ -27,10 +27,10 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
       if (!constructorClassName.equals(className))
         throw new BadConstructorNameException(clazz, constructor)
 
-      constructor.clazz = MethodC.MethodKey
-      constructor(MethodC.MethodNameKey) = SuperCallExpression.constructorName
-      constructor(MethodC.ReturnTypeKey) = VoidTypeC.voidType
-      constructor(MethodC.TypeParameters) = Seq.empty
+      constructor.clazz = MethodDelta.MethodKey
+      constructor(MethodDelta.MethodNameKey) = SuperCallExpression.constructorName
+      constructor(MethodDelta.ReturnTypeKey) = VoidTypeC.voidType
+      constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(StaticKey) = false
       constructor.data.remove(ConstructorClassNameKey)
     }
@@ -52,8 +52,8 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val visibilityModifier = grammars.find(MethodC.VisibilityGrammar) as VisibilityKey
-    val parseParameters = grammars.find(MethodC.ParametersGrammar) as MethodParametersKey
+    val visibilityModifier = grammars.find(MethodDelta.VisibilityGrammar) as VisibilityKey
+    val parseParameters = grammars.find(MethodDelta.ParametersGrammar) as MethodParametersKey
     val block = grammars.find(BlockC.BlockGrammar) as MethodBodyKey
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)

@@ -3,3 +3,5 @@ jdk:
   - oraclejdk8
 scala:
    - 2.12.3
+env:
+  PLATFORM=travis

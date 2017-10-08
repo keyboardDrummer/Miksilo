@@ -3,7 +3,7 @@ package transformations.javac.constructor
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
-import core.particles.{Contract, Language}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.types.VoidTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
@@ -18,15 +18,15 @@ object ThisCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
-  override def getType(expression: Path, state: Language): Node = VoidTypeC.voidType
+  override def getType(expression: Path, compilation: Compilation): Node = VoidTypeC.voidType
 
-  override def toByteCode(call: Path, state: Language): Seq[Node] = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(state)
-    transformThisCall(classCompiler.currentClass, call, state)
+  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
+    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    transformThisCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformThisCall(clazz: Node, call: Path, state: Language): Seq[Node] = {
-    SuperCallExpression.transformToByteCode(call, state, clazz.name)
+  def transformThisCall(clazz: Node, call: Path, compilation: Compilation): Seq[Node] = {
+    SuperCallExpression.transformToByteCode(call, compilation, clazz.name)
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {

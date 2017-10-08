@@ -9,20 +9,20 @@ import transformations.bytecode.additions.LabelledLocations
 import transformations.bytecode.simpleBytecode.InferredStackFrames
 import transformations.javac.expressions.ExpressionSkeleton
 
-object WhileC extends StatementInstance with WithState {
+object WhileC extends StatementInstance with WithLanguageRegistry {
 
   override val key = WhileKey
 
-  override def toByteCode(_while: Path, state: Language): Seq[Node] = {
+  override def toByteCode(_while: Path, compilation: Compilation): Seq[Node] = {
     val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val startLabel = LabelledLocations.getUniqueLabel("start", methodInfo, state)
-    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
+    val startLabel = LabelledLocations.getUniqueLabel("start", methodInfo, compilation)
+    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
 
-    val conditionInstructions = ExpressionSkeleton.getToInstructions(state)(getCondition(_while))
-    getState(state).whileStartLabels += _while.current -> startLabel
+    val conditionInstructions = ExpressionSkeleton.getToInstructions(compilation)(getCondition(_while))
+    getRegistry(compilation).whileStartLabels += _while.current -> startLabel
 
     val body = getBody(_while)
-    val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(state)(statement))
+    val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(compilation)(statement))
 
     Seq(InferredStackFrames.label(startLabel)) ++
       conditionInstructions ++
@@ -73,9 +73,9 @@ object WhileC extends StatementInstance with WithState {
     result
   }
 
-  class State {
+  class Registry {
     var whileStartLabels: Map[Node, String] = Map.empty
   }
 
-  override def createState = new State()
+  override def createRegistry = new Registry()
 }

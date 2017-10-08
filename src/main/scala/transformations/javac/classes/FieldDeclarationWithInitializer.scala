@@ -9,7 +9,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.constructor.{ConstructorC, SuperCallExpression}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 import transformations.javac.methods.call.CallC
-import transformations.javac.methods.{MethodC, VariableC}
+import transformations.javac.methods.{MethodDelta, VariableC}
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 
@@ -50,16 +50,16 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
-    val fieldInitializerMethod = MethodC.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
+    val fieldInitializerMethod = MethodDelta.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- program.members.filter(member => member.clazz == ConstructorC.ConstructorKey)) {
-      val body = MethodC.getMethodBody(constructor)
+      val body = MethodDelta.getMethodBody(constructor)
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
         val callToFieldInitialiser = ExpressionAsStatementC.create(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
-        constructor(MethodC.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
+        constructor(MethodDelta.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }
   }

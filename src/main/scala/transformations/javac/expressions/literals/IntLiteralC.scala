@@ -23,7 +23,7 @@ object IntLiteralC extends ExpressionInstance {
 
   def literal(value: Int) = new Node(IntLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: Language): Seq[Node] = {
+  override def toByteCode(literal: Path, compilation: Compilation): Seq[Node] = {
     val value: Int = getValue(literal)
     if (-1 <= value && value <= 5) {
       val node = literal.current.shallowClone
@@ -39,7 +39,7 @@ object IntLiteralC extends ExpressionInstance {
 
   def getValue(literal: Node): Int = literal(ValueKey).asInstanceOf[Int]
 
-  override def getType(expression: Path, state: Language): Node = IntTypeC.intType
+  override def getType(expression: Path, compilation: Compilation): Node = IntTypeC.intType
 
   object IntLiteralKey extends NodeClass
 

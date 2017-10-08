@@ -34,17 +34,17 @@ object SubtractionC extends ExpressionInstance {
 
   override val key = SubtractionKey
 
-  override def getType(expression: Path, state: Language): Node = {
-    val getType = ExpressionSkeleton.getType(state)
+  override def getType(expression: Path, compilation: Compilation): Node = {
+    val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, firstType)
-    TypeSkeleton.checkAssignableTo(state)(IntTypeC.intType, secondType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
     IntTypeC.intType
   }
 
-  override def toByteCode(subtraction: Path, state: Language): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(state)
+  override def toByteCode(subtraction: Path, compilation: Compilation): Seq[Node] = {
+    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
     firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)

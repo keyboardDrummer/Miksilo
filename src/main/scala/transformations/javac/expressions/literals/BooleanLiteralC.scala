@@ -21,13 +21,13 @@ object BooleanLiteralC extends ExpressionInstance {
 
   def literal(value: Boolean) = new Node(LiteralBooleanKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: Language): Seq[Node] = {
+  override def toByteCode(literal: Path, compilation: Compilation): Seq[Node] = {
     Seq(SmallIntegerConstantDelta.integerConstant(if (getValue(literal)) 1 else 0))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Boolean]
 
-  override def getType(expression: Path, state: Language): Node = BooleanTypeC.booleanType
+  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
 
   object LiteralBooleanKey extends NodeClass
 

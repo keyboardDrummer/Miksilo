@@ -2,7 +2,7 @@ package transformations.javac.constructor
 
 import core.particles.node.Node
 import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
-import transformations.javac.methods.MethodC
+import transformations.javac.methods.MethodDelta
 import transformations.javac.statements.ExpressionAsStatementC
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
@@ -11,7 +11,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def transform(clazz: Node, state: Compilation): Unit = {
 
     for (constructor <- ConstructorC.getConstructors(clazz)) {
-      val statements = MethodC.getMethodBody(constructor)
+      val statements = MethodDelta.getMethodBody(constructor)
       var addSuperCall = false
       if (statements.isEmpty)
         addSuperCall = true
@@ -23,7 +23,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
       }
 
       if (addSuperCall)
-        constructor(MethodC.MethodBodyKey) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
+        constructor(MethodDelta.MethodBodyKey) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
     }
   }
 

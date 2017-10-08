@@ -36,7 +36,7 @@ object ClassInfoConstant extends ConstantEntry {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstantDelta.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstantDelta.key))
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =

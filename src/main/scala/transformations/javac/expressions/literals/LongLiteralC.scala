@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, RegexG}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
-import core.particles.{Contract, Language}
+import core.particles.{Compilation, Contract, Language}
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import transformations.bytecode.coreInstructions.longs.PushLongDelta
 import transformations.bytecode.types.LongTypeC
@@ -26,13 +26,13 @@ object LongLiteralC extends ExpressionInstance {
 
   def literal(value: Long) = new Node(LongLiteralKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, state: Language): Seq[Node] = {
+  override def toByteCode(literal: Path, compilation: Compilation): Seq[Node] = {
     Seq(PushLongDelta.constant(getValue(literal).toInt))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Long]
 
-  override def getType(expression: Path, state: Language): Node = LongTypeC.longType
+  override def getType(expression: Path, compilation: Compilation): Node = LongTypeC.longType
 
   object LongLiteralKey extends NodeClass
 

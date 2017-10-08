@@ -66,9 +66,9 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8ConstantDelta.key))
-    ByteCodeSkeleton.getState(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
+    ByteCodeSkeleton.getRegistry(state).getBytes(Clazz) = (attribute: Node) => getStackMapTableBytes(attribute, state)
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Clazz, Map(AttributeNameKey -> Utf8ConstantDelta.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
   }
 
   def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {

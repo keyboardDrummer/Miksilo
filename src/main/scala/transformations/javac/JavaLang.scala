@@ -11,17 +11,10 @@ object JavaLang {
 
   val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
-  var systemClass: Node = _
-  var printStreamClass: Node = _
-  var objectClass: Node = _
-  var stringClass: Node = _
-
-  this.synchronized {
-    systemClass = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
-    printStreamClass = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
-    objectClass = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
-    stringClass = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
-  }
+  var systemClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
+  var printStreamClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
+  var objectClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
+  var stringClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
 
   val systemHash = systemClass.hashCode()
   val printStreamHash = printStreamClass.hashCode()
@@ -29,14 +22,22 @@ object JavaLang {
   val stringHash = stringClass.hashCode()
 
   def initialise(javaCompilerState: JavaCompilerState) {
-    if (systemHash != systemClass.hashCode())
-      throw new Exception("system changed")
-    if (printStreamHash != printStreamClass.hashCode())
-      throw new Exception("printStreamClass changed")
-    if (objectHash != objectClass.hashCode())
-      throw new Exception("objectClass changed")
-    if (stringHash != stringClass.hashCode())
-      throw new Exception("stringClass changed")
+
+    if (System.getenv("PLATFORM") == "travis") {
+      if (systemHash != systemClass.hashCode())
+        throw new Exception("system changed")
+      if (printStreamHash != printStreamClass.hashCode())
+        throw new Exception("printStreamClass changed")
+      if (objectHash != objectClass.hashCode())
+        throw new Exception("objectClass changed")
+      if (stringHash != stringClass.hashCode())
+        throw new Exception("stringClass changed")
+
+      systemClass = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
+      printStreamClass = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program
+      objectClass = compiler.parseAndTransform(SourceUtils.getTestFile("Object.class")).program
+      stringClass = compiler.parseAndTransform(SourceUtils.getTestFile("String2.class")).program
+    }
 
     this.synchronized {
       ClassCompiler(objectClass, javaCompilerState)

@@ -34,7 +34,7 @@ object NewByteCodeDelta extends InstructionDelta {
   object ClassRef extends NodeField
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(ClassRef -> ClassInfoConstant.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(ClassRef -> ClassInfoConstant.key))
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(ClassRef)

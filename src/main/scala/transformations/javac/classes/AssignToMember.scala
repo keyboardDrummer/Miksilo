@@ -17,13 +17,14 @@ object AssignToMember extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: Language): Unit = {
-    AssignmentSkeleton.getState(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey, (selector: Path) => {
-      val compiler = JavaClassSkeleton.getClassCompiler(state)
+    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey,
+      (compilation: Compilation, selector: Path) => {
+      val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
       val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
 
       val _object = MemberSelector.getSelectorObject(selector)
-      val objectInstructions = ExpressionSkeleton.getToInstructions(state)(_object)
+      val objectInstructions = ExpressionSkeleton.getToInstructions(compilation)(_object)
       objectInstructions ++ Seq(SwapInstruction.swap, PutField.putField(fieldRefIndex))
     })
     super.inject(state)

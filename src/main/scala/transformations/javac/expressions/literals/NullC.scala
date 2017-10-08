@@ -23,9 +23,9 @@ object NullC extends ExpressionInstance {
 
   override val key = NullKey
 
-  override def getType(expression: Path, state: Language): Node = ???
+  override def getType(expression: Path, compilation: Compilation): Node = ???
 
-  override def toByteCode(expression: Path, state: Language): Seq[Node] = {
+  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = {
     Seq(PushNullDelta.pushNull)
   }
 

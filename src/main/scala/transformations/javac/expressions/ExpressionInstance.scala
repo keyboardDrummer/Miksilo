@@ -8,16 +8,16 @@ trait ExpressionInstance extends DeltaWithGrammar {
   val key: AnyRef
 
   override def inject(state: Language): Unit = {
-    ExpressionSkeleton.getState(state).instances.put(key, this)
+    ExpressionSkeleton.getRegistry(state).instances.put(key, this)
     super.inject(state)
   }
 
-  def toByteCode(expression: Path, state: Language): Seq[Node]
+  def toByteCode(expression: Path, compilation: Compilation): Seq[Node]
 
   /**
    * Given expression is a path so that a variablePool can be retrieved.
    */
-  def getType(expression: Path, state: Language): Node
+  def getType(expression: Path, compilation: Compilation): Node
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 }

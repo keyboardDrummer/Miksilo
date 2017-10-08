@@ -9,19 +9,19 @@ import transformations.javac.classes.ClassCompiler
 import transformations.javac.classes.skeleton.{ClassSignature, ClassMember, JavaClassSkeleton, JavaCompilerState}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.call.CallC
-import transformations.javac.methods.{MemberSelector, MethodC, VariableC}
+import transformations.javac.methods.{MemberSelector, MethodDelta, VariableC}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
   val thisName: String = "this"
 
-  override def dependencies: Set[Contract] = Set(MethodC, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton)
 
-  def addThisToVariable(state: Language, variable: Path) {
-    val compiler = JavaClassSkeleton.getClassCompiler(state)
+  def addThisToVariable(compilation: Compilation, variable: Path) {
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val name = VariableC.getVariableName(variable)
     val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
-    if (!MethodC.getMethodCompiler(state).getVariables(variableWithCorrectPath).contains(name)) {
+    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
       currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
         val classMember: ClassMember = currentClass.methods(key)
@@ -43,7 +43,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   }
 
   def getVariableWithCorrectPath(obj: Path): Path = {
-    if (obj.clazz == MethodC.MethodKey)
+    if (obj.clazz == MethodDelta.MethodKey)
       return new PathRoot(obj.current)
 
     obj match {
@@ -62,7 +62,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
               JavaLang.initialise(compiler)
               ClassCompiler(obj, compiler)
 
-            case MethodC.MethodKey => MethodC.setMethodCompiler(obj, state)
+            case MethodDelta.MethodKey => MethodDelta.setMethodCompiler(obj, state)
             case VariableC.VariableKey => addThisToVariable(state, obj)
             case _ =>
           }

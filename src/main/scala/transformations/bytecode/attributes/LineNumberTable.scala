@@ -19,7 +19,7 @@ object LineNumberTable extends ByteCodeAttribute {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
+    ByteCodeSkeleton.getRegistry(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
   }
 
   def getLineNumberTableBytes(attribute: Node): Seq[Byte] = {

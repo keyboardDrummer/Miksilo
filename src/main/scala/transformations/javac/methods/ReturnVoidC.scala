@@ -9,7 +9,7 @@ import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 
 object ReturnVoidC extends StatementInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, VoidReturnInstructionDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
@@ -30,7 +30,7 @@ object ReturnVoidC extends StatementInstance {
 
   override val key = ReturnVoidKey
 
-  override def toByteCode(_return: Path, state: Language): Seq[Node] = {
+  override def toByteCode(_return: Path, compilation: Compilation): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }
 

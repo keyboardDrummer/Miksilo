@@ -46,20 +46,20 @@ object PrintByteCode {
     def getMethodsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
       val methods = clazz.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
-        ByteCodeSkeleton.getState(state).getBytes(method.clazz)(method)
+        ByteCodeSkeleton.getRegistry(state).getBytes(method.clazz)(method)
       })
     }
 
     def getFieldsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
       val fields = clazz.fields
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
-        ByteCodeSkeleton.getState(state).getBytes(field.clazz)(field)
+        ByteCodeSkeleton.getRegistry(state).getBytes(field.clazz)(field)
       })
     }
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-        case metaEntry: Node => ByteCodeSkeleton.getState(state).getBytes(metaEntry.clazz)(metaEntry)
+        case metaEntry: Node => ByteCodeSkeleton.getRegistry(state).getBytes(metaEntry.clazz)(metaEntry)
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
       }
@@ -99,7 +99,7 @@ object PrintByteCode {
 
     def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
-        prefixWithIntLength(() => ByteCodeSkeleton.getState(state).getBytes(attribute.clazz)(attribute))
+        prefixWithIntLength(() => ByteCodeSkeleton.getRegistry(state).getBytes(attribute.clazz)(attribute))
     }
 
     shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))

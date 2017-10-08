@@ -45,7 +45,7 @@ object FieldRefConstant extends ConstantEntry {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(
       ClassInfo -> ClassInfoConstant.key,
       NameAndType -> NameAndTypeConstant.key))
   }

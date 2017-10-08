@@ -9,7 +9,7 @@ trait StackType extends Delta
   def getStackSize: Int
 
   override def inject(state: Language): Unit = {
-    TypeSkeleton.getState(state).stackSize.put(key, getStackSize)
+    TypeSkeleton.getRegistry(state).stackSize.put(key, getStackSize)
     super.inject(state)
   }
 }

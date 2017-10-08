@@ -17,10 +17,10 @@ trait InstructionDelta extends InstructionWithGrammar with InstructionSignatureP
   override def inject(state: Language): Unit = {
     super.inject(state)
     CodeAttribute.getInstructionSignatureRegistry(state).put(key, this)
-    ByteCodeSkeleton.getState(state).getBytes.put(key, getInstructionByteCode)
+    ByteCodeSkeleton.getRegistry(state).getBytes.put(key, getInstructionByteCode)
     CodeAttribute.getInstructionSizeRegistry(state).put(key, getInstructionSize)
-    CodeAttribute.getState(state).jumpBehaviorRegistry.put(key, jumpBehavior)
-    CodeAttribute.getState(state).localUpdates.put(key, this)
+    CodeAttribute.getRegistry(state).jumpBehaviorRegistry.put(key, jumpBehavior)
+    CodeAttribute.getRegistry(state).localUpdates.put(key, this)
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {

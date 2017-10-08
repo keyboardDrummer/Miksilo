@@ -17,7 +17,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InstructionArgumentsKey extends NodeField
 
-object CodeAttribute extends ByteCodeAttribute with WithState {
+object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
 
   implicit class CodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def maxStack: Int = node(MaxStack).asInstanceOf[Int]
@@ -35,9 +35,9 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
     instruction(InstructionArgumentsKey) = arguments
   }
 
-  def getInstructionSizeRegistry(state: Language) = getState(state).getInstructionSizeRegistry
+  def getInstructionSizeRegistry(state: Language) = getRegistry(state).getInstructionSizeRegistry
 
-  def getInstructionSignatureRegistry(state: Language) = getState(state).getInstructionSignatureRegistry
+  def getInstructionSignatureRegistry(state: Language) = getRegistry(state).getInstructionSignatureRegistry
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
@@ -66,8 +66,8 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
 
-  def createState = new State()
-  class State {
+  def createRegistry = new Registry()
+  class Registry {
     val getInstructionSignatureRegistry = new ClassRegistry[InstructionSignatureProvider]
     val getInstructionSizeRegistry = new ClassRegistry[Int]
     val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
@@ -78,15 +78,15 @@ object CodeAttribute extends ByteCodeAttribute with WithState {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(
+    ByteCodeSkeleton.getRegistry(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(
       AttributeNameKey -> Utf8ConstantDelta.key))
   }
 
   def getCodeAttributeBytes(attribute: CodeWrapper[Node], state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-      ByteCodeSkeleton.getState(state).getBytes(instruction.clazz)(instruction)
+      ByteCodeSkeleton.getRegistry(state).getBytes(instruction.clazz)(instruction)
     }
 
     val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)

@@ -3,13 +3,14 @@ package transformations.javac.methods
 import core.particles.exceptions.BadInputException
 import core.particles.node.Node
 import core.particles.path.{Path, PathRoot}
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import transformations.javac.classes.skeleton.JavaClassSkeleton
-import transformations.javac.methods.MethodC._
+import transformations.javac.methods.MethodDelta._
 import transformations.javac.statements.StatementSkeleton
 import transformations.javac.statements.locals.LocalsAnalysis
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.classes.ClassCompiler
+
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
 }
@@ -40,19 +41,19 @@ case class VariablePool(state: Language, typedVariables: Map[String, Node] = Map
   }
 }
 
-case class MethodCompiler(state: Language, method: Node) {
+case class MethodCompiler(compilation: Compilation, method: Node) {
   val parameters: Seq[Node] = getMethodParameters(method)
-  val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(state)
+  val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
   private val initialVariables = getInitialVariables
 
-  val localAnalysis = new LocalsAnalysis(state, method)
+  val localAnalysis = new LocalsAnalysis(compilation, method)
   private val intermediate = getMethodBody[Path](PathRoot(method))
   val firstInstruction: Path = intermediate.head
   val variablesPerStatement: Map[Path, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables: VariablePool = {
-    var result = VariablePool(state)
+    var result = VariablePool(compilation)
     if (!getMethodStatic(method))
       result = result.add("this", ObjectTypeDelta.objectType(classCompiler.currentClassInfo.name))
     for (parameter <- parameters)
@@ -66,9 +67,9 @@ case class MethodCompiler(state: Language, method: Node) {
   }
 
   def getVariables(obj: Path): VariablePool = {
-    val instances = StatementSkeleton.getState(state).instances
+    val instances = StatementSkeleton.getRegistry(compilation).instances
     val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.clazz)).head
-    val variablesPerStatement: Map[Path, VariablePool] = MethodC.getMethodCompiler(state).variablesPerStatement
+    val variablesPerStatement: Map[Path, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
     try
     {
       variablesPerStatement(statement)

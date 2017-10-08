@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.Language
+import core.particles.{Compilation, Language}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
@@ -14,7 +14,7 @@ object JustJavaGoto extends StatementInstance {
 
   def goto(label: String) = new Node(GotoKey, Target -> label)
 
-  override def toByteCode(statement: Path, state: Language): Seq[Node] = {
+  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
     Seq(LabelledLocations.goTo(getTarget(statement.current)))
   }
 

@@ -34,7 +34,7 @@ abstract class InvokeDelta extends InstructionDelta {
   object MethodRef extends NodeField
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getState(state).constantReferences.put(key, Map(MethodRef -> MethodRefConstant.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodRef -> MethodRefConstant.key))
   }
 
   override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(MethodRef)

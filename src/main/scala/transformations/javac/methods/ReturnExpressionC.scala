@@ -14,21 +14,21 @@ import transformations.javac.statements.{StatementInstance, StatementSkeleton}
 
 object ReturnExpressionC extends StatementInstance {
 
-  override def dependencies: Set[Contract] = Set(MethodC, IntegerReturnInstructionDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
   def returnToLines(_return: Path, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: Path = getReturnValue(_return)
-    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.state)(returnValue)
-    val getType = ExpressionSkeleton.getType(compiler.state)
+    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.compilation)(returnValue)
+    val getType = ExpressionSkeleton.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
     {
       case x if x == IntTypeC.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
       case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta.longReturn)
       case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
       case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.state)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
+      case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
   }
@@ -51,8 +51,8 @@ object ReturnExpressionC extends StatementInstance {
 
   override val key = ReturnInteger
 
-  override def toByteCode(_return: Path, state: Language): Seq[Node] = {
-    val methodCompiler = MethodC.getMethodCompiler(state)
+  override def toByteCode(_return: Path, compilation: Compilation): Seq[Node] = {
+    val methodCompiler = MethodDelta.getMethodCompiler(compilation)
     returnToLines(_return, methodCompiler)
   }
 
