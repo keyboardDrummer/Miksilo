@@ -29,7 +29,7 @@ and do things like ask the compiler for its in- and output grammar.
 " target="_blank"><img src="http://img.youtube.com/vi/IHFHcf61g-k/0.jpg" 
 alt="Introduction video" width="240" height="180" border="10" /></a>
 
-### How to Contribute
+### Contribute
 There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for an Bachelor's or Master's thesis.
 
 Some examples of cool features:
@@ -40,4 +40,8 @@ Some examples of cool features:
 - Incremental compilation: incremental parsing, incremental type checking, etc.
 - Add a new language front-end or back-end.
 
-If you decide to contribute, it might help to reach out in the gitter channel, so we can help you out where the documentation is lacking.
+#### How to contribute
+- If you decide to contribute, it might help to reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.
+- Look through the open issues to see if you find something interesting
+- Start hacking ;-)
+- Once you're done submit a pull request and make sure the buildserver approves it.
