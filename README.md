@@ -29,7 +29,7 @@ and do things like ask the compiler for its in- and output grammar.
 " target="_blank"><img src="http://img.youtube.com/vi/IHFHcf61g-k/0.jpg" 
 alt="Introduction video" width="240" height="180" border="10" /></a>
 
-### Contribute
+### Contributions
 There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for an Bachelor's or Master's thesis.
 
 Some examples of cool features:
