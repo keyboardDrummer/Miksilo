@@ -10,23 +10,15 @@ Another differentiator of Blender is its meta language. The meta language is the
 ### Delta
 The core concept of Blender is a *delta*. A delta is piece of code that applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Delta's are put into an ordered list to form a language. Language re-use comes from re-using these delta's. Some delta's depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper '*A Nanopass Framework for Compiler Education*'.
 
-A delta can include one or several phases such as parsing, type checking, optimization and code generation.
-Commonly compilers are modularised by defining several compiler phases and using a limited number of intermediate languages.
-Blender focuses purely on intermediate languages to achieve modularisation.
-By keeping the abstract syntax tree untyped, it becomes relatively simple to define a language as a sequence of language delta's.
-
-### GUI
-Blender includes a GUI. You can use this to play around with the defined deltas and construct a compiler from them.
-Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can run your compiler,
-and do things like ask the compiler for its in- and output grammar.
-
 ### BiGrammar
 To allow writing both a parser and a printer at the same time, Blender defines the [BiGrammar DSL](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-1:-unified-parsing-and-printing). The approach taken here is similar to that described by the paper '*Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing*'.
 A BiGrammar may be defined in a left recursive fashion, which can be contributed to the use of packrat parsing as described in
 '*Packrat Parsing: Simple, Powerful, Lazy, Linear Time*' to deal with problems associated with such grammars.
 
-### State of the project
-Currently I'm only working on deltas that enable a Java to JVM bytecode translation. I'm using JVM as a target because it's a relatively high level language so it's easy to compile to. My current goal is to finish or almost finish a Java compiler. I'd say it's about halfway done. After that I'd like to use very different languages for front- and back-end, say Haskell as a front-end and Javascript as a back-end. I'm curious what the similarities between these languages from different paradigms are and how many compiler deltas can be reused between different languages.
+### GUI
+Blender includes a GUI. You can use this to play around with the defined deltas and construct a compiler from them.
+Once you're happy with your compiler you can play around with it in the compiler cockpit. Here you can run your compiler,
+and do things like ask the compiler for its in- and output grammar.
 
 ### Build instructions
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
@@ -37,5 +29,12 @@ Currently I'm only working on deltas that enable a Java to JVM bytecode translat
 " target="_blank"><img src="http://img.youtube.com/vi/IHFHcf61g-k/0.jpg" 
 alt="Introduction video" width="240" height="180" border="10" /></a>
 
-### Contributions
-Currently I (KeyboardDrummer) am the only one working on this project, but contributions are very welcome.
+### How to Contribute
+There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for an Bachelor's or Master's thesis.
+
+Some examples of cool features:
+- Parser combinators that allow defining indentation sensitive grammars, such as those of Python and Haskell.
+- A DSL for static semantics, such as name binding and type checking. See the paper [A constraint language for static semantic analysis based on scope graphs](http://delivery.acm.org/10.1145/2850000/2847543/p49-antwerpen.pdf?ip=145.129.111.38&id=2847543&acc=OA&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E77FCF3B2F09622E1&CFID=992904318&CFTOKEN=51306518&__acm__=1507451717_5c1e5970ab3ac31fbd9849edb486a802) for inspiration
+- Error correcting parsing
+- Generating syntactic code completion from a grammar, as in [Principled syntactic code completion using placeholders](http://delivery.acm.org/10.1145/3000000/2997374/p163-amorim.pdf?ip=145.129.111.38&id=2997374&acc=OA&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E77FCF3B2F09622E1&CFID=992904318&CFTOKEN=51306518&__acm__=1507451951_eb454d2173854f174d05e3c1e1526bbd)
+- Incremental compilation: incremental parsing, incremental type checking, etc.
