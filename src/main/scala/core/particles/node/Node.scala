@@ -3,6 +3,7 @@ package core.particles.node
 import core.particles.path.Path
 
 import scala.collection.mutable
+import scala.util.hashing.Hashing
 
 object Node {
 
@@ -95,7 +96,7 @@ class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
 
   override def hashCode(): Int = {
     val state = Seq(data, clazz)
-    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+    Hashing.default.hash(state)
   }
 
   override def get(key: NodeField): Option[Any] = data.get(key)
