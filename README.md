@@ -19,14 +19,11 @@ A BiGrammar may be defined in a left recursive fashion, which can be contributed
 Blender includes a GUI. You can use this to play around with the defined deltas and construct a language from them.
 Once you're happy with your language you can play around with it in the language cockpit. Here you can run write programs in the language with IDE support, compile those programs and pretty print the target language, run those programs, determine which compilation phases the language's compiler has, and inspect the language's in- and output grammar.
 
+To see Blender's GUI in action, watch our [introduction video](http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k).
+
 ### Build instructions
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
 2. Call 'sbt run' in the project root
-
-### Introduction Video
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k
-" target="_blank"><img src="http://img.youtube.com/vi/IHFHcf61g-k/0.jpg" 
-alt="Introduction video" width="240" height="180" border="10" /></a>
 
 ### Contributions
 There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for an Bachelor's or Master's thesis.
