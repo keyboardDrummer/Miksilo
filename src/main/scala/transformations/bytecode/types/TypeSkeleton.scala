@@ -30,7 +30,8 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar)
-      BiGrammarToPrinter.toDocument(_type, grammar).renderString()
+      val rendered = BiGrammarToPrinter.toDocument(_type, grammar).renderString()
+      rendered
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)

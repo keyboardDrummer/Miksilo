@@ -14,7 +14,7 @@ class GrammarCatalogue {
 
   var grammars: Map[Any, Labelled] = Map.empty
 
-  def root: BiGrammar = grammars(ProgramGrammar)
+  def root: Labelled = find(ProgramGrammar)
   def find(key: Any): Labelled = {
     try {
       grammars(key)

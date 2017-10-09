@@ -2,8 +2,14 @@ package core.bigrammar
 
 import core.grammar.{Grammar, ~}
 
-case class WithMap(value: Any, state: Map[Any, Any])
+
+case class WithMap(value: Any, state: Map[Any, Any]){
+  def withValue[T](newValue: T) = WithMapG(newValue, state)
+}
+
+case class WithMapG[T](value: T, state: Map[Any, Any])
 {
+  def withValue[U](newValue: U) = WithMapG(newValue, state)
 }
 
 object BiGrammarToGrammar {

@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.printer.BiGrammarToPrinter
+import core.bigrammar.printer.{BiGrammarToPrinter, PrinterTypes}
 import core.document.{BlankLine, WhiteSpace}
 import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
 import core.particles.node.{Node, NodeField}
@@ -102,7 +102,13 @@ trait CustomGrammar extends BiGrammar {
 
 trait SequenceLike extends BiGrammar with Layout {
   def first: BiGrammar
+  def first_=(value: BiGrammar): Unit
+
   def second: BiGrammar
+  def second_=(value: BiGrammar): Unit
+
+  override def children = Seq(first, second)
+
   def ignoreLeft: MapGrammar = {
     new MapGrammar(this,
       { case ~(l, r) => r },
@@ -146,12 +152,12 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
           if (parseResult.successful && parseResult.get.equals(withMap.value))
             Success(string)
           else
-            BiGrammarToPrinter.fail("FromGrammarWithToString could not parse string")
+            PrinterTypes.fail("FromGrammarWithToString could not parse string")
         }
         else
           Success(string)
 
-      case _ => BiGrammarToPrinter.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
+      case _ => PrinterTypes.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
     }
   }
 }
@@ -186,7 +192,6 @@ class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: B
 
 class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
 {
-  override def children = Seq(first, second)
 
   override def horizontal = true
 }
@@ -211,8 +216,6 @@ trait Layout {
 
 class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike {
   override lazy val height: Int = first.height + second.height
-
-  override def children = Seq(first, second)
 
   override def horizontal = false
 }
