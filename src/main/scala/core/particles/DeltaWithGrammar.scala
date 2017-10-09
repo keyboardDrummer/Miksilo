@@ -50,7 +50,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
     if (node.clazz == key) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap))
+      Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap ++ withMap.state))
     } else {
       None
     }

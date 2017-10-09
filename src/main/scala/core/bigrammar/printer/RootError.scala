@@ -12,5 +12,5 @@ case class RootError(depth: Int, partial: ResponsiveDocument, inner: Any) extend
      // % s"trace = " % inner.getStackTrace.map(e => e.toString: ResponsiveDocument).reduce((a, b) => a % b).indent(4)
      Empty
 
-   override def mapPartial(f: (ResponsiveDocument) => ResponsiveDocument): PrintError = new RootError(1 + depth, f(partial), inner)
+   override def mapPartial(f: (ResponsiveDocument) => ResponsiveDocument): PrintError = RootError(1 + depth, f(partial), inner)
  }

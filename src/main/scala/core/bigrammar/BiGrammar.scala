@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.printer.{BiGrammarToPrinter, PrinterTypes}
+import core.bigrammar.printer.{BiGrammarToPrinter, TryState}
 import core.document.{BlankLine, WhiteSpace}
 import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
 import core.particles.node.{Node, NodeField}
@@ -152,12 +152,12 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
           if (parseResult.successful && parseResult.get.equals(withMap.value))
             Success(string)
           else
-            PrinterTypes.fail("FromGrammarWithToString could not parse string")
+            TryState.fail("FromGrammarWithToString could not parse string")
         }
         else
           Success(string)
 
-      case _ => PrinterTypes.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
+      case _ => TryState.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
     }
   }
 }
