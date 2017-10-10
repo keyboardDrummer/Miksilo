@@ -4,13 +4,13 @@ import core.particles._
 import core.particles.path.Path
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature, PackageSignature}
 import transformations.javac.methods.MemberSelector
-import transformations.javac.methods.MemberSelector.SelectorKey
+import transformations.javac.methods.MemberSelector.Clazz
 
 object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(SelectorKey, (compilation, selector) => {
+    MemberSelector.getReferenceKindRegistry(state).put(Clazz, (compilation, selector) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(selector, compiler)
     })

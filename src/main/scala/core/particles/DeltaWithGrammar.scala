@@ -50,7 +50,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
     if (node.clazz == key) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap ++ withMap.state))
+      Some(WithMap(UndefinedDestructuringValue, /*withMap.state ++*/ dataViewAsGenericMap )) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
     } else {
       None
     }

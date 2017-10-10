@@ -13,7 +13,7 @@ import transformations.javac.methods.MemberSelector._
 
 object SelectField extends ExpressionInstance {
 
-  override val key = SelectorKey
+  override val key = Clazz
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 

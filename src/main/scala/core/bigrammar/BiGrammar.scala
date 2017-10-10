@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.bigrammar.printer.{BiGrammarToPrinter, TryState}
 import core.document.{BlankLine, WhiteSpace}
 import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
@@ -92,12 +93,11 @@ trait BiGrammar extends BiGrammarWriter {
 
 object StringLiteral extends CustomGrammar {
   override def getGrammar = core.grammar.StringLiteral
-  override def print(withMap: WithMap) = Try("\"" + withMap.value + "\"")
+  override def write(from: Any, state: State) = Try(state, "\"" + from + "\"")
 }
 
-trait CustomGrammar extends BiGrammar {
+trait CustomGrammar extends BiGrammar with NodePrinter {
   def getGrammar: Grammar
-  def print(withMap: WithMap): Try[ResponsiveDocument]
 }
 
 trait SequenceLike extends BiGrammar with Layout {
@@ -127,9 +127,8 @@ case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: 
 class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = true)
   extends FromStringGrammar(grammar, verifyWhenPrinting) {
 
-  override def print(withMap: WithMap) = {
-    super.print(WithMap(withMap.value.toString, withMap.state))
-  }
+  override def write(from: Any, state: State) =
+    super.write(from.toString, state)
 }
 
 /**
@@ -144,20 +143,21 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
 
   lazy val parser = GrammarToParserConverter.convert(grammar)
 
-  override def print(withMap: WithMap) = {
-    withMap.value match {
-      case string:String =>
+
+  override def write(from: Any, state: State) = {
+    from match {
+      case string: String =>
         if (verifyWhenPrinting) {
           val parseResult = parser(new CharArrayReader(string.toCharArray))
-          if (parseResult.successful && parseResult.get.equals(withMap.value))
-            Success(string)
+          if (parseResult.successful && parseResult.get.equals(from))
+            Success(state, string)
           else
             TryState.fail("FromGrammarWithToString could not parse string")
         }
         else
-          Success(string)
+          Success(state, string)
 
-      case _ => TryState.fail(s"FromStringGrammar expects a string value, and not a ${withMap.value}")
+      case _ => TryState.fail(s"FromStringGrammar expects a string value, and not a $from")
     }
   }
 }
