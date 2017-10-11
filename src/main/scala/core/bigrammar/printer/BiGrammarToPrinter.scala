@@ -14,8 +14,17 @@ import scala.util.{Failure, Success, Try}
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(outerValue, Map.empty).get._2
+    printer.write(outerValue, new BiGrammarState()).get._2
   }
+}
+
+class BiGrammarState(map: Map[Any, ::[Any]] = Map.empty) {
+  def get(key: Any): Option[Any] = map.get(key).map(l => l.head)
+  def put(key: Any, value: Any): BiGrammarState = new BiGrammarState(map + (key -> ::(value, map.getOrElse(key, List.empty))))
+  def remove(key: Any): BiGrammarState = new BiGrammarState(map.get(key).fold(map)({
+    case _::Nil => map - key;
+    case ::(_, tail: ::[Any]) => map + (key -> tail)
+  }))
 }
 
 class BindPrinter[T, U](first: TryState[T, ResponsiveDocument => ResponsiveDocument], second: Printer[U])
@@ -41,7 +50,7 @@ object TryState {
 
   type Printer[T] = TryState[T, ResponsiveDocument]
   type NodePrinter = Printer[Any]
-  type State = Map[Any, Any]
+  type State = BiGrammarState
 
   class NonePrintFailureException(e: Throwable) extends RuntimeException {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
@@ -121,8 +130,9 @@ class BiGrammarToPrinter {
           val innerPrinter = toPrinterCached(inner)
           new NodePrinter {
             override def write(from: Any, state: State) = {
-              if (state.contains(key)) innerPrinter.write(state(key), state - key)
-              else fail(s"did not find as key $key in state $state")
+              state.get(key).fold[Try[(State, ResponsiveDocument)]](
+                fail(s"did not find as key $key in state $state"))(
+                value => innerPrinter.write(value, state.remove(key)))
             }
           }
       }
@@ -143,14 +153,14 @@ class BiGrammarToPrinter {
         for {
           (newState, deconstructedValue) <- deconstructValue(value, state, mapGrammar)
           result <- innerPrinter.write(deconstructedValue, newState).recoverWith { case e: PrintError => Failure(e.mapPartial(x => x)) }
-        } yield (state, result._2) //TODO scary not to use the state from result
+        } yield result // (state, result._2) //TODO scary not to use the state from result
       }
   }
 
   def deconstructValue(value: Any, state: State, grammar: MapGrammar): Try[(State, Any)] = {
     if (grammar.showMap) {
-      grammar.deconstruct(WithMap(value, state)) match {
-        case Some(WithMap(newValue, newState)) =>
+      grammar.deconstruct(WithMap2(value, state)) match {
+        case Some(WithMap2(newValue, newState)) =>
           Try((newState, newValue))
         case _ => fail("could not deconstruct value")
       }

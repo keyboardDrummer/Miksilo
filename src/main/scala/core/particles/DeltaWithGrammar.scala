@@ -23,7 +23,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
     def parseMap(key: NodeClass): BiGrammar = {
       new MapGrammar(grammar,
         input => construct(input.asInstanceOf[WithMap], key),
-        obj => destruct(obj.asInstanceOf[WithMap], key), showMap = true)
+        obj => destruct(obj.asInstanceOf[WithMap2], key), showMap = true)
     }
 
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
@@ -36,12 +36,12 @@ trait NodeGrammarWriter extends BiGrammarWriter {
   class NodeGrammar(inner: BiGrammar, val key: NodeClass)
     extends MapGrammar(inner,
       input => construct(input.asInstanceOf[WithMap], key),
-      obj => destruct(obj.asInstanceOf[WithMap], key), showMap = true)
+      obj => destruct(obj.asInstanceOf[WithMap2], key), showMap = true)
   {
   }
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(withMap: WithMap, key: NodeClass): Option[WithMap] = {
+  def destruct(withMap: WithMap2, key: NodeClass): Option[WithMap2] = {
     val value = withMap.value
     if (!value.isInstanceOf[NodeLike])
       return None
@@ -50,8 +50,10 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
     if (node.clazz == key) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      Some(WithMap(UndefinedDestructuringValue, /*withMap.state ++*/ dataViewAsGenericMap )) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
-    } else {
+      val mergedMap = dataViewAsGenericMap.foldLeft(withMap.state)((result, entry) => result.put(entry._1, entry._2))
+      Some(WithMap2(UndefinedDestructuringValue, mergedMap)) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
+    }
+    else {
       None
     }
   }

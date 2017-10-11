@@ -5,8 +5,8 @@ import core.bigrammar.{TestCompilerGrammarUtils, TestGrammarUtils}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
-import transformations.javac.expressions.literals.IntLiteralC
+import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
+import transformations.javac.expressions.literals.IntLiteralDelta
 import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
@@ -39,7 +39,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 //Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
   test("addition") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
-      Seq(AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+      Seq(AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
@@ -50,7 +50,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("addition2") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
-      Seq(AdditionC, SubtractionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+      Seq(AdditionDelta, SubtractionC, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
@@ -61,7 +61,7 @@ class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleComments
 
   test("addition3") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
-      Seq(SubtractionC, AdditionC, AddAdditivePrecedence, IntLiteralC, ExpressionSkeleton) ++
+      Seq(SubtractionC, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
     JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 

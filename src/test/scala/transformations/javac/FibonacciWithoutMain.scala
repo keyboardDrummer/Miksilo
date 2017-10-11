@@ -4,8 +4,8 @@ import core.particles.node.Node
 import transformations.bytecode.types.IntTypeC
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.expressions._
-import transformations.javac.expressions.additive.{AdditionC, SubtractionC}
-import transformations.javac.expressions.literals.IntLiteralC
+import transformations.javac.expressions.additive.{AdditionDelta, SubtractionC}
+import transformations.javac.expressions.literals.IntLiteralDelta
 import transformations.javac.expressions.relational.LessThanC
 import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.ReturnExpressionC
@@ -32,10 +32,10 @@ class FibonacciWithoutMain {
 
   def getFibonacciMethodJava: Node = {
     val parameters = Seq(parameter("i", IntTypeC.intType))
-    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralC.literal(1))))
-    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralC.literal(2))))
-    val condition = LessThanC.lessThan(variable("i"), IntLiteralC.literal(2))
-    val returnValue = TernaryC.ternary(condition, IntLiteralC.literal(1), AdditionC.addition(recursiveCall1, recursiveCall2))
+    val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralDelta.literal(1))))
+    val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralDelta.literal(2))))
+    val condition = LessThanC.lessThan(variable("i"), IntLiteralDelta.literal(2))
+    val returnValue = TernaryC.ternary(condition, IntLiteralDelta.literal(1), AdditionDelta.addition(recursiveCall1, recursiveCall2))
     val body = Seq(ReturnExpressionC._return(returnValue))
     method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }

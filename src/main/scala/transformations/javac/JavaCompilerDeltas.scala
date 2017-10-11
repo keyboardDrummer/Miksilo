@@ -22,9 +22,9 @@ import transformations.javac.classes._
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.constructor._
 import transformations.javac.expressions._
-import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionC, SubtractionC}
+import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
-import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralC, LongLiteralC, NullC}
+import transformations.javac.expressions.literals.{BooleanLiteralC, IntLiteralDelta, LongLiteralC, NullC}
 import transformations.javac.expressions.postfix.PostFixIncrementC
 import transformations.javac.expressions.prefix.NotC
 import transformations.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
@@ -60,8 +60,8 @@ object JavaCompilerDeltas {
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityDelta,
-    AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionC, SubtractionC, AddAdditivePrecedence,
-    BooleanLiteralC, LongLiteralC, IntLiteralC, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
+    AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
+    BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
 
   def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++

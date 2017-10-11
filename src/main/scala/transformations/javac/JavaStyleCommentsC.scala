@@ -9,8 +9,6 @@ import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
-  case class CommentCollection(comments: Seq[String])
-
   object CommentKey extends NodeField
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
@@ -30,11 +28,6 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   def getCommentsGrammar: BiGrammar = {
     val commentGrammar = getCommentGrammar
     val comments = commentGrammar.manyVertical
-//    ^^
-//      (comments => CommentCollection(comments.asInstanceOf[Seq[String]]), {
-//        case c: CommentCollection => Some(c.comments)
-//        case _ => None
-//      })
     new MapGrammar(comments, { case withMap: WithMap =>
       val existingCommentsOption = withMap.state.get(CommentKey)
       val newComments: Seq[String] = existingCommentsOption.fold(withMap.value.asInstanceOf[Seq[String]])(
@@ -42,9 +35,10 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
       val newState = if (newComments.isEmpty) withMap.state else withMap.state + (CommentKey -> newComments)
       WithMap(Unit, newState)
     }, {
-      case withMap: WithMap => withMap.state.get(CommentKey) match {
-        case Some(comment) => Some(WithMap(comment.asInstanceOf[Seq[String]], withMap.state - CommentKey))
-        case _ => Some(WithMap(Seq.empty, withMap.state))
+      case withMap: WithMap2 => withMap.state.get(CommentKey) match {
+        case Some(comment) =>
+          Some(WithMap2(comment.asInstanceOf[Seq[String]], withMap.state.remove(CommentKey)))
+        case _ => Some(WithMap2(Seq.empty, withMap.state))
       }
     }, showMap = true)
   }

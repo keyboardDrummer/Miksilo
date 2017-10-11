@@ -1,15 +1,13 @@
 package core.bigrammar
 
+import core.bigrammar.printer.TryState
 import core.grammar.{Grammar, ~}
 
-
-case class WithMap(value: Any, state: Map[Any, Any]){
-  def withValue[T](newValue: T) = WithMapG(newValue, state)
+case class WithMap2(value: Any, state: TryState.State){
 }
 
-case class WithMapG[T](value: T, state: Map[Any, Any])
-{
-  def withValue[U](newValue: U) = WithMapG(newValue, state)
+
+case class WithMap(value: Any, state: Map[Any,Any]){
 }
 
 object BiGrammarToGrammar {
