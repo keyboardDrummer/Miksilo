@@ -32,7 +32,7 @@ class ExtendedType[T](_type: Class[T])
 
       override def _type: Class[AnyRef] = propertyType.asInstanceOf[Class[AnyRef]]
 
-
+      override def toString: String = name
     })
   }
 }

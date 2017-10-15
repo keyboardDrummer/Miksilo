@@ -29,7 +29,7 @@ object Utf8ConstantDelta extends ConstantEntry {
       keywordClass("<clinit>") |
       StringLiteral
       //TODO misschien een aparte constant maken voor 'Names'
-      ).as(Value).asNode(Utf8ConstantKey)
+      ).as(Value)
 
   override def description: String = "A string constant"
 

@@ -231,5 +231,8 @@ case class Print(document: ResponsiveDocument) extends BiGrammar
 case class ValueGrammar(value: Any) extends BiGrammar
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
+{
+  override def children: Seq[BiGrammar] = Seq(inner)
+}
 
 case class BiFailure(message: String = "") extends BiGrammar

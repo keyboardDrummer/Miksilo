@@ -20,7 +20,7 @@ object LongInfoConstant extends ConstantEntry {
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = PrintByteCode.byteToBytes(5) ++ PrintByteCode.longToBytes(constant.value)
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = number.as(LongEntryValue).asNode(LongEntryKey)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = number.as(LongEntryValue)
 
   override def description: String = "Add the long constant entry."
 

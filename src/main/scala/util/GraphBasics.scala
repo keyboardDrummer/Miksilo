@@ -18,7 +18,6 @@ object GraphBasics {
 
       if (visited.add(value))
       {
-        result ::= value
         if (!shouldContinue(value))
           return result
 

@@ -26,7 +26,7 @@ object MethodTypeConstant extends ConstantEntry {
   }
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex).asNode(MethodTypeConstantKey)
+    grammars.find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex)
 
   override def description: String = "Add the method type constant"
 
