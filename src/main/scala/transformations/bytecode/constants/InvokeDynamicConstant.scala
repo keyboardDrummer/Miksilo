@@ -5,7 +5,6 @@ import core.particles.Language
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
-import transformations.bytecode.constants.MethodHandleConstant.MethodHandleKey
 
 object InvokeDynamicConstant extends ConstantEntry {
 
@@ -24,7 +23,7 @@ object InvokeDynamicConstant extends ConstantEntry {
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
     "bootstrap index:" ~~> integer.as(InvokeDynamicBootstrapMethodIndex) ~<
       ", nameAndTypeIndex:" ~~
-      integer.as(InvokeDynamicNameAndTypeIndex) asNode MethodHandleKey
+      integer.as(InvokeDynamicNameAndTypeIndex)
 
   override def description: String = "Adds the invoke dynamic constant"
 

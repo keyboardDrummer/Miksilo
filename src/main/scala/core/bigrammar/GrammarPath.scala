@@ -19,7 +19,8 @@ object GrammarPath {
 trait GrammarPath {
   def get: BiGrammar
   lazy val children: Seq[GrammarReference] = {
-    GrammarPath.getBiGrammarProperties(get.getClass).map(property => new GrammarReference(this, property))
+    val properties = GrammarPath.getBiGrammarProperties(get.getClass)
+    properties.map(property => new GrammarReference(this, property))
   }
 
   def ancestorGrammars: Set[BiGrammar]
@@ -106,7 +107,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
     previous.asInstanceOf[GrammarReference].set(sibling)
   }
 
-  override def toString = s"GrammarSelection($get)"
+  override def toString = s"$get <INSIDE> $parent"
 
   override def ancestors: Seq[GrammarPath] = Seq(previous) ++ previous.ancestors
 

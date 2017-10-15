@@ -50,7 +50,7 @@ object TypeConstant extends ConstantEntry {
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    typeGrammar.as(Type).asNode(key)
+    typeGrammar.as(Type)
   }
 
   override def description: String = "Adds the field descriptor constant. It contains the type of a field."

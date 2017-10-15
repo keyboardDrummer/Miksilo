@@ -53,9 +53,8 @@ object FieldRefConstant extends ConstantEntry {
   override def key = FieldRef
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    (grammars.find(ConstantPoolIndexGrammar).as(ClassInfo) ~< "." ~
-      grammars.find(ConstantPoolIndexGrammar).as(NameAndType)).
-      asNode(FieldRef)
+    grammars.find(ConstantPoolIndexGrammar).as(ClassInfo) ~< "." ~
+      grammars.find(ConstantPoolIndexGrammar).as(NameAndType)
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 
