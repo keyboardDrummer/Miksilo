@@ -1,9 +1,9 @@
 package core.bigrammar
 
-import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToGrammar.{StateM, WithMap}
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.bigrammar.printer.{BiGrammarToPrinter, TryState}
-import core.document.{BlankLine, WhiteSpace}
+import core.document.{BlankLine, Empty, WhiteSpace}
 import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
 import core.particles.node.{Node, NodeField}
 import core.responsiveDocument.ResponsiveDocument
@@ -95,6 +95,11 @@ trait BiGrammar extends BiGrammarWriter {
 object StringLiteral extends CustomGrammar {
   override def getGrammar = core.grammar.StringLiteral
   override def write(from: WithMapG[Any], state: State) = Try(state, "\"" + from.value + "\"")
+}
+
+trait SuperCustomGrammar extends BiGrammar {
+  def createGrammar(map: BiGrammar => Grammar): Grammar
+  def createPrinter(map: BiGrammar => NodePrinter): NodePrinter
 }
 
 trait CustomGrammar extends BiGrammar with NodePrinter {

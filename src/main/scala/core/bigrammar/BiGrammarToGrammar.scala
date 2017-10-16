@@ -33,6 +33,7 @@ object BiGrammarToGrammar {
         }
       case choice:Choice => core.grammar.Choice(recursive(choice.left), recursive(choice.right), choice.firstBeforeSecond)
       case custom:CustomGrammar => custom.getGrammar ^^ valueToResult
+      case custom:SuperCustomGrammar => custom.createGrammar(recursive)
       case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ valueToResult
       case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ valueToResult
       case many:Many => core.grammar.Many(recursive(many.inner)) ^^

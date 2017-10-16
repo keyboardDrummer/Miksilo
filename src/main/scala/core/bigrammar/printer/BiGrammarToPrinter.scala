@@ -14,17 +14,8 @@ import scala.util.{Failure, Success, Try}
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(WithMapG(outerValue, Map.empty), new BiGrammarState()).get._2
+    printer.write(WithMapG(outerValue, Map.empty), Map.empty).get._2
   }
-}
-
-class BiGrammarState(map: Map[Any, ::[Any]] = Map.empty) {
-  def get(key: Any): Option[Any] = map.get(key).map(l => l.head)
-  def put(key: Any, value: Any): BiGrammarState = new BiGrammarState(map + (key -> ::(value, map.getOrElse(key, List.empty))))
-  def remove(key: Any): BiGrammarState = new BiGrammarState(map.get(key).fold(map)({
-    case _::Nil => map - key;
-    case ::(_, tail: ::[Any]) => map + (key -> tail)
-  }))
 }
 
 class BindPrinter[T, U](first: TryState[T, ResponsiveDocument => ResponsiveDocument], second: Printer[U])
@@ -50,7 +41,7 @@ object TryState {
 
   type Printer[T] = TryState[T, ResponsiveDocument]
   type NodePrinter = Printer[Any]
-  type State = BiGrammarState
+  type State = Map[Any,Any]
   type Result = Try[(State, ResponsiveDocument)]
 
   class NonePrintFailureException(e: Throwable) extends RuntimeException {
@@ -113,6 +104,7 @@ class BiGrammarToPrinter {
       val result: NodePrinter = grammar match {
         case choice:Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
         case custom:CustomGrammar => custom
+        case custom: SuperCustomGrammar => custom.createPrinter(toPrinterCached)
         case Keyword(keyword, _, verify) => (value, state) =>
           if (!verify || value.value == keyword)
             succeed(state, keyword)
