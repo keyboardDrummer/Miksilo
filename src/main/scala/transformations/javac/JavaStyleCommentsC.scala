@@ -2,14 +2,13 @@ package transformations.javac
 
 import core.bigrammar._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.NodeField
+import core.particles.node.{Key, NodeField}
 import core.particles.{DeltaWithGrammar, Language}
 
 import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
-  object CommentKey extends NodeField
   object CommentGrammar
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
@@ -25,21 +24,28 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     leafReference.set(commentsGrammar ~> leafReference.get)
   }
 
+  object CommentCounter extends Key
+  case class Comment(index: Int) extends NodeField
   def getCommentsGrammar: BiGrammar = {
     val commentGrammar = getCommentGrammar
     val comments = commentGrammar.manyVertical
-    new MapGrammar(comments, { case withMap: WithMap =>
-      val existingCommentsOption = withMap.state.get(CommentKey)
-      val newComments: Seq[String] = existingCommentsOption.fold(withMap.value.asInstanceOf[Seq[String]])(
-          { case existingComments: Seq[String] => Seq(withMap.value.asInstanceOf[String]) ++ existingComments })
-      val newState = if (newComments.isEmpty) withMap.state else withMap.state + (CommentKey -> newComments)
-      WithMap(Unit, newState)
+    new MapGrammar(comments, { case withMap: WithMapG[Any] =>
+      val counter: Int = withMap.map.getOrElse(CommentCounter, 0).asInstanceOf[Int]
+      val key = Comment(counter)
+      var newState = withMap.map + (CommentCounter -> (counter + 1))
+      if (withMap.value.asInstanceOf[Seq[_]].nonEmpty)
+        newState += (key -> withMap.value)
+      WithMapG(Unit, newState)
     }, {
-      case withMap: WithMap2 => withMap.state.get(CommentKey) match {
-        case Some(comment) =>
-          Some(WithMap2(comment.asInstanceOf[Seq[String]], withMap.state.remove(CommentKey)))
-        case _ => Some(WithMap2(Seq.empty, withMap.state))
-      }
+      case withMap: WithMapG[Any] =>
+        val counter: Int = withMap.map.getOrElse(CommentCounter, 0).asInstanceOf[Int]
+        val key = Comment(counter)
+        val newState = withMap.map - CommentCounter + (CommentCounter -> (counter + 1))
+        val value = withMap.map.get(key) match {
+          case Some(comment) => comment.asInstanceOf[Seq[String]]
+          case _ => Seq.empty
+        }
+        Some(WithMapG(value, newState))
     }, showMap = true)
   }
 //  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {

@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.bigrammar.printer.{BiGrammarToPrinter, TryState}
 import core.document.{BlankLine, WhiteSpace}
@@ -93,7 +94,7 @@ trait BiGrammar extends BiGrammarWriter {
 
 object StringLiteral extends CustomGrammar {
   override def getGrammar = core.grammar.StringLiteral
-  override def write(from: Any, state: State) = Try(state, "\"" + from + "\"")
+  override def write(from: WithMapG[Any], state: State) = Try(state, "\"" + from.value + "\"")
 }
 
 trait CustomGrammar extends BiGrammar with NodePrinter {
@@ -127,8 +128,8 @@ case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: 
 class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = true)
   extends FromStringGrammar(grammar, verifyWhenPrinting) {
 
-  override def write(from: Any, state: State) =
-    super.write(from.toString, state)
+  override def write(from: WithMap, state: State) =
+    super.write(WithMapG(from.value.toString, from.map), state)
 }
 
 /**
@@ -143,13 +144,12 @@ class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
 
   lazy val parser = GrammarToParserConverter.convert(grammar)
 
-
-  override def write(from: Any, state: State) = {
-    from match {
+  override def write(from: WithMap, state: State) = {
+    from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
           val parseResult = parser(new CharArrayReader(string.toCharArray))
-          if (parseResult.successful && parseResult.get.equals(from))
+          if (parseResult.successful && parseResult.get.equals(from.value))
             Success(state, string)
           else
             TryState.fail("FromGrammarWithToString could not parse string")
@@ -196,7 +196,8 @@ class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar wi
   override def horizontal = true
 }
 
-class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any], val showMap: Boolean = false) extends BiGrammar
+class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any],
+                 val showMap: Boolean = false) extends BiGrammar
 {
   override def children = Seq(inner)
 } //TODO deze nog wat meer typed maken met WithState

@@ -14,7 +14,7 @@ import scala.util.{Failure, Success, Try}
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(outerValue, new BiGrammarState()).get._2
+    printer.write(WithMapG(outerValue, Map.empty), new BiGrammarState()).get._2
   }
 }
 
@@ -29,13 +29,13 @@ class BiGrammarState(map: Map[Any, ::[Any]] = Map.empty) {
 
 class BindPrinter[T, U](first: TryState[T, ResponsiveDocument => ResponsiveDocument], second: Printer[U])
   extends Printer[~[T,U]] {
-  override def write(from: ~[T, U], state: State) = {
-    val firstValue = from._1
-    val secondValue = from._2
+  override def write(from: WithMapG[~[T, U]], state: State) = {
+    val firstValue = from.value._1
+    val secondValue = from.value._2
 
-    first.write(firstValue, state) match {
+    first.write(WithMapG(firstValue, from.map), state) match {
       case Success(firstSuccess) =>
-        second.write(secondValue, firstSuccess._1) match {
+        second.write(WithMapG(secondValue, from.map), firstSuccess._1) match {
           case Success(secondSuccess) => Success((secondSuccess._1, firstSuccess._2(secondSuccess._2)))
           case Failure(printError: PrintError) => Failure(printError.mapPartial(firstSuccess._2))
           case Failure(e: NonePrintFailureException) => throw e
@@ -51,12 +51,13 @@ object TryState {
   type Printer[T] = TryState[T, ResponsiveDocument]
   type NodePrinter = Printer[Any]
   type State = BiGrammarState
+  type Result = Try[(State, ResponsiveDocument)]
 
   class NonePrintFailureException(e: Throwable) extends RuntimeException {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
 
-  def or[T](first: Printer[T], second: Printer[T]): Printer[T] = (value: T,  state) => {
+  def or[T](first: Printer[T], second: Printer[T]): Printer[T] = (value: WithMapG[T],  state) => {
     first.write(value, state).recoverWith({ case leftFailure: PrintError =>
       second.write(value, state).recoverWith({ case rightFailure: PrintError =>
         combineOrFailures(leftFailure, rightFailure)
@@ -71,9 +72,9 @@ object TryState {
 }
 
 trait TryState[From, To] {
-  def write(from: From, state: State): Try[(State, To)]
+  def write(from: WithMapG[From], state: State): Try[(State, To)]
 
-  def map[NewTo](function: To => NewTo): TryState[From, NewTo] = (from: From, state: State) =>
+  def map[NewTo](function: To => NewTo): TryState[From, NewTo] = (from: WithMapG[From], state: State) =>
     write(from, state).map[(State, NewTo)](t => (t._1, function(t._2)))
 }
 
@@ -81,10 +82,11 @@ class BiGrammarToPrinter {
 
   case class LabelWithValue(label: Labelled, value: Any)
   val printerCache: mutable.Map[BiGrammar, NodePrinter] = mutable.Map.empty
-  val valueCache: mutable.Map[(NodePrinter, Any, State), Try[(State, ResponsiveDocument)]] = mutable.Map.empty
+  val valueCache: mutable.Map[(NodePrinter, Any, State), Result] = mutable.Map.empty
 
+  def succeed(state: State, value: ResponsiveDocument): Result = Success((state, value))
   class CachingPrinter(inner: NodePrinter) extends NodePrinter {
-    override def write(from: Any, state: State): Try[(State, ResponsiveDocument)] = {
+    override def write(from: WithMapG[Any], state: State): Result = {
       val key = (inner, from, state)
       valueCache.get(key) match {
         case Some(result) =>
@@ -99,7 +101,7 @@ class BiGrammarToPrinter {
   }
 
   class NestPrinter(grammar: BiGrammar, inner: NodePrinter) extends NodePrinter {
-    override def write(from: Any, state: State): Try[(State, ResponsiveDocument)] = {
+    override def write(from: WithMapG[Any], state: State): Result = {
       inner.write(from, state).recoverWith(
         { case e: PrintError => Failure(NestedError((from, state), grammar, e))})
     }
@@ -112,11 +114,11 @@ class BiGrammarToPrinter {
         case choice:Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
         case custom:CustomGrammar => custom
         case Keyword(keyword, _, verify) => (value, state) =>
-          if (!verify || value == keyword)
-            Try((state, keyword))
+          if (!verify || value.value == keyword)
+            succeed(state, keyword)
           else
             failureToGrammar("keyword didn't match", grammar)
-        case Delimiter(keyword) => (value, state) => Try((state, keyword))
+        case Delimiter(keyword) => (value, state) => succeed(state, keyword)
         case labelled: Labelled => labelledToPrinter(labelled)
         case many: ManyHorizontal => new ManyPrinter(many, (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(many, (left, right) => left % right)
@@ -125,14 +127,14 @@ class BiGrammarToPrinter {
         case mapGrammar: MapGrammar => mapGrammarToPrinter(mapGrammar)
         case BiFailure(message) => (value, state) => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => valueGrammarToPrinter(valueGrammar)
-        case Print(document) => (value, state) => Try((state, document))
+        case Print(document) => (value, state) => succeed(state, document)
         case As(inner, key) =>
           val innerPrinter = toPrinterCached(inner)
           new NodePrinter {
-            override def write(from: Any, state: State) = {
-              state.get(key).fold[Try[(State, ResponsiveDocument)]](
-                fail(s"did not find as key $key in state $state"))(
-                value => innerPrinter.write(value, state.remove(key)))
+            override def write(from: WithMapG[Any], state: State) = {
+              from.map.get(key).fold[Try[(State, ResponsiveDocument)]](
+                fail(s"did not find as key $key in state ${from.map}"))(
+                value => innerPrinter.write(WithMapG(value, from.map), state))
             }
           }
       }
@@ -149,25 +151,27 @@ class BiGrammarToPrinter {
 
   def mapGrammarToPrinter(mapGrammar: MapGrammar): NodePrinter = {
     val innerPrinter = toPrinterCached(mapGrammar.inner)
-    (value, state) => {
+    new NodePrinter {
+      override def write(value: WithMapG[Any], state: State) = {
         for {
-          (newState, deconstructedValue) <- deconstructValue(value, state, mapGrammar)
-          result <- innerPrinter.write(deconstructedValue, newState).recoverWith { case e: PrintError => Failure(e.mapPartial(x => x)) }
-        } yield result // (state, result._2) //TODO scary not to use the state from result
+          deconstructedValue <- deconstructValue(value, state, mapGrammar)
+          result <- innerPrinter.write(deconstructedValue, state).recoverWith { case e: PrintError => Failure(e.mapPartial(x => x)) }
+        } yield result
       }
+    }
   }
 
-  def deconstructValue(value: Any, state: State, grammar: MapGrammar): Try[(State, Any)] = {
+  def deconstructValue(value: WithMapG[Any], state: State, grammar: MapGrammar): Try[WithMapG[Any]] = {
     if (grammar.showMap) {
-      grammar.deconstruct(WithMap2(value, state)) match {
-        case Some(WithMap2(newValue, newState)) =>
-          Try((newState, newValue))
+      grammar.deconstruct(value) match {
+        case Some(r: WithMapG[Any]) => Try(r)
         case _ => fail("could not deconstruct value")
       }
     }
     else {
-      grammar.deconstruct(value) match {
-        case Some(x) => Try((state, x))
+      val deconstructed = grammar.deconstruct(value.value)
+      deconstructed match {
+        case Some(x) => Try(WithMapG(x, value.map))
         case None => fail("could not deconstruct value")
       }
     }
@@ -199,13 +203,15 @@ class BiGrammarToPrinter {
 
     val tuplePrinter = new BindPrinter[Any, Any](newFirst, toPrinterCached(grammar.second))
 
-    (value, state) => {
-      val result = value match {
-        case tuple: ~[Any, Any] => tuplePrinter.write(tuple, state)
-        case UndefinedDestructuringValue => tuplePrinter.write(undefinedTuple, state)
-        case _ => fail(s"$value is not a tuple.")
+    new NodePrinter {
+      override def write(value: WithMapG[Any], state: State) = {
+        val result = value.value match {
+          case tuple: ~[Any, Any] => tuplePrinter.write(WithMapG(tuple, value.map), state)
+          case UndefinedDestructuringValue => tuplePrinter.write(WithMapG(undefinedTuple, value.map), state)
+          case _ => fail(s"$value is not a tuple.")
+        }
+        result
       }
-      result
     }
   }
 
@@ -214,9 +220,10 @@ class BiGrammarToPrinter {
     val innerPrinter: NodePrinter = toPrinterCached(many.inner)
     val bindableInner = innerPrinter.map(left => (right: ResponsiveDocument) => combine(left, right))
 
-    override def write(from: Any, state: State): Try[(State, ResponsiveDocument)] = {
-      val result: Try[(State, ResponsiveDocument)] = from match {
-        case seq: Seq[_] if seq.nonEmpty => new BindPrinter(bindableInner, this).write(core.grammar.~(seq.head, seq.tail), state) //TODO matching on both list and ArrayBuffer like this is a bit ugly.
+    override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+      val result: Try[(State, ResponsiveDocument)] = from.value match {
+        case seq: Seq[_] if seq.nonEmpty => new BindPrinter(bindableInner, this).
+          write(WithMapG(core.grammar.~(seq.head, seq.tail), from.map), state) //TODO matching on both list and ArrayBuffer like this is a bit ugly.
         case seq: Seq[_] => Success(state, Empty)
         case _ => fail(s"$from passed to many was not a list")
       }
@@ -228,8 +235,8 @@ class BiGrammarToPrinter {
     override def toString = s"given value $actual was not equal to value grammar's $expected"
   }
 
-  def valueGrammarToPrinter(grammar: ValueGrammar): NodePrinter = (value, state) => {
-    if (Objects.equals(grammar.value, value)) Success(state, Empty)
+  def valueGrammarToPrinter(grammar: ValueGrammar): NodePrinter = (value: WithMapG[Any], state) => {
+    if (Objects.equals(grammar.value, value.value)) Success(state, Empty)
     else fail(ValueDiffers(value, grammar.value), -100)
   }
 }

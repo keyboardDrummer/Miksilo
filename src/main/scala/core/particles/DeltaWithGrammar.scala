@@ -1,5 +1,6 @@
 package core.particles
 
+import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.{MapGrammar, _}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
@@ -23,7 +24,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
     def parseMap(key: NodeClass): BiGrammar = {
       new MapGrammar(grammar,
         input => construct(input.asInstanceOf[WithMap], key),
-        obj => destruct(obj.asInstanceOf[WithMap2], key), showMap = true)
+        obj => destruct(obj.asInstanceOf[WithMapG[Any]], key), showMap = true)
     }
 
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
@@ -36,12 +37,12 @@ trait NodeGrammarWriter extends BiGrammarWriter {
   class NodeGrammar(inner: BiGrammar, val key: NodeClass)
     extends MapGrammar(inner,
       input => construct(input.asInstanceOf[WithMap], key),
-      obj => destruct(obj.asInstanceOf[WithMap2], key), showMap = true)
+      obj => destruct(obj.asInstanceOf[WithMapG[Any]], key), showMap = true)
   {
   }
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(withMap: WithMap2, key: NodeClass): Option[WithMap2] = {
+  def destruct(withMap: WithMapG[Any], key: NodeClass): Option[WithMapG[Any]] = {
     val value = withMap.value
     if (!value.isInstanceOf[NodeLike])
       return None
@@ -50,8 +51,7 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
     if (node.clazz == key) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      val mergedMap = dataViewAsGenericMap.foldLeft(withMap.state)((result, entry) => result.put(entry._1, entry._2))
-      Some(WithMap2(UndefinedDestructuringValue, mergedMap)) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
+      Some(WithMapG(UndefinedDestructuringValue, dataViewAsGenericMap)) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
     }
     else {
       None
@@ -62,8 +62,8 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
   def construct(withMap: WithMap, key: NodeClass): WithMap = {
     val result = new Node(key)
-    result.data ++= withMap.state.collect { case (k: NodeField,v) => (k,v) }
-    WithMap(result, Map.empty)
+    result.data ++= withMap.map.collect { case (k: NodeField,v) => (k,v) }
+    WithMapG(result, Map.empty)
   }
 }
 
