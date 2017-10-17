@@ -15,39 +15,46 @@ import scala.util.matching.Regex
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
   object CommentGrammar
-//  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-//    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
-//
-//    for(path <- grammars.root.selfAndDescendants.
-//      filter(path => path.get.children.isEmpty))
-//    {
-//      addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
-//    }
-//  }
-//
-//  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, leafReference: GrammarReference): Unit = {
-//    leafReference.set(commentsGrammar ~> leafReference.get)
-//  }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
-    for(path <- grammars.root.selfAndDescendants.
-      filter(path => path.get.isInstanceOf[Layout]))
+    var visited = Set.empty[BiGrammar]
+    for(path <- grammars.root.selfAndDescendants.filter(path => path.get.isInstanceOf[Layout]))
     {
-      addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
+      if (!visited.contains(path.get)) {
+        visited += path.get
+        addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
+      }
     }
     val node = grammars.root.find(p => p.get.isInstanceOf[NodeGrammar]).get.get.asInstanceOf[NodeGrammar]
-    //node.inner = commentsGrammar ~> node.inner
+    node.inner = commentsGrammar ~> node.inner
+    System.out.append("")
   }
 
   def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, layoutReference: GrammarReference): Unit = {
     layoutReference.get match {
-      case sequence: SequenceLike => sequence.second =
-        if (sequence.horizontal) commentsGrammar ~> sequence.second
-        else commentsGrammar %> sequence.second
+      case sequence: SequenceLike =>
+        if (!isOk(sequence.first, commentsGrammar) || !isOk(sequence.second, commentsGrammar))
+          return
+
+        sequence.first =
+          if (sequence.horizontal) sequence.first ~< commentsGrammar
+          else sequence.first %< commentsGrammar
       case many: ManyVertical => layoutReference.set(many.inner.manySeparatedVertical(commentsGrammar))
       case many: ManyHorizontal => layoutReference.set(many.inner.manySeparated(commentsGrammar))
+      case _ =>
+    }
+  }
+
+  def isOk(grammar: BiGrammar, commentGrammar: BiGrammar): Boolean = {
+    if (grammar == commentGrammar)
+      return false
+
+    grammar match {
+      case _:ValueGrammar => false
+      case _:Print => false
+      case _ => true
     }
   }
 
