@@ -138,7 +138,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
     val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(Instructions)
     val exceptionTableGrammar = "Exceptions:" %> value(Seq.empty[Any])
-    val body = (nameGrammar ~ "," ~~ maxStackGrammar ~ maxLocalGrammar %
+    val body = (nameGrammar ~ ("," ~~ maxStackGrammar ~ maxLocalGrammar) %
       instructionsGrammar %
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
