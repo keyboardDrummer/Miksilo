@@ -14,19 +14,59 @@ import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
+
+  case class NodeWrapper(var node: NodeGrammar) extends SuperCustomGrammar {
+
+    override def children = Seq(node)
+
+    override def createGrammar(map: (BiGrammar) => Grammar): Grammar = {
+      map(node) ^^ {
+        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
+          val newState = state + (CommentCounter -> 0)
+          result.run(newState)
+        })
+      }
+    }
+
+    override def createPrinter(recursive: (BiGrammar) => NodePrinter): NodePrinter = {
+      val nodePrinter: NodePrinter = recursive(node)
+      new NodePrinter {
+        override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+          val newState = state + (CommentCounter -> 0)
+          nodePrinter.write(from, newState)
+        }
+      }
+    }
+  }
+
   object CommentGrammar
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
 
     var visited = Set.empty[BiGrammar]
-    for(path <- grammars.root.selfAndDescendants.filter(path => path.get.isInstanceOf[Layout]))
+    for(path <- grammars.root.selfAndDescendants)
     {
       if (!visited.contains(path.get)) {
         visited += path.get
-        addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
+        if (path.get.isInstanceOf[Layout]) {
+          addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
+        }
       }
     }
+
+    var visited2 = Set.empty[BiGrammar]
+    for(path <- grammars.root.selfAndDescendants)
+    {
+      if (!visited2.contains(path.get)) {
+        visited2 += path.get
+        if (path.get.isInstanceOf[NodeGrammar]) {
+          val node = path.get.asInstanceOf[NodeGrammar]
+          path.asInstanceOf[GrammarReference].set(NodeWrapper(node))
+        }
+      }
+    }
+
     val node = grammars.root.find(p => p.get.isInstanceOf[NodeGrammar]).get.get.asInstanceOf[NodeGrammar]
     node.inner = commentsGrammar ~> node.inner
     System.out.append("")
@@ -38,12 +78,44 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
         if (!isOk(sequence.first, commentsGrammar) || !isOk(sequence.second, commentsGrammar))
           return
 
-        sequence.first =
-          if (sequence.horizontal) sequence.first ~< commentsGrammar
-          else sequence.first %< commentsGrammar
-      case many: ManyVertical => layoutReference.set(many.inner.manySeparatedVertical(commentsGrammar))
-      case many: ManyHorizontal => layoutReference.set(many.inner.manySeparated(commentsGrammar))
+        injectComments(commentsGrammar, layoutReference.children(1), sequence.horizontal)
+      case many: ManyVertical => injectComments(commentsGrammar, layoutReference.children.head, horizontal = false)
+      case many: ManyHorizontal => injectComments(commentsGrammar, layoutReference.children.head, horizontal = true)
       case _ =>
+    }
+  }
+
+  def injectComments(commentsGrammar: BiGrammar, grammar: GrammarReference, horizontal: Boolean): Boolean = {
+    if (grammar.ancestors.size + 1 != grammar.ancestorGrammars.size) {
+      return true
+    }
+
+    grammar.get match {
+      case _: BiFailure => false
+      case _: Print => false
+      case _: ValueGrammar => false
+      case _: Labelled => injectComments(commentsGrammar, grammar.children.head, horizontal)
+      case superCustom: SuperCustomGrammar if superCustom.children.size == 1 =>
+        injectComments(commentsGrammar, grammar.children.head, horizontal)
+      case node: NodeGrammar =>
+        node.inner =
+          if (horizontal) commentsGrammar ~> node.inner
+          else commentsGrammar %> node.inner
+        true
+      case _: MapGrammar => injectComments(commentsGrammar, grammar.children.head, horizontal)
+      case _: As => injectComments(commentsGrammar, grammar.children.head, horizontal)
+      case _: SequenceLike =>
+        if (!injectComments(commentsGrammar, grammar.children.head, horizontal))
+          injectComments(commentsGrammar, grammar.children(1), horizontal)
+        else
+          true
+      case _: Choice =>
+        injectComments(commentsGrammar, grammar.children.head, horizontal) |
+          injectComments(commentsGrammar, grammar.children(1), horizontal)
+      case _ => grammar.set(
+        if (horizontal) commentsGrammar ~> grammar.get
+        else commentsGrammar %> grammar.get)
+        true
     }
   }
 
@@ -54,6 +126,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     grammar match {
       case _:ValueGrammar => false
       case _:Print => false
+      case _: BiFailure => false
       case _ => true
     }
   }
@@ -71,7 +144,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
           case result: Result => StateM((state: BiGrammarToGrammar.State) => {
             val counter: Int = state.getOrElse(CommentCounter, 0).asInstanceOf[Int]
             val key = Comment(counter)
-            var newState = state + (CommentCounter -> (counter + 1))
+            val newState = state + (CommentCounter -> (counter + 1))
             val inner = result.run(state)
             val innerValue = inner._2.value.asInstanceOf[Seq[_]]
             val map: Map[Any,Any] = if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty
@@ -88,7 +161,8 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
           val key = Comment(counter)
           val newState = state + (CommentCounter -> (counter + 1))
           val value = from.map.get(key) match {
-            case Some(comment) => comment.asInstanceOf[Seq[String]]
+            case Some(comment) =>
+              comment.asInstanceOf[Seq[String]]
             case _ => Seq.empty
           }
           commentsPrinter.write(WithMapG(value, from.map), newState)
@@ -98,7 +172,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   }
 
   def getCommentGrammar: BiGrammar = {
-    val regex: Regex = new Regex( """/\*.*\*/""")
+    val regex: Regex = new Regex("""(?s)/\*.*?\*/""")
     RegexG(regex) ~ space
   }
 

@@ -1,9 +1,10 @@
 package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
-import core.bigrammar.{TestCompilerGrammarUtils, TestGrammarUtils}
+import core.bigrammar.{As, BiGrammar, TestCompilerGrammarUtils, TestGrammarUtils}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.{DeltaWithGrammar, Language}
+import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{DeltaWithGrammar, Language, NodeGrammarWriter}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralDelta
@@ -11,7 +12,37 @@ import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
 
-class TestComments extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations)) {
+class TestComments
+  extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
+  with NodeGrammarWriter
+{
+  object MasterClass extends NodeClass
+  object SlaveClass extends NodeClass
+  object MasterName extends NodeField
+  object MasterSlave extends NodeField
+  object SlaveName extends NodeField
+
+  test("test injection") {
+    val grammar: BiGrammar = "{" ~ identifier.as(MasterName) ~~
+      ("_" ~ identifier.as(SlaveName) ~ "_" asNode SlaveClass).as(MasterSlave) ~ "}" asNode MasterClass
+    val grammars = new GrammarCatalogue
+    grammars.create(ProgramGrammar, grammar)
+    JavaStyleCommentsC.transformGrammars(grammars, new Language)
+
+    val parsed = TestGrammarUtils.parse(
+      """ /*a*/ { /*b*/ remy /*c*/ _ judith /*d*/ _ /*e*/ } """.stripMargin, grammar)
+    assert(parsed.successful, parsed.toString)
+    val ast = parsed.get.asInstanceOf[Node]
+    val printed = TestGrammarUtils.print(ast, grammar)
+    val expected = "/*a*/ {/*b*/ remy /*c*/ _judith/*d*/ _/*e*/ }"
+    assertResult(expected)(printed)
+
+    val slaveNode = ast(MasterSlave).asInstanceOf[Node]
+    val slaveGrammar = grammar.findAs(MasterSlave).get.asInstanceOf[As].inner
+    val slavePrinted = TestGrammarUtils.print(slaveNode, slaveGrammar)
+    val slaveExpectation = "/*c*/ _judith/*d*/ _"
+    assertResult(slaveExpectation)(slavePrinted)
+  }
 
   val testGrammar = TestCompilerGrammarUtils(this.compiler.deltas)
 

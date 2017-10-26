@@ -98,8 +98,8 @@ object StringLiteral extends CustomGrammar {
 }
 
 trait SuperCustomGrammar extends BiGrammar {
-  def createGrammar(map: BiGrammar => Grammar): Grammar
-  def createPrinter(map: BiGrammar => NodePrinter): NodePrinter
+  def createGrammar(recursive: BiGrammar => Grammar): Grammar
+  def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
 }
 
 trait CustomGrammar extends BiGrammar with NodePrinter {
