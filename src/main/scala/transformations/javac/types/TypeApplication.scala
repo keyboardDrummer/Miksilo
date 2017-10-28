@@ -2,7 +2,7 @@ package transformations.javac.types
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{NodeClass, NodeField}
+import core.particles.node.{GrammarKey, NodeClass, NodeField}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
@@ -18,7 +18,7 @@ object TypeApplication extends DeltaWithGrammar {
     transformJavaGrammars(grammars)
   }
 
-  object JavaTypeArgumentGrammar
+  object JavaTypeArgumentGrammar extends GrammarKey
   def transformJavaGrammars(grammars: GrammarCatalogue): Unit = {
     val typeArgumentGrammar = grammars.create(JavaTypeArgumentGrammar)
     val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
@@ -29,7 +29,7 @@ object TypeApplication extends DeltaWithGrammar {
     typeGrammar.addOption(typeApplication)
   }
 
-  object ByteCodeTypeArgumentGrammar
+  object ByteCodeTypeArgumentGrammar extends GrammarKey
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {
     val typeArgumentGrammar = grammars.create(ByteCodeTypeArgumentGrammar)
     val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)

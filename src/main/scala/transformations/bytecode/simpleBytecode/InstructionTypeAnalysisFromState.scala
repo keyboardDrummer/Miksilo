@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.particles.Compilation
-import core.particles.node.Node
+import core.particles.node.{Node, NodeClass}
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.attributes.CodeAttribute
 import transformations.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -35,7 +35,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
         instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, state)
 
       val jumpBehaviorRegistry = CodeAttribute.getRegistry(state).jumpBehaviorRegistry
-      override def getJumpBehavior(instructionClazz: Any): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
+      override def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
     }
   }
   

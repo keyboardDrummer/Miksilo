@@ -1,7 +1,8 @@
 package transformations.javac.expressions.relational
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node.GrammarKey
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddRelationalPrecedence extends DeltaWithGrammar {
@@ -14,7 +15,7 @@ object AddRelationalPrecedence extends DeltaWithGrammar {
     expressionGrammar.inner = relationalGrammar
   }
 
-  object RelationalExpressionGrammar
+  object RelationalExpressionGrammar extends GrammarKey
 
   override def description: String = "Creates a named grammar with the correct precedence for relational operators."
 }

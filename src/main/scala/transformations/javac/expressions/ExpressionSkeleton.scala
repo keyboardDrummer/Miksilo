@@ -2,7 +2,7 @@ package transformations.javac.expressions
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeWrapper}
+import core.particles.node.{GrammarKey, Key, Node, NodeWrapper}
 import core.particles.path.Path
 import transformations.bytecode.types.TypeSkeleton
 
@@ -32,8 +32,8 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val instances = new ClassRegistry[ExpressionInstance]
   }
 
-  object CoreGrammar
-  object ExpressionGrammar
+  object CoreGrammar extends GrammarKey
+  object ExpressionGrammar extends GrammarKey
 
   override def description: String = "Introduces the concept of an expression."
 }

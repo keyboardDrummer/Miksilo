@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
 import transformations.bytecode.coreInstructions.longs.LoadLongDelta
@@ -23,7 +23,7 @@ object VariableC extends ExpressionInstance {
     core.addOption(variableGrammar)
   }
 
-  object VariableGrammar
+  object VariableGrammar extends GrammarKey
 
   def variable(name: String) = new Node(VariableKey, VariableNameKey -> name)
 

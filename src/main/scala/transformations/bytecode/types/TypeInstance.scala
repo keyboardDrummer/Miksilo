@@ -2,12 +2,12 @@ package transformations.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node}
+import core.particles.node.{Node, NodeClass}
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton
 
 trait TypeInstance extends DeltaWithGrammar {
-  val key: Key
+  val key: NodeClass
 
   override def inject(state: Language): Unit = {
     TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))

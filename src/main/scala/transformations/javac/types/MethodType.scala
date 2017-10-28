@@ -32,7 +32,7 @@ object MethodType extends TypeInstance {
 
   object ThrowsSignature extends NodeField
 
-  val key: Key = MethodTypeKey
+  val key = MethodTypeKey
 
   override def description: String = "Defines the method type."
 

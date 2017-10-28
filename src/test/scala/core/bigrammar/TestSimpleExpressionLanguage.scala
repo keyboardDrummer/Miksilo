@@ -54,7 +54,7 @@ class TestSimpleExpressionLanguage extends FunSuite with BiGrammarWriter {
   }
 
   def getExpressionGrammarDocument: Labelled = {
-    val expression = new Labelled("expression")
+    val expression = new Labelled(StringKey("expression"))
     val parenthesis: BiGrammar = "(" ~> expression ~< ")"
 
 
@@ -63,7 +63,7 @@ class TestSimpleExpressionLanguage extends FunSuite with BiGrammarWriter {
       case _ => None
     })
 
-    val multipleLabel = new Labelled("multiply")
+    val multipleLabel = new Labelled(StringKey("multiply"))
     val multiply = (multipleLabel ~~< "*") ~~ multipleLabel ^^( {
       case core.grammar.~(l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
@@ -74,7 +74,7 @@ class TestSimpleExpressionLanguage extends FunSuite with BiGrammarWriter {
     multipleLabel.addOption(numberValue)
     multipleLabel.addOption(parenthesis)
 
-    val addLabel = new Labelled("add")
+    val addLabel = new Labelled(StringKey("add"))
     val add: BiGrammar = (addLabel ~~< "+") ~~ addLabel ^^( {
       case core.grammar.~(l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {

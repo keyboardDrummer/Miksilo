@@ -16,15 +16,15 @@ class TestComments
   extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
   with NodeGrammarWriter
 {
-  object MasterClass extends NodeClass
-  object SlaveClass extends NodeClass
-  object MasterName extends NodeField
-  object MasterSlave extends NodeField
-  object SlaveName extends NodeField
+  object ParentClass extends NodeClass
+  object ChildClass extends NodeClass
+  object ParentName extends NodeField
+  object ParentChild extends NodeField
+  object ChildName extends NodeField
 
   test("test injection") {
-    val grammar: BiGrammar = "{" ~ identifier.as(MasterName) ~~
-      ("_" ~ identifier.as(SlaveName) ~ "_" asNode SlaveClass).as(MasterSlave) ~ "}" asNode MasterClass
+    val grammar: BiGrammar = "{" ~ identifier.as(ParentName) ~~
+      ("_" ~ identifier.as(ChildName) ~ "_" asNode ChildClass).as(ParentChild) ~ "}" asNode ParentClass
     val grammars = new GrammarCatalogue
     grammars.create(ProgramGrammar, grammar)
     JavaStyleCommentsC.transformGrammars(grammars, new Language)
@@ -37,8 +37,8 @@ class TestComments
     val expected = "/*a*/ {/*b*/ remy /*c*/ _judith/*d*/ _/*e*/ }"
     assertResult(expected)(printed)
 
-    val slaveNode = ast(MasterSlave).asInstanceOf[Node]
-    val slaveGrammar = grammar.findAs(MasterSlave).get.asInstanceOf[As].inner
+    val slaveNode = ast(ParentChild).asInstanceOf[Node]
+    val slaveGrammar = grammar.findAs(ParentChild).get.asInstanceOf[As].inner
     val slavePrinted = TestGrammarUtils.print(slaveNode, slaveGrammar)
     val slaveExpectation = "/*c*/ _judith/*d*/ _"
     assertResult(slaveExpectation)(slavePrinted)

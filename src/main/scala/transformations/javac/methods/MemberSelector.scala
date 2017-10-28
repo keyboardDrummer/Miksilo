@@ -20,7 +20,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
     grammars.create(SelectGrammar, selection)
   }
 
-  object SelectGrammar
+  object SelectGrammar extends GrammarKey
 
   object Clazz extends NodeClass
 

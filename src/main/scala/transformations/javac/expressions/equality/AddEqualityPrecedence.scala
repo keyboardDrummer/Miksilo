@@ -1,7 +1,8 @@
 package transformations.javac.expressions.equality
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node.GrammarKey
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AddEqualityPrecedence extends DeltaWithGrammar {
@@ -14,7 +15,7 @@ object AddEqualityPrecedence extends DeltaWithGrammar {
     expressionGrammar.inner = equalityGrammar
   }
 
-  object EqualityExpressionGrammar
+  object EqualityExpressionGrammar extends GrammarKey
 
   override def description: String = "Creates a named grammar with the correct precedence for equality-like operators."
 }

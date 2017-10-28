@@ -1,25 +1,23 @@
 package core.bigrammar
 
-import core.bigrammar.BiGrammarToGrammar.{StateM, WithMap}
+import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.printer.TryState
 import core.bigrammar.printer.TryState.{NodePrinter, State}
-import core.bigrammar.printer.{BiGrammarToPrinter, TryState}
-import core.document.{BlankLine, Empty, WhiteSpace}
-import core.grammar.{Grammar, GrammarToParserConverter, PrintGrammar, ~}
-import core.particles.node.{Node, NodeField}
+import core.document.{BlankLine, WhiteSpace}
+import core.grammar.{Grammar, GrammarToParserConverter, ~}
+import core.particles.node.{GrammarKey, Node, NodeField}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.matching.Regex
-import scala.util.{Success, Try}
 import scala.util.parsing.input.CharArrayReader
+import scala.util.{Success, Try}
 
 /*
 A grammar that maps to both a parser and a printer
  */
 trait BiGrammar extends BiGrammarWriter {
 
-  def getDescendantsAndSelf: Seq[BiGrammar] = ???
-
-  override def toString = PrintGrammar.toDocument(BiGrammarToGrammar.toGrammar(this)).renderString(trim = false)
+  override def toString = PrintBiGrammar.toDocument(this).renderString(trim = false)
 
   lazy val height = 1
 
@@ -45,7 +43,6 @@ trait BiGrammar extends BiGrammarWriter {
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
   def some: BiGrammar = someMap(this ~ (this*))
   def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> this) *))
-  def children: Seq[BiGrammar] = Seq.empty
 
   private def someMap(grammar: BiGrammar): BiGrammar = {
     grammar ^^
@@ -90,9 +87,18 @@ trait BiGrammar extends BiGrammarWriter {
   def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 
   def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
+
+  def fold[T](recursive: BiGrammar => BiGrammar): BiGrammar
+  def children: Seq[BiGrammar]
 }
 
-object StringLiteral extends CustomGrammar {
+trait BiGrammarWithoutChildren extends BiGrammar {
+  def children: Seq[BiGrammar] = Seq.empty
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(this)
+}
+
+object StringLiteral extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.StringLiteral
   override def write(from: WithMapG[Any], state: State) = Try(state, "\"" + from.value + "\"")
 }
@@ -106,6 +112,14 @@ trait CustomGrammar extends BiGrammar with NodePrinter {
   def getGrammar: Grammar
 }
 
+class IgnoreLeft(inner: SequenceLike) extends MapGrammar(inner,
+  { case ~(l, r) => r },
+  r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
+
+class IgnoreRight(inner: SequenceLike) extends MapGrammar(inner,
+  { case ~(l, r) => l},
+  l => Some(core.grammar.~(l, UndefinedDestructuringValue)))
+
 trait SequenceLike extends BiGrammar with Layout {
   def first: BiGrammar
   def first_=(value: BiGrammar): Unit
@@ -115,20 +129,14 @@ trait SequenceLike extends BiGrammar with Layout {
 
   override def children = Seq(first, second)
 
-  def ignoreLeft: MapGrammar = {
-    new MapGrammar(this,
-      { case ~(l, r) => r },
-      r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
-  }
+  def ignoreLeft: MapGrammar = new IgnoreLeft(this)
 
-  def ignoreRight: MapGrammar = {
-    new MapGrammar(this, { case ~(l, r) => l}, l => Some(core.grammar.~(l, UndefinedDestructuringValue)))
-  }
+  def ignoreRight: MapGrammar = new IgnoreRight(this)
 }
 
-case class Delimiter(value: String) extends BiGrammar
+case class Delimiter(value: String) extends BiGrammarWithoutChildren
 
-case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammar
+case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammarWithoutChildren
 
 class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = true)
   extends FromStringGrammar(grammar, verifyWhenPrinting) {
@@ -140,10 +148,10 @@ class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = tr
 /**
   * Takes a grammar for parsing, and uses toString for printing.
   * so the result of the grammar is exactly what has been consumed.
-  * @verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
+  * verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
-class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
-  extends CustomGrammar
+class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = false)
+  extends CustomGrammar with BiGrammarWithoutChildren
 {
   override def getGrammar = grammar
 
@@ -176,10 +184,14 @@ abstract class Many(var inner: BiGrammar) extends BiGrammar with Layout
 
 class ManyVertical(inner: BiGrammar) extends Many(inner) {
   override def horizontal = false
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new ManyVertical(inner.fold(recursive)))
 }
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner) {
   override def horizontal = true
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new ManyHorizontal(inner.fold(recursive)))
 }
 
 /*
@@ -193,27 +205,34 @@ object UndefinedDestructuringValue //TODO looks a bit like ValueNotFound. Combin
 class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: Boolean = false) extends BiGrammar
 {
   override def children = Seq(left, right)
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Choice(left.fold(recursive), right.fold(recursive)))
 }
 
 class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
 {
-
   override def horizontal = true
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Sequence(first.fold(recursive), second.fold(recursive)))
 }
 
 class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any],
                  val showMap: Boolean = false) extends BiGrammar
 {
   override def children = Seq(inner)
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new MapGrammar(inner.fold(recursive), construct, deconstruct, showMap))
 } //TODO deze nog wat meer typed maken met WithState
 
-class Labelled(val name: AnyRef, var inner: BiGrammar = BiFailure()) extends BiGrammar {
+class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
   def addOption(addition: BiGrammar) {
     inner = inner | addition
   }
 
   override def children = Seq(inner)
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Labelled(name, inner.fold(recursive)))
 }
 
 trait Layout {
@@ -224,21 +243,25 @@ class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar w
   override lazy val height: Int = first.height + second.height
 
   override def horizontal = false
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new TopBottom(first.fold(recursive), second.fold(recursive)))
 }
 
 /**
   * Prints a value, but parses nothing.
   */
-case class Print(document: ResponsiveDocument) extends BiGrammar
+case class Print(document: ResponsiveDocument) extends BiGrammarWithoutChildren
 
 /**
   * Does not consume or produce any syntax, but simply produces or consumes a value.
   */
-case class ValueGrammar(value: Any) extends BiGrammar
+case class ValueGrammar(value: Any) extends BiGrammarWithoutChildren
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
+
+  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(As(inner.fold(recursive), key))
 }
 
-case class BiFailure(message: String = "") extends BiGrammar
+case class BiFailure(message: String = "") extends BiGrammarWithoutChildren

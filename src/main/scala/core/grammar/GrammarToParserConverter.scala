@@ -41,7 +41,7 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
     def helper(grammar: Grammar): PackratParser[Any] = {
-      map.getOrElseUpdate(grammar, grammar.simplify match {
+      map.getOrElseUpdate(grammar, grammar.expand match {
         case choice: Choice => if (choice.firstBeforeSecond)
           helper(choice.left) | helper(choice.right)
           else helper(choice.left) ||| helper(choice.right)

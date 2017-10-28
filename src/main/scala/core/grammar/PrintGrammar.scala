@@ -69,7 +69,7 @@ object PrintGrammar {
   case class Option(inner: Grammar) extends Grammar
 
 
-  def transform(grammar: Grammar): Grammar = grammar.simplify match {
+  def transform(grammar: Grammar): Grammar = grammar.expand match {
     case choice:Choice =>
       val left = transform(choice.left)
       val right = transform(choice.right)
@@ -101,7 +101,7 @@ object PrintGrammar {
   }
 
   def getLabelled(grammar: Grammar): Stream[Labelled] = {
-    grammar.fold[Stream[Labelled]](Stream.empty, (inner, grammar) => grammar.simplify match {
+    grammar.fold[Stream[Labelled]](Stream.empty, (inner, grammar) => grammar.expand match {
       case choice: Choice => inner(choice.left) ++ inner(choice.right)
       case sequence: Sequence => inner(sequence.first) ++ inner(sequence.second)
       case many: Many => inner(many.inner)

@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
@@ -10,7 +10,7 @@ object BasicImportC extends DeltaWithGrammar {
   object ImportKey extends NodeClass
   object ElementsKey extends NodeField
 
-  object ImportPathGrammar
+  object ImportPathGrammar extends GrammarKey
 
   def _import(elements: Seq[String]) = new Node(ImportKey, ElementsKey -> elements)
 

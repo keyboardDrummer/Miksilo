@@ -27,7 +27,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     expressionGrammar.addOption(assignmentGrammar)
   }
 
-  object AssignmentTargetGrammar
+  object AssignmentTargetGrammar extends GrammarKey
 
   def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 

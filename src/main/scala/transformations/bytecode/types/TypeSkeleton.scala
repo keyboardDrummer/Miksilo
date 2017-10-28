@@ -5,7 +5,7 @@ import core.particles.exceptions.BadInputException
 import core.grammar.ParseException
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.node.{GrammarKey, Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: Node, from: Node) extends BadInputException {
@@ -73,7 +73,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     })
   }
 
-  object ByteCodeTypeGrammar
+  object ByteCodeTypeGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     grammars.create(JavaTypeGrammar)
     grammars.create(ByteCodeTypeGrammar)
@@ -87,7 +87,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val instances = new ClassRegistry[TypeInstance]
   }
 
-  object JavaTypeGrammar
+  object JavaTypeGrammar extends GrammarKey
 
   override def description: String = "Defines the concept of a type."
 }

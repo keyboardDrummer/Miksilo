@@ -1,19 +1,16 @@
 package transformations.bytecode.attributes
 
-import core.bigrammar.{BiGrammar, Choice, ManyVertical}
-import core.document.Empty
+import core.bigrammar.{BiGrammar, ManyVertical}
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
-import core.particles.path.{Path, PathRoot}
-import transformations.bytecode.ByteCodeMethodInfo.{ByteCodeMethodInfoWrapper, MethodDescriptor}
-import transformations.bytecode.ByteCodeSkeleton.{ByteCodeWrapper, ClassMethodsKey}
+import transformations.bytecode.ByteCodeSkeleton
+import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.PrintByteCode._
 import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
 import transformations.bytecode.readJar.ClassFileParser
 import transformations.bytecode.simpleBytecode.ProgramTypeState
-import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
 object InstructionArgumentsKey extends NodeField
 
@@ -125,11 +122,11 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
 
   object CodeAttributesKey extends NodeField
 
-  object InstructionGrammar
+  object InstructionGrammar extends GrammarKey
 
-  override def key: Key = CodeKey
+  override def key: NodeClass = CodeKey
 
-  object MaxStackGrammar extends Key
+  object MaxStackGrammar extends GrammarKey
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = grammars.create(InstructionGrammar)

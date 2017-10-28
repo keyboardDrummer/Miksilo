@@ -2,7 +2,7 @@ package transformations.bytecode.simpleBytecode
 
 import core.bigrammar.{GrammarReference, RootGrammar}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.node._
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -36,7 +36,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
     val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
     for(containerEntry <- constantReferences) {
-      val key: Any = containerEntry._1
+      val key: GrammarKey = containerEntry._1
       val constantFields: Map[NodeField, NodeClass] = containerEntry._2
       val keyGrammar = new RootGrammar(grammars.find(key))
       for(field <- constantFields) {

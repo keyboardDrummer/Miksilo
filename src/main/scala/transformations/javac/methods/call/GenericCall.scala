@@ -19,7 +19,7 @@ object CallC
 
   object CallArguments extends NodeField
 
-  object CallArgumentsGrammar
+  object CallArgumentsGrammar extends GrammarKey
 
   def getCallCallee[T <: NodeLike](call: T) = call(CallC.CallCallee).asInstanceOf[T]
 

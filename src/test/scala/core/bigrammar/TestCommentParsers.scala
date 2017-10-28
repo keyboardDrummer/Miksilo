@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.particles.node.GrammarKey
 import org.scalatest.FunSuite
 import transformations.javac.JavaStyleCommentsC
 
@@ -7,7 +8,9 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
 
+case class StringKey(value: String) extends GrammarKey
 class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratParsers with BiGrammarWriter {
+
 
   test("PlusMinus") {
     lazy val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
@@ -22,7 +25,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   test("MinusPlusRightCommutationBiGrammar4") {
     val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
-    val core = new Labelled("core")
+    val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ core ~ "+" ~ core |
       core ~ "+" ~ core |
       commentParser ~ number
@@ -72,7 +75,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
    */
   ignore("MinusPlusRightCommutationBiGrammar") {
     val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
-    val core = new Labelled("core")
+    val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ number | commentParser ~ core ~ "+" ~ core
 
     val input = "/* jo */ 2 + 3"
@@ -116,11 +119,11 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   test("MinusPlusRightCommutationBiGrammar2") {
     val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
-    val core = new Labelled("core")
+    val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ core ~ "+" ~ core |
       commentParser ~ number
 
-    val parser = new Labelled("parser")
+    val parser = new Labelled(StringKey("parser"))
     parser.inner = core //commentParser ~ parser ~ "-" ~ core | core
     val input = "2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, core)
@@ -128,11 +131,11 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   test("MinusPlusRightCommutationBiGrammar3") {
     val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
-    val core = new Labelled("core")
+    val core = new Labelled(StringKey("core"))
     core.inner = core ~ "+" ~ core |
       commentParser ~ number
 
-    val parser = new Labelled("parser")
+    val parser = new Labelled(StringKey("parser"))
     parser.inner = core //commentParser ~ parser ~ "-" ~ core | core
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, core)
@@ -140,7 +143,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   test("RightRecursionUsingBiGrammar") {
     val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
-    val expression = new core.bigrammar.Labelled("expression")
+    val expression = new core.bigrammar.Labelled(StringKey("expression"))
     expression.addOption(commentsGrammar ~> number)
     expression.addOption(commentsGrammar ~> (expression ~~ "+" ~~ expression))
     val input = "/* jo */ 2 + 3"
@@ -151,7 +154,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   test("RightRecursionUsingBiGrammarWithSubtraction") {
     val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
-    val expression = new core.bigrammar.Labelled("expression")
+    val expression = new core.bigrammar.Labelled(StringKey("expression"))
     expression.addOption(commentsGrammar ~> number)
     expression.addOption(commentsGrammar ~> (expression ~~ "+" ~~ expression))
     val withoutSubtraction = expression.inner
@@ -183,9 +186,9 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   def getManualSubAddGrammar: Labelled = {
     val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
-    val core = new Labelled("core")
-    val addition = new Labelled("addition", core)
-    val expression = new Labelled("expression", addition)
+    val core = new Labelled(StringKey("core"))
+    val addition = new Labelled(StringKey("addition"), core)
+    val expression = new Labelled(StringKey("expression"), addition)
     core.addOption(commentsGrammar ~> number)
     val withoutSubtraction = expression.inner
     addition.addOption(commentsGrammar ~> (expression ~~ "-" ~~ withoutSubtraction))
@@ -195,9 +198,9 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 
   def getManualAddSubGrammar: Labelled = {
     val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
-    val core = new Labelled("core")
-    val addition = new Labelled("addition", core)
-    val expression = new Labelled("expression", addition)
+    val core = new Labelled(StringKey("core"))
+    val addition = new Labelled(StringKey("addition"), core)
+    val expression = new Labelled(StringKey("expression"), addition)
     core.addOption(commentsGrammar ~> number)
     addition.addOption(commentsGrammar ~> (expression ~~ "+" ~~ expression))
     val withoutSubtraction = expression.inner

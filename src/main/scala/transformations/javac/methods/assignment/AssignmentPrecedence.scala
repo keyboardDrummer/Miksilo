@@ -1,7 +1,8 @@
 package transformations.javac.methods.assignment
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.node.GrammarKey
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.expressions.ExpressionSkeleton
 
 object AssignmentPrecedence extends DeltaWithGrammar {
@@ -14,7 +15,7 @@ object AssignmentPrecedence extends DeltaWithGrammar {
     expressionGrammar.inner = assignmentGrammar
   }
 
-  object AssignmentGrammar
+  object AssignmentGrammar extends GrammarKey
 
   override def description: String = "Wraps the current expression grammar in a failing assignment grammar."
 }

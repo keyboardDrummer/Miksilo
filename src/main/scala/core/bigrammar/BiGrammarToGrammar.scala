@@ -1,6 +1,7 @@
 package core.bigrammar
 
 import core.grammar.{Grammar, ~}
+import core.particles.node.GrammarKey
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
@@ -21,10 +22,9 @@ object BiGrammarToGrammar {
 
   def valueToResult(value: Any): Result = StateM((state: State) => (state, WithMapG(value, Map.empty)))
   object Observer extends BiGrammarObserver[Grammar] {
-    override def labelledEnter(name: AnyRef): Grammar = new core.grammar.Labelled(name)
+    override def labelledEnter(name: GrammarKey): Grammar = new core.grammar.Labelled(name)
 
     override def handleGrammar(self: BiGrammar, recursive: (BiGrammar) => Grammar): Grammar = {
-      val size = Thread.currentThread().getStackTrace.size
       self match {
         case sequence: SequenceLike =>
           core.grammar.Sequence(recursive(sequence.first), recursive(sequence.second)) ^^ { case ~(firstResult: Result, secondResult: Result) => StateM((state: State) => {

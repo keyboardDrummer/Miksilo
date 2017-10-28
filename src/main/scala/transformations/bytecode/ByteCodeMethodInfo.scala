@@ -74,7 +74,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       getAttributesByteCode(state, methodInfo.attributes)
     }
 
-  object MethodsGrammar
+  object MethodsGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     val methods = grammars.create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
@@ -82,7 +82,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     membersGrammar.inner = membersGrammar.inner % methods
   }
 
-  object AccessFlagGrammar
+  object AccessFlagGrammar extends GrammarKey
   def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val attributesGrammar = grammars.find(AttributesGrammar)
     val parseAccessFlag = grammars.create(AccessFlagGrammar,

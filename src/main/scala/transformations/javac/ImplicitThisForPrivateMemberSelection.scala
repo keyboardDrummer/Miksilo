@@ -58,7 +58,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   override def transform(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.clazz match {
-            case ByteCodeSkeleton.ClassFileKey =>
+            case ByteCodeSkeleton.Clazz =>
               JavaLang.loadIntoClassPath(compilation)
 
               val classCompiler = ClassCompiler(obj, compilation)

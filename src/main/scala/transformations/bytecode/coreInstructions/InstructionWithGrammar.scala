@@ -2,11 +2,11 @@ package transformations.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.NodeClass
+import core.particles.node.{GrammarKey, Key, NodeClass}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
 
-object ConstantPoolIndexGrammar
+object ConstantPoolIndexGrammar extends GrammarKey
 trait InstructionWithGrammar extends DeltaWithGrammar
 {
   val key: NodeClass

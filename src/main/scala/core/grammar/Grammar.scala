@@ -23,7 +23,7 @@ trait GrammarWriter {
 
 trait Grammar extends GrammarWriter {
 
-  def simplify: Grammar = this
+  def expand: Grammar = this
 
   def some: Grammar = this ~ (this*)
 
@@ -72,7 +72,7 @@ trait Grammar extends GrammarWriter {
         return
 
       closed += grammar
-      grammar.simplify match {
+      grammar.expand match {
         case labelled: Labelled => inner(labelled.inner)
         case sequence: Sequence =>
           inner(sequence.first)
@@ -98,12 +98,12 @@ case class Many(var inner: Grammar) extends Grammar
 
 case class IgnoreLeft(first: Grammar, second: Grammar) extends Grammar
 {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => r})
+  override def expand = new MapGrammar(new Sequence(first, second), { case ~(l, r) => r})
 }
 
 case class IgnoreRight(first: Grammar, second: Grammar) extends Grammar
 {
-  override def simplify = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l})
+  override def expand = new MapGrammar(new Sequence(first, second), { case ~(l, r) => l})
 }
 
 case class Choice(left: Grammar, right: Grammar, firstBeforeSecond: Boolean = false) extends Grammar

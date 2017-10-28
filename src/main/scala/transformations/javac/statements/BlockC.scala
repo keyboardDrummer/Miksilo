@@ -2,6 +2,7 @@ package transformations.javac.statements
 
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
+import core.particles.node.GrammarKey
 
 object BlockC extends DeltaWithGrammar {
 
@@ -15,9 +16,9 @@ object BlockC extends DeltaWithGrammar {
     grammars.create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
   }
 
-  object BlockOrStatementGrammar
-  object StatementAsBlockGrammar
-  object BlockGrammar
+  object BlockOrStatementGrammar extends GrammarKey
+  object StatementAsBlockGrammar extends GrammarKey
+  object BlockGrammar extends GrammarKey
 
   override def description: String = "Defines a grammar for blocks."
 }

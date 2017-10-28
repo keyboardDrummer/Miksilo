@@ -5,10 +5,10 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.node.GrammarKey
 import org.scalatest.FunSuite
 import transformations.javac.JavaCompilerDeltas
-import util.CompilerBuilder
-import util.TestUtils
+import util.{CompilerBuilder, TestUtils}
 
 import scala.util.parsing.input.CharArrayReader
 
@@ -47,29 +47,29 @@ object TestGrammarUtils extends FunSuite {
 
 case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
-  def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: Any = ProgramGrammar) {
+  def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = ProgramGrammar) {
     parseAndPrintSame(input, expected, getGrammarUsingTransformer(grammarTransformer))
   }
 
-  def getPrintResult(value: Any, grammarTransformer: Any = ProgramGrammar): String = {
+  def getPrintResult(value: Any, grammarTransformer: GrammarKey = ProgramGrammar): String = {
     val document = getGrammarUsingTransformer(grammarTransformer)
     BiGrammarToPrinter.toDocument(value, document).renderString()
   }
 
-  def getGrammarUsingTransformer(grammarTransformer: Any = ProgramGrammar): Labelled = {
+  def getGrammarUsingTransformer(grammarTransformer: GrammarKey = ProgramGrammar): Labelled = {
     CompilerBuilder.build(getTransformations(grammarTransformer)).getGrammar
   }
 
-  def getGrammarResult(input: String, grammarTransformer: Any = ProgramGrammar): Any = {
+  def getGrammarResult(input: String, grammarTransformer: GrammarKey = ProgramGrammar): Any = {
     val compiler = CompilerBuilder.build(getTransformations(grammarTransformer))
     compiler.parse(TestUtils.stringToInputStream(input))
   }
 
-  def getTransformations(key: Any): Seq[Delta] = {
+  def getTransformations(key: GrammarKey): Seq[Delta] = {
     Seq(new SelectorTransformation(key)) ++ particles
   }
 
-  class SelectorTransformation(key: Any) extends DeltaWithGrammar {
+  class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {
     override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
       if (key != ProgramGrammar)
         grammars.find(ProgramGrammar).inner = grammars.find(key)

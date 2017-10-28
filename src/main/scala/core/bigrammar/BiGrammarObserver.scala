@@ -1,8 +1,10 @@
 package core.bigrammar
 
+import core.particles.node.GrammarKey
+
 trait BiGrammarObserver[Result] {
 
-  def labelledEnter(name: AnyRef): Result
+  def labelledEnter(name: GrammarKey): Result
 
   def labelledLeave(inner: Result, partial: Result)
 

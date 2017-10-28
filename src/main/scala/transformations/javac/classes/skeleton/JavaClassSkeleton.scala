@@ -4,9 +4,9 @@ import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.{Node, NodeField, NodeLike}
+import core.particles.node.{GrammarKey, Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
-import transformations.bytecode.ByteCodeSkeleton.ClassFileKey
+import transformations.bytecode.ByteCodeSkeleton.Clazz
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
@@ -76,7 +76,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
 
-  object ClassMemberGrammar
+  object ClassMemberGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
 
     val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
@@ -87,14 +87,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}" as Members
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
-    val classGrammar = grammars.create(ClassGrammar, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode ClassFileKey)
+    val classGrammar = grammars.create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
     grammars.find(ProgramGrammar).inner = classGrammar
   }
 
-  object ImportGrammar
+  object ImportGrammar extends GrammarKey
 
   def clazz(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
-    new Node(ByteCodeSkeleton.ClassFileKey,
+    new Node(ByteCodeSkeleton.Clazz,
     Members -> members,
     ClassPackage -> _package,
     ClassName -> name,

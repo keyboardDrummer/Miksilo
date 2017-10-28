@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node._
 import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -118,7 +118,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def key: Key = Clazz
 
   val offsetGrammarKey = KeyGrammar(FrameOffset)
-  object StackMapFrameGrammar extends Key
+  object StackMapFrameGrammar extends GrammarKey
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
     val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
 

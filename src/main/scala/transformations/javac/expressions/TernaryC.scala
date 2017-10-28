@@ -43,7 +43,7 @@ object TernaryC extends ExpressionInstance {
 
   object TernaryKey extends NodeClass
 
-  object TernaryExpressionGrammar
+  object TernaryExpressionGrammar extends GrammarKey
 
   override val key = TernaryKey
 

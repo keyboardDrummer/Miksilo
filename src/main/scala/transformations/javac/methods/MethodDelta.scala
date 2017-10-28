@@ -149,10 +149,10 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 
-  object ParametersGrammar
-  object VisibilityGrammar
-  object StaticGrammar
-  object ReturnTypeGrammar
+  object ParametersGrammar extends GrammarKey
+  object VisibilityGrammar extends GrammarKey
+  object StaticGrammar extends GrammarKey
+  object ReturnTypeGrammar extends GrammarKey
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val block = grammars.find(BlockC.BlockGrammar)
@@ -209,7 +209,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   object MethodKey extends NodeClass
 
-  object MethodGrammar
+  object MethodGrammar extends GrammarKey
 
   object MethodBodyKey extends NodeField
 

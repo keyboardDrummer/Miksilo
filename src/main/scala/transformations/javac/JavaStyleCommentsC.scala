@@ -5,7 +5,7 @@ import core.bigrammar._
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.grammar.Grammar
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, NodeField}
+import core.particles.node.{GrammarKey, Key, NodeField}
 import core.particles.{DeltaWithGrammar, Language}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -15,7 +15,7 @@ import scala.util.matching.Regex
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
 
-  case class NodeWrapper(var node: NodeGrammar) extends SuperCustomGrammar {
+  case class NodeWrapper(var node: BiGrammar) extends SuperCustomGrammar {
 
     override def children = Seq(node)
 
@@ -37,9 +37,11 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
         }
       }
     }
+
+    override def fold[T](recursive: (BiGrammar) => BiGrammar): BiGrammar = recursive(NodeWrapper(node.fold(recursive)))
   }
 
-  object CommentGrammar
+  object CommentGrammar extends GrammarKey
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
@@ -136,7 +138,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   def getCommentsGrammar: BiGrammar = {
     val commentGrammar = getCommentGrammar
     val comments = commentGrammar.manyVertical
-    new SuperCustomGrammar {
+    new SuperCustomGrammar with BiGrammarWithoutChildren {
 
       override def createGrammar(recursive: (BiGrammar) => Grammar) = {
         val commentsGrammar = recursive(comments)
