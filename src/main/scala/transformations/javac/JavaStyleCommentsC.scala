@@ -6,7 +6,7 @@ import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.grammar.Grammar
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{GrammarKey, Key, NodeField}
-import core.particles.{DeltaWithGrammar, Language}
+import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
@@ -41,7 +41,9 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeWrapper(newChildren.head)
   }
 
-  object CommentGrammar extends GrammarKey
+  object CommentGrammar extends GrammarKey {
+    override lazy val toString: String = "Comments"
+  }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, CommentsGrammar)

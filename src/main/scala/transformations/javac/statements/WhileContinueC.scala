@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.{Compilation, Language}
+import core.particles.{Compilation, Language, NodeGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path

@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.document.Empty
 import core.grammar.{PrintGrammar, Produce}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.GrammarKey
@@ -48,7 +49,15 @@ object PrintBiGrammar {
     case labelled: Labelled => grammarKeyToName(labelled.name)
     case StringLiteral => "string"
     case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
-    case print: Print => ("print(": ResponsiveDocument) ~ print.document ~ ")"
+    case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
+    case ignore: IgnoreLeft =>
+      val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
+      toDocumentInner(sequenceLike.first) ~ "~>" ~ toDocumentInner(sequenceLike.second)
+    case ignore: IgnoreRight =>
+      val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
+      toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
+    case map: MapGrammar => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
+    case _ => grammar.getClass.toString
   }
 
   private def withChoiceParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
