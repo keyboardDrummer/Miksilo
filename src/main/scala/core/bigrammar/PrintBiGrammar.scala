@@ -70,14 +70,15 @@ object PrintBiGrammar {
 //  }
 
   trait FakeBiGrammar extends BiGrammar {
-    override def fold[T](recursive: (BiGrammar) => BiGrammar): BiGrammar = ???
+
+    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = ???
 
     override def children: Seq[BiGrammar] = ???
   }
 
   case class OptionGrammar(inner: BiGrammar, value: Any) extends FakeBiGrammar
 
-  def simplify(grammar: BiGrammar): BiGrammar = grammar.fold {
+  def simplify(grammar: BiGrammar): BiGrammar = grammar.map {
     case choice: Choice =>
       val left = choice.left
       val right = choice.right
@@ -101,7 +102,7 @@ object PrintBiGrammar {
     case x => x
   }
 
-  def contract(grammar: BiGrammar): BiGrammar = grammar.fold {
+  def contract(grammar: BiGrammar): BiGrammar = grammar.map {
     case choice: Choice =>
       val left = choice.left
       val right = choice.right
@@ -122,7 +123,7 @@ object PrintBiGrammar {
     case x => x
   }
 
-  def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.fold {
+  def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.map {
     case sequence: SequenceLike =>
       val left = sequence.first
       val right = sequence.second

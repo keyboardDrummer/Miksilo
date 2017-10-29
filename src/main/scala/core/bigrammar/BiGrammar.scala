@@ -86,16 +86,24 @@ trait BiGrammar extends BiGrammarWriter {
 
   def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 
-  def deepClone: BiGrammar = new DeepCloneBiGrammar().observe(this)
-
-  def fold[T](recursive: BiGrammar => BiGrammar): BiGrammar
   def children: Seq[BiGrammar]
+  def withChildren(newChildren: Seq[BiGrammar]): BiGrammar
+  def map(function: BiGrammar => BiGrammar): BiGrammar = new BiGrammarObserver[BiGrammar] {
+    override def getReference(name: GrammarKey): BiGrammar = new Labelled(name)
+
+    override def setReference(result: BiGrammar, reference: BiGrammar): Unit = {
+      reference.asInstanceOf[Labelled].inner = result.asInstanceOf[Labelled].inner
+    }
+
+    override def handleGrammar(self: BiGrammar, children: Seq[BiGrammar], recursive: (BiGrammar) => BiGrammar): BiGrammar = self.withChildren(children)
+  }.observe(this)
+
+  def deepClone = map(x => x)
 }
 
 trait BiGrammarWithoutChildren extends BiGrammar {
   def children: Seq[BiGrammar] = Seq.empty
-
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(this)
+  override def withChildren(newChildren: Seq[BiGrammar]) = this
 }
 
 object StringLiteral extends CustomGrammar with BiGrammarWithoutChildren {
@@ -104,7 +112,7 @@ object StringLiteral extends CustomGrammar with BiGrammarWithoutChildren {
 }
 
 trait SuperCustomGrammar extends BiGrammar {
-  def createGrammar(recursive: BiGrammar => Grammar): Grammar
+  def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
 }
 
@@ -185,13 +193,13 @@ abstract class Many(var inner: BiGrammar) extends BiGrammar with Layout
 class ManyVertical(inner: BiGrammar) extends Many(inner) {
   override def horizontal = false
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new ManyVertical(inner.fold(recursive)))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new ManyVertical(newChildren.head)
 }
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner) {
   override def horizontal = true
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new ManyHorizontal(inner.fold(recursive)))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new ManyHorizontal(newChildren.head)
 }
 
 /*
@@ -206,14 +214,14 @@ class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: B
 {
   override def children = Seq(left, right)
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Choice(left.fold(recursive), right.fold(recursive)))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new Choice(newChildren(0), newChildren(1))
 }
 
 class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
 {
   override def horizontal = true
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Sequence(first.fold(recursive), second.fold(recursive)))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new Sequence(newChildren(0), newChildren(1))
 }
 
 class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any],
@@ -221,7 +229,8 @@ class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruc
 {
   override def children = Seq(inner)
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new MapGrammar(inner.fold(recursive), construct, deconstruct, showMap))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new MapGrammar(newChildren.head, construct, deconstruct, showMap)
+
 } //TODO deze nog wat meer typed maken met WithState
 
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
@@ -232,7 +241,8 @@ class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends
 
   override def children = Seq(inner)
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new Labelled(name, inner.fold(recursive)))
+
+  override def withChildren(newChildren: Seq[BiGrammar]) = new Labelled(name, newChildren.head)
 }
 
 trait Layout {
@@ -244,7 +254,7 @@ class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar w
 
   override def horizontal = false
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(new TopBottom(first.fold(recursive), second.fold(recursive)))
+  override def withChildren(newChildren: Seq[BiGrammar]) = new TopBottom(newChildren(0), newChildren(1))
 }
 
 /**
@@ -261,7 +271,8 @@ case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
 
-  override def fold[T](recursive: (BiGrammar) => BiGrammar) = recursive(As(inner.fold(recursive), key))
+
+  override def withChildren(newChildren: Seq[BiGrammar]) = As(newChildren.head, key)
 }
 
 case class BiFailure(message: String = "") extends BiGrammarWithoutChildren

@@ -19,8 +19,8 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
     override def children = Seq(node)
 
-    override def createGrammar(map: (BiGrammar) => Grammar): Grammar = {
-      map(node) ^^ {
+    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
+      children.head ^^ {
         case result: Result => StateM((state: BiGrammarToGrammar.State) => {
           val newState = state + (CommentCounter -> 0)
           result.run(newState)
@@ -38,13 +38,13 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
       }
     }
 
-    override def fold[T](recursive: (BiGrammar) => BiGrammar): BiGrammar = recursive(NodeWrapper(node.fold(recursive)))
+    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeWrapper(newChildren.head)
   }
 
   object CommentGrammar extends GrammarKey
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val commentsGrammar = grammars.create(CommentGrammar, getCommentsGrammar)
+    val commentsGrammar = grammars.create(CommentGrammar, CommentsGrammar)
 
     var visited = Set.empty[BiGrammar]
     for(path <- grammars.root.selfAndDescendants)
@@ -135,40 +135,39 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
   object CommentCounter extends Key
   case class Comment(index: Int) extends NodeField
-  def getCommentsGrammar: BiGrammar = {
+
+  object CommentsGrammar extends SuperCustomGrammar with BiGrammarWithoutChildren {
+
     val commentGrammar = getCommentGrammar
-    val comments = commentGrammar.manyVertical
-    new SuperCustomGrammar with BiGrammarWithoutChildren {
+    var comments = commentGrammar.manyVertical
 
-      override def createGrammar(recursive: (BiGrammar) => Grammar) = {
-        val commentsGrammar = recursive(comments)
-        commentsGrammar ^^ {
-          case result: Result => StateM((state: BiGrammarToGrammar.State) => {
-            val counter: Int = state.getOrElse(CommentCounter, 0).asInstanceOf[Int]
-            val key = Comment(counter)
-            val newState = state + (CommentCounter -> (counter + 1))
-            val inner = result.run(state)
-            val innerValue = inner._2.value.asInstanceOf[Seq[_]]
-            val map: Map[Any,Any] = if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty
-            (newState, WithMapG[Any](Unit, map))
-          })
-        }
-      }
-
-      override def createPrinter(recursive: (BiGrammar) => NodePrinter) = new NodePrinter {
-
-        val commentsPrinter: NodePrinter = recursive(comments)
-        override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
+      recursive(comments) ^^ {
+        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
           val counter: Int = state.getOrElse(CommentCounter, 0).asInstanceOf[Int]
           val key = Comment(counter)
           val newState = state + (CommentCounter -> (counter + 1))
-          val value = from.map.get(key) match {
-            case Some(comment) =>
-              comment.asInstanceOf[Seq[String]]
-            case _ => Seq.empty
-          }
-          commentsPrinter.write(WithMapG(value, from.map), newState)
+          val inner = result.run(state)
+          val innerValue = inner._2.value.asInstanceOf[Seq[_]]
+          val map: Map[Any,Any] = if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty
+          (newState, WithMapG[Any](Unit, map))
+        })
+      }
+    }
+
+    override def createPrinter(recursive: (BiGrammar) => NodePrinter) = new NodePrinter {
+
+      val commentsPrinter: NodePrinter = recursive(comments)
+      override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+        val counter: Int = state.getOrElse(CommentCounter, 0).asInstanceOf[Int]
+        val key = Comment(counter)
+        val newState = state + (CommentCounter -> (counter + 1))
+        val value = from.map.get(key) match {
+          case Some(comment) =>
+            comment.asInstanceOf[Seq[String]]
+          case _ => Seq.empty
         }
+        commentsPrinter.write(WithMapG(value, from.map), newState)
       }
     }
   }

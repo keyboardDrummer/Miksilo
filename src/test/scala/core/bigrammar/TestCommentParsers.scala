@@ -142,7 +142,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   test("RightRecursionUsingBiGrammar") {
-    val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
+    val commentsGrammar: BiGrammar = JavaStyleCommentsC.CommentsGrammar
     val expression = new core.bigrammar.Labelled(StringKey("expression"))
     expression.addOption(commentsGrammar ~> number)
     expression.addOption(commentsGrammar ~> (expression ~~ "+" ~~ expression))
@@ -153,7 +153,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   test("RightRecursionUsingBiGrammarWithSubtraction") {
-    val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
+    val commentsGrammar: BiGrammar = JavaStyleCommentsC.CommentsGrammar
     val expression = new core.bigrammar.Labelled(StringKey("expression"))
     expression.addOption(commentsGrammar ~> number)
     expression.addOption(commentsGrammar ~> (expression ~~ "+" ~~ expression))
@@ -185,7 +185,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   def getManualSubAddGrammar: Labelled = {
-    val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
+    val commentsGrammar: BiGrammar = JavaStyleCommentsC.CommentsGrammar
     val core = new Labelled(StringKey("core"))
     val addition = new Labelled(StringKey("addition"), core)
     val expression = new Labelled(StringKey("expression"), addition)
@@ -197,7 +197,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   def getManualAddSubGrammar: Labelled = {
-    val commentsGrammar: BiGrammar = JavaStyleCommentsC.getCommentsGrammar
+    val commentsGrammar: BiGrammar = JavaStyleCommentsC.CommentsGrammar
     val core = new Labelled(StringKey("core"))
     val addition = new Labelled(StringKey("addition"), core)
     val expression = new Labelled(StringKey("expression"), addition)
