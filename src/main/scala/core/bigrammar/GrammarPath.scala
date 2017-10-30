@@ -101,10 +101,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
   }
 
   def removeMeFromSequence(): Unit = {
-    val choiceParent = parent.asInstanceOf[SequenceLike]
-    val me = get
-    val sibling = Set(choiceParent.first,choiceParent.second).filter(grammar => grammar != me).head
-    previous.asInstanceOf[GrammarReference].set(sibling)
+    set(ValueGrammar(UndefinedDestructuringValue)) //TODO add transformation to remove ValueGrammar(Unit)
   }
 
   override def toString = s"$get <INSIDE> $parent"

@@ -43,7 +43,7 @@ object PrintBiGrammar {
     case RegexG(value) => s"Regex($value)"
     case keyword: Keyword => keyword.value
     case delimiter: Delimiter => delimiter.value
-    case ValueGrammar(_) => "value"
+    case ValueGrammar(value) => value.toString
     case BiFailure(message) => message
     case fromString:FromStringGrammar => PrintGrammar.toDocument(fromString.grammar)
     case labelled: Labelled => grammarKeyToName(labelled.name)
@@ -57,6 +57,7 @@ object PrintBiGrammar {
       val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
       toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
     case map: MapGrammar => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
+    case ParseWhiteSpace => ""
     case _ => grammar.getClass.toString
   }
 

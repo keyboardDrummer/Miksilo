@@ -1,6 +1,6 @@
 package core.particles
 
-import core.bigrammar.{BiGrammarToGrammar, Labelled}
+import core.bigrammar._
 import core.grammar.{GrammarToParserConverter, ParseException}
 
 import scala.util.parsing.input.CharArrayReader
@@ -25,7 +25,8 @@ class DeltasToParserConverter extends GrammarToParserConverter {
   }
 
   def buildParser(programGrammarDocument: Labelled): (String) => ParseResult[Any] = {
-    val programGrammar = BiGrammarToGrammar.toGrammar(programGrammarDocument)
+    val biGrammar = WithWhiteSpace(new IgnoreRight(new Sequence(programGrammarDocument, ParseWhiteSpace)))
+    val programGrammar = BiGrammarToGrammar.toGrammar(biGrammar)
     input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }
 }

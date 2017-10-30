@@ -24,7 +24,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   test("MinusPlusRightCommutationBiGrammar4") {
-    val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
+    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ core ~ "+" ~ core |
       core ~ "+" ~ core |
@@ -65,7 +65,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   test("EmptyComment") {
-    val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
+    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint("", None, commentParser)
   }
@@ -74,7 +74,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   Curious that this test fails. Wouldn't expect it to. Especially since the next test succeeds.
    */
   ignore("MinusPlusRightCommutationBiGrammar") {
-    val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
+    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ number | commentParser ~ core ~ "+" ~ core
 
@@ -118,7 +118,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
 //  }
 
   test("MinusPlusRightCommutationBiGrammar2") {
-    val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
+    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ core ~ "+" ~ core |
       commentParser ~ number
@@ -130,7 +130,7 @@ class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratPars
   }
 
   test("MinusPlusRightCommutationBiGrammar3") {
-    val commentParser: BiGrammar = new ManyVertical(RegexG(new Regex("""/\*.*\*/""")))
+    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val core = new Labelled(StringKey("core"))
     core.inner = core ~ "+" ~ core |
       commentParser ~ number

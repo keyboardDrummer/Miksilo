@@ -1,6 +1,6 @@
 package transformations.bytecode.attributes
 
-import core.bigrammar.{BiGrammar, ManyVertical}
+import core.bigrammar.BiGrammar
 import core.particles._
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
@@ -133,7 +133,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
     val maxStackGrammar = grammars.create(MaxStackGrammar, ("stack:" ~> integer ~< ", ").as(MaxStack))
     val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
     val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
-    val instructionsGrammar = new ManyVertical(instructionGrammar).indent().as(Instructions)
+    val instructionsGrammar = instructionGrammar.manyVertical.indent().as(Instructions)
     val exceptionTableGrammar = "Exceptions:" %> value(Seq.empty[Any])
     val body = (nameGrammar ~ ("," ~~ maxStackGrammar ~ maxLocalGrammar) %
       instructionsGrammar %

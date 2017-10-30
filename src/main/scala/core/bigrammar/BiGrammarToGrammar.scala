@@ -5,7 +5,6 @@ import core.particles.node.GrammarKey
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
-
 object BiGrammarToGrammar {
   type WithMap = WithMapG[Any]
   type State = Map[Any, Any]
