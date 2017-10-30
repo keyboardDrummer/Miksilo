@@ -129,9 +129,10 @@ class TestComments
     assertResult("3")( output)
   }
 
-    test("comments are maintained in bytecode") {
+  test("comments are maintained in bytecode") {
     val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(JavaStyleCommentsC))))
+    //val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ initialCompiler.deltas)) //++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(JavaStyleCommentsC))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)

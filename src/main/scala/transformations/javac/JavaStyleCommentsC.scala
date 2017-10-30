@@ -14,7 +14,6 @@ import scala.util.matching.Regex
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
-
   case class NodeWrapper(var node: BiGrammar) extends SuperCustomGrammar {
 
     override def children = Seq(node)
@@ -48,6 +47,9 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val commentsGrammar = grammars.create(CommentGrammar, CommentsGrammar)
 
+    val commentPaths = grammars.root.selfAndDescendants.filter(p => p.get == CommentsGrammar)
+    val containsComments = commentPaths.nonEmpty
+
     var visited = Set.empty[BiGrammar]
     for(path <- grammars.root.selfAndDescendants)
     {
@@ -65,8 +67,12 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
       if (!visited2.contains(path.get)) {
         visited2 += path.get
         if (path.get.isInstanceOf[NodeGrammar]) {
-          val node = path.get.asInstanceOf[NodeGrammar]
-          path.asInstanceOf[GrammarReference].set(NodeWrapper(node))
+          if (path.asInstanceOf[GrammarReference].parent.isInstanceOf[NodeWrapper])
+            System.out.append("jo")
+          else {
+            val node = path.get.asInstanceOf[NodeGrammar]
+            path.asInstanceOf[GrammarReference].set(NodeWrapper(node))
+          }
         }
       }
     }
@@ -95,17 +101,23 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     }
 
     grammar.get match {
+      case CommentsGrammar => true
       case _: BiFailure => false
       case _: Print => false
       case _: ValueGrammar => false
       case _: Labelled => injectComments(commentsGrammar, grammar.children.head, horizontal)
       case superCustom: SuperCustomGrammar if superCustom.children.size == 1 =>
         injectComments(commentsGrammar, grammar.children.head, horizontal)
-      case node: NodeGrammar =>
-        node.inner =
-          if (horizontal) commentsGrammar ~> node.inner
-          else commentsGrammar %> node.inner
-        true
+      case node: NodeGrammar => node.inner match {
+        case ignore: IgnoreLeft if ignore.inner.isInstanceOf[SequenceLike] &&
+          ignore.inner.asInstanceOf[SequenceLike].first == CommentsGrammar =>
+          true
+        case _ =>
+          node.inner =
+            if (horizontal) commentsGrammar ~> node.inner
+            else commentsGrammar %> node.inner
+          true
+      }
       case _: MapGrammar => injectComments(commentsGrammar, grammar.children.head, horizontal)
       case _: As => injectComments(commentsGrammar, grammar.children.head, horizontal)
       case _: SequenceLike =>

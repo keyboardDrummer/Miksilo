@@ -1,7 +1,6 @@
 class Fibonacci
 {
     /* hello */
-
     /* bye */
     /* PS */ public static void main(java.lang.String[] args)
     {
