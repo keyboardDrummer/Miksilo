@@ -51,7 +51,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseAddition = ((additiveGrammar.as(First) ~~< "+") ~~ additiveGrammar.as(Second)).parseMap(Clazz) //TODO for some reason I have to use parseMap here instead of asNode, otherwise the JavaStyleComments tests fail
+    val parseAddition = additiveGrammar.as(First) ~~< "+" ~~ additiveGrammar.as(Second) asNode Clazz
     additiveGrammar.addOption(parseAddition)
   }
 

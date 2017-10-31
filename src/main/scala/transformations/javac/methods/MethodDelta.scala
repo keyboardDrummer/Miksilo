@@ -175,7 +175,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
     val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
-    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey))
+    val methodGrammar = grammars.create(MethodGrammar, methodUnmapped.asNode(MethodKey))
 
     val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)

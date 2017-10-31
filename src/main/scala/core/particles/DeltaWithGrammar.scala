@@ -7,7 +7,6 @@ import core.particles.node._
 
 object NodeGrammar {
 
-
   //noinspection ComparingUnrelatedTypes
   def destruct(withMap: WithMapG[Any], key: NodeClass): Option[WithMapG[Any]] = {
     val value = withMap.value
@@ -46,30 +45,12 @@ trait NodeGrammarWriter extends BiGrammarWriter {
   implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
   implicit val postfixOps = language.postfixOps
 
-  case class ValueWasNotAMetaObject(value: Any, clazz: Any) extends RuntimeException
-  {
-    override def toString = s"value $value was not a MetaObject but used in parseMap for $clazz"
-  }
-
-  def parseMapPrimitive(clazz: Class[_]): (Any => Any, Any => Option[Any]) = {
-    (x => x, x => Some(x).filter(clazz.isInstance))
-  }
-
   implicit class GrammarForAst(grammar: BiGrammar)
   {
-    def parseMap(key: NodeClass): BiGrammar = {
-      new MapGrammar(grammar,
-        input => NodeGrammar.construct(input.asInstanceOf[WithMap], key),
-        obj => NodeGrammar.destruct(obj.asInstanceOf[WithMapG[Any]], key), showMap = true)
-    }
-
     def asLabelledNode(grammars: GrammarCatalogue, key: NodeClass): Labelled = grammars.create(key, this.asNode(key))
     def asNode(key: NodeClass) = new NodeGrammar(grammar, key)
     def as(field: NodeField) = As(grammar, field)
   }
-
-  def nodeGrammar(inner: BiGrammar, key: NodeClass) = new NodeGrammar(inner, key)
-
 }
 
 trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
