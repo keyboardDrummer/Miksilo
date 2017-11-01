@@ -31,9 +31,10 @@ object AssignToMember extends DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val assignTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
+    import grammars._
+    val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
-    val variableGrammar = grammars.find(VariableC.VariableGrammar)
+    val variableGrammar = find(VariableC.VariableGrammar)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Clazz)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addOption(selectGrammar)

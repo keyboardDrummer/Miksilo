@@ -21,6 +21,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
 
   object ObjectTypeJavaGrammar extends GrammarKey
   override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})
@@ -33,7 +34,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
       case Right(QualifiedClassName(stringIds)) => stringIds
       case Left(string) => Seq(string)
     })
-    val parseObjectType = grammars.create(ObjectTypeJavaGrammar,
+    val parseObjectType = create(ObjectTypeJavaGrammar,
       (identifier.someSeparated(".") ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
     parseObjectType
   }
@@ -54,10 +55,13 @@ object ObjectTypeDelta extends TypeInstance with StackType {
     def deconstruct(value: Any): Option[Any] = Some(value match {
       case Right(name) => name
     })
-    val inner: Labelled = grammars.create(ObjectTypeByteCodeGrammarInner,
-      (QualifiedClassNameConstantDelta.getQualifiedClassNameParser ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
+
+    val qualifiedClassNameParser = QualifiedClassNameConstantDelta.getQualifiedClassNameParser(grammars)
+    import grammars._
+    val inner: Labelled = create(ObjectTypeByteCodeGrammarInner,
+      (qualifiedClassNameParser ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
     val grammar: BiGrammar = Keyword("L", reserved = false) ~> inner ~< ";"
-    grammars.create(ObjectTypeByteCodeGrammar, grammar)
+    create(ObjectTypeByteCodeGrammar, grammar)
   }
 
   def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(Name).asInstanceOf[Either[String, QualifiedClassName]]

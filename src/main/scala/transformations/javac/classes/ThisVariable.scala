@@ -10,8 +10,9 @@ object ThisVariable extends DeltaWithGrammar
 {
   object Grammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val variable = grammars.find(VariableC.VariableGrammar)
-    val thisGrammar = grammars.create(Grammar, ("this" ~> value("this").as(VariableNameKey)).asNode(VariableKey))
+    import grammars._
+    val variable = find(VariableC.VariableGrammar)
+    val thisGrammar = create(Grammar, ("this" ~> value("this").as(VariableNameKey)).asNode(VariableKey))
     variable.addOption(thisGrammar)
   }
 

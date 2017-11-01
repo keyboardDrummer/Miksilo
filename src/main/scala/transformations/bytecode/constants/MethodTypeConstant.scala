@@ -25,8 +25,10 @@ object MethodTypeConstant extends ConstantEntry {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8ConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex)
+  }
 
   override def description: String = "Add the method type constant"
 

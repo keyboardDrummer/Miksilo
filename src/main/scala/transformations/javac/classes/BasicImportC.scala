@@ -15,9 +15,10 @@ object BasicImportC extends DeltaWithGrammar {
   def _import(elements: Seq[String]) = new Node(ImportKey, ElementsKey -> elements)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val importPath = grammars.create(ImportPathGrammar, identifier.someSeparated(".").as(ElementsKey).asNode(ImportKey))
+    import grammars._
+    val importPath = create(ImportPathGrammar, identifier.someSeparated(".").as(ElementsKey).asNode(ImportKey))
     val basicImport = "import" ~~> importPath ~< ";"
-    grammars.find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
+    find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
   }
 
   def getParts(_import: Node) = _import(ElementsKey).asInstanceOf[Seq[String]]

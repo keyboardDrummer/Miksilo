@@ -37,7 +37,8 @@ object GreaterThanC extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
+    import grammars._
+    val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar.as(GreaterThanFirst) ~~< ">") ~~ relationalGrammar.as(GreaterThanSecond)).asNode(GreaterThanKey)
     relationalGrammar.addOption(parseLessThan)
   }
@@ -80,7 +81,8 @@ object LessThanC extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
+    import grammars._
+    val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar.as(LessThanFirst) ~~< "<") ~~ relationalGrammar.as(LessThanSecond)).asNode(LessThanKey)
     relationalGrammar.addOption(parseLessThan)
   }

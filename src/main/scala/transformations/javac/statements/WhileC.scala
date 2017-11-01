@@ -37,9 +37,10 @@ object WhileC extends StatementInstance with WithLanguageRegistry {
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val blockGrammar = grammars.find(BlockC.BlockGrammar)
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val blockGrammar = find(BlockC.BlockGrammar)
     val whileGrammar =
       "while" ~> expression.inParenthesis.as(Condition) %
       blockGrammar.as(Body) asNode WhileKey

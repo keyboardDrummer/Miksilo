@@ -35,7 +35,10 @@ object GetStaticDelta extends InstructionDelta {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue): BiGrammar = grammars.find(ConstantPoolIndexGrammar).as(FieldRef)
+  override def argumentsGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(FieldRef)
+  }
 
   override def getInstructionSize: Int = 3
 

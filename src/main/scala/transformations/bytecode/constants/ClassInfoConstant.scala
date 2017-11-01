@@ -39,8 +39,10 @@ object ClassInfoConstant extends ConstantEntry {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(Name)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(Name)
+  }
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

@@ -22,11 +22,12 @@ object TernaryC extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    import grammars._
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val parseTernary = (expressionGrammar.as(ConditionKey) ~~< "?") ~~
       (expressionGrammar.as(TrueKey) ~~< ":") ~~
       expressionGrammar.as(FalseKey) asNode TernaryKey
-    val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
+    val ternaryGrammar = create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar
   }
 

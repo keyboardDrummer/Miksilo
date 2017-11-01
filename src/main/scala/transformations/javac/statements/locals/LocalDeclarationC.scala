@@ -18,8 +18,9 @@ object LocalDeclarationC extends StatementInstance {
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statement = grammars.find(StatementSkeleton.StatementGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
+    import grammars._
+    val statement = find(StatementSkeleton.StatementGrammar)
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode DeclarationKey
     statement.addOption(parseDeclaration)
   }

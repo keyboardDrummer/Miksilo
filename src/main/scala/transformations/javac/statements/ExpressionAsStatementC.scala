@@ -34,8 +34,9 @@ object ExpressionAsStatementC extends StatementInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
+    import grammars._
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Clazz
     statementGrammar.addOption(expressionAsStatement)
   }

@@ -1,7 +1,7 @@
 package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
-import core.bigrammar.{As, BiGrammar, TestCompilerGrammarUtils, TestGrammarUtils}
+import core.bigrammar._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{DeltaWithGrammar, Language, NodeGrammarWriter}
@@ -14,7 +14,7 @@ import scala.reflect.io.Path
 
 class TestComments
   extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
-  with NodeGrammarWriter
+  with NodeGrammarWriter with BiGrammarSequenceWriter
 {
   object ParentClass extends NodeClass
   object ChildClass extends NodeClass

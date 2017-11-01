@@ -18,10 +18,11 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
   def getInitializer(withInitializer: Node) = withInitializer(Initializer).asInstanceOf[Node]
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statement = grammars.find(StatementSkeleton.StatementGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val parseDeclarationWithInitializer = grammars.create(Clazz,
+    import grammars._
+    val statement = find(StatementSkeleton.StatementGrammar)
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val parseDeclarationWithInitializer = create(Clazz,
       (typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(Initializer)) ~< ";").
       asNode(Clazz))
     statement.addOption(parseDeclarationWithInitializer)

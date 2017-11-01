@@ -19,8 +19,9 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val memberGrammar = grammars.find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = grammars.find(LocalDeclarationWithInitializerC.Clazz).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
+    import grammars._
+    val memberGrammar = find(ClassMemberGrammar)
+    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerC.Clazz).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 

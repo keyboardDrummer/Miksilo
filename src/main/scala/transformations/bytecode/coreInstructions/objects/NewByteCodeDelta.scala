@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Compilation, Language}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
@@ -37,7 +37,10 @@ object NewByteCodeDelta extends InstructionDelta {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(ClassRef -> ClassInfoConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(ClassRef)
+  override def argumentsGrammar(grammars: GrammarCatalogue) = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(ClassRef)
+  }
 
   override def grammarName = "new"
 }

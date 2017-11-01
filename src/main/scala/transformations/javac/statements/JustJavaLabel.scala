@@ -23,8 +23,9 @@ object JustJavaLabel extends StatementInstance {
   object JavaLabelGrammar extends GrammarKey
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(grammars.create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode LabelKey))
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    statementGrammar.addOption(create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode LabelKey))
   }
 
   override def description: String = "Adds a label statement"

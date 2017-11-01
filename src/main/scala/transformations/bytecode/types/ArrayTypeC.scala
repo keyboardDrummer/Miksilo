@@ -2,9 +2,9 @@ package transformations.bytecode.types
 
 
 import core.bigrammar.BiGrammar
-import core.particles.{Language, NodeGrammar}
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.{Language, NodeGrammar}
 
 object ArrayTypeC extends TypeInstance with StackType {
   override val key = ArrayTypeKey
@@ -12,14 +12,16 @@ object ArrayTypeC extends TypeInstance with StackType {
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(ObjectTypeDelta.rootObjectType)
 
   override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+    import grammars._
+    val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     "[" ~> typeGrammar.as(ArrayElementType) asNode ArrayTypeKey
   }
 
   def getArrayElementType(arrayType: Node): Node = arrayType(ArrayElementType).asInstanceOf[Node]
 
   override def getJavaGrammar(grammars: GrammarCatalogue): NodeGrammar = {
-    val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
+    import grammars._
+    val parseType = find(TypeSkeleton.JavaTypeGrammar)
     parseType.as(ArrayElementType) ~< "[]" asNode ArrayTypeKey
   }
 

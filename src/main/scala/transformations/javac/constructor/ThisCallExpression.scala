@@ -30,9 +30,10 @@ object ThisCallExpression extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val callArguments = grammars.find(CallC.CallArgumentsGrammar)
+    import grammars._
+    val callArguments = find(CallC.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments.as(CallC.CallArguments) asNode ThisCall
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(thisCallGrammar)
   }
 

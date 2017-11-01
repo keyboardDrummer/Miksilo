@@ -12,9 +12,13 @@ object ShortTypeC extends TypeInstance with StackType {
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty //TODO extend. long ?
 
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("S",false) ~> value(shortType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    new Keyword("S",false) ~> value(shortType)
+  }
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
+    import grammars._
     "short" ~> value(shortType)
   }
 

@@ -19,8 +19,10 @@ object StringConstant extends ConstantEntry {
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = PrintByteCode.byteToBytes(8) ++
     PrintByteCode.shortToBytes(constant(StringIndex).asInstanceOf[Int])
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(StringIndex)
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(StringIndex)
+  }
 
   override def description: String = "Adds the string constant entry."
 

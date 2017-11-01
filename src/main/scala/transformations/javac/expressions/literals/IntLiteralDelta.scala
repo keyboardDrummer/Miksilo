@@ -15,9 +15,10 @@ object IntLiteralDelta extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    import grammars._
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
     val parseNumber = inner.as(Value).asNode(Clazz)
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
 

@@ -70,8 +70,9 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
+    import grammars._
+    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = (typeGrammar.as(FieldType) ~~ identifier.as(FieldName) ~< ";").asNode(FieldKey)
     memberGrammar.addOption(fieldGrammar)

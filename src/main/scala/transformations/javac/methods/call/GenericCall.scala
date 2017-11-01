@@ -38,11 +38,12 @@ trait GenericCall extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(MemberSelector)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)
-    val calleeGrammar = grammars.create(CallC.CallCallee, selectorGrammar)
-    val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
+    import grammars._
+    val core = find(ExpressionSkeleton.CoreGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val selectorGrammar = find(MemberSelector.SelectGrammar)
+    val calleeGrammar = create(CallC.CallCallee, selectorGrammar)
+    val callArguments = create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
     val parseCall = calleeGrammar.as(CallC.CallCallee) ~ callArguments.as(CallC.CallArguments) asNode CallC.CallKey
     core.addOption(parseCall)
   }

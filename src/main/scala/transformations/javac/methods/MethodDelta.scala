@@ -155,29 +155,30 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
   object ReturnTypeGrammar extends GrammarKey
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val block = grammars.find(BlockC.BlockGrammar)
+    import grammars._
+    val block = find(BlockC.BlockGrammar)
 
-    val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
+    val parseType = find(TypeSkeleton.JavaTypeGrammar)
+    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType.as(ParameterTypeKey) ~~ identifier.as(ParameterNameKey) asNode ParameterKey
-    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
-    val parseStatic = grammars.create(StaticGrammar, "static" ~~> value(true) | value(false))
+    val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
+    val parseStatic = create(StaticGrammar, "static" ~~> value(true) | value(false))
 
-    val visibilityModifier = grammars.create(VisibilityGrammar,
+    val visibilityModifier = create(VisibilityGrammar,
       "public" ~~> value(PublicVisibility) |
         "protected" ~~> value(ProtectedVisibility) |
         "private" ~~> value(PrivateVisibility) |
         value(DefaultVisibility))
 
 
-    val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
+    val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
     val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
-    val methodGrammar = grammars.create(MethodGrammar, methodUnmapped.asNode(MethodKey))
+    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(MethodKey))
 
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
   }
 

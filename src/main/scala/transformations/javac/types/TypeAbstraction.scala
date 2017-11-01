@@ -32,22 +32,24 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
+    import grammars._
     val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< " ").option.optionToSeq)
+    create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< " ").option.optionToSeq)
   }
 
   object AbstractMethodTypeGrammar extends GrammarKey
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
-    val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val methodTypeGrammar = grammars.find(KeyGrammar(MethodTypeKey))
-    val objectTypeGrammar = grammars.find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
+    import grammars._
+    val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
+    val methodTypeGrammar = find(KeyGrammar(MethodTypeKey))
+    val objectTypeGrammar = find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier.as(ParameterName) ~
       (":" ~> classBound.option).as(ParameterClassBound) ~~
       ((":" ~> classBound)*).as(ParameterInterfaceBound) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
+    val abstractMethodType = create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
       asNode(TypeAbstractionKey))
     byteCodeType.addOption(abstractMethodType)
   }

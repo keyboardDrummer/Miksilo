@@ -3,7 +3,7 @@ package core.bigrammar
 import core.grammar.~
 import org.scalatest.FunSuite
 
-class TestSimpleExpressionLanguage extends FunSuite with BiGrammarWriter {
+class TestSimpleExpressionLanguage extends FunSuite with BiGrammarSequenceWriter {
 
   test("SimpleAddition") {
     val example = "3 + 4"

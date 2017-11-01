@@ -21,8 +21,9 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
   override def dependencies: Set[Contract] = Set(MethodDelta, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val targetGrammar = grammars.create(AssignmentTargetGrammar, BiFailure())
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    import grammars._
+    val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val assignmentGrammar = targetGrammar.as(AssignmentTarget) ~~< "=" ~~ expressionGrammar.as(AssignmentValue) asNode AssignmentKey
     expressionGrammar.addOption(assignmentGrammar)
   }

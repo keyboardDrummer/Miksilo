@@ -1,6 +1,6 @@
 package example
 
-import core.bigrammar.{BiGrammar, Labelled, StringKey, TestGrammarUtils}
+import core.bigrammar._
 import core.grammar.~
 import core.particles.NodeGrammarWriter
 import core.particles.node.{NodeClass, NodeField}
@@ -36,7 +36,7 @@ object Constant {
 /**
   * Contains some examples for the wiki.
   */
-class BiGrammarExample extends FunSuite with NodeGrammarWriter {
+class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSequenceWriter {
 
   test("whileWithAsNode") {
     val expression = new Labelled(StringKey("expression"))

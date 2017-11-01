@@ -4,7 +4,7 @@ import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$, PrintErr
 import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 
-class TestFailureFeedback extends FunSuite with BiGrammarWriter {
+class TestFailureFeedback extends FunSuite with BiGrammarSequenceWriter {
 
   test("FailureFeedback") {
     val input = core.grammar.~("1", "2")

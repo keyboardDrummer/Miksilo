@@ -15,12 +15,13 @@ object ConstantPoolIndices extends DeltaWithGrammar {
   private object Content extends NodeField
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val previousConstantPoolItem = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
+    import grammars._
+    val previousConstantPoolItem = find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     val constantPoolItem = (("#" ~> number.as(Index) ~~< "=") ~~ previousConstantPoolItem.inner.as(Content)).
       asNode(WithIndexClass)
     previousConstantPoolItem.inner = constantPoolItem
 
-    val constantPoolGrammar = grammars.find(ConstantPoolGrammar)
+    val constantPoolGrammar = find(ConstantPoolGrammar)
     val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.get.isInstanceOf[ManyVertical]).
       get.asInstanceOf[GrammarReference] //TODO al die casts naar GrammarReference zijn loos. Beter altijd een GrammarReference returnen. O wacht, implicit cast naar grammarReference!!!
     entries.set(addIndicesToList(entries.get))

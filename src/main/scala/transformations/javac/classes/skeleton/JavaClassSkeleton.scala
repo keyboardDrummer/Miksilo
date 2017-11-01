@@ -78,17 +78,18 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   object ClassMemberGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    import grammars._
 
-    val classMember: BiGrammar = grammars.create(ClassMemberGrammar)
-    val importGrammar = grammars.create(ImportGrammar)
+    val classMember: BiGrammar = create(ClassMemberGrammar)
+    val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}" as Members
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
-    val classGrammar = grammars.create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
-    grammars.find(ProgramGrammar).inner = classGrammar
+    val classGrammar = create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
+    find(ProgramGrammar).inner = classGrammar
   }
 
   object ImportGrammar extends GrammarKey

@@ -13,6 +13,7 @@ object SignatureAttribute extends ByteCodeAttribute {
   override def key: Key = SignatureKey
 
   override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
     ("signature with index:" ~~> integer.as(SignatureIndex)).asNode(SignatureKey)
   }
 

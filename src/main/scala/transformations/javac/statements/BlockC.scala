@@ -10,10 +10,11 @@ object BlockC extends DeltaWithGrammar {
 
   val indentAmount = 4
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val blockGrammar = grammars.create(BlockGrammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
-    val statementAsBlockGrammar = grammars.create(StatementAsBlockGrammar, statementGrammar ^^(statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]].head)))
-    grammars.create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val blockGrammar = create(BlockGrammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
+    val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementGrammar ^^(statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]].head)))
+    create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
   }
 
   object BlockOrStatementGrammar extends GrammarKey

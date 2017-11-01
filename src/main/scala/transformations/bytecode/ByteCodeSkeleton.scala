@@ -89,17 +89,18 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   object MembersGrammar extends GrammarKey
   object AttributesGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val constantIndexGrammar = grammars.create(ConstantPoolIndexGrammar, integer)
-    val program = grammars.find(ProgramGrammar)
-    val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
+    import grammars._
+    val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
+    val program = find(ProgramGrammar)
+    val attributeGrammar: BiGrammar = create(AttributeGrammar)
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (constantIndexGrammar *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
     val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
-    val attributesGrammar = grammars.create(AttributesGrammar, attributeGrammar.manyVertical)
-    val membersGrammar = grammars.create(MembersGrammar, print(Empty))
+    val attributesGrammar = create(AttributesGrammar, attributeGrammar.manyVertical)
+    val membersGrammar = create(MembersGrammar, print(Empty))
     val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
-    val classGrammar = grammars.create(Clazz,
+    val classGrammar = create(Clazz,
       (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
         constantPool.as(ClassConstantPool) % bodyGrammar).asNode(Clazz))
 
@@ -109,12 +110,13 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   object ConstantPoolGrammar extends GrammarKey
 
   def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar)
+    import grammars._
+    val constantPoolItemContent = create(ConstantPoolItemContentGrammar)
     val entries = constantPoolItemContent.manyVertical.indent()
     val result = "Constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
-    grammars.create(ConstantPoolGrammar, result)
+    create(ConstantPoolGrammar, result)
   }
 
   override def description: String = "Defines a skeleton for bytecode."

@@ -23,13 +23,15 @@ object Utf8ConstantDelta extends ConstantEntry {
   override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
     (new FromStringGrammar(Identifier, verifyWhenPrinting = true) |
       keywordClass("<init>") |
       keywordClass("<clinit>") |
       StringLiteral
       //TODO misschien een aparte constant maken voor 'Names'
       ).as(Value)
+  }
 
   override def description: String = "A string constant"
 

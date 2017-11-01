@@ -13,7 +13,8 @@ object SelectInnerClassC extends DeltaWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = transformByteCodeGrammars(grammars)
 
   def transformByteCodeGrammars(grammars: GrammarCatalogue): Unit = {
-    val objectInner = grammars.find(ObjectTypeByteCodeGrammarInner)
+    import grammars._
+    val objectInner = find(ObjectTypeByteCodeGrammarInner)
     val selectInnerGrammar = (objectInner.as(ParentClass) ~< "." ~~ objectInner.as(ChildClass)).asNode(SelectInnerClass)
 
     objectInner.addOption(selectInnerGrammar)

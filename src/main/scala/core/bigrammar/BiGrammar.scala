@@ -3,9 +3,9 @@ package core.bigrammar
 import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.printer.TryState
 import core.bigrammar.printer.TryState.{NodePrinter, State}
-import core.document.{BlankLine, Empty, WhiteSpace}
+import core.document.Empty
 import core.grammar.{Grammar, GrammarToParserConverter, ~}
-import core.particles.node.{GrammarKey, Node, NodeField}
+import core.particles.node.{GrammarKey, NodeField}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.matching.Regex
@@ -21,37 +21,9 @@ trait BiGrammar extends BiGrammarWriter {
 
   lazy val height = 1
 
-  def ~<(right: BiGrammar) = (this ~ right).ignoreRight
-
-  def ~~<(right: BiGrammar) = this ~< (space ~ right)
-
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
-
   def |(other: BiGrammar) = new Choice(this, other)
-
-  def ~~(right: BiGrammar): BiGrammar = {
-    (this ~< space) ~ right
-  }
-
-  def someSeparatedVertical(separator: BiGrammar): BiGrammar =
-    someMap(this % (separator %> this).manyVertical)
-
-  def manyVertical = new ManyVertical(WithWhiteSpace(this))
-
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
-
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
-  def some: BiGrammar = someMap(this ~ (this*))
-  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> this) *))
 
-  private def someMap(grammar: BiGrammar): BiGrammar = {
-    grammar ^^
-    ( {
-      case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
-    }, {
-      case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
-    })
-  }
 
   def optionToSeq: BiGrammar = new MapGrammar(this,
     option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {
@@ -60,31 +32,8 @@ trait BiGrammar extends BiGrammarWriter {
     })
   def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))
 
-  def inParenthesis = ("(": BiGrammar) ~> this ~< ")"
-
-  def ~(other: BiGrammar) = new Sequence(this, new WithWhiteSpace(other))
-
-  def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
-
-  def ~~>(right: BiGrammar) = (this ~ space) ~> right
-
-  def * = new ManyHorizontal(WithWhiteSpace(this))
-  def many = this*
-
-  def %(bottom: BiGrammar) = new TopBottom(this, new WithWhiteSpace(bottom))
-
-  def %%(bottom: BiGrammar): BiGrammar = {
-    (this %< BlankLine) % bottom
-  }
-
-  def %>(bottom: BiGrammar) = (this % bottom).ignoreLeft
-
-  def %<(bottom: BiGrammar) = (this % bottom).ignoreRight
-
   def ^^(afterParsing: Any => Any, beforePrinting: Any => Option[Any]): BiGrammar =
     new MapGrammar(this, afterParsing, beforePrinting)
-
-  def indent(width: Int = 2) = WhiteSpace(width, 0) ~> this
 
   def children: Seq[BiGrammar]
   def withChildren(newChildren: Seq[BiGrammar]): BiGrammar
@@ -101,7 +50,7 @@ trait BiGrammar extends BiGrammarWriter {
   def deepClone = map(x => x)
 }
 
-case class WithWhiteSpace(grammar: BiGrammar) extends IgnoreLeft(new Sequence(ParseWhiteSpace, grammar))
+case class WithWhiteSpace(grammar: BiGrammar, whiteSpace: BiGrammar = ParseWhiteSpace) extends IgnoreLeft(new Sequence(whiteSpace, grammar))
 
 object ParseWhiteSpace extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.RegexG("""\s*""".r)

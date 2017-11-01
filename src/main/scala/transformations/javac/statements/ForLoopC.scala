@@ -26,9 +26,10 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(WhileC)
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val blockGrammar = grammars.find(BlockC.BlockGrammar)
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val blockGrammar = find(BlockC.BlockGrammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
       expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %

@@ -15,9 +15,10 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   def getSelectorMember(selector: Node) = selector(Member).asInstanceOf[String]
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    import grammars._
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
     val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Clazz
-    grammars.create(SelectGrammar, selection)
+    create(SelectGrammar, selection)
   }
 
   object SelectGrammar extends GrammarKey

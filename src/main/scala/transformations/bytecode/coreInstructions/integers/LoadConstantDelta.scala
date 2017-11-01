@@ -33,7 +33,10 @@ object LoadConstantDelta extends InstructionDelta
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(IntegerConstantIndex -> IntegerInfoConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(IntegerConstantIndex)
+  override def argumentsGrammar(grammars: GrammarCatalogue) = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(IntegerConstantIndex)
+  }
 
   override def grammarName = "ldc"
 }

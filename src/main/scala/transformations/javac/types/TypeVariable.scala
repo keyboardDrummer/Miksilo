@@ -16,13 +16,15 @@ object TypeVariable extends DeltaWithGrammar {
   }
 
   def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
+    import grammars._
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val variableGrammar: BiGrammar = identifier.as(TypeVariableName).asNode(TypeVariableKey)
     typeGrammar.addOption(variableGrammar)
   }
 
   def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
-    val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+    import grammars._
+    val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
     byteCodeType.addOption(Keyword("T", false) ~> identifier.as(TypeVariableName) ~< ";" asNode TypeVariableKey)
   }
 

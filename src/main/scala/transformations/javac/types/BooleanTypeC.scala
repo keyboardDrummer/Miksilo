@@ -13,11 +13,15 @@ object BooleanTypeC extends TypeInstance
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = new Keyword("Z",false) ~> value(booleanType)
+  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
+    new Keyword("Z",false) ~> value(booleanType)
+  }
 
   override def getStackType(_type: Node, state: Language): Node = IntTypeC.intType
 
   override def getJavaGrammar(grammars: GrammarCatalogue) = {
+    import grammars._
     "boolean" ~> value(booleanType)
   }
 

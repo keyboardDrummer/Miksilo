@@ -23,7 +23,8 @@ object NotC extends ExpressionInstance {
   }
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
+    import grammars._
+    val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
     coreGrammar.addOption("!" ~> coreGrammar.as(NotExpression) asNode NotKey)
   }
 

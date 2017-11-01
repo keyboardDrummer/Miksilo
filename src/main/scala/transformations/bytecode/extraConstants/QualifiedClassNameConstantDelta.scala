@@ -29,9 +29,10 @@ object QualifiedClassNameConstantDelta extends ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[QualifiedClassName].parts.mkString("/"))
 
   override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    getQualifiedClassNameParser.as(Value)
+    getQualifiedClassNameParser(grammars).as(Value)
 
-  def getQualifiedClassNameParser: BiGrammar = {
+  def getQualifiedClassNameParser(grammars: GrammarCatalogue): BiGrammar = {
+    import grammars._
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})
