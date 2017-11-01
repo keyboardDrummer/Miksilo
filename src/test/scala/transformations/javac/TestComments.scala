@@ -14,7 +14,7 @@ import scala.reflect.io.Path
 
 class TestComments
   extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
-  with NodeGrammarWriter with BiGrammarSequenceWriter
+  with NodeGrammarWriter
 {
   object ParentClass extends NodeClass
   object ChildClass extends NodeClass
@@ -23,18 +23,20 @@ class TestComments
   object ChildName extends NodeField
 
   test("test injection") {
+    val grammars = new GrammarCatalogue
+    import grammars._
+
     val grammar: BiGrammar = "{" ~ identifier.as(ParentName) ~~
       ("_" ~ identifier.as(ChildName) ~ "_" asNode ChildClass).as(ParentChild) ~ "}" asNode ParentClass
-    val grammars = new GrammarCatalogue
     grammars.create(ProgramGrammar, grammar)
     JavaStyleCommentsC.transformGrammars(grammars, new Language)
 
     val parsed = TestGrammarUtils.parse(
-      """ /*a*/ { /*b*/ remy /*c*/ _ judith /*d*/ _ /*e*/ } """.stripMargin, grammar)
+      """{ /*b*/ remy /*c*/ _ judith /*d*/ _ /*e*/ }""".stripMargin, grammar)
     assert(parsed.successful, parsed.toString)
     val ast = parsed.get.asInstanceOf[Node]
     val printed = TestGrammarUtils.print(ast, grammar)
-    val expected = "/*a*/ {/*b*/ remy /*c*/ _judith/*d*/ _/*e*/ }"
+    val expected = "{/*b*/remy/*c*/ _judith/*d*/_/*e*/ }"
     assertResult(expected)(printed)
 
     val slaveNode = ast(ParentChild).asInstanceOf[Node]

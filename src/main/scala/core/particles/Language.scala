@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends Delta {
     state.parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
       val manager = new DeltasToParserConverter()
-      manager.parse(grammarCatalogue.find(ProgramGrammar), inputString).asInstanceOf[Node]
+      manager.parse(grammarCatalogue, inputString).asInstanceOf[Node]
     }
   }
 
@@ -36,7 +36,7 @@ class Compilation(val language: Language) {
 
   def parseString(input: String): Unit = {
     val manager = new DeltasToParserConverter()
-    program = manager.parse(language.grammarCatalogue.find(ProgramGrammar), input).asInstanceOf[Node]
+    program = manager.parse(language.grammarCatalogue, input).asInstanceOf[Node]
   }
 
   def runPhases(): Unit = {

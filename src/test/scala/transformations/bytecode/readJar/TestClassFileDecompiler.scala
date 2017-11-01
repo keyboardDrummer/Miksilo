@@ -23,7 +23,7 @@ class TestClassFileDecompiler extends FunSuite {
     val state = compiler.buildLanguage
 
     val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammarCatalogue.find(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
+    val result = manager.parse(state.grammarCatalogue.newRoot(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
   }
 
   test("TypeVariable") {
@@ -32,7 +32,7 @@ class TestClassFileDecompiler extends FunSuite {
     val state = compiler.buildLanguage
 
     val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val result = manager.parse(state.grammarCatalogue.newRoot(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
@@ -41,7 +41,7 @@ class TestClassFileDecompiler extends FunSuite {
     val state = compiler.buildLanguage
 
     val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val result = manager.parse(state.grammarCatalogue.newRoot(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
   test("TypeVariable3") {
@@ -50,7 +50,7 @@ class TestClassFileDecompiler extends FunSuite {
     val state = compiler.buildLanguage
 
     val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val result = manager.parse(state.grammarCatalogue.newRoot(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
   }
 
   ignore("decompileRuntimeJar") {

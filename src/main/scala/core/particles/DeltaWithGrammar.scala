@@ -67,7 +67,7 @@ class GrammarWithTrivia(grammar: BiGrammar)(implicit grammars: GrammarCatalogue)
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
     someMap(this % (separator %> grammar).manyVertical)
 
-  def manyVertical = new ManyVertical(WithWhiteSpace(grammar, grammars.whiteSpace))
+  def manyVertical = new ManyVertical(WithTrivia(grammar, grammars.trivia))
 
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
 
@@ -84,16 +84,16 @@ class GrammarWithTrivia(grammar: BiGrammar)(implicit grammars: GrammarCatalogue)
   }
   def inParenthesis = ("(": BiGrammar) ~> grammar ~< ")"
 
-  def ~(other: BiGrammar) = new Sequence(grammar, WithWhiteSpace(other, grammars.whiteSpace))
+  def ~(other: BiGrammar) = new Sequence(grammar, WithTrivia(other, grammars.trivia))
 
   def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
 
   def ~~>(right: BiGrammar) = (this ~ space) ~> right
 
-  def * = new ManyHorizontal(WithWhiteSpace(grammar, grammars.whiteSpace))
+  def * = new ManyHorizontal(WithTrivia(grammar, grammars.trivia))
   def many = this*
 
-  def %(bottom: BiGrammar) = new TopBottom(grammar, WithWhiteSpace(bottom, grammars.whiteSpace))
+  def %(bottom: BiGrammar) = new TopBottom(grammar, WithTrivia(bottom, grammars.trivia))
 
   def %%(bottom: BiGrammar): BiGrammar = {
     (this %< BlankLine) % bottom

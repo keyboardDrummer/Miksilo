@@ -26,7 +26,7 @@ trait BiGrammarSequenceWriter extends BiGrammarWriter {
     def someSeparatedVertical(separator: BiGrammar): BiGrammar =
       someMap(this % (separator %> grammar).manyVertical)
 
-    def manyVertical = new ManyVertical(WithWhiteSpace(grammar))
+    def manyVertical = new ManyVertical(WithTrivia(grammar))
 
     def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
 
@@ -43,16 +43,16 @@ trait BiGrammarSequenceWriter extends BiGrammarWriter {
     }
     def inParenthesis = ("(": BiGrammar) ~> grammar ~< ")"
 
-    def ~(other: BiGrammar) = new Sequence(grammar, WithWhiteSpace(other))
+    def ~(other: BiGrammar) = new Sequence(grammar, WithTrivia(other))
 
     def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
 
     def ~~>(right: BiGrammar) = (this ~ space) ~> right
 
-    def * = new ManyHorizontal(WithWhiteSpace(grammar))
+    def * = new ManyHorizontal(WithTrivia(grammar))
     def many = this*
 
-    def %(bottom: BiGrammar) = new TopBottom(grammar, WithWhiteSpace(bottom))
+    def %(bottom: BiGrammar) = new TopBottom(grammar, WithTrivia(bottom))
 
     def %%(bottom: BiGrammar): BiGrammar = {
       (this %< BlankLine) % bottom

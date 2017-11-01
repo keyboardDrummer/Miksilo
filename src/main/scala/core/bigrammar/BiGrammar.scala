@@ -50,7 +50,7 @@ trait BiGrammar extends BiGrammarWriter {
   def deepClone = map(x => x)
 }
 
-case class WithWhiteSpace(grammar: BiGrammar, whiteSpace: BiGrammar = ParseWhiteSpace) extends IgnoreLeft(new Sequence(whiteSpace, grammar))
+case class WithTrivia(grammar: BiGrammar, whiteSpace: BiGrammar = ParseWhiteSpace) extends IgnoreLeft(new Sequence(whiteSpace, grammar))
 
 object ParseWhiteSpace extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.RegexG("""\s*""".r)
