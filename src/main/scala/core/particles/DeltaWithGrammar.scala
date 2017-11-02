@@ -2,8 +2,6 @@ package core.particles
 
 import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.{MapGrammar, _}
-import core.document.{BlankLine, WhiteSpace}
-import core.grammar.~
 import core.particles.grammars.GrammarCatalogue
 import core.particles.node._
 
@@ -47,61 +45,20 @@ class GrammarForAst(grammar: BiGrammar) {
   def as(field: NodeField) = As(grammar, field)
 }
 
-class GrammarWithTrivia(grammar: BiGrammar)(implicit grammars: GrammarCatalogue) extends NodeGrammarWriter
+class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: GrammarCatalogue) extends NodeGrammarWriter
+  with BiGrammarSequenceMethodsExtension
 {
   def asLabelledNode(key: NodeClass): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
-  implicit def wrap(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar)
 
-  def indent(width: Int = 2) = new GrammarWithTrivia(WhiteSpace(width, 0)) ~> grammar
+  def manyVertical = new ManyVertical(new WithTrivia(grammar, grammars.trivia))
 
-  def ~<(right: BiGrammar) = (this ~ right).ignoreRight
+  def ~(other: BiGrammar) = new Sequence(grammar, new WithTrivia(other, grammars.trivia))
 
-  def ~~<(right: BiGrammar) = this ~< (space ~ right)
-
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
-
-  def ~~(right: BiGrammar): BiGrammar = {
-    (this ~< space) ~ right
-  }
-
-  def someSeparatedVertical(separator: BiGrammar): BiGrammar =
-    someMap(this % (separator %> grammar).manyVertical)
-
-  def manyVertical = new ManyVertical(WithTrivia(grammar, grammars.trivia))
-
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
-
-  def some: BiGrammar = someMap(grammar ~ (grammar*))
-  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))
-
-  private def someMap(grammar: BiGrammar): BiGrammar = {
-    grammar ^^
-      ( {
-        case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
-      }, {
-        case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
-      })
-  }
-  def inParenthesis = ("(": BiGrammar) ~> grammar ~< ")"
-
-  def ~(other: BiGrammar) = new Sequence(grammar, WithTrivia(other, grammars.trivia))
-
-  def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
-
-  def ~~>(right: BiGrammar) = (this ~ space) ~> right
-
-  def * = new ManyHorizontal(WithTrivia(grammar, grammars.trivia))
   def many = this*
 
-  def %(bottom: BiGrammar) = new TopBottom(grammar, WithTrivia(bottom, grammars.trivia))
+  def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, grammars.trivia))
 
-  def %%(bottom: BiGrammar): BiGrammar = {
-    (this %< BlankLine) % bottom
-  }
-
-  def %>(bottom: BiGrammar) = (this % bottom).ignoreLeft
-
-  def %<(bottom: BiGrammar) = (this % bottom).ignoreRight
+  override implicit def addSequenceMethods(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar)
 }
 
 trait NodeGrammarWriter extends BiGrammarWriter {

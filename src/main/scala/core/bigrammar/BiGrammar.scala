@@ -50,7 +50,8 @@ trait BiGrammar extends BiGrammarWriter {
   def deepClone = map(x => x)
 }
 
-case class WithTrivia(grammar: BiGrammar, whiteSpace: BiGrammar = ParseWhiteSpace) extends IgnoreLeft(new Sequence(whiteSpace, grammar))
+class WithTrivia(var grammar: BiGrammar, var trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true)
+  extends IgnoreLeft(new Sequence(trivia, grammar))
 
 object ParseWhiteSpace extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.RegexG("""\s*""".r)
@@ -78,10 +79,7 @@ trait CustomGrammar extends BiGrammar with NodePrinter {
 }
 
 class IgnoreLeft(inner: SequenceLike) extends MapGrammar(inner,
-  { case ~(l, r) => {
-    val temp = inner
-    r
-  } },
+  { case ~(l, r) => r },
   r => Some(core.grammar.~(UndefinedDestructuringValue, r)))
 
 class IgnoreRight(inner: SequenceLike) extends MapGrammar(inner,
@@ -230,7 +228,6 @@ case class ValueGrammar(value: Any) extends BiGrammarWithoutChildren
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
-
 
   override def withChildren(newChildren: Seq[BiGrammar]) = As(newChildren.head, key)
 }

@@ -12,8 +12,8 @@ import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
 
-class TestComments
-  extends TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
+class JavaStyleCommentsTest
+  extends TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, JavaStyleCommentsC) ++ JavaCompilerDeltas.javaCompilerTransformations))
   with NodeGrammarWriter
 {
   object ParentClass extends NodeClass
@@ -26,23 +26,24 @@ class TestComments
     val grammars = new GrammarCatalogue
     import grammars._
 
-    val grammar: BiGrammar = "{" ~ identifier.as(ParentName) ~~
-      ("_" ~ identifier.as(ChildName) ~ "_" asNode ChildClass).as(ParentChild) ~ "}" asNode ParentClass
+    val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
+      ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
     grammars.create(ProgramGrammar, grammar)
     JavaStyleCommentsC.transformGrammars(grammars, new Language)
+    TriviaInsideNode.transformGrammars(grammars, new Language)
 
     val parsed = TestGrammarUtils.parse(
-      """{ /*b*/ remy /*c*/ _ judith /*d*/ _ /*e*/ }""".stripMargin, grammar)
+      """ParentStart/*b*/Remy/*c*/ChildStart Judith /*d*/ ChildEnd /*e*/ ParentEnd""".stripMargin, grammar)
     assert(parsed.successful, parsed.toString)
     val ast = parsed.get.asInstanceOf[Node]
     val printed = TestGrammarUtils.print(ast, grammar)
-    val expected = "{/*b*/remy/*c*/ _judith/*d*/_/*e*/ }"
+    val expected = """ParentStart/*b*/Remy/*c*/ChildStartJudith/*d*/ChildEnd/*e*/ParentEnd"""
     assertResult(expected)(printed)
 
     val slaveNode = ast(ParentChild).asInstanceOf[Node]
     val slaveGrammar = grammar.findAs(ParentChild).get.asInstanceOf[As].inner
     val slavePrinted = TestGrammarUtils.print(slaveNode, slaveGrammar)
-    val slaveExpectation = "/*c*/ _judith/*d*/ _"
+    val slaveExpectation = """/*c*/ChildStartJudith/*d*/ChildEnd"""
     assertResult(slaveExpectation)(slavePrinted)
   }
 

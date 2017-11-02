@@ -9,8 +9,7 @@ import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
 
 case class StringKey(value: String) extends GrammarKey
-class TestCommentParsers extends FunSuite with JavaTokenParsers with PackratParsers with BiGrammarSequenceWriter {
-
+class TestPackratWithCommentRegex extends FunSuite with JavaTokenParsers with PackratParsers with BiGrammarSequenceWriter {
 
   test("PlusMinus") {
     lazy val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*

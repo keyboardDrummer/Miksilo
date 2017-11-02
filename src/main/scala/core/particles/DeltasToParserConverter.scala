@@ -26,7 +26,7 @@ class DeltasToParserConverter extends GrammarToParserConverter {
   }
 
   def buildParser(grammars: GrammarCatalogue): (String) => ParseResult[Any] = {
-    val biGrammar = WithTrivia(new IgnoreRight(new Sequence(grammars.root, grammars.trivia)), grammars.trivia)
+    val biGrammar = new WithTrivia(new IgnoreRight(new Sequence(grammars.root, grammars.trivia)), grammars.trivia)
     val programGrammar = BiGrammarToGrammar.toGrammar(biGrammar)
     input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }

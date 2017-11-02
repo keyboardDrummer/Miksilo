@@ -18,7 +18,9 @@ object GrammarPath {
 
 trait GrammarPath {
   def get: BiGrammar
-  lazy val children: Seq[GrammarReference] = {
+  def newChildren: List[GrammarReference] = children.filter(c => !ancestorGrammars.contains(c.get))
+
+  def children: List[GrammarReference] = {
     val properties = GrammarPath.getBiGrammarProperties(get.getClass)
     properties.map(property => new GrammarReference(this, property))
   }
@@ -89,7 +91,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
     case _ => false
   }
 
-  lazy val get: BiGrammar = {
+  def get: BiGrammar = {
     property.get(parent).asInstanceOf[BiGrammar]
   }
   

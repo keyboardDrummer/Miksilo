@@ -1,80 +1,63 @@
 package transformations.javac
 
-object TriviaInsideNode {
+import core.bigrammar._
+import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
+import core.particles.grammars.GrammarCatalogue
 
-  //    var visited = Set.empty[BiGrammar]
-  //    for(path <- grammars.root.selfAndDescendants)
-  //    {
-  //      if (!visited.contains(path.get)) {
-  //        visited += path.get
-  //        if (path.get.isInstanceOf[Layout]) {
-  //          addCommentPrefixToGrammar(commentsGrammar, path.asInstanceOf[GrammarReference])
-  //        }
-  //      }
-  //    }
+import scala.collection.immutable.List
 
-  //  def addCommentPrefixToGrammar(commentsGrammar: BiGrammar, layoutReference: GrammarReference): Unit = {
-  //    layoutReference.get match {
-  //      case sequence: SequenceLike =>
-  //        if (!isOk(sequence.first, commentsGrammar) || !isOk(sequence.second, commentsGrammar))
-  //          return
-  //
-  //        injectComments(commentsGrammar, layoutReference.children(1), sequence.horizontal)
-  //      case many: ManyVertical => injectComments(commentsGrammar, layoutReference.children.head, horizontal = false)
-  //      case many: ManyHorizontal => injectComments(commentsGrammar, layoutReference.children.head, horizontal = true)
-  //      case _ =>
-  //    }
-  //  }
-  //
-  //  def injectComments(commentsGrammar: BiGrammar, grammar: GrammarReference, horizontal: Boolean): Boolean = {
-  //    if (grammar.ancestors.size + 1 != grammar.ancestorGrammars.size) {
-  //      return true
-  //    }
-  //
-  //    grammar.get match {
-  //      case CommentsGrammar => true
-  //      case _: BiFailure => false
-  //      case _: Print => false
-  //      case _: ValueGrammar => false
-  //      case _: Labelled => injectComments(commentsGrammar, grammar.children.head, horizontal)
-  //      case superCustom: SuperCustomGrammar if superCustom.children.size == 1 =>
-  //        injectComments(commentsGrammar, grammar.children.head, horizontal)
-  //      case node: NodeGrammar => node.inner match {
-  //        case ignore: IgnoreLeft if ignore.inner.isInstanceOf[SequenceLike] &&
-  //          ignore.inner.asInstanceOf[SequenceLike].first == CommentsGrammar =>
-  //          true
-  //        case _ =>
-  //          node.inner =
-  //            if (horizontal) commentsGrammar ~> node.inner
-  //            else commentsGrammar %> node.inner
-  //          true
-  //      }
-  //      case _: MapGrammar => injectComments(commentsGrammar, grammar.children.head, horizontal)
-  //      case _: As => injectComments(commentsGrammar, grammar.children.head, horizontal)
-  //      case _: SequenceLike =>
-  //        if (!injectComments(commentsGrammar, grammar.children.head, horizontal))
-  //          injectComments(commentsGrammar, grammar.children(1), horizontal)
-  //        else
-  //          true
-  //      case _: Choice =>
-  //        injectComments(commentsGrammar, grammar.children.head, horizontal) |
-  //          injectComments(commentsGrammar, grammar.children(1), horizontal)
-  //      case _ => grammar.set(
-  //        if (horizontal) commentsGrammar ~> grammar.get
-  //        else commentsGrammar %> grammar.get)
-  //        true
-  //    }
-  //  }
-  //
-  //  def isOk(grammar: BiGrammar, commentGrammar: BiGrammar): Boolean = {
-  //    if (grammar == commentGrammar)
-  //      return false
-  //
-  //    grammar match {
-  //      case _:ValueGrammar => false
-  //      case _:Print => false
-  //      case _: BiFailure => false
-  //      case _ => true
-  //    }
-  //  }
+//noinspection ZeroIndexToHead
+object TriviaInsideNode extends DeltaWithGrammar {
+
+  override def description: String = "Moves trivia grammars left of a node to the inside of the node"
+
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    var visited = Set.empty[BiGrammar]
+    for(path <- grammars.root.descendants)
+    {
+      if (!visited.contains(path.get)) {
+        visited += path.get
+        path.get match {
+          case trivia: WithTrivia
+            if hasLeftNode(trivia.grammar) =>
+              path.set(trivia.grammar)
+              injectTrivia(grammars, path, trivia.inner.isInstanceOf[Sequence])
+          case _ =>
+        }
+      }
+    }
+  }
+
+  private def hasLeftNode(path: GrammarPath) = {
+    getLeftChildren(path).exists(p => p.get.isInstanceOf[NodeGrammar])
+  }
+
+  def injectTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean): Unit = {
+    grammar.get match {
+      case _:SequenceLike => injectTrivia(grammars, grammar.children.head, horizontal)
+      case _:NodeGrammar => placeTrivia(grammars, grammar.children.head, horizontal)
+      case _:Choice =>
+        placeTrivia(grammars, grammar.children(0), horizontal)
+        placeTrivia(grammars, grammar.children(1), horizontal)
+      case _:WithTrivia =>
+      case _ =>
+        if (grammar.children.length == 1)
+          injectTrivia(grammars, grammar.children.head, horizontal)
+        else placeTrivia(grammars, grammar, horizontal)
+    }
+  }
+
+  def placeTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean) = {
+    grammar.set(new WithTrivia(grammar.get, grammars.trivia, horizontal))
+  }
+
+  def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
+    val tail: List[GrammarPath] = reference.get match {
+      case _: SequenceLike => getLeftChildren(reference.children.head)
+      case _: Choice => getLeftChildren(reference.children(0)) ++ getLeftChildren(reference.children(1))
+      case _ => reference.newChildren.flatMap(c => getLeftChildren(c))
+    }
+    reference :: tail
+  }
+
 }
