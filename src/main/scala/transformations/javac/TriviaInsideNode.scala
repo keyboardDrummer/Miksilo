@@ -19,8 +19,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
         visited += path.value
         path.value match {
           case trivia: WithTrivia
-            if hasLeftNode(trivia.grammar) =>
-              path.set(trivia.grammar)
+            if hasLeftNode(trivia) =>
+              path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[Sequence])
           case _ =>
         }
