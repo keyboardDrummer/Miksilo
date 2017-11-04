@@ -2,14 +2,14 @@ package core.bigrammar
 
 import core.document.Empty
 import core.grammar.{PrintGrammar, Produce}
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
 
   def toDocument(catalogue: GrammarCatalogue) = {
-    val program = catalogue.find(ProgramGrammar)
+    val program = catalogue.root
     printReachableGrammars(program)
   }
 
@@ -58,6 +58,7 @@ object PrintBiGrammar {
       toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
     case map: MapGrammar => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
+    case custom: SuperCustomGrammar => custom.print(toDocumentInner)
     case _ => grammar.getClass.toString
   }
 
@@ -150,6 +151,6 @@ object PrintBiGrammar {
   }
 
   def getLabelled(grammar: BiGrammar): Seq[Labelled] = {
-    new RootGrammar(grammar).selfAndDescendants.flatMap((p: GrammarPath) => p.get match { case x: Labelled => Some(x); case _ => None} )
+    new RootGrammar(grammar).selfAndDescendants.flatMap((p: GrammarPath) => p.value match { case x: Labelled => Some(x); case _ => None} )
   }
 }

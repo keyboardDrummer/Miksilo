@@ -89,7 +89,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}" as Members
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
     val classGrammar = create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
-    find(ProgramGrammar).inner = classGrammar
+    find(BodyGrammar).inner = classGrammar
   }
 
   object ImportGrammar extends GrammarKey

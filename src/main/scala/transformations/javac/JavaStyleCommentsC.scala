@@ -22,9 +22,9 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   private def addNodeCounterResets(grammars: GrammarCatalogue) = {
     var visited = Set.empty[BiGrammar]
     for (path <- grammars.root.descendants) {
-      if (!visited.contains(path.get)) { //TODO make sure the visited check isn't needed.
-        visited += path.get
-        path.get match {
+      if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
+        visited += path.value
+        path.value match {
           case node: NodeGrammar =>
             if (!path.parent.isInstanceOf[NodeCounterReset]) {
               path.set(NodeCounterReset(node))
@@ -72,10 +72,12 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
         commentsPrinter.write(WithMapG(value, from.map), newState)
       }
     }
+
+    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = "Comments"
   }
 
   def getCommentGrammar: BiGrammar = {
-    RegexG("""(?s)/\*.*?\*/""".r)
+    new Sequence(RegexG("""(?s)/\*.*?\*/""".r), space).ignoreRight
   }
 
   override def description: String = "Adds Java-style comments to the language"
@@ -104,5 +106,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     }
 
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeCounterReset(newChildren.head)
+
+    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
   }
 }

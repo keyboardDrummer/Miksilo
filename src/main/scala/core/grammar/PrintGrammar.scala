@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.BiGrammarToGrammar
-import core.particles.grammars.{KeyGrammar, GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons
@@ -9,12 +9,7 @@ import scala.util.matching.Regex
 
 object PrintGrammar {
 
-  def toDocument(catalogue: GrammarCatalogue) = {
-    val program = BiGrammarToGrammar.toGrammar(catalogue.find(ProgramGrammar))
-    printReachableGrammars(program)
-  }
-
-  def printReachableGrammars(program: Grammar): ResponsiveDocument = {
+  def toTopLevelDocument(program: Grammar): ResponsiveDocument = {
     val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
     reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
   }

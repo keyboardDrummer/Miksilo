@@ -1,6 +1,6 @@
 package transformations.javac
 
-import core.bigrammar.{BiGrammar, TestGrammarUtils}
+import core.bigrammar.{BiGrammar, TestGrammarUtils, WithTrivia}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{NodeClass, NodeField}
 import core.particles.{Language, NodeGrammarWriter}
@@ -15,8 +15,6 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object ChildName extends NodeField
 
   test("Trivia is moved inside Child Node") {
-    val language1 = new Language
-
     val grammars = new GrammarCatalogue
     import grammars._
 
@@ -30,8 +28,19 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     val beforeTransformation = TestGrammarUtils.parse(input, grammars.find(ChildClass))
     assert(!beforeTransformationWithSpace.successful)
     assert(beforeTransformation.successful, beforeTransformation.toString)
-    TriviaInsideNode.transformGrammars(grammars, language1)
+    TriviaInsideNode.transformGrammars(grammars, new Language)
     val afterTransformation = TestGrammarUtils.parse(inputWithSpace, grammars.find(ChildClass))
     assert(afterTransformation.successful, afterTransformation.toString)
+  }
+
+  test("No doubles") {
+    val grammars = new GrammarCatalogue
+    import grammars._
+
+    val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
+    grammars.create(ProgramGrammar, "Start" ~ (parentGrammar | parentGrammar))
+    TriviaInsideNode.transformGrammars(grammars, new Language)
+    val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
+    assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
 }

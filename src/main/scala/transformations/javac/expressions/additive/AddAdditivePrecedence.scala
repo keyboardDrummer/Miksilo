@@ -11,11 +11,11 @@ object AddAdditivePrecedence extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val additiveGrammar = grammars.create(AdditiveExpressionGrammar, expressionGrammar.inner)
+    val additiveGrammar = grammars.create(Grammar, expressionGrammar.inner)
     expressionGrammar.inner = additiveGrammar
   }
 
-  object AdditiveExpressionGrammar extends GrammarKey
+  object Grammar extends GrammarKey
 
   override def description: String = "Creates a named grammar with the correct precedence for addition-like operators."
 }

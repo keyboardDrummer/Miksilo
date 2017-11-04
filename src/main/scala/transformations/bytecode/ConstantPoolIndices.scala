@@ -22,9 +22,9 @@ object ConstantPoolIndices extends DeltaWithGrammar {
     previousConstantPoolItem.inner = constantPoolItem
 
     val constantPoolGrammar = find(ConstantPoolGrammar)
-    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.get.isInstanceOf[ManyVertical]).
+    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.value.isInstanceOf[ManyVertical]).
       get.asInstanceOf[GrammarReference] //TODO al die casts naar GrammarReference zijn loos. Beter altijd een GrammarReference returnen. O wacht, implicit cast naar grammarReference!!!
-    entries.set(addIndicesToList(entries.get))
+    entries.set(addIndicesToList(entries.value))
   }
 
   def addIndicesToList(listGrammar: BiGrammar): BiGrammar = {

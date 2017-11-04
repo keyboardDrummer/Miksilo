@@ -92,7 +92,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     import grammars._
     val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
-    val program = find(ProgramGrammar)
     val attributeGrammar: BiGrammar = create(AttributeGrammar)
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (constantIndexGrammar *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
@@ -104,7 +103,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
       (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
         constantPool.as(ClassConstantPool) % bodyGrammar).asNode(Clazz))
 
-    program.inner = classGrammar
+    find(BodyGrammar).inner = classGrammar
   }
 
   object ConstantPoolGrammar extends GrammarKey

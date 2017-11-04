@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets
 
 import core.bigrammar.Labelled
 import core.particles.exceptions.ParticleDependencyViolation
-import core.particles.grammars.ProgramGrammar
 import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
@@ -16,7 +15,7 @@ class CompilerFromDeltas(val deltas: Seq[Delta]) {
   lazy val language: Language = buildLanguage
 
   def getGrammar: Labelled = {
-    language.grammarCatalogue.find(ProgramGrammar)
+    language.grammarCatalogue.root
   }
 
   def parseAndTransform(input: File): Compilation = {

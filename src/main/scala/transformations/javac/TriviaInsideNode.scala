@@ -15,9 +15,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
     var visited = Set.empty[BiGrammar]
     for(path <- grammars.root.descendants)
     {
-      if (!visited.contains(path.get)) {
-        visited += path.get
-        path.get match {
+      if (!visited.contains(path.value)) {
+        visited += path.value
+        path.value match {
           case trivia: WithTrivia
             if hasLeftNode(trivia.grammar) =>
               path.set(trivia.grammar)
@@ -29,17 +29,18 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   private def hasLeftNode(path: GrammarPath) = {
-    getLeftChildren(path).exists(p => p.get.isInstanceOf[NodeGrammar])
+    getLeftChildren(path).exists(p => p.value.isInstanceOf[NodeGrammar])
   }
 
   def injectTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    grammar.get match {
+    grammar.value match {
       case _:SequenceLike => injectTrivia(grammars, grammar.children.head, horizontal)
       case _:NodeGrammar => placeTrivia(grammars, grammar.children.head, horizontal)
       case _:Choice =>
-        placeTrivia(grammars, grammar.children(0), horizontal)
-        placeTrivia(grammars, grammar.children(1), horizontal)
+        injectTrivia(grammars, grammar.children(0), horizontal)
+        injectTrivia(grammars, grammar.children(1), horizontal)
       case _:WithTrivia =>
+      case _:BiFailure =>
       case _ =>
         if (grammar.children.length == 1)
           injectTrivia(grammars, grammar.children.head, horizontal)
@@ -48,11 +49,12 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean) = {
-    grammar.set(new WithTrivia(grammar.get, grammars.trivia, horizontal))
+    if (!grammar.value.isInstanceOf[WithTrivia])
+      grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
   }
 
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
-    val tail: List[GrammarPath] = reference.get match {
+    val tail: List[GrammarPath] = reference.value match {
       case _: SequenceLike => getLeftChildren(reference.children.head)
       case _: Choice => getLeftChildren(reference.children(0)) ++ getLeftChildren(reference.children(1))
       case _ => reference.newChildren.flatMap(c => getLeftChildren(c))

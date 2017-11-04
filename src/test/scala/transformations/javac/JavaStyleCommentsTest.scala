@@ -4,7 +4,7 @@ import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{DeltaWithGrammar, Language, NodeGrammarWriter}
+import core.particles.{BodyGrammar, DeltaWithGrammar, Language, NodeGrammarWriter}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralDelta
@@ -22,7 +22,7 @@ class JavaStyleCommentsTest
   object ParentChild extends NodeField
   object ChildName extends NodeField
 
-  test("test injection") {
+  test("comments with trivia inside node on tiny grammar") {
     val grammars = new GrammarCatalogue
     import grammars._
 
@@ -37,13 +37,13 @@ class JavaStyleCommentsTest
     assert(parsed.successful, parsed.toString)
     val ast = parsed.get.asInstanceOf[Node]
     val printed = TestGrammarUtils.print(ast, grammar)
-    val expected = """ParentStart/*b*/Remy/*c*/ChildStartJudith/*d*/ChildEnd/*e*/ParentEnd"""
+    val expected = """ParentStart/*b*/ Remy/*c*/ ChildStartJudith/*d*/ ChildEnd/*e*/ ParentEnd"""
     assertResult(expected)(printed)
 
     val slaveNode = ast(ParentChild).asInstanceOf[Node]
-    val slaveGrammar = grammar.findAs(ParentChild).get.asInstanceOf[As].inner
+    val slaveGrammar = grammar.findAs(ParentChild).value.asInstanceOf[As].inner
     val slavePrinted = TestGrammarUtils.print(slaveNode, slaveGrammar)
-    val slaveExpectation = """/*c*/ChildStartJudith/*d*/ChildEnd"""
+    val slaveExpectation = """/*c*/ ChildStartJudith/*d*/ ChildEnd"""
     assertResult(slaveExpectation)(slavePrinted)
   }
 
@@ -57,7 +57,7 @@ class JavaStyleCommentsTest
   object ExpressionAsRoot extends DeltaWithGrammar
   {
     override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-      grammars.create(ProgramGrammar, grammars.find(ExpressionSkeleton.ExpressionGrammar))
+      grammars.find(BodyGrammar).inner = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     }
 
     override def description: String = ""
@@ -72,7 +72,7 @@ class JavaStyleCommentsTest
   }
 //Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
   test("addition") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -83,7 +83,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition2") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionC, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -94,7 +94,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition3") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, JavaStyleCommentsC, ExpressionAsRoot) ++
       Seq(SubtractionC, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
     JavaCompilerDeltas.allByteCodeTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -105,7 +105,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition4") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsC, ExpressionAsRoot) ++
+    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, JavaStyleCommentsC, ExpressionAsRoot) ++
       JavaCompilerDeltas.javaCompilerTransformations))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 

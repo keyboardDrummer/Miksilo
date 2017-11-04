@@ -54,7 +54,7 @@ class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: GrammarCatalo
 
   def ~(other: BiGrammar) = new Sequence(grammar, new WithTrivia(other, grammars.trivia))
 
-  def many = this*
+  def many = new ManyHorizontal(new WithTrivia(grammar, grammars.trivia))
 
   def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, grammars.trivia))
 

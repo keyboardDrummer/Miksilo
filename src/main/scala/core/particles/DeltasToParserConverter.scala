@@ -2,18 +2,17 @@ package core.particles
 
 import core.bigrammar._
 import core.grammar.{GrammarToParserConverter, ParseException}
-import core.particles.grammars.GrammarCatalogue
 
 import scala.util.parsing.input.CharArrayReader
 
 class DeltasToParserConverter extends GrammarToParserConverter {
   def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
     val catalogue = new CompilerFromDeltas(transformations).language.grammarCatalogue
-    buildParser(catalogue)
+    buildParser(catalogue.root)
   }
 
-  def parse(catalogue: GrammarCatalogue, input: String): Any = {
-    val parser = buildParser(catalogue)
+  def parse(grammar: BiGrammar, input: String): Any = {
+    val parser = buildParser(grammar)
 
     val parseResult = parser(input)
     if (!parseResult.successful)
@@ -25,9 +24,8 @@ class DeltasToParserConverter extends GrammarToParserConverter {
     parseResult.get
   }
 
-  def buildParser(grammars: GrammarCatalogue): (String) => ParseResult[Any] = {
-    val biGrammar = new WithTrivia(new IgnoreRight(new Sequence(grammars.root, grammars.trivia)), grammars.trivia)
-    val programGrammar = BiGrammarToGrammar.toGrammar(biGrammar)
+  def buildParser(grammar: BiGrammar): (String) => ParseResult[Any] = {
+    val programGrammar = BiGrammarToGrammar.toGrammar(grammar)
     input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }
 }

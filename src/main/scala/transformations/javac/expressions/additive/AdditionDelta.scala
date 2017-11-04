@@ -51,7 +51,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     import grammars._
-    val additiveGrammar = find(AddAdditivePrecedence.AdditiveExpressionGrammar)
+    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
     val parseAddition = additiveGrammar.as(First) ~~< "+" ~~ additiveGrammar.as(Second) asNode Clazz
     additiveGrammar.addOption(parseAddition)
   }

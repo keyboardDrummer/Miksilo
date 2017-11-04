@@ -19,7 +19,7 @@ class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadIn
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getTypeFromByteCodeString(state: Language, typeString: String): Node = {
     val manager = new DeltasToParserConverter()
-    manager.parse(state.grammarCatalogue, typeString).asInstanceOf[Node]
+    manager.parse(state.grammarCatalogue.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
   }
 
   def toStackType(_type: Node, state: Language) : Node = {

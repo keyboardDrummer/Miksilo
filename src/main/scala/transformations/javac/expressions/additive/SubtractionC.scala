@@ -21,7 +21,7 @@ object SubtractionC extends ExpressionInstance {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     import grammars._
-    val additiveGrammar = find(AddAdditivePrecedence.AdditiveExpressionGrammar)
+    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
     val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
     val parseSubtraction = (additiveGrammar.as(FirstKey) ~~< "-") ~~ withoutSubtraction.as(SecondKey) asNode SubtractionKey
     additiveGrammar.addOption(parseSubtraction)

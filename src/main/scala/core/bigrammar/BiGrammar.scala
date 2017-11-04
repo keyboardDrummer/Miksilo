@@ -70,6 +70,7 @@ object StringLiteral extends CustomGrammar with BiGrammarWithoutChildren {
 }
 
 trait SuperCustomGrammar extends BiGrammar {
+  def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument
   def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
 }
@@ -182,8 +183,10 @@ class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar wi
   override def withChildren(newChildren: Seq[BiGrammar]) = new Sequence(newChildren(0), newChildren(1))
 }
 
-class MapGrammar(var inner: BiGrammar, val construct: Any => Any, val deconstruct: Any => Option[Any],
-                 val showMap: Boolean = false) extends BiGrammar
+case class MapGrammar(var inner: BiGrammar,
+                      construct: Any => Any,
+                      deconstruct: Any => Option[Any],
+                      showMap: Boolean = false) extends BiGrammar
 {
   override def children = Seq(inner)
 

@@ -17,16 +17,16 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
   implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension
 
-  def indent(width: Int = 2) = addSequenceMethods(WhiteSpace(width, 0)) ~> grammar
+  def indent(width: Int = 2) = new Sequence(WhiteSpace(width, 0), grammar).ignoreLeft
 
   def ~<(right: BiGrammar) = (this ~ right).ignoreRight
 
-  def ~~<(right: BiGrammar) = this ~< (space ~ right)
+  def ~~<(right: BiGrammar) = this ~< new Sequence(space, right)
 
   def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
 
   def ~~(right: BiGrammar): BiGrammar = {
-    (this ~< space) ~ right
+    new IgnoreRight(new Sequence(grammar, space)) ~ right
   }
 
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
@@ -49,7 +49,7 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
   def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
 
-  def ~~>(right: BiGrammar) = (this ~ space) ~> right
+  def ~~>(right: BiGrammar) = new Sequence(grammar, space) ~> right
 
   def * = many
 
@@ -66,13 +66,13 @@ trait BiGrammarSequenceWriter extends BiGrammarWriter {
 
   implicit def stringAsGrammar(value: String) = new GrammarWithSequence(value)
   implicit class GrammarWithSequence(val grammar: BiGrammar) extends BiGrammarSequenceMethodsExtension {
-    def manyVertical = new ManyVertical(new WithTrivia(grammar))
+    def manyVertical = new ManyVertical(new WithTrivia(grammar, horizontal = false))
 
     def ~(other: BiGrammar) = new Sequence(grammar, new WithTrivia(other))
 
-    def many = this*
+    def many = new ManyHorizontal(new WithTrivia(grammar))
 
-    def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom))
+    def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, horizontal = false))
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension = new GrammarWithSequence(grammar)
   }

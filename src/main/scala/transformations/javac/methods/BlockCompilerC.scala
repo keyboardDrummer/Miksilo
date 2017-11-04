@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import transformations.javac.ImplicitObjectSuperClass
@@ -16,7 +16,7 @@ object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     import grammars._
     val statements = find(StatementSkeleton.StatementGrammar).manyVertical.as(ProgramStatements).asNode(ProgramKey)
-    find(ProgramGrammar).inner = statements
+    find(BodyGrammar).inner = statements
   }
 
   override def transform(program: Node, state: Compilation): Unit = {

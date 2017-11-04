@@ -13,7 +13,7 @@ import scala.util.Try
 case class PrettyPrint(recover: Boolean = false) extends Delta
 {
   override def inject(state: Language): Unit = {
-    val foundGrammar = state.grammarCatalogue.find(ProgramGrammar)
+    val foundGrammar = state.grammarCatalogue.root
     state.data(this) = foundGrammar.deepClone
 
     state.compilerPhases = List(Phase(this.name, this.description, compilation => {

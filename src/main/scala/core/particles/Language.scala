@@ -2,9 +2,9 @@ package core.particles
 
 import java.io.InputStream
 
-import core.bigrammar.BiFailure
+import core.bigrammar.{BiFailure, IgnoreRight, Sequence, WithTrivia}
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
-import core.particles.node.Node
+import core.particles.node.{GrammarKey, Node}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends Delta {
     state.parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
       val manager = new DeltasToParserConverter()
-      manager.parse(grammarCatalogue, inputString).asInstanceOf[Node]
+      manager.parse(grammarCatalogue.root, inputString).asInstanceOf[Node]
     }
   }
 
@@ -36,7 +36,7 @@ class Compilation(val language: Language) {
 
   def parseString(input: String): Unit = {
     val manager = new DeltasToParserConverter()
-    program = manager.parse(language.grammarCatalogue, input).asInstanceOf[Node]
+    program = manager.parse(language.grammarCatalogue.root, input).asInstanceOf[Node]
   }
 
   def runPhases(): Unit = {
@@ -46,10 +46,14 @@ class Compilation(val language: Language) {
 
 }
 
+object BodyGrammar extends GrammarKey
 class Language {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammarCatalogue = new GrammarCatalogue
-  grammarCatalogue.create(ProgramGrammar, BiFailure())
+
+  val bodyGrammar = grammarCatalogue.create(BodyGrammar, BiFailure())
+  grammarCatalogue.create(ProgramGrammar, new WithTrivia(new IgnoreRight(new Sequence(bodyGrammar, grammarCatalogue.trivia)), grammarCatalogue.trivia))
+
   var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = _
 

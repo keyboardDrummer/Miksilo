@@ -56,7 +56,7 @@ case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
     BiGrammarToPrinter.toDocument(value, document).renderString()
   }
 
-  def getGrammarUsingTransformer(grammarTransformer: GrammarKey = ProgramGrammar): Labelled = {
+  def getGrammarUsingTransformer(grammarTransformer: GrammarKey = ProgramGrammar): BiGrammar = {
     CompilerBuilder.build(getTransformations(grammarTransformer)).getGrammar
   }
 
