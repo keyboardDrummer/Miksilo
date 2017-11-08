@@ -50,13 +50,13 @@ class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: GrammarCatalo
 {
   def asLabelledNode(key: NodeClass): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
-  def manyVertical = new ManyVertical(new WithTrivia(grammar, grammars.trivia))
+  def manyVertical = new ManyVertical(new WithTrivia(grammar, grammars.trivia, false))
 
   def ~(other: BiGrammar) = new Sequence(grammar, new WithTrivia(other, grammars.trivia))
 
   def many = new ManyHorizontal(new WithTrivia(grammar, grammars.trivia))
 
-  def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, grammars.trivia))
+  def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, grammars.trivia, false))
 
   override implicit def addSequenceMethods(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar)
 }
