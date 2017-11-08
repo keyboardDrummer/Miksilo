@@ -48,7 +48,8 @@ object TestGrammarUtils extends FunSuite {
 case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = ProgramGrammar) {
-    parseAndPrintSame(input, expected, getGrammarUsingTransformer(grammarTransformer))
+    val grammar = getGrammarUsingTransformer(grammarTransformer)
+    parseAndPrintSame(input, expected, grammar)
   }
 
   def getPrintResult(value: Any, grammarTransformer: GrammarKey = ProgramGrammar): String = {

@@ -48,17 +48,37 @@ trait BiGrammar extends BiGrammarWriter {
   }.observe(this)
 
   def deepClone = map(x => x)
+  def containsParser(): Boolean = {
+    var map: Map[BiGrammar, Boolean] = Map.empty
+    lazy val recursive: BiGrammar => Boolean = grammar => {
+      map.get(grammar) match {
+        case Some(result) => result
+        case _ =>
+          map += grammar -> false
+          val result = grammar.containsParser(recursive)
+          map += grammar -> result
+          result
+      }
+    }
+    this.containsParser(recursive)
+  }
+
+  protected def containsParser(recursive: BiGrammar => Boolean): Boolean
 }
 
 class WithTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true)
   extends IgnoreLeft(new Sequence(trivia, grammar)) {
   def getGrammar = sequence.second
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 }
 
 object ParseWhiteSpace extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.RegexG("""\s*""".r)
 
   override def write(from: WithMapG[Any], state: State) = Try(state, Empty)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 }
 
 trait BiGrammarWithoutChildren extends BiGrammar {
@@ -69,6 +89,7 @@ trait BiGrammarWithoutChildren extends BiGrammar {
 object StringLiteral extends CustomGrammar with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.StringLiteral
   override def write(from: WithMapG[Any], state: State) = Try(state, "\"" + from.value + "\"")
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 }
 
 trait SuperCustomGrammar extends BiGrammar {
@@ -103,11 +124,18 @@ trait SequenceLike extends BiGrammar with Layout {
   def ignoreLeft: MapGrammar = new IgnoreLeft(this)
 
   def ignoreRight: MapGrammar = new IgnoreRight(this)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean =
+    recursive(first) || recursive(second)
 }
 
-case class Delimiter(value: String) extends BiGrammarWithoutChildren
+case class Delimiter(value: String) extends BiGrammarWithoutChildren {
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+}
 
-case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammarWithoutChildren
+case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammarWithoutChildren {
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+}
 
 class FromGrammarWithToString(grammar: Grammar, verifyWhenPrinting: Boolean = true)
   extends FromStringGrammar(grammar, verifyWhenPrinting) {
@@ -127,6 +155,8 @@ class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = fals
   override def getGrammar = grammar
 
   lazy val parser = GrammarToParserConverter.convert(grammar)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
   override def write(from: WithMap, state: State) = {
     from.value match {
@@ -157,12 +187,15 @@ class ManyVertical(inner: BiGrammar) extends Many(inner) {
   override def horizontal = false
 
   override def withChildren(newChildren: Seq[BiGrammar]) = new ManyVertical(newChildren.head)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 }
 
 class ManyHorizontal(inner: BiGrammar) extends Many(inner) {
   override def horizontal = true
 
   override def withChildren(newChildren: Seq[BiGrammar]) = new ManyHorizontal(newChildren.head)
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 }
 
 /*
@@ -178,6 +211,8 @@ class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: B
   override def children = Seq(left, right)
 
   override def withChildren(newChildren: Seq[BiGrammar]) = new Choice(newChildren(0), newChildren(1))
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(left) || recursive(right)
 }
 
 class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
@@ -196,6 +231,7 @@ case class MapGrammar(var inner: BiGrammar,
 
   override def withChildren(newChildren: Seq[BiGrammar]) = new MapGrammar(newChildren.head, construct, deconstruct, showMap)
 
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 } //TODO deze nog wat meer typed maken met WithState
 
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
@@ -206,8 +242,9 @@ class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends
 
   override def children = Seq(inner)
 
-
   override def withChildren(newChildren: Seq[BiGrammar]) = new Labelled(name, newChildren.head)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 }
 
 trait Layout {
@@ -225,18 +262,26 @@ class TopBottom(var first: BiGrammar, var second: BiGrammar) extends BiGrammar w
 /**
   * Prints a value, but parses nothing.
   */
-case class Print(document: ResponsiveDocument) extends BiGrammarWithoutChildren
+case class Print(document: ResponsiveDocument) extends BiGrammarWithoutChildren {
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = false
+}
 
 /**
   * Does not consume or produce any syntax, but simply produces or consumes a value.
   */
-case class ValueGrammar(value: Any) extends BiGrammarWithoutChildren
+case class ValueGrammar(value: Any) extends BiGrammarWithoutChildren {
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = false
+}
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
 
   override def withChildren(newChildren: Seq[BiGrammar]) = As(newChildren.head, key)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 }
 
-case class BiFailure(message: String = "") extends BiGrammarWithoutChildren
+case class BiFailure(message: String = "") extends BiGrammarWithoutChildren {
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+}

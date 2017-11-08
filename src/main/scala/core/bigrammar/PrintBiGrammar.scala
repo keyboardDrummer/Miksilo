@@ -81,10 +81,9 @@ object PrintBiGrammar {
 //  }
 
   trait FakeBiGrammar extends BiGrammar {
-
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = ???
-
     override def children: Seq[BiGrammar] = ???
+    override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
   }
 
   case class OptionGrammar(inner: BiGrammar, value: Any) extends FakeBiGrammar

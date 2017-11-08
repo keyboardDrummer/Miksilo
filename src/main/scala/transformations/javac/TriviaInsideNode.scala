@@ -26,6 +26,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
         }
       }
     }
+    System.out.append("")
   }
 
   private def hasLeftNode(path: GrammarPath) = {
@@ -34,8 +35,14 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def injectTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean): Unit = {
     grammar.value match {
-      case _:SequenceLike => injectTrivia(grammars, grammar.children.head, horizontal)
-      case _:NodeGrammar => placeTrivia(grammars, grammar.children.head, horizontal)
+      case _:SequenceLike =>
+      case sequence: SequenceLike =>
+        if (sequence.first.containsParser())
+          injectTrivia(grammars, grammar.children.head, horizontal)
+        else
+          injectTrivia(grammars, grammar.children(1), horizontal)
+      case _:NodeGrammar => if (!isLeftRecursive(grammar.children.head))
+        placeTrivia(grammars, grammar.children.head, horizontal)
       case _:Choice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
@@ -53,9 +60,32 @@ object TriviaInsideNode extends DeltaWithGrammar {
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
   }
 
+  def isLeftRecursive(grammar: GrammarPath): Boolean = {
+    if (grammar.ancestorGrammars.size != grammar.ancestors.size + 1)
+      return true
+
+    grammar.value match {
+      case _:SequenceLike => isLeftRecursive(grammar.children.head)
+      case _:NodeGrammar =>
+        false
+      case _:Choice => isLeftRecursive(grammar.children(0)) || isLeftRecursive(grammar.children(1))
+      case _:BiFailure =>
+        false
+      case _ =>
+        if (grammar.children.length == 1)
+          isLeftRecursive(grammar.children.head)
+        else
+          false
+    }
+  }
+
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
     val tail: List[GrammarPath] = reference.value match {
-      case _: SequenceLike => getLeftChildren(reference.children.head)
+      case sequence: SequenceLike =>
+        if (sequence.first.containsParser())
+          getLeftChildren(reference.children.head)
+        else
+          getLeftChildren(reference.children(1))
       case _: Choice => getLeftChildren(reference.children(0)) ++ getLeftChildren(reference.children(1))
       case _ => reference.newChildren.flatMap(c => getLeftChildren(c))
     }

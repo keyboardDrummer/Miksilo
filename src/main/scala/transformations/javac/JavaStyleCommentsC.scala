@@ -74,6 +74,8 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     }
 
     override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = "Comments"
+
+    override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
   }
 
   def getCommentGrammar: BiGrammar = {
@@ -108,5 +110,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeCounterReset(newChildren.head)
 
     override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
+
+    override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
   }
 }

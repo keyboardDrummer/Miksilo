@@ -8,6 +8,76 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
 
+class Example extends FunSuite with JavaTokenParsers with PackratParsers {
+
+  val comments: PackratParser[Any] = regex(new Regex( """/\*.*\*/""")).*
+  val comments2: PackratParser[Any] = regex(new Regex( """/\*.*\*/""")).*
+  val input = "/* foo */ 2 + 3"
+  def reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
+
+  test("Addition with comments") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ expression ~ literal("+") ~ expression |
+      comments ~ wholeNumber
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 2") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ (expression ~ literal("+") ~ expression |
+        wholeNumber)
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 3") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ (wholeNumber ||| expression ~ literal("+") ~ expression)
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 4") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ (wholeNumber | expression ~ literal("+") ~ expression)
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 5") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ (wholeNumber | expression ~ literal("+") ~ expression)
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 1.5") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ expression ~ literal("+") ~ expression |
+        comments2 ~ wholeNumber
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 1.2") {
+    lazy val expression: PackratParser[Any] =
+      comments ~ expression ~ literal("+") ~ expression |
+        wholeNumber
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("Addition with comments 1.3") {
+    lazy val expression: PackratParser[Any] =
+      expression ~ literal("+") ~ expression |
+        comments ~ wholeNumber
+    val result = phrase(expression)(reader)
+    assert(result.successful, result.toString)
+  }
+}
+
+
 case class StringKey(value: String) extends GrammarKey
 class TestPackratWithCommentRegex extends FunSuite with JavaTokenParsers with PackratParsers with BiGrammarSequenceWriter {
 
@@ -33,36 +103,6 @@ class TestPackratWithCommentRegex extends FunSuite with JavaTokenParsers with Pa
     val result = TestGrammarUtils.parseAndPrint(input, None, core)
   }
 
-  test("Plus") {
-    lazy val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
-    lazy val parser: PackratParser[Any] =
-      commentParser ~ parser ~ literal("+") ~ parser |||
-        commentParser ~ wholeNumber
-    val input = "/* jo */ 2 + 3"
-    val reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
-    val result = parser(reader)
-  }
-
-  test("PlusWithoutLazy") {
-    val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
-    var parser: PackratParser[Any] = null
-    parser = commentParser ~ parser ~ literal("+") ~ parser |||
-        commentParser ~ wholeNumber
-    val input = "/* jo */ 2 + 3"
-    val reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
-    val result = parser(reader)
-  }
-
-  test("PlusWithoutLazy2") {
-    val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
-    var parser: PackratParser[Any] = null
-    parser = commentParser ~ parser ~ literal("+") ~ parser |
-      commentParser ~ wholeNumber
-    val input = "/* jo */ 2 + 3"
-    val reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
-    val result = parser(reader)
-  }
-
   test("EmptyComment") {
     val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
     val input = "/* jo */ 2 + 3"
@@ -72,13 +112,35 @@ class TestPackratWithCommentRegex extends FunSuite with JavaTokenParsers with Pa
   /*
   Curious that this test fails. Wouldn't expect it to. Especially since the next test succeeds.
    */
-  ignore("MinusPlusRightCommutationBiGrammar") {
-    val commentParser: BiGrammar = RegexG(new Regex("""/\*.*\*/""")).manyVertical
+  test("PlusBiGrammar") {
+    val commentParser: BiGrammar = RegexG("""/\*.*\*/""".r).manyVertical
     val core = new Labelled(StringKey("core"))
     core.inner = commentParser ~ number | commentParser ~ core ~ "+" ~ core
 
     val input = "/* jo */ 2 + 3"
     val result = TestGrammarUtils.parseAndPrint(input, None, core)
+  }
+
+  test("Plus") {
+    lazy val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
+    lazy val parser: PackratParser[Any] =
+      commentParser ~ parser ~ literal("+") ~ parser |
+        commentParser ~ wholeNumber
+    val input = "/* jo */ 2 + 3"
+    val reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
+    val result = phrase(parser)(reader)
+    assert(result.successful, result.toString)
+  }
+
+  test("PlusWithoutLazy2") {
+    val commentParser: PackratParser[Any] = regex(new Regex( """/\*.*\*/"""))*
+    var parser: PackratParser[Any] = null
+    parser = commentParser ~ parser ~ literal("+") ~ parser |
+      commentParser ~ wholeNumber
+    val input = "/* jo */ 2 + 3"
+    val reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
+    val result = phrase(parser)(reader)
+    assert(result.successful)
   }
 
   test("MinusPlus") {
