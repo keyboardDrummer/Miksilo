@@ -17,8 +17,6 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
   implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension
 
-  def indent(width: Int = 2) = new Sequence(WhiteSpace(width, 0), grammar).ignoreLeft
-
   def ~<(right: BiGrammar) = (this ~ right).ignoreRight
 
   def ~~<(right: BiGrammar) = this ~< new Sequence(space, right)

@@ -3,7 +3,7 @@ package core.bigrammar
 import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.printer.TryState
 import core.bigrammar.printer.TryState.{NodePrinter, State}
-import core.document.Empty
+import core.document.{Empty, WhiteSpace}
 import core.grammar.{Grammar, GrammarToParserConverter, ~}
 import core.particles.node.{GrammarKey, NodeField}
 import core.responsiveDocument.ResponsiveDocument
@@ -24,6 +24,7 @@ trait BiGrammar extends BiGrammarWriter {
   def |(other: BiGrammar) = new Choice(this, other)
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
 
+  def indent(width: Int = 2) = new Sequence(WhiteSpace(width, 0), this).ignoreLeft
 
   def optionToSeq: BiGrammar = new MapGrammar(this,
     option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {

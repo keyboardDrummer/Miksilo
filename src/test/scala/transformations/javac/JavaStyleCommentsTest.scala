@@ -2,9 +2,9 @@ package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
+import core.particles._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles._
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralDelta
@@ -117,12 +117,19 @@ class JavaStyleCommentsTest
 
   test("block transformation") {
     val java = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).buildLanguage
-    java.grammarCatalogue.find(StatementSkeleton.StatementGrammar).inner = new NodeGrammar("statement", ParentClass)
+    val statementGrammar = java.grammarCatalogue.find(StatementSkeleton.StatementGrammar)
+    statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammarCatalogue.find(BlockDelta.Grammar)
     val language = new Language()
     language.grammarCatalogue.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammarCatalogue, language)
-    assertResult(true)(blockGrammar.toString)
+
+    val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammarCatalogue.trivia, false), ParentClass)
+
+    val expectedBlockGrammar = new TopBottom(new TopBottom("{", new ManyVertical(new Labelled(StatementSkeleton.StatementGrammar)).indent()).ignoreLeft,
+      new WithTrivia("}", language.grammarCatalogue.trivia, false)).ignoreRight
+    assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
+    assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }
 
   test("comparePrintResultWithoutComment") {
