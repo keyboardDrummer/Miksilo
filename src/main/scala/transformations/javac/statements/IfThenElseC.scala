@@ -39,7 +39,7 @@ object IfThenElseC extends StatementInstance {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val bodyGrammar = find(BlockC.BlockOrStatementGrammar)
+    val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val ifThenGrammar = find(IfThenC.key)
     val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode key
     statementGrammar.addOption(ifThenElseGrammar)

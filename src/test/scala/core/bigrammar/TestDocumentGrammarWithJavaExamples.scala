@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
-import transformations.javac.statements.BlockC
+import transformations.javac.statements.BlockDelta
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
 import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
@@ -59,7 +59,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockDelta.Grammar)
   }
 
   test("PrintAfterImplicitAddition") {

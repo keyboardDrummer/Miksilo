@@ -4,10 +4,11 @@ import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{BodyGrammar, DeltaWithGrammar, Language, NodeGrammarWriter}
+import core.particles._
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralDelta
+import transformations.javac.statements.{BlockDelta, StatementSkeleton}
 import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
@@ -112,6 +113,16 @@ class JavaStyleCommentsTest
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
     grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+  }
+
+  test("block transformation") {
+    val java = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).buildLanguage
+    java.grammarCatalogue.find(StatementSkeleton.StatementGrammar).inner = new NodeGrammar("statement", ParentClass)
+    val blockGrammar = java.grammarCatalogue.find(BlockDelta.Grammar)
+    val language = new Language()
+    language.grammarCatalogue.root.inner = blockGrammar
+    TriviaInsideNode.transformGrammars(language.grammarCatalogue, language)
+    assertResult(true)(blockGrammar.toString)
   }
 
   test("comparePrintResultWithoutComment") {

@@ -12,7 +12,7 @@ import transformations.bytecode.simpleBytecode.{InferredMaxStack, InferredStackF
 import transformations.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
 import transformations.javac.JavaLang
 import transformations.javac.classes.ClassCompiler
-import transformations.javac.statements.BlockC
+import transformations.javac.statements.BlockDelta
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithLanguageRegistry with WithCompilationState {
@@ -74,7 +74,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     QualifiedClassName(clazz._package ++ Seq(clazz.name))
   }
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames)
+  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar extends GrammarKey
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
@@ -86,7 +86,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
-    val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockC.indentAmount) %< "}" as Members
+    val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockDelta.indentAmount) %< "}" as Members
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
     val classGrammar = create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
     find(BodyGrammar).inner = classGrammar

@@ -35,7 +35,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def injectTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean): Unit = {
     grammar.value match {
-      case _:SequenceLike =>
       case sequence: SequenceLike =>
         if (sequence.first.containsParser())
           injectTrivia(grammars, grammar.children.head, horizontal)
@@ -46,7 +45,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
       case _:Choice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
-      case _:WithTrivia =>
+      case _:WithTrivia => //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
       case _:BiFailure =>
       case _ =>
         if (grammar.children.length == 1)
@@ -81,6 +80,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
     val tail: List[GrammarPath] = reference.value match {
+      case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
       case sequence: SequenceLike =>
         if (sequence.first.containsParser())
           getLeftChildren(reference.children.head)

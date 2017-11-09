@@ -19,7 +19,7 @@ object IfThenC extends StatementInstance {
 
   override val key = IfThenKey
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 
   override def toByteCode(ifThen: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
@@ -49,7 +49,7 @@ object IfThenC extends StatementInstance {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    val bodyGrammar = find(BlockC.BlockOrStatementGrammar)
+    val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val ifThenGrammar = create(IfThenKey, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") ~ bodyGrammar.as(Then)).
       asNode(IfThenKey))
     statementGrammar.addOption(ifThenGrammar)

@@ -12,7 +12,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.methods.MethodDelta
 import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.call.CallStaticOrInstanceC
-import transformations.javac.statements.BlockC
+import transformations.javac.statements.BlockDelta
 
 object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -55,7 +55,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = find(MethodDelta.VisibilityGrammar) as VisibilityKey
     val parseParameters = find(MethodDelta.ParametersGrammar) as MethodParametersKey
-    val block = find(BlockC.BlockGrammar) as MethodBodyKey
+    val block = find(BlockDelta.Grammar) as MethodBodyKey
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)
   }

@@ -56,7 +56,7 @@ object JavaCompilerDeltas {
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockC,
+  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockDelta,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityDelta,

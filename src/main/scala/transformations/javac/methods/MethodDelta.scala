@@ -16,7 +16,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
-import transformations.javac.statements.{BlockC, StatementSkeleton}
+import transformations.javac.statements.{BlockDelta, StatementSkeleton}
 import transformations.javac.types.{MethodType, TypeAbstraction}
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState with ClassMemberDelta {
@@ -57,7 +57,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     }
   }
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler) = {
     val result = metaObject(ParameterTypeKey).asInstanceOf[Node]
@@ -156,7 +156,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
     import grammars._
-    val block = find(BlockC.BlockGrammar)
+    val block = find(BlockDelta.Grammar)
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
     val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
