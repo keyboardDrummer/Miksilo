@@ -1,7 +1,7 @@
 class WhileeWithComment
 {
     /* SomeComment1 */
-    public static void main(String[] args)
+    public /* inner comment */ static void main(String[] args)
     {
         int i = 0;
         /* SomeComment2 */
