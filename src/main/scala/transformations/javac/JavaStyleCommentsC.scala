@@ -8,18 +8,12 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, NodeField}
 import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
+import transformations.javac.JavaStyleCommentsC.CommentCounter
 
 import scala.util.Try
 
-object JavaStyleCommentsC extends DeltaWithGrammar {
-
+object CaptureTriviaDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    grammars.trivia.inner = new Sequence(CommentsGrammar, ParseWhiteSpace).ignoreRight
-
-    addNodeCounterResets(grammars)
-  }
-
-  private def addNodeCounterResets(grammars: GrammarCatalogue) = {
     var visited = Set.empty[BiGrammar]
     for (path <- grammars.root.descendants) {
       if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
@@ -35,13 +29,52 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     }
   }
 
+  case class NodeCounterReset(var node: BiGrammar) extends SuperCustomGrammar {
+
+    override def children = Seq(node)
+
+    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
+      children.head ^^ {
+        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
+          val newState = state + (CommentCounter -> 0)
+          result.run(newState)
+        })
+      }
+    }
+
+    override def createPrinter(recursive: (BiGrammar) => NodePrinter): NodePrinter = {
+      val nodePrinter: NodePrinter = recursive(node)
+      new NodePrinter {
+        override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+          val newState = state + (CommentCounter -> 0)
+          nodePrinter.write(from, newState)
+        }
+      }
+    }
+
+    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeCounterReset(newChildren.head)
+
+    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
+
+    override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
+  }
+
+  override def description: String = "Causes trivia to be captured in the AST during parsing"
+}
+
+object JavaStyleCommentsC extends DeltaWithGrammar {
+
+  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    grammars.trivia.inner = new Sequence(CommentsGrammar, ParseWhiteSpace).ignoreRight
+  }
+
   object CommentCounter extends Key
   case class Comment(index: Int) extends NodeField
 
   object CommentsGrammar extends SuperCustomGrammar with BiGrammarWithoutChildren {
 
     val commentGrammar = getCommentGrammar
-    val comments = new ManyHorizontal(new Sequence(ParseWhiteSpace, commentGrammar).ignoreLeft)
+    val comments = new ManyVertical(new Sequence(ParseWhiteSpace, commentGrammar).ignoreLeft)
 
     override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
       recursive(comments) ^^ {
@@ -51,7 +84,10 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
           val newState = state + (CommentCounter -> (counter + 1))
           val inner = result.run(state)
           val innerValue = inner._2.value.asInstanceOf[Seq[_]]
-          val map: Map[Any,Any] = if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty
+          val map: Map[Any,Any] =
+            if (innerValue.nonEmpty)
+              Map(key -> innerValue)
+            else Map.empty
           (newState, WithMapG[Any](Unit, map))
         })
       }
@@ -84,33 +120,4 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
 
   override def description: String = "Adds Java-style comments to the language"
 
-  case class NodeCounterReset(var node: BiGrammar) extends SuperCustomGrammar {
-
-    override def children = Seq(node)
-
-    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
-      children.head ^^ {
-        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
-          val newState = state + (CommentCounter -> 0)
-          result.run(newState)
-        })
-      }
-    }
-
-    override def createPrinter(recursive: (BiGrammar) => NodePrinter): NodePrinter = {
-      val nodePrinter: NodePrinter = recursive(node)
-      new NodePrinter {
-        override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
-          val newState = state + (CommentCounter -> 0)
-          nodePrinter.write(from, newState)
-        }
-      }
-    }
-
-    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeCounterReset(newChildren.head)
-
-    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
-
-    override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
-  }
 }
