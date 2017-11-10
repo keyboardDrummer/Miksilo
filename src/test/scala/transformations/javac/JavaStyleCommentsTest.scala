@@ -24,14 +24,16 @@ class JavaStyleCommentsTest
   object ChildName extends NodeField
 
   test("comments with trivia inside node on tiny grammar") {
-    val grammars = new GrammarCatalogue
+    val language = new Language
+    val grammars = language.grammarCatalogue
     import grammars._
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
       ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
     grammars.create(ProgramGrammar, grammar)
-    JavaStyleCommentsC.transformGrammars(grammars, new Language)
-    TriviaInsideNode.transformGrammars(grammars, new Language)
+    JavaStyleCommentsC.transformGrammars(grammars, language)
+    CaptureTriviaDelta.transformGrammars(grammars, language)
+    TriviaInsideNode.transformGrammars(grammars, language)
 
     val parsed = TestGrammarUtils.parse(
       """ParentStart/*b*/Remy/*c*/ChildStart Judith /*d*/ ChildEnd /*e*/ ParentEnd""".stripMargin, grammar)

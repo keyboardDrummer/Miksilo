@@ -12,6 +12,9 @@ import util.{CompilerBuilder, TestUtils}
 
 import scala.util.parsing.input.CharArrayReader
 
+
+case class StringKey(value: String) extends GrammarKey
+
 object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations)
 
 object TestGrammarUtils extends FunSuite {
