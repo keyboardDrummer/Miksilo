@@ -74,6 +74,6 @@ class PackratDoesNotParserLeftRecursiveComments extends FunSuite with JavaTokenP
       expression ~ literal("+") ~ expression |
         comments ~ wholeNumber
     val result = phrase(expression)(reader)
-    assert(!result.successful, result.toString)
+    assert(result.successful, result.toString)
   }
 }
