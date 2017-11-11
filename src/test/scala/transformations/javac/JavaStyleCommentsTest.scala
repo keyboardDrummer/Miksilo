@@ -137,7 +137,7 @@ class JavaStyleCommentsTest
   test("comparePrintResultWithoutComment") {
     val input = SourceUtils.getJavaTestFileContents("Whilee")
     val result = TestGrammarUtils.parseAndPrint(input, None, TestCompilerGrammarUtils.getGrammarUsingTransformer())
-    assertResult(input)( result)
+    assertResult(input)(result)
   }
 
   test("comparePrintResult") {
