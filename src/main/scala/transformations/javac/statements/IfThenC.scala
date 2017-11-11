@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
@@ -45,7 +45,7 @@ object IfThenC extends StatementInstance {
     ifThen(Then).asInstanceOf[Seq[T]]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)

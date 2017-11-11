@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.types.VoidTypeC
@@ -18,7 +18,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val memberGrammar = find(ClassMemberGrammar)
     val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerC.Clazz).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey

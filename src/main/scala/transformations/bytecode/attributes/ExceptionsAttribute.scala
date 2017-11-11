@@ -1,7 +1,7 @@
 package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Key, Node, NodeClass}
 import transformations.bytecode.readJar.ClassFileParser
 
@@ -10,7 +10,7 @@ object ExceptionsAttribute extends ByteCodeAttribute {
   object ExceptionsKey extends NodeClass
   override def key: Key = ExceptionsKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ???
+  override def getGrammar(grammars: LanguageGrammars): BiGrammar = ???
 
   override def constantPoolKey: String = "Exceptions"
 

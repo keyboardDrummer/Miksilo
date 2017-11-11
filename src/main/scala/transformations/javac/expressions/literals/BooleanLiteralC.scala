@@ -1,7 +1,7 @@
 package transformations.javac.expressions.literals
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -13,7 +13,7 @@ object BooleanLiteralC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val parseNumber = "true" ~> value(literal(true)) | "false" ~> value(literal(false))
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)

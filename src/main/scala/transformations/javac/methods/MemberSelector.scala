@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles._
 import core.particles.node._
 import core.particles.path.Path
@@ -14,7 +14,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getSelectorMember(selector: Node) = selector(Member).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
     val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Clazz

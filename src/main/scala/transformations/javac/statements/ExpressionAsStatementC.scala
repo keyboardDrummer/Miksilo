@@ -1,6 +1,6 @@
 package transformations.javac.statements
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import core.particles.{Compilation, Language}
@@ -33,7 +33,7 @@ object ExpressionAsStatementC extends StatementInstance {
     statement(Expression).asInstanceOf[T]
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = find(StatementSkeleton.StatementGrammar)

@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{GrammarKey, Key, Node, NodeWrapper}
 import core.particles.path.Path
 import transformations.bytecode.types.TypeSkeleton
@@ -22,7 +22,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getToInstructionsRegistry(state: Language) = getRegistry(state).instances
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     val core = grammars.create(CoreGrammar)
     grammars.create(ExpressionGrammar, core)
   }

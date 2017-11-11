@@ -2,7 +2,7 @@ package transformations.bytecode.types
 
 import core.bigrammar.{BiGrammar, Keyword, Labelled}
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta
@@ -20,7 +20,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
   def stackObjectType(constantPoolClassRef: Int) = new Node(ObjectTypeKey, Name -> constantPoolClassRef)
 
   object ObjectTypeJavaGrammar extends GrammarKey
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val construct: Any => Any = {
       case ids: Seq[Any] =>
@@ -47,7 +47,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
 
   object ObjectTypeByteCodeGrammar extends GrammarKey
   object ObjectTypeByteCodeGrammarInner extends GrammarKey
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     val construct: Any => Any = {
       case name: QualifiedClassName =>
         Right(name)

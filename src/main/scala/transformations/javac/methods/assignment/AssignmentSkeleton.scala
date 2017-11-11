@@ -2,7 +2,7 @@ package transformations.javac.methods.assignment
 
 import core.bigrammar.BiFailure
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
@@ -20,7 +20,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)

@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.bigrammar.{GrammarReference, RootGrammar}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.PathRoot
 import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
@@ -31,7 +31,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     }))
   }
 
-  override def transformGrammars(_grammars: GrammarCatalogue, language: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
 
@@ -60,7 +60,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8ConstantDelta.key).as(NameAndTypeConstant.Name) ~~
       grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
 
-    val constantPoolGrammar = language.root.findLabelled(ConstantPoolGrammar)
+    val constantPoolGrammar = language.grammars.root.findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 

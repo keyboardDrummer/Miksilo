@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.StoreIntegerDelta
@@ -38,7 +38,7 @@ object AssignToVariable extends DeltaWithGrammar {
     }
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableC.VariableGrammar)
     targetGrammar.addOption(variableGrammar)

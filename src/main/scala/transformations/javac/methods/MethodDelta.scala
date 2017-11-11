@@ -2,7 +2,7 @@ package transformations.javac.methods
 
 import core.bigrammar.{BiGrammar, TopBottom}
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
@@ -154,7 +154,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
   object StaticGrammar extends GrammarKey
   object ReturnTypeGrammar extends GrammarKey
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val block = find(BlockDelta.Grammar)
 

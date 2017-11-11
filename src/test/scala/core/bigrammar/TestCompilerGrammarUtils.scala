@@ -4,7 +4,7 @@ import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.grammar.{Grammar, GrammarToParserConverter}
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue}
+import core.particles.grammars.{LanguageGrammars}
 import core.particles.node.GrammarKey
 import org.scalatest.FunSuite
 import transformations.javac.JavaCompilerDeltas
@@ -61,7 +61,7 @@ case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   def getGrammarUsingTransformer(grammarTransformer: GrammarKey = null): BiGrammar = {
-    CompilerBuilder.build(getTransformations(grammarTransformer)).language.root
+    CompilerBuilder.build(getTransformations(grammarTransformer)).language.grammars.root
   }
 
   def getGrammarResult(input: String, grammarTransformer: GrammarKey = null): Any = {
@@ -74,9 +74,9 @@ case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {
-    override def transformGrammars(grammars: GrammarCatalogue, language: Language): Unit = {
+    override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
       if (key != null)
-        language.root.inner = grammars.find(key)
+        grammars.root.inner = grammars.find(key)
     }
 
     override def dependencies: Set[Contract] = Set.empty

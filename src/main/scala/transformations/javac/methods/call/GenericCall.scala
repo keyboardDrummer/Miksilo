@@ -1,6 +1,6 @@
 package transformations.javac.methods.call
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -37,7 +37,7 @@ trait GenericCall extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MemberSelector)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val core = find(ExpressionSkeleton.CoreGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)

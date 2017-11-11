@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammarToGrammar.{Result, StateM}
 import core.bigrammar._
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.grammar.Grammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Key, NodeField}
 import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
@@ -13,9 +13,9 @@ import transformations.javac.JavaStyleCommentsC.CommentCounter
 import scala.util.Try
 
 object CaptureTriviaDelta extends DeltaWithGrammar {
-  override def transformGrammars(grammars: GrammarCatalogue, language: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    for (path <- language.root.descendants) {
+    for (path <- grammars.root.descendants) {
       if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
         visited += path.value
         path.value match {
@@ -34,8 +34,9 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
     override def children = Seq(node)
 
     override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
-      children.head ^^ {
-        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
+      children.head ^^ { untyped =>
+        val result = untyped.asInstanceOf[Result]
+        StateM((state: BiGrammarToGrammar.State) => {
           val newState = state + (CommentCounter -> 0)
           result.run(newState)
         })
@@ -64,7 +65,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
 
 object JavaStyleCommentsC extends DeltaWithGrammar {
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.trivia.inner = new Sequence(CommentsGrammar, ParseWhiteSpace).ignoreRight
   }
 
@@ -77,8 +78,9 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
     val comments = new ManyVertical(new Sequence(ParseWhiteSpace, commentGrammar).ignoreLeft)
 
     override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
-      recursive(comments) ^^ {
-        case result: Result => StateM((state: BiGrammarToGrammar.State) => {
+      recursive(comments) ^^ { untyped =>
+        val result = untyped.asInstanceOf[Result]
+        StateM((state: BiGrammarToGrammar.State) => {
           val counter: Int = state.getOrElse(CommentCounter, 0).asInstanceOf[Int]
           val key = Comment(counter)
           val newState = state + (CommentCounter -> (counter + 1))

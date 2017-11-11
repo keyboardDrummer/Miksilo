@@ -1,6 +1,6 @@
 package transformations.bytecode.coreInstructions
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeField}
 import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -37,7 +37,7 @@ abstract class InvokeDelta extends InstructionDelta {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodRef -> MethodRefConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue) = {
+  override def argumentsGrammar(grammars: LanguageGrammars) = {
     import grammars._
     find(ConstantPoolIndexGrammar).as(MethodRef)
   }

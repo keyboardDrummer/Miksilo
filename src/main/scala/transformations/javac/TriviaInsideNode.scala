@@ -2,7 +2,7 @@ package transformations.javac
 
 import core.bigrammar._
 import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 
 import scala.collection.immutable.List
 
@@ -11,9 +11,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def description: String = "Moves trivia grammars left of a node to the inside of the node"
 
-  override def transformGrammars(grammars: GrammarCatalogue, language: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    for(path <- language.root.descendants)
+    for(path <- grammars.root.descendants)
     {
       if (!visited.contains(path.value)) {
         visited += path.value
@@ -33,7 +33,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
     getLeftChildren(path).exists(p => p.value.isInstanceOf[NodeGrammar])
   }
 
-  def injectTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean): Unit = {
+  def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
     grammar.value match {
       case sequence: SequenceLike =>
         if (sequence.first.containsParser())
@@ -54,7 +54,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
     }
   }
 
-  def placeTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean) = {
+  def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean) = {
     if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser())
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
   }

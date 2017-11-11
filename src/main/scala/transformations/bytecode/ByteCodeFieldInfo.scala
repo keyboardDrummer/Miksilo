@@ -1,7 +1,7 @@
 package transformations.bytecode
 
 import core.document.BlankLine
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields}
@@ -39,7 +39,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
       DescriptorIndex -> Utf8ConstantDelta.key))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
     val attributesGrammar = find(AttributesGrammar)

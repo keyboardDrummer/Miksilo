@@ -1,6 +1,6 @@
 package transformations.javac.statements
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.javac.expressions.ExpressionSkeleton
@@ -25,7 +25,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(WhileC)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)

@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 
@@ -20,7 +20,7 @@ object LongInfoConstant extends ConstantEntry {
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = PrintByteCode.byteToBytes(5) ++ PrintByteCode.longToBytes(constant.value)
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     number.as(LongEntryValue)
   }

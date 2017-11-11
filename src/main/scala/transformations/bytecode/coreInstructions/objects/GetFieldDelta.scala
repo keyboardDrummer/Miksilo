@@ -1,7 +1,7 @@
 package transformations.bytecode.coreInstructions.objects
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Compilation, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -38,7 +38,7 @@ object GetFieldDelta extends InstructionDelta {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     find(ConstantPoolIndexGrammar).as(FieldRef)
   }

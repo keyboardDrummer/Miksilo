@@ -1,13 +1,13 @@
 package transformations.javac.expressions
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.{Language, Contract, DeltaWithGrammar}
 
 object ParenthesisC extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val core = find(ExpressionSkeleton.CoreGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)

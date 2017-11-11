@@ -2,7 +2,7 @@ package core.particles
 
 import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.{MapGrammar, _}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 
 object NodeGrammar {
@@ -45,7 +45,7 @@ class GrammarForAst(grammar: BiGrammar) {
   def as(field: NodeField) = As(grammar, field)
 }
 
-class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: GrammarCatalogue) extends NodeGrammarWriter
+class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: LanguageGrammars) extends NodeGrammarWriter
   with BiGrammarSequenceMethodsExtension
 {
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
@@ -73,11 +73,11 @@ trait NodeGrammarWriter extends BiGrammarWriter {
 
 trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
 
-  def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit
+  def transformGrammars(grammars: LanguageGrammars, state: Language): Unit
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    transformGrammars(state.grammarCatalogue, state)
+    transformGrammars(state.grammars, state)
   }
 
 }

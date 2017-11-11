@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.SwapInstruction
@@ -30,7 +30,7 @@ object AssignToMember extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 

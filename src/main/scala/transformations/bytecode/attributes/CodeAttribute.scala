@@ -2,7 +2,7 @@ package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
@@ -127,7 +127,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
   override def key: NodeClass = CodeKey
 
   object MaxStackGrammar extends GrammarKey
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val attributesGrammar = find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = create(InstructionGrammar)

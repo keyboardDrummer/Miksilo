@@ -2,30 +2,18 @@ package core.particles
 
 import java.io.InputStream
 
-import core.bigrammar._
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{GrammarKey, Node}
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.Node
 
 import scala.collection.mutable
 import scala.util.Random
 
 case class Phase(name: String, description: String, action: Compilation => Unit)
 
-
-
-
-
-object BodyGrammar extends GrammarKey
 class Language {
 
-  object ProgramGrammar extends GrammarKey
-
   val data: mutable.Map[Any, Any] = mutable.Map.empty
-  val grammarCatalogue = new GrammarCatalogue
-  val bodyGrammar = grammarCatalogue.create(BodyGrammar, BiFailure())
-  grammarCatalogue.create(ProgramGrammar, new WithTrivia(new IgnoreRight(new Sequence(bodyGrammar, grammarCatalogue.trivia)), grammarCatalogue.trivia))
-
-  def root: Labelled = grammarCatalogue.find(ProgramGrammar)
+  val grammars = new LanguageGrammars
 
   var compilerPhases: List[Phase] = List.empty
   var parse: InputStream => Node = _

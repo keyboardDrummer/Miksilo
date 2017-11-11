@@ -1,7 +1,7 @@
 package transformations.javac.expressions.equality
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.longs.CompareLongDelta
@@ -17,7 +17,7 @@ object EqualityDelta extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](equality: T) = equality(SecondKey).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val equalityGrammar = find(AddEqualityPrecedence.EqualityExpressionGrammar)
     val parseEquality = ((equalityGrammar.as(FirstKey) ~< "==") ~ equalityGrammar.as(SecondKey)).asNode(EqualityKey)

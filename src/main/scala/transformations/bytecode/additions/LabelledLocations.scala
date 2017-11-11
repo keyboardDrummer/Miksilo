@@ -2,7 +2,7 @@ package transformations.bytecode.additions
 
 import core.bigrammar.{BiGrammar, StringLiteral}
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.attributes.CodeAttribute._
@@ -153,7 +153,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     override def getInstructionSize: Int = 0
 
-    override def getGrammarForThisInstruction(grammars: GrammarCatalogue): BiGrammar = {
+    override def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
       import grammars._
       val stackMapFrameGrammar = find(StackMapFrameGrammar)
       grammarName ~~> StringLiteral.as(LabelName) %
@@ -174,18 +174,18 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     overrideJumpGrammars(grammars)
     overrideStackMapFrameGrammars(grammars)
   }
 
-  def overrideStackMapFrameGrammars(grammars: GrammarCatalogue): Unit = {
+  def overrideStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {
     val offsetGrammar = grammars.find(offsetGrammarKey)
     val offsetGrammarPaths = grammars.find(StackMapFrameGrammar).descendants.filter(path => path.value == offsetGrammar)
     offsetGrammarPaths.foreach(delta => delta.removeMeFromSequence())
   }
 
-  def overrideJumpGrammars(grammars: GrammarCatalogue): Unit = {
+  def overrideJumpGrammars(grammars: LanguageGrammars): Unit = {
     import grammars._
     val jumps = Seq[InstructionDelta](IfZeroDelta, IfNotZero, GotoDelta,
       IfIntegerCompareGreaterOrEqualDelta,

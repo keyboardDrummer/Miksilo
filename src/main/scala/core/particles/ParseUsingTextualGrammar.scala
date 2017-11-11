@@ -7,7 +7,7 @@ object ParseUsingTextualGrammar extends Delta {
     language.parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
       val manager = new DeltasToParserConverter()
-      manager.parse(language.root, inputString).asInstanceOf[Node]
+      manager.parse(language.grammars.root, inputString).asInstanceOf[Node]
     }
   }
 

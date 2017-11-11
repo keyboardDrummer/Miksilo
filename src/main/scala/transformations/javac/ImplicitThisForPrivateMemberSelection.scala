@@ -1,7 +1,7 @@
 package transformations.javac
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.Node
 import core.particles.path.{FieldValue, Path, PathRoot, SequenceElement}
 import transformations.bytecode.ByteCodeSkeleton
@@ -73,7 +73,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
         })
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val callee = grammars.find(CallC.CallCallee)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     callee.inner = expression

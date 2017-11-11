@@ -1,7 +1,7 @@
 package transformations.bytecode.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.grammars.{LanguageGrammars, KeyGrammar}
 import core.particles.node.{Node, NodeClass}
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -19,12 +19,12 @@ trait TypeInstance extends DeltaWithGrammar {
 
   def getStackType(_type: Node, state: Language): Node = _type
 
-  def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar
+  def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
   def byteCodeGrammarKey = KeyGrammar(key)
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(key, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
@@ -35,5 +35,5 @@ trait TypeInstance extends DeltaWithGrammar {
     byteCodeType.addOption(byteCodeGrammar)
   }
 
-  def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar
+  def getJavaGrammar(grammars: LanguageGrammars): BiGrammar
 }

@@ -1,7 +1,7 @@
 package transformations.javac.statements.locals
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.{Path, PathRoot, SequenceElement}
 import transformations.bytecode.types.TypeSkeleton
@@ -17,7 +17,7 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
 
   def getInitializer(withInitializer: Node) = withInitializer(Initializer).asInstanceOf[Node]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)

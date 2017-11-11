@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.document.Empty
 import core.grammar.{PrintGrammar, Produce}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 

@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -25,7 +25,7 @@ object MethodTypeConstant extends ConstantEntry {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8ConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     find(ConstantPoolIndexGrammar).as(MethodTypeDescriptorIndex)
   }

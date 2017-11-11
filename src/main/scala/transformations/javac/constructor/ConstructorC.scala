@@ -2,7 +2,7 @@ package transformations.javac.constructor
 
 import core.particles._
 import core.particles.exceptions.BadInputException
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.coreInstructions.InvokeSpecialDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
@@ -50,7 +50,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   object ConstructorClassNameKey extends NodeField
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = find(MethodDelta.VisibilityGrammar) as VisibilityKey

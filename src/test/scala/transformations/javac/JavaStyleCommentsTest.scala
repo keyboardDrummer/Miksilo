@@ -3,7 +3,7 @@ package transformations.javac
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue}
+import core.particles.grammars.{BodyGrammar, LanguageGrammars}
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
@@ -25,12 +25,12 @@ class JavaStyleCommentsTest
 
   test("comments with trivia inside node on tiny grammar") {
     val language = new Language
-    val grammars = language.grammarCatalogue
+    val grammars = language.grammars
     import grammars._
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
       ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
-    language.root.inner = grammar
+    grammars.root.inner = grammar
     JavaStyleCommentsC.transformGrammars(grammars, language)
     CaptureTriviaDelta.transformGrammars(grammars, language)
     TriviaInsideNode.transformGrammars(grammars, language)
@@ -59,7 +59,7 @@ class JavaStyleCommentsTest
 
   object ExpressionAsRoot extends DeltaWithGrammar
   {
-    override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+    override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
       grammars.find(BodyGrammar).inner = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     }
 
@@ -119,17 +119,17 @@ class JavaStyleCommentsTest
 
   test("block transformation") {
     val java = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).buildLanguage
-    val statementGrammar = java.grammarCatalogue.find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
-    val blockGrammar = java.grammarCatalogue.find(BlockDelta.Grammar)
+    val blockGrammar = java.grammars.find(BlockDelta.Grammar)
     val language = new Language()
-    language.root.inner = blockGrammar
-    TriviaInsideNode.transformGrammars(language.grammarCatalogue, language)
+    language.grammars.root.inner = blockGrammar
+    TriviaInsideNode.transformGrammars(language.grammars, language)
 
-    val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammarCatalogue.trivia, false), ParentClass)
+    val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
 
     val expectedBlockGrammar = new TopBottom(new TopBottom("{", new ManyVertical(new Labelled(StatementSkeleton.StatementGrammar)).indent()).ignoreLeft,
-      new WithTrivia("}", language.grammarCatalogue.trivia, false)).ignoreRight
+      new WithTrivia("}", language.grammars.trivia, false)).ignoreRight
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

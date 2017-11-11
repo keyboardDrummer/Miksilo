@@ -1,7 +1,7 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
+import core.particles.grammars.{LanguageGrammars, KeyGrammar}
 import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
@@ -26,12 +26,12 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   object TypeParametersGrammar extends GrammarKey
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     transformByteCodeGrammar(grammars)
     transformJavaGrammar(grammars)
   }
 
-  def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
+  def transformJavaGrammar(grammars: LanguageGrammars): Unit = {
     import grammars._
     val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
@@ -39,7 +39,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   object AbstractMethodTypeGrammar extends GrammarKey
-  def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
+  def transformByteCodeGrammar(grammars: LanguageGrammars): Unit = {
     import grammars._
     val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
     val methodTypeGrammar = find(KeyGrammar(MethodTypeKey))

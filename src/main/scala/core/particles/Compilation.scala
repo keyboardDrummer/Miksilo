@@ -11,7 +11,7 @@ class Compilation(val language: Language) {
 
   def parseString(input: String): Unit = {
     val manager = new DeltasToParserConverter()
-    program = manager.parse(language.root, input).asInstanceOf[Node]
+    program = manager.parse(language.grammars.root, input).asInstanceOf[Node]
   }
 
   def runPhases(): Unit = {

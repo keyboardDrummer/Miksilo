@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.LoadIntegerDelta
@@ -17,7 +17,7 @@ object VariableC extends ExpressionInstance {
 
   def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val core = find(ExpressionSkeleton.CoreGrammar)
     val variableGrammar = create(VariableGrammar, identifier.as(VariableNameKey) asNode VariableKey)

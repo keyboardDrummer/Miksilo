@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
@@ -36,7 +36,7 @@ object WhileC extends StatementInstance with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)

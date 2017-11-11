@@ -1,7 +1,7 @@
 package transformations.javac.expressions.literals
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.constants.IntegerInfoConstant
@@ -14,7 +14,7 @@ object IntLiteralDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
     val parseNumber = inner.as(Value).asLabelledNode(Clazz)

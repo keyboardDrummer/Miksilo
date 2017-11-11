@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{BodyGrammar, LanguageGrammars}
 import core.particles.node._
 import transformations.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
@@ -88,7 +88,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   object AttributeGrammar extends GrammarKey
   object MembersGrammar extends GrammarKey
   object AttributesGrammar extends GrammarKey
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     import grammars._
     val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
@@ -108,7 +108,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   object ConstantPoolGrammar extends GrammarKey
 
-  def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  def getConstantPoolGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val constantPoolItemContent = create(ConstantPoolItemContentGrammar)
     val entries = constantPoolItemContent.manyVertical.indent()

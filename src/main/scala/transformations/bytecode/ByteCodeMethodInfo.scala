@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton._
@@ -75,7 +75,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     }
 
   object MethodsGrammar extends GrammarKey
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
     import grammars._
     val methods = create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
@@ -84,7 +84,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   }
 
   object AccessFlagGrammar extends GrammarKey
-  def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  def getMethodInfoGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val attributesGrammar = find(AttributesGrammar)
     val parseAccessFlag = create(AccessFlagGrammar,

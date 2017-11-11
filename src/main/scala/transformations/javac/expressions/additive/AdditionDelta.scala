@@ -1,7 +1,7 @@
 package transformations.javac.expressions.additive
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersDelta
@@ -49,7 +49,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val additiveGrammar = find(AddAdditivePrecedence.Grammar)
     val parseAddition = additiveGrammar.as(First) ~~< "+" ~~ additiveGrammar.as(Second) asNode Clazz

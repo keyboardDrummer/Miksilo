@@ -1,7 +1,7 @@
 package transformations.javac.methods.assignment
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.javac.expressions.additive.AdditionDelta
@@ -14,7 +14,7 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
   def incrementAssignment(target: Node, value: Node) =
     new Node(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)

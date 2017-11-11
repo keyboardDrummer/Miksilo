@@ -2,7 +2,7 @@ package transformations.javac.statements.locals
 
 import core.particles._
 import core.particles.exceptions.BadInputException
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.types.TypeSkeleton
@@ -17,7 +17,7 @@ object LocalDeclarationC extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)

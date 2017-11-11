@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 import core.particles.{Compilation, Contract, DeltaWithGrammar, Language}
 import transformations.javac.classes.BasicImportC._
@@ -12,7 +12,7 @@ object WildcardImportC extends DeltaWithGrammar {
 
   def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val importPath = find(ImportPathGrammar)
     importPath.addOption(identifier.someSeparated(".").as(ElementsKey) ~< ".*" asNode WildcardImportKey)

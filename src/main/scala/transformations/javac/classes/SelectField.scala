@@ -1,7 +1,7 @@
 package transformations.javac.classes
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.Node
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.GetStaticDelta
@@ -46,7 +46,7 @@ object SelectField extends ExpressionInstance {
     fieldRef
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
     core.addOption(grammars.find(SelectGrammar))
   }

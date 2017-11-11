@@ -2,7 +2,7 @@ package transformations.javac.types
 
 import core.bigrammar.{BiFailure, BiGrammar}
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
 
@@ -38,9 +38,9 @@ object MethodType extends TypeInstance {
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure()
+  override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure()
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     val throwsGrammar = ("^" ~> typeGrammar)*

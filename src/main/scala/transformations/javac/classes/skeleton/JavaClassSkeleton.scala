@@ -3,7 +3,7 @@ package transformations.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{BodyGrammar, LanguageGrammars}
 import core.particles.node.{GrammarKey, Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.Clazz
@@ -77,7 +77,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar extends GrammarKey
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
     val classMember: BiGrammar = create(ClassMemberGrammar)

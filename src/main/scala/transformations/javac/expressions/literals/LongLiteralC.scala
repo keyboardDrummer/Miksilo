@@ -1,7 +1,7 @@
 package transformations.javac.expressions.literals
 
 import core.bigrammar.{BiGrammar, RegexG}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -17,7 +17,7 @@ object LongLiteralC extends ExpressionInstance {
 
   def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val longGrammar : BiGrammar = RegexG("""-?\d+l""".r) ^^
       (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) as ValueKey asNode LongLiteralKey

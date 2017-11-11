@@ -1,6 +1,6 @@
 package transformations.javac.constructor
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -43,7 +43,7 @@ object SuperCallExpression extends ExpressionInstance {
     Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val callArguments = find(CallC.CallArgumentsGrammar)
     val superCallGrammar = "super" ~> callArguments.as(CallC.CallArguments) asNode SuperCall
