@@ -1,15 +1,15 @@
 package core.particles
 
 import core.bigrammar.BiGrammarToGrammar.WithMap
-import core.bigrammar.grammars.MapGrammar
+import core.bigrammar.grammars.MapGrammarWithMap
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMapG}
 import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 
 class NodeGrammar(inner: BiGrammar, val key: NodeClass)
-  extends MapGrammar(inner,
-    input => NodeGrammar.construct(input.asInstanceOf[WithMap], key),
-    obj => NodeGrammar.destruct(obj.asInstanceOf[WithMapG[Any]], key), showMap = true)
+  extends MapGrammarWithMap(inner,
+    input => NodeGrammar.construct(input, key),
+    obj => NodeGrammar.destruct(obj.asInstanceOf[WithMapG[Any]], key))
 {
 }
 

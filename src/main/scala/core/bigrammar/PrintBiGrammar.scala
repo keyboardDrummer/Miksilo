@@ -51,9 +51,9 @@ object PrintBiGrammar {
     case ignore: IgnoreRight =>
       val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
       toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
-    case map: MapGrammar => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
+    case map: MapGrammarWithMap => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
-    case custom: SuperCustomGrammar => custom.print(toDocumentInner)
+    case custom: CustomGrammar => custom.print(toDocumentInner)
     case _ => grammar.getClass.toString
   }
 

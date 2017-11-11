@@ -15,7 +15,7 @@ import scala.util.parsing.input.CharArrayReader
   * verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
 class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = false)
-  extends CustomGrammar with BiGrammarWithoutChildren
+  extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
   override def getGrammar = grammar
 

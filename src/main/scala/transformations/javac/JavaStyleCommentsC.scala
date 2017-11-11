@@ -30,7 +30,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
     }
   }
 
-  case class NodeCounterReset(var node: BiGrammar) extends SuperCustomGrammar {
+  case class NodeCounterReset(var node: BiGrammar) extends CustomGrammar {
 
     override def children = Seq(node)
 
@@ -73,7 +73,7 @@ object JavaStyleCommentsC extends DeltaWithGrammar {
   object CommentCounter extends Key
   case class Comment(index: Int) extends NodeField
 
-  object CommentsGrammar extends SuperCustomGrammar with BiGrammarWithoutChildren {
+  object CommentsGrammar extends CustomGrammar with BiGrammarWithoutChildren {
 
     val commentGrammar = getCommentGrammar
     val comments = new ManyVertical(new Sequence(ParseWhiteSpace, commentGrammar).ignoreLeft)

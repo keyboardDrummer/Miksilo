@@ -20,7 +20,7 @@ trait BiGrammar extends BiGrammarWriter {
 
   def optionToSeq: BiGrammar = new MapGrammar(this,
     option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {
-      case seq:Seq[Any] => Some(if (seq.isEmpty) None else Some(seq))
+      case seq: Seq[Any] => Some(if (seq.isEmpty) None else Some(seq))
       case _ => None
     })
   def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))

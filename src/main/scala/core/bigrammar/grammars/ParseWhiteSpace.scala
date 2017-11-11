@@ -6,7 +6,7 @@ import core.document.Empty
 
 import scala.util.Try
 
-object ParseWhiteSpace extends CustomGrammar with BiGrammarWithoutChildren {
+object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.RegexG("""\s*""".r)
 
   override def write(from: WithMapG[Any], state: State) = Try(state, Empty)

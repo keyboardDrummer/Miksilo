@@ -104,8 +104,8 @@ class BiGrammarToPrinter {
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
         case choice:Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
-        case custom:CustomGrammar => custom
-        case custom: SuperCustomGrammar => custom.createPrinter(toPrinterCached)
+        case custom:CustomGrammarWithoutChildren => custom
+        case custom: CustomGrammar => custom.createPrinter(toPrinterCached)
         case Keyword(keyword, _, verify) => (value, state) =>
           if (!verify || value.value == keyword)
             succeed(state, keyword)
@@ -117,7 +117,7 @@ class BiGrammarToPrinter {
         case many: ManyVertical => new ManyPrinter(many, (left, right) => left % right)
         case sequence: Sequence => sequenceToPrinter(sequence, (left, right) => left ~ right)
         case topBottom: TopBottom => sequenceToPrinter(topBottom, (topDoc, bottomDoc) => topDoc % bottomDoc)
-        case mapGrammar: MapGrammar => mapGrammarToPrinter(mapGrammar)
+        case mapGrammar: MapGrammarWithMap => mapGrammarToPrinter(mapGrammar)
         case BiFailure(message) => (value, state) => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => valueGrammarToPrinter(valueGrammar)
         case Print(document) => (value, state) => succeed(state, document)
@@ -142,7 +142,7 @@ class BiGrammarToPrinter {
     fail("encountered failure", -10000)
   }
 
-  def mapGrammarToPrinter(mapGrammar: MapGrammar): NodePrinter = {
+  def mapGrammarToPrinter(mapGrammar: MapGrammarWithMap): NodePrinter = {
     val innerPrinter = toPrinterCached(mapGrammar.inner)
     new NodePrinter {
       override def write(value: WithMapG[Any], state: State) = {
@@ -154,19 +154,10 @@ class BiGrammarToPrinter {
     }
   }
 
-  def deconstructValue(value: WithMapG[Any], state: State, grammar: MapGrammar): Try[WithMapG[Any]] = {
-    if (grammar.showMap) {
-      grammar.deconstruct(value) match {
-        case Some(r: WithMapG[_]) => Try(r.asInstanceOf[WithMapG[Any]])
-        case _ => fail("could not deconstruct value")
-      }
-    }
-    else {
-      val deconstructed = grammar.deconstruct(value.value)
-      deconstructed match {
-        case Some(x) => Try(WithMapG(x, value.map))
-        case None => fail("could not deconstruct value")
-      }
+  def deconstructValue(value: WithMapG[Any], state: State, grammar: MapGrammarWithMap): Try[WithMapG[Any]] = {
+    grammar.deconstruct(value) match {
+      case Some(r) => Try(r)
+      case _ => fail("could not deconstruct value")
     }
   }
 

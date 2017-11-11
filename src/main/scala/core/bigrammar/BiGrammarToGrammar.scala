@@ -37,8 +37,8 @@ object BiGrammarToGrammar {
             })
           }
         case choice: Choice => core.grammar.Choice(children(0), children(1), choice.firstBeforeSecond)
-        case custom: CustomGrammar => custom.getGrammar ^^ valueToResult
-        case custom: SuperCustomGrammar => custom.createGrammar(children, recursive)
+        case custom: CustomGrammarWithoutChildren => custom.getGrammar ^^ valueToResult
+        case custom: CustomGrammar => custom.createGrammar(children, recursive)
         case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ valueToResult
         case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ valueToResult
         case many: Many => core.grammar.Many(children.head) ^^ { untyped =>
@@ -56,12 +56,9 @@ object BiGrammarToGrammar {
             (state, WithMapG(result.reverse, withMapState))
           })
         }
-        case mapGrammar: MapGrammar => core.grammar.MapGrammar(children.head,
-          if (!mapGrammar.showMap)
-            result => result.asInstanceOf[Result].map { case WithMapG(value, state) => WithMapG(mapGrammar.construct(value), state) }
-          else
-            result => result.asInstanceOf[Result].map(x => mapGrammar.construct(x).asInstanceOf[WithMap])
-        )
+        case mapGrammar: MapGrammarWithMap => core.grammar.MapGrammar(children.head,
+          result => result.asInstanceOf[Result].map(x => mapGrammar.construct(x)))
+
         case BiFailure(message) => core.grammar.FailureG(message)
         case Print(_) => core.grammar.Produce(Unit) ^^ valueToResult //TODO really want unit here?
         case ValueGrammar(value) => core.grammar.Produce(value) ^^ valueToResult
