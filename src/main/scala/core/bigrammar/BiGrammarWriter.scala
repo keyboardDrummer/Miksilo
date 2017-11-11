@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars._
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Identifier, NumberG, ~}
 import core.particles.node.Node
@@ -92,11 +93,11 @@ trait BiGrammarWriter {
 
   def failure: BiGrammar = BiFailure()
 
-  def value(value: Any): BiGrammar = new ValueGrammar(value)
+  def value(value: Any): BiGrammar = ValueGrammar(value)
 
-  def keywordClass(value: String) = new Keyword(value, false, true)
+  def keywordClass(value: String) = Keyword(value, false, true)
 
-  def space: BiGrammar = print(new WhiteSpace(1, 1))
+  def space: BiGrammar = print(WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = new Keyword(word)
 

@@ -2,6 +2,7 @@ package transformations.javac
 
 import core.bigrammar.BiGrammarToGrammar.{Result, StateM}
 import core.bigrammar._
+import core.bigrammar.grammars._
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.grammar.Grammar
 import core.particles.grammars.LanguageGrammars

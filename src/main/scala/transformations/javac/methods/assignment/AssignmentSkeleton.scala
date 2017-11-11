@@ -1,6 +1,6 @@
 package transformations.javac.methods.assignment
 
-import core.bigrammar.BiFailure
+import core.bigrammar.grammars.BiFailure
 import core.particles._
 import core.particles.grammars.LanguageGrammars
 import core.particles.node._

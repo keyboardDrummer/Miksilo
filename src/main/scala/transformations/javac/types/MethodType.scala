@@ -1,6 +1,7 @@
 package transformations.javac.types
 
-import core.bigrammar.{BiFailure, BiGrammar}
+import core.bigrammar.grammars.BiFailure
+import core.bigrammar.BiGrammar
 import core.particles.Language
 import core.particles.grammars.LanguageGrammars
 import core.particles.node._

@@ -1,6 +1,7 @@
 package transformations.javac
 
 import core.bigrammar._
+import core.bigrammar.grammars.{Labelled, Sequence, WithTrivia}
 import core.particles.grammars.BodyGrammar
 import core.particles.node.{GrammarKey, NodeClass, NodeField}
 import core.particles.{Language, NodeGrammarWriter}

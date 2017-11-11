@@ -1,6 +1,7 @@
 package example
 
 import core.bigrammar._
+import core.bigrammar.grammars.Labelled
 import core.grammar.~
 import core.particles.NodeGrammarWriter
 import core.particles.node.{NodeClass, NodeField}

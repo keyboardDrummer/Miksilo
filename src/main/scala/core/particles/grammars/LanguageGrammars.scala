@@ -1,6 +1,7 @@
 package core.particles.grammars
 
 import core.bigrammar._
+import core.bigrammar.grammars._
 import core.particles.GrammarWithTrivia
 import core.particles.node.{GrammarKey, Key}
 
@@ -22,11 +23,4 @@ class LanguageGrammars extends GrammarCatalogue {
 
   implicit def stringToAstGrammar(value: String) = new GrammarWithTrivia(Keyword(value))(this)
   implicit def grammarToAstGrammar(value: BiGrammar) = new GrammarWithTrivia(value)(this)
-
-
-}
-
-case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)
-{
-  override def toString = s"Could not find grammar $key."
 }

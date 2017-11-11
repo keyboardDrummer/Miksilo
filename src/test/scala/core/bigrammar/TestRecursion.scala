@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.BiGrammarToPrinter
 import org.scalatest.FunSuite
 

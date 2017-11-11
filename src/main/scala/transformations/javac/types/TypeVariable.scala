@@ -1,6 +1,7 @@
 package transformations.javac.types
 
-import core.bigrammar.{BiGrammar, Keyword}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{DeltaWithGrammar, Language}

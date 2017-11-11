@@ -1,6 +1,7 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{BiGrammar, Keyword, Labelled}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.{Keyword, Labelled}
 import core.particles.Language
 import core.particles.grammars.LanguageGrammars
 import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
@@ -10,8 +11,8 @@ import transformations.javac.classes.skeleton.QualifiedClassName
 
 object ObjectTypeDelta extends TypeInstance with StackType {
   override val key = ObjectTypeKey
-  val stringType = objectType(new QualifiedClassName(Seq("java", "lang", "String")))
-  val rootObjectType = objectType(new QualifiedClassName(Seq("java", "lang", "Object")))
+  val stringType = objectType(QualifiedClassName(Seq("java", "lang", "String")))
+  val rootObjectType = objectType(QualifiedClassName(Seq("java", "lang", "Object")))
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = {
     Seq.empty //TODO extend

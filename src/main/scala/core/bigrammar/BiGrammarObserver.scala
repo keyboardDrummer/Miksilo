@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
 import core.particles.node.GrammarKey
 
 trait BiGrammarObserver[Result] {

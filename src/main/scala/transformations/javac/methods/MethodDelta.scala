@@ -1,12 +1,13 @@
 package transformations.javac.methods
 
-import core.bigrammar.{BiGrammar, TopBottom}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.TopBottom
 import core.particles._
 import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, Instructions, CodeMaxLocalsKey}
+import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
 import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.extraConstants.TypeConstant

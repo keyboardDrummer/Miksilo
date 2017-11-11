@@ -1,8 +1,8 @@
 package core.bigrammar
 
+import core.bigrammar.grammars._
 import core.document.Empty
 import core.grammar.{PrintGrammar, Produce}
-import core.particles.grammars.LanguageGrammars
 import core.particles.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 

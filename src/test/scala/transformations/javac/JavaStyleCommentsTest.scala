@@ -2,6 +2,7 @@ package transformations.javac
 
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
+import core.bigrammar.grammars._
 import core.particles._
 import core.particles.grammars.{BodyGrammar, LanguageGrammars}
 import core.particles.node.{Node, NodeClass, NodeField}

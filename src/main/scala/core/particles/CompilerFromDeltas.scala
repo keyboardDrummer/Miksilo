@@ -2,8 +2,6 @@ package core.particles
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
-
-import core.bigrammar.Labelled
 import core.particles.exceptions.ParticleDependencyViolation
 import core.particles.node.Node
 

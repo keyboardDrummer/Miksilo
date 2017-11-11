@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
 import core.grammar.~
 import org.scalatest.FunSuite
 

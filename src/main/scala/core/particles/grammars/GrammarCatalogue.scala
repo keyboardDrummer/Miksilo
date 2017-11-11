@@ -3,6 +3,7 @@ package core.particles.grammars
 import java.util.NoSuchElementException
 
 import core.bigrammar._
+import core.bigrammar.grammars.{BiFailure, Labelled}
 import core.particles.node.GrammarKey
 
 class GrammarCatalogue {
@@ -25,5 +26,9 @@ class GrammarCatalogue {
     val rootGrammar = new RootGrammar(find(from))
     rootGrammar.findLabelled(to)
   }
+}
 
+case class GrammarNotFoundException(key: Any, inner: Exception) extends RuntimeException(inner)
+{
+  override def toString = s"Could not find grammar $key."
 }

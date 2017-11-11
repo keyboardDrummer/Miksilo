@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars._
 import core.particles.node.{Key, NodeField}
 import util.{ExtendedType, GraphBasics, Property}
 

@@ -1,9 +1,10 @@
 package transformations.bytecode
 
 import core.bigrammar._
+import core.bigrammar.grammars.ManyVertical
 import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{Language, DeltaWithGrammar}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 
 object ConstantPoolIndices extends DeltaWithGrammar {

@@ -3,6 +3,7 @@ package core.bigrammar.printer
 import java.util.Objects
 
 import core.bigrammar._
+import core.bigrammar.grammars._
 import core.bigrammar.printer.TryState._
 import core.document.Empty
 import core.grammar.~
@@ -156,7 +157,7 @@ class BiGrammarToPrinter {
   def deconstructValue(value: WithMapG[Any], state: State, grammar: MapGrammar): Try[WithMapG[Any]] = {
     if (grammar.showMap) {
       grammar.deconstruct(value) match {
-        case Some(r: WithMapG[Any]) => Try(r)
+        case Some(r: WithMapG[_]) => Try(r.asInstanceOf[WithMapG[Any]])
         case _ => fail("could not deconstruct value")
       }
     }

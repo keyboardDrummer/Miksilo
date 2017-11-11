@@ -1,6 +1,7 @@
 package transformations.bytecode.constants
 
-import core.bigrammar.{BiGrammar, FromStringGrammar, StringLiteral}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.{FromStringGrammar, StringLiteral}
 import core.grammar.Identifier
 import core.particles.Language
 import core.particles.grammars.LanguageGrammars
@@ -24,7 +25,6 @@ object Utf8ConstantDelta extends ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
-    import grammars._
     (new FromStringGrammar(Identifier, verifyWhenPrinting = true) |
       keywordClass("<init>") |
       keywordClass("<clinit>") |

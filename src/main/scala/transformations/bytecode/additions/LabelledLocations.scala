@@ -1,6 +1,7 @@
 package transformations.bytecode.additions
 
-import core.bigrammar.{BiGrammar, StringLiteral}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.StringLiteral
 import core.particles._
 import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}

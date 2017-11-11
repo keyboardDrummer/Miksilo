@@ -1,6 +1,7 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{BiGrammar, Keyword}
+import core.bigrammar.grammars.Keyword
+import core.bigrammar.{BiGrammar}
 import core.particles.Language
 import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
