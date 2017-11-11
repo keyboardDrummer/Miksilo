@@ -233,3 +233,11 @@ class BiGrammarToPrinter {
     else fail(ValueDiffers(value, grammar.value), -100)
   }
 }
+
+/*
+Used in destructuring when a value is required as a result but it's not in the object to be destructured.
+*/
+object UndefinedDestructuringValue //TODO looks a bit like ValueNotFound. Combine??
+{
+  override def toString = "_"
+}

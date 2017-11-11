@@ -1,7 +1,8 @@
 package core.particles
 
 import core.bigrammar.BiGrammarToGrammar.WithMap
-import core.bigrammar.grammars.{MapGrammar, UndefinedDestructuringValue}
+import core.bigrammar.grammars.MapGrammar
+import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMapG}
 import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 
@@ -24,7 +25,7 @@ object NodeGrammar {
 
     if (node.clazz == key) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      Some(WithMapG(UndefinedDestructuringValue, dataViewAsGenericMap)) //TODO The withMap.state ++ is inconsistent with the construct method. Consistent would be to check that withMap.state is empty.
+      Some(WithMapG(UndefinedDestructuringValue, dataViewAsGenericMap))
     }
     else {
       None
