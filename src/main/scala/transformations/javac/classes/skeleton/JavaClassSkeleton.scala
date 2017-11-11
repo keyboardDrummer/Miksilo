@@ -3,7 +3,7 @@ package transformations.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{GrammarKey, Node, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.ByteCodeSkeleton.Clazz

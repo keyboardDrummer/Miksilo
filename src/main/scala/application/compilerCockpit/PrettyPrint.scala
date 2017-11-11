@@ -2,21 +2,22 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import core.bigrammar.{BiGrammar, BiGrammarToGrammar}
-import core.particles.{CompilerFromDeltas, Delta, Language, Phase}
+import core.bigrammar.printer.{BiGrammarToPrinter, PrintError, BiGrammarToPrinter$}
+import core.bigrammar.{BiGrammarToGrammar, BiGrammar}
+import core.particles.grammars.ProgramGrammar
+import core.particles.{Phase, Language, CompilerFromDeltas, Delta}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
 
 case class PrettyPrint(recover: Boolean = false) extends Delta
 {
-  override def inject(language: Language): Unit = {
-    val foundGrammar = language.grammars.root
-    language.data(this) = foundGrammar.deepClone
+  override def inject(state: Language): Unit = {
+    val foundGrammar = state.grammarCatalogue.root
+    state.data(this) = foundGrammar.deepClone
 
-    language.compilerPhases = List(Phase(this.name, this.description, compilation => {
-      val grammar = getOutputGrammar(language)
+    state.compilerPhases = List(Phase(this.name, this.description, compilation => {
+      val grammar = getOutputGrammar(state)
       val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToPrinter.toDocument(compilation.program, grammar))
       val documentTryWithOptionalRecover: Try[ResponsiveDocument] = if (recover) {
         documentTry.recover({ case e: PrintError => e.toDocument })

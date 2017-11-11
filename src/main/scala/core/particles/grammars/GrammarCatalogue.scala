@@ -21,7 +21,7 @@ class GrammarCatalogue {
   implicit def grammarToAstGrammar(value: BiGrammar) = new GrammarWithTrivia(value)(this)
 
   val trivia: Labelled = new Labelled(TriviaGrammar, ParseWhiteSpace)
-  var root: BiGrammar = new BiFailure //TODO maybe move this to the language
+  def root: Labelled = find(ProgramGrammar) //TODO can we move this and the trivia part outside of grammarCatalogue to make it more generic?
 
   def find(key: GrammarKey): Labelled = {
     try {

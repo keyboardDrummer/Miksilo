@@ -1,7 +1,7 @@
 package transformations.javac
 
 import core.bigrammar._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node.{GrammarKey, NodeClass, NodeField}
 import core.particles.{BodyGrammar, Language, NodeGrammarWriter}
 import org.scalatest.FunSuite
@@ -20,7 +20,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
       ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
-    grammars.root = grammar
+    grammars.create(ProgramGrammar, grammar)
     assert(grammars.find(ChildClass).inner != grammars.trivia)
     val input = """ChildStart judith ChildEnd""".stripMargin
     val inputWithSpace = " " + input
@@ -38,7 +38,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     import grammars._
 
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
-    grammars.root = "Start" ~ (parentGrammar | parentGrammar)
+    grammars.create(ProgramGrammar, "Start" ~ (parentGrammar | parentGrammar))
     TriviaInsideNode.transformGrammars(grammars, new Language)
     val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
@@ -50,10 +50,9 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object Right extends NodeField
   object Add extends NodeClass
   object Expression extends GrammarKey
-
   test("Left Recursive") {
     val language = new Language
-    val grammars = language.grammars
+    val grammars = language.grammarCatalogue
     import grammars._
 
     val numberGrammar = (number : BiGrammar).as(Value).asLabelledNode(IntegerClass)

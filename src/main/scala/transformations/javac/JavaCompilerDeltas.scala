@@ -39,7 +39,7 @@ object JavaCompilerDeltas {
 
   def getCompiler = new CompilerFromDeltas(javaCompilerTransformations)
 
-  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsDelta, ExpressionMethodC, BlockCompilerC, JavaGotoC)
+  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC, JavaGotoC)
 
   def javaCompilerTransformations: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,

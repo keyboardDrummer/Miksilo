@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
 import core.particles.node._
 import transformations.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper

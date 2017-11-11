@@ -8,7 +8,7 @@ import core.particles.grammars.GrammarCatalogue
 import core.particles.node.{Key, NodeField}
 import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
-import transformations.javac.JavaStyleCommentsDelta.CommentCounter
+import transformations.javac.JavaStyleCommentsC.CommentCounter
 
 import scala.util.Try
 
@@ -62,7 +62,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
   override def description: String = "Causes trivia to be captured in the AST during parsing"
 }
 
-object JavaStyleCommentsDelta extends DeltaWithGrammar {
+object JavaStyleCommentsC extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
     grammars.trivia.inner = new Sequence(CommentsGrammar, ParseWhiteSpace).ignoreRight
