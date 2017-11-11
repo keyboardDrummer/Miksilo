@@ -3,7 +3,7 @@ package core.particles
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
-import core.bigrammar.Labelled
+import core.bigrammar.BiGrammar
 import core.particles.exceptions.ParticleDependencyViolation
 import core.particles.node.Node
 
@@ -13,10 +13,6 @@ class CompilerFromDeltas(val deltas: Seq[Delta]) {
 
   validateDependencies(deltas)
   lazy val language: Language = buildLanguage
-
-  def getGrammar: Labelled = {
-    language.grammarCatalogue.root
-  }
 
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())

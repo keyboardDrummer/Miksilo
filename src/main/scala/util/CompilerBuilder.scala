@@ -41,7 +41,7 @@ class TestingCompiler(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = statistics.profile("build language", buildLanguage)
 
   def getGrammar = {
-    language.grammarCatalogue.root
+    language.grammars.root
   }
 
   def parseAndTransform(input: File): Compilation = {

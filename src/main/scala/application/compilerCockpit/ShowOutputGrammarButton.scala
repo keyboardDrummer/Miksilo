@@ -12,7 +12,7 @@ class ShowOutputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton(
     override def actionPerformed(e: ActionEvent): Unit = {
       val myParticles = compilerCockpit.particles.dropWhile(p => p != MarkOutputGrammar)
       val state = new CompilerFromDeltas(myParticles).buildLanguage
-      val grammarString = PrintGrammar.toTopLevelDocument(BiGrammarToGrammar.toGrammar(state.grammarCatalogue.root)).renderString()
+      val grammarString = PrintGrammar.toTopLevelDocument(BiGrammarToGrammar.toGrammar(state.grammars.root)).renderString()
       compilerCockpit.setOutputText(grammarString)
     }
   })

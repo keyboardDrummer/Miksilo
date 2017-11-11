@@ -77,7 +77,7 @@ trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    transformGrammars(state.grammarCatalogue, state)
+    transformGrammars(state.grammars, state)
   }
 
 }
