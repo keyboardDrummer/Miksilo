@@ -13,9 +13,9 @@ import transformations.javac.JavaStyleCommentsC.CommentCounter
 import scala.util.Try
 
 object CaptureTriviaDelta extends DeltaWithGrammar {
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    for (path <- grammars.root.descendants) {
+    for (path <- language.root.descendants) {
       if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
         visited += path.value
         path.value match {

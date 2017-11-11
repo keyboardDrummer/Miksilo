@@ -27,7 +27,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Delta],
 
   this.title = name
   val compiler = new CompilerFromDeltas(particles)
-  val grammar = BiGrammarToGrammar.toGrammar(compiler.getGrammar)
+  val grammar = BiGrammarToGrammar.toGrammar(compiler.language.root)
   val factory = new TokenMakerFactoryFromGrammar(grammar)
 
   private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)

@@ -8,11 +8,6 @@ import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
 
-  def toDocument(catalogue: GrammarCatalogue) = {
-    val program = catalogue.root
-    printReachableGrammars(program)
-  }
-
   def printReachableGrammars(program: BiGrammar): ResponsiveDocument = {
     val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
     reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)

@@ -3,7 +3,7 @@ package transformations.javac
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.{GrammarCatalogue}
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
@@ -30,7 +30,7 @@ class JavaStyleCommentsTest
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
       ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
-    grammars.create(ProgramGrammar, grammar)
+    language.root.inner = grammar
     JavaStyleCommentsC.transformGrammars(grammars, language)
     CaptureTriviaDelta.transformGrammars(grammars, language)
     TriviaInsideNode.transformGrammars(grammars, language)
@@ -123,7 +123,7 @@ class JavaStyleCommentsTest
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammarCatalogue.find(BlockDelta.Grammar)
     val language = new Language()
-    language.grammarCatalogue.root.inner = blockGrammar
+    language.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammarCatalogue, language)
 
     val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammarCatalogue.trivia, false), ParentClass)

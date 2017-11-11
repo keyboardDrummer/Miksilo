@@ -14,10 +14,6 @@ class CompilerFromDeltas(val deltas: Seq[Delta]) {
   validateDependencies(deltas)
   lazy val language: Language = buildLanguage
 
-  def getGrammar: Labelled = {
-    language.grammarCatalogue.root
-  }
-
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())
     state

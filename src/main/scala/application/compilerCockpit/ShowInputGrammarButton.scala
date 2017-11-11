@@ -9,8 +9,8 @@ import core.grammar.PrintGrammar
 class ShowInputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show input grammar") {
   addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
-        val state = compilerCockpit.compiler.buildLanguage
-        val grammarString = PrintGrammar.toTopLevelDocument(BiGrammarToGrammar.toGrammar(state.grammarCatalogue.root)).renderString()
+        val language = compilerCockpit.compiler.buildLanguage
+        val grammarString = PrintGrammar.toTopLevelDocument(BiGrammarToGrammar.toGrammar(language.root)).renderString()
         compilerCockpit.setOutputText(grammarString)
     }
   })

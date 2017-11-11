@@ -11,9 +11,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def description: String = "Moves trivia grammars left of a node to the inside of the node"
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: GrammarCatalogue, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    for(path <- grammars.root.descendants)
+    for(path <- language.root.descendants)
     {
       if (!visited.contains(path.value)) {
         visited += path.value

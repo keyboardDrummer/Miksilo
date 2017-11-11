@@ -31,11 +31,11 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     }))
   }
 
-  override def transformGrammars(_grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(_grammars: GrammarCatalogue, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
 
-    val constantReferences = ByteCodeSkeleton.getRegistry(state).constantReferences
+    val constantReferences = ByteCodeSkeleton.getRegistry(language).constantReferences
 
     val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
     for(containerEntry <- constantReferences) {
@@ -60,7 +60,7 @@ object RemoveConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     grammars.find(NameAndTypeConstant.key).inner = grammars.find(Utf8ConstantDelta.key).as(NameAndTypeConstant.Name) ~~
       grammars.find(TypeConstant.key).as(Type) asNode NameAndTypeConstant.Clazz
 
-    val constantPoolGrammar = grammars.root.findLabelled(ConstantPoolGrammar)
+    val constantPoolGrammar = language.root.findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
   }
 

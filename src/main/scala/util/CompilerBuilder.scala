@@ -40,10 +40,6 @@ class TestingCompiler(val deltas: Seq[Delta], compilerName: String) {
   validateDependencies(deltas)
   lazy val language: Language = statistics.profile("build language", buildLanguage)
 
-  def getGrammar = {
-    language.grammarCatalogue.root
-  }
-
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())
     state

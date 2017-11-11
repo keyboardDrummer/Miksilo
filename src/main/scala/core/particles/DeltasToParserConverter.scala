@@ -7,8 +7,8 @@ import scala.util.parsing.input.CharArrayReader
 
 class DeltasToParserConverter extends GrammarToParserConverter {
   def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
-    val catalogue = new CompilerFromDeltas(transformations).language.grammarCatalogue
-    buildParser(catalogue.root)
+    val language = new CompilerFromDeltas(transformations).language
+    buildParser(language.root)
   }
 
   def parse(grammar: BiGrammar, input: String): Any = {
