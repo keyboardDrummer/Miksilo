@@ -55,7 +55,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: GrammarCatalogue, grammar: GrammarReference, horizontal: Boolean) = {
-    if (!grammar.value.isInstanceOf[WithTrivia])
+    if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser())
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
   }
 

@@ -48,15 +48,18 @@ class GrammarForAst(grammar: BiGrammar) {
 class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: GrammarCatalogue) extends NodeGrammarWriter
   with BiGrammarSequenceMethodsExtension
 {
+  def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
+    if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
+
   def asLabelledNode(key: NodeClass): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
-  def manyVertical = new ManyVertical(new WithTrivia(grammar, grammars.trivia, false))
+  def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-  def ~(other: BiGrammar) = new Sequence(grammar, new WithTrivia(other, grammars.trivia))
+  def ~(other: BiGrammar) = new Sequence(grammar, addTriviaIfUseful(other))
 
-  def many = new ManyHorizontal(new WithTrivia(grammar, grammars.trivia))
+  def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 
-  def %(bottom: BiGrammar) = new TopBottom(grammar, new WithTrivia(bottom, grammars.trivia, false))
+  def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, false))
 
   override implicit def addSequenceMethods(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar)
 }
