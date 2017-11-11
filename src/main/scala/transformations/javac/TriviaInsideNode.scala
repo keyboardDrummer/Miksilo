@@ -60,7 +60,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def isLeftRecursive(grammar: GrammarPath): Boolean = {
-    if (grammar.ancestorGrammars.size != grammar.ancestors.size + 1)
+    if (grammar.ancestorGrammars.size != grammar.ancestors.size)
       return true
 
     grammar.value match {

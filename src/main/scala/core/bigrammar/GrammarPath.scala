@@ -18,13 +18,14 @@ object GrammarPath {
 
 trait GrammarPath {
   def value: BiGrammar
-  def newChildren: List[GrammarReference] = children.filter(c => !ancestorGrammars.contains(c.value))
+  def newChildren: List[GrammarReference] = children.filter(c => !seenGrammars.contains(c.value))
 
   def children: List[GrammarReference] = {
     val properties = GrammarPath.getBiGrammarProperties(value.getClass)
     properties.map(property => new GrammarReference(this, property))
   }
 
+  def seenGrammars: Set[BiGrammar] = ancestorGrammars + value
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
   def findGrammar(grammar: BiGrammar): Option[GrammarPath] = find(p => p.value == grammar)
@@ -40,7 +41,7 @@ trait GrammarPath {
   def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = {
     var result: Option[GrammarPath] = None
     GraphBasics.traverseBreadth[GrammarPath](Seq(this),
-      path => path.children.filter(c => !path.ancestorGrammars.contains(c.value)),
+      path => path.newChildren,
       path =>
         if (predicate(path)) {
           result = Some(path)
@@ -55,12 +56,12 @@ trait GrammarPath {
 
   def descendants: Seq[GrammarReference] = selfAndDescendants.drop(1).collect { case x:GrammarReference => x }
   def selfAndDescendants: Seq[GrammarPath] = GraphBasics.traverseBreadth[GrammarPath](Seq(this),
-    path => path.children.filter(c => !path.ancestorGrammars.contains(c.value)))
+    path => path.newChildren)
 }
 
 class RootGrammar(val value: BiGrammar) extends GrammarPath
 {
-  override def ancestorGrammars = Set(value)
+  override def ancestorGrammars = Set.empty
 
   override def ancestors: Seq[GrammarPath] = Seq.empty
 
@@ -81,7 +82,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
 
   def ancestorGrammars: Set[BiGrammar] = {
     if (cachedAncestorGrammars == null)
-      cachedAncestorGrammars = previous.ancestorGrammars + value
+      cachedAncestorGrammars = previous.ancestorGrammars + parent
     cachedAncestorGrammars
   }
 
