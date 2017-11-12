@@ -38,6 +38,19 @@ class BindPrinter[T, U](first: TryState[T, ResponsiveDocument => ResponsiveDocum
   }
 }
 
+class OrPrinter[T](first: Printer[T], second: Printer[T]) extends Printer[T] {
+  override def write(from: WithMapG[T], state: State): Try[(State, ResponsiveDocument)] = {
+    first.write(from, state).recoverWith({ case leftFailure: PrintError =>
+      second.write(from, state).recoverWith({ case rightFailure: PrintError =>
+        combineOrFailures(leftFailure, rightFailure)
+      })
+    })
+  }
+
+  def combineOrFailures[U](left: PrintError, right: PrintError): Try[U] =
+    if (left.depth >= right.depth) Failure(left) else Failure(right)
+}
+
 object TryState {
 
   type Printer[T] = TryState[T, ResponsiveDocument]
@@ -49,17 +62,6 @@ object TryState {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
 
-  def or[T](first: Printer[T], second: Printer[T]): Printer[T] = (value: WithMapG[T],  state) => {
-    first.write(value, state).recoverWith({ case leftFailure: PrintError =>
-      second.write(value, state).recoverWith({ case rightFailure: PrintError =>
-        combineOrFailures(leftFailure, rightFailure)
-      })
-    })
-  }
-
-  def combineOrFailures[T](left: PrintError, right: PrintError): Try[T] =
-    if (left.depth >= right.depth) Failure(left) else Failure(right)
-
   def fail(inner: Any, depth: Int = 0) = Failure(RootError(depth, Empty, inner))
 }
 
@@ -70,42 +72,48 @@ trait TryState[From, To] {
     write(from, state).map[(State, NewTo)](t => (t._1, function(t._2)))
 }
 
+class CachingPrinter(inner: NodePrinter) extends NodePrinter {
+  val valueCache: mutable.Map[(Any, State), Result] = mutable.Map.empty
+
+  override def write(from: WithMapG[Any], state: State): Result = {
+    val key = (from, state)
+    valueCache.get(key) match {
+      case Some(result) =>
+        result
+      case _ =>
+        valueCache.put(key, fail(FoundDirectRecursionInLabel(inner), -1000))
+        val result = inner.write(from, state)
+        valueCache.put(key, result)
+        result
+    }
+  }
+
+  case class FoundDirectRecursionInLabel(name: NodePrinter) extends Throwable {
+    override def toString = s"found direct recursion in label: $name"
+  }
+}
+
+class NestPrinter(grammar: BiGrammar, inner: NodePrinter) extends NodePrinter {
+  override def write(from: WithMapG[Any], state: State): Result = {
+    inner.write(from, state).recoverWith(
+      { case e: PrintError => Failure(NestedError((from, state), grammar, e))})
+  }
+}
+
 class BiGrammarToPrinter {
 
   case class LabelWithValue(label: Labelled, value: Any)
   val printerCache: mutable.Map[BiGrammar, NodePrinter] = mutable.Map.empty
 
   def succeed(state: State, value: ResponsiveDocument): Result = Success((state, value))
-  class CachingPrinter(inner: NodePrinter) extends NodePrinter {
-    val valueCache: mutable.Map[(Any, State), Result] = mutable.Map.empty
-    override def write(from: WithMapG[Any], state: State): Result = {
-      val key = (from, state)
-      valueCache.get(key) match {
-        case Some(result) =>
-          result
-        case _ =>
-          valueCache.put(key, fail(FoundDirectRecursionInLabel(inner), -1000))
-          val result = inner.write(from, state)
-          valueCache.put(key, result)
-          result
-      }
-    }
-  }
-
-  class NestPrinter(grammar: BiGrammar, inner: NodePrinter) extends NodePrinter {
-    override def write(from: WithMapG[Any], state: State): Result = {
-      inner.write(from, state).recoverWith(
-        { case e: PrintError => Failure(NestedError((from, state), grammar, e))})
-    }
-  }
 
   def toPrinterCached(grammar: BiGrammar): NodePrinter = {
 
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
-        case choice: Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
+        case choice: Choice => new OrPrinter(toPrinterCached(choice.left), toPrinterCached(choice.right))
         case custom: CustomGrammarWithoutChildren => custom
-        case custom: CustomGrammar => custom.createPrinter(toPrinterCached)
+        case custom: CustomGrammar => new CachingPrinter(custom.createPrinter(toPrinterCached))
         case Keyword(keyword, _, verify) => (value, state) =>
           if (!verify || value.value == keyword)
             succeed(state, keyword)
@@ -132,7 +140,7 @@ class BiGrammarToPrinter {
           }
       }
 
-      new NestPrinter(grammar, new CachingPrinter(result))
+      new NestPrinter(grammar, result)
     })
   }
 
@@ -161,22 +169,17 @@ class BiGrammarToPrinter {
     }
   }
 
-  case class FoundDirectRecursionInLabel(name: NodePrinter) extends Throwable {
-    override def toString = s"found direct recursion in label: $name"
+  class RedirectingPrinter extends NodePrinter {
+    var inner: NodePrinter = _
+
+    override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = inner.write(from, state)
   }
 
   def labelledToPrinter(labelled: Labelled): NodePrinter = {
-    val printerOption = printerCache.get(labelled)
-    printerOption match {
-      case Some(printer) => printer
-      case None =>
-        var result: NodePrinter = null
-        val redirectPrinter: NodePrinter = (value, state) => result.write(value, state)
-        printerCache.put(labelled, redirectPrinter)
-        result = toPrinterCached(labelled.inner)
-        printerCache.put(labelled, result)
-        result
-    }
+    val redirectPrinter = new RedirectingPrinter()
+    printerCache.put(labelled, new CachingPrinter(redirectPrinter))
+    redirectPrinter.inner = toPrinterCached(labelled.inner)
+    redirectPrinter
   }
 
   val undefinedTuple = core.grammar.~[Any, Any](UndefinedDestructuringValue, UndefinedDestructuringValue)

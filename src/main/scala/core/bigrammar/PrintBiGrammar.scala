@@ -38,7 +38,7 @@ object PrintBiGrammar {
     case RegexG(value) => s"Regex($value)"
     case keyword: Keyword => keyword.value
     case delimiter: Delimiter => delimiter.value
-    case ValueGrammar(value) => value.toString
+    case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
     case fromString:FromStringGrammar => PrintGrammar.toDocument(fromString.grammar)
     case labelled: Labelled => grammarKeyToName(labelled.name)
