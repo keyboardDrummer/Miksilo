@@ -11,9 +11,9 @@ trait SequenceLike extends BiGrammar with Layout {
 
   override def children = Seq(first, second)
 
-  def ignoreLeft: MapGrammar = new IgnoreLeft(this)
+  def ignoreLeft = new IgnoreLeft(this)
 
-  def ignoreRight: MapGrammar = new IgnoreRight(this)
+  def ignoreRight = new IgnoreRight(this)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean =
     recursive(first) || recursive(second)

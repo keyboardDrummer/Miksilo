@@ -23,7 +23,9 @@ trait BiGrammar extends BiGrammarWriter {
       case seq: Seq[Any] => Some(if (seq.isEmpty) None else Some(seq))
       case _ => None
     })
-  def seqToSet: BiGrammar = new MapGrammar(this, seq => seq.asInstanceOf[Seq[Any]].toSet, set => Some(set.asInstanceOf[Set[Any]].toSeq))
+  def seqToSet: BiGrammar = new MapGrammar(this,
+    seq => seq.asInstanceOf[Seq[Any]].toSet,
+    set => Some(set.asInstanceOf[Set[Any]].toSeq))
 
   def ^^(afterParsing: Any => Any, beforePrinting: Any => Option[Any]): BiGrammar =
     new MapGrammar(this, afterParsing, beforePrinting)

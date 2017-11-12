@@ -68,12 +68,6 @@ object PrintBiGrammar {
   }
 
   def grammarKeyToName(key: GrammarKey): String = key.toString
-//    key match {
-//    case key: KeyGrammar => key.toString
-//    case _ =>
-//      val regex = new Regex("Grammar\\$")
-//      regex.replaceAllIn(key.getClass.getSimpleName, "")
-//  }
 
   trait FakeBiGrammar extends BiGrammar {
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = ???
@@ -132,15 +126,15 @@ object PrintBiGrammar {
     case sequence: SequenceLike =>
       val left = sequence.first
       val right = sequence.second
-      if (left.isInstanceOf[Produce])
+      if (left.isInstanceOf[ValueGrammar])
         return right
 
-      if (right.isInstanceOf[Produce])
+      if (right.isInstanceOf[ValueGrammar])
         return left
 
       sequence
-    case many: Many if many.inner.isInstanceOf[Produce] => many.inner
-    case map: MapGrammar => map.inner
+    case many: Many if many.inner.isInstanceOf[ValueGrammar] => many.inner
+    case map: MapGrammarWithMap => map.inner
     case x => x
   }
 
