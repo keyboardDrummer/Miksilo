@@ -74,12 +74,12 @@ class BiGrammarToPrinter {
 
   case class LabelWithValue(label: Labelled, value: Any)
   val printerCache: mutable.Map[BiGrammar, NodePrinter] = mutable.Map.empty
-  val valueCache: mutable.Map[(NodePrinter, Any, State), Result] = mutable.Map.empty
 
   def succeed(state: State, value: ResponsiveDocument): Result = Success((state, value))
   class CachingPrinter(inner: NodePrinter) extends NodePrinter {
+    val valueCache: mutable.Map[(Any, State), Result] = mutable.Map.empty
     override def write(from: WithMapG[Any], state: State): Result = {
-      val key = (inner, from, state)
+      val key = (from, state)
       valueCache.get(key) match {
         case Some(result) =>
           result
@@ -103,8 +103,8 @@ class BiGrammarToPrinter {
 
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
-        case choice:Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
-        case custom:CustomGrammarWithoutChildren => custom
+        case choice: Choice => or(toPrinterCached(choice.left), toPrinterCached(choice.right))
+        case custom: CustomGrammarWithoutChildren => custom
         case custom: CustomGrammar => custom.createPrinter(toPrinterCached)
         case Keyword(keyword, _, verify) => (value, state) =>
           if (!verify || value.value == keyword)
