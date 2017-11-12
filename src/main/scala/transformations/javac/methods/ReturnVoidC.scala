@@ -1,8 +1,8 @@
 package transformations.javac.methods
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass}
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.VoidReturnInstructionDelta
 import transformations.javac.statements.{StatementInstance, StatementSkeleton}
@@ -17,8 +17,9 @@ object ReturnVoidC extends StatementInstance {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statement = grammars.find(StatementSkeleton.StatementGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val statement = find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = ("return" ~ ";") ~> value(_return)
     statement.inner = statement.inner | returnExpression

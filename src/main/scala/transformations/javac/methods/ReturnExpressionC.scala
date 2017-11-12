@@ -1,7 +1,7 @@
 package transformations.javac.methods
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
@@ -35,9 +35,10 @@ object ReturnExpressionC extends StatementInstance {
 
   def getReturnValue[T <: NodeLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val statement = grammars.find(StatementSkeleton.StatementGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val statement = find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
     statement.inner = statement.inner | returnExpression

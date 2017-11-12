@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles.{Compilation, Language}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledLocations
@@ -20,8 +20,9 @@ object JustJavaGoto extends StatementInstance {
 
   def getTarget(node: Node) = node(Target).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 

@@ -1,12 +1,13 @@
 package transformations.javac.methods
 
-import core.bigrammar.{BiGrammar, TopBottom}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.TopBottom
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, PathRoot}
 import transformations.bytecode.ByteCodeMethodInfo._
-import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, Instructions, CodeMaxLocalsKey}
+import transformations.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import transformations.bytecode.attributes.{AttributeNameKey, CodeAttribute}
 import transformations.bytecode.constants.Utf8ConstantDelta
 import transformations.bytecode.extraConstants.TypeConstant
@@ -16,7 +17,7 @@ import transformations.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.classes.skeleton._
 import transformations.javac.classes.{ClassCompiler, MethodInfo}
-import transformations.javac.statements.{BlockC, StatementSkeleton}
+import transformations.javac.statements.{BlockDelta, StatementSkeleton}
 import transformations.javac.types.{MethodType, TypeAbstraction}
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState with ClassMemberDelta {
@@ -57,7 +58,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     }
   }
 
-  override def dependencies: Set[Contract] = Set(BlockC, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler) = {
     val result = metaObject(ParameterTypeKey).asInstanceOf[Node]
@@ -149,35 +150,36 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 
-  object ParametersGrammar
-  object VisibilityGrammar
-  object StaticGrammar
-  object ReturnTypeGrammar
+  object ParametersGrammar extends GrammarKey
+  object VisibilityGrammar extends GrammarKey
+  object StaticGrammar extends GrammarKey
+  object ReturnTypeGrammar extends GrammarKey
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val block = grammars.find(BlockC.BlockGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val block = find(BlockDelta.Grammar)
 
-    val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = grammars.create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
+    val parseType = find(TypeSkeleton.JavaTypeGrammar)
+    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
 
     val parseParameter = parseType.as(ParameterTypeKey) ~~ identifier.as(ParameterNameKey) asNode ParameterKey
-    val parseParameters = grammars.create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
-    val parseStatic = grammars.create(StaticGrammar, "static" ~~> value(true) | value(false))
+    val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
+    val parseStatic = create(StaticGrammar, "static" ~~> value(true) | value(false))
 
-    val visibilityModifier = grammars.create(VisibilityGrammar,
+    val visibilityModifier = create(VisibilityGrammar,
       "public" ~~> value(PublicVisibility) |
         "protected" ~~> value(ProtectedVisibility) |
         "private" ~~> value(PrivateVisibility) |
         value(DefaultVisibility))
 
 
-    val typeParametersGrammar: BiGrammar = grammars.find(TypeAbstraction.TypeParametersGrammar)
+    val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
     val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
-    val methodGrammar = grammars.create(MethodGrammar, nodeGrammar(methodUnmapped, MethodKey))
+    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(MethodKey))
 
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
   }
 
@@ -209,7 +211,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   object MethodKey extends NodeClass
 
-  object MethodGrammar
+  object MethodGrammar extends GrammarKey
 
   object MethodBodyKey extends NodeField
 

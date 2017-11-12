@@ -2,7 +2,7 @@ package transformations.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField, NodeLike}
 import transformations.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import transformations.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodInfoKey, MethodNameIndex}
@@ -48,7 +48,7 @@ object TypeConstant extends ConstantEntry {
 
   override def dependencies = Set(MethodTypeConstant, NameAndTypeConstant, ByteCodeMethodInfo, ByteCodeFieldInfo)
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
     typeGrammar.as(Type)
   }

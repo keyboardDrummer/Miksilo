@@ -8,6 +8,8 @@ import scala.util.parsing.input.CharArrayReader._
 object GrammarToParserConverter extends GrammarToParserConverter
 class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
 
+  override val whiteSpace = "".r
+
   var keywords: Set[String] = Set.empty
 
   def whitespaceG: Parser[Any] = rep(
@@ -18,12 +20,6 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
   )
 
   def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != EofCh)
-  protected def comment: Parser[Any] = (
-    '*' ~ '/'  ^^ { case _ => ' '  }
-      | chrExcept(EofCh) ~ comment
-    )
-
-  def chrExcept(cs: Char*) = elem("", ch => cs forall (ch != _))
 
   def convert(grammar: Grammar) : PackratParser[Any] = {
     val allGrammars: Set[Grammar] = grammar.getGrammars
@@ -41,7 +37,7 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
     val map = new mutable.HashMap[Grammar, PackratParser[Any]]
 
     def helper(grammar: Grammar): PackratParser[Any] = {
-      map.getOrElseUpdate(grammar, grammar.simplify match {
+      map.getOrElseUpdate(grammar, grammar.expand match {
         case choice: Choice => if (choice.firstBeforeSecond)
           helper(choice.left) | helper(choice.right)
           else helper(choice.left) ||| helper(choice.right)

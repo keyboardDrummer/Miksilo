@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -42,9 +42,11 @@ object MethodRefConstant extends ConstantEntry {
 
   def getNameAndTypeIndex(methodRef: Node): Int = methodRef(NameAndType).asInstanceOf[Int]
 
-  def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(ClassRef) ~< "." ~
-      grammars.find(ConstantPoolIndexGrammar).as(NameAndType)
+  def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(ClassRef) ~< "." ~
+      find(ConstantPoolIndexGrammar).as(NameAndType)
+  }
 
   override def description: String = "Defines the method reference constant, which refers to a method by class name, method name and signature."
 

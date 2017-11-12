@@ -2,7 +2,7 @@ package transformations.javac.constructor
 
 import core.particles._
 import core.particles.exceptions.BadInputException
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.coreInstructions.InvokeSpecialDelta
 import transformations.bytecode.coreInstructions.objects.LoadAddressDelta
@@ -12,7 +12,7 @@ import transformations.javac.classes.skeleton.JavaClassSkeleton._
 import transformations.javac.methods.MethodDelta
 import transformations.javac.methods.MethodDelta._
 import transformations.javac.methods.call.CallStaticOrInstanceC
-import transformations.javac.statements.BlockC
+import transformations.javac.statements.BlockDelta
 
 object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -50,11 +50,12 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   object ConstructorClassNameKey extends NodeField
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val visibilityModifier = grammars.find(MethodDelta.VisibilityGrammar) as VisibilityKey
-    val parseParameters = grammars.find(MethodDelta.ParametersGrammar) as MethodParametersKey
-    val block = grammars.find(BlockC.BlockGrammar) as MethodBodyKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val visibilityModifier = find(MethodDelta.VisibilityGrammar) as VisibilityKey
+    val parseParameters = find(MethodDelta.ParametersGrammar) as MethodParametersKey
+    val block = find(BlockDelta.Grammar) as MethodBodyKey
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)
   }

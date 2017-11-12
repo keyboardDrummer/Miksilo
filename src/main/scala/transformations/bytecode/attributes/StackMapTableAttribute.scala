@@ -1,8 +1,8 @@
 package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Key, Node, NodeClass, NodeField}
+import core.particles.grammars.{LanguageGrammars, KeyGrammar}
+import core.particles.node._
 import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -118,30 +118,32 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def key: Key = Clazz
 
   val offsetGrammarKey = KeyGrammar(FrameOffset)
-  object StackMapFrameGrammar extends Key
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val offsetGrammar = grammars.create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
-
+  object StackMapFrameGrammar extends GrammarKey
+  override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
     val verificationGrammar : BiGrammar = getVerificationInfoGrammar(grammars)
+    import grammars._
+    val offsetGrammar = create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
+
     val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %
       verificationGrammar.as(SameLocals1StackItemType).indent()).
-      asLabelledNode(grammars, SameLocals1StackItem)
+      asLabelledNode(SameLocals1StackItem)
     val appendFrameGrammar = ("append frame" ~ offsetGrammar % verificationGrammar.manyVertical.indent().as(AppendFrameTypes)).
-      asLabelledNode(grammars, AppendFrame)
+      asLabelledNode(AppendFrame)
     val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
     val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer.as(ChopFrameCount)) asNode ChopFrame
-    val nameGrammar = "name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(AttributeNameKey)
-    val stackMapGrammar: BiGrammar = grammars.create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
+    val nameGrammar = "name:" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val stackMapGrammar: BiGrammar = create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
     val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
       asNode(Clazz)
 
-    grammars.create(Clazz, stackMapTableGrammar)
+    create(Clazz, stackMapTableGrammar)
   }
 
-  def getVerificationInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
+  def getVerificationInfoGrammar(grammars: LanguageGrammars): BiGrammar = {
     val index = grammars.find(ConstantPoolIndexGrammar)
     val basic = grammars.find(IntTypeC.key) |  grammars.find(LongTypeC.key)
-    val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(grammars, ObjectStackType)
+    import grammars._
+    val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(ObjectStackType)
 
     basic | objectReference
   }

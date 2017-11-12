@@ -4,8 +4,8 @@ import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
 import core.particles.exceptions.BadInputException
 import core.grammar.ParseException
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.Node
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.{GrammarKey, Key, Node}
 import transformations.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: Node, from: Node) extends BadInputException {
@@ -19,7 +19,7 @@ class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadIn
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getTypeFromByteCodeString(state: Language, typeString: String): Node = {
     val manager = new DeltasToParserConverter()
-    manager.parse(state.grammarCatalogue.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
+    manager.parse(state.grammars.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
   }
 
   def toStackType(_type: Node, state: Language) : Node = {
@@ -29,8 +29,9 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getTypeSize(_type: Node, state: Language): Int = getRegistry(state).stackSize(_type.clazz)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
-      val grammar = state.grammarCatalogue.find(TypeSkeleton.ByteCodeTypeGrammar)
-      BiGrammarToPrinter.toDocument(_type, grammar).renderString()
+      val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+      val rendered = BiGrammarToPrinter.toDocument(_type, grammar).renderString()
+      rendered
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
@@ -72,8 +73,8 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     })
   }
 
-  object ByteCodeTypeGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  object ByteCodeTypeGrammar extends GrammarKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.create(JavaTypeGrammar)
     grammars.create(ByteCodeTypeGrammar)
   }
@@ -86,7 +87,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val instances = new ClassRegistry[TypeInstance]
   }
 
-  object JavaTypeGrammar
+  object JavaTypeGrammar extends GrammarKey
 
   override def description: String = "Defines the concept of a type."
 }

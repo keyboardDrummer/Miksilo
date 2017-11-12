@@ -1,11 +1,11 @@
 package transformations.bytecode.types
 
-import core.particles.{Language, Delta}
-import core.particles.node.Key
+import core.particles.node.NodeClass
+import core.particles.{Delta, Language}
 
 trait StackType extends Delta
 {
-  val key: Key
+  val key: NodeClass
   def getStackSize: Int
 
   override def inject(state: Language): Unit = {

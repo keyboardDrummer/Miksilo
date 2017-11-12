@@ -1,6 +1,6 @@
 package transformations.javac.methods
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles._
 import core.particles.node._
 import core.particles.path.Path
@@ -10,30 +10,31 @@ import transformations.javac.expressions.ExpressionSkeleton
 
 object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
 
-  def getSelectorObject[T <: NodeLike](selector: T) = selector(SelectorObject).asInstanceOf[T]
+  def getSelectorObject[T <: NodeLike](selector: T) = selector(Target).asInstanceOf[T]
 
-  def getSelectorMember(selector: Node) = selector(SelectorMember).asInstanceOf[String]
+  def getSelectorMember(selector: Node) = selector(Member).asInstanceOf[String]
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val selection = (expression.as(SelectorObject) ~< ".") ~ identifier.as(SelectorMember) asNode(SelectorKey)
-    grammars.create(SelectGrammar, selection)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Clazz
+    create(SelectGrammar, selection)
   }
 
-  object SelectGrammar
+  object SelectGrammar extends GrammarKey
 
-  object SelectorKey extends NodeClass
+  object Clazz extends NodeClass
 
-  object SelectorObject  extends NodeField
+  object Target  extends NodeField
 
-  object SelectorMember extends NodeField
+  object Member extends NodeField
 
   def selector(_object: Any, member: Any): Node = selector(_object.asInstanceOf[Node], member.asInstanceOf[String])
 
   def selector(_object: Node, member: String): Node = {
-    new Node(SelectorKey,
-      SelectorObject -> _object,
-      SelectorMember -> member)
+    new Node(Clazz,
+      Target -> _object,
+      Member -> member)
   }
 
   def getClassOrObjectReference(selector: Path, compiler: ClassCompiler): ClassOrObjectReference = {

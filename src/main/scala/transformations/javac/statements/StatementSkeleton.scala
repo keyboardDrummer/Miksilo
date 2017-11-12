@@ -1,8 +1,8 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Node, NodeLike, NodeWrapper}
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.{GrammarKey, Node, NodeLike, NodeWrapper}
 import core.particles.path.Path
 import transformations.javac.expressions.ExpressionSkeleton
 
@@ -17,11 +17,11 @@ object StatementSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     statement => getRegistry(compilation).instances(statement.clazz).toByteCode(statement, compilation)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     grammars.create(StatementGrammar)
   }
 
-  object StatementGrammar
+  object StatementGrammar extends GrammarKey
 
   override def description: String = "Defines the concept of a statement."
 

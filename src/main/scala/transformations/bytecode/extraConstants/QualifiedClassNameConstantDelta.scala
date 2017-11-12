@@ -2,7 +2,7 @@ package transformations.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.constants.ConstantEntry
@@ -28,10 +28,11 @@ object QualifiedClassNameConstantDelta extends ConstantEntry {
   override def getByteCode(constant: Node, state: Language): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[QualifiedClassName].parts.mkString("/"))
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    getQualifiedClassNameParser.as(Value)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar =
+    getQualifiedClassNameParser(grammars).as(Value)
 
-  def getQualifiedClassNameParser: BiGrammar = {
+  def getQualifiedClassNameParser(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     val construct: Any => Any = {
       case ids: Seq[Any] =>
         val stringIds = ids.collect({ case v: String => v})

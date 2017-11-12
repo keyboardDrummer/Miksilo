@@ -1,16 +1,17 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.BiGrammarToPrinter
 import org.scalatest.FunSuite
 
 import scala.collection.immutable.StringOps
 
-class TestRecursion extends FunSuite with BiGrammarWriter {
+class TestRecursion extends FunSuite with BiGrammarSequenceWriter {
 
   val input = "!!!!!"
 
   test("RightRecursion") {
-    val grammar: Labelled = new Labelled("leftRec")
+    val grammar: Labelled = new Labelled(StringKey("leftRec"))
     grammar.addOption("!" ~ grammar)
     grammar.addOption(value(null))
 
@@ -18,7 +19,7 @@ class TestRecursion extends FunSuite with BiGrammarWriter {
   }
 
   test("DirectRecursion") {
-    val grammar: Labelled = new Labelled("leftRec")
+    val grammar: Labelled = new Labelled(StringKey("leftRec"))
     grammar.addOption("!" ~ grammar)
     grammar.addOption(grammar)
     grammar.addOption(value(null))
@@ -35,7 +36,7 @@ class TestRecursion extends FunSuite with BiGrammarWriter {
   }
 
   ignore("LeftRecursion") {
-    val grammar: Labelled = new Labelled("leftRec")
+    val grammar: Labelled = new Labelled(StringKey("leftRec"))
     grammar.addOption(value(null))
     grammar.addOption(grammar ~ "!")
 
@@ -43,7 +44,7 @@ class TestRecursion extends FunSuite with BiGrammarWriter {
   }
 
   test("LeftRecursionPrintOnly") {
-    val grammarDocument: Labelled = new Labelled("leftRec")
+    val grammarDocument: Labelled = new Labelled(StringKey("leftRec"))
     grammarDocument.addOption(grammarDocument ~ "!")
     grammarDocument.addOption(value(null))
 
@@ -59,8 +60,8 @@ class TestRecursion extends FunSuite with BiGrammarWriter {
   }
 
   test("PrintingIndirectLeftRecursion") {
-    val inner = new Labelled("boep")
-    val outer = new Labelled("woep", inner)
+    val inner = new Labelled(StringKey("boep"))
+    val outer = new Labelled(StringKey("woep"), inner)
     inner.addOption(outer ~ "!")
     inner.addOption(value(null))
 

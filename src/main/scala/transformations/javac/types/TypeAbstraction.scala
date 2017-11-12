@@ -1,8 +1,8 @@
 package transformations.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.{GrammarCatalogue, KeyGrammar}
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.particles.grammars.{LanguageGrammars, KeyGrammar}
+import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
 import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import transformations.javac.types.MethodType.MethodTypeKey
@@ -25,29 +25,31 @@ object TypeAbstraction extends DeltaWithGrammar {
     _type(TypeAbstraction.Parameters).asInstanceOf[Seq[Node]]
   }
 
-  object TypeParametersGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  object TypeParametersGrammar extends GrammarKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     transformByteCodeGrammar(grammars)
     transformJavaGrammar(grammars)
   }
 
-  def transformJavaGrammar(grammars: GrammarCatalogue): Unit = {
+  def transformJavaGrammar(grammars: LanguageGrammars): Unit = {
+    import grammars._
     val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    grammars.create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< " ").option.optionToSeq)
+    create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< " ").option.optionToSeq)
   }
 
-  object AbstractMethodTypeGrammar
-  def transformByteCodeGrammar(grammars: GrammarCatalogue): Unit = {
-    val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    val methodTypeGrammar = grammars.find(KeyGrammar(MethodTypeKey))
-    val objectTypeGrammar = grammars.find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
+  object AbstractMethodTypeGrammar extends GrammarKey
+  def transformByteCodeGrammar(grammars: LanguageGrammars): Unit = {
+    import grammars._
+    val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
+    val methodTypeGrammar = find(KeyGrammar(MethodTypeKey))
+    val objectTypeGrammar = find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier.as(ParameterName) ~
       (":" ~> classBound.option).as(ParameterClassBound) ~~
       ((":" ~> classBound)*).as(ParameterInterfaceBound) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    val abstractMethodType = grammars.create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
+    val abstractMethodType = create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
       asNode(TypeAbstractionKey))
     byteCodeType.addOption(abstractMethodType)
   }

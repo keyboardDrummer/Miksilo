@@ -3,7 +3,7 @@ package transformations.bytecode
 import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.particles._
-import core.particles.grammars.{GrammarCatalogue, ProgramGrammar}
+import core.particles.grammars.{BodyGrammar, LanguageGrammars}
 import core.particles.node._
 import transformations.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
@@ -11,6 +11,8 @@ import transformations.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import transformations.bytecode.constants.ClassInfoConstant
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import transformations.javac.classes.ConstantPool
+
+import scala.collection.mutable
 
 object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
@@ -39,7 +41,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def createRegistry = new Registry()
 
   def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
-            classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(ClassFileKey,
+            classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(Clazz,
     ClassMethodsKey ->  methods,
     ClassNameIndexKey ->  name,
     ClassParentIndex ->  parent,
@@ -53,19 +55,19 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   class Registry {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
-    val attributes = new ClassRegistry[ByteCodeAttribute]
+    val attributes = new mutable.HashMap[String, ByteCodeAttribute]
     val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
   }
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ClassFileKey, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Clazz, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
       ClassParentIndex -> ClassInfoConstant.key,
       ClassNameIndexKey -> ClassInfoConstant.key))
   }
 
-  object ClassFileKey extends NodeClass
+  object Clazz extends NodeClass
 
   object ClassMethodsKey extends NodeField
 
@@ -81,38 +83,39 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   object ClassAttributes extends NodeField
 
-  object ConstantPoolItemContentGrammar
+  object ConstantPoolItemContentGrammar extends GrammarKey
 
-  object AttributeGrammar
-  object MembersGrammar
-  object AttributesGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val constantIndexGrammar = grammars.create(ConstantPoolIndexGrammar, integer)
-    val program = grammars.find(ProgramGrammar)
-    val attributeGrammar: BiGrammar = grammars.create(AttributeGrammar)
+  object AttributeGrammar extends GrammarKey
+  object MembersGrammar extends GrammarKey
+  object AttributesGrammar extends GrammarKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
+    import grammars._
+    val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
+    val attributeGrammar: BiGrammar = create(AttributeGrammar)
     val interfacesGrammar: BiGrammar = "with interfaces:" ~~> (constantIndexGrammar *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
     val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
-    val attributesGrammar = grammars.create(AttributesGrammar, attributeGrammar.manyVertical)
-    val membersGrammar = grammars.create(MembersGrammar, print(Empty))
+    val attributesGrammar = create(AttributesGrammar, attributeGrammar.manyVertical)
+    val membersGrammar = create(MembersGrammar, print(Empty))
     val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
-    val classGrammar = grammars.create(ClassFileKey,
+    val classGrammar = create(Clazz,
       (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
-        constantPool.as(ClassConstantPool) % bodyGrammar).asNode(ClassFileKey))
+        constantPool.as(ClassConstantPool) % bodyGrammar).asNode(Clazz))
 
-    program.inner = classGrammar
+    find(BodyGrammar).inner = classGrammar
   }
 
-  object ConstantPoolGrammar extends Key
+  object ConstantPoolGrammar extends GrammarKey
 
-  def getConstantPoolGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val constantPoolItemContent = grammars.create(ConstantPoolItemContentGrammar)
+  def getConstantPoolGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    val constantPoolItemContent = create(ConstantPoolItemContentGrammar)
     val entries = constantPoolItemContent.manyVertical.indent()
     val result = "Constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
-    grammars.create(ConstantPoolGrammar, result)
+    create(ConstantPoolGrammar, result)
   }
 
   override def description: String = "Defines a skeleton for bytecode."

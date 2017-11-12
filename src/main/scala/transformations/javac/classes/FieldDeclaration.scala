@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Compilation, Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.extraConstants.TypeConstant
@@ -69,9 +69,10 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
     field.data.remove(FieldType)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val memberGrammar = grammars.find(JavaClassSkeleton.ClassMemberGrammar)
-    val typeGrammar = grammars.find(TypeSkeleton.JavaTypeGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = (typeGrammar.as(FieldType) ~~ identifier.as(FieldName) ~< ";").asNode(FieldKey)
     memberGrammar.addOption(fieldGrammar)

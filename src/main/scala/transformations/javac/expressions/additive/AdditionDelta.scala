@@ -1,7 +1,7 @@
 package transformations.javac.expressions.additive
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.AddIntegersDelta
@@ -9,9 +9,9 @@ import transformations.bytecode.coreInstructions.longs.AddLongsDelta
 import transformations.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import transformations.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
-object AdditionC extends DeltaWithGrammar with ExpressionInstance {
+object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
-  val key = AdditionClazz
+  val key = Clazz
 
   override def toByteCode(addition: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
@@ -43,25 +43,26 @@ object AdditionC extends DeltaWithGrammar with ExpressionInstance {
 
   }
 
-  def getFirst[T <: NodeLike](addition: T) = addition(FirstKey).asInstanceOf[T]
+  def getFirst[T <: NodeLike](addition: T) = addition(First).asInstanceOf[T]
 
-  def getSecond[T <: NodeLike](addition: T) = addition(SecondKey).asInstanceOf[T]
+  def getSecond[T <: NodeLike](addition: T) = addition(Second).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
-    val parseAddition = ((additiveGrammar.as(FirstKey) ~~< "+") ~~ additiveGrammar.as(SecondKey)).parseMap(AdditionClazz) //TODO for some reason I have to use parseMap here instead of asNode, otherwise the JavaStyleComments tests fail
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
+    val parseAddition = additiveGrammar.as(First) ~~< "+" ~~ additiveGrammar.as(Second) asNode Clazz
     additiveGrammar.addOption(parseAddition)
   }
 
-  def addition(first: Node, second: Node) = new Node(AdditionClazz, FirstKey -> first, SecondKey -> second)
+  def addition(first: Node, second: Node) = new Node(Clazz, First -> first, Second -> second)
 
-  object AdditionClazz extends NodeClass
+  object Clazz extends NodeClass
 
-  object FirstKey extends NodeField
+  object First extends NodeField
 
-  object SecondKey extends NodeField
+  object Second extends NodeField
 
   override def description: String = "Adds the + operator."
 }

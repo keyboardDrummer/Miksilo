@@ -1,8 +1,9 @@
 package transformations.bytecode.constants
 
-import core.bigrammar.{BiGrammar, Keyword}
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode
 import transformations.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -19,8 +20,10 @@ object StringConstant extends ConstantEntry {
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = PrintByteCode.byteToBytes(8) ++
     PrintByteCode.shortToBytes(constant(StringIndex).asInstanceOf[Int])
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(StringIndex)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(StringIndex)
+  }
 
   override def description: String = "Adds the string constant entry."
 

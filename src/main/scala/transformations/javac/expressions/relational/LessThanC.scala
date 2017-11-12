@@ -1,7 +1,7 @@
 package transformations.javac.expressions.relational
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -36,8 +36,9 @@ object GreaterThanC extends ExpressionInstance {
     BooleanTypeC.booleanType
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar.as(GreaterThanFirst) ~~< ">") ~~ relationalGrammar.as(GreaterThanSecond)).asNode(GreaterThanKey)
     relationalGrammar.addOption(parseLessThan)
   }
@@ -79,8 +80,9 @@ object LessThanC extends ExpressionInstance {
     BooleanTypeC.booleanType
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val relationalGrammar = grammars.find(AddRelationalPrecedence.RelationalExpressionGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar.as(LessThanFirst) ~~< "<") ~~ relationalGrammar.as(LessThanSecond)).asNode(LessThanKey)
     relationalGrammar.addOption(parseLessThan)
   }

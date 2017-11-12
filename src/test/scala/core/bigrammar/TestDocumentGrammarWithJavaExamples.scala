@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
-import transformations.javac.statements.BlockC
+import transformations.javac.statements.BlockDelta
 import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
 import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
@@ -36,6 +36,22 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
+  test("SystemPrintX") {
+    val input = s"System.print(x)"
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+  }
+
+  /*
+  Deze case is lastig omdat Selector.Member eerst print is, maar daarna out wordt,
+  en daarna verdwijnt voordat print gehandled wordt.
+
+  Hoe werkt dit tijdens parsen?
+   */
+  test("SystemOutPrintX") {
+    val input = s"System.out.print(x)"
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+  }
+
   test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
     TestCompilerGrammarUtils.compareInputWithPrint(input, None, MethodDelta.MethodGrammar)
@@ -43,7 +59,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockC.BlockGrammar)
+    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockDelta.Grammar)
   }
 
   test("PrintAfterImplicitAddition") {

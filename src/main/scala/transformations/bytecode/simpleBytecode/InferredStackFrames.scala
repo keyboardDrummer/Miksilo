@@ -2,7 +2,7 @@ package transformations.bytecode.simpleBytecode
 
 import core.bigrammar.GrammarReference
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import transformations.bytecode.additions.LabelledLocations
@@ -76,7 +76,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Generates a stack frame for each label instruction. " +
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(LabelledLocations.LabelKey).
       findAs(LabelledLocations.LabelStackFrame).
       asInstanceOf[GrammarReference].removeMeFromSequence()

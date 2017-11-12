@@ -1,11 +1,13 @@
 package core.particles
 
+import core.particles.node.NodeClass
+
 import scala.collection.mutable
 
 trait WithLanguageRegistry {
   type Registry
 
-  type ClassRegistry[Registration] = mutable.HashMap[Any, Registration]
+  type ClassRegistry[Registration] = mutable.HashMap[NodeClass, Registration]
   def createRegistry: Registry
   def getRegistry(state: Language): Registry = state.data.getOrElseUpdate(this, createRegistry).asInstanceOf[Registry]
 }

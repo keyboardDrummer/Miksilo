@@ -1,7 +1,7 @@
 package transformations.javac.expressions.additive
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.integers.SubtractIntegerDelta
@@ -19,8 +19,9 @@ object SubtractionC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val additiveGrammar = grammars.find(AddAdditivePrecedence.AdditiveExpressionGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
     val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
     val parseSubtraction = (additiveGrammar.as(FirstKey) ~~< "-") ~~ withoutSubtraction.as(SecondKey) asNode SubtractionKey
     additiveGrammar.addOption(parseSubtraction)

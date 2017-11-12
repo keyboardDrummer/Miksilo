@@ -2,7 +2,7 @@ package transformations.bytecode
 
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton._
@@ -74,29 +74,31 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       getAttributesByteCode(state, methodInfo.attributes)
     }
 
-  object MethodsGrammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  object MethodsGrammar extends GrammarKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val methodInfoGrammar: BiGrammar = getMethodInfoGrammar(grammars)
-    val methods = grammars.create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
-    val membersGrammar = grammars.find(ByteCodeSkeleton.MembersGrammar)
+    import grammars._
+    val methods = create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(ClassMethodsKey))
+    val membersGrammar = find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = membersGrammar.inner % methods
   }
 
-  object AccessFlagGrammar
-  def getMethodInfoGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val attributesGrammar = grammars.find(AttributesGrammar)
-    val parseAccessFlag = grammars.create(AccessFlagGrammar,
+  object AccessFlagGrammar extends GrammarKey
+  def getMethodInfoGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    val attributesGrammar = find(AttributesGrammar)
+    val parseAccessFlag = create(AccessFlagGrammar,
         "ACC_PUBLIC" ~> value(PublicAccess) |
         "ACC_STATIC" ~> value(StaticAccess) |
         "ACC_PRIVATE" ~> value(PrivateAccess))
 
     val methodInfoGrammar: BiGrammar = "Method;" %>
-      ("name:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
-      "descriptor:" ~~> grammars.find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
+      ("name:" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
+      "descriptor:" ~~> find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
       "flags:" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
       attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
 
-    grammars.create(MethodInfoKey, methodInfoGrammar)
+    create(MethodInfoKey, methodInfoGrammar)
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies

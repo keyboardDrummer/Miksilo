@@ -1,7 +1,7 @@
 package transformations.bytecode.simpleBytecode
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.Node
 import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
@@ -34,7 +34,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
       case LabelKey => 0
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(CodeAttribute.CodeKey).findLabelled(CodeAttribute.MaxStackGrammar).removeMeFromSequence()
   }
 

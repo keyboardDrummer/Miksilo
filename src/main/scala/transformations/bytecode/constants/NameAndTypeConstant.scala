@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -52,9 +52,11 @@ object NameAndTypeConstant extends ConstantEntry {
       Type -> Utf8ConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    (grammars.find(ConstantPoolIndexGrammar).as(Name) ~< ":") ~
-      grammars.find(ConstantPoolIndexGrammar).as(Type)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    (find(ConstantPoolIndexGrammar).as(Name) ~< ":") ~
+      find(ConstantPoolIndexGrammar).as(Type)
+  }
 
   override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."
 

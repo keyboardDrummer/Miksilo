@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles._
 import core.particles.node._
 import core.particles.path.Path
@@ -17,11 +17,12 @@ object NewC extends ExpressionInstance {
   object NewCallKey extends NodeClass
   object NewObject extends NodeField
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val objectGrammar = grammars.find(ObjectTypeDelta.ObjectTypeJavaGrammar)
-    val callArgumentsGrammar = grammars.find(CallC.CallArgumentsGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val objectGrammar = find(ObjectTypeDelta.ObjectTypeJavaGrammar)
+    val callArgumentsGrammar = find(CallC.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar.as(NewObject) ~ callArgumentsGrammar.as(CallC.CallArguments) asNode NewCallKey
-    val expressionGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
+    val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }
 

@@ -1,9 +1,10 @@
 package transformations.bytecode
 
 import core.bigrammar._
-import core.particles.grammars.GrammarCatalogue
+import core.bigrammar.grammars.ManyVertical
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{Language, DeltaWithGrammar}
+import core.particles.{DeltaWithGrammar, Language}
 import transformations.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 
 object ConstantPoolIndices extends DeltaWithGrammar {
@@ -14,16 +15,17 @@ object ConstantPoolIndices extends DeltaWithGrammar {
 
   private object Content extends NodeField
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val previousConstantPoolItem = grammars.find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val previousConstantPoolItem = find(ByteCodeSkeleton.ConstantPoolItemContentGrammar)
     val constantPoolItem = (("#" ~> number.as(Index) ~~< "=") ~~ previousConstantPoolItem.inner.as(Content)).
       asNode(WithIndexClass)
     previousConstantPoolItem.inner = constantPoolItem
 
-    val constantPoolGrammar = grammars.find(ConstantPoolGrammar)
-    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.get.isInstanceOf[ManyVertical]).
+    val constantPoolGrammar = find(ConstantPoolGrammar)
+    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.value.isInstanceOf[ManyVertical]).
       get.asInstanceOf[GrammarReference] //TODO al die casts naar GrammarReference zijn loos. Beter altijd een GrammarReference returnen. O wacht, implicit cast naar grammarReference!!!
-    entries.set(addIndicesToList(entries.get))
+    entries.set(addIndicesToList(entries.value))
   }
 
   def addIndicesToList(listGrammar: BiGrammar): BiGrammar = {

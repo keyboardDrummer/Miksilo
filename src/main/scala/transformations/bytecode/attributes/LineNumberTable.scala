@@ -1,7 +1,7 @@
 package transformations.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Contract, Language}
 import transformations.bytecode.ByteCodeSkeleton
@@ -42,7 +42,10 @@ object LineNumberTable extends ByteCodeAttribute {
 
   override def key = LineNumberTableKey
 
-  override def getGrammar(grammars: GrammarCatalogue): BiGrammar = ("Not implemented" : BiGrammar).asNode(key) // TODO implement. Also figure out why I can't use failure here.
+  override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    ("Not implemented" : BiGrammar).asNode(key)
+  } // TODO implement. Also figure out why I can't use failure here.
 
   override def constantPoolKey: String = "LineNumberTable"
 

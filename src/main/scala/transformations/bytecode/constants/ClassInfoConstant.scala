@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -39,8 +39,10 @@ object ClassInfoConstant extends ConstantEntry {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(Name -> QualifiedClassNameConstantDelta.key))
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(Name)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(Name)
+  }
 
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."

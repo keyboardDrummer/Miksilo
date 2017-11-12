@@ -1,31 +1,31 @@
 package core.particles
 
-import core.bigrammar.{BiGrammarToGrammar, Labelled}
+import core.bigrammar._
 import core.grammar.{GrammarToParserConverter, ParseException}
 
 import scala.util.parsing.input.CharArrayReader
 
 class DeltasToParserConverter extends GrammarToParserConverter {
   def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
-    val programGrammar: Labelled = new CompilerFromDeltas(transformations).getGrammar
-    buildParser(programGrammar)
+    val language = new CompilerFromDeltas(transformations).language
+    buildParser(language.grammars.root)
   }
 
-  def parse(grammar: Labelled, input: String): Any = {
+  def parse(grammar: BiGrammar, input: String): Any = {
     val parser = buildParser(grammar)
 
     val parseResult = parser(input)
     if (!parseResult.successful)
-      throw new ParseException(parseResult.toString)
+      throw ParseException(parseResult.toString)
 
     if(!parseResult.next.atEnd)
-      throw new ParseException("Did not parse until end.")
+      throw ParseException("Did not parse until end.")
 
     parseResult.get
   }
 
-  def buildParser(programGrammarDocument: Labelled): (String) => ParseResult[Any] = {
-    val programGrammar = BiGrammarToGrammar.toGrammar(programGrammarDocument)
+  def buildParser(grammar: BiGrammar): (String) => ParseResult[Any] = {
+    val programGrammar = BiGrammarToGrammar.toGrammar(grammar)
     input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
   }
 }

@@ -1,6 +1,7 @@
 package example
 
-import core.bigrammar.{BiGrammar, Labelled, TestGrammarUtils}
+import core.bigrammar._
+import core.bigrammar.grammars.Labelled
 import core.grammar.~
 import core.particles.NodeGrammarWriter
 import core.particles.node.{NodeClass, NodeField}
@@ -36,10 +37,10 @@ object Constant {
 /**
   * Contains some examples for the wiki.
   */
-class BiGrammarExample extends FunSuite with NodeGrammarWriter {
+class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSequenceWriter {
 
   test("whileWithAsNode") {
-    val expression = new Labelled("expression")
+    val expression = new Labelled(StringKey("expression"))
     expression.addOption(identifier.as(Variable.Name).asNode(Variable.Clazz))
     expression.addOption(number.as(Constant.Value).asNode(Constant.Clazz))
     val assignment = identifier ~~ keywordClass("=") ~~ expression |
@@ -47,7 +48,7 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter {
     expression.addOption(assignment)
     expression.addOption(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Clazz)
     expression.addOption(expression ~~ "-" ~~ expression)
-    val statement = new Labelled("statement")
+    val statement = new Labelled(StringKey("statement"))
     val _while =
       "while" ~ expression.inParenthesis.as(While.Condition) ~~ "{" %
         statement.manyVertical.indent(2).as(While.Body) %<

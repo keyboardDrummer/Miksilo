@@ -1,6 +1,6 @@
 package transformations.javac.constructor
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -29,10 +29,11 @@ object ThisCallExpression extends ExpressionInstance {
     SuperCallExpression.transformToByteCode(call, compilation, clazz.name)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val callArguments = grammars.find(CallC.CallArgumentsGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val callArguments = find(CallC.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments.as(CallC.CallArguments) asNode ThisCall
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(thisCallGrammar)
   }
 

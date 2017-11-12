@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.ByteCodeSkeleton
 import transformations.bytecode.PrintByteCode._
@@ -52,9 +52,11 @@ object FieldRefConstant extends ConstantEntry {
 
   override def key = FieldRef
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
-    grammars.find(ConstantPoolIndexGrammar).as(ClassInfo) ~< "." ~
-      grammars.find(ConstantPoolIndexGrammar).as(NameAndType)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(ClassInfo) ~< "." ~
+      find(ConstantPoolIndexGrammar).as(NameAndType)
+  }
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 

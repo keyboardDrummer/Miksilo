@@ -1,7 +1,7 @@
 package transformations.javac.expressions.prefix
 
 import core.particles.{Compilation, Language}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import transformations.bytecode.extraBooleanInstructions.NotInstructionC
@@ -22,8 +22,9 @@ object NotC extends ExpressionInstance {
     ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionC.not)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
     coreGrammar.addOption("!" ~> coreGrammar.as(NotExpression) asNode NotKey)
   }
 

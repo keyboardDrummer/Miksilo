@@ -6,7 +6,7 @@ import util.{CompilerBuilder, TestUtils, SourceUtils}
 
 class SimplifiedByteCodeTest extends FunSuite {
 
-  test("javaToSimplified") {
+    test("javaToSimplified") {
     val utils = new TestUtils(CompilerBuilder.build(PresetsPanel.getJavaToSimplifiedByteCodePreset.particles))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("Fibonacci.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")

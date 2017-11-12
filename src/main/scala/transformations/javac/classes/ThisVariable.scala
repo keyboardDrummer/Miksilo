@@ -1,16 +1,18 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
-import core.particles.{Language, Contract, DeltaWithGrammar}
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.GrammarKey
+import core.particles.{Contract, DeltaWithGrammar, Language}
 import transformations.javac.methods.VariableC
 import transformations.javac.methods.VariableC.{VariableKey, VariableNameKey}
 
 object ThisVariable extends DeltaWithGrammar
 {
-  object Grammar
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val variable = grammars.find(VariableC.VariableGrammar)
-    val thisGrammar = grammars.create(Grammar, ("this" ~> value("this").as(VariableNameKey)).asNode(VariableKey))
+  object Grammar extends GrammarKey
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val variable = find(VariableC.VariableGrammar)
+    val thisGrammar = create(Grammar, ("this" ~> value("this").as(VariableNameKey)).asNode(VariableKey))
     variable.addOption(thisGrammar)
   }
 

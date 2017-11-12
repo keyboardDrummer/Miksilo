@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 
@@ -20,7 +20,10 @@ object MethodHandleConstant extends ConstantEntry {
     byteToBytes(15) ++ byteToBytes(constant(MethodHandleReference).asInstanceOf[Int]) ++ shortToBytes(constant(MethodHandleIndex).asInstanceOf[Int])
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar = (integer.as(MethodHandleReference) ~< ":") ~~ integer.as(MethodHandleIndex)
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    (integer.as(MethodHandleReference) ~< ":") ~~ integer.as(MethodHandleIndex)
+  }
 
   override def description: String = "Adds the method handle constant"
 

@@ -2,7 +2,7 @@ package transformations.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import transformations.bytecode.PrintByteCode._
 
@@ -20,10 +20,12 @@ object InvokeDynamicConstant extends ConstantEntry {
     byteToBytes(18) ++ byteToBytes(constant(InvokeDynamicBootstrapMethodIndex).asInstanceOf[Int]) ++ shortToBytes(constant(InvokeDynamicNameAndTypeIndex).asInstanceOf[Int])
   }
 
-  override def getConstantEntryGrammar(grammars: GrammarCatalogue): BiGrammar =
+  override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     "bootstrap index:" ~~> integer.as(InvokeDynamicBootstrapMethodIndex) ~<
       ", nameAndTypeIndex:" ~~
       integer.as(InvokeDynamicNameAndTypeIndex)
+  }
 
   override def description: String = "Adds the invoke dynamic constant"
 

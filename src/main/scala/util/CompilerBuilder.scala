@@ -4,10 +4,8 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.util.{Timer, TimerTask}
 
-import core.bigrammar.Labelled
 import core.particles._
 import core.particles.exceptions.ParticleDependencyViolation
-import core.particles.grammars.ProgramGrammar
 import core.particles.node.Node
 
 import scala.collection.mutable
@@ -41,10 +39,6 @@ class TestingCompiler(val deltas: Seq[Delta], compilerName: String) {
 
   validateDependencies(deltas)
   lazy val language: Language = statistics.profile("build language", buildLanguage)
-
-  def getGrammar: Labelled = {
-    language.grammarCatalogue.find(ProgramGrammar)
-  }
 
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())

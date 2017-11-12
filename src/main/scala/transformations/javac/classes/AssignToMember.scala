@@ -1,6 +1,6 @@
 package transformations.javac.classes
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles._
 import core.particles.path.Path
 import transformations.bytecode.coreInstructions.SwapInstruction
@@ -8,7 +8,7 @@ import transformations.bytecode.coreInstructions.objects.PutField
 import transformations.javac.classes.SelectField._
 import transformations.javac.classes.skeleton.JavaClassSkeleton
 import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.MemberSelector.{SelectorMember, SelectorObject, SelectorKey}
+import transformations.javac.methods.MemberSelector.{Member, Target, Clazz}
 import transformations.javac.methods.{MemberSelector, VariableC}
 import transformations.javac.methods.assignment.AssignmentSkeleton
 
@@ -17,7 +17,7 @@ object AssignToMember extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: Language): Unit = {
-    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.SelectorKey,
+    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.Clazz,
       (compilation: Compilation, selector: Path) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
@@ -30,11 +30,12 @@ object AssignToMember extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val assignTarget = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
-    val variableGrammar = grammars.find(VariableC.VariableGrammar)
-    val selectGrammar = ((variableGrammar.as(SelectorObject) ~< ".") ~ identifier.as(SelectorMember)).asNode(SelectorKey)
+    val variableGrammar = find(VariableC.VariableGrammar)
+    val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Clazz)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addOption(selectGrammar)
   }

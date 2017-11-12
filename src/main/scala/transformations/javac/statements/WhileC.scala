@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.{Path, SequenceElement}
 import transformations.bytecode.ByteCodeMethodInfo
@@ -34,15 +34,16 @@ object WhileC extends StatementInstance with WithLanguageRegistry {
 
   def getBody[T <: NodeLike](_while: T) = _while(Body).asInstanceOf[Seq[T]]
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val blockGrammar = grammars.find(BlockC.BlockGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val blockGrammar = find(BlockDelta.Grammar)
     val whileGrammar =
       "while" ~> expression.inParenthesis.as(Condition) %
-      blockGrammar.as(Body) asNode WhileKey
+      blockGrammar.as(Body) asLabelledNode WhileKey
     statementGrammar.addOption(whileGrammar)
   }
 

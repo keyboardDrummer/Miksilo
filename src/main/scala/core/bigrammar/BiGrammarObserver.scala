@@ -1,25 +1,29 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
+import core.particles.node.GrammarKey
+
 trait BiGrammarObserver[Result] {
 
-  def labelledEnter(name: AnyRef): Result
+  def getReference(name: GrammarKey): Result
 
-  def labelledLeave(inner: Result, partial: Result)
+  def setReference(result: Result, reference: Result)
 
-  def handleGrammar(self: BiGrammar, recursive: BiGrammar => Result): Result
+  def handleGrammar(self: BiGrammar, children: Seq[Result], recursive: (BiGrammar) => Result): Result
 
   def observe(grammar: BiGrammar) = {
     var cache = Map.empty[Labelled, Result]
-    def helper(grammar: BiGrammar): Result = grammar match {
-      case labelled: Labelled =>
-        cache.getOrElse(labelled, {
-          val result = labelledEnter(labelled.name)
-          cache += labelled -> result
-          labelledLeave(helper(labelled.inner), result)
-          result
+    def withoutCache(grammar: BiGrammar) = handleGrammar(grammar, grammar.children.map(child => withCache(child)), withCache)
+    def withCache(grammar: BiGrammar): Result = grammar match {
+      case labelled: Labelled => cache.getOrElse(labelled, {
+          val reference = getReference(labelled.name)
+          cache += labelled -> reference
+          val result = withoutCache(labelled)
+          setReference(result, reference)
+          reference
         })
-      case _ => handleGrammar(grammar, helper)
+      case _ => withoutCache(grammar)
     }
-    helper(grammar)
+    withCache(grammar)
   }
 }

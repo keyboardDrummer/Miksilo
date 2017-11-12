@@ -1,7 +1,7 @@
 package transformations.javac.expressions
 
 import core.particles._
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import transformations.bytecode.ByteCodeMethodInfo
@@ -21,12 +21,13 @@ object TernaryC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit =  {
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val parseTernary = (expressionGrammar.as(ConditionKey) ~~< "?") ~~
       (expressionGrammar.as(TrueKey) ~~< ":") ~~
       expressionGrammar.as(FalseKey) asNode TernaryKey
-    val ternaryGrammar = grammars.create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
+    val ternaryGrammar = create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
     expressionGrammar.inner = ternaryGrammar
   }
 
@@ -43,7 +44,7 @@ object TernaryC extends ExpressionInstance {
 
   object TernaryKey extends NodeClass
 
-  object TernaryExpressionGrammar
+  object TernaryExpressionGrammar extends GrammarKey
 
   override val key = TernaryKey
 

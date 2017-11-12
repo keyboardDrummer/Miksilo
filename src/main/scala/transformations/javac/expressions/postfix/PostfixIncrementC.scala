@@ -1,6 +1,6 @@
 package transformations.javac.expressions.postfix
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -24,8 +24,9 @@ object PostFixIncrementC extends ExpressionInstance {
     Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val coreGrammar = grammars.find(ExpressionSkeleton.CoreGrammar)
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
     val postFixIncrement = identifier.as(VariableKey) ~< "++" asNode PostfixIncrementKey
     coreGrammar.addOption(postFixIncrement)
   }

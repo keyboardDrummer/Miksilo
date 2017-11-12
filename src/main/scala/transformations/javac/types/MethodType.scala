@@ -1,8 +1,9 @@
 package transformations.javac.types
 
-import core.bigrammar.{BiFailure, BiGrammar}
+import core.bigrammar.grammars.BiFailure
+import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import transformations.bytecode.types.{TypeInstance, TypeSkeleton}
 
@@ -32,16 +33,17 @@ object MethodType extends TypeInstance {
 
   object ThrowsSignature extends NodeField
 
-  val key: Key = MethodTypeKey
+  val key = MethodTypeKey
 
   override def description: String = "Defines the method type."
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: GrammarCatalogue): BiGrammar = BiFailure()
+  override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure()
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = {
-    val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     val throwsGrammar = ("^" ~> typeGrammar)*
     val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) ~< ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(MethodTypeKey)
     methodGrammar

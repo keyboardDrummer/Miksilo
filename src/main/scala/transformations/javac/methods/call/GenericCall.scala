@@ -1,6 +1,6 @@
 package transformations.javac.methods.call
 
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node._
 import core.particles.path.Path
 import core.particles.{Compilation, Contract, Language}
@@ -19,7 +19,7 @@ object CallC
 
   object CallArguments extends NodeField
 
-  object CallArgumentsGrammar
+  object CallArgumentsGrammar extends GrammarKey
 
   def getCallCallee[T <: NodeLike](call: T) = call(CallC.CallCallee).asInstanceOf[T]
 
@@ -37,12 +37,13 @@ trait GenericCall extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MemberSelector)
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
-    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
-    val selectorGrammar = grammars.find(MemberSelector.SelectGrammar)
-    val calleeGrammar = grammars.create(CallC.CallCallee, selectorGrammar)
-    val callArguments = grammars.create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val core = find(ExpressionSkeleton.CoreGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val selectorGrammar = find(MemberSelector.SelectGrammar)
+    val calleeGrammar = create(CallC.CallCallee, selectorGrammar)
+    val callArguments = create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
     val parseCall = calleeGrammar.as(CallC.CallCallee) ~ callArguments.as(CallC.CallArguments) asNode CallC.CallKey
     core.addOption(parseCall)
   }

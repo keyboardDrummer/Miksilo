@@ -1,8 +1,9 @@
 package transformations.bytecode.types
 
-import core.bigrammar.{BiGrammar, Keyword}
+import core.bigrammar.grammars.Keyword
+import core.bigrammar.BiGrammar
 import core.particles.Language
-import core.particles.grammars.GrammarCatalogue
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 
 object VoidTypeC extends TypeInstance with StackType {
@@ -11,11 +12,15 @@ object VoidTypeC extends TypeInstance with StackType {
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
-  override def getByteCodeGrammar(grammars: GrammarCatalogue): BiGrammar = Keyword("V", false) ~> value(voidType)
+  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    Keyword("V", false) ~> value(voidType)
+  }
 
   override def getStackSize: Int = 0
 
-  override def getJavaGrammar(grammars: GrammarCatalogue) = {
+  override def getJavaGrammar(grammars: LanguageGrammars) = {
+    import grammars._
     "void" ~> value(voidType)
   }
 

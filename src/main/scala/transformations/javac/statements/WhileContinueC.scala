@@ -1,7 +1,7 @@
 package transformations.javac.statements
 
-import core.particles.{Compilation, Language}
-import core.particles.grammars.GrammarCatalogue
+import core.particles.{Compilation, Language, NodeGrammar}
+import core.particles.grammars.LanguageGrammars
 import core.particles.node.{Node, NodeClass}
 import core.particles.path.Path
 import transformations.bytecode.additions.LabelledLocations
@@ -17,7 +17,7 @@ object WhileContinueC extends StatementInstance {
     Seq(LabelledLocations.goTo(startLabel))
   }
 
-  override def transformGrammars(grammars: GrammarCatalogue, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey))
   }

@@ -1,8 +1,8 @@
 package transformations.bytecode.coreInstructions.objects
 
+import core.particles.grammars.LanguageGrammars
+import core.particles.node.{Node, NodeClass, NodeField}
 import core.particles.{Compilation, Language}
-import core.particles.grammars.GrammarCatalogue
-import core.particles.node.{Key, Node, NodeClass, NodeField}
 import transformations.bytecode.constants.FieldRefConstant
 import transformations.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import transformations.bytecode.simpleBytecode.ProgramTypeState
@@ -40,7 +40,10 @@ object PutField extends InstructionDelta {
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
   }
 
-  override def argumentsGrammar(grammars: GrammarCatalogue) = grammars.find(ConstantPoolIndexGrammar).as(FieldRef)
+  override def argumentsGrammar(grammars: LanguageGrammars) = {
+    import grammars._
+    find(ConstantPoolIndexGrammar).as(FieldRef)
+  }
 
   override def grammarName = "putfield"
 }
