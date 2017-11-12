@@ -1,0 +1,48 @@
+Profiling global results:
+015273ms total, 803.8ms average, for javac
+009160ms total, 166.5ms average, for running phases
+006166ms total, 324.5ms average, for blender compile
+004271ms total, 062.8ms average, for build language
+004113ms total, 411.3ms average, for run Prints the program by generating a pretty printer from its grammar.
+003611ms total, 109.4ms average, for run Implicitly prefixes references to private methods with the 'this' qualified if it is missing.
+003069ms total, 161.5ms average, for Java run expected
+002843ms total, 149.6ms average, for Java run actual
+002063ms total, 121.3ms average, for inject java style comments
+001829ms total, 031.5ms average, for parse
+000419ms total, 209.5ms average, for run Takes the bytecode program and runs it using the JVM.
+000322ms total, 053.7ms average, for run Writes the current program as JVM class file bytes to a function.
+000288ms total, 005.2ms average, for inject labelled locations
+000227ms total, 007.1ms average, for run Defines a skeleton for the Java class.
+000217ms total, 004.3ms average, for inject inferred stack frames
+000183ms total, 003.6ms average, for inject inferred max stack
+000157ms total, 003.1ms average, for inject remove constant pool
+000091ms total, 002.8ms average, for run Removes the constant pool in favor of inline constant entries
+000076ms total, 002.1ms average, for run Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop.
+000048ms total, 000.7ms average, for inject store long
+000046ms total, 000.7ms average, for inject store address
+000041ms total, 000.6ms average, for inject byte code skeleton
+000034ms total, 001.1ms average, for run Determines which TypeVariables are actually object types.
+000032ms total, 001.0ms average, for run Generates a stack frame for each label instruction. Stack frames can be used to determine the stack and variable types at a particular instruction.
+000030ms total, 000.4ms average, for inject field ref constant
+000030ms total, 000.9ms average, for run Enables fields to have initialisers.
+000029ms total, 000.9ms average, for run Enables declaring a local and initializing it in one statement.
+000028ms total, 027.5ms average, for run Decompiles the field and method signatures in a classfile.
+000026ms total, 000.8ms average, for run Add proper C-style for-loop continue semantics.
+000025ms total, 000.8ms average, for run Enables using the non-iterator for loop.
+000024ms total, 000.8ms average, for run Generates the code max stack value for code attributes which is required by the JVM.
+000024ms total, 000.4ms average, for inject pop 2
+000022ms total, 000.3ms average, for inject duplicate instruction
+000019ms total, 000.3ms average, for inject name and type constant
+000018ms total, 000.6ms average, for run Defines the += operator.
+000017ms total, 000.2ms average, for inject signature attribute
+000015ms total, 000.2ms average, for inject load long
+000013ms total, 000.2ms average, for inject byte code method info
+000013ms total, 000.3ms average, for inject java goto
+000013ms total, 000.4ms average, for run Replaces the jump instructions from bytecode. The new instructions are similar to the old ones except that they use labels as target instead of instruction indices.
+000012ms total, 000.1ms average, for inject method type
+000011ms total, 000.2ms average, for inject pop
+000011ms total, 000.2ms average, for inject double return instruction
+000011ms total, 000.2ms average, for inject stack map table attribute
+000010ms total, 000.2ms average, for inject get field
+000010ms total, 000.2ms average, for inject code attribute
+000010ms total, 000.1ms average, for inject qualified class name constant
