@@ -10,6 +10,7 @@ import transformations.javac.expressions.ExpressionSkeleton
 import transformations.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import transformations.javac.expressions.literals.IntLiteralDelta
 import transformations.javac.statements.{BlockDelta, StatementSkeleton}
+import transformations.javac.trivia.{CaptureTriviaDelta, JavaStyleCommentsC, TriviaInsideNode}
 import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path

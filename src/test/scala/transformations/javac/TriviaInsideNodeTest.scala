@@ -6,6 +6,7 @@ import core.particles.grammars.BodyGrammar
 import core.particles.node.{GrammarKey, NodeClass, NodeField}
 import core.particles.{Language, NodeGrammarWriter}
 import org.scalatest.FunSuite
+import transformations.javac.trivia.TriviaInsideNode
 
 class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
 

@@ -1,9 +1,9 @@
-package transformations.javac
+package transformations.javac.trivia
 
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 import core.particles.grammars.LanguageGrammars
+import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
 
 import scala.collection.immutable.List
 
