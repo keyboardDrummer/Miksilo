@@ -64,7 +64,7 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 trait BiGrammarSequenceWriter extends BiGrammarWriter {
 
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
-    if (grammar.containsParser()) new WithTrivia(grammar, ParseWhiteSpace, horizontal) else grammar
+    if (grammar.containsParser()) new WithTrivia(grammar, new ManyHorizontal(ParseWhiteSpace), horizontal) else grammar
 
   implicit def stringAsGrammar(value: String) = new GrammarWithSequence(value)
   implicit class GrammarWithSequence(val grammar: BiGrammar) extends BiGrammarSequenceMethodsExtension {

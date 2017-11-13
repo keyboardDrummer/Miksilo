@@ -17,6 +17,7 @@ class ManyPrinter(val inner: NodePrinter,
       case seq: Seq[_] if seq.nonEmpty => new BindPrinter(bindableInner, this).
         write(WithMapG(core.grammar.~(seq.head, seq.tail), from.map), state) //TODO matching on both list and ArrayBuffer like this is a bit ugly.
       case seq: Seq[_] => Success(state, Empty)
+      case UndefinedDestructuringValue => Success(state, Empty)
       case _ => fail(s"$from passed to many was not a list")
     }
     result

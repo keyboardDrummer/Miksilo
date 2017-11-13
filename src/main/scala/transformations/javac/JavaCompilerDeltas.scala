@@ -33,14 +33,14 @@ import transformations.javac.methods.assignment.{AssignToVariable, AssignmentPre
 import transformations.javac.methods.call.CallStaticOrInstanceC
 import transformations.javac.statements._
 import transformations.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import transformations.javac.trivia.JavaStyleCommentsC
+import transformations.javac.trivia.JavaStyleCommentsDelta
 import transformations.javac.types._
 
 object JavaCompilerDeltas {
 
   def getCompiler = new CompilerFromDeltas(javaCompilerTransformations)
 
-  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsC, ExpressionMethodC, BlockCompilerC, JavaGotoC)
+  def allTransformations = javaCompilerTransformations ++ Seq(JavaStyleCommentsDelta, ExpressionMethodC, BlockCompilerC, JavaGotoC)
 
   def javaCompilerTransformations: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,

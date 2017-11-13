@@ -13,10 +13,10 @@ import transformations.javac.methods.assignment.IncrementAssignmentC
 import transformations.javac.methods.call.CallC
 import transformations.javac.statements.ExpressionAsStatementC
 import transformations.javac.JavaCompilerDeltas
-import transformations.javac.trivia.JavaStyleCommentsC
+import transformations.javac.trivia.JavaStyleCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations.filter(p => p != JavaStyleCommentsC))
+  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations.filter(p => p != JavaStyleCommentsDelta))
 {
 
   test("BasicClass") {
