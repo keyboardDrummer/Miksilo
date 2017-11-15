@@ -9,11 +9,11 @@ import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
 import core.particles.Delta
 import org.jdesktop.swingx.JXList
-import transformations.javac.JavaCompilerDeltas
-import application.compilerBuilder.ParticleInstance._
+import deltas.javac.JavaCompilerDeltas
+import application.compilerBuilder.DeltaInstance._
 
 object CompilerBuilderPanel {
-  val availableParticles = JavaCompilerDeltas.allTransformations ++ Seq(MarkOutputGrammar)
+  val availableParticles = JavaCompilerDeltas.allDeltas ++ Seq(MarkOutputGrammar)
 }
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {

@@ -3,11 +3,11 @@ package core.bigrammar
 import application.compilerCockpit._
 import core.particles.Delta
 import org.scalatest.FunSuite
-import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.expressions.ExpressionSkeleton
-import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
-import transformations.javac.statements.BlockDelta
-import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
+import deltas.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
+import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
+import deltas.javac.statements.BlockDelta
+import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
 import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
 
@@ -68,7 +68,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorC, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorC, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
-    val newTransformations = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+    val newTransformations = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
 
     val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)

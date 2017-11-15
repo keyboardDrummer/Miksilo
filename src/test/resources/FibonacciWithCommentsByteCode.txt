@@ -1,31 +1,31 @@
-class 6 extends 26 with interfaces: ()
+class 4 extends 26 with interfaces: ()
 Constant pool:
-  Utf8 java/lang/Object
   Utf8 Fibonacci
-  Utf8 StackMapTable
   Utf8 fibonacci
   Utf8 (I)I
-  Class 2
-  NameAndType 4:5
-  Methodref 6.7
+  Class 1
+  NameAndType 2:3
+  Methodref 4.5
+  Utf8 StackMapTable
   Utf8 Code
+  Utf8 java/io/PrintStream
   Utf8 print
   Utf8 (I)V
-  Utf8 java/io/PrintStream
-  Class 12
+  Class 9
   NameAndType 10:11
-  Methodref 13.14
-  Utf8 java/lang/System
+  Methodref 12.13
   Utf8 out
   Utf8 Ljava/io/PrintStream;
-  Class 16
-  NameAndType 17:18
-  Fieldref 19.20
+  Utf8 java/lang/System
+  Class 17
+  NameAndType 15:16
+  Fieldref 18.19
   Utf8 main
   Utf8 ([Ljava/lang/String;)V
+  Utf8 java/lang/Object
   Utf8 <init>
   Utf8 ()V
-  Class 1
+  Class 23
   NameAndType 24:25
   Methodref 26.27
 {
@@ -34,7 +34,7 @@ Constant pool:
     descriptor: 25
     flags: ACC_PUBLIC
     Code:
-      name: 9, stack:1, locals:1
+      name: 8, stack:1, locals:1
         aload 0
         invokespecial 28
         return
@@ -44,24 +44,24 @@ Constant pool:
   /* hello */
   /* bye */
   /* PS */
-    name: 22
-    descriptor: 23
+    name: 21
+    descriptor: 22
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 9, stack:2, locals:1
-        getstatic 21
+      name: 8, stack:2, locals:1
+        getstatic 20
         iconst 5
-        invokestatic 8
-        invokevirtual 15
+        invokestatic 6
+        invokevirtual 14
         return
       Exceptions:
 
   Method;
-    name: 4
-    descriptor: 5
+    name: 2
+    descriptor: 3
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
-      name: 9, stack:3, locals:1
+      name: 8, stack:3, locals:1
         iload 0
         /* here comes two */
         iconst 2
@@ -71,14 +71,14 @@ Constant pool:
         iload 0
         iconst 1
         isub
-        invokestatic 8
+        invokestatic 6
         iload 0
         iconst 2
         isub
-        invokestatic 8
+        invokestatic 6
         iadd
         ireturn
-      StackMapTable: name: 3
+      StackMapTable: name: 7
         same frame, offset:9
         same locals, 1 stack item, offset:12
           int

@@ -2,8 +2,8 @@ package util
 
 import core.particles._
 import core.particles.node.Node
-import transformations.bytecode.PrintByteCode
-import transformations.javac.JavaCompilerDeltas
+import deltas.bytecode.PrintByteCode
+import deltas.javac.JavaCompilerDeltas
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}

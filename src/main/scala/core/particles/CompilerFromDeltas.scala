@@ -2,7 +2,7 @@ package core.particles
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
-import core.particles.exceptions.ParticleDependencyViolation
+import core.particles.exceptions.DeltaDependencyViolation
 import core.particles.node.Node
 
 import scala.reflect.io.{Directory, File}
@@ -62,7 +62,7 @@ class CompilerFromDeltas(val deltas: Seq[Delta]) {
     for (transformation <- transformations.reverse) {
       transformation.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
-          throw ParticleDependencyViolation(dependency, transformation)
+          throw DeltaDependencyViolation(dependency, transformation)
       )
       available += transformation
     }

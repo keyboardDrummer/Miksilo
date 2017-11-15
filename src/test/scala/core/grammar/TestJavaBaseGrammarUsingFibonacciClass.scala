@@ -2,21 +2,21 @@ package core.grammar
 
 import core.bigrammar.TestCompilerGrammarUtils
 import core.particles.node.{ComparisonOptions, Node}
-import transformations.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
-import transformations.javac.classes.skeleton.JavaClassSkeleton
-import transformations.javac.expressions._
-import transformations.javac.expressions.additive.{AdditionDelta, SubtractionC}
-import transformations.javac.expressions.literals.IntLiteralDelta
-import transformations.javac.expressions.relational.LessThanC
-import transformations.javac.methods._
-import transformations.javac.methods.assignment.IncrementAssignmentC
-import transformations.javac.methods.call.CallC
-import transformations.javac.statements.ExpressionAsStatementC
-import transformations.javac.JavaCompilerDeltas
-import transformations.javac.trivia.JavaStyleCommentsDelta
+import deltas.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
+import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.expressions._
+import deltas.javac.expressions.additive.{AdditionDelta, SubtractionC}
+import deltas.javac.expressions.literals.IntLiteralDelta
+import deltas.javac.expressions.relational.LessThanC
+import deltas.javac.methods._
+import deltas.javac.methods.assignment.IncrementAssignmentC
+import deltas.javac.methods.call.CallC
+import deltas.javac.statements.ExpressionAsStatementC
+import deltas.javac.JavaCompilerDeltas
+import deltas.javac.trivia.JavaStyleCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations.filter(p => p != JavaStyleCommentsDelta))
+  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerDeltas.filter(p => p != JavaStyleCommentsDelta))
 {
 
   test("BasicClass") {

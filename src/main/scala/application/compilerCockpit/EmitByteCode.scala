@@ -2,7 +2,7 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import transformations.bytecode.PrintByteCode
+import deltas.bytecode.PrintByteCode
 
 object EmitByteCode extends CompileOption {
 

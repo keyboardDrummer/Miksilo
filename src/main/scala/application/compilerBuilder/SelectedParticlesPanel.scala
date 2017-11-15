@@ -8,38 +8,38 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 import core.particles.Delta
 import org.jdesktop.swingx.JXList
 
-object ParticleInstance
+object DeltaInstance
 {
   implicit class ParticleLike(val particleLike: Any)
   {
     def getParticle: Delta = particleLike match {
       case particle: Delta => particle
-      case instance: ParticleInstance => instance.particle
+      case instance: DeltaInstance => instance.delta
     }
 
-    def getParticleInstance: ParticleInstance = particleLike match {
-      case particle: Delta => new ParticleInstance(particle)
-      case instance: ParticleInstance => instance
+    def getParticleInstance: DeltaInstance = particleLike match {
+      case particle: Delta => new DeltaInstance(particle)
+      case instance: DeltaInstance => instance
     }
   }
 }
 
-class ParticleInstance(val particle: Delta)
+class DeltaInstance(val delta: Delta)
 
-class ParticleInstanceJXList() extends JXList() {
+class DeltaInstanceJXList() extends JXList() {
   override def getToolTipText(event: MouseEvent): String = {
     val index = this.locationToIndex(event.getPoint)
     val model = this.getModel
     if (index >= 0)
-      model.getElementAt(index).asInstanceOf[ParticleInstance].particle.description
+      model.getElementAt(index).asInstanceOf[DeltaInstance].delta.description
     else
       ""
   }
 }
 
 object SelectedParticlesPanel {
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[ParticleInstance]) = {
-    val compilerList = new ParticleInstanceJXList()
+  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[DeltaInstance]) = {
+    val compilerList = new DeltaInstanceJXList()
     compilerList.setTransferHandler(new SelectedParticlesTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)

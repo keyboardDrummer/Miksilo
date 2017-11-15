@@ -10,7 +10,7 @@ import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
-class ConsolePanel(val selectedParticles: ParticleInstanceList)  extends JPanel(new BorderLayout()) {
+class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new BorderLayout()) {
 
   val console = new JTextArea()
   console.setBorder(BorderFactory.createLoweredBevelBorder())

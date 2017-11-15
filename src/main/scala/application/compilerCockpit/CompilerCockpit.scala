@@ -15,7 +15,7 @@ import core.particles.exceptions.CompileException
 import core.particles.{CompilerFromDeltas, Delta}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
-import transformations.bytecode.ByteCodeSkeleton
+import deltas.bytecode.ByteCodeSkeleton
 
 import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter

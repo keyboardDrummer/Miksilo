@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 import java.util.{Timer, TimerTask}
 
 import core.particles._
-import core.particles.exceptions.ParticleDependencyViolation
+import core.particles.exceptions.DeltaDependencyViolation
 import core.particles.node.Node
 
 import scala.collection.mutable
@@ -117,7 +117,7 @@ class TestingCompiler(val deltas: Seq[Delta], compilerName: String) {
     for (transformation <- transformations.reverse) {
       transformation.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
-          throw ParticleDependencyViolation(dependency, transformation)
+          throw DeltaDependencyViolation(dependency, transformation)
       )
       available += transformation
     }

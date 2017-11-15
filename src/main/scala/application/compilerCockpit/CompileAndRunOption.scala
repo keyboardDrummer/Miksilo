@@ -4,9 +4,9 @@ import java.io.InputStream
 
 import core.particles._
 import core.particles.node.Node
-import transformations.bytecode.ByteCodeSkeleton._
-import transformations.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
-import transformations.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
+import deltas.bytecode.ByteCodeSkeleton._
+import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
+import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import util.SourceUtils
 
 object RunWithJVM extends DeltaWithPhase

@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass}
+import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass}
 
 object JavaClass extends TransformationGroup {
 

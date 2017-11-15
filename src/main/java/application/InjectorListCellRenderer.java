@@ -1,6 +1,6 @@
 package application;
 
-import application.compilerBuilder.ParticleInstance;
+import application.compilerBuilder.DeltaInstance;
 import application.compilerBuilder.ParticleLabelPainter;
 import application.compilerCockpit.MarkOutputGrammar$;
 import core.particles.Delta;
@@ -24,7 +24,7 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
       delta = (Delta)value;
     } else // if (value instanceof ParticleInstance)
     {
-      delta = ((ParticleInstance)value).particle();
+      delta = ((DeltaInstance)value).delta();
     }
     label.setText(delta.name());
     if (!isSelected) {

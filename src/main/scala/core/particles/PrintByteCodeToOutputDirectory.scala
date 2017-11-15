@@ -1,6 +1,6 @@
 package core.particles
 
-import transformations.bytecode.PrintByteCode
+import deltas.bytecode.PrintByteCode
 import util.FileNameUtils
 
 import scala.reflect.io.{Directory, File, Path}

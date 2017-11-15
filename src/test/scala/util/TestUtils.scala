@@ -7,16 +7,16 @@ import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.particles.Compilation
 import core.particles.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
-import transformations.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
-import transformations.bytecode.ByteCodeSkeleton.ByteCodeWrapper
-import transformations.bytecode.PrintByteCode
-import transformations.javac.JavaCompilerDeltas
+import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
+import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.PrintByteCode
+import deltas.javac.JavaCompilerDeltas
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.javaCompilerTransformations)) {
+object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
 }
 
 class TestUtils(val compiler: TestingCompiler) extends FunSuite {

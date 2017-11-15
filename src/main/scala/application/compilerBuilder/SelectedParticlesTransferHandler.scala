@@ -7,7 +7,7 @@ import javax.swing.{DefaultListModel, JComponent, JList}
 
 import core.particles.Delta
 
-class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[ParticleInstance])
+class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[DeltaInstance])
   extends ParticleProviderTransferHandler(availableList) {
   override def canImport(support: TransferSupport): Boolean = {
     val injectors = getInjectors(support.getTransferable)
@@ -19,7 +19,7 @@ class SelectedParticlesTransferHandler(availableList: JList[_], val model: Defau
     val location = support.getDropLocation.asInstanceOf[JList.DropLocation].getIndex
 
     for(injector <- injectors.reverse)
-      model.add(location, new ParticleInstance(injector.particle))
+      model.add(location, new DeltaInstance(injector.delta))
     true
   }
 
@@ -44,10 +44,10 @@ class SelectedParticlesTransferHandler(availableList: JList[_], val model: Defau
     super.exportDone(source, data, action)
   }
 
-  def getInjectors(transferable: Transferable): Seq[ParticleInstance] = {
+  def getInjectors(transferable: Transferable): Seq[DeltaInstance] = {
     transferable.getTransferData(ListItemTransferable.LIST_ITEM_DATA_FLAVOR).asInstanceOf[Seq[_]].collect({
-      case particle: Delta => new ParticleInstance(particle)
-      case instance: ParticleInstance => instance
+      case particle: Delta => new DeltaInstance(particle)
+      case instance: DeltaInstance => instance
     })
   }
 

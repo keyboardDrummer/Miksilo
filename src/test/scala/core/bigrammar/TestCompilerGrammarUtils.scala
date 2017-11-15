@@ -7,7 +7,7 @@ import core.particles._
 import core.particles.grammars.{LanguageGrammars}
 import core.particles.node.GrammarKey
 import org.scalatest.FunSuite
-import transformations.javac.JavaCompilerDeltas
+import deltas.javac.JavaCompilerDeltas
 import util.{CompilerBuilder, TestUtils}
 
 import scala.util.parsing.input.CharArrayReader
@@ -15,7 +15,7 @@ import scala.util.parsing.input.CharArrayReader
 
 case class StringKey(value: String) extends GrammarKey
 
-object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerTransformations)
+object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerDeltas)
 
 object TestGrammarUtils extends FunSuite {
 
@@ -48,7 +48,7 @@ object TestGrammarUtils extends FunSuite {
   }
 }
 
-case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
+case class TestCompilerGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null) {
     val grammar = getGrammarUsingTransformer(grammarTransformer)
@@ -70,7 +70,7 @@ case class TestCompilerGrammarUtils(particles: Seq[Delta]) extends FunSuite {
   }
 
   def getTransformations(key: GrammarKey): Seq[Delta] = {
-    Seq(new SelectorTransformation(key)) ++ particles
+    Seq(new SelectorTransformation(key)) ++ deltas
   }
 
   class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {

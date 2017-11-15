@@ -2,9 +2,9 @@ package core.particles
 
 import core.particles.node.{Node, NodeClass, NodeField}
 import org.scalatest.FunSuite
-import transformations.javac.expressions.literals.IntLiteralDelta
-import transformations.javac.methods.call.CallC
-import transformations.javac.methods.{MemberSelector, VariableC}
+import deltas.javac.expressions.literals.IntLiteralDelta
+import deltas.javac.methods.call.CallC
+import deltas.javac.methods.{MemberSelector, VariableC}
 
 class TestMetaObject extends FunSuite {
 

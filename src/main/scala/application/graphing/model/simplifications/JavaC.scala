@@ -1,9 +1,9 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.javac._
-import transformations.javac.classes.{SelectorReferenceKind, VariableReferenceKind}
-import transformations.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
+import deltas.javac._
+import deltas.javac.classes.{SelectorReferenceKind, VariableReferenceKind}
+import deltas.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}
 
 object JavaC extends TransformationGroup {
   override def dependencies: Set[Contract] =

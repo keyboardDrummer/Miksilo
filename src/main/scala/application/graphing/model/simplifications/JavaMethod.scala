@@ -1,12 +1,12 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.javac.ImplicitObjectSuperClass
-import transformations.javac.classes.{BasicImportC, FieldDeclaration}
-import transformations.javac.expressions.postfix.PostFixIncrementC
-import transformations.javac.methods.assignment.{AssignToVariable, IncrementAssignmentC}
-import transformations.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelector}
-import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
+import deltas.javac.ImplicitObjectSuperClass
+import deltas.javac.classes.{BasicImportC, FieldDeclaration}
+import deltas.javac.expressions.postfix.PostFixIncrementC
+import deltas.javac.methods.assignment.{AssignToVariable, IncrementAssignmentC}
+import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelector}
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object JavaMethod extends TransformationGroup {
 

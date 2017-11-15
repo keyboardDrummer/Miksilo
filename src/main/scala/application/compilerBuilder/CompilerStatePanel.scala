@@ -11,13 +11,13 @@ import core.particles.Delta
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
-class ParticleInstanceList extends DefaultListModel[ParticleInstance]
+class DeltaInstanceList extends DefaultListModel[DeltaInstance]
 {
-  def scalaElements: Seq[Delta] = JEnumerationWrapper(super.elements()).map(instance => instance.particle).toSeq
+  def scalaElements: Seq[Delta] = JEnumerationWrapper(super.elements()).map(instance => instance.delta).toSeq
 }
 
 class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
-  val selectedParticles = new ParticleInstanceList()
+  val selectedParticles = new DeltaInstanceList()
   val compilerName = new PlainDocument()
 
   StyleSheet.setTitleBorder(this, "Compiler")

@@ -10,7 +10,7 @@ import core.particles.Delta
 
 object MissingParticlesPanel {
 
-  def getPanel(panel: CompilerBuilderPanel, selectedParticles: ParticleInstanceList) = {
+  def getPanel(panel: CompilerBuilderPanel, selectedParticles: DeltaInstanceList) = {
     val dependentItems = new DefaultListModel[Delta]()
     val dependentList = new ParticleList()
     dependentList.setModel(dependentItems)
@@ -28,7 +28,7 @@ object MissingParticlesPanel {
     addButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
         for (selectedValue <- dependentList.getSelectedValues)
-          selectedParticles.addElement(new ParticleInstance(selectedValue.asInstanceOf[Delta]))
+          selectedParticles.addElement(new DeltaInstance(selectedValue.asInstanceOf[Delta]))
       }
     })
     dependentPanel.add(addButton, BorderLayout.PAGE_END)

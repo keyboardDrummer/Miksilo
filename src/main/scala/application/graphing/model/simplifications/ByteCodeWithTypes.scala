@@ -1,9 +1,9 @@
 package application.graphing.model.simplifications
 
 import core.particles.Contract
-import transformations.bytecode.types._
-import transformations.javac.JavaCompilerDeltas
-import transformations.javac.types.BooleanTypeC
+import deltas.bytecode.types._
+import deltas.javac.JavaCompilerDeltas
+import deltas.javac.types.BooleanTypeC
 
 object ByteCodeWithTypes extends TransformationGroup {
   override def dependants: Set[Contract] = Set(ByteCode)

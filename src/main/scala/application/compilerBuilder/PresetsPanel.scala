@@ -9,15 +9,15 @@ import javax.swing.text.AbstractDocument
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.particles.{CompilerFromDeltas, Delta}
-import transformations.bytecode.additions.LabelledLocations
-import transformations.javaPlus.ExpressionMethodC
-import transformations.javac._
-import transformations.javac.classes.FieldDeclarationWithInitializer
-import transformations.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
-import transformations.javac.methods.assignment.IncrementAssignmentC
-import transformations.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
-import transformations.javac.statements.{ForLoopC, ForLoopContinueC}
-import transformations.javac.statements.locals.LocalDeclarationWithInitializerC
+import deltas.bytecode.additions.LabelledLocations
+import deltas.javaPlus.ExpressionMethodC
+import deltas.javac._
+import deltas.javac.classes.FieldDeclarationWithInitializer
+import deltas.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
+import deltas.javac.methods.assignment.IncrementAssignmentC
+import deltas.javac.methods.{BlockCompilerC, ImplicitReturnAtEndOfMethod}
+import deltas.javac.statements.{ForLoopC, ForLoopContinueC}
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object PresetsPanel
 {
@@ -48,7 +48,7 @@ object PresetsPanel
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompilerDeltas.javaCompilerTransformations,
+    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompilerDeltas.javaCompilerDeltas,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
@@ -105,7 +105,7 @@ object PresetsPanel
   }
 }
 
-class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleInstanceList) extends JPanel(new GridBagLayout()) {
+class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInstanceList) extends JPanel(new GridBagLayout()) {
 
   initialise()
 
@@ -174,7 +174,7 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: ParticleIn
     selectedParticles.clear()
     compilerName.replace(0, compilerName.getLength, preset.name, null)
     for (particle <- preset.particles)
-      selectedParticles.addElement(new ParticleInstance(particle))
+      selectedParticles.addElement(new DeltaInstance(particle))
   }
 }
 
