@@ -44,7 +44,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   }
 
   def getVariableWithCorrectPath(obj: Path): Path = {
-    if (obj.clazz == MethodDelta.MethodKey)
+    if (obj.clazz == MethodDelta.Clazz)
       return PathRoot(obj.current)
 
     obj match {
@@ -65,7 +65,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
               getState(compilation).classCompiler = classCompiler
               classCompiler.bind()
 
-            case MethodDelta.MethodKey => MethodDelta.setMethodCompiler(obj, compilation)
+            case MethodDelta.Clazz => MethodDelta.setMethodCompiler(obj, compilation)
             case VariableC.VariableKey => addThisToVariable(compilation, obj)
             case _ =>
           }

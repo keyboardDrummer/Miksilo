@@ -1,17 +1,17 @@
 package deltas.javac.constructor
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ExpressionAsStatementC
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
-  override def dependencies: Set[Contract] = Set(ConstructorC)
+  override def dependencies: Set[Contract] = Set(ConstructorDelta)
 
   override def transform(clazz: Node, state: Compilation): Unit = {
 
-    for (constructor <- ConstructorC.getConstructors(clazz)) {
-      val statements = MethodDelta.getMethodBody(constructor)
+    for (constructor <- ConstructorDelta.getConstructors(clazz)) {
+      val statements = constructor.body
       var addSuperCall = false
       if (statements.isEmpty)
         addSuperCall = true

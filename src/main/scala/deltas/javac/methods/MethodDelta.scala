@@ -6,7 +6,6 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, PathRoot}
-import deltas.bytecode.ByteCodeMethodInfo._
 import deltas.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute}
 import deltas.bytecode.constants.Utf8ConstantDelta
@@ -17,26 +16,30 @@ import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
+import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
-object MethodDelta extends DeltaWithGrammar with WithCompilationState with ClassMemberDelta {
+object MethodDelta extends DeltaWithGrammar with WithCompilationState
+  with ClassMemberDelta {
 
-  implicit class Method(node: Node) {
-    def returnType: Node = node(ReturnTypeKey).asInstanceOf[Node]
-    def returnType_=(value: Node): Unit = node(ReturnTypeKey) = value
+  implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
+    def returnType: T = node(ReturnTypeKey).asInstanceOf[T]
+    def returnType_=(value: T): Unit = node(ReturnTypeKey) = value
 
-    def parameters: Seq[Node] = node(MethodParametersKey).asInstanceOf[Seq[Node]]
-    def parameters_=(value: Seq[Node]): Unit = node(MethodParametersKey) = value
+    def parameters: Seq[T] = node(MethodParametersKey).asInstanceOf[Seq[T]]
+    def parameters_=(value: Seq[T]): Unit = node(MethodParametersKey) = value
+
+    def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
   }
 
   def compile(compilation: Compilation, clazz: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val methods = getMethods(clazz)
-    clazz(ByteCodeSkeleton.ClassMethodsKey) = methods.map(method => {
+    clazz(ByteCodeSkeleton.Methods) = methods.map(method => {
       convertMethod(method, classCompiler, compilation)
-      method
+      method.node
     })
   }
 
@@ -48,17 +51,18 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     for (method <- methods)
       bindMethod(method)
 
-    def bindMethod(method: Node) = {
+    def bindMethod(method: Method[Node]) = {
       val methodName: String = MethodDelta.getMethodName(method)
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
       val _type = MethodType.construct(method.returnType, parameterTypes)
-      val key = new MethodClassKey(methodName, parameterTypes.toVector)
-      classInfo.methods(key) = new MethodInfo(_type, MethodDelta.getMethodStatic(method))
+      val key = MethodClassKey(methodName, parameterTypes.toVector)
+      classInfo.methods(key) = MethodInfo(_type, method.isStatic)
     }
   }
 
-  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
+    AccessibilityFieldsDelta)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler) = {
     val result = metaObject(ParameterTypeKey).asInstanceOf[Node]
@@ -66,17 +70,15 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     result
   }
 
-  def getMethodDescriptor(method: Node, classCompiler: ClassCompiler): Node = {
-    val returnType = getMethodReturnType(method)
-    val parameters = getMethodParameters(method)
-    val methodType = MethodType.construct(returnType, parameters.map(p => getParameterType(p, classCompiler)))
+  def getMethodDescriptor(method: Method[Node], classCompiler: ClassCompiler): Node = {
+    val methodType = MethodType.construct(method.returnType, method.parameters.map(p => getParameterType(p, classCompiler)))
     TypeConstant.constructor(methodType)
   }
 
-  def convertMethod(method: Node, classCompiler: ClassCompiler, compilation: Compilation): Unit = {
+  def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
 
     method.clazz = ByteCodeMethodInfo.MethodInfoKey
-    addMethodFlags(method)
+    AccessibilityFieldsDelta.addAccessFlags(method)
     method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
@@ -87,7 +89,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
     def addCodeAnnotation(method: Path) {
       setMethodCompiler(method, compilation)
-      val statements = getMethodBody(method)
+      val statements = method.body
       method.current.data.remove(Body)
       val statementToInstructions = StatementSkeleton.getToInstructions(compilation)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
@@ -109,50 +111,17 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     getState(compilation).methodCompiler = methodCompiler
   }
 
-  def getMethodReturnType(metaObject: Node) = {
-    metaObject(ReturnTypeKey).asInstanceOf[Node]
-  }
-
-  def getMethodParameters(metaObject: Node) = {
-    metaObject(MethodParametersKey).asInstanceOf[Seq[Node]]
-  }
-
-  def addMethodFlags(method: Node) = {
-    var flags = Set[ByteCodeMethodInfo.MethodAccessFlag]()
-    if (getMethodStatic(method))
-      flags += ByteCodeMethodInfo.StaticAccess
-
-    flags ++= visibilityToAccessFlag(getMethodVisibility(method))
-
-    method(ByteCodeMethodInfo.AccessFlagsKey) = flags
-  }
-
-  val visibilityToAccessFlag = visibilityAccessFlagLinks.toMap
-  def visibilityAccessFlagLinks: Seq[(Visibility, Set[ByteCodeMethodInfo.MethodAccessFlag])] = Seq(
-    (PublicVisibility, Set[MethodAccessFlag](PublicAccess)),
-    (PrivateVisibility, Set[MethodAccessFlag](PrivateAccess)),
-    (DefaultVisibility, Set.empty[MethodAccessFlag])
-  )
-
-  def getMethodVisibility(method: Node) = method(VisibilityKey).asInstanceOf[Visibility]
-
-  def getMethodStatic(method: Node) = method(StaticKey).asInstanceOf[Boolean]
-
   def getMethodCompiler(compilation: Compilation) = getState(compilation).methodCompiler
-
-  def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(Body).asInstanceOf[Seq[T]]
 
   def getMethodName(method: Node) = {
     method(MethodNameKey).asInstanceOf[String]
   }
 
-  def getMethods(clazz: Node) = clazz.members.filter(member => member.clazz == MethodKey)
+  def getMethods[T <: NodeLike](clazz: T): Seq[Method[T]] = NodeWrapper.wrapList(clazz.members.filter(member => member.clazz == Clazz))
 
   def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 
   object ParametersGrammar extends GrammarKey
-  object VisibilityGrammar extends GrammarKey
-  object StaticGrammar extends GrammarKey
   object ReturnTypeGrammar extends GrammarKey
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
@@ -164,34 +133,27 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
     val parseParameter = parseType.as(ParameterTypeKey) ~~ identifier.as(ParameterNameKey) asNode ParameterKey
     val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
-    val parseStatic = create(StaticGrammar, "static" ~~> value(true) | value(false))
-
-    val visibilityModifier = create(VisibilityGrammar,
-      "public" ~~> value(PublicVisibility) |
-        "protected" ~~> value(ProtectedVisibility) |
-        "private" ~~> value(PrivateVisibility) |
-        value(DefaultVisibility))
 
 
     val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
+    val methodUnmapped: TopBottom = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(Body)
-    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(MethodKey))
+    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Clazz))
 
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
   }
 
   def method(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],
-             static: Boolean = false, visibility: Visibility = PrivateVisibility, typeParameters: Seq[Node] = Seq.empty) = {
-    new Node(MethodKey,
+             static: Boolean = false, visibility: AccessibilityFieldsDelta.Visibility = PrivateVisibility, typeParameters: Seq[Node] = Seq.empty) = {
+    new Node(Clazz,
       MethodNameKey -> name,
       ReturnTypeKey -> _returnType,
       MethodParametersKey -> _parameters,
       Body -> _body,
-      StaticKey -> static,
-      VisibilityKey -> visibility,
+      AccessibilityFieldsDelta.Static -> static,
+      AccessibilityFieldsDelta.VisibilityField -> visibility,
       TypeParameters -> typeParameters)
   }
 
@@ -207,19 +169,13 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     var methodCompiler: MethodCompiler = _
   }
 
-  class Visibility extends NodeClass
-
-  object MethodKey extends NodeClass
+  object Clazz extends NodeClass
 
   object MethodGrammar extends GrammarKey
 
   object Body extends NodeField
 
   object ParameterNameKey extends NodeField
-
-  object StaticKey extends NodeField
-
-  object VisibilityKey extends NodeField
 
   object ReturnTypeKey extends NodeField
 
@@ -230,14 +186,6 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
   object TypeParameters extends NodeField
 
   object ParameterTypeKey extends NodeField
-
-  object PublicVisibility extends Visibility
-
-  object ProtectedVisibility extends Visibility
-
-  object PrivateVisibility extends Visibility
-
-  object DefaultVisibility extends Visibility
 
   override def description: String = "Enables Java classes to contain methods."
 }

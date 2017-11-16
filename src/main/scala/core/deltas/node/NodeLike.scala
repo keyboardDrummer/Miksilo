@@ -17,6 +17,7 @@ trait NodeWrapper[T <: NodeLike] {
   def apply(key: NodeField): Any = node.apply(key)
   def update(key: NodeField, value: Any): Unit = node.update(key, value)
   def clazz = node.clazz
+  def clazz_=(value: NodeClass) = node.clazz = value
   def dataView: Map[NodeField, Any] = node.dataView
 }
 
@@ -26,6 +27,7 @@ trait NodeLike {
   def apply(key: NodeField): Any
   def update(key: NodeField, value: Any): Unit
   def clazz: NodeClass
+  def clazz_=(value: NodeClass): Unit
   def dataView: Map[NodeField, Any]
 
   def selfAndDescendants: List[Self] = {

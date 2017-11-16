@@ -7,7 +7,7 @@ import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
-object ReturnVoidC extends StatementInstance {
+object ReturnVoidDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 

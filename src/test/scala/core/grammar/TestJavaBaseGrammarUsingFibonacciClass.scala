@@ -118,12 +118,12 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val printCall = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodDelta.method("main", VoidTypeC.voidType, Seq(MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.stringType))),
-      Seq(ExpressionAsStatementC.create(printCall)), static = true, MethodDelta.PublicVisibility)
+      Seq(ExpressionAsStatementC.create(printCall)), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {
     MethodDelta.method("fibonacci", IntTypeC.intType, Seq(MethodDelta.parameter("index", IntTypeC.intType)),
-      Seq(ReturnExpressionC._return(getFibonacciExpression)), static = true, MethodDelta.PublicVisibility)
+      Seq(ReturnExpressionDelta._return(getFibonacciExpression)), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciExpression: Node = {

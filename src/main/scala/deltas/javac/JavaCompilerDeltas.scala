@@ -41,11 +41,11 @@ object JavaCompilerDeltas {
   def getCompiler = new CompilerFromDeltas(javaCompilerDeltas)
 
   def allDeltas = javaCompilerDeltas ++
-    Seq(JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerC, JavaGotoC)
+    Seq(JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
 
   def javaCompilerDeltas: Seq[Delta] = {
-    Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, FieldDeclarationWithInitializer, ConstructorC, SelectorReferenceKind, VariableReferenceKind) ++
+    Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
+      NewC, FieldDeclarationWithInitializer, ConstructorDelta, SelectorReferenceKind, VariableReferenceKind) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
@@ -54,9 +54,9 @@ object JavaCompilerDeltas {
   def fields = Seq(FieldDeclaration, AssignToMember)
 
   def javaMethod = Seq(ForLoopContinueC, JavaGotoC, ForLoopC, LocalDeclarationWithInitializerC) ++
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionC, ReturnVoidC, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
+    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueC, WhileC, BlockDelta,
     ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
