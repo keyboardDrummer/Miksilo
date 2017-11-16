@@ -4,7 +4,7 @@ import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 import javax.swing.{JComponent, JList, TransferHandler}
 import application.compilerBuilder.DeltaInstance._
-import core.particles.Delta
+import core.deltas.Delta
 
 import scala.collection.convert.Wrappers.JListWrapper
 

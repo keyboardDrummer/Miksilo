@@ -2,9 +2,9 @@ package deltas.javac
 
 import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, Sequence, WithTrivia}
-import core.particles.grammars.BodyGrammar
-import core.particles.node.{GrammarKey, NodeClass, NodeField}
-import core.particles.{Language, NodeGrammarWriter}
+import core.deltas.grammars.BodyGrammar
+import core.deltas.node.{GrammarKey, NodeClass, NodeField}
+import core.deltas.{Language, NodeGrammarWriter}
 import org.scalatest.FunSuite
 import deltas.javac.trivia.TriviaInsideNode
 

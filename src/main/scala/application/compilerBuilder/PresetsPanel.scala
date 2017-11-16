@@ -8,9 +8,9 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.{CompilerFromDeltas, Delta}
+import core.deltas.{CompilerFromDeltas, Delta}
 import deltas.bytecode.additions.LabelledLocations
-import deltas.javaPlus.ExpressionMethodC
+import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
@@ -53,7 +53,7 @@ object PresetsPanel
   }
 
   def getFibonacciExpressionMethodPreset = {
-    new Preset("Java with expression method", Seq(ExpressionMethodC) ++ getJavaCompilerParticles,
+    new Preset("Java with expression method", Seq(ExpressionMethodDelta) ++ getJavaCompilerParticles,
       "Allows you to use an expression as the body of a method.")
   }
 

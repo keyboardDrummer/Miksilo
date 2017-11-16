@@ -2,7 +2,7 @@ package core.bigrammar.printer
 
 import core.bigrammar.WithMapG
 import core.bigrammar.printer.TryState.{NodePrinter, State, fail}
-import core.particles.node.NodeField
+import core.deltas.node.NodeField
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try

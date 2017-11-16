@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionC}
 import deltas.javac.expressions.equality.EqualityDelta

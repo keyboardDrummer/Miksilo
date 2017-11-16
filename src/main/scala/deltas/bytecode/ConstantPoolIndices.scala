@@ -2,9 +2,9 @@ package deltas.bytecode
 
 import core.bigrammar._
 import core.bigrammar.grammars.ManyVertical
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 
 object ConstantPoolIndices extends DeltaWithGrammar {

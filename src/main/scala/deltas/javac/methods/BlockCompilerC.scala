@@ -1,8 +1,8 @@
 package deltas.javac.methods
 
-import core.particles._
-import core.particles.grammars.{BodyGrammar, LanguageGrammars}
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.deltas._
+import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
+import core.deltas.node.{Node, NodeClass, NodeField}
 import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.skeleton.JavaClassSkeleton

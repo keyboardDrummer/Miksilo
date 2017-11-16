@@ -3,8 +3,8 @@ package deltas.bytecode.readJar
 import java.io.{BufferedInputStream, InputStream}
 
 import core.grammar.ParseException
-import core.particles.node.Node
-import core.particles.{Language, Delta}
+import core.deltas.node.Node
+import core.deltas.{Language, Delta}
 
 object DecodeByteCodeParser extends Delta {
   override def inject(state: Language): Unit = {

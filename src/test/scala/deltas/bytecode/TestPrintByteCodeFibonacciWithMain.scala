@@ -1,6 +1,6 @@
 package deltas.bytecode
 
-import core.particles.node.Node
+import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants._

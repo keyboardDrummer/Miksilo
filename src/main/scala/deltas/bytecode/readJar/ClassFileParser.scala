@@ -1,6 +1,6 @@
 package deltas.bytecode.readJar
 
-import core.particles.node.Node
+import core.deltas.node.Node
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.constants._
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}

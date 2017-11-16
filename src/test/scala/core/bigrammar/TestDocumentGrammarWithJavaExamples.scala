@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import application.compilerCockpit._
-import core.particles.Delta
+import core.deltas.Delta
 import org.scalatest.FunSuite
 import deltas.javac.constructor.{ConstructorC, DefaultConstructorC, ImplicitSuperConstructorCall}
 import deltas.javac.expressions.ExpressionSkeleton

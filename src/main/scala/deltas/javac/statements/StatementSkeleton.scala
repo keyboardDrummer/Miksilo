@@ -1,9 +1,9 @@
 package deltas.javac.statements
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{GrammarKey, Node, NodeLike, NodeWrapper}
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{GrammarKey, Node, NodeLike, NodeWrapper}
+import core.deltas.path.Path
 import deltas.javac.expressions.ExpressionSkeleton
 
 

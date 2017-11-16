@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
-import core.particles._
-import core.particles.node.Node
+import core.deltas._
+import core.deltas.node.Node
 import deltas.bytecode._
 import deltas.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import deltas.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}

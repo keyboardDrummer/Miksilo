@@ -1,9 +1,9 @@
 package deltas.javac.expressions.equality
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

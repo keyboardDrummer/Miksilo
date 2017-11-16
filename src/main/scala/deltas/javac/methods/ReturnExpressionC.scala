@@ -1,9 +1,9 @@
 package deltas.javac.methods
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
 import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
 import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta

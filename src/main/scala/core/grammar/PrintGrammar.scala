@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.BiGrammarToGrammar
-import core.particles.grammars.{LanguageGrammars, KeyGrammar}
+import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons

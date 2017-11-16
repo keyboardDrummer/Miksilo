@@ -5,10 +5,10 @@ import core.bigrammar.grammars._
 import core.bigrammar.printer.TryState.{NodePrinter, State}
 import core.bigrammar.{BiGrammar, BiGrammarToGrammar, WithMapG}
 import core.grammar.Grammar
-import core.particles.grammars.{LanguageGrammars, TriviasGrammar}
-import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
+import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
+import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
-import core.particles.node.{Key, NodeField}
+import core.deltas.node.{Key, NodeField}
 
 import scala.util.Try
 

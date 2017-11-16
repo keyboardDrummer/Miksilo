@@ -1,6 +1,6 @@
 package deltas.bytecode.extraBytecodeInstructions
 
-import core.particles.node.Node
+import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC

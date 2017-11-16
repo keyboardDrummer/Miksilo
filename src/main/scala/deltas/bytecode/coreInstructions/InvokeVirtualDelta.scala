@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
-import core.particles.{Compilation, Language}
-import core.particles.node.{Key, Node, NodeClass}
+import core.deltas.{Compilation, Language}
+import core.deltas.node.{Key, Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 

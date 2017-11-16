@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.grammar.{Grammar, ~}
-import core.particles.node.GrammarKey
+import core.deltas.node.GrammarKey
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 

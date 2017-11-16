@@ -1,7 +1,7 @@
 package deltas.javac
 
-import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.node.Node
+import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.javac.classes.WildcardImportC
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import JavaClassSkeleton._

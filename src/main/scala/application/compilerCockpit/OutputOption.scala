@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.particles.Language
+import core.deltas.Language
 
 object OutputOption {
 

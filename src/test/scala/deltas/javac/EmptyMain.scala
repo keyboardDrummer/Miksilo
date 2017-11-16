@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.particles.node.Node
+import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._

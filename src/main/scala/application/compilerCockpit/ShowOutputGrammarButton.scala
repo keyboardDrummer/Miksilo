@@ -5,7 +5,7 @@ import javax.swing.JButton
 
 import core.bigrammar.BiGrammarToGrammar
 import core.grammar.PrintGrammar
-import core.particles.CompilerFromDeltas
+import core.deltas.CompilerFromDeltas
 
 class ShowOutputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show output grammar") {
   addActionListener(new ActionListener {

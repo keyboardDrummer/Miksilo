@@ -1,9 +1,9 @@
 package deltas.javac.methods.assignment
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.Node
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.Node
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta

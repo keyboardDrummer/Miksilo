@@ -1,7 +1,7 @@
 package deltas.bytecode.additions
 
-import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.node.Node
+import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions._

@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.GrammarKey
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.GrammarKey
 
 object BlockDelta extends DeltaWithGrammar {
 

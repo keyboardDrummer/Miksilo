@@ -1,6 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
-import core.particles.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.JumpBehavior

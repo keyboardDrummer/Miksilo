@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.bigrammar.printer.UndefinedDestructuringValue
-import core.particles.node.{Key, NodeField}
+import core.deltas.node.{Key, NodeField}
 import util.{ExtendedType, GraphBasics, Property}
 
 import scala.collection.mutable

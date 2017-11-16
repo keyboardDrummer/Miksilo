@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{Compilation, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.{Compilation, Language}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta

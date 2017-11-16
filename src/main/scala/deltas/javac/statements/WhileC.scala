@@ -1,9 +1,9 @@
 package deltas.javac.statements
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.{Path, SequenceElement}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.{Path, SequenceElement}
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.simpleBytecode.InferredStackFrames

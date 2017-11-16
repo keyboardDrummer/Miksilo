@@ -1,9 +1,9 @@
 package deltas.javac.methods.call
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.Path
+import core.deltas.{Compilation, Contract, Language}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

@@ -1,8 +1,8 @@
 package deltas.bytecode.simpleBytecode
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.Node
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.Node
 import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import deltas.bytecode.additions.LabelledLocations

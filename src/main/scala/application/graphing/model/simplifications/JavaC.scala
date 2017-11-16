@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.javac._
 import deltas.javac.classes.{SelectorReferenceKind, VariableReferenceKind}
 import deltas.javac.constructor.{DefaultConstructorC, ImplicitSuperConstructorCall}

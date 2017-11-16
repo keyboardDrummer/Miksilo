@@ -4,9 +4,9 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.util.{Timer, TimerTask}
 
-import core.particles._
-import core.particles.exceptions.DeltaDependencyViolation
-import core.particles.node.Node
+import core.deltas._
+import core.deltas.exceptions.DeltaDependencyViolation
+import core.deltas.node.Node
 
 import scala.collection.mutable
 import scala.reflect.io.{Directory, File}

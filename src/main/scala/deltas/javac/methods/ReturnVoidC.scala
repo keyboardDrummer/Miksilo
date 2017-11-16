@@ -1,9 +1,9 @@
 package deltas.javac.methods
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 

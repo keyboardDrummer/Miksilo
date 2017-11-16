@@ -3,7 +3,7 @@ package core.bigrammar
 import core.bigrammar.grammars._
 import core.document.Empty
 import core.grammar.{PrintGrammar, Produce}
-import core.particles.node.GrammarKey
+import core.deltas.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {

@@ -3,8 +3,8 @@ package deltas.bytecode.readJar
 import java.io.{BufferedInputStream, InputStream}
 
 import core.grammar.ParseException
-import core.particles.node.Node
-import core.particles.{Language, Delta}
+import core.deltas.node.Node
+import core.deltas.{Language, Delta}
 import deltas.bytecode.attributes.{ByteCodeAttribute, SignatureAttribute, UnParsedAttribute}
 import deltas.javac.JavaCompilerDeltas
 

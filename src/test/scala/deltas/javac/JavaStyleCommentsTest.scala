@@ -3,9 +3,9 @@ package deltas.javac
 import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.particles._
-import core.particles.grammars.{BodyGrammar, LanguageGrammars}
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.deltas._
+import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
+import core.deltas.node.{Node, NodeClass, NodeField}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import deltas.javac.expressions.literals.IntLiteralDelta

@@ -2,8 +2,8 @@ package deltas.javac.trivia
 
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.particles.grammars.LanguageGrammars
-import core.particles.{DeltaWithGrammar, Language, NodeGrammar}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
 
 import scala.collection.immutable.List
 

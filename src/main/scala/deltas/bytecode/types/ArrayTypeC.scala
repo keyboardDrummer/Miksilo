@@ -2,9 +2,9 @@ package deltas.bytecode.types
 
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.{Language, NodeGrammar}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.{Language, NodeGrammar}
 
 object ArrayTypeC extends TypeInstance with StackType {
   override val key = ArrayTypeKey

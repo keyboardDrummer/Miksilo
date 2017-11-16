@@ -1,9 +1,9 @@
 package deltas.javac.statements.locals
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.path.{Path, PathRoot, SequenceElement}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.path.{Path, PathRoot, SequenceElement}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.VariableC

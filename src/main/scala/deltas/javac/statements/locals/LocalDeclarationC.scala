@@ -1,10 +1,10 @@
 package deltas.javac.statements.locals
 
-import core.particles._
-import core.particles.exceptions.BadInputException
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.exceptions.BadInputException
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.path.Path
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}

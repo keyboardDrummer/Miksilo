@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
 import core.bigrammar.{BiGrammarToGrammar, BiGrammar}
-import core.particles.{Phase, Language, CompilerFromDeltas, Delta}
+import core.deltas.{Phase, Language, CompilerFromDeltas, Delta}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try

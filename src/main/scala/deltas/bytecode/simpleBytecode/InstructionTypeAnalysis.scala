@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
-import core.particles.exceptions.BadInputException
-import core.particles.node.Node
+import core.deltas.exceptions.BadInputException
+import core.deltas.node.Node
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import deltas.bytecode.types.ObjectTypeDelta

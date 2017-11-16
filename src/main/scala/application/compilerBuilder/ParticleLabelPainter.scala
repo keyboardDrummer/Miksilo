@@ -2,7 +2,7 @@ package application.compilerBuilder
 
 import javax.swing.JPanel
 
-import core.particles.Delta
+import core.deltas.Delta
 import util.Cache
 
 import scala.collection.mutable

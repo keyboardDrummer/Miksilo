@@ -3,9 +3,9 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{FromStringGrammar, StringLiteral}
 import core.grammar.Identifier
-import core.particles.Language
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
+import core.deltas.Language
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
 import deltas.bytecode.PrintByteCode
 
 object Utf8ConstantDelta extends ConstantEntry {

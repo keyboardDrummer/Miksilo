@@ -1,8 +1,8 @@
 package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, Key}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, Key}
 import deltas.bytecode.readJar.ClassFileParser
 
 object InnerClassesAttribute extends ByteCodeAttribute {

@@ -1,8 +1,8 @@
 package deltas.javac.types
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{NodeClass, NodeField}
-import core.particles.{DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{NodeClass, NodeField}
+import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.types.TypeSkeleton
 
 object SuperTypeArgument extends DeltaWithGrammar {

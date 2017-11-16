@@ -1,8 +1,8 @@
 package deltas.bytecode.types
 
 import core.bigrammar.TestCompilerGrammarUtils
-import core.particles.Delta
-import core.particles.node.Node
+import core.deltas.Delta
+import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.additions.LabelledLocations.LabelKey

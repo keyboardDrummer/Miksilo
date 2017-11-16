@@ -1,9 +1,9 @@
 package deltas.javac.constructor
 
-import core.particles._
-import core.particles.exceptions.BadInputException
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.deltas._
+import core.deltas.exceptions.BadInputException
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeC
@@ -42,7 +42,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
 
   def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],
                   visibility: Visibility = PublicVisibility) = new Node(ConstructorKey,
-    MethodParametersKey -> _parameters, MethodBodyKey -> _body, VisibilityKey -> visibility,
+    MethodParametersKey -> _parameters, Body -> _body, VisibilityKey -> visibility,
     ConstructorClassNameKey -> className)
 
 
@@ -55,7 +55,7 @@ object ConstructorC extends DeltaWithGrammar with DeltaWithPhase {
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = find(MethodDelta.VisibilityGrammar) as VisibilityKey
     val parseParameters = find(MethodDelta.ParametersGrammar) as MethodParametersKey
-    val block = find(BlockDelta.Grammar) as MethodBodyKey
+    val block = find(BlockDelta.Grammar) as Body
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)
   }

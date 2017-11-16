@@ -2,10 +2,10 @@ package deltas.javac.expressions.literals
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexG
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.path.Path
+import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeC

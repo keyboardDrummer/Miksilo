@@ -1,7 +1,7 @@
 package deltas.bytecode.readJar
 
-import core.particles.node.Node
-import core.particles.{Compilation, DeltaWithPhase, Language}
+import core.deltas.node.Node
+import core.deltas.{Compilation, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute, UnParsedAttribute}
 import deltas.bytecode.attributes.UnParsedAttribute.UnParsedAttribute

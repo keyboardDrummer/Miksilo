@@ -1,7 +1,7 @@
 package deltas.javac.methods
 
-import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.node.Node
+import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
@@ -14,7 +14,7 @@ object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
       val hasNoReturn = statements.isEmpty ||
         (statements.last.clazz != ReturnExpressionC.ReturnInteger && statements.last.clazz != ReturnVoidC.ReturnVoidKey)
       if (hasNoReturn) {
-        method(MethodDelta.MethodBodyKey) = statements ++ Seq(ReturnVoidC._return)
+        method(MethodDelta.Body) = statements ++ Seq(ReturnVoidC._return)
       }
     }
   }

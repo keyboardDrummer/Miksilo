@@ -2,9 +2,9 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Labelled}
-import core.particles.Language
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{GrammarKey, Node, NodeClass, NodeField}
+import core.deltas.Language
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{GrammarKey, Node, NodeClass, NodeField}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName

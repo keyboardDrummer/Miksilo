@@ -7,7 +7,7 @@ import javax.swing.text.PlainDocument
 
 import application.StyleSheet
 import application.compilerCockpit.CompilerCockpit
-import core.particles.Delta
+import core.deltas.Delta
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 

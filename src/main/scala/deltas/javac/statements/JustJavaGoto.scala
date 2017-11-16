@@ -1,9 +1,9 @@
 package deltas.javac.statements
 
-import core.particles.{Compilation, Language}
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
-import core.particles.path.Path
+import core.deltas.{Compilation, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.path.Path
 import deltas.bytecode.additions.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {

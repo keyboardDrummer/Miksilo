@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions
 
-import core.particles.node.{Key, Node, NodeClass}
+import core.deltas.node.{Key, Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 
 object InvokeStaticDelta extends InvokeDelta {

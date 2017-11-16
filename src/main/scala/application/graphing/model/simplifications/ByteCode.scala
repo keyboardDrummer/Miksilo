@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.javac.JavaCompilerDeltas
 
 object ByteCode extends TransformationGroup {

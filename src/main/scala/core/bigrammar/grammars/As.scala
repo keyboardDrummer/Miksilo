@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
-import core.particles.node.NodeField
+import core.deltas.node.NodeField
 
 case class As(var inner: BiGrammar, key: NodeField) extends BiGrammar
 {

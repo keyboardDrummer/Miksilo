@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.floats
 
-import core.particles.node.{Node, NodeClass}
-import core.particles.{Compilation, Contract}
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.{Compilation, Contract}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
