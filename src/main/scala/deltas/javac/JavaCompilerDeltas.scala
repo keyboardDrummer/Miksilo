@@ -40,6 +40,8 @@ object JavaCompilerDeltas {
 
   def getCompiler = new CompilerFromDeltas(javaCompilerDeltas)
 
+  def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
+
   def allDeltas = javaCompilerDeltas ++
     Seq(JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
 

@@ -9,7 +9,7 @@ import core.deltas.node.{Node, NodeClass, NodeField, NodeLike}
 class NodeGrammar(inner: BiGrammar, val key: NodeClass)
   extends MapGrammarWithMap(inner,
     input => NodeGrammar.construct(input, key),
-    obj => NodeGrammar.destruct(obj.asInstanceOf[WithMapG[Any]], key))
+    obj => NodeGrammar.destruct(obj, key))
 {
 }
 
