@@ -2,9 +2,9 @@ package deltas.javac.classes.skeleton
 
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
-import core.particles._
-import core.particles.grammars.{BodyGrammar, LanguageGrammars}
-import core.particles.node.{GrammarKey, Node, NodeField, NodeLike}
+import core.deltas._
+import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
+import core.deltas.node.{GrammarKey, Node, NodeField, NodeLike}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.Clazz
 import deltas.bytecode.constants.ClassInfoConstant

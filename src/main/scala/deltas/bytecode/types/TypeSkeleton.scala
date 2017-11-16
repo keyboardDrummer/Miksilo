@@ -1,11 +1,11 @@
 package deltas.bytecode.types
 
 import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
-import core.particles.exceptions.BadInputException
+import core.deltas.exceptions.BadInputException
 import core.grammar.ParseException
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{GrammarKey, Key, Node}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{GrammarKey, Key, Node}
 import deltas.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: Node, from: Node) extends BadInputException {

@@ -3,7 +3,7 @@ package application;
 import application.compilerBuilder.DeltaInstance;
 import application.compilerBuilder.ParticleLabelPainter;
 import application.compilerCockpit.MarkOutputGrammar$;
-import core.particles.Delta;
+import core.deltas.Delta;
 
 import javax.swing.*;
 import java.awt.*;

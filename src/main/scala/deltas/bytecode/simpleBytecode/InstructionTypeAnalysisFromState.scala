@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
-import core.particles.Compilation
-import core.particles.node.{Node, NodeClass}
+import core.deltas.Compilation
+import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.JumpBehavior

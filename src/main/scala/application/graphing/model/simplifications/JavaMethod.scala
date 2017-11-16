@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.{BasicImportC, FieldDeclaration}
 import deltas.javac.expressions.postfix.PostFixIncrementC

@@ -2,8 +2,8 @@ package deltas.javac.trivia
 
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.particles.grammars.{LanguageGrammars, TriviaGrammar}
-import core.particles.{DeltaWithGrammar, Language}
+import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
+import core.deltas.{DeltaWithGrammar, Language}
 
 object JavaStyleCommentsDelta extends DeltaWithGrammar {
 

@@ -1,7 +1,7 @@
 package deltas.bytecode.types
 
-import core.particles.node.NodeClass
-import core.particles.{Delta, Language}
+import core.deltas.node.NodeClass
+import core.deltas.{Delta, Language}
 
 trait StackType extends Delta
 {

@@ -1,7 +1,7 @@
 package deltas.javac.constructor
 
-import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.node.Node
+import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ExpressionAsStatementC
 
@@ -23,7 +23,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
       }
 
       if (addSuperCall)
-        constructor(MethodDelta.MethodBodyKey) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
+        constructor(MethodDelta.Body) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
     }
   }
 

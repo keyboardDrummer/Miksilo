@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
-import core.particles._
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.{Path, SequenceElement}
+import core.deltas._
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.{Path, SequenceElement}
 
 trait StatementInstance extends DeltaWithGrammar {
 

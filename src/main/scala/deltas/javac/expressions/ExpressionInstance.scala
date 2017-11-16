@@ -1,8 +1,8 @@
 package deltas.javac.expressions
 
-import core.particles._
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.Path
 
 trait ExpressionInstance extends DeltaWithGrammar {
   val key: NodeClass

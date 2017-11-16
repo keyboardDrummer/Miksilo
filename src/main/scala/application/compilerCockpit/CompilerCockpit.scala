@@ -11,8 +11,8 @@ import application.StyleSheet
 import core.bigrammar.BiGrammarToGrammar
 import core.grammar.Grammar
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
-import core.particles.exceptions.CompileException
-import core.particles.{CompilerFromDeltas, Delta}
+import core.deltas.exceptions.CompileException
+import core.deltas.{CompilerFromDeltas, Delta}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import deltas.bytecode.ByteCodeSkeleton

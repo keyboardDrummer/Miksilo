@@ -2,9 +2,9 @@ package deltas.bytecode
 
 import core.bigrammar.BiGrammar
 import core.document.BlankLine
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.{Contract, DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute

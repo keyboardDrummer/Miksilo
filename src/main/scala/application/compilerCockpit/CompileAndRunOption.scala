@@ -2,8 +2,8 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.particles._
-import core.particles.node.Node
+import core.deltas._
+import core.deltas.node.Node
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant

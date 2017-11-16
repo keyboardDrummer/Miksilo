@@ -1,9 +1,9 @@
 package deltas.javac.methods
 
-import core.particles.grammars.LanguageGrammars
-import core.particles._
-import core.particles.node._
-import core.particles.path.Path
+import core.deltas.grammars.LanguageGrammars
+import core.deltas._
+import core.deltas.node._
+import core.deltas.path.Path
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton

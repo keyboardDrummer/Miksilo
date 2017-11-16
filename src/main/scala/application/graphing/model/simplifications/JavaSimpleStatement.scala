@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.assignment.AssignmentPrecedence
 import deltas.javac.statements._

@@ -1,7 +1,7 @@
 package util
 
-import core.particles._
-import core.particles.node.Node
+import core.deltas._
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaCompilerDeltas
 

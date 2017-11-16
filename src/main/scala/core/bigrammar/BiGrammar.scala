@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars.{Choice, Labelled, MapGrammar, Sequence}
 import core.document.WhiteSpace
-import core.particles.node.GrammarKey
+import core.deltas.node.GrammarKey
 
 /*
 A grammar that maps to both a parser and a printer

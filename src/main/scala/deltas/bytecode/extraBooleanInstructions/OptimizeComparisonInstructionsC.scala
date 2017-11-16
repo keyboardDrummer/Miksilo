@@ -1,7 +1,7 @@
 package deltas.bytecode.extraBooleanInstructions
 
-import core.particles.node.Node
-import core.particles.{Compilation, Contract, DeltaWithPhase}
+import core.deltas.node.Node
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute

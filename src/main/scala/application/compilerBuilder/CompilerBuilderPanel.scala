@@ -7,7 +7,7 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
-import core.particles.Delta
+import core.deltas.Delta
 import org.jdesktop.swingx.JXList
 import deltas.javac.JavaCompilerDeltas
 import application.compilerBuilder.DeltaInstance._

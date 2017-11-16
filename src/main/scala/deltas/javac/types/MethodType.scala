@@ -2,9 +2,9 @@ package deltas.javac.types
 
 import core.bigrammar.grammars.BiFailure
 import core.bigrammar.BiGrammar
-import core.particles.Language
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
+import core.deltas.Language
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
 import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
 
 

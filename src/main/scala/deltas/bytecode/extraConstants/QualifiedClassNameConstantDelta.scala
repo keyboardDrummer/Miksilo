@@ -1,9 +1,9 @@
 package deltas.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
-import core.particles.Language
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
+import core.deltas.Language
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.constants.ConstantEntry
 import deltas.javac.classes.skeleton.QualifiedClassName

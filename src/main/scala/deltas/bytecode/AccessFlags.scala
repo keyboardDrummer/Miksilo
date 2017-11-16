@@ -1,6 +1,6 @@
 package deltas.bytecode
 
-import core.particles.node.{Key, Node, NodeField}
+import core.deltas.node.{Key, Node, NodeField}
 import deltas.bytecode.PrintByteCode._
 
 trait AccessFlags {

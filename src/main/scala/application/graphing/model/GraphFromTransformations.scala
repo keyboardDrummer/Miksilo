@@ -1,6 +1,6 @@
 package application.graphing.model
 
-import core.particles.Delta
+import core.deltas.Delta
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 
 class GraphFromTransformations(transformations: Seq[Delta])

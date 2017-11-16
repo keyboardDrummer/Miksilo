@@ -1,7 +1,7 @@
 package deltas.bytecode
 
 import application.compilerCockpit.MarkOutputGrammar
-import core.particles.Delta
+import core.deltas.Delta
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.simpleBytecode.RemoveConstantPool

@@ -1,8 +1,8 @@
 package deltas.bytecode.extraBooleanInstructions
 
-import core.particles._
-import core.particles.node.Node
-import core.particles.path.{Path, PathRoot}
+import core.deltas._
+import core.deltas.node.Node
+import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute

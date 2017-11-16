@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.bytecode.types._
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.types.BooleanTypeC

@@ -1,6 +1,6 @@
 package application.compilerCockpit
 
-import core.particles.Delta
+import core.deltas.Delta
 
 object MarkOutputGrammar extends Delta {
   override def name = "pretty print"

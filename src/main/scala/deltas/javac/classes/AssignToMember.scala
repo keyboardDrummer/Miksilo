@@ -1,8 +1,8 @@
 package deltas.javac.classes
 
-import core.particles.grammars.LanguageGrammars
-import core.particles._
-import core.particles.path.Path
+import core.deltas.grammars.LanguageGrammars
+import core.deltas._
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.javac.classes.SelectField._

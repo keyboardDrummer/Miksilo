@@ -1,7 +1,7 @@
 package deltas.javac.classes.skeleton
 
-import core.particles.{Compilation, DeltaWithGrammar, Language}
-import core.particles.node.Node
+import core.deltas.{Compilation, DeltaWithGrammar, Language}
+import core.deltas.node.Node
 
 trait ClassMemberDelta extends DeltaWithGrammar {
   def bind(compilation: Compilation, clazz: ClassSignature, member: Node)

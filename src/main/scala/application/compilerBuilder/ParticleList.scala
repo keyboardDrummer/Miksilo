@@ -2,7 +2,7 @@ package application.compilerBuilder
 
 import java.awt.event.MouseEvent
 
-import core.particles.Delta
+import core.deltas.Delta
 import org.jdesktop.swingx.JXList
 
 class ParticleList() extends JXList() {

@@ -1,6 +1,6 @@
 package application.graphing.model.simplifications
 
-import core.particles.Contract
+import core.deltas.Contract
 import deltas.bytecode.additions.PoptimizeC
 import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import deltas.javac.expressions.ExpressionSkeleton

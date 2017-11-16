@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.particles.node.Node
+import core.deltas.node.Node
 import deltas.bytecode.types.IntTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions._

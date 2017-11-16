@@ -1,10 +1,10 @@
 package deltas.bytecode.simpleBytecode
 
 import core.bigrammar.{GrammarReference, RootGrammar}
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.PathRoot
-import core.particles.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.PathRoot
+import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
 import deltas.bytecode.constants.FieldRefConstant.ClassInfo

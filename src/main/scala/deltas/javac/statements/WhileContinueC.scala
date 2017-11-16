@@ -1,9 +1,9 @@
 package deltas.javac.statements
 
-import core.particles.{Compilation, Language, NodeGrammar}
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.Path
+import core.deltas.{Compilation, Language, NodeGrammar}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.Path
 import deltas.bytecode.additions.LabelledLocations
 
 object WhileContinueC extends StatementInstance {

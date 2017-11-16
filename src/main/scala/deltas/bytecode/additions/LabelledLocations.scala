@@ -2,9 +2,9 @@ package deltas.bytecode.additions
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.StringLiteral
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.attributes.CodeAttribute._
 import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}

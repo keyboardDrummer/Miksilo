@@ -1,9 +1,9 @@
 package deltas.javac.types
 
 import core.bigrammar.BiGrammar
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{GrammarKey, NodeClass, NodeField}
-import core.particles.{DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{GrammarKey, NodeClass, NodeField}
+import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 

@@ -1,9 +1,9 @@
 package deltas.javac.classes
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.{Path, PathRoot}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorC, SuperCallExpression}
@@ -60,7 +60,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
         val bodyAfterHead = body.drop(1)
         val head = body.head
         val callToFieldInitialiser = ExpressionAsStatementC.create(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
-        constructor(MethodDelta.MethodBodyKey) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
+        constructor(MethodDelta.Body) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }
   }

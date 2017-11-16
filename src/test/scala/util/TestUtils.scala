@@ -4,8 +4,8 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
-import core.particles.Compilation
-import core.particles.node.{ComparisonOptions, Node}
+import core.deltas.Compilation
+import core.deltas.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
 import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper

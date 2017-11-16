@@ -1,9 +1,9 @@
 package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
 import deltas.bytecode.PrintByteCode._

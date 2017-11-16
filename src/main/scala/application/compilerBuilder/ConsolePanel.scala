@@ -5,7 +5,7 @@ import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
 
 import core.document.Empty
-import core.particles.{Contract, Delta}
+import core.deltas.{Contract, Delta}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper

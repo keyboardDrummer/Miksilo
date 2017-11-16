@@ -3,7 +3,7 @@ package core.bigrammar
 import core.bigrammar.grammars._
 import core.document.{BlankLine, Document, WhiteSpace}
 import core.grammar.{Identifier, NumberG, ~}
-import core.particles.node.Node
+import core.deltas.node.Node
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions

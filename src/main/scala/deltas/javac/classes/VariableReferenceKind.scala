@@ -1,7 +1,7 @@
 package deltas.javac.classes
 
-import core.particles._
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.path.Path
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{MemberSelector, VariableC}
 import deltas.javac.methods.VariableC.VariableKey

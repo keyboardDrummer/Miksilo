@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.particles.Compilation
-import core.particles.node.{Node, NodeClass}
+import core.deltas.Compilation
+import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState

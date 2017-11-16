@@ -4,8 +4,8 @@ import java.io
 
 import application.compilerCockpit.PrettyPrint
 import core.bigrammar.TestCompilerGrammarUtils
-import core.particles.DeltasToParserConverter
-import core.particles.node.Node
+import core.deltas.DeltasToParserConverter
+import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar

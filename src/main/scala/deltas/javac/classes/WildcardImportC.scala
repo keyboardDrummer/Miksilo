@@ -1,8 +1,8 @@
 package deltas.javac.classes
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass}
-import core.particles.{Compilation, Contract, DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.{Compilation, Contract, DeltaWithGrammar, Language}
 import deltas.javac.classes.BasicImportC._
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
 

@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeField}
-import core.particles.{Compilation, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeField}
+import core.deltas.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import deltas.bytecode.constants._

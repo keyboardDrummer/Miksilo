@@ -2,10 +2,10 @@ package deltas.javac.methods
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.TopBottom
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.{Path, PathRoot}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.ByteCodeMethodInfo._
 import deltas.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute}
@@ -88,7 +88,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     def addCodeAnnotation(method: Path) {
       setMethodCompiler(method, compilation)
       val statements = getMethodBody(method)
-      method.current.data.remove(MethodBodyKey)
+      method.current.data.remove(Body)
       val statementToInstructions = StatementSkeleton.getToInstructions(compilation)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val exceptionTable = Seq[Node]()
@@ -140,7 +140,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   def getMethodCompiler(compilation: Compilation) = getState(compilation).methodCompiler
 
-  def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(MethodBodyKey).asInstanceOf[Seq[T]]
+  def getMethodBody[T <: NodeLike](metaObject: T) = metaObject(Body).asInstanceOf[Seq[T]]
 
   def getMethodName(method: Node) = {
     method(MethodNameKey).asInstanceOf[String]
@@ -176,7 +176,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
     val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
     val methodUnmapped: TopBottom = visibilityModifier.as(VisibilityKey) ~ parseStatic.as(StaticKey) ~ typeParametersGrammar.as(TypeParameters) ~
-      parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(MethodBodyKey)
+      parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(Body)
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(MethodKey))
 
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
@@ -189,7 +189,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
       MethodNameKey -> name,
       ReturnTypeKey -> _returnType,
       MethodParametersKey -> _parameters,
-      MethodBodyKey -> _body,
+      Body -> _body,
       StaticKey -> static,
       VisibilityKey -> visibility,
       TypeParameters -> typeParameters)
@@ -213,7 +213,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState with Class
 
   object MethodGrammar extends GrammarKey
 
-  object MethodBodyKey extends NodeField
+  object Body extends NodeField
 
   object ParameterNameKey extends NodeField
 

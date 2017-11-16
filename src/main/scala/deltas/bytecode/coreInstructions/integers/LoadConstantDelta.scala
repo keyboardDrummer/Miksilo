@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.particles.{Compilation, Language}
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass, NodeField}
+import core.deltas.{Compilation, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.IntegerInfoConstant

@@ -1,8 +1,8 @@
 package deltas.javac.classes
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.GrammarKey
-import core.particles.{Contract, DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.GrammarKey
+import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.javac.methods.VariableC
 import deltas.javac.methods.VariableC.{VariableKey, VariableNameKey}
 

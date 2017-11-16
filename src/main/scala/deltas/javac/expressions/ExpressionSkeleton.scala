@@ -1,9 +1,9 @@
 package deltas.javac.expressions
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{GrammarKey, Key, Node, NodeWrapper}
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{GrammarKey, Key, Node, NodeWrapper}
+import core.deltas.path.Path
 import deltas.bytecode.types.TypeSkeleton
 
 object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {

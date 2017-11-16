@@ -1,9 +1,9 @@
 package deltas.javac.classes
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.Node
-import core.particles.path.Path
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.Node
+import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton

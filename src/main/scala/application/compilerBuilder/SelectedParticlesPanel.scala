@@ -5,7 +5,7 @@ import java.awt.event.{MouseEvent, ActionEvent, ActionListener}
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
-import core.particles.Delta
+import core.deltas.Delta
 import org.jdesktop.swingx.JXList
 
 object DeltaInstance

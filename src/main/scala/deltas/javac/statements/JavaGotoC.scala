@@ -1,6 +1,6 @@
 package deltas.javac.statements
 
-import core.particles.{Language, Delta, DeltaWithGrammar}
+import core.deltas.{Language, Delta, DeltaWithGrammar}
 
 object JavaGotoC extends Delta {
 

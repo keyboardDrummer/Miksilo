@@ -1,7 +1,7 @@
 package deltas.javac
 
 import application.compilerCockpit.PrettyPrint
-import core.particles._
+import core.deltas._
 import deltas.bytecode._
 import deltas.bytecode.additions.{LabelledLocations, PoptimizeC}
 import deltas.bytecode.attributes._
@@ -17,7 +17,7 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, RemoveConstantPool}
 import deltas.bytecode.types._
-import deltas.javaPlus.ExpressionMethodC
+import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.constructor._
@@ -33,14 +33,15 @@ import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, 
 import deltas.javac.methods.call.CallStaticOrInstanceC
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import deltas.javac.trivia.JavaStyleCommentsDelta
+import deltas.javac.trivia.{CaptureTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
 import deltas.javac.types._
 
 object JavaCompilerDeltas {
 
   def getCompiler = new CompilerFromDeltas(javaCompilerDeltas)
 
-  def allDeltas = javaCompilerDeltas ++ Seq(JavaStyleCommentsDelta, ExpressionMethodC, BlockCompilerC, JavaGotoC)
+  def allDeltas = javaCompilerDeltas ++
+    Seq(JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerC, JavaGotoC)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorC, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,

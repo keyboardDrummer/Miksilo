@@ -1,9 +1,9 @@
 package deltas.javac.constructor
 
-import core.particles.grammars.LanguageGrammars
-import core.particles.node.{Node, NodeClass}
-import core.particles.path.Path
-import core.particles.{Compilation, Contract, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.{Node, NodeClass}
+import core.deltas.path.Path
+import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._

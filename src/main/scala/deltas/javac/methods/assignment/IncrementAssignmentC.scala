@@ -1,9 +1,9 @@
 package deltas.javac.methods.assignment
 
-import core.particles._
-import core.particles.grammars.LanguageGrammars
-import core.particles.node._
-import core.particles.path.{Path, PathRoot}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node._
+import core.deltas.path.{Path, PathRoot}
 import deltas.javac.expressions.additive.AdditionDelta
 
 //TODO refactor so it uses a phase to reduce itself.

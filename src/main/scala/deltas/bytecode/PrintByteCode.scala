@@ -3,8 +3,8 @@ package deltas.bytecode
 import java.math.BigInteger
 
 import com.google.common.primitives.{Ints, Longs}
-import core.particles.Language
-import core.particles.node.Node
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.bytecode.ByteCodeSkeleton._
 

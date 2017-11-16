@@ -1,7 +1,7 @@
 package deltas.bytecode
 
-import core.particles.Language
-import core.particles.node.Node
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.additions.LabelledLocations.LabelKey
 import deltas.javac.classes.ConstantPool

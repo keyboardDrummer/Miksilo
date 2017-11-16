@@ -3,7 +3,7 @@ package application.compilerCockpit
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.JButton
 
-import core.particles.Phase
+import core.deltas.Phase
 
 class ShowPhasesButton(compilerCockpit: CompilerCockpit) extends JButton("Show phases") {
   addActionListener(new ActionListener {

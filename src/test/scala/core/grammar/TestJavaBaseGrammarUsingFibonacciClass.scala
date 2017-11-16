@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.TestCompilerGrammarUtils
-import core.particles.node.{ComparisonOptions, Node}
+import core.deltas.node.{ComparisonOptions, Node}
 import deltas.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._

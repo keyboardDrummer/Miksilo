@@ -5,7 +5,7 @@ import java.awt.dnd.DnDConstants
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.{DefaultListModel, JComponent, JList}
 
-import core.particles.Delta
+import core.deltas.Delta
 
 class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[DeltaInstance])
   extends ParticleProviderTransferHandler(availableList) {

@@ -6,7 +6,7 @@ import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
 
 import application.graphing.model.DepthFirstTraversal
-import core.particles.Delta
+import core.deltas.Delta
 
 object MissingParticlesPanel {
 

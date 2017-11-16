@@ -1,6 +1,6 @@
 package deltas.javac.methods
 
-import core.particles.Language
+import core.deltas.Language
 import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 import deltas.javac.expressions.ExpressionSkeleton
