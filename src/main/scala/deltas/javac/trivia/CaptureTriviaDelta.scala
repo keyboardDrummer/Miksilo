@@ -89,8 +89,10 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
       children.head ^^ { untyped =>
         val result = untyped.asInstanceOf[Result]
         StateM((state: BiGrammarToGrammar.State) => {
+          val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
           val newState = state + (TriviaCounter -> 0)
-          result.run(newState)
+          val (resultState, value) = result.run(newState)
+          (resultState + (TriviaCounter -> initialCounter), value)
         })
       }
     }
@@ -99,8 +101,11 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
       val nodePrinter: NodePrinter = recursive(node)
       new NodePrinter {
         override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
+          val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
           val newState = state + (TriviaCounter -> 0)
-          nodePrinter.write(from, newState)
+          nodePrinter.write(from, newState).map({
+            case (resultState, value) => (resultState + (TriviaCounter -> initialCounter), value)
+          })
         }
       }
     }
