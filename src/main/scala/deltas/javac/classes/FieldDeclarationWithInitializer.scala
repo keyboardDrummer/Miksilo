@@ -6,7 +6,7 @@ import core.deltas.node.{Node, NodeClass}
 import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.constructor.{ConstructorC, SuperCallExpression}
+import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallC
 import deltas.javac.methods.{MethodDelta, VariableC}
@@ -54,8 +54,8 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val fieldInitializerMethod = MethodDelta.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
-    for(constructor <- program.members.filter(member => member.clazz == ConstructorC.ConstructorKey)) {
-      val body = MethodDelta.getMethodBody(constructor)
+    for(constructor <- ConstructorDelta.getConstructors(program)) {
+      val body = constructor.body
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head

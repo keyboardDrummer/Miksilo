@@ -1,20 +1,20 @@
 package deltas.javac.methods
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
-  override def dependencies: Set[Contract] = Set(ReturnVoidC, ReturnExpressionC)
+  override def dependencies: Set[Contract] = Set(ReturnVoidDelta, ReturnExpressionDelta)
 
   override def transform(program: Node, state: Compilation): Unit = {
     val clazz = program
     val methods = MethodDelta.getMethods(clazz)
     for (method <- methods) {
-      val statements = MethodDelta.getMethodBody(method)
+      val statements = method.body
       val hasNoReturn = statements.isEmpty ||
-        (statements.last.clazz != ReturnExpressionC.ReturnInteger && statements.last.clazz != ReturnVoidC.ReturnVoidKey)
+        (statements.last.clazz != ReturnExpressionDelta.ReturnInteger && statements.last.clazz != ReturnVoidDelta.ReturnVoidKey)
       if (hasNoReturn) {
-        method(MethodDelta.Body) = statements ++ Seq(ReturnVoidC._return)
+        method(MethodDelta.Body) = statements ++ Seq(ReturnVoidDelta._return)
       }
     }
   }

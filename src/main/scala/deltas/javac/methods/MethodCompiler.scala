@@ -41,20 +41,20 @@ case class VariablePool(state: Language, typedVariables: Map[String, Node] = Map
   }
 }
 
-case class MethodCompiler(compilation: Compilation, method: Node) {
-  val parameters: Seq[Node] = getMethodParameters(method)
+case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
+  val parameters: Seq[Node] = method.parameters
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(compilation, method)
-  private val intermediate = getMethodBody[Path](PathRoot(method))
+  private val intermediate = new Method(PathRoot(method)).body
   val firstInstruction: Path = intermediate.head
   val variablesPerStatement: Map[Path, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables: VariablePool = {
     var result = VariablePool(compilation)
-    if (!getMethodStatic(method))
+    if (!method.isStatic)
       result = result.add("this", ObjectTypeDelta.objectType(classCompiler.currentClassInfo.name))
     for (parameter <- parameters)
       result = result.add(getParameterName(parameter), getParameterType(parameter, classCompiler))

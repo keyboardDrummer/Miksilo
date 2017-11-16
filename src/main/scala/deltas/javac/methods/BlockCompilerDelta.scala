@@ -8,7 +8,7 @@ import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.StatementSkeleton
 
-object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
+object BlockCompilerDelta extends DeltaWithGrammar with DeltaWithPhase
 {
   object ProgramKey extends NodeClass
   object ProgramStatements extends NodeField
@@ -22,7 +22,7 @@ object BlockCompilerC extends DeltaWithGrammar with DeltaWithPhase
   override def transform(program: Node, state: Compilation): Unit = {
     val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
     val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType("String")))
-    val method = MethodDelta.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true,MethodDelta.PublicVisibility)
+    val method = MethodDelta.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val clazz = JavaClassSkeleton.clazz(Seq.empty,"Block",Seq(method))
     program.replaceWith(clazz)
   }

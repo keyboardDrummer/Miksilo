@@ -12,7 +12,7 @@ import deltas.bytecode.types._
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
-object ReturnExpressionC extends StatementInstance {
+object ReturnExpressionDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 

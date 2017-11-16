@@ -2,15 +2,15 @@ package deltas.bytecode.readJar
 
 import core.deltas.node.Node
 import core.deltas.{Compilation, DeltaWithPhase, Language}
+import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
+import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.bytecode.ByteCodeSkeleton._
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.classes.{ConstantPool, FieldDeclaration}
-import deltas.javac.methods.MethodDelta
-import deltas.javac.methods.MethodDelta.{DefaultVisibility, Visibility}
-import deltas.bytecode.types.TypeSkeleton
+import deltas.javac.methods.AccessibilityFieldsDelta.Visibility
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
@@ -20,7 +20,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
     val nameIndex = classReference(ClassInfoConstant.Name).asInstanceOf[Int]
-    val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
+    val qualifiedClassName = QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
 //    val parentClassReference = constantPool.getNode(program(ByteCodeSkeleton.ClassParentIndex).asInstanceOf[Int])
     //    val nameIndex = classReference(ClassRefConstant.ClassRefName).asInstanceOf[Int]
@@ -32,13 +32,14 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     val fieldInfos = program(ByteCodeSkeleton.ClassFields).asInstanceOf[Seq[Node]]
 
     members ++= getFields(state, constantPool, fieldInfos)
-    members ++= getMethods(state, constantPool, program(ByteCodeSkeleton.ClassMethodsKey).asInstanceOf[Seq[Node]])
+    members ++= getMethods(state, constantPool, program(ByteCodeSkeleton.Methods).asInstanceOf[Seq[Node]])
 
     program.replaceWith(javaClazz)
   }
 
-  val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = MethodDelta.visibilityAccessFlagLinks.
+  val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = AccessibilityFieldsDelta.visibilityAccessFlagLinks.
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
+
   def getMethods(state: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
@@ -69,7 +70,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
 
       val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
       val foundVisibilities: Set[Visibility] = accessFlags.flatMap(f => accessFlagsToVisibility.get(f))
-      val visibility: Visibility = (foundVisibilities ++ Seq(DefaultVisibility)).head
+      val visibility: Visibility = (foundVisibilities ++ Seq(AccessibilityFieldsDelta.DefaultVisibility)).head
       val static: Boolean = false //TODO fix.
       MethodDelta.method(name, returnType, parameters, Seq.empty, static, visibility, typeParameters)
     })

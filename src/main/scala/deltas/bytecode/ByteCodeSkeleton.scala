@@ -33,7 +33,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
     def attributes: Seq[T] = node(ClassAttributes).asInstanceOf[Seq[T]]
 
-    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassMethodsKey).asInstanceOf[Seq[T]])
+    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(Methods).asInstanceOf[Seq[T]])
   }
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]
@@ -42,7 +42,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
             classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(Clazz,
-    ClassMethodsKey ->  methods,
+    Methods ->  methods,
     ClassNameIndexKey ->  name,
     ClassParentIndex ->  parent,
     ClassConstantPool ->  constantPool,
@@ -69,7 +69,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   object Clazz extends NodeClass
 
-  object ClassMethodsKey extends NodeField
+  object Methods extends NodeField
 
   object ClassNameIndexKey extends NodeField
 
