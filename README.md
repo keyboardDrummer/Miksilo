@@ -26,7 +26,7 @@ To see Blender's GUI in action, watch our [introduction video](http://www.youtub
 2. Call 'sbt run' in the project root
 
 ### Contributions
-There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for an Bachelor's or Master's thesis.
+There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor's or Master's thesis.
 
 Some examples of cool features:
 - Parser combinators that allow defining indentation sensitive grammars, such as those of Python and Haskell.
