@@ -2,11 +2,9 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.BiGrammarToGrammar.WithMap
-import core.bigrammar.printer.TryState
-import core.bigrammar.printer.TryState.State
+import core.bigrammar.printer.{Printer, TryState}
 import core.grammar.{Grammar, GrammarToParserConverter}
 
-import scala.util.Success
 import scala.util.parsing.input.CharArrayReader
 
 /**
@@ -23,20 +21,20 @@ class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = fals
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
-  override def write(from: WithMap, state: State) = {
+  override def write(from: WithMap) = {
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
           val parseResult = parser(new CharArrayReader(string.toCharArray))
           if (parseResult.successful && parseResult.get.equals(from.value))
-            Success(state, string)
+            TryState.ret(string)
           else
-            TryState.fail("FromGrammarWithToString could not parse string")
+            Printer.fail("FromGrammarWithToString could not parse string")
         }
         else
-          Success(state, string)
+          TryState.ret(string)
 
-      case _ => TryState.fail(s"FromStringGrammar expects a string value, and not a $from")
+      case _ => Printer.fail(s"FromStringGrammar expects a string value, and not a $from")
     }
   }
 }

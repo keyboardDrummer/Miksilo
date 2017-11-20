@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.printer.TryState.NodePrinter
+import core.bigrammar.printer.Printer.NodePrinter
 import core.grammar.Grammar
 import core.responsiveDocument.ResponsiveDocument
 

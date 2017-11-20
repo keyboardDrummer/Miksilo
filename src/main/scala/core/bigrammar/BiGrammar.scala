@@ -4,6 +4,10 @@ import core.bigrammar.grammars.{Choice, Labelled, MapGrammar, Sequence}
 import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
 
+object BiGrammar {
+  type State = Map[Any, Any]
+}
+
 /*
 A grammar that maps to both a parser and a printer
  */

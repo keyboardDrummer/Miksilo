@@ -2,19 +2,16 @@ package core.bigrammar.printer
 
 import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.WithMapG
-import core.bigrammar.printer.TryState.{NodePrinter, State, fail}
+import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
-import scala.util.{Failure, Try}
-
 class MapGrammarWithMapPrinter(inner: NodePrinter, deconstruct: WithMap => Option[WithMap]) extends NodePrinter {
-  override def write(from: WithMapG[Any], state: State): Try[(State, ResponsiveDocument)] = {
-
+  override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = {
     for {
-      deconstructedValue <- deconstruct(from).fold[Try[WithMapG[Any]]](
-        fail("could not deconstruct value"))(
-        r => Try(r))
-      result <- inner.write(deconstructedValue, state).recoverWith { case e: PrintError => Failure(e.mapPartial(x => x)) }
+      deconstructedValue <- deconstruct(from).fold[TryState[WithMapG[Any]]](
+        Printer.fail("could not deconstruct value"))(
+        r => TryState.ret(r))
+      result <- inner.write(deconstructedValue).mapError { case e: PrintError => e.mapPartial(x => x) }
     } yield result
   }
 }
