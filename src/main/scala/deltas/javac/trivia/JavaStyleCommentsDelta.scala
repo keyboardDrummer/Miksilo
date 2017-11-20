@@ -15,7 +15,7 @@ object JavaStyleCommentsDelta extends DeltaWithGrammar {
   }
 
   def getCommentGrammar: BiGrammar = {
-    new Sequence(new FromStringGrammar(core.grammar.RegexG("""(?s)/\*.*?\*/""".r), verifyWhenPrinting = true), space).ignoreRight
+    new Sequence(RegexGrammar("""(?s)/\*.*?\*/""".r, verifyWhenPrinting = true), space).ignoreRight
   }
 
   override def description: String = "Adds Java-style comments to the language"

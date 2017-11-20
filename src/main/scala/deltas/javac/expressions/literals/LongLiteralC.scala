@@ -1,7 +1,7 @@
 package deltas.javac.expressions.literals
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.RegexG
+import core.bigrammar.grammars.RegexGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
 import core.deltas.path.Path
@@ -20,7 +20,7 @@ object LongLiteralC extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val longGrammar : BiGrammar = RegexG("""-?\d+l""".r) ^^
+    val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r) ^^
       (number => parseLong(number.asInstanceOf[String]), l => Some(s"${l}l")) as ValueKey asNode LongLiteralKey
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(longGrammar)

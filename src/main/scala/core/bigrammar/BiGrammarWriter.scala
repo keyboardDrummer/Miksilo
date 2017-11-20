@@ -1,84 +1,11 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.document.{BlankLine, Document, WhiteSpace}
-import core.grammar.{Identifier, NumberG, ~}
-import core.deltas.node.Node
+import core.document.{Document, WhiteSpace}
+import core.grammar.{Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
-
-trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
-
-  def grammar: BiGrammar
-  def %(bottom: BiGrammar): SequenceLike
-  def ~(other: BiGrammar): SequenceLike
-  def many: ManyHorizontal
-  def manyVertical: ManyVertical
-
-  implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension
-
-  def ~<(right: BiGrammar) = (this ~ right).ignoreRight
-
-  def ~~<(right: BiGrammar) = this ~< new Sequence(space, right)
-
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
-
-  def ~~(right: BiGrammar): BiGrammar = {
-    new IgnoreRight(new Sequence(grammar, space)) ~ right
-  }
-
-  def someSeparatedVertical(separator: BiGrammar): BiGrammar =
-    someMap(this % (separator %> grammar).manyVertical)
-
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
-
-  def some: BiGrammar = someMap(grammar ~ (grammar*))
-  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))
-
-  private def someMap(grammar: BiGrammar): BiGrammar = {
-    grammar ^^
-      ( {
-        case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
-      }, {
-        case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
-      })
-  }
-  def inParenthesis = ("(": BiGrammar) ~> grammar ~< ")"
-
-  def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
-
-  def ~~>(right: BiGrammar) = new Sequence(grammar, space) ~> right
-
-  def * = many
-
-  def %%(bottom: BiGrammar): BiGrammar = {
-    (this %< BlankLine) % bottom
-  }
-
-  def %>(bottom: BiGrammar) = (this % bottom).ignoreLeft
-
-  def %<(bottom: BiGrammar) = (this % bottom).ignoreRight
-}
-
-trait BiGrammarSequenceWriter extends BiGrammarWriter {
-
-  def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
-    if (grammar.containsParser()) new WithTrivia(grammar, new ManyHorizontal(ParseWhiteSpace), horizontal) else grammar
-
-  implicit def stringAsGrammar(value: String) = new GrammarWithSequence(value)
-  implicit class GrammarWithSequence(val grammar: BiGrammar) extends BiGrammarSequenceMethodsExtension {
-    def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, horizontal = false))
-
-    def ~(other: BiGrammar) = new Sequence(grammar, addTriviaIfUseful(other))
-
-    def many = new ManyHorizontal(addTriviaIfUseful(grammar))
-
-    def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, horizontal = false))
-
-    override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension = new GrammarWithSequence(grammar)
-  }
-}
 
 trait BiGrammarWriter {
 

@@ -51,10 +51,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
           val newState = state + (TriviaCounter -> (counter + 1))
           val inner = result.run(state)
           val innerValue = inner._2.value.asInstanceOf[Seq[_]]
-          val map: Map[Any,Any] =
-            if (innerValue.nonEmpty)
-              Map(key -> innerValue)
-            else Map.empty
+          val map: Map[Any,Any] = if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty
           (newState, WithMapG[Any](Unit, map))
         })
       }
@@ -67,12 +64,8 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
         val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
         val key = Trivias(counter)
         val newState = state + (TriviaCounter -> (counter + 1))
-        val value = from.map.get(key) match {
-          case Some(trivia) =>
-            trivia.asInstanceOf[Seq[String]]
-          case _ => Seq.empty
-        }
-        triviasPrinter.write(WithMapG(value, from.map), newState)
+        val value = from.map.getOrElse(key, Seq.empty)
+        triviasPrinter.write(WithMapG[Any](value, from.map), newState)
       }
     }
 
