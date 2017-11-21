@@ -1,6 +1,5 @@
 package core.bigrammar
 
-import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.deltas.node.GrammarKey
 import core.grammar.{Grammar, ~}
@@ -35,20 +34,15 @@ object BiGrammarToGrammar {
         case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ valueToResult
         case _: Many => core.grammar.Many(children.head) ^^ { untyped =>
           val elements = untyped.asInstanceOf[Seq[Result]]
-          new StateFull[WithMap] {
-            override def run(initialState: State) = {
-              var state = initialState
-              var withMapState = Map.empty[Any, Any]
-              var result = List.empty[Any]
-              elements.foreach(r => {
-                val withMap = r(state)
-                state = withMap._1
-                withMapState = withMapState ++ withMap._2.map
-                result ::= withMap._2.value
-              })
-              (state, WithMapG(result.reverse, withMapState))
-            }
-          }
+          StateFull.flattenMonads(elements).map(withMaps => {
+            var resultMap = Map.empty[Any, Any]
+            var resultValue = List.empty[Any]
+            withMaps.foreach(withMap => {
+              resultMap ++= withMap.map
+              resultValue ::= withMap.value
+            })
+            WithMapG[Any](resultValue, resultMap)
+          })
         }
         case mapGrammar: MapGrammarWithMap => core.grammar.MapGrammar(children.head,
           result => result.asInstanceOf[Result].map(x => mapGrammar.construct(x)))
@@ -65,6 +59,6 @@ object BiGrammarToGrammar {
     override def setReference(inner: Grammar, partial: Grammar): Unit = partial.asInstanceOf[core.grammar.Labelled].inner = inner
   }
 
-  
+
   def toGrammar(grammar: BiGrammar): Grammar = Observer.observe(grammar) ^^ (r => r.asInstanceOf[Result](Map.empty[Any,Any])._2.value)
 }
