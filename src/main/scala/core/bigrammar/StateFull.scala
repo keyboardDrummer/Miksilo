@@ -3,7 +3,7 @@ package core.bigrammar
 import core.bigrammar.BiGrammar.State
 
 object StateFull {
-  def ret[T](value: T): StateFull[T] = state => (state, value)
+  def value[T](value: T): StateFull[T] = state => (state, value)
 }
 
 trait StateFull[T] {

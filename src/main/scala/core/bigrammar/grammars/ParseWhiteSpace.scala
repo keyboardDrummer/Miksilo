@@ -12,7 +12,7 @@ object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithou
   }
 
   override def write(from: WithMapG[Any]) =
-    if (regex.replaceSomeIn(from.value.asInstanceOf[String], _ => Some("")).isEmpty) TryState.ret(Empty)
+    if (regex.replaceSomeIn(from.value.asInstanceOf[String], _ => Some("")).isEmpty) TryState.value(Empty)
     else TryState.fail(new Exception(s"String ${from.value} was not whitespace"))
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true

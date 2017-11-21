@@ -42,14 +42,14 @@ class BiGrammarToPrinter {
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
-        case Print(document) => _ => TryState.ret(document)
+        case Print(document) => _ => TryState.value(document)
         case As(inner, key) => new AsPrinter(toPrinterCached(inner), key)
       }
       result
     })
   }
 
-  def succeed(value: ResponsiveDocument): TryState[ResponsiveDocument] = TryState.ret(value)
+  def succeed(value: ResponsiveDocument): TryState[ResponsiveDocument] = TryState.value(value)
 
   def failureToGrammar(message: String, grammar: BiGrammar): TryState[ResponsiveDocument] = {
     Printer.fail("encountered failure", -10000)

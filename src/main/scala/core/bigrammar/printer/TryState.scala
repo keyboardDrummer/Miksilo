@@ -7,13 +7,9 @@ import core.responsiveDocument.ResponsiveDocument
 import scala.util.{Failure, Success, Try}
 
 object TryState {
-  def ret[T](value: T): TryState[T] = state => Success((state, value))
+  def value[T](value: T): TryState[T] = state => Success((state, value))
   def fail[T](t: Throwable): TryState[T] = (state: State) => Failure(t)
   def fromStateM[T](stateM: StateFull[T]): TryState[T] = state => Success(stateM.run(state))
-}
-
-trait Functor[T] {
-  def map[U](f: T => U): Functor[U]
 }
 
 trait TryState[To] {
@@ -52,6 +48,6 @@ object Printer {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
 
-  def fail[T](message: Any): TryState[T] = (_: State) => Failure(RootError(message))
-  def fail[T](message: Any, depth: Int): TryState[T] = (_: State) => Failure(NegativeDepthRootError(message, depth))
+  def fail[T](message: Any): TryState[T] = TryState.fail(RootError(message))
+  def fail[T](message: Any, depth: Int): TryState[T] = TryState.fail(NegativeDepthRootError(message, depth))
 }

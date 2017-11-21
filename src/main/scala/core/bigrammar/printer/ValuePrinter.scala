@@ -9,7 +9,7 @@ import core.responsiveDocument.ResponsiveDocument
 
 class ValuePrinter(value: Any) extends NodePrinter {
   override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = {
-    if (Objects.equals(value, from.value)) TryState.ret(Empty)
+    if (Objects.equals(value, from.value)) TryState.value(Empty)
     else Printer.fail(ValueDiffers(from.value, value), -100)
   }
 

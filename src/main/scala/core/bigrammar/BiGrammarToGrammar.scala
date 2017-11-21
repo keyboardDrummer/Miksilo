@@ -12,7 +12,7 @@ object BiGrammarToGrammar {
 
   type Result = StateFull[WithMap]
 
-  def valueToResult(value: Any): Result = StateFull.ret(WithMapG(value, Map.empty))
+  def valueToResult(value: Any): Result = StateFull.value(WithMapG(value, Map.empty))
 
   //noinspection ZeroIndexToHead
   object Observer extends BiGrammarObserver[Grammar] {

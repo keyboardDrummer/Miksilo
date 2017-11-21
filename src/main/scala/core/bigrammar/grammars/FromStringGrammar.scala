@@ -27,12 +27,12 @@ class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = fals
         if (verifyWhenPrinting) {
           val parseResult = parser(new CharArrayReader(string.toCharArray))
           if (parseResult.successful && parseResult.get.equals(from.value))
-            TryState.ret(string)
+            TryState.value(string)
           else
             Printer.fail("FromGrammarWithToString could not parse string")
         }
         else
-          TryState.ret(string)
+          TryState.value(string)
 
       case _ => Printer.fail(s"FromStringGrammar expects a string value, and not a $from")
     }

@@ -5,6 +5,6 @@ import core.bigrammar.{BiGrammar, WithMapG}
 
 object StringLiteral extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
   override def getGrammar = core.grammar.StringLiteral
-  override def write(from: WithMapG[Any]) = TryState.ret("\"" + from.value + "\"")
+  override def write(from: WithMapG[Any]) = TryState.value("\"" + from.value + "\"")
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 }

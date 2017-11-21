@@ -10,7 +10,7 @@ class MapGrammarWithMapPrinter(inner: NodePrinter, deconstruct: WithMap => Optio
     for {
       deconstructedValue <- deconstruct(from).fold[TryState[WithMapG[Any]]](
         Printer.fail("could not deconstruct value"))(
-        r => TryState.ret(r))
+        r => TryState.value(r))
       result <- inner.write(deconstructedValue).mapError { case e: PrintError => MappedError(x => x, e) }
     } yield result
   }
