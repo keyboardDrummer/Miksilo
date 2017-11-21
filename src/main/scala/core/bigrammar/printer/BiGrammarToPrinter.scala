@@ -31,7 +31,8 @@ class BiGrammarToPrinter {
           else
             failureToGrammar("keyword didn't match", grammar)
         case Delimiter(keyword) => _ => succeed(keyword)
-        case labelled: Labelled => labelledToPrinter(labelled)
+        case labelled: Labelled =>
+          new NestPrinter(grammar, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left % right)
         case sequence: Sequence => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
@@ -44,8 +45,7 @@ class BiGrammarToPrinter {
         case Print(document) => _ => TryState.ret(document)
         case As(inner, key) => new AsPrinter(toPrinterCached(inner), key)
       }
-
-      new NestPrinter(grammar, result)
+      result
     })
   }
 

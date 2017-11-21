@@ -6,9 +6,11 @@ import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.mutable
+import scala.util
 
 class CachingPrinter(inner: NodePrinter) extends NodePrinter {
   val valueCache: mutable.Map[(Any, State), Printer.Result] = mutable.Map.empty
+  val failure = util.Failure[(State, ResponsiveDocument)](RootError(FoundDirectRecursionInLabel(inner), -1000))
 
   override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = state => {
     val key = (from, state)
@@ -16,7 +18,7 @@ class CachingPrinter(inner: NodePrinter) extends NodePrinter {
       case Some(result) =>
         result
       case _ =>
-        valueCache.put(key, Printer.fail(FoundDirectRecursionInLabel(inner), -1000).run(state))
+        valueCache.put(key, failure)
         val result = inner.write(from).run(state)
         valueCache.put(key, result)
         result

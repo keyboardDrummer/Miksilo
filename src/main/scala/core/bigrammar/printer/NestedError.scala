@@ -1,16 +1,14 @@
 package core.bigrammar.printer
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, PrintBiGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
-case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extends PrintError
- {
-   def partial = inner.partial
-   def mapPartial(f: ResponsiveDocument => ResponsiveDocument) = NestedError(value, grammar, inner.mapPartial(f))
-   val depth = inner.depth
+case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extends PrintError {
+  def partial = inner.partial
 
-   override def toDocument = ("Nested:": ResponsiveDocument) % (
-     ("Value:": ResponsiveDocument) ~~ value.toString %
-     ("Grammar:": ResponsiveDocument) ~~ grammar.toString %
-     inner.toDocument)
- }
+  val depth = inner.depth
+
+  override def toDocument = inner.toDocument %
+    ("Value:": ResponsiveDocument) ~~ value.toString %
+    ("Grammar:": ResponsiveDocument) ~~ PrintBiGrammar.toDocument(grammar)
+}

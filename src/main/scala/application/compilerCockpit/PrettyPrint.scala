@@ -19,7 +19,7 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
       val grammar = getOutputGrammar(language)
       val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToPrinter.toDocument(compilation.program, grammar))
       val documentTryWithOptionalRecover: Try[ResponsiveDocument] = if (recover) {
-        documentTry.recover({ case e: PrintError => e.toDocument })
+        documentTry.recover({ case e: PrintError => e.toDocumentWithPartial })
       }
       else {
         documentTry

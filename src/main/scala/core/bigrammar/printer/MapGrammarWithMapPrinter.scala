@@ -11,7 +11,7 @@ class MapGrammarWithMapPrinter(inner: NodePrinter, deconstruct: WithMap => Optio
       deconstructedValue <- deconstruct(from).fold[TryState[WithMapG[Any]]](
         Printer.fail("could not deconstruct value"))(
         r => TryState.ret(r))
-      result <- inner.write(deconstructedValue).mapError { case e: PrintError => e.mapPartial(x => x) }
+      result <- inner.write(deconstructedValue).mapError { case e: PrintError => MappedError(x => x, e) }
     } yield result
   }
 }

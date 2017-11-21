@@ -2,7 +2,6 @@ package core.bigrammar.printer
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.{StateFull, WithMapG}
-import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.{Failure, Success, Try}
@@ -53,5 +52,6 @@ object Printer {
     override def toString = "failed toDocument with something different than a print failure: " + e.toString
   }
 
-  def fail[T](inner: Any, depth: Int = 0): TryState[T] = (_: State) => Failure(RootError(depth, Empty, inner))
+  def fail[T](message: Any): TryState[T] = (_: State) => Failure(RootError(message))
+  def fail[T](message: Any, depth: Int): TryState[T] = (_: State) => Failure(NegativeDepthRootError(message, depth))
 }

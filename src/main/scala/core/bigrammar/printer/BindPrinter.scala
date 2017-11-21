@@ -17,7 +17,7 @@ class BindPrinter[T, U](first: WithMapG[T] => TryState[ResponsiveDocument => Res
       case Success(firstSuccess) =>
         second.write(WithMapG(secondValue, from.map)).run(firstSuccess._1) match {
           case Success(secondSuccess) => Success((secondSuccess._1, firstSuccess._2(secondSuccess._2)))
-          case Failure(printError: PrintError) => Failure(printError.mapPartial(firstSuccess._2))
+          case Failure(printError: PrintError) => Failure(MappedError(firstSuccess._2, printError))
           case Failure(e: NonePrintFailureException) => throw e
           case Failure(e: Throwable) => throw new NonePrintFailureException(e)
       }
