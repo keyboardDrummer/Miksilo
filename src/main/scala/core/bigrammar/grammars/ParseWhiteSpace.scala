@@ -1,6 +1,6 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.printer.TryState
+import core.bigrammar.printer.{Printer, TryState}
 import core.bigrammar.{BiGrammar, WithMapG}
 import core.document.Empty
 
@@ -13,7 +13,7 @@ object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithou
 
   override def write(from: WithMapG[Any]) =
     if (regex.replaceSomeIn(from.value.asInstanceOf[String], _ => Some("")).isEmpty) TryState.value(Empty)
-    else TryState.fail(new Exception(s"String ${from.value} was not whitespace"))
+    else Printer.fail(s"String ${from.value} was not whitespace")
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 }
