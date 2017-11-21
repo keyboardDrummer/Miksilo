@@ -23,13 +23,10 @@ object BiGrammarToGrammar {
         case _: SequenceLike =>
           core.grammar.Sequence(children(0), children(1)) ^^ { untyped =>
             val ~(firstResult: Result, secondResult: Result) = untyped.asInstanceOf[~[Result,Result]]
-            new StateFull[WithMap] {
-              override def run(state: State) = {
-                val firstMap = firstResult(state)
-                val secondMap = secondResult(firstMap._1)
-                (secondMap._1, WithMapG(core.grammar.~(firstMap._2.value, secondMap._2.value), firstMap._2.map ++ secondMap._2.map))
-              }
-            }
+            for {
+              firstValue <- firstResult
+              secondValue <- secondResult
+            } yield WithMapG(core.grammar.~(firstValue.value, secondValue.value), firstValue.map ++ secondValue.map)
           }
         case choice: Choice => core.grammar.Choice(children(0), children(1), choice.firstBeforeSecond)
         case custom: CustomGrammarWithoutChildren => custom.getGrammar ^^ valueToResult
