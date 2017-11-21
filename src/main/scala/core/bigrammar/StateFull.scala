@@ -2,19 +2,19 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 
-object StateM {
-  def ret[T](value: T): StateM[T] = state => (state, value)
+object StateFull {
+  def ret[T](value: T): StateFull[T] = state => (state, value)
 }
 
-trait StateM[T] {
+trait StateFull[T] {
   def run(state: State): (State, T)
 
-  def map(f: T => T): StateM[T] = state => {
+  def map(f: T => T): StateFull[T] = state => {
     val (newState, value) = run(state)
     (newState, f(value))
   }
 
-  def flatMap[U](f: T => StateM[U]): StateM[U] = state => {
+  def flatMap[U](f: T => StateFull[U]): StateFull[U] = state => {
     val (newState, value) = run(state)
     f(value).run(newState)
   }

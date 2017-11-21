@@ -10,9 +10,9 @@ case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 object BiGrammarToGrammar {
   type WithMap = WithMapG[Any]
 
-  type Result = StateM[WithMap]
+  type Result = StateFull[WithMap]
 
-  def valueToResult(value: Any): Result = StateM.ret(WithMapG(value, Map.empty))
+  def valueToResult(value: Any): Result = StateFull.ret(WithMapG(value, Map.empty))
 
   //noinspection ZeroIndexToHead
   object Observer extends BiGrammarObserver[Grammar] {
@@ -23,7 +23,7 @@ object BiGrammarToGrammar {
         case _: SequenceLike =>
           core.grammar.Sequence(children(0), children(1)) ^^ { untyped =>
             val ~(firstResult: Result, secondResult: Result) = untyped.asInstanceOf[~[Result,Result]]
-            new StateM[WithMap] {
+            new StateFull[WithMap] {
               override def run(state: State) = {
                 val firstMap = firstResult(state)
                 val secondMap = secondResult(firstMap._1)
@@ -38,7 +38,7 @@ object BiGrammarToGrammar {
         case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ valueToResult
         case _: Many => core.grammar.Many(children.head) ^^ { untyped =>
           val elements = untyped.asInstanceOf[Seq[Result]]
-          new StateM[WithMap] {
+          new StateFull[WithMap] {
             override def run(initialState: State) = {
               var state = initialState
               var withMapState = Map.empty[Any, Any]

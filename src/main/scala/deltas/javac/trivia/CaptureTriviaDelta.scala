@@ -5,7 +5,7 @@ import core.bigrammar.BiGrammarToGrammar.{Result, WithMap}
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, BiGrammarToGrammar, StateM, WithMapG}
+import core.bigrammar.{BiGrammar, BiGrammarToGrammar, StateFull, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.node.{Key, NodeField}
 import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
@@ -48,7 +48,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
 
   class StoreTrivia(triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammarWithoutChildren {
 
-    def getKeyAndIncrementCounter: StateM[NodeField] = (state: State) => {
+    def getKeyAndIncrementCounter: StateFull[NodeField] = (state: State) => {
       val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
       val key = Trivia(counter)
       val newState = state + (TriviaCounter -> (counter + 1))
@@ -57,7 +57,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
 
     override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
       recursive(triviaGrammar) ^^ { untyped =>
-        val result = untyped.asInstanceOf[StateM[WithMap]]
+        val result = untyped.asInstanceOf[StateFull[WithMap]]
         for {
           key <- getKeyAndIncrementCounter
           inner <- result
@@ -96,7 +96,7 @@ object CaptureTriviaDelta extends DeltaWithGrammar {
       })
     }
 
-    def resetAndRestoreCounter[T](inner: StateM[T]): StateM[T] = state => {
+    def resetAndRestoreCounter[T](inner: StateFull[T]): StateFull[T] = state => {
       resetAndRestoreCounter(TryState.fromStateM(inner)).run(state).get
     }
 

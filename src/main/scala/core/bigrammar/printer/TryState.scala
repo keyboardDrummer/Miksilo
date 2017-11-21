@@ -1,7 +1,7 @@
 package core.bigrammar.printer
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.{StateM, WithMapG}
+import core.bigrammar.{StateFull, WithMapG}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 object TryState {
   def ret[T](value: T): TryState[T] = state => Success((state, value))
   def fail[T](t: Throwable): TryState[T] = (state: State) => Failure(t)
-  def fromStateM[T](stateM: StateM[T]): TryState[T] = state => Success(stateM.run(state))
+  def fromStateM[T](stateM: StateFull[T]): TryState[T] = state => Success(stateM.run(state))
 }
 
 trait Functor[T] {
