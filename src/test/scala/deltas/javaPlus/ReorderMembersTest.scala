@@ -11,7 +11,6 @@ import util.CompilerBuilder
 
 class ReorderMembersTest extends FunSuite {
 
-
   test("cannot parse comment") {
     val input =
       """class Example

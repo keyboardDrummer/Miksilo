@@ -9,7 +9,7 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.classes.{ConstantPool, FieldDeclaration}
-import deltas.javac.methods.AccessibilityFieldsDelta.Visibility
+import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
@@ -40,7 +40,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
   val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = AccessibilityFieldsDelta.visibilityAccessFlagLinks.
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
 
-  def getMethods(state: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
+  def getMethods(language: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
       val attributes = methodInfo(ByteCodeMethodInfo.MethodAttributes).asInstanceOf[Seq[Node]]
@@ -49,11 +49,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
           val signatureTypeString = constantPool.getUtf8(signatureIndex)
-          TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
+          TypeSkeleton.getTypeFromByteCodeString(language, signatureTypeString)
         case None =>
           val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptor).asInstanceOf[Int]
           val descriptor = constantPool.getUtf8(methodDescriptorIndex)
-          val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
+          val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(language, descriptor)
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)
@@ -68,12 +68,18 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
 	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
         MethodDelta.parameter("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 
-      val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
-      val foundVisibilities: Set[Visibility] = accessFlags.flatMap(f => accessFlagsToVisibility.get(f))
-      val visibility: Visibility = (foundVisibilities ++ Seq(AccessibilityFieldsDelta.DefaultVisibility)).head
-      val static: Boolean = false //TODO fix.
-      MethodDelta.method(name, returnType, parameters, Seq.empty, static, visibility, typeParameters)
+      val method = MethodDelta.method(name, returnType, parameters, Seq.empty, typeParameters = typeParameters)
+      setVisibility(methodInfo, method)
+      method
     })
+  }
+
+  def setVisibility(hasFlags: Node, target: Node): Unit = {
+    val accessFlags: Set[ByteCodeMethodInfo.MethodAccessFlag] = Set.empty //TODO fix.
+    val foundVisibilities: Set[Visibility] = accessFlags.flatMap(f => accessFlagsToVisibility.get(f))
+    val visibility: Visibility = (foundVisibilities ++ Seq(AccessibilityFieldsDelta.DefaultVisibility)).head
+    target(VisibilityField) = visibility
+    target(Static) = false
   }
 
   def getFields(state: Language, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
@@ -93,7 +99,9 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)
-      FieldDeclaration.field(_type, name)      
+      val field = FieldDeclaration.field(_type, name)
+      setVisibility(fieldInfo, field)
+      field
     })
   }
 

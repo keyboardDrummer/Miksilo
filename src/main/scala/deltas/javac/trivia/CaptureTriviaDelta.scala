@@ -5,12 +5,18 @@ import core.bigrammar.BiGrammarToGrammar.{Result, WithMap}
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, StateM, WithMapG}
+import core.bigrammar.{BiGrammar, BiGrammarToGrammar, StateM, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.node.{Key, NodeField}
 import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
 import core.grammar.Grammar
 import core.responsiveDocument.ResponsiveDocument
+import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
+import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
+import core.responsiveDocument.ResponsiveDocument
+import core.deltas.node.{Key, NodeField}
+
+import scala.util.Try
 
 object CaptureTriviaDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
