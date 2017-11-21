@@ -1,20 +1,19 @@
 package core.bigrammar.printer
 
 import core.bigrammar.WithMapG
-import core.bigrammar.printer.TryState.{Printer, State}
 import core.responsiveDocument.ResponsiveDocument
 
-import scala.util.{Failure, Try}
+import scala.util.Failure
 
 class OrPrinter[T](first: Printer[T], second: Printer[T]) extends Printer[T] {
-  override def write(from: WithMapG[T], state: State): Try[(State, ResponsiveDocument)] = {
-    first.write(from, state).recoverWith({ case leftFailure: PrintError =>
-      second.write(from, state).recoverWith({ case rightFailure: PrintError =>
+  override def write(from: WithMapG[T]): TryState[ResponsiveDocument] = {
+    first.write(from).recoverWith[ResponsiveDocument]({ case leftFailure: PrintError =>
+      second.write(from).recoverWith[ResponsiveDocument]({ case rightFailure: PrintError =>
         combineOrFailures(leftFailure, rightFailure)
       })
     })
   }
 
-  def combineOrFailures[U](left: PrintError, right: PrintError): Try[U] =
-    if (left.depth >= right.depth) Failure(left) else Failure(right)
+  def combineOrFailures[U](left: PrintError, right: PrintError): TryState[ResponsiveDocument] =
+    state => if (left.depth >= right.depth) Failure(left) else Failure(right)
 }

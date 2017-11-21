@@ -1,6 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
+import core.bigrammar.printer.PrintError
 import core.grammar.~
 import org.scalatest.FunSuite
 
@@ -41,6 +42,42 @@ class TestSimpleExpressionLanguage extends FunSuite with BiGrammarSequenceWriter
     parseAndPrint(example, expected)
   }
 
+  test("MultiplyWithAdditionWithParenthesisFailure") {
+    val example = "3 * (4 + 2)"
+    val expected = Multiply(Value(3), Add(Value(4), UndefinedExpression))
+
+    val grammarDocument = getExpressionGrammarDocument
+
+    val expectedError = """could not deconstruct value
+Value: (WithMapG(Undefined,Map()),Map())
+Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
+Value: (WithMapG(Add(Value(4),Undefined),Map()),Map())
+Grammar: | StringKey ()* + ()* StringKey | StringKey
+Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
+Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Grammar: | StringKey ()* + ()* StringKey | StringKey
+Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
+Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Grammar: | StringKey ()* + ()* StringKey | StringKey
+Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Grammar: | StringKey % ()* % ? ()* StringKey % ()* % : ()* StringKey | StringKey
+Depth: 23
+Partial:
+    (3 * (4 + ("""
+
+    try
+    {
+      TestGrammarUtils.print(expected, grammarDocument)
+      //noinspection NameBooleanParameters
+      assert(false)
+    } catch {
+      case e: PrintError => assertResult(expectedError)(e.toString)
+      case e => throw e
+    }
+  }
+
   test("If") {
     val newLine = System.lineSeparator()
     val example = s"3$newLine? 4$newLine: 2"
@@ -57,7 +94,6 @@ class TestSimpleExpressionLanguage extends FunSuite with BiGrammarSequenceWriter
   def getExpressionGrammarDocument: Labelled = {
     val expression = new Labelled(StringKey("expression"))
     val parenthesis: BiGrammar = "(" ~> expression ~< ")"
-
 
     val numberValue: BiGrammar = integer ^^ (v => Value(v.asInstanceOf[Int]), {
       case Value(i) => Some(i)

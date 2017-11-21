@@ -35,7 +35,7 @@ object PrintBiGrammar {
     case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
     case many:ManyVertical => withParenthesis(many.inner) ~ "%*"
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
-    case RegexG(value) => s"Regex($value)"
+    case RegexGrammar(value, _) => s"Regex($value)"
     case keyword: Keyword => keyword.value
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString

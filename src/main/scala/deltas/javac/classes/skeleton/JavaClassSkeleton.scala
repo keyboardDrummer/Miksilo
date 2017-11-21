@@ -77,8 +77,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
 
   object ClassMemberGrammar extends GrammarKey
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    import grammars._
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+    import language.grammars._
 
     val classMember: BiGrammar = create(ClassMemberGrammar)
     val importGrammar = create(ImportGrammar)
@@ -86,9 +86,9 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
-    val membersGrammar = "{" %> classMember.manySeparatedVertical(BlankLine).indent(BlockDelta.indentAmount) %< "}" as Members
+    val membersGrammar = "{" % (classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount) % "}"
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
-    val classGrammar = create(Clazz, packageGrammar % importsGrammar % nameAndParent % membersGrammar asNode Clazz)
+    val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Clazz
     find(BodyGrammar).inner = classGrammar
   }
 

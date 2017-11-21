@@ -11,6 +11,28 @@ import util.CompilerBuilder
 
 class ReorderMembersTest extends FunSuite {
 
+  test("cannot parse comment") {
+    val input =
+      """class Example
+        |{
+        |    int first;
+        |
+        |    /* second is for XYZ */
+        |    public static /* global state XOXO */ int second;
+        |
+        |    /* third comes last */
+        |    int third;
+        |}""".stripMargin
+
+    val compiler = CompilerBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
+
+    val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+    assertThrows[core.grammar.ParseException]({
+      val state = compiler.parseAndTransform(inputStream)
+      assertResult(null)(state.output)
+    })
+  }
+
   test("basic") {
     val input =
       """class Example

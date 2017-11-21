@@ -1,29 +1,32 @@
 package core.bigrammar.printer
 
-import core.bigrammar.WithMapG
-import core.responsiveDocument.ResponsiveDocument
+import core.bigrammar.BiGrammar.State
+import core.bigrammar.StateFull
 
-import scala.util.{Failure, Try}
-import TryState._
-import core.document.Empty
-
-trait TryState[From, To] {
-  def write(from: WithMapG[From], state: State): Try[(State, To)]
-
-  def map[NewTo](function: To => NewTo): TryState[From, NewTo] = (from: WithMapG[From], state: State) =>
-    write(from, state).map[(State, NewTo)](t => (t._1, function(t._2)))
-}
+import scala.util.{Failure, Success, Try}
 
 object TryState {
+  def value[T](value: T): TryState[T] = state => Success((state, value))
+  def fail[T](t: Throwable): TryState[T] = (state: State) => Failure(t)
+  def fromStateM[T](stateM: StateFull[T]): TryState[T] = state => Success(stateM.run(state))
+}
 
-  type Printer[T] = TryState[T, ResponsiveDocument]
-  type NodePrinter = Printer[Any]
-  type State = Map[Any,Any]
-  type Result = Try[(State, ResponsiveDocument)]
+trait TryState[To] {
+  def run(state: State): Try[(State, To)]
 
-  class NonePrintFailureException(e: Throwable) extends RuntimeException {
-    override def toString = "failed toDocument with something different than a print failure: " + e.toString
+  def flatMap[NewTo](function: To => TryState[NewTo]): TryState[NewTo] = state => {
+    for {
+      (state2, result1) <- run(state)
+      result2 <- function(result1).run(state2)
+    } yield result2
   }
 
-  def fail(inner: Any, depth: Int = 0) = Failure(RootError(depth, Empty, inner))
+  def mapError(pf: PartialFunction[Throwable, Throwable]): TryState[To] = (state: State) =>
+    run(state).recoverWith(pf.andThen(t => Failure(t)))
+
+  def recoverWith[U >: To](pf: PartialFunction[Throwable, TryState[U]]): TryState[U] = (state: State) =>
+    run(state).recoverWith(pf.andThen(r => r.run(state)))
+
+  def map[NewTo](function: To => NewTo): TryState[NewTo] = (state: State) =>
+    run(state).map[(State, NewTo)](t => (t._1, function(t._2)))
 }

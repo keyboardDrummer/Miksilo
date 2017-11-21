@@ -1,13 +1,13 @@
 package core.bigrammar.printer
 
-import core.bigrammar.BiGrammar
 import core.responsiveDocument.ResponsiveDocument
 
 trait PrintError extends Throwable
  {
-   override def toString = toDocument.renderString()
+   def toDocumentWithPartial = toDocument % s"Depth: $depth" % "Partial:" % partial.indent(4)
+
+   override def toString = toDocumentWithPartial.renderString()
    def toDocument: ResponsiveDocument
    def partial: ResponsiveDocument
    val depth: Int
-   def mapPartial(f: ResponsiveDocument => ResponsiveDocument): PrintError
  }
