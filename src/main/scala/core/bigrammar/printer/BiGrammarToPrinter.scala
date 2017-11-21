@@ -32,7 +32,7 @@ class BiGrammarToPrinter {
             failureToGrammar("keyword didn't match", grammar)
         case Delimiter(keyword) => _ => succeed(keyword)
         case labelled: Labelled =>
-          new NestPrinter(grammar, labelledToPrinter(labelled))
+          new NestPrinter(labelled.inner, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left % right)
         case sequence: Sequence => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
@@ -55,14 +55,16 @@ class BiGrammarToPrinter {
     Printer.fail("encountered failure", -10000)
   }
 
-  class RedirectingPrinter extends NodePrinter {
+  class RedirectingPrinter(labelled: Labelled) extends NodePrinter {
     var inner: NodePrinter = _
 
     override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = inner.write(from)
+
+    override def toString: String = labelled.toString
   }
 
   def labelledToPrinter(labelled: Labelled): NodePrinter = {
-    val redirectPrinter = new RedirectingPrinter()
+    val redirectPrinter = new RedirectingPrinter(labelled)
     printerCache.put(labelled, new CachingPrinter(redirectPrinter))
     redirectPrinter.inner = toPrinterCached(labelled.inner)
     redirectPrinter

@@ -1,5 +1,10 @@
 package core.bigrammar
 
+object UndefinedExpression extends TestExpression {
+  override def compute = ???
+  override def toString = "Undefined"
+}
+
 case class Value(value: Int) extends TestExpression {
   override def compute = value
 }
