@@ -1,8 +1,7 @@
 package core.bigrammar.printer
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.{StateFull, WithMapG}
-import core.responsiveDocument.ResponsiveDocument
+import core.bigrammar.StateFull
 
 import scala.util.{Failure, Success, Try}
 
@@ -30,24 +29,4 @@ trait TryState[To] {
 
   def map[NewTo](function: To => NewTo): TryState[NewTo] = (state: State) =>
     run(state).map[(State, NewTo)](t => (t._1, function(t._2)))
-}
-
-trait Printer[T] {
-  def write(from: WithMapG[T]): TryState[ResponsiveDocument]
-
-  def map(function: ResponsiveDocument => ResponsiveDocument): Printer[T] =
-    from => write(from).map(function)
-}
-
-object Printer {
-
-  type NodePrinter = Printer[Any]
-  type Result = Try[(State, ResponsiveDocument)]
-
-  class NonePrintFailureException(e: Throwable) extends RuntimeException {
-    override def toString = "failed toDocument with something different than a print failure: " + e.toString
-  }
-
-  def fail[T](message: Any): TryState[T] = TryState.fail(RootError(message))
-  def fail[T](message: Any, depth: Int): TryState[T] = TryState.fail(NegativeDepthRootError(message, depth))
 }
