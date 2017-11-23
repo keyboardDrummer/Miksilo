@@ -66,6 +66,11 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     expressionGrammar.addOption(additionGrammar)
 
     grammars.find(BodyGrammar).inner = expressionGrammar
+    val expectedBeforeAdditionGrammar = new Sequence(expressionGrammar.as(Left), new WithTrivia(new Sequence("+",
+      new WithTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
+    val expectedBeforeNumberGrammar = (number : BiGrammar).as(Value)
+    assertResult(expectedBeforeAdditionGrammar.toString)(additionGrammar.inner.toString) //TODO use actual equality instead of toString
+    assertResult(expectedBeforeNumberGrammar.toString)(numberGrammar.inner.toString) //TODO use actual equality instead of toString
     TriviaInsideNode.transformGrammars(grammars, language)
 
     val expectedAdditionGrammar = expressionGrammar.as(Left) ~ new Sequence("+", expressionGrammar.as(Right))

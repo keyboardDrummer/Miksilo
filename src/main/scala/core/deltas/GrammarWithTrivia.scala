@@ -5,7 +5,7 @@ import core.bigrammar.{BiGrammar, BiGrammarSequenceMethodsExtension}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.NodeClass
 
-class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: LanguageGrammars) extends NodeGrammarWriter
+class GrammarWithTrivia(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
   with BiGrammarSequenceMethodsExtension
 {
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
@@ -21,5 +21,5 @@ class GrammarWithTrivia(val grammar: BiGrammar)(implicit grammars: LanguageGramm
 
   def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, false))
 
-  override implicit def addSequenceMethods(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar)
+  override implicit def addSequenceMethods(grammar: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(grammar, grammars)
 }
