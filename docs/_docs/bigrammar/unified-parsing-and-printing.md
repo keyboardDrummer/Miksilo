@@ -1,3 +1,9 @@
+---
+title: Unified Parsing & Printing
+category: BiGrammar
+order: 1
+---
+
 BiGrammar is a DSL that allows the user to define both a parser and a pretty printer at the same time. Operators and methods in BiGrammar will often have an effect on both the parser and the printer, both can sometimes influence only one of both.
 
 ### Example
