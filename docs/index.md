@@ -1,6 +1,9 @@
 ---
-title: Blender
+title: ' '
+layout: default
 ---
+
+{% include home-banner.html %}
 
 Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>. Language workbenches often define one or several _metalanguages_, which are used to define (parts of) a language.
 

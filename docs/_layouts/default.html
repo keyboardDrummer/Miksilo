@@ -50,24 +50,21 @@
 				</ul>
 
 				<ul>
-					{% assign grouped = site.docs | group_by: 'category' %}
-					{% for group in grouped %}
-						<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
-							{% assign items = group.items | sort: 'order' %}
-							<a href="{{ site.baseurl }}{{ items.first.url }}">{{ group.name }}</a>
-							<ul>
-								{% for item in items %}
-									<li class="nav-item {% if item.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ item.url }}">{{ item.title }}</a></li>
-								{% endfor %}
-							</ul>
-						</li>
+					{% assign category = "Core, BiGrammar, Practical, Discussion" | split: ", " %}
+						{% for docs in site.docs %}
+							{% if item.category == category/ %}
+								<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
+									{% assign items = group.items | sort: 'order' %}
+									<a href="{{ site.baseurl }}{{ items.first.url }}">{{ category }}</a>
+									<ul>
+										{% for item in items %}
+											<li class="nav-item {% if item.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ item.url }}">{{ item.title }}</a></li>
+										{% endfor %}
+									</ul>
+								</li>
+							{% endif %}
+						{% endfor %}
 					{% endfor %}
-				</ul>
-
-				<ul>
-					<li class="nav-item top-level">
-						<a href="https://github.com/keyboardDrummer/Blender/">GitHub</a>
-					</li>
 				</ul>
 			</nav>
 		</header>
