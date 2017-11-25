@@ -16,13 +16,13 @@ object ForLoopContinueC extends DeltaWithPhase {
   override def transform(program: Node, state: Compilation): Unit = {
     val beforeIncrementLabels = new scala.collection.mutable.HashMap[Node, String]()
     PathRoot(program).visit(path => path.clazz match {
-      case WhileContinueC.ContinueKey => transformContinue(path, beforeIncrementLabels, state)
+      case WhileContinueDelta.ContinueKey => transformContinue(path, beforeIncrementLabels, state)
       case _ =>
     })
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Node, String], state: Language): Unit = {
-    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopType || ancestor.clazz == WhileC.WhileKey)
+    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopC.ForLoopType || ancestor.clazz == WhileDelta.WhileKey)
     containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopC.ForLoopType).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, transformForLoop(containingForLoop, state))
       continuePath.replaceWith(JustJavaGoto.goto(label))
@@ -37,5 +37,5 @@ object ForLoopContinueC extends DeltaWithPhase {
     beforeIncrementLabel
   }
 
-  override def dependencies: Set[Contract] = Set(ForLoopC, WhileContinueC)
+  override def dependencies: Set[Contract] = Set(ForLoopC, WhileContinueDelta)
 }

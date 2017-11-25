@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="generator" content="Jekyll v3.3.0">
+
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Open+Sans:400,400italic,600,600italic,700,700italic|Inconsolata:400,700">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/touch-icon.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blender" />
+		<!-- Begin Jekyll SEO tag v2.1.0 -->
+<title>Whole language transformation - Blender</title>
+<meta property="og:title" content="Whole language transformation" />
+<meta name="description" content="In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language." />
+<meta property="og:description" content="In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language." />
+<link rel="canonical" href="http://localhost:4000/grammar/whole-language-transformation/" />
+<meta property="og:url" content="http://localhost:4000/grammar/whole-language-transformation/" />
+<meta property="og:site_name" content="Blender" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-11-26T00:01:26+01:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "Article",
+"headline": "Whole language transformation",
+"datePublished": "2017-11-26T00:01:26+01:00",
+"description": "In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.",
+"publisher": {"@type": "Organization",
+"logo": {"@type": "ImageObject",
+"url": "http://localhost:4000/favicon.png"}},
+"url": "http://localhost:4000/grammar/whole-language-transformation/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+		
+	</head>
+
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/images/favicon.png" width="40" height="40" alt="Blender logo"></a>
+				Blender
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+			<form action="/search/" method="get">
+				<input type="text" name="q" id="search-input" placeholder="Search" autofocus>
+				<input type="submit" value="Search" style="display: none;">
+			</form>
+
+			<nav class="full-navigation">
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/">Blender</a>
+					</li>
+				</ul>
+
+				<ul>
+					
+					
+						<li class="nav-item top-level ">
+							<a href="">Core</a>
+							<ul>
+								
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+									
+								
+									
+										<li class="nav-item "><a href="/core/what-is-a-language/">What is a language?</a></li>
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/effective-blender/">Effective Blender</a></li>
+									
+								
+									
+										<li class="nav-item "><a href="/core/sandbox/">Sandbox</a></li>
+									
+								
+									
+								
+									
+								
+									
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							<a href="/grammar/bigrammar/">Grammar</a>
+							<ul>
+								
+								
+									
+										<li class="nav-item "><a href="/grammar/bigrammar/">BiGrammar</a></li>
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/grammar/unified-parsing-and-printing/">Unified Parsing & Printing</a></li>
+									
+								
+									
+										<li class="nav-item "><a href="/grammar/modularity/">Modularity</a></li>
+									
+								
+									
+										<li class="nav-item current"><a href="/grammar/whole-language-transformation/">Whole language transformation</a></li>
+									
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							<a href="/grammar/bigrammar/">Java</a>
+							<ul>
+								
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							<a href="/grammar/bigrammar/">Practical</a>
+							<ul>
+								
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/practical/build/">Build instructions</a></li>
+									
+								
+									
+										<li class="nav-item "><a href="/practical/contributions/">How to contribute</a></li>
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							<a href="/grammar/bigrammar/">Discussion</a>
+							<ul>
+								
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+									
+								
+							</ul>
+						</li>
+					
+				</ul>
+			</nav>
+		</header>
+
+		<section class="main">
+			<div class="page-header">
+				<h2>Grammar</h2>
+				<h3>Whole language transformation</h3>
+			</div>
+			<article class="content">
+				<p>In <a href="http://keyboarddrummer.github.io/Blender/bigrammar/modularity/">Modularity</a> we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.</p>
+
+<p>Our first case starts with a simple refactoring which reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. We’ll demonstrate a series of three delta’s that together enable the refactoring to accept Java block comments in the input program, and also to output them in the refactored program, in an way that matches with how we use comments.</p>
+
+<p>Our input program for this case is the following:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
+    <span class="n">int</span> <span class="n">first</span><span class="o">;</span>
+    <span class="cm">/* second is used for foo */</span>
+    <span class="n">public</span> <span class="n">static</span> <span class="cm">/* bar */</span> <span class="n">int</span> <span class="n">second</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>If we apply reorder members on this program, we get the following exception:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="o">[</span><span class="mf">5.5</span><span class="o">]</span> <span class="nl">failure:</span> <span class="err">`</span><span class="o">}</span><span class="err">'</span> <span class="n">expected</span> <span class="n">but</span> <span class="err">`</span><span class="o">/</span><span class="err">'</span> <span class="n">found</span>
+
+    <span class="cm">/* second is for XYZ */</span>
+    <span class="o">^</span>
+</code></pre>
+</div>
+
+<p>We can allow comment parsing using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called <code class="highlighter-rouge">TriviaGrammar</code> that parses whitespace. Given a <code class="highlighter-rouge">Language</code>, we can use <code class="highlighter-rouge">import language.grammars._</code> to get a set of language specific parser combinators. These combinators, such as <code class="highlighter-rouge">~</code>, will use the language’s <code class="highlighter-rouge">TriviaGrammar</code> as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our earlier program:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code>  <span class="k">override</span> <span class="k">def</span> <span class="n">transformGrammars</span><span class="o">(</span><span class="n">language</span><span class="k">:</span> <span class="kt">Language</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">import</span> <span class="nn">language.grammars._</span>
+
+    <span class="c1">//Create an empty named grammar, that we can modify in another delta.
+</span>    <span class="k">val</span> <span class="n">classMember</span> <span class="k">=</span> <span class="n">create</span><span class="o">(</span><span class="nc">ClassMemberGrammar</span><span class="o">)</span> 
+
+    <span class="k">val</span> <span class="n">nameGrammar</span> <span class="k">=</span> <span class="s">"class"</span> <span class="o">~~&gt;</span> <span class="n">identifier</span><span class="o">.</span><span class="n">as</span><span class="o">(</span><span class="nc">ClassName</span><span class="o">)</span>
+    <span class="k">val</span> <span class="n">membersGrammar</span> <span class="k">=</span> <span class="n">classMember</span><span class="o">.</span><span class="n">manyVertical</span><span class="o">.</span><span class="n">indent</span><span class="o">(</span><span class="mi">4</span><span class="o">).</span><span class="n">as</span><span class="o">(</span><span class="nc">Members</span><span class="o">)</span>
+    <span class="k">val</span> <span class="n">classGrammar</span> <span class="k">=</span> <span class="n">packageGrammar</span> <span class="o">%</span> <span class="n">importsGrammar</span> <span class="o">%</span> 
+      <span class="n">nameGrammar</span> <span class="o">~&lt;</span> <span class="s">"{"</span> <span class="o">%</span> <span class="n">membersGrammar</span> <span class="o">%&lt;</span> <span class="s">"}"</span> <span class="n">asLabelledNode</span> <span class="nc">Clazz</span>
+
+    <span class="c1">//BodyGrammar is the file's top level grammar
+</span>    <span class="n">find</span><span class="o">(</span><span class="nc">BodyGrammar</span><span class="o">).</span><span class="n">inner</span> <span class="k">=</span> <span class="n">classGrammar</span> 
+  <span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Now that we know about TriviaGrammar, we can understand how the following Delta adds comment parsing to the language:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">object</span> <span class="nc">JavaStyleCommentsDelta</span> <span class="k">extends</span> <span class="nc">DeltaWithGrammar</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">transformGrammars</span><span class="o">(</span><span class="n">grammars</span><span class="k">:</span> <span class="kt">LanguageGrammars</span><span class="o">,</span> <span class="n">state</span><span class="k">:</span> <span class="kt">Language</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">val</span> <span class="n">commentGrammar</span> <span class="k">=</span> <span class="nc">RegexGrammar</span><span class="o">(</span><span class="s">"""(?s)/\*.*?\*/"""</span><span class="o">.</span><span class="n">r</span><span class="o">)</span>
+    <span class="n">grammars</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="nc">TriviaGrammar</span><span class="o">).</span><span class="n">addOption</span><span class="o">(</span><span class="n">getCommentGrammar</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>If we add this delta to our refactoring, and then apply it, we get the following output program:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
+    <span class="n">static</span> <span class="n">int</span> <span class="n">second</span><span class="o">;</span>
+    <span class="n">int</span> <span class="n">first</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>The reordering has completed but all the comments are gone! To retain our comments in the output, we’ll add another delta that causes the results from <code class="highlighter-rouge">TriviaGrammar</code> to be stored in the AST. For brevity we won’t show the code now, but you can find it <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/CaptureTriviaDelta.scala">here</a>. With this delta added to our refactoring, we get the following output:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
+    <span class="n">public</span> <span class="n">static</span> <span class="cm">/* bar */</span> <span class="n">int</span> <span class="n">second</span><span class="o">;</span>
+    <span class="cm">/* second is used for foo */</span>
+    <span class="n">int</span> <span class="n">first</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>This is quite good! All the comments are still there in the output, and the <code class="highlighter-rouge">/* bar */</code> comment inside the second field has moved with the field. However, one last thing still irks us. The comment <code class="highlighter-rouge">/* second is used for foo */</code> is in the same position as before, in front of the field <code class="highlighter-rouge">first</code>, even though it is meant to clarify the meaning of the field <code class="highlighter-rouge">second</code>.</p>
+
+<p>The reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta that will improve this behavior, so that trivia located right in front of a node, will be stored inside that node, instead of the parent node. The code is shown <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/TriviaInsideNode.scala">here</a>. The resulting output is now:</p>
+
+<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
+    <span class="cm">/* second is used for foo */</span>
+    <span class="n">public</span> <span class="n">static</span> <span class="cm">/* bar */</span> <span class="n">int</span> <span class="n">second</span><span class="o">;</span>
+    <span class="n">int</span> <span class="n">first</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Perfect!</p>
+
+			</article>
+		</section>
+
+		<script>
+			document.getElementById("open-nav").addEventListener("click", function () {
+				document.body.classList.toggle("nav-open");
+			});
+		</script>
+	</body>
+</html>

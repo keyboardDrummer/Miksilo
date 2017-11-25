@@ -31,7 +31,7 @@
 	<body>
 		<header>
 			<h1>
-				<a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/emblem.svg" width="40" height="40" alt="{{ site.title }} logo"></a>
+				<a href="{{ site.baseurl }}/"><img src="{{ site.baseurl }}/images/favicon.png" width="40" height="40" alt="{{ site.title }} logo"></a>
 				{{ site.title }}
 				<button type="button" class="open-nav" id="open-nav"></button>
 			</h1>
@@ -45,25 +45,24 @@
 				<ul>
 					<li class="nav-item top-level {% if page.url == '/' %}current{% endif %}">
 						{% assign home = site.html_pages | where: 'url', '/' | first %}
-						<a href="{{ site.baseurl }}/">{{ home.title }}</a>
+						<a href="{{ site.baseurl }}/">{{ site.title }}</a>
 					</li>
 				</ul>
 
 				<ul>
-					{% assign category = "Core, BiGrammar, Practical, Discussion" | split: ", " %}
-						{% for docs in site.docs %}
-							{% if item.category == category/ %}
-								<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
-									{% assign items = group.items | sort: 'order' %}
-									<a href="{{ site.baseurl }}{{ items.first.url }}">{{ category }}</a>
-									<ul>
-										{% for item in items %}
-											<li class="nav-item {% if item.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ item.url }}">{{ item.title }}</a></li>
-										{% endfor %}
-									</ul>
-								</li>
-							{% endif %}
-						{% endfor %}
+					{% assign categories = "Core, Grammar, Java, Practical, Discussion" | split: ", " %}
+					{% for category in categories %}
+						<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
+							<a href="{{ site.baseurl }}{{ items.first.url }}">{{ category }}</a>
+							<ul>
+								{% assign items = site.docs | sort: 'order' %}
+								{% for doc in items %}
+									{% if doc.category == category %}
+										<li class="nav-item {% if doc.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ doc.url }}">{{ doc.title }}</a></li>
+									{% endif %}
+								{% endfor %}
+							</ul>
+						</li>
 					{% endfor %}
 				</ul>
 			</nav>

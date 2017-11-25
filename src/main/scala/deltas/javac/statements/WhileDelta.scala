@@ -9,7 +9,7 @@ import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 import deltas.javac.expressions.ExpressionSkeleton
 
-object WhileC extends StatementInstance with WithLanguageRegistry {
+object WhileDelta extends StatementInstance with WithLanguageRegistry {
 
   override val key = WhileKey
 

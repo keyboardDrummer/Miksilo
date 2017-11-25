@@ -1,7 +1,7 @@
 ---
 title: Modularity
-category: BiGrammar
-order: 2
+category: Grammar
+order: 3
 ---
 The #1 focus of Blender is to enable _modular_ language design. This page explains how BiGrammar supports that goal.
 

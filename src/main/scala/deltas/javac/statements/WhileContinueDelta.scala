@@ -6,14 +6,17 @@ import core.deltas.node.{Node, NodeClass}
 import core.deltas.path.Path
 import deltas.bytecode.additions.LabelledLocations
 
-object WhileContinueC extends StatementInstance {
+object WhileContinueDelta extends StatementInstance {
   override val key = ContinueKey
 
   object ContinueKey extends NodeClass
   def continue = new Node(ContinueKey)
 
+
+  override def dependencies = super.dependencies ++ Set(WhileDelta)
+
   override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
-    val startLabel = WhileC.getRegistry(compilation).whileStartLabels(getWhileParent(statement))
+    val startLabel = WhileDelta.getRegistry(compilation).whileStartLabels(getWhileParent(statement))
     Seq(LabelledLocations.goTo(startLabel))
   }
 
@@ -26,12 +29,12 @@ object WhileContinueC extends StatementInstance {
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     val _whileParent: Path = getWhileParent(obj)
-    Set(labels(WhileC.startKey(_whileParent.current)))
+    Set(labels(WhileDelta.startKey(_whileParent.current)))
   }
 
   def getWhileParent(obj: Path): Path = {
     val ancestors = obj.ancestors
-    val _whileParent = ancestors.filter(ancestor => ancestor.clazz == WhileC.WhileKey).head
+    val _whileParent = ancestors.filter(ancestor => ancestor.clazz == WhileDelta.WhileKey).head
     _whileParent
   }
 }

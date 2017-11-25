@@ -23,7 +23,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     def body_=(value: Node) = node(Body) = value
   }
 
-  override def dependencies: Set[Contract] = Set(WhileC)
+  override def dependencies: Set[Contract] = Set(WhileDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -61,7 +61,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementC.create(forLoop.increment))
-    val _while = WhileC.create(forLoop.condition, whileBody)
+    val _while = WhileDelta.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
     forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
