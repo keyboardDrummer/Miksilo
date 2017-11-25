@@ -1,6 +1,14 @@
-Sadly to use Blender effectively we need to write some boilerplate. For each new type of `Node`, we need to define one `NodeClass` object, and a `NodeField` object for each field. Then, to make using the new Node type easier, we need a `NodeWrapper` to make accessing the fields easier. Scala macro's might help us here but they are not mature enough. To help with writing boilerplate we've written a generator for this.
+---
+title: Effective Blender
+category: Core
+order: 2
+---
 
-It takes the following as input:
+> This article is under construction.
+
+To use Blender effectively requires writing some boilerplate. For each type of `Node`, we need to define one `NodeClass` object, and a `NodeField` object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of `NodeWrapper`. Scala macro's might help us here in the future, but currently they are not mature enough. For now we've written a generator for the boilerplate. Here follows an example of the generator in action:
+
+Given the following input:
 ```scala
 object ClassFileDelta {
   val input = new NodeClassDefinition("ClassFile", 
@@ -10,7 +18,7 @@ object ClassFileDelta {
     "attributes" -> "Seq[Node]"
   )
 ```
-And then outputs:
+It outputs:
 ```scala
 object ClassFileDelta {
   val input = new NodeClassDefinition("ClassFile", 
@@ -20,7 +28,7 @@ object ClassFileDelta {
     "attributes" -> "Seq[Node]"
   )
 
-  //region Generated Node class boilerplate
+  //region Generated Node boilerplate
   object Clazz extends NodeClass
   object Interfaces extends NodeField
   object Methods extends NodeField

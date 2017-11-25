@@ -2,11 +2,17 @@
 title: Blender
 ---
 
-Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>.
+Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>. Language workbenches often define one or several _metalanguages_, which are used to define (parts of) a language.
 
-Blender's focus is to enable creating modular and thus re-usable languages, allowing you to combine features from existing languages to create new ones. Blender gets modularity right by allowing you to both extend and constrain an existing language. Other language workbenches support only extension, which allows you to grow a small language into a bigger one, but not to transform between arbitrary languages.
+Blender's focus is on modular language design, it gets modularity right because of these properties:
+- Languages are composed of many small transformations
+- Language transformations are packaged as re-usable units with well-defined dependencies
+- Metalanguages are embedded, making them first class objects and allowing arbitrary computations over them. This enables transforming between arbitrary languages.
+- Metalanguages are designed to be transformed. For example, early binding to fields in the grammar allows easy & safe editing.
+- AST transformations are defined generically, making them resilient to structural changes in the AST
+- AST's are stored unstructured, which provides many benefits such as fast AST transformations and allowing language composition at run-time
 
-Another differentiator of Blender is its meta languages. A meta language is a language used to define (parts of) a language. Unlike with other tools, Blender's meta languages are embedded in a host language, [Scala](http://www.scala-lang.org/"), allowing you to use them while inside a powerful general purpose programming language. Some workbenches like [Rascal](https://github.com/usethesource/rascal") define a stand-alone meta language, which provides a smooth experience when using its language construction features, but leaves you without the ecosystem of a popular language. Other workbenches like [Spoofax](http://metaborg.org/en/latest/) and [MPS](https://www.jetbrains.com/mps/) define several meta languages, that each focus on different aspects of language definition such as syntax or typing rules. While these languages are user-friendly, they are often not programming languages, so they miss out on a lot of power.
+Blender is written in [Scala](http://www.scala-lang.org/"), which serves as a host language for its embedded metalanguages. Some workbenches like [Rascal](https://github.com/usethesource/rascal") define stand-alone metalanguages with general purpose programming facilities. This provides a smooth experience when using the language, but leaves you without the ecosystem of a popular language. Other workbenches like [Spoofax](http://metaborg.org/en/latest/) and [MPS](https://www.jetbrains.com/mps/) define metalanguages optimized for usability, leaving out generic programming facilities. While these languages are user-friendly, they are not suitable for being transformed.
 
 ### Delta
 The core concept of Blender is a *delta*. A delta applies a small change to a language, such as adding/removing a language feature, or adding an optimization. Delta's can be chained together to form a language. Language re-use comes from re-using these delta's. Some delta's depend on others but there's a lot of freedom in combining them. A similar approach is described in the paper [A Nanopass Framework for Compiler Education](https://www.cs.indiana.edu/~dyb/pubs/nano-jfp.pdf).
