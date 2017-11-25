@@ -1,3 +1,7 @@
+---
+title: Blender
+---
+
 Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>.
 
 Blender's focus is to enable creating modular and thus re-usable languages, allowing you to combine features from existing languages to create new ones. Blender gets modularity right by allowing you to both extend and constrain an existing language. Other language workbenches support only extension, which allows you to grow a small language into a bigger one, but not to transform between arbitrary languages.
