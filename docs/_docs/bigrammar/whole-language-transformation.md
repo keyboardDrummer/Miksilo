@@ -4,7 +4,7 @@ category: BiGrammar
 order: 3
 ---
 
-In [BiGrammar 2: modularity](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-2:-modularity) we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.
+In [Modularity](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/) we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.
 
 Our first case starts with a simple refactoring which reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. We'll demonstrate a series of three delta's that together enable the refactoring to accept Java block comments in the input program, and also to output them in the refactored program, in an way that matches with how we use comments.
 

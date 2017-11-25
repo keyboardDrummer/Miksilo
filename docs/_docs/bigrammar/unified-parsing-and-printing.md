@@ -9,7 +9,7 @@ BiGrammar is a DSL that allows the user to define both a parser and a pretty pri
 ### Example
 Here follows an example of a small piece of grammar defined using BiGrammar:
 
-```Scala
+```scala
 "while" ~ expression.inParenthesis.as(Condition) ~~ "{" %
         statement.manyVertical.indent(2).as(Body) %
         "}" asNode While
@@ -25,7 +25,7 @@ The operators have the following meaning:
 - `indent` indents the grammar on which it is applied, but only when printing.
 
 With the defined BiGrammar, we can parse the following program (ugly formatting is intentional)
-```Java
+```java
 while (i){
   i--; x += 2;
 }
@@ -57,7 +57,7 @@ while(i) {
 
 ### Choice, ignore and value
 Here is another example grammar:
-```Scala
+```scala
 "yes" ~> value(true) | "no" ~> value(false)
 ```
 - `|` is the choice operator. If the left grammar fails to parse/print, then the right grammar is used.
@@ -76,4 +76,4 @@ new RegexGrammar("""-?\d+""".r).map(
 - `map` transforms the grammar's value using a bidirectional mapping. The argument `beforePrinting` returns an `Option` to allow printing to fail if the passed value does not belong to the grammar.
 
 ### Next 
-[Read how BiGrammar supports modular language design](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-2:-modularity)
+[Read how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)

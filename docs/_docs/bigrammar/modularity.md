@@ -5,8 +5,8 @@ order: 2
 ---
 The #1 focus of Blender is to enable _modular_ language design. This page explains how BiGrammar supports that goal.
 
-In [BiGrammar 1: unified parsing and printing](https://github.com/keyboardDrummer/Blender/wiki/BiGrammar-1:-unified-parsing-and-printing) we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is a bit peculiar. It is common when using parser combinators, to first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node, for example:
-```Scala
+In [Unified parsing and printing](http://keyboarddrummer.github.io/Blender/bigrammar/unified-parsing-and-printing/) we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is a bit peculiar. It is common when using parser combinators, to first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node, for example:
+```scala
 (expression ~< "|" ~ expression).map(
       { case ~(left, right) => new Or(left, right) }, //Constructor
       (or: Or) => Some(~(or.left, or.right))) //Destructor
@@ -14,7 +14,7 @@ In [BiGrammar 1: unified parsing and printing](https://github.com/keyboardDrumme
 
 Now suppose we want a grammar that has both `|` and `||`, to indicate whether to evaluate the arguments lazily or strict. If we would write this grammar from scratch, we could write:
 
-```Scala
+```scala
 val strict = ("|" ~> value(false) | value(true))
 val inner = expression ~< "|" ~ strict ~ expression
 inner.map({ case ~(~(left, strict: Boolean), right) => Or(left, right, strict) },
@@ -23,20 +23,20 @@ inner.map({ case ~(~(left, strict: Boolean), right) => Or(left, right, strict) }
 However, if we want to get this second grammar by transforming the first, then things will get messy. We'll need to change code in multiple locations, both in the `inner` grammar, but also in both functions passed to `map`.
 
 Now let's use the `as` and `asNode` style to bind our grammar to the AST. The initial grammar is
-```Scala
+```scala
 val grammar = expression.as(Left) ~ "|" ~ expression.as(Right) asNode Or
 ```
 which we can transform using
-```Scala
+```scala
 val strict = ("|" ~> value(false) | value(true)).as(Strict)
 grammar.findAs(Right).replace(original => strict ~ original)
 ```
 to get the grammar with lazyness
-```Scala
+```scala
 val lazyGrammar = expression.as(Left) ~< "|" ~ strict ~ expression.as(Right) asNode Or
 ```
 We can transform back to the initial grammar using
-```
+```scala
 grammars.findAs(Strict).removeFromSequence()
 ```
 
