@@ -65,9 +65,8 @@
 				</ul>
 
 				<ul>
-					<li class="nav-item top-level {% if page.url == '/changelog/' %}current{% endif %}">
-						{% assign changelog = site.html_pages | where: 'url', '/changelog/' | first %}
-						<a href="{{ site.baseurl }}/changelog/">{{ changelog.title }}</a>
+					<li class="nav-item top-level">
+						<a href="https://github.com/keyboardDrummer/Blender/">GitHub</a>
 					</li>
 				</ul>
 			</nav>
@@ -75,7 +74,7 @@
 
 		<section class="main">
 			<div class="page-header">
-				<h2>{% if page.category %}{{ page.category }}{% else %}{{ site.title }}{% endif %}</h2>
+				<h2>{% if page.category %}{{ page.category }}{% endif %}</h2>
 				<h3>{{ page.title }}</h3>
 			</div>
 			<article class="content">
