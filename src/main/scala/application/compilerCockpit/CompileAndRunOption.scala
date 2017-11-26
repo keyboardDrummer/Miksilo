@@ -12,7 +12,7 @@ import util.SourceUtils
 object RunWithJVM extends DeltaWithPhase
 {
   override def transform(program: Node, state: Compilation): Unit = {
-    val clazz: ByteCodeWrapper[Node] = state.program
+    val clazz: ClassFile[Node] = state.program
     val classRefIndex = clazz.classInfoIndex
     val constantPool = clazz.constantPool
     val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex

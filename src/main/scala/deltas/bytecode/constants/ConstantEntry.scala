@@ -1,20 +1,22 @@
 package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
+import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
 trait ConstantEntry extends DeltaWithGrammar {
 
   def key: NodeClass
+
   def getByteCode(constant: Node, state: Language): Seq[Byte]
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).getBytes.put(key, (constant: Node) => getByteCode(constant, state))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.getRegistry(language).constantEntries.add(this)
+    ByteCodeSkeleton.getRegistry(language).getBytes.put(key, (constant: Node) => getByteCode(constant, language))
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

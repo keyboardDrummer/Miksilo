@@ -4,14 +4,14 @@ import application.compilerCockpit.MarkOutputGrammar
 import core.deltas.Delta
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.LabelledLocations
-import deltas.bytecode.simpleBytecode.RemoveConstantPool
+import deltas.bytecode.simpleBytecode.InlineConstantPool
 import deltas.javac.JavaCompilerDeltas
 import util.{CompilerBuilder, SourceUtils}
 import util.TestUtils
 
 class TestLabelledLocations extends FunSuite {
 
-  val labelledParticles: Seq[Delta] = Seq(LabelledLocations, RemoveConstantPool) ++ JavaCompilerDeltas.byteCodeTransformations
+  val labelledParticles: Seq[Delta] = Seq(LabelledLocations, InlineConstantPool) ++ JavaCompilerDeltas.byteCodeTransformations
 
   test("javaToLabelled") {
     val particles: Seq[Delta] = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).spliceBeforeTransformations(labelledParticles, Seq(MarkOutputGrammar))

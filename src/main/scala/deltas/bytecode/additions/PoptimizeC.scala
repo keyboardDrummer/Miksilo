@@ -2,7 +2,7 @@ package deltas.bytecode.additions
 
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
-import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions._
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
@@ -19,7 +19,7 @@ object PoptimizeC extends DeltaWithPhase {
   }
 
   override def transform(_clazz: Node, state: Compilation): Unit = {
-    val clazz = new ByteCodeWrapper(_clazz)
+    val clazz = new ClassFile(_clazz)
     for (method <- clazz.methods) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
       val codeAnnotation = method.codeAttribute

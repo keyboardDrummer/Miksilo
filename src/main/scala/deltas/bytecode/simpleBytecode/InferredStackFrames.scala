@@ -4,7 +4,7 @@ import core.bigrammar.GrammarReference
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.StackMapTableAttribute
 import deltas.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
@@ -17,7 +17,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
   override def transform(program: Node, state: Compilation): Unit = {
-    val clazz: ByteCodeWrapper[Node] = program
+    val clazz: ClassFile[Node] = program
     for (method <- clazz.methods) {
       val codeAnnotation = method.codeAttribute
       val instructions = codeAnnotation.instructions

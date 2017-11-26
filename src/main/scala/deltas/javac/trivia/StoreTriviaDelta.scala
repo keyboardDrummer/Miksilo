@@ -18,7 +18,7 @@ import core.deltas.node.{Key, NodeField}
 
 import scala.util.Try
 
-object CaptureTriviaDelta extends DeltaWithGrammar {
+object StoreTriviaDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     resetCounterWhenEnteringNode(grammars)
 

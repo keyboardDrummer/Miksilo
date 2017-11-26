@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.PrettyPrint
 import deltas.javac.JavaCompilerDeltas
-import deltas.javac.trivia.{CaptureTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
+import deltas.javac.trivia.{StoreTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
 import util.CompilerBuilder
 
@@ -85,7 +85,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
     val compiler = CompilerBuilder.build(Seq(ReorderMembers, PrettyPrint(),
-      JavaStyleCommentsDelta, CaptureTriviaDelta) ++
+      JavaStyleCommentsDelta, StoreTriviaDelta) ++
       JavaCompilerDeltas.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
@@ -118,7 +118,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
     val compiler = CompilerBuilder.build(Seq(ReorderMembers, PrettyPrint(),
-      JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode) ++
+      JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
       JavaCompilerDeltas.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))

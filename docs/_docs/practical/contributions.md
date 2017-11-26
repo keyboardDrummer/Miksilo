@@ -1,5 +1,5 @@
 ---
-title: How to contribute
+title: Contributions
 category: Practical
 order: 2
 ---

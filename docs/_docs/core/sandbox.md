@@ -1,7 +1,7 @@
 ---
 title: Sandbox
 category: Core
-order: 2
+order: 5
 ---
 Blender can be run as a desktop application, which provides a sandbox for constructing languages from the Delta's defined beforehand.
 

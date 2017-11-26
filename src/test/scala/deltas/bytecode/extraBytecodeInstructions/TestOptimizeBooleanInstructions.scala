@@ -2,7 +2,7 @@ package deltas.bytecode.extraBytecodeInstructions
 
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
 import deltas.javac.JavaCompilerDeltas
 import util.CompilerBuilder
@@ -24,7 +24,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
       s"optimizedInstructions.size (${optimizedInstructions.size}) + 5 < unoptimizedInstructions.size (${unoptimizedInstructions.size})")
   }
 
-  def getFibonacciInstructions(clazz: ByteCodeWrapper[Node]) = {
+  def getFibonacciInstructions(clazz: ClassFile[Node]) = {
     clazz.methods.flatMap(methodInfo => methodInfo.codeAttribute.instructions)
   }
 }

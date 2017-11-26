@@ -5,7 +5,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
@@ -96,7 +96,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
   }
 
 
-  def getCodeAnnotations[T <: NodeLike](clazz: ByteCodeWrapper[T]): Seq[T] = {
+  def getCodeAnnotations[T <: NodeLike](clazz: ClassFile[T]): Seq[T] = {
     clazz.methods
       .flatMap(methodInfo => methodInfo.attributes)
       .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)

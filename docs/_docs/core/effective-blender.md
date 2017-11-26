@@ -1,7 +1,7 @@
 ---
 title: Effective Blender
 category: Core
-order: 2
+order: 4
 ---
 
 > This article is under construction.

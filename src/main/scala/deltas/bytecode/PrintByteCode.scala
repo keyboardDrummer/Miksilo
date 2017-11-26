@@ -21,7 +21,7 @@ object PrintByteCode {
 
   def getBytes(byteCode: Node, language: Language): Seq[Byte] = {
 
-    val clazz = new ByteCodeWrapper(byteCode)
+    val clazz = new ClassFile(byteCode)
     def getBytes(byteCode: Node): Seq[Byte] = {
       var result = List[Byte]()
 
@@ -43,14 +43,14 @@ object PrintByteCode {
       result
     }
 
-    def getMethodsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
+    def getMethodsByteCode(clazz: ClassFile[Node]): Seq[Byte] = {
       val methods = clazz.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
         ByteCodeSkeleton.getRegistry(language).getBytes(method.clazz)(method)
       })
     }
 
-    def getFieldsByteCode(clazz: ByteCodeWrapper[Node]): Seq[Byte] = {
+    def getFieldsByteCode(clazz: ClassFile[Node]): Seq[Byte] = {
       val fields = clazz.fields
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
         ByteCodeSkeleton.getRegistry(language).getBytes(field.clazz)(field)

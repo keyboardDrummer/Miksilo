@@ -15,7 +15,7 @@ import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
 import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
-import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, RemoveConstantPool}
+import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool}
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
@@ -33,7 +33,7 @@ import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, 
 import deltas.javac.methods.call.CallStaticOrInstanceC
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import deltas.javac.trivia.{CaptureTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
+import deltas.javac.trivia.{StoreTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
 import deltas.javac.types._
 
 object JavaCompilerDeltas {
@@ -43,7 +43,7 @@ object JavaCompilerDeltas {
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
   def allDeltas = javaCompilerDeltas ++
-    Seq(JavaStyleCommentsDelta, CaptureTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
+    Seq(JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -72,7 +72,7 @@ object JavaCompilerDeltas {
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
-    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, RemoveConstantPool) ++ byteCodeTransformations
+    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool) ++ byteCodeTransformations
 
   def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
 

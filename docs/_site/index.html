@@ -70,13 +70,29 @@
 									
 								
 									
-										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+								
+									
+								
 									
 								
 									
 										<li class="nav-item "><a href="/core/what-is-a-language/">What is a language?</a></li>
 									
 								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/node/">Node</a></li>
 									
 								
 									
@@ -89,26 +105,20 @@
 										<li class="nav-item "><a href="/core/sandbox/">Sandbox</a></li>
 									
 								
-									
-								
-									
-								
-									
-								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Grammar</a>
+							<a href="/deltas/built-in-languages/">Grammar</a>
 							<ul>
 								
 								
 									
+								
+									
+								
+									
 										<li class="nav-item "><a href="/grammar/bigrammar/">BiGrammar</a></li>
-									
-								
-									
-								
 									
 								
 									
@@ -124,18 +134,26 @@
 									
 								
 									
+								
+									
 										<li class="nav-item "><a href="/grammar/modularity/">Modularity</a></li>
 									
 								
 									
-										<li class="nav-item "><a href="/grammar/whole-language-transformation/">Whole language transformation</a></li>
+								
+									
+										<li class="nav-item "><a href="/grammar/trivia/">Trivia</a></li>
+									
+								
+									
+								
 									
 								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Java</a>
+							<a href="/deltas/built-in-languages/">Java</a>
 							<ul>
 								
 								
@@ -159,17 +177,21 @@
 								
 									
 								
+									
+								
+									
+								
+									
+								
+									
+								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Practical</a>
+							<a href="/deltas/built-in-languages/">Practical</a>
 							<ul>
 								
-								
-									
-								
-									
 								
 									
 								
@@ -178,7 +200,19 @@
 									
 								
 									
-										<li class="nav-item "><a href="/practical/contributions/">How to contribute</a></li>
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/practical/contributions/">Contributions</a></li>
+									
+								
+									
+								
+									
+								
 									
 								
 									
@@ -195,9 +229,19 @@
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Discussion</a>
+							<a href="/deltas/built-in-languages/">Discussion</a>
 							<ul>
 								
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/discussion/related-projects/">Related projects</a></li>
+									
 								
 									
 								
@@ -244,22 +288,24 @@
 
 <p>Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain’s Meta Programming System</a>. Language workbenches often define one or several <em>metalanguages</em>, which are used to define (parts of) a language.</p>
 
-<p>Blender’s focus is on modular language design, it gets modularity right because of these properties:</p>
+<p>Blender’s focus is on modular language design. These are the properties that make it so modular:</p>
 
 <ul>
   <li>Languages are composed of many small transformations</li>
-  <li>Language transformations are packaged as re-usable units with well-defined dependencies</li>
-  <li>Metalanguages are embedded, making them first class objects and allowing arbitrary computations over them. This enables transforming between arbitrary languages.</li>
+  <li>Language transformations are packaged as reusable units with well-defined dependencies</li>
+  <li>Metalanguages are embedded in <a href="http://www.scala-lang.org/&quot;">Scala</a>, making them first class objects and allowing arbitrary computations over them. This enables transforming between arbitrary languages.</li>
   <li>Metalanguages are designed to be transformed. For example, early binding to fields in the grammar allows easy &amp; safe editing.</li>
   <li>Compiler phases are defined generically, making them resilient to changes in the language</li>
-  <li>Abstract syntax trees are stored unstructured, which provides many benefits such as fast transformations and allowing language composition at run-time</li>
+  <li>Abstract syntax trees are stored unstructured, which provides many benefits such as fast transformations and language composition at run-time</li>
 </ul>
 
-<p>Blender is written in <a href="http://www.scala-lang.org/&quot;">Scala</a>, which serves as a host language for its embedded metalanguages. Some workbenches like <a href="https://github.com/usethesource/rascal&quot;">Rascal</a> define stand-alone metalanguages with general purpose programming facilities. This provides a smooth experience when using the language, but leaves you without the ecosystem of a popular language. Other workbenches like <a href="http://metaborg.org/en/latest/">Spoofax</a> and <a href="https://www.jetbrains.com/mps/">MPS</a> define metalanguages optimized for usability, leaving out generic programming facilities. While these languages are user-friendly, they are not suitable for being transformed.</p>
+<p>The best way to show Blender’s modularity is by example. Here are examples of language transformations demonstrating the power of Blender:</p>
 
-<blockquote>
-  <p>TODO. Add awesome cases.</p>
-</blockquote>
+<ul>
+  <li><a href="http://keyboarddrummer.github.io/Blender/bigrammar/modularity/">Adding support for comments to an automatic refactoring, in a language agnostic way.</a></li>
+  <li><a href="http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/">Inlining the constant pool in Java bytecode.</a></li>
+  <li><a href="http://keyboarddrummer.github.io/Blender/deltas/infer-stack-frames/">Inferring stack frames in Java bytecode.</a></li>
+</ul>
 
 			</article>
 		</section>

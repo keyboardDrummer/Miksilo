@@ -68,13 +68,29 @@
 									
 								
 									
-										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+								
+									
+								
 									
 								
 									
 										<li class="nav-item "><a href="/core/what-is-a-language/">What is a language?</a></li>
 									
 								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/node/">Node</a></li>
 									
 								
 									
@@ -87,26 +103,20 @@
 										<li class="nav-item "><a href="/core/sandbox/">Sandbox</a></li>
 									
 								
-									
-								
-									
-								
-									
-								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Grammar</a>
+							<a href="/deltas/built-in-languages/">Grammar</a>
 							<ul>
 								
 								
 									
+								
+									
+								
+									
 										<li class="nav-item "><a href="/grammar/bigrammar/">BiGrammar</a></li>
-									
-								
-									
-								
 									
 								
 									
@@ -122,18 +132,26 @@
 									
 								
 									
+								
+									
 										<li class="nav-item "><a href="/grammar/modularity/">Modularity</a></li>
 									
 								
 									
-										<li class="nav-item "><a href="/grammar/whole-language-transformation/">Whole language transformation</a></li>
+								
+									
+										<li class="nav-item "><a href="/grammar/trivia/">Trivia</a></li>
+									
+								
+									
+								
 									
 								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Java</a>
+							<a href="/deltas/built-in-languages/">Java</a>
 							<ul>
 								
 								
@@ -157,17 +175,21 @@
 								
 									
 								
+									
+								
+									
+								
+									
+								
+									
+								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Practical</a>
+							<a href="/deltas/built-in-languages/">Practical</a>
 							<ul>
 								
-								
-									
-								
-									
 								
 									
 								
@@ -176,7 +198,19 @@
 									
 								
 									
-										<li class="nav-item "><a href="/practical/contributions/">How to contribute</a></li>
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/practical/contributions/">Contributions</a></li>
+									
+								
+									
+								
+									
+								
 									
 								
 									
@@ -193,9 +227,19 @@
 						</li>
 					
 						<li class="nav-item top-level current">
-							<a href="/grammar/bigrammar/">Discussion</a>
+							<a href="/deltas/built-in-languages/">Discussion</a>
 							<ul>
 								
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/discussion/related-projects/">Related projects</a></li>
+									
 								
 									
 								
@@ -246,7 +290,7 @@
 						"title": "Delta",
 						"category": "",
 						"url": " /core/delta/",
-						"content": "In Blender, language transformations are packaged as re-usable units. Such a unit is called a Delta. Commonly, a delta applies a small change to a language, such as adding or removing a language feature, or adding an optimization. Languages are defined by composing many Delta’s. By keeping Delta’s simple and language agnostic, they can be reused for different languages. A similar approach is described in the paper A Nanopass Framework for Compiler Education.\n\nDelta’s can, and commonly do, depend on other Delta’s. For example, WhileContinueDelta, that allows using the continue statement in a Java while loop, depends on WhileDelta, that defines a Java while loop, which depends on StatementSkeleton that defines the concept of a statement, etc.\n\nAn overview of Delta’s and their dependencies can be seen in the architecture panel, which is part of the Blender desktop application."
+						"content": "In Blender, language transformations are packaged as re-usable units. Such a unit is called a Delta. Commonly, a delta applies a small change to a language, such as adding or removing a language feature, or adding an optimization. Languages are defined by composing many Delta’s. By keeping Delta’s simple and language agnostic, they can be reused for different languages. A similar approach is described in the paper A Nanopass Framework for Compiler Education.\n\nDelta’s can, and commonly do, depend on other Delta’s. For example, WhileContinueDelta, that allows using the continue statement in a Java while loop, depends on WhileDelta, that defines a Java while loop, which depends on StatementSkeleton that defines the concept of a statement, etc.\n\n\n  Discuss compilation\nDiscuss language class\n\n\nAn overview of Delta’s and their dependencies can be seen in the architecture panel, which is part of the Blender desktop application.\n\n\n  Add link"
 					}
 
 					
@@ -264,6 +308,23 @@
 						"category": "",
 						"url": " /core/effective-blender/",
 						"content": "This article is under construction.\n\n\nTo use Blender effectively requires writing some boilerplate. For each type of Node, we need to define one NodeClass object, and a NodeField object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of NodeWrapper. Scala macro’s might help us here in the future, but currently they are not mature enough. For now we’ve written a generator for the boilerplate. Here follows an example of the generator in action:\n\nGiven the following input:\nscala\nobject ClassFileDelta {\n  val input = new NodeClassDefinition(\"ClassFile\", \n    \"classInfoIndex\" -&gt; \"Int\",\n    \"interfaces\" -&gt; \"Seq[Int]\",\n    \"methods\" -&gt; wrapSeq(\"Seq[MethodInfo]\"),\n    \"attributes\" -&gt; \"Seq[Node]\"\n  )\n\nIt outputs:\n```scala\nobject ClassFileDelta {\n  val input = new NodeClassDefinition(“ClassFile”, \n    “classInfoIndex” -&gt; “Int”,\n    “interfaces” -&gt; “Seq[Int]”,\n    “methods” -&gt; wrapSeq(“Seq[MethodInfo]”),\n    “attributes” -&gt; “Seq[Node]”\n  )\n\n//region Generated Node boilerplate\n  object Clazz extends NodeClass\n  object Interfaces extends NodeField\n  object Methods extends NodeField\n  object Attributes extends NodeField\n\nimplicit class ClassFileT &lt;: NodeLike extends NodeWrapper {\n    assert(node.clazz == Clazz)\n\ndef interfaces: Seq[Int] = node(Interfaces).asInstanceOf[Seq[Int]]\ndef interfaces_(value: Seq[Int]): Unit = node(Interfaces) = value\n\ndef methods: Seq[MethodInfo[T]] = NodeWrapper.wrapSeq(node(Methods).asInstanceOf[Seq[T]])\ndef methods_(value: Seq[MethodInfo[T]]): Unit = node(Methods) = NodeWrapper.unwrapSeq(value)\n\ndef attributes: Seq[T] = node(Attributes).asInstanceOf[Seq[T]]\ndef attributes_(value: Seq[T]): Unit = node(Attributes) = value   }     //endregion } ```\n\n\n\nThe generic type argument for the wrappers allows it to wrap around both Node and Path types. Wrapped fields can either wrap around regular types, other wrappers, or sequences of other wrappers."
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"core-node": {
+						"id": "core-node",
+						"title": "Node",
+						"category": "",
+						"url": " /core/node/",
+						"content": "Node is the type used to define abstract syntax tree nodes in Blender."
 					}
 
 					
@@ -309,6 +370,57 @@
 					,
 					
 
+					"deltas-built-in-languages": {
+						"id": "deltas-built-in-languages",
+						"title": "Built-in languages",
+						"category": "",
+						"url": " /deltas/built-in-languages/",
+						"content": ""
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"deltas-inline-constant-pool": {
+						"id": "deltas-inline-constant-pool",
+						"title": "Inline constant pool",
+						"category": "",
+						"url": " /deltas/inline-constant-pool/",
+						"content": ""
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"discussion-related-projects": {
+						"id": "discussion-related-projects",
+						"title": "Related projects",
+						"category": "",
+						"url": " /discussion/related-projects/",
+						"content": "Blender is written in Scala, which serves as a host language for its embedded metalanguages. Some workbenches like Rascal define stand-alone metalanguages with general purpose programming facilities. This provides a smooth experience when using the language, but leaves you without the ecosystem of a popular language. Other workbenches like Spoofax and MPS define metalanguages optimized for usability, leaving out generic programming facilities. While these languages are user-friendly, they are not suitable for being transformed."
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
 					"grammar-bigrammar": {
 						"id": "grammar-bigrammar",
 						"title": "BiGrammar",
@@ -343,6 +455,23 @@
 					,
 					
 
+					"grammar-trivia": {
+						"id": "grammar-trivia",
+						"title": "Trivia",
+						"category": "",
+						"url": " /grammar/trivia/",
+						"content": "In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.\n\n\n  Introduce concept of a language pipeline to replace the usage of ‘target’\n\n\nTo demonstrate these delta’s, we need a target for them to transform. We choose a simple refactoring that reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three delta’s will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.\n\nOur input program for this case is the following:\n\nclass Example {\n    int first;\n    /* second is used for foo */\n    public static /* bar */ int second;\n}\n\n\n\nIf we apply reorder members on this program, we get the following exception:\n\n[5.5] failure: `}' expected but `/' found\n\n    /* second is for XYZ */\n    ^\n\n\n\nWe can allow comment parsing using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called TriviaGrammar that parses whitespace. Given a Language, we can use import language.grammars._ to get a set of language specific parser combinators. These combinators, such as ~, will use the language’s TriviaGrammar as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our earlier program:\n\n  override def transformGrammars(language: Language): Unit = {\n    import language.grammars._\n\n    //Create an empty named grammar, that we can modify in another delta.\n    val classMember = create(ClassMemberGrammar) \n\n    val nameGrammar = \"class\" ~~&gt; identifier.as(ClassName)\n    val membersGrammar = classMember.manyVertical.indent(4).as(Members)\n    val classGrammar = packageGrammar % importsGrammar % \n      nameGrammar ~&lt; \"{\" % membersGrammar %&lt; \"}\" asLabelledNode Clazz\n\n    //BodyGrammar is the file's top level grammar\n    find(BodyGrammar).inner = classGrammar \n  }\n\n\n\nNow that we know about TriviaGrammar, we can understand how the following Delta adds comment parsing to the language:\n\nobject JavaStyleCommentsDelta extends DeltaWithGrammar {\n  override def transformGrammars(grammars: LanguageGrammars, state: Language) = {\n    val commentGrammar = RegexGrammar(\"\"\"(?s)/\\*.*?\\*/\"\"\".r)\n    grammars.find(TriviaGrammar).addOption(getCommentGrammar)\n  }\n}\n\n\n\nIf we add this delta to our refactoring, and then apply it, we get the following output program:\n\nclass Example {\n    static int second;\n    int first;\n}\n\n\n\nThe reordering has completed but all the comments are gone! To retain our comments in the output, we’ll add another delta, StoreTriviaDelta, that causes the results from TriviaGrammar to be stored in the AST. With this delta added to our refactoring, we get the following output:\n\nclass Example {\n    public static /* bar */ int second;\n    /* second is used for foo */\n    int first;\n}\n\n\n\nThis is quite good! All the comments are still there in the output, and the /* bar */ comment inside the second field has moved with the field. However, one last thing still irks us. The comment /* second is used for foo */ is in the same position as before, in front of the field first, even though it is meant to clarify the meaning of the field second.\n\nThe reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta, TriviaInsideNode, that will improve this behavior, so that trivia located right in front of a node, will be stored inside that node, instead of the parent node. The resulting output is now:\n\nclass Example {\n    /* second is used for foo */\n    public static /* bar */ int second;\n    int first;\n}\n\n\n\nPerfect!\n\nThe refactoring used as a target in this article is a minimal example, but since the three delta’s we used are all language agnostic, we can use them in any context, for example when transforming from Java to C#."
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
 					"grammar-unified-parsing-and-printing": {
 						"id": "grammar-unified-parsing-and-printing",
 						"title": "Unified Parsing &amp; Printing",
@@ -360,29 +489,12 @@
 					,
 					
 
-					"grammar-whole-language-transformation": {
-						"id": "grammar-whole-language-transformation",
-						"title": "Whole language transformation",
-						"category": "",
-						"url": " /grammar/whole-language-transformation/",
-						"content": "In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.\n\nOur first case starts with a simple refactoring which reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. We’ll demonstrate a series of three delta’s that together enable the refactoring to accept Java block comments in the input program, and also to output them in the refactored program, in an way that matches with how we use comments.\n\nOur input program for this case is the following:\n\nclass Example {\n    int first;\n    /* second is used for foo */\n    public static /* bar */ int second;\n}\n\n\n\nIf we apply reorder members on this program, we get the following exception:\n\n[5.5] failure: `}' expected but `/' found\n\n    /* second is for XYZ */\n    ^\n\n\n\nWe can allow comment parsing using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called TriviaGrammar that parses whitespace. Given a Language, we can use import language.grammars._ to get a set of language specific parser combinators. These combinators, such as ~, will use the language’s TriviaGrammar as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our earlier program:\n\n  override def transformGrammars(language: Language): Unit = {\n    import language.grammars._\n\n    //Create an empty named grammar, that we can modify in another delta.\n    val classMember = create(ClassMemberGrammar) \n\n    val nameGrammar = \"class\" ~~&gt; identifier.as(ClassName)\n    val membersGrammar = classMember.manyVertical.indent(4).as(Members)\n    val classGrammar = packageGrammar % importsGrammar % \n      nameGrammar ~&lt; \"{\" % membersGrammar %&lt; \"}\" asLabelledNode Clazz\n\n    //BodyGrammar is the file's top level grammar\n    find(BodyGrammar).inner = classGrammar \n  }\n\n\n\nNow that we know about TriviaGrammar, we can understand how the following Delta adds comment parsing to the language:\n\nobject JavaStyleCommentsDelta extends DeltaWithGrammar {\n  override def transformGrammars(grammars: LanguageGrammars, state: Language) = {\n    val commentGrammar = RegexGrammar(\"\"\"(?s)/\\*.*?\\*/\"\"\".r)\n    grammars.find(TriviaGrammar).addOption(getCommentGrammar)\n  }\n}\n\n\n\nIf we add this delta to our refactoring, and then apply it, we get the following output program:\n\nclass Example {\n    static int second;\n    int first;\n}\n\n\n\nThe reordering has completed but all the comments are gone! To retain our comments in the output, we’ll add another delta that causes the results from TriviaGrammar to be stored in the AST. For brevity we won’t show the code now, but you can find it here. With this delta added to our refactoring, we get the following output:\n\nclass Example {\n    public static /* bar */ int second;\n    /* second is used for foo */\n    int first;\n}\n\n\n\nThis is quite good! All the comments are still there in the output, and the /* bar */ comment inside the second field has moved with the field. However, one last thing still irks us. The comment /* second is used for foo */ is in the same position as before, in front of the field first, even though it is meant to clarify the meaning of the field second.\n\nThe reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta that will improve this behavior, so that trivia located right in front of a node, will be stored inside that node, instead of the parent node. The code is shown here. The resulting output is now:\n\nclass Example {\n    /* second is used for foo */\n    public static /* bar */ int second;\n    int first;\n}\n\n\n\nPerfect!"
-					}
-
-					
-				
-			
-		
-			
-				
-					,
-					
-
 					"practical-build": {
 						"id": "practical-build",
 						"title": "Build instructions",
 						"category": "",
 						"url": " /practical/build/",
-						"content": "Building Blender is as simple as 1-2-done! Here are the steps:\n\n\n  Install sbt\n  Call ‘sbt run’ in the project root to build Blender and start the sandbox."
+						"content": "Building Blender is as simple:\n\n\n  Grab the source from GitHub\n  Install sbt\n  Call ‘sbt run’ in the project root to build Blender and start the sandbox desktop application."
 					}
 
 					
@@ -396,7 +508,7 @@
 
 					"practical-contributions": {
 						"id": "practical-contributions",
-						"title": "How to contribute",
+						"title": "Contributions",
 						"category": "",
 						"url": " /practical/contributions/",
 						"content": "There’s an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor’s or Master’s thesis.\n\nSome examples of cool features:\n\n\n  Parser combinators that allow defining indentation sensitive grammars, such as those of Python and Haskell.\n  A DSL for static semantics, such as name binding and type checking. See the paper A constraint language for static semantic analysis based on scope graphs for inspiration\n  Error correcting parsing\n  Generating syntactic code completion from a grammar, as in the paper Principled syntactic code completion using placeholders\n  Incremental compilation: incremental parsing, incremental type checking, etc.\n  Add a new language front-end or back-end.\n\n\nHow to contribute\n\n  Reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.\n  Look through the open issues to see if you find something interesting\n  Enjoy the work ;-)\n  Once you’re done, submit a pull request and make sure the build server approves it."

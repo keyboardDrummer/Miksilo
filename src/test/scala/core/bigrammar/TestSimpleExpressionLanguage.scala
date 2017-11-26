@@ -74,7 +74,7 @@ Partial:
       assert(false)
     } catch {
       case e: PrintError => assertResult(expectedError)(e.toString)
-      case e => throw e
+      case e: Throwable => throw e
     }
   }
 

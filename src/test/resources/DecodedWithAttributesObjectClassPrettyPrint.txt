@@ -57,16 +57,16 @@ Constant pool:
   Utf8 "()Ljava/lang/Class;"
   Utf8 "()Ljava/lang/Class<*>;"
   Utf8 "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
-  NameAndType 30:6
-  NameAndType 16:9
-  NameAndType 42:9
-  NameAndType 46:11
-  NameAndType 28:55
-  NameAndType 29:8
-  NameAndType 45:8
-  NameAndType 44:10
-  NameAndType 16:14
-  NameAndType 24:57
+  NameAndType 30 6
+  NameAndType 16 9
+  NameAndType 42 9
+  NameAndType 46 11
+  NameAndType 28 55
+  NameAndType 29 8
+  NameAndType 45 8
+  NameAndType 44 10
+  NameAndType 16 14
+  NameAndType 24 57
   Methodref 47.63
   Methodref 49.66
   Methodref 50.65

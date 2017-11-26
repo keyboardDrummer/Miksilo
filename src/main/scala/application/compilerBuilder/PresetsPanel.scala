@@ -173,11 +173,11 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInsta
   def applyPreset(preset: Preset) {
     selectedParticles.clear()
     compilerName.replace(0, compilerName.getLength, preset.name, null)
-    for (particle <- preset.particles)
+    for (particle <- preset.deltas)
       selectedParticles.addElement(new DeltaInstance(particle))
   }
 }
 
-case class Preset(name: String, particles: Seq[Delta], description: String = "") {
+case class Preset(name: String, deltas: Seq[Delta], description: String = "") {
   override def toString = name
 }

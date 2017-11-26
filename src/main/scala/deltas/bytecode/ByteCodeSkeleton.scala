@@ -8,7 +8,7 @@ import core.deltas.node._
 import deltas.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
 import deltas.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
-import deltas.bytecode.constants.ClassInfoConstant
+import deltas.bytecode.constants.{ClassInfoConstant, ConstantEntry}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.javac.classes.ConstantPool
 
@@ -16,18 +16,18 @@ import scala.collection.mutable
 
 object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
-  implicit class ByteCodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class ClassFile[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
-    def constantPool_=(constantPool: ConstantPool) = node(ClassConstantPool) = constantPool
+    def constantPool_=(constantPool: ConstantPool): Unit = node(ClassConstantPool) = constantPool
 
     def parentIndex: Int = node(ClassParentIndex).asInstanceOf[Int]
-    def parentIndex_=(index: Int) = node(ClassParentIndex) = index
+    def parentIndex_=(index: Int): Unit = node(ClassParentIndex) = index
 
     def classInfoIndex: Int = node(ClassNameIndexKey).asInstanceOf[Int]
-    def classInfoIndex_=(index: Int) = node(ClassNameIndexKey) = index
+    def classInfoIndex_=(index: Int): Unit = node(ClassNameIndexKey) = index
 
-    def interfaceIndices = node(ClassInterfaces).asInstanceOf[Seq[Int]]
-    def interfaceIndices_=(indices: Seq[Int]) = node(ClassInterfaces) = indices
+    def interfaceIndices: Seq[Int] = node(ClassInterfaces).asInstanceOf[Seq[Int]]
+    def interfaceIndices_=(indices: Seq[Int]): Unit = node(ClassInterfaces) = indices
 
     def fields: Seq[FieldInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassFields).asInstanceOf[Seq[T]])
 
@@ -57,6 +57,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val getBytes = new ClassRegistry[Node => Seq[Byte]]
     val attributes = new mutable.HashMap[String, ByteCodeAttribute]
     val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
+    val constantEntries = mutable.Set.empty[ConstantEntry]
   }
 
   override def inject(state: Language): Unit = {

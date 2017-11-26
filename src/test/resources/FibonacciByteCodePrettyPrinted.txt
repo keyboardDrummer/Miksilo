@@ -4,7 +4,7 @@ Constant pool:
   Utf8 fibonacci
   Utf8 (I)I
   Class 1
-  NameAndType 2:3
+  NameAndType 2 3
   Methodref 4.5
   Utf8 StackMapTable
   Utf8 Code
@@ -12,13 +12,13 @@ Constant pool:
   Utf8 print
   Utf8 (I)V
   Class 9
-  NameAndType 10:11
+  NameAndType 10 11
   Methodref 12.13
   Utf8 out
   Utf8 Ljava/io/PrintStream;
   Utf8 java/lang/System
   Class 17
-  NameAndType 15:16
+  NameAndType 15 16
   Fieldref 18.19
   Utf8 main
   Utf8 ([Ljava/lang/String;)V
@@ -26,7 +26,7 @@ Constant pool:
   Utf8 <init>
   Utf8 ()V
   Class 23
-  NameAndType 24:25
+  NameAndType 24 25
   Methodref 26.27
 {
   Method;

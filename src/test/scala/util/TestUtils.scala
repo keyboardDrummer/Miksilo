@@ -8,7 +8,7 @@ import core.deltas.Compilation
 import core.deltas.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
 import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
-import deltas.bytecode.ByteCodeSkeleton.ByteCodeWrapper
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaCompilerDeltas
 import util.SourceUtils.LineProcessLogger
@@ -32,7 +32,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
   def rootOutput: Path = currentDir / Path("testOutput")
   def actualOutputDirectory: Path = rootOutput / "actual"
 
-  def testInstructionEquivalence(expectedByteCode: ByteCodeWrapper[Node], compiledCode: ByteCodeWrapper[Node]) {
+  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
       assert(ComparisonOptions(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }

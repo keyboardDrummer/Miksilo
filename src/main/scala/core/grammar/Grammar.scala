@@ -136,8 +136,6 @@ case class FailureG(message: String = "failure") extends Grammar {
 
 object StringLiteral extends Grammar
 
-object NumberG extends Grammar {
-}
+object NumberG extends Grammar
 
-object Identifier extends Grammar {
-}
+object Identifier extends Grammar

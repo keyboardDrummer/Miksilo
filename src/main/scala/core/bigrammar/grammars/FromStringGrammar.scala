@@ -12,7 +12,7 @@ import scala.util.parsing.input.CharArrayReader
   * so the result of the grammar is exactly what has been consumed.
   * verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
-class FromStringGrammar(val grammar: Grammar, verifyWhenPrinting: Boolean = false)
+case class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
   override def getGrammar = grammar

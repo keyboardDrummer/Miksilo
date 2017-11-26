@@ -4,10 +4,10 @@ import core.deltas.grammars.LanguageGrammars
 
 trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
 
-  def transformGrammars(grammars: LanguageGrammars, state: Language): Unit
+  def transformGrammars(grammars: LanguageGrammars, language: Language): Unit
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    transformGrammars(state.grammars, state)
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    transformGrammars(language.grammars, language)
   }
 }

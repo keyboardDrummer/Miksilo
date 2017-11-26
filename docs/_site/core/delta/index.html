@@ -22,12 +22,12 @@
 <meta property="og:url" content="http://localhost:4000/core/delta/" />
 <meta property="og:site_name" content="Blender" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2017-11-26T00:01:26+01:00" />
+<meta property="article:published_time" content="2017-11-26T17:00:01+01:00" />
 <script type="application/ld+json">
 {"@context": "http://schema.org",
 "@type": "Article",
 "headline": "Delta",
-"datePublished": "2017-11-26T00:01:26+01:00",
+"datePublished": "2017-11-26T17:00:01+01:00",
 "description": "In Blender, language transformations are packaged as re-usable units. Such a unit is called a Delta. Commonly, a delta applies a small change to a language, such as adding or removing a language feature, or adding an optimization. Languages are defined by composing many Delta’s. By keeping Delta’s simple and language agnostic, they can be reused for different languages. A similar approach is described in the paper A Nanopass Framework for Compiler Education.",
 "publisher": {"@type": "Organization",
 "logo": {"@type": "ImageObject",
@@ -71,13 +71,29 @@
 									
 								
 									
-										<li class="nav-item current"><a href="/core/delta/">Delta</a></li>
+								
+									
+								
 									
 								
 									
 										<li class="nav-item "><a href="/core/what-is-a-language/">What is a language?</a></li>
 									
 								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item current"><a href="/core/delta/">Delta</a></li>
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/node/">Node</a></li>
 									
 								
 									
@@ -90,26 +106,20 @@
 										<li class="nav-item "><a href="/core/sandbox/">Sandbox</a></li>
 									
 								
-									
-								
-									
-								
-									
-								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Grammar</a>
+							<a href="/deltas/built-in-languages/">Grammar</a>
 							<ul>
 								
 								
 									
+								
+									
+								
+									
 										<li class="nav-item "><a href="/grammar/bigrammar/">BiGrammar</a></li>
-									
-								
-									
-								
 									
 								
 									
@@ -125,18 +135,26 @@
 									
 								
 									
+								
+									
 										<li class="nav-item "><a href="/grammar/modularity/">Modularity</a></li>
 									
 								
 									
-										<li class="nav-item "><a href="/grammar/whole-language-transformation/">Whole language transformation</a></li>
+								
+									
+										<li class="nav-item "><a href="/grammar/trivia/">Trivia</a></li>
+									
+								
+									
+								
 									
 								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Java</a>
+							<a href="/deltas/built-in-languages/">Java</a>
 							<ul>
 								
 								
@@ -160,17 +178,21 @@
 								
 									
 								
+									
+								
+									
+								
+									
+								
+									
+								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Practical</a>
+							<a href="/deltas/built-in-languages/">Practical</a>
 							<ul>
 								
-								
-									
-								
-									
 								
 									
 								
@@ -179,7 +201,19 @@
 									
 								
 									
-										<li class="nav-item "><a href="/practical/contributions/">How to contribute</a></li>
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/practical/contributions/">Contributions</a></li>
+									
+								
+									
+								
+									
+								
 									
 								
 									
@@ -196,9 +230,19 @@
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Discussion</a>
+							<a href="/deltas/built-in-languages/">Discussion</a>
 							<ul>
 								
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/discussion/related-projects/">Related projects</a></li>
+									
 								
 									
 								
@@ -237,7 +281,16 @@
 
 <p>Delta’s can, and commonly do, depend on other Delta’s. For example, <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/WhileContinueDelta.scala">WhileContinueDelta</a>, that allows using the continue statement in a Java while loop, depends on <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/WhileDelta.scala">WhileDelta</a>, that defines a Java while loop, which depends on <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/StatementSkeleton.scala">StatementSkeleton</a> that defines the concept of a statement, etc.</p>
 
+<blockquote>
+  <p>Discuss compilation
+Discuss language class</p>
+</blockquote>
+
 <p>An overview of Delta’s and their dependencies can be seen in the <em>architecture panel</em>, which is part of the Blender desktop application.</p>
+
+<blockquote>
+  <p>Add link</p>
+</blockquote>
 
 			</article>
 		</section>

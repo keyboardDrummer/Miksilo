@@ -14,25 +14,25 @@
 
 		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blender" />
 		<!-- Begin Jekyll SEO tag v2.1.0 -->
-<title>Whole language transformation - Blender</title>
-<meta property="og:title" content="Whole language transformation" />
+<title>Trivia - Blender</title>
+<meta property="og:title" content="Trivia" />
 <meta name="description" content="In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language." />
 <meta property="og:description" content="In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language." />
-<link rel="canonical" href="http://localhost:4000/grammar/whole-language-transformation/" />
-<meta property="og:url" content="http://localhost:4000/grammar/whole-language-transformation/" />
+<link rel="canonical" href="http://localhost:4000/grammar/trivia/" />
+<meta property="og:url" content="http://localhost:4000/grammar/trivia/" />
 <meta property="og:site_name" content="Blender" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2017-11-26T00:01:26+01:00" />
+<meta property="article:published_time" content="2017-11-26T17:00:01+01:00" />
 <script type="application/ld+json">
 {"@context": "http://schema.org",
 "@type": "Article",
-"headline": "Whole language transformation",
-"datePublished": "2017-11-26T00:01:26+01:00",
+"headline": "Trivia",
+"datePublished": "2017-11-26T17:00:01+01:00",
 "description": "In Modularity we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.",
 "publisher": {"@type": "Organization",
 "logo": {"@type": "ImageObject",
 "url": "http://localhost:4000/favicon.png"}},
-"url": "http://localhost:4000/grammar/whole-language-transformation/"}</script>
+"url": "http://localhost:4000/grammar/trivia/"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -71,13 +71,29 @@
 									
 								
 									
-										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+								
+									
+								
 									
 								
 									
 										<li class="nav-item "><a href="/core/what-is-a-language/">What is a language?</a></li>
 									
 								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/delta/">Delta</a></li>
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/core/node/">Node</a></li>
 									
 								
 									
@@ -90,26 +106,20 @@
 										<li class="nav-item "><a href="/core/sandbox/">Sandbox</a></li>
 									
 								
-									
-								
-									
-								
-									
-								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Grammar</a>
+							<a href="/deltas/built-in-languages/">Grammar</a>
 							<ul>
 								
 								
 									
+								
+									
+								
+									
 										<li class="nav-item "><a href="/grammar/bigrammar/">BiGrammar</a></li>
-									
-								
-									
-								
 									
 								
 									
@@ -125,18 +135,26 @@
 									
 								
 									
+								
+									
 										<li class="nav-item "><a href="/grammar/modularity/">Modularity</a></li>
 									
 								
 									
-										<li class="nav-item current"><a href="/grammar/whole-language-transformation/">Whole language transformation</a></li>
+								
+									
+										<li class="nav-item current"><a href="/grammar/trivia/">Trivia</a></li>
+									
+								
+									
+								
 									
 								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Java</a>
+							<a href="/deltas/built-in-languages/">Java</a>
 							<ul>
 								
 								
@@ -160,17 +178,21 @@
 								
 									
 								
+									
+								
+									
+								
+									
+								
+									
+								
 							</ul>
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Practical</a>
+							<a href="/deltas/built-in-languages/">Practical</a>
 							<ul>
 								
-								
-									
-								
-									
 								
 									
 								
@@ -179,7 +201,19 @@
 									
 								
 									
-										<li class="nav-item "><a href="/practical/contributions/">How to contribute</a></li>
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/practical/contributions/">Contributions</a></li>
+									
+								
+									
+								
+									
+								
 									
 								
 									
@@ -196,9 +230,19 @@
 						</li>
 					
 						<li class="nav-item top-level ">
-							<a href="/grammar/bigrammar/">Discussion</a>
+							<a href="/deltas/built-in-languages/">Discussion</a>
 							<ul>
 								
+								
+									
+								
+									
+								
+									
+								
+									
+										<li class="nav-item "><a href="/discussion/related-projects/">Related projects</a></li>
+									
 								
 									
 								
@@ -230,12 +274,16 @@
 		<section class="main">
 			<div class="page-header">
 				<h2>Grammar</h2>
-				<h3>Whole language transformation</h3>
+				<h3>Trivia</h3>
 			</div>
 			<article class="content">
 				<p>In <a href="http://keyboarddrummer.github.io/Blender/bigrammar/modularity/">Modularity</a> we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.</p>
 
-<p>Our first case starts with a simple refactoring which reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. We’ll demonstrate a series of three delta’s that together enable the refactoring to accept Java block comments in the input program, and also to output them in the refactored program, in an way that matches with how we use comments.</p>
+<blockquote>
+  <p>Introduce concept of a language pipeline to replace the usage of ‘target’</p>
+</blockquote>
+
+<p>To demonstrate these delta’s, we need a target for them to transform. We choose a simple refactoring that reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three delta’s will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.</p>
 
 <p>Our input program for this case is the following:</p>
 
@@ -295,7 +343,7 @@
 </code></pre>
 </div>
 
-<p>The reordering has completed but all the comments are gone! To retain our comments in the output, we’ll add another delta that causes the results from <code class="highlighter-rouge">TriviaGrammar</code> to be stored in the AST. For brevity we won’t show the code now, but you can find it <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/CaptureTriviaDelta.scala">here</a>. With this delta added to our refactoring, we get the following output:</p>
+<p>The reordering has completed but all the comments are gone! To retain our comments in the output, we’ll add another delta, <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/StoreTriviaDelta.scala">StoreTriviaDelta</a>, that causes the results from <code class="highlighter-rouge">TriviaGrammar</code> to be stored in the AST. With this delta added to our refactoring, we get the following output:</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
     <span class="n">public</span> <span class="n">static</span> <span class="cm">/* bar */</span> <span class="n">int</span> <span class="n">second</span><span class="o">;</span>
@@ -307,7 +355,7 @@
 
 <p>This is quite good! All the comments are still there in the output, and the <code class="highlighter-rouge">/* bar */</code> comment inside the second field has moved with the field. However, one last thing still irks us. The comment <code class="highlighter-rouge">/* second is used for foo */</code> is in the same position as before, in front of the field <code class="highlighter-rouge">first</code>, even though it is meant to clarify the meaning of the field <code class="highlighter-rouge">second</code>.</p>
 
-<p>The reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta that will improve this behavior, so that trivia located right in front of a node, will be stored inside that node, instead of the parent node. The code is shown <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/TriviaInsideNode.scala">here</a>. The resulting output is now:</p>
+<p>The reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta, <a href="https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/TriviaInsideNode.scala">TriviaInsideNode</a>, that will improve this behavior, so that trivia located right in front of a node, will be stored inside that node, instead of the parent node. The resulting output is now:</p>
 
 <div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Example</span> <span class="o">{</span>
     <span class="cm">/* second is used for foo */</span>
@@ -318,6 +366,8 @@
 </div>
 
 <p>Perfect!</p>
+
+<p>The refactoring used as a target in this article is a minimal example, but since the three delta’s we used are all language agnostic, we can use them in any context, for example when transforming from <code class="highlighter-rouge">Java</code> to <code class="highlighter-rouge">C#</code>.</p>
 
 			</article>
 		</section>
