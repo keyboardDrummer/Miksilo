@@ -16,13 +16,13 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
-  override def transformProgram(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: ClassFile[Node] = program
     for (method <- clazz.methods) {
       val codeAnnotation = method.codeAttribute
       val instructions = codeAnnotation.instructions
 
-      val stackLayouts = new InstructionTypeAnalysisFromState(state, method)
+      val stackLayouts = new InstructionTypeAnalysisFromState(compilation, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
       for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledLocations.LabelKey)) {
@@ -42,7 +42,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 
-    def toStackType(_type: Node) = TypeSkeleton.toStackType(_type, state)
+    def toStackType(_type: Node) = TypeSkeleton.toStackType(_type, compilation)
 
     def getStackMap(previousStack: Seq[Node], stack: Seq[Node], previousLocals: Seq[Node], locals: Seq[Node]) = {
       getStackMapHelper(previousStack.map(toStackType), stack.map(toStackType), previousLocals.map(toStackType), locals.map(toStackType))
@@ -79,6 +79,6 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(LabelledLocations.LabelKey).
       findAs(LabelledLocations.LabelStackFrame).
-      asInstanceOf[GrammarReference].removeMeFromSequence()
+      asInstanceOf[GrammarReference].removeMe()
   }
 }

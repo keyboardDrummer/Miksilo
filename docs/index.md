@@ -18,6 +18,6 @@ Blender's focus is on modular language design. These are the properties that mak
 
 The best way to show Blender's modularity is by example. Here are examples of language transformations demonstrating the power of Blender:
 
-- [Adding support for comments to an automatic refactoring, in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
-- [Inlining the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
-- [Inferring stack frames in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/infer-stack-frames/)
+- [Add support for comments to an automatic refactoring, in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
+- [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
+- [Remove stack frames in Java bytecode by inferring them.](http://keyboarddrummer.github.io/Blender/deltas/infer-stack-frames/)

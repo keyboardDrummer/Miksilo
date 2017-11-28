@@ -30,7 +30,7 @@ trait GrammarPath {
   def seenGrammars: Set[BiGrammar] = ancestorGrammars + value
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
-  def findGrammar(grammar: BiGrammar): Option[GrammarPath] = find(p => p.value == grammar)
+  def findGrammar(grammar: BiGrammar): Option[GrammarReference] = find(p => p.value == grammar)
 
   def findAs(field: NodeField): GrammarReference = {
     find(p => p.value match { case as:As => as.key == field; case _ => false}).get
@@ -120,7 +120,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
     previous.asInstanceOf[GrammarReference].set(sibling)
   }
 
-  def removeMeFromSequence(): Unit = {
+  def removeMe(): Unit = {
     set(ValueGrammar(UndefinedDestructuringValue)) //TODO add transformation to remove ValueGrammar(Unit)
   }
 

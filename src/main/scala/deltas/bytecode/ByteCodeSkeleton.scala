@@ -102,7 +102,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
     val classGrammar = create(Clazz,
       (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
-        constantPool.as(ClassConstantPool) % bodyGrammar).asNode(Clazz))
+        constantPool % bodyGrammar).asNode(Clazz))
 
     find(BodyGrammar).inner = classGrammar
   }
@@ -116,7 +116,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val result = "Constant pool:" %> entries ^^ (
       entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
       constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
-    create(ConstantPoolGrammar, result)
+    create(ConstantPoolGrammar, result.as(ClassConstantPool))
   }
 
   override def description: String = "Defines a skeleton for bytecode."

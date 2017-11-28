@@ -13,7 +13,7 @@ import deltas.bytecode.types.ObjectTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.QualifiedClassName
 
-class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMethodInfoWrapper[Node]) {
+class InstructionTypeAnalysisFromState(compilation: Compilation, method: ByteCodeMethodInfoWrapper[Node]) {
   val typeAnalysis = getTypeAnalysis
   val parameters = getMethodParameters
   val initialVariables = parameters.zipWithIndex.map(p => p._2 -> p._1).toMap
@@ -26,19 +26,19 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
     val instructions = codeAnnotation.instructions
 
     new InstructionTypeAnalysis(instructions) {
-      val instructionVariableUpdateRegistry = CodeAttribute.getRegistry(state).localUpdates
+      val instructionVariableUpdateRegistry = CodeAttribute.getRegistry(compilation).localUpdates
       override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
         instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)
 
-      val instructionSignatureRegistry = CodeAttribute.getInstructionSignatureRegistry(state)
+      val instructionSignatureRegistry = CodeAttribute.getInstructionSignatureRegistry(compilation)
       override def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature =
-        instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, state)
+        instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, compilation)
 
-      val jumpBehaviorRegistry = CodeAttribute.getRegistry(state).jumpBehaviorRegistry
+      val jumpBehaviorRegistry = CodeAttribute.getRegistry(compilation).jumpBehaviorRegistry
       override def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
     }
   }
-  
+
   private def getMethodParameters = {
     val methodIsStatic: Boolean = method.accessFlags.contains(ByteCodeMethodInfo.StaticAccess)
     val methodParameters = method._type.parameterTypes
@@ -46,7 +46,7 @@ class InstructionTypeAnalysisFromState(state: Compilation, method: ByteCodeMetho
       methodParameters
     }
     else {
-      val clazz = state.program
+      val clazz = compilation.program
       val clazzRef = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
       val className = clazzRef(ClassInfoConstant.Name).asInstanceOf[Node]
       Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters

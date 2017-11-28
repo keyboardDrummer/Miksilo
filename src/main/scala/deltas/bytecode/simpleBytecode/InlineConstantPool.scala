@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
-import core.bigrammar.grammars.IgnoreLeft
-import core.bigrammar.{GrammarReference, RootGrammar}
+import core.bigrammar.{BiGrammar, GrammarReference}
+import core.bigrammar.grammars.{IgnoreLeft, Labelled}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
@@ -15,18 +15,18 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val constantPool = new ConstantPool()
     program.constantPool = constantPool
-    val constantReferences = ByteCodeSkeleton.getRegistry(compilation).constantReferences
+    val fieldConstantTypesPerClass = ByteCodeSkeleton.getRegistry(compilation).constantReferences
 
     program.visit(afterChildren = extractReferencesInNode)
 
     def extractReferencesInNode(node: Node): Unit = {
       for {
-        references: Map[NodeField, NodeClass] <- constantReferences.get(node.clazz)
-        reference <- references
-        fieldValue <- node.get(reference._1)
+        fieldConstantTypes: Map[NodeField, NodeClass] <- fieldConstantTypesPerClass.get(node.clazz)
+        field <- fieldConstantTypes.keys
+        constantPoolElement <- node.get(field)
       } {
-        val index = constantPool.store(fieldValue)
-        node.data.put(reference._1, index)
+        val index = constantPool.store(constantPoolElement)
+        node.data.put(field, index)
       }
     }
   }
@@ -38,17 +38,20 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def inlineConstantPoolReferences(language: Language): Unit = {
-    val grammars = language.grammars
+    import language.grammars._
     val constantReferences = ByteCodeSkeleton.getRegistry(language).constantReferences
-    val constantPoolIndexGrammar = grammars.find(ConstantPoolIndexGrammar)
-    for (containerEntry <- constantReferences) {
-      val key: GrammarKey = containerEntry._1
-      val constantFields: Map[NodeField, NodeClass] = containerEntry._2
-      val keyGrammar = new RootGrammar(grammars.find(key))
-      for (field <- constantFields) {
-        val asGrammar = keyGrammar.findAs(field._1)
-        val constantRef = asGrammar.findGrammar(constantPoolIndexGrammar).get.asInstanceOf[GrammarReference]
-        constantRef.set(grammars.find(field._2))
+    val constantPoolIndexGrammar = find(ConstantPoolIndexGrammar)
+    for (classWithConstantReferences <- constantReferences) {
+      val clazz: NodeClass = classWithConstantReferences._1
+      val constantReferences: Map[NodeField, NodeClass] = classWithConstantReferences._2
+      val classGrammar: BiGrammar = find(clazz)
+      for (constantReference <- constantReferences) {
+        val field = constantReference._1
+        val constantType = constantReference._2
+        val fieldGrammar: GrammarReference = classGrammar.findAs(field)
+        val constantReferenceGrammar: GrammarReference = fieldGrammar.findGrammar(constantPoolIndexGrammar).get
+        val constantElementGrammar: BiGrammar = find(constantType)
+        constantReferenceGrammar.set(constantElementGrammar)
       }
     }
   }
@@ -62,8 +65,9 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def removeConstantPoolGrammar(language: Language): Unit = {
-    val constantPoolGrammar = language.grammars.root.findLabelled(ConstantPoolGrammar)
-    constantPoolGrammar.previous.asInstanceOf[GrammarReference].removeMeFromSequence()
+    val root: Labelled = language.grammars.root
+    val constantPoolGrammar: GrammarReference = root.findLabelled(ConstantPoolGrammar)
+    constantPoolGrammar.removeMe()
   }
 
   override def description: String = "Removes the constant pool in favor of inline constant entries"

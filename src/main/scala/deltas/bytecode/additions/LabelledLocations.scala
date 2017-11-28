@@ -183,7 +183,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def overrideStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {
     val offsetGrammar = grammars.find(offsetGrammarKey)
     val offsetGrammarPaths = grammars.find(StackMapFrameGrammar).descendants.filter(path => path.value == offsetGrammar)
-    offsetGrammarPaths.foreach(delta => delta.removeMeFromSequence())
+    offsetGrammarPaths.foreach(delta => delta.removeMe())
   }
 
   def overrideJumpGrammars(grammars: LanguageGrammars): Unit = {
