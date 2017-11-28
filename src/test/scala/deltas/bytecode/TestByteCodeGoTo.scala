@@ -22,7 +22,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompilerDeltas.byteCodeTransformations).transform(labelledWhile).program
+    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }

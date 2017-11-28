@@ -1,4 +1,4 @@
-package deltas.bytecode.simpleBytecode
+package deltas.bytecode
 
 import core.bigrammar.grammars.IgnoreLeft
 import core.bigrammar.{GrammarReference, RootGrammar}
@@ -6,12 +6,12 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
-import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ClassFile, ConstantPoolGrammar}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.javac.classes.ConstantPool
 
-object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
+object InlineConstantPool2 extends DeltaWithPhase with DeltaWithGrammar {
+
   override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = new ConstantPool()
     program.constantPool = constantPool
@@ -56,7 +56,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
     for (entry <- ByteCodeSkeleton.getRegistry(language).constantEntries) {
-      val ignoreLeft = grammars.find(entry.key).find(p => p.value.isInstanceOf[IgnoreLeft]).get.asInstanceOf[GrammarReference]
+      val ignoreLeft = grammars.find(entry.key).find(p => p.value.isInstanceOf[IgnoreLeft]).get
       ignoreLeft.set(ignoreLeft.value.asInstanceOf[IgnoreLeft].sequence.second)
     }
   }

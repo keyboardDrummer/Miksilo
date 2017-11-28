@@ -74,8 +74,8 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
   def compileAndPrettyPrint(input: InputStream): String = {
 
     val prettyPrint = PrettyPrint(recover = true)
-    val splicedParticles = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
-    val newCompiler = CompilerBuilder.build(splicedParticles)
+    val splicedDeltas = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
+    val newCompiler = CompilerBuilder.build(splicedDeltas)
 
     val state = newCompiler.parseAndTransform(input)
     state.output
@@ -114,7 +114,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeTransformations)
+    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas)
     val output = prettyPrintByteCodeCompiler.transform(state.program).output
     val prettyPrintActualByteCode = output
 

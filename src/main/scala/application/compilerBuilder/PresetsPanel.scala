@@ -23,7 +23,7 @@ object PresetsPanel
 {
   def getSimplifiedByteCodePreset = {
     new Preset("Simplified bytecode", new CompilerFromDeltas(JavaCompilerDeltas.simpleByteCodeTransformations).
-      spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(MarkOutputGrammar)),
+      spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar)),
       "Simplified JVM bytecode.")
   }
 
@@ -35,7 +35,7 @@ object PresetsPanel
 
   def getJavaToExtendedByteCodePreset = {
     new Preset("Java to extended bytecode",
-      JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.allByteCodeTransformations, Seq(MarkOutputGrammar)),
+      JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.allByteCodeDeltas, Seq(MarkOutputGrammar)),
       "Compiles Java into extended bytecode")
   }
 
@@ -44,7 +44,7 @@ object PresetsPanel
   }
 
   def getJavaCompilerParticles: Seq[Delta] = {
-    JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(MarkOutputGrammar))
+    JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))
   }
 
   def getPrettyPrintPreset = {
@@ -63,7 +63,7 @@ object PresetsPanel
   }
 
   def getByteCodePreset = {
-    new Preset("Basic bytecode", JavaCompilerDeltas.byteCodeTransformations,
+    new Preset("Basic bytecode", JavaCompilerDeltas.byteCodeDeltas,
       "Regular JVM bytecode.")
   }
 
@@ -84,7 +84,7 @@ object PresetsPanel
   }
 
   def getLabelledLocations = {
-    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeTransformations,
+    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeDeltas,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 

@@ -50,7 +50,7 @@ object TestGrammarUtils extends FunSuite {
 
 case class TestCompilerGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
-  def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null) {
+  def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null): Unit = {
     val grammar = getGrammarUsingTransformer(grammarTransformer)
     parseAndPrintSame(input, expected, grammar)
   }

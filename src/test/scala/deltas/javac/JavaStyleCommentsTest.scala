@@ -79,7 +79,7 @@ class JavaStyleCommentsTest
   test("addition") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
-      JavaCompilerDeltas.allByteCodeTransformations))
+      JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -90,7 +90,7 @@ class JavaStyleCommentsTest
   test("addition2") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionC, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
-      JavaCompilerDeltas.allByteCodeTransformations))
+      JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -101,7 +101,7 @@ class JavaStyleCommentsTest
   test("addition3") {
     val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(SubtractionC, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
-    JavaCompilerDeltas.allByteCodeTransformations))
+    JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -156,7 +156,7 @@ class JavaStyleCommentsTest
 
   test("comments are maintained in bytecode") {
     val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
+    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)

@@ -7,7 +7,7 @@ import util.Cache
 
 import scala.collection.mutable
 
-class ParticleLabelPainter(container: JPanel, availableDeltas: Seq[Delta]) {
+class ParticleLabelPainter(container: JPanel, availableDeltas: Set[Delta]) {
   val dependants = getDependants
   var selection: Seq[Delta] = Seq.empty
   val dependenciesCache = new Cache[Set[Delta]](() => selection.flatMap(s => s.dependencies2).toSet)

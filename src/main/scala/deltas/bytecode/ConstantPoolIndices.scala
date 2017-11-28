@@ -5,7 +5,7 @@ import core.bigrammar.grammars.ManyVertical
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
 import core.deltas.{DeltaWithGrammar, Language}
-import deltas.bytecode.ByteCodeSkeleton.ConstantPoolGrammar
+import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolGrammar, ConstantPoolItemContentGrammar}
 
 object ConstantPoolIndices extends DeltaWithGrammar {
 
@@ -23,16 +23,14 @@ object ConstantPoolIndices extends DeltaWithGrammar {
     previousConstantPoolItem.inner = constantPoolItem
 
     val constantPoolGrammar = find(ConstantPoolGrammar)
-    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).find(p => p.value.isInstanceOf[ManyVertical]).
-      get.asInstanceOf[GrammarReference] //TODO al die casts naar GrammarReference zijn loos. Beter altijd een GrammarReference returnen. O wacht, implicit cast naar grammarReference!!!
+    val entries: GrammarReference = new RootGrammar(constantPoolGrammar).findLabelled(ConstantPoolItemContentGrammar).ancestors.filter(p => p.value.isInstanceOf[ManyVertical]).head.asInstanceOf[GrammarReference]
     entries.set(addIndicesToList(entries.value))
   }
 
   def addIndicesToList(listGrammar: BiGrammar): BiGrammar = {
     val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[Node]].map(i => i(Content))
-    val addIndexForPrinting: (Any) => Some[Seq[Node]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map(p => new Node(WithIndexClass,
-      Index -> (p._2.asInstanceOf[Int] + 1),
-      Content -> p._1)))
+    val addIndexForPrinting: (Any) => Some[Seq[Node]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map((p: (Any, Int)) =>
+      WithIndexClass.create(Index -> (p._2 + 1), Content -> p._1)))
     listGrammar ^^ ( removeIndexForParsing, addIndexForPrinting )
   }
 
