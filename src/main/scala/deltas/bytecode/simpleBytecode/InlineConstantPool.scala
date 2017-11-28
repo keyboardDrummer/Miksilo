@@ -4,7 +4,6 @@ import core.bigrammar.grammars.IgnoreLeft
 import core.bigrammar.{GrammarReference, RootGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ClassFile, ConstantPoolGrammar}
@@ -18,16 +17,16 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     program.constantPool = constantPool
     val constantReferences = ByteCodeSkeleton.getRegistry(compilation).constantReferences
 
-    PathRoot(program).visit(afterChildren = extractReferencesInNode)
+    program.visit(afterChildren = extractReferencesInNode)
 
-    def extractReferencesInNode(node: Path): Unit = {
+    def extractReferencesInNode(node: Node): Unit = {
       for {
-        references <- constantReferences.get(node.clazz)
+        references: Map[NodeField, NodeClass] <- constantReferences.get(node.clazz)
         reference <- references
-        fieldValue <- node.current.get(reference._1)
+        fieldValue <- node.get(reference._1)
       } {
         val index = constantPool.store(fieldValue)
-        node.current.data.put(reference._1, index)
+        node.data.put(reference._1, index)
       }
     }
   }
