@@ -90,7 +90,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
   test("PrettyPrintAndParseByteCode") {
     val input = SourceUtils.getJavaTestFile("Fibonacci.java", Path(""))
 
-    val byteCodeTransformations = JavaCompilerDeltas.byteCodeTransformations
+    val byteCodeTransformations = JavaCompilerDeltas.byteCodeDeltas
     val prettyPrintCompiler = JavaCompilerDeltas.getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.parseAndTransform(input)
@@ -103,14 +103,14 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
-    val parseTransformations = Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeTransformations
+    val parseTransformations = Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas
     val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
-    val parseTransformations = JavaCompilerDeltas.byteCodeTransformations ++ Seq(RunWithJVM)
+    val parseTransformations = JavaCompilerDeltas.byteCodeDeltas ++ Seq(RunWithJVM)
     val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }

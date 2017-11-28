@@ -3,7 +3,7 @@ package application.graphing
 import java.util
 
 import application.graphing.model.simplifications.TransformationGroup
-import application.graphing.model.{TransformationGraph, TransformationVertex}
+import application.graphing.model.{TransformationGraph, DeltaVertex}
 import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
@@ -27,7 +27,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     setResetEdgesOnMove(true)
 
     setStyleSheet()
-    var vertexMap: Map[TransformationVertex, mxCell] = Map.empty[TransformationVertex, mxCell]
+    var vertexMap: Map[DeltaVertex, mxCell] = Map.empty[DeltaVertex, mxCell]
     val parent = getDefaultParent
 
     val topologicalOrdering = Lists.reverse(Lists.newArrayList(new TopologicalOrderIterator(origin)))
@@ -81,7 +81,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
     insertEdge(parent, null, "", source, target)
   }
 
-  def getVertex(parent: AnyRef, vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]): mxCell = {
+  def getVertex(parent: AnyRef, vertex: DeltaVertex, vertexMap: Map[DeltaVertex, mxCell]): mxCell = {
     val vertexLabel = vertex.toString
     val height: Double = 30
     val width = Math.max(getCellWidthBasedOnLabel(vertexLabel), getCellWidthBasedOnDependencies(vertex, vertexMap))
@@ -104,7 +104,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
   }
 
 
-  def getCellWidthBasedOnDependencies(vertex: TransformationVertex, vertexMap: Map[TransformationVertex, mxCell]) = {
+  def getCellWidthBasedOnDependencies(vertex: DeltaVertex, vertexMap: Map[DeltaVertex, mxCell]) = {
     val incoming = origin.inDegreeOf(vertex)
     val outgoing = origin.outDegreeOf(vertex)
     val maximum = Math.max(incoming, outgoing)

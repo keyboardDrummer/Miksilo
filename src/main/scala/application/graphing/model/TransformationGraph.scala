@@ -11,13 +11,13 @@ import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class TransformationGraph
-  extends GraphFromTransformations(JavaCompilerDeltas.allDeltas) {
+  extends GraphFromDeltas(JavaCompilerDeltas.allDeltas) {
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
     JavaSimpleStatement, JavaMethod, JavaC)
   addSimplifications()
 
-  val sources: JSetWrapper[TransformationVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
+  val sources: JSetWrapper[DeltaVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
 //  if (sources.size > 1)
 //    throw new RuntimeException(s"more than once source, sources = $sources.")
 
@@ -37,7 +37,7 @@ class TransformationGraph
       }
       for (dependency <- simplification.dependencies) {
         for (derivedDependant <- getOutgoingNodes(dependency)) {
-          val dijkstra = DijkstraShortestPath.findPathBetween[TransformationVertex, DefaultEdge](this, derivedDependant, simplification)
+          val dijkstra = DijkstraShortestPath.findPathBetween[DeltaVertex, DefaultEdge](this, derivedDependant, simplification)
           if (dijkstra == null)
             dependants += derivedDependant.transformation
         }
@@ -49,7 +49,7 @@ class TransformationGraph
     }
   }
 
-  def getOutgoingNodes(vertex: TransformationVertex): Set[TransformationVertex] = {
+  def getOutgoingNodes(vertex: DeltaVertex): Set[DeltaVertex] = {
     new JSetWrapper(this.outgoingEdgesOf(vertex)).map(outgoingEdge => getEdgeTarget(outgoingEdge)).toSet
   }
 
@@ -66,9 +66,9 @@ class TransformationGraph
       throw new RuntimeException("topological ordering missed some nodes. ")
     }
 
-    var deepDependencies = Map.empty[TransformationVertex, Map[TransformationVertex, Int]]
-    for (vertex <- JListWrapper[TransformationVertex](topologicalOrdering)) {
-      deepDependencies += vertex -> Map[TransformationVertex, Int](vertex -> 1)
+    var deepDependencies = Map.empty[DeltaVertex, Map[DeltaVertex, Int]]
+    for (vertex <- JListWrapper[DeltaVertex](topologicalOrdering)) {
+      deepDependencies += vertex -> Map[DeltaVertex, Int](vertex -> 1)
 
       for (outgoingNode <- getIncomingNodes(vertex)) {
         for (dependencyEntry <- deepDependencies(outgoingNode)) {
@@ -88,7 +88,7 @@ class TransformationGraph
     }
   }
 
-  def getIncomingNodes(dependency: TransformationVertex): Set[TransformationVertex] = {
+  def getIncomingNodes(dependency: DeltaVertex): Set[DeltaVertex] = {
     JSetWrapper(incomingEdgesOf(dependency)).map(edge => getEdgeSource(edge)).toSet
   }
 
@@ -101,7 +101,7 @@ class TransformationGraph
     map + (key -> alter(map.getOrElse(key, default)))
   }
 
-  def getVertices: Wrappers.JSetWrapper[TransformationVertex] = {
+  def getVertices: Wrappers.JSetWrapper[DeltaVertex] = {
     JSetWrapper(vertexSet())
   }
 

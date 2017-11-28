@@ -1,8 +1,8 @@
-package deltas.javac
+package deltas.bytecode.simplebytecode
 
 import application.compilerBuilder.PresetsPanel
 import org.scalatest.FunSuite
-import util.{CompilerBuilder, TestUtils, SourceUtils}
+import util.{CompilerBuilder, SourceUtils, TestUtils}
 
 class SimplifiedByteCodeTest extends FunSuite {
 

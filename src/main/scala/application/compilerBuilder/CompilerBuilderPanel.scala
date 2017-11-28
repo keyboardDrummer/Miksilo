@@ -64,7 +64,7 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane = {
-    val availableItems: Seq[Delta] = CompilerBuilderPanel.availableParticles.sortBy(i => i.name)
+    val availableItems: Seq[Delta] = CompilerBuilderPanel.availableParticles.toStream.sortBy(i => i.name)
     val availableList = new ParticleList()
     availableList.setModel(new AbstractListModel[Delta] {
       def getSize: Int = availableItems.length

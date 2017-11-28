@@ -33,20 +33,20 @@ trait GrammarPath {
   def findGrammar(grammar: BiGrammar): Option[GrammarPath] = find(p => p.value == grammar)
 
   def findAs(field: NodeField): GrammarReference = {
-    find(p => p.value match { case as:As => as.key == field; case _ => false}).get.asInstanceOf[GrammarReference]
+    find(p => p.value match { case as:As => as.key == field; case _ => false}).get
   }
 
   def findLabelled(label: Key): GrammarReference = {
-    find(p => p.value match { case as:Labelled => as.name == label; case _ => false}).get.asInstanceOf[GrammarReference]
+    find(p => p.value match { case as:Labelled => as.name == label; case _ => false}).get
   }
 
-  def find(predicate: GrammarPath => Boolean): Option[GrammarPath] = {
-    var result: Option[GrammarPath] = None
+  def find(predicate: GrammarPath => Boolean): Option[GrammarReference] = {
+    var result: Option[GrammarReference] = None
     GraphBasics.traverseBreadth[GrammarPath](Seq(this),
       path => path.newChildren,
       path =>
         if (predicate(path)) {
-          result = Some(path)
+          result = Some(path).collect({case x: GrammarReference => x})
           false
         }
         else {

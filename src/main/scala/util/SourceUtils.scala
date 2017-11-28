@@ -45,7 +45,7 @@ object SourceUtils {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompilerDeltas.byteCodeTransformations
+    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompilerDeltas.byteCodeDeltas
     CompilerBuilder.build(particles).transform(byteCode)
     output
   }

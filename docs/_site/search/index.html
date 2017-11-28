@@ -392,7 +392,7 @@
 						"title": "Inline constant pool",
 						"category": "",
 						"url": " /deltas/inline-constant-pool/",
-						"content": ""
+						"content": "Fix link\nThe delta Inline constant pool makes Java bytecode more programmer-friendly by inlining the elements from the constant pool.\nIt allows the programmer to write this:\n\n\nclass Empty extends java/lang/Object with interfaces: ()\n{\n  Method;\n    name: &lt;init&gt;\n    descriptor: ()V\n    flags: ACC_PUBLIC\n    Code:\n      name: Code, stack:1, locals:1\n        aload 0\n        invokespecial java/lang/Object.&lt;init&gt; ()V\n        return\n      Exceptions:\n}\n\n\n\nInstead of this:\n```java\nclass 9 extends 5 with interfaces: ()\nConstant pool:\n  #1 = Utf8 Empty\n  #2 = Utf8 java/lang/Object\n  #3 = Utf8 \n  #4 = Utf8 ()V\n  #5 = Class 2\n  #6 = NameAndType 3 4\n  #7 = Methodref 5.6\n  #8 = Utf8 Code\n  #9 = Class 1\n{\n  Method;\n    name: 3\n    descriptor: 4\n    flags: ACC_PUBLIC\n    Code:\n      name: 8, stack:1, locals:1\n        aload 0\n        invokespecial 7\n        return\n      Exceptions:\n}\n\n```"
 					}
 
 					

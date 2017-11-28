@@ -77,7 +77,7 @@ class TestPoptimize extends FunSuite {
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
-    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompilerDeltas.byteCodeTransformations)
+    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompilerDeltas.byteCodeDeltas)
     compiler.transform(clazz)
     codeAnnotation.instructions
   }

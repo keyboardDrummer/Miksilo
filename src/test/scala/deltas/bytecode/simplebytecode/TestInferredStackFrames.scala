@@ -1,4 +1,4 @@
-package deltas.bytecode
+package deltas.bytecode.simplebytecode
 
 import org.scalatest.FunSuite
 import util.TestUtils

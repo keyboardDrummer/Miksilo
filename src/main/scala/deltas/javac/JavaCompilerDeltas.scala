@@ -15,7 +15,7 @@ import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
 import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
-import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool}
+import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
@@ -42,8 +42,9 @@ object JavaCompilerDeltas {
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
-  def allDeltas = javaCompilerDeltas ++
-    Seq(JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
+  def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
+    Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
+      TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -65,16 +66,16 @@ object JavaCompilerDeltas {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityDelta,
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
-    BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeTransformations
+    BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
-  def allByteCodeTransformations = Seq(OptimizeComparisonInstructionsC) ++
+  def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsC) ++
     Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
-    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool) ++ byteCodeTransformations
+    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool2) ++ byteCodeDeltas
 
-  def byteCodeTransformations = byteCodeInstructions ++ byteCodeWithoutInstructions
+  def byteCodeDeltas: Seq[Delta] = byteCodeInstructions ++ byteCodeWithoutInstructions
 
   def byteCodeInstructions: Seq[InstructionDelta] = {
     Seq(Pop2Delta, PopDelta, GetStaticDelta, GotoDelta, IfIntegerCompareLessDelta, IfIntegerCompareLessOrEqualDelta,
@@ -95,9 +96,9 @@ object JavaCompilerDeltas {
   def integerInstructions = Seq(AddIntegersDelta, SmallIntegerConstantDelta, LoadConstantDelta, IncrementIntegerDelta, IntegerReturnInstructionDelta, LoadIntegerDelta, IfIntegerCompareGreaterOrEqualDelta,
     IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
 
-  def byteCodeWithoutInstructions = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
+  def byteCodeWithoutInstructions: Seq[Delta] = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
 
-  def byteCodeWithoutTextualParser: Seq[DeltaWithGrammar] = bytecodeAttributes ++ constantEntryParticles ++
+  def byteCodeWithoutTextualParser: Seq[Delta] = bytecodeAttributes ++ constantEntryDeltas ++
     Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
@@ -105,7 +106,7 @@ object JavaCompilerDeltas {
     CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryParticles = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
+  def constantEntryDeltas: Seq[Delta] = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
 
@@ -121,7 +122,7 @@ object JavaCompilerDeltas {
     getCompiler.spliceAfterTransformations(implicits, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler = {
-    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeTransformations, Seq(new PrettyPrint)))
+    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(new PrettyPrint)))
   }
 }
 
