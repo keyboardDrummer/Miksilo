@@ -13,10 +13,10 @@ import deltas.javac.classes.ConstantPool
 
 object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transform(program: Node, compilation: Compilation): Unit = {
     val constantPool = new ConstantPool()
     program.constantPool = constantPool
-    val constantReferences = ByteCodeSkeleton.getRegistry(state).constantReferences
+    val constantReferences = ByteCodeSkeleton.getRegistry(compilation).constantReferences
 
     PathRoot(program).visit(afterChildren = extractReferencesInNode)
 

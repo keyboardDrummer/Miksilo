@@ -4,8 +4,10 @@ category: Deltas
 order: 2
 ---
 
-> Fix link
-The delta [Inline constant pool]() makes Java bytecode more programmer-friendly by inlining the elements from the constant pool.
+In some scenario's a programmer might want to write class files directly, instead of writing some JVM languages and having that language be compiled to Java bytecode. Predefined delta's in Blender allow you to write Java bytecode using a grammar inspired by `javap`, and emit a Java classfile.
+
+The constant pool in a class file is useful because it reduces code duplication. However, for a programmer it is hard to use because the elements in the pool are referenced by index, and it's hard to remember which index refers to which constant pool element. To make writing Java bytecode more programmer-friendly, it's better to inline the elements from the constant, which is what the delta [Inline constant pool](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) does.
+
 It allows the programmer to write this:
 
 ```java
@@ -51,3 +53,5 @@ Constant pool:
 }
 
 ```
+
+References to the constant pool occur throughout the entire class file, so inlining them is quite a big change. Let's look at the source of [Inline constant pool](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) to see the work involved.
