@@ -22,7 +22,7 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithLanguageRegist
     val expandInstruction = new ClassRegistry[ExpandInstruction]()
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[Path] = CodeAttribute.getCodeAnnotations(PathRoot(clazz))

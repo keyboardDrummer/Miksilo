@@ -53,7 +53,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     LabelDelta.inject(state)
   }
 
-  def transform(program: Node, state: Compilation): Unit = {
+  def transformProgram(program: Node, state: Compilation): Unit = {
 
     val jumpRegistry = CodeAttribute.getRegistry(state.language).jumpBehaviorRegistry
     def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(state.language)(instruction.clazz)

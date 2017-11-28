@@ -50,7 +50,7 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
 
   object Body extends NodeField
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     PathRoot(program).visit(path => path.clazz match {
       case ForLoopType => transformForLoop(path)
       case _ =>

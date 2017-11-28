@@ -16,7 +16,7 @@ import deltas.javac.types.{MethodType, TypeAbstraction}
 import scala.collection.mutable.ArrayBuffer
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
     val nameIndex = classReference(ClassInfoConstant.Name).asInstanceOf[Int]

@@ -29,7 +29,7 @@ object PrintBiGrammar {
   def toDocument(grammar: BiGrammar) = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
   private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case sequence: Sequence => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
+    case sequence: LeftRight => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
     case topBottom: TopBottom => withChoiceParenthesis(topBottom.first) ~~ "%" ~~withChoiceParenthesis(topBottom.second)
     case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
@@ -46,10 +46,10 @@ object PrintBiGrammar {
     case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
     case ignore: IgnoreLeft =>
-      val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
+      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
       toDocumentInner(sequenceLike.first) ~ "~>" ~ toDocumentInner(sequenceLike.second)
     case ignore: IgnoreRight =>
-      val sequenceLike = ignore.inner.asInstanceOf[SequenceLike]
+      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
       toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
     case map: MapGrammarWithMap => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
@@ -88,7 +88,7 @@ object PrintBiGrammar {
         return left
 
       choice
-    case sequence: SequenceLike =>
+    case sequence: Sequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[BiFailure])
@@ -123,7 +123,7 @@ object PrintBiGrammar {
   }
 
   def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.map {
-    case sequence: SequenceLike =>
+    case sequence: Sequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[ValueGrammar])

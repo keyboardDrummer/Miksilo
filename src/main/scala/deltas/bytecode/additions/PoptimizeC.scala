@@ -18,7 +18,7 @@ object PoptimizeC extends DeltaWithPhase {
     (inputLength, outputLength)
   }
 
-  override def transform(_clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(_clazz: Node, state: Compilation): Unit = {
     val clazz = new ClassFile(_clazz)
     for (method <- clazz.methods) {
       val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)

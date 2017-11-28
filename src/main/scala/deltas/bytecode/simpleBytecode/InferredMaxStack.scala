@@ -13,7 +13,7 @@ import deltas.bytecode.types.TypeSkeleton
 object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz: ClassFile[Node] = program
 
     def getMaxStack(method: ByteCodeMethodInfoWrapper[Node]): Int = {

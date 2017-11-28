@@ -12,7 +12,7 @@ object ImplicitJavaLangImport extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, WildcardImportC)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz = program
     val imports = clazz.imports
     val implicitImport = WildcardImportC.wildCardImport(Seq(javaPackageName, langPackageName))

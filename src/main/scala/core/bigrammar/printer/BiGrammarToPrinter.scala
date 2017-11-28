@@ -35,7 +35,7 @@ class BiGrammarToPrinter {
           new NestPrinter(labelled.inner, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left % right)
-        case sequence: Sequence => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
+        case sequence: LeftRight => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
           (left, right) => left ~ right)
         case topBottom: TopBottom => new SequencePrinter(toPrinterCached(topBottom.first), toPrinterCached(topBottom.second),
           (topDoc, bottomDoc) => topDoc % bottomDoc)

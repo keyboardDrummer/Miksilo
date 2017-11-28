@@ -2,9 +2,19 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
-class Sequence(var first: BiGrammar, var second: BiGrammar) extends BiGrammar with SequenceLike
-{
-  override def horizontal = true
+trait Sequence extends BiGrammar with Layout {
+  def first: BiGrammar
+  def first_=(value: BiGrammar): Unit
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new Sequence(newChildren(0), newChildren(1))
+  def second: BiGrammar
+  def second_=(value: BiGrammar): Unit
+
+  override def children = Seq(first, second)
+
+  def ignoreLeft = new IgnoreLeft(this)
+
+  def ignoreRight = new IgnoreRight(this)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean =
+    recursive(first) || recursive(second)
 }

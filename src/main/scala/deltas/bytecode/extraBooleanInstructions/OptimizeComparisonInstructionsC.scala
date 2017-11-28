@@ -19,7 +19,7 @@ object OptimizeComparisonInstructionsC extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
     NotInstructionC, IntegerEqualsInstructionC)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
 
     val clazz = program
     val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)

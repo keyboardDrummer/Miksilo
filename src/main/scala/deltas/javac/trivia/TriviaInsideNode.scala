@@ -22,7 +22,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
           case trivia: WithTrivia
             if hasLeftNode(trivia.getGrammar) =>
               path.set(trivia.getGrammar)
-              injectTrivia(grammars, path, trivia.inner.isInstanceOf[Sequence])
+              injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
           case _ =>
         }
       }
@@ -35,7 +35,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
     grammar.value match {
-      case sequence: SequenceLike =>
+      case sequence: Sequence =>
         if (sequence.first.containsParser())
           injectTrivia(grammars, grammar.children.head, horizontal)
         else
@@ -64,7 +64,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
       return true
 
     grammar.value match {
-      case _:SequenceLike => isLeftRecursive(grammar.children.head)
+      case _:Sequence => isLeftRecursive(grammar.children.head)
       case _:NodeGrammar =>
         false
       case _:Choice => isLeftRecursive(grammar.children(0)) || isLeftRecursive(grammar.children(1))
@@ -81,7 +81,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
     val tail: List[GrammarPath] = reference.value match {
       case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
-      case sequence: SequenceLike =>
+      case sequence: Sequence =>
         if (sequence.first.containsParser())
           getLeftChildren(reference.children.head)
         else

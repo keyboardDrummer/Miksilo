@@ -51,7 +51,7 @@ object SourceUtils {
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
-    override def transform(program: Node, state: Compilation): Unit = {
+    override def transformProgram(program: Node, state: Compilation): Unit = {
       write(PrintByteCode.getBytes(program, state))
     }
 

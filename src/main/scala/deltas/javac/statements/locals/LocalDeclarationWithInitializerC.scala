@@ -48,7 +48,7 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     PathRoot(program).visit(obj => obj.clazz match {
       case Clazz => transformDeclarationWithInitializer(obj, state)
       case _ =>

@@ -15,7 +15,7 @@ class GrammarWithTrivia(val grammar: BiGrammar, grammars: LanguageGrammars) exte
 
   def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-  def ~(other: BiGrammar) = new Sequence(grammar, addTriviaIfUseful(other))
+  def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
 
   def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 

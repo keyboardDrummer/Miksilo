@@ -16,7 +16,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz: ClassFile[Node] = program
     for (method <- clazz.methods) {
       val codeAnnotation = method.codeAttribute

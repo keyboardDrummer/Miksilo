@@ -6,7 +6,7 @@ import core.deltas.{Compilation, Contract, DeltaWithPhase}
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidDelta, ReturnExpressionDelta)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz = program
     val methods = MethodDelta.getMethods(clazz)
     for (method <- methods) {

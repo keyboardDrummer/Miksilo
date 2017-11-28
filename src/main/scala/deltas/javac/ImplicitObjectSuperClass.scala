@@ -12,7 +12,7 @@ object ImplicitObjectSuperClass extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     if (program.parent.isEmpty) {
       program.parent = Some(objectName)
     }

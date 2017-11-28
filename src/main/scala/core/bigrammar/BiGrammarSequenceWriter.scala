@@ -11,7 +11,7 @@ trait BiGrammarSequenceWriter extends BiGrammarWriter {
   implicit class GrammarWithSequence(val grammar: BiGrammar) extends BiGrammarSequenceMethodsExtension {
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, horizontal = false))
 
-    def ~(other: BiGrammar) = new Sequence(grammar, addTriviaIfUseful(other))
+    def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
 
     def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 

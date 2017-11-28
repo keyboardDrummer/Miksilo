@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Choice, Labelled, MapGrammar, Sequence}
+import core.bigrammar.grammars.{Choice, Labelled, MapGrammar, LeftRight}
 import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
 
@@ -20,7 +20,7 @@ trait BiGrammar extends BiGrammarWriter {
   def |(other: BiGrammar) = new Choice(this, other)
   def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
 
-  def indent(width: Int = 2) = new Sequence(WhiteSpace(width, 0), this).ignoreLeft
+  def indent(width: Int = 2) = new LeftRight(WhiteSpace(width, 0), this).ignoreLeft
 
   def optionToSeq: BiGrammar = new MapGrammar(this,
     option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {

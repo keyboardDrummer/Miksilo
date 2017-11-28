@@ -9,7 +9,7 @@ import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.constants.Utf8ConstantDelta
 
 object ParseKnownAttributes extends DeltaWithPhase {
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     program.visit(node => node.clazz match {
           case UnParsedAttribute.Clazz =>

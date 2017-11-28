@@ -19,7 +19,7 @@ object BiGrammarToGrammar {
 
     override def handleGrammar(self: BiGrammar, children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
       self match {
-        case _: SequenceLike =>
+        case _: Sequence =>
           core.grammar.Sequence(children(0), children(1)) ^^ { untyped =>
             val ~(firstResult: Result, secondResult: Result) = untyped.asInstanceOf[~[Result,Result]]
             for {

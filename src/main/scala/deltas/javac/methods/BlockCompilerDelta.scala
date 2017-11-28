@@ -19,7 +19,7 @@ object BlockCompilerDelta extends DeltaWithGrammar with DeltaWithPhase
     find(BodyGrammar).inner = statements
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
     val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType("String")))
     val method = MethodDelta.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)

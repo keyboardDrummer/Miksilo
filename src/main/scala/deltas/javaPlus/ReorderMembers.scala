@@ -7,7 +7,7 @@ import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.MethodDelta
 
 object ReorderMembers extends DeltaWithPhase {
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz: JavaClass[Node] = program
 
     val methods = clazz.members.filter(member => member.clazz == MethodDelta.Clazz)

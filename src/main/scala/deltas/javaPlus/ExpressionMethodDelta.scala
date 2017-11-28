@@ -30,7 +30,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     methodGrammar.addOption(expressionMethodGrammar)
   }
 
-  override def transform(clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(clazz: Node, state: Compilation): Unit = {
     for(expressionMethod <- clazz.members.filter(method => method.clazz == Clazz))
     {
       val expression = expressionMethod(Expression).asInstanceOf[Node]

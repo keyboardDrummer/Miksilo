@@ -34,7 +34,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]) = node(ClassParent) = value
   }
 
-  override def transform(program: Node, compilation: Compilation): Unit = {
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(clazz: Node) {

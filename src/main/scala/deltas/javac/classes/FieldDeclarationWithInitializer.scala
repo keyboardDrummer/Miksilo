@@ -39,7 +39,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     fieldWithInitialiser.replaceWith(declaration)
   }
 
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
     new PathRoot(program).visit(obj => obj.clazz match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)

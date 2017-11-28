@@ -21,7 +21,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 
-  override def transform(clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(clazz: Node, state: Compilation): Unit = {
     val className = clazz.name
     for (constructor <- getConstructors(clazz)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]

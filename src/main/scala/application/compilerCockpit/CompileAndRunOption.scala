@@ -11,7 +11,7 @@ import util.SourceUtils
 
 object RunWithJVM extends DeltaWithPhase
 {
-  override def transform(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz: ClassFile[Node] = state.program
     val classRefIndex = clazz.classInfoIndex
     val constantPool = clazz.constantPool

@@ -8,7 +8,7 @@ import deltas.javac.statements.ExpressionAsStatementC
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorDelta)
 
-  override def transform(clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(clazz: Node, state: Compilation): Unit = {
 
     for (constructor <- ConstructorDelta.getConstructors(clazz)) {
       val statements = constructor.body

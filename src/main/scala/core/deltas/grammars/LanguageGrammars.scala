@@ -18,7 +18,7 @@ class LanguageGrammars extends GrammarCatalogue {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new Sequence(bodyGrammar, trivia)), trivia))
+  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new LeftRight(bodyGrammar, trivia)), trivia))
 
   def root: Labelled = find(ProgramGrammar)
 
