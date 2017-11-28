@@ -1,4 +1,4 @@
-package deltas.bytecode
+package deltas.bytecode.simpleBytecode
 
 import core.bigrammar.grammars.IgnoreLeft
 import core.bigrammar.{GrammarReference, RootGrammar}
@@ -6,11 +6,12 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
+import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ClassFile, ConstantPoolGrammar}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.javac.classes.ConstantPool
 
-object InlineConstantPool2 extends DeltaWithPhase with DeltaWithGrammar {
+object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transform(program: Node, state: Compilation): Unit = {
     val constantPool = new ConstantPool()

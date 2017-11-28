@@ -15,7 +15,7 @@ import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
 import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
-import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
+import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool}
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
@@ -33,7 +33,7 @@ import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, 
 import deltas.javac.methods.call.CallStaticOrInstanceC
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
-import deltas.javac.trivia.{StoreTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
+import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 
 object JavaCompilerDeltas {
@@ -73,7 +73,7 @@ object JavaCompilerDeltas {
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
-    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool2) ++ byteCodeDeltas
+    Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool) ++ byteCodeDeltas
 
   def byteCodeDeltas: Seq[Delta] = byteCodeInstructions ++ byteCodeWithoutInstructions
 
