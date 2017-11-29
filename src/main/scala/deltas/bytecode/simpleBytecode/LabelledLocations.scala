@@ -5,9 +5,9 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.attributes.CodeAttribute.{instruction, _}
+import deltas.bytecode.attributes.CodeAttribute._
 import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
-import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute, InstructionArgumentsKey, StackMapTableAttribute}
+import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.coreInstructions.{GotoDelta, InstructionDelta}
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
@@ -16,17 +16,17 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
-  def ifZero(target: String): Node = instruction(IfZeroDelta.Clazz, Seq(target))
-  def ifNotZero(target: String): Node = instruction(IfNotZero.key, Seq(target))
 
-  def goTo(target: String): Node = instruction(GotoDelta.GoToKey, Seq(target))
-
-  def ifIntegerCompareGreaterEquals(target: String): Node = instruction(IfIntegerCompareGreaterOrEqualDelta.Clazz, Seq(target))
-  def ifIntegerCompareLess(target: String): Node = instruction(IfIntegerCompareLessDelta.key, Seq(target))
-  def ifIntegerCompareGreater(target: String): Node = instruction(IfIntegerCompareGreaterDelta.key, Seq(target))
-  def ifIntegerCompareEquals(target: String): Node = instruction(IfIntegerCompareEqualDelta.key, Seq(target))
-  def ifIntegerCompareNotEquals(target: String): Node = instruction(IfIntegerCompareNotEqualDelta.key, Seq(target))
-  def ifIntegerCompareLessEquals(target: String): Node = instruction(IfIntegerCompareLessOrEqualDelta.key, Seq(target))
+  def jump(key: NodeClass, target: String) = key.create(JumpName -> target)
+  def ifZero(target: String): Node = jump(IfZeroDelta.Clazz, target)
+  def ifNotZero(target: String): Node = jump(IfNotZero.key, target)
+  def goTo(target: String): Node = jump(GotoDelta.GoToKey, target)
+  def ifIntegerCompareGreaterEquals(target: String): Node = jump(IfIntegerCompareGreaterOrEqualDelta.Clazz, target)
+  def ifIntegerCompareLess(target: String): Node = jump(IfIntegerCompareLessDelta.key, target)
+  def ifIntegerCompareGreater(target: String): Node = jump(IfIntegerCompareGreaterDelta.key, target)
+  def ifIntegerCompareEquals(target: String): Node = jump(IfIntegerCompareEqualDelta.key, target)
+  def ifIntegerCompareNotEquals(target: String): Node = jump(IfIntegerCompareNotEqualDelta.key, target)
+  def ifIntegerCompareLessEquals(target: String): Node = jump(IfIntegerCompareLessOrEqualDelta.key, target)
 
   object GeneratedLabels extends NodeField
   def getUniqueLabel(suggestion: String, methodInfo: Node, state: Language): String = {
@@ -52,26 +52,6 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     val jumpRegistry = CodeAttribute.getRegistry(compilation.language).jumpBehaviorRegistry
     def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(compilation.language)(instruction.clazz)
-
-    def getNewInstructions(instructions: Seq[Node], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
-      var newInstructions = mutable.ArrayBuffer[Node]()
-      newInstructions.sizeHint(instructions.length)
-
-      var location = 0
-      for (instruction <- instructions) {
-
-        if (jumpRegistry(instruction.clazz).hasJumpInFirstArgument) {
-          setInstructionArguments(instruction, Seq(targetLocations(getJumpInstructionLabel(instruction)) - location))
-        }
-
-        if (instruction.clazz != LabelDelta.LabelKey)
-          newInstructions += instruction
-
-        location += instructionSize(instruction)
-      }
-
-      newInstructions
-    }
 
     val clazz = program
     val codeAnnotations = CodeAttribute.getCodeAnnotations(clazz)
@@ -103,10 +83,31 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       }
       targetLocations.toMap
     }
+
+    def getNewInstructions(instructions: Seq[Node], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
+      var newInstructions = mutable.ArrayBuffer[Node]()
+      newInstructions.sizeHint(instructions.length)
+
+      var location = 0
+      for (instruction <- instructions) {
+
+        if (jumpRegistry(instruction.clazz).hasJumpInFirstArgument) {
+          setInstructionArguments(instruction, Seq(targetLocations(getJumpInstructionLabel(instruction)) - location))
+          instruction.data.remove(JumpName)
+        }
+
+        if (instruction.clazz != LabelDelta.LabelKey)
+          newInstructions += instruction
+
+        location += instructionSize(instruction)
+      }
+
+      newInstructions
+    }
   }
 
   def getJumpInstructionLabel(instruction: Node): String = {
-    getInstructionArguments(instruction).head.asInstanceOf[String]
+    instruction(JumpName).asInstanceOf[String]
   }
 
   def getStackMapTable(labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
@@ -146,18 +147,19 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def removeOffsetFromStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {
     val offsetGrammar = grammars.find(offsetGrammarKey)
     val offsetGrammarPaths = grammars.find(StackMapFrameGrammar).descendants.filter(path => path.value == offsetGrammar)
-    offsetGrammarPaths.foreach(delta => delta.removeMe()) //TODO refactor this search
+    offsetGrammarPaths.foreach(delta => delta.removeMe())
   }
 
+  object JumpName extends NodeField
   def replaceJumpIndicesWithLabels(grammars: LanguageGrammars): Unit = {
     import grammars._
     val jumps = Seq[InstructionDelta](IfZeroDelta, IfNotZero, GotoDelta,
       IfIntegerCompareGreaterOrEqualDelta,
-      IfIntegerCompareLessDelta, IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
+      IfIntegerCompareLessDelta, IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta) //TODO replace hardcoded list with registry lookup
     for(jump <- jumps)
     {
       val grammar = find(jump.key)
-      grammar.inner = jump.grammarName ~~> StringLiteral.manySeparated(" ").as(InstructionArgumentsKey) asNode jump.key
+      grammar.inner = jump.grammarName ~~> StringLiteral.as(JumpName) asNode jump.key
     }
   }
 }

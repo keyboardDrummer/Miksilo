@@ -1,7 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
 import core.deltas.node.{Node, NodeClass}
-import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 import util.DataFlowAnalysis
@@ -24,7 +23,7 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Node])
       result += instructionIndex + 1
 
     if (jumpBehavior.hasJumpInFirstArgument)
-      result += labelIndices(CodeAttribute.getInstructionArguments(instruction).head.asInstanceOf[String])
+      result += labelIndices(LabelledLocations.getJumpInstructionLabel(instruction))
 
     result
   }
