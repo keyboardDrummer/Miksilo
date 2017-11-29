@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.integers.integerCompare
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -12,10 +12,10 @@ object IfIntegerCompareLessDelta extends JumpInstruction {
 
   override val key = IfIntegerCompareLessKey
 
-  def ifIntegerCompareGreater(target: Int): Node = CodeAttribute.instruction(IfIntegerCompareLessKey, Seq(target))
+  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(IfIntegerCompareLessKey, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    val arguments = CodeAttribute.getInstructionArguments(instruction)
+    val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     hexToBytes("a1") ++ shortToBytes(arguments.head)
   }
 

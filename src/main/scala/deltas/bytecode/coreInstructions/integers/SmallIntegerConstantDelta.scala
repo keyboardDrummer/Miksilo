@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.integers
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -15,11 +15,11 @@ object SmallIntegerConstantDelta extends InstructionDelta {
   def integerConstant(value: Int) = {
     require (value <= 5)
     require (value >= -1)
-    CodeAttribute.instruction(IntegerConstantKey, Seq(value))
+    CodeAttributeDelta.instruction(IntegerConstantKey, Seq(value))
   }
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    byteToBytes(3 + CodeAttribute.getInstructionArguments(instruction).head)
+    byteToBytes(3 + CodeAttributeDelta.getInstructionArguments(instruction).head)
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =

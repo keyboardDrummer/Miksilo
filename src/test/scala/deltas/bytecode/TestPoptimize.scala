@@ -3,7 +3,7 @@ package deltas.bytecode
 import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.PoptimizeC
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
@@ -69,7 +69,7 @@ class TestPoptimize extends FunSuite {
   }
 
   def transformInstructions(instructions: Seq[Node]) = {
-    val codeAnnotation = CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
+    val codeAnnotation = CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.MethodInfoKey.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
       ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),

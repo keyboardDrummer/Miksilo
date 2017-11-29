@@ -6,8 +6,8 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, PathRoot}
-import deltas.bytecode.attributes.CodeAttribute.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
-import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute}
+import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
+import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
@@ -96,8 +96,8 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
       val maxLocalCount: Int = getMethodCompiler(compilation).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
-      val codeAttribute = new Node(CodeAttribute.CodeKey,
-        AttributeNameKey -> CodeAttribute.constantEntry,
+      val codeAttribute = new Node(CodeAttributeDelta.CodeKey,
+        AttributeNameKey -> CodeAttributeDelta.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
         Instructions -> instructions,
         CodeExceptionTableKey -> exceptionTable,

@@ -3,8 +3,8 @@ package deltas.bytecode.coreInstructions
 import core.deltas._
 import core.deltas.node.Node
 import deltas.bytecode._
-import deltas.bytecode.attributes.CodeAttribute.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
-import deltas.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
+import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
+import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
@@ -17,11 +17,11 @@ trait InstructionDelta extends InstructionWithGrammar
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    CodeAttribute.getInstructionSignatureRegistry(state).put(key, this)
+    CodeAttributeDelta.getInstructionSignatureRegistry(state).put(key, this)
     ByteCodeSkeleton.getRegistry(state).getBytes.put(key, getInstructionByteCode)
-    CodeAttribute.getInstructionSizeRegistry(state).put(key, getInstructionSize)
-    CodeAttribute.getRegistry(state).jumpBehaviorRegistry.put(key, jumpBehavior)
-    CodeAttribute.getRegistry(state).localUpdates.put(key, this)
+    CodeAttributeDelta.getInstructionSizeRegistry(state).put(key, getInstructionSize)
+    CodeAttributeDelta.getRegistry(state).jumpBehaviorRegistry.put(key, jumpBehavior)
+    CodeAttributeDelta.getRegistry(state).localUpdates.put(key, this)
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {

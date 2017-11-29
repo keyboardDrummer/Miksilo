@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.integers
 import core.deltas.node.{Key, Node, NodeClass}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -11,7 +11,7 @@ import deltas.bytecode.types.IntTypeC
 object SubtractIntegerDelta extends InstructionDelta {
   override val key = SubtractIntegerKey
 
-  def subtractInteger = CodeAttribute.instruction(SubtractIntegerKey)
+  def subtractInteger = CodeAttributeDelta.instruction(SubtractIntegerKey)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("64")
 

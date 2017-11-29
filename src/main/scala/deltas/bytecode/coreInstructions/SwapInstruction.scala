@@ -3,12 +3,12 @@ package deltas.bytecode.coreInstructions
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Key, Node, NodeClass}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object SwapInstruction extends InstructionDelta {
   object SwapKey extends NodeClass
-  def swap = CodeAttribute.instruction(SwapKey)
+  def swap = CodeAttributeDelta.instruction(SwapKey)
 
   override val key = SwapKey
 

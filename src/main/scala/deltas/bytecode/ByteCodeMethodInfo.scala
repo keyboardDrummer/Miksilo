@@ -7,8 +7,8 @@ import core.deltas.node._
 import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.CodeWrapper
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
@@ -49,7 +49,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
     def attributes: Seq[T] = node(MethodAttributes).asInstanceOf[Seq[T]]
 
-    def codeAttribute: CodeWrapper[T] = attributes.find(r => r.clazz == CodeAttribute.key).get
+    def codeAttribute: CodeAttribute[T] = attributes.find(r => r.clazz == CodeAttributeDelta.key).get
   }
 
   override def inject(state: Language): Unit = {

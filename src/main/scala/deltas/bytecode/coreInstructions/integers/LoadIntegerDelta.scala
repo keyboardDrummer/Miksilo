@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.integers
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -12,10 +12,10 @@ object LoadIntegerDelta extends InstructionDelta {
 
   override val key = IntegerLoad
 
-  def load(location: Integer) = CodeAttribute.instruction(IntegerLoad, Seq(location))
+  def load(location: Integer) = CodeAttributeDelta.instruction(IntegerLoad, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    val arguments = CodeAttribute.getInstructionArguments(instruction)
+    val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     val location = arguments.head
     if (location > 3)
       hexToBytes("15") ++ byteToBytes(location)

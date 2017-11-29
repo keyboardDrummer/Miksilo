@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
-import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionC, LessThanInstructionC}
+import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionC}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.bytecode.types.{IntTypeC, TypeSkeleton}
 import deltas.javac.types.BooleanTypeC
@@ -20,7 +20,7 @@ object GreaterThanC extends ExpressionInstance {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
-    firstInstructions ++ secondInstructions ++ Seq(GreaterThanInstructionC.greaterThanInstruction)
+    firstInstructions ++ secondInstructions ++ Seq(GreaterThanInstructionDelta.greaterThanInstruction)
   }
 
   def getFirst[T <: NodeLike](lessThan: T) = lessThan(GreaterThanFirst).asInstanceOf[T]

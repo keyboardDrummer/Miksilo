@@ -4,8 +4,8 @@ import core.bigrammar.TestCompilerGrammarUtils
 import core.deltas.Delta
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.attributes.CodeAttribute.CodeKey
-import deltas.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
+import deltas.bytecode.attributes.CodeAttributeDelta.CodeKey
+import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttribute}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.skeleton.QualifiedClassName
@@ -33,7 +33,7 @@ class TestParseTypes extends FunSuite {
   test("labelWithAppendFrame") {
     val input = "label \"start-4962768465676381896\"\n        append frame int int"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
-      getGrammarResult(input, CodeAttribute.InstructionGrammar)
+      getGrammarResult(input, CodeAttributeDelta.InstructionGrammar)
     assertResult(LabelDelta.LabelKey)(result.asInstanceOf[Node].clazz)
   }
 
@@ -41,7 +41,7 @@ class TestParseTypes extends FunSuite {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        same frame\n iload 2 \n    Exceptions:"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
-      getGrammarResult(input, CodeAttribute.CodeKey)
+      getGrammarResult(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)
   }
 
@@ -49,7 +49,7 @@ class TestParseTypes extends FunSuite {
     val input = "code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        append frame int int\n iload 2 \n    Exceptions:"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
-      getGrammarResult(input, CodeAttribute.CodeKey)
+      getGrammarResult(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)
   }
 

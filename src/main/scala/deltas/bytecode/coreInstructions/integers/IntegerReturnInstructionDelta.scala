@@ -3,8 +3,8 @@ package deltas.bytecode.coreInstructions.integers
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -13,7 +13,7 @@ object IntegerReturnInstructionDelta extends InstructionDelta {
 
   override val key = IntegerReturn
 
-  def integerReturn: Node = CodeAttribute.instruction(IntegerReturn)
+  def integerReturn: Node = CodeAttributeDelta.instruction(IntegerReturn)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 

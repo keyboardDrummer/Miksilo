@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.integers
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -12,10 +12,10 @@ object StoreIntegerDelta extends InstructionDelta {
 
   override val key = IntegerStore
 
-  def integerStore(location: Int) = CodeAttribute.instruction(IntegerStore, Seq(location))
+  def integerStore(location: Int) = CodeAttributeDelta.instruction(IntegerStore, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    val arguments = CodeAttribute.getInstructionArguments(instruction)
+    val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
       hexToBytes("36") ++ byteToBytes(location)
@@ -27,7 +27,7 @@ object StoreIntegerDelta extends InstructionDelta {
     InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
-    Map(CodeAttribute.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
+    Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
 
   object IntegerStore extends NodeClass
 

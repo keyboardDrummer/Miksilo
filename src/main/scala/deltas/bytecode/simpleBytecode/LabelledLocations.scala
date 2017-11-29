@@ -5,9 +5,9 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.attributes.CodeAttribute._
+import deltas.bytecode.attributes.CodeAttributeDelta._
 import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
-import deltas.bytecode.attributes.{AttributeNameKey, CodeAttribute, StackMapTableAttribute}
+import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.coreInstructions.{GotoDelta, InstructionDelta}
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
-  def jump(key: NodeClass, target: String) = key.create(JumpName -> target)
+  def jump(key: NodeClass, target: String): Node = key.create(JumpName -> target)
   def ifZero(target: String): Node = jump(IfZeroDelta.Clazz, target)
   def ifNotZero(target: String): Node = jump(IfNotZero.key, target)
   def goTo(target: String): Node = jump(GotoDelta.GoToKey, target)
@@ -29,7 +29,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifIntegerCompareLessEquals(target: String): Node = jump(IfIntegerCompareLessOrEqualDelta.key, target)
 
   object GeneratedLabels extends NodeField
-  def getUniqueLabel(suggestion: String, methodInfo: Node, state: Language): String = {
+  def getUniqueLabel(suggestion: String, methodInfo: Node, language: Language): String = {
     val taken: mutable.Set[String] = methodInfo.data.getOrElseUpdate(GeneratedLabels, mutable.Set.empty).
       asInstanceOf[mutable.Set[String]]
     var result = suggestion
@@ -50,24 +50,21 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
 
-    val jumpRegistry = CodeAttribute.getRegistry(compilation.language).jumpBehaviorRegistry
-    def instructionSize(instruction: Node) = CodeAttribute.getInstructionSizeRegistry(compilation.language)(instruction.clazz)
+    val jumpRegistry = CodeAttributeDelta.getRegistry(compilation.language).jumpBehaviorRegistry
+    def instructionSize(instruction: Node) = CodeAttributeDelta.getInstructionSizeRegistry(compilation.language)(instruction.clazz)
 
     val clazz = program
-    val codeAnnotations = CodeAttribute.getCodeAnnotations(clazz)
+    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: CodeWrapper[Node]): Unit = {
+    def processCodeAnnotation(codeAnnotation: CodeAttribute[Node]): Unit = {
       val instructions = codeAnnotation.instructions
-      val targetLocations: Map[String, Int] = determineTargetLocations(instructions)
-      codeAnnotation(CodeAttribute.CodeAttributesKey) = CodeAttribute.getCodeAttributes(codeAnnotation) ++
-        getStackMapTable(targetLocations, instructions)
-
-      val newInstructions: Seq[Node] = getNewInstructions(instructions, targetLocations)
-      codeAnnotation(CodeAttribute.Instructions) = newInstructions
+      val labelLocations: Map[String, Int] = determineTargetLocations(instructions)
+      codeAnnotation.attributes = codeAnnotation.attributes ++ getStackMapTable(labelLocations, instructions)
+      codeAnnotation.instructions = getNewInstructions(instructions, labelLocations)
     }
 
     def determineTargetLocations(instructions: Seq[Node]): Map[String, Int] = {
@@ -141,7 +138,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     replaceJumpIndicesWithLabels(grammars)
     removeOffsetFromStackMapFrameGrammars(grammars)
-    //Why not remove StackMapFrameAttribute?
+    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttribute.Clazz).removeMeFromOption()
   }
 
   def removeOffsetFromStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {

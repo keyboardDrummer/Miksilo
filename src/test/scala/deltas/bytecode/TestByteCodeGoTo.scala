@@ -2,7 +2,7 @@ package deltas.bytecode
 
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
+import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions._
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
@@ -16,7 +16,7 @@ import util.TestUtils
 class TestByteCodeGoTo extends FunSuite {
 
   def testMain(instructions: Seq[Node]): Node = {
-    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 
@@ -39,7 +39,7 @@ class TestByteCodeGoTo extends FunSuite {
 
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
-    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.entry)), Seq(method))
   }
 
@@ -57,7 +57,7 @@ class TestByteCodeGoTo extends FunSuite {
       LabelDelta.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )
 
-    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
+    val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
     ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
   }
 }

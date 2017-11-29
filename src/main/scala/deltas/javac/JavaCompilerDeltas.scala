@@ -69,7 +69,7 @@ object JavaCompilerDeltas {
     BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsC) ++
-    Seq(LessThanInstructionC, GreaterThanInstructionC, NotInstructionC, IntegerEqualsInstructionC, ExpandVirtualInstructionsC) ++
+    Seq(LessThanInstructionC, GreaterThanInstructionDelta, NotInstructionC, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 
   def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
@@ -103,7 +103,7 @@ object JavaCompilerDeltas {
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
   val bytecodeAttributes: Seq[DeltaWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
-    CodeAttribute, //ExceptionsAttribute, InnerClassesAttribute,
+    CodeAttributeDelta, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
   def constantEntryDeltas: Seq[Delta] = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,

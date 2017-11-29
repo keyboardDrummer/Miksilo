@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.longs
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.LongTypeC
@@ -14,11 +14,11 @@ object PushLongDelta extends InstructionDelta {
 
   def constant(value: Int) = {
     require (0 <= value && value <= 1)
-    CodeAttribute.instruction(LongConstantKey, Seq(value))
+    CodeAttributeDelta.instruction(LongConstantKey, Seq(value))
   }
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    byteToBytes(9 + CodeAttribute.getInstructionArguments(instruction).head)
+    byteToBytes(9 + CodeAttributeDelta.getInstructionArguments(instruction).head)
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =

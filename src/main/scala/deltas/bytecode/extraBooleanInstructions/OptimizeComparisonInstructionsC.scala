@@ -3,11 +3,11 @@ package deltas.bytecode.extraBooleanInstructions
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.CodeWrapper
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareNotEqualDelta, IfNotZero, IfZeroDelta}
-import deltas.bytecode.extraBooleanInstructions.GreaterThanInstructionC.GreaterThanInstructionKey
-import deltas.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
+import deltas.bytecode.extraBooleanInstructions.GreaterThanInstructionDelta.GreaterThanInstructionKey
+import deltas.bytecode.extraBooleanInstructions.IntegerEqualsInstructionDelta.IntegerEqualsInstructionKey
 import deltas.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import deltas.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
 import deltas.bytecode.simpleBytecode.LabelledLocations
@@ -17,18 +17,18 @@ import scala.collection.mutable
 object OptimizeComparisonInstructionsC extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
-    NotInstructionC, IntegerEqualsInstructionC)
+    NotInstructionC, IntegerEqualsInstructionDelta)
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[Node] = CodeAttribute.getCodeAnnotations(clazz)
+    val codeAnnotations: Seq[Node] = CodeAttributeDelta.getCodeAnnotations(clazz)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: CodeWrapper[Node]): Unit = {
+    def processCodeAnnotation(codeAnnotation: CodeAttribute[Node]): Unit = {
       val instructions = codeAnnotation.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions)
       codeAnnotation.instructions = newInstructions

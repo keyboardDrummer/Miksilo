@@ -67,7 +67,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = StackMapTableAttribute.stackMapTable(15, Seq(StackMapTableAttribute.sameFrame(9),
       StackMapTableAttribute.sameLocals1StackItem(12, IntTypeC.intType)))
-    val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttribute.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
+    val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttributeDelta.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     method
   }
@@ -81,7 +81,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
-      CodeAttribute.constantEntry,
+      CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(
@@ -113,7 +113,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
     val instructions = Seq(LoadAddressDelta.addressLoad(0),
       InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
-    val codeAttribute = Seq(CodeAttribute.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
+    val codeAttribute = Seq(CodeAttributeDelta.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
     ByteCodeMethodInfo.methodInfo(7, 8, codeAttribute, Set())
   }
 
@@ -124,7 +124,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       InvokeVirtualDelta.invokeVirtual(4),
       VoidReturnInstructionDelta.voidReturn)
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
-    ByteCodeMethodInfo.methodInfo(11, 12, Seq(CodeAttribute.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
+    ByteCodeMethodInfo.methodInfo(11, 12, Seq(CodeAttributeDelta.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
   }
 }

@@ -28,7 +28,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(14),
       "<init>",
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
-      CodeAttribute.constantEntry,
+      CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",
       StackMapTableAttribute.entry,
@@ -47,7 +47,7 @@ class TestPrintByteCodeWhile extends FunSuite {
   def getConstructor: Node = {
     val lineNumberTable = LineNumberTable.lineNumberTable(7, Seq(new LineNumberRef(3, 0)))
     val constructor = ByteCodeMethodInfo.methodInfo(4, 5, Seq(
-      CodeAttribute.codeAttribute(6, 1, 1, Seq(
+      CodeAttributeDelta.codeAttribute(6, 1, 1, Seq(
         LoadAddressDelta.addressLoad(0),
         InvokeSpecialDelta.invokeSpecial(1),
         VoidReturnInstructionDelta.voidReturn
@@ -64,7 +64,7 @@ class TestPrintByteCodeWhile extends FunSuite {
     ))
     val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
-    val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttribute.codeAttribute(6, 2, 1, Seq(
+    val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttributeDelta.codeAttribute(6, 2, 1, Seq(
       SmallIntegerConstantDelta.integerConstant(0),
       StoreIntegerDelta.integerStore(0),
       LoadIntegerDelta.load(0),

@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Key, Node, NodeClass}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object Pop2Delta extends InstructionDelta {
@@ -11,7 +11,7 @@ object Pop2Delta extends InstructionDelta {
   object Pop2Key extends NodeClass
   override val key = Pop2Key
 
-  def pop2 = CodeAttribute.instruction(Pop2Key)
+  def pop2 = CodeAttributeDelta.instruction(Pop2Key)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("58")

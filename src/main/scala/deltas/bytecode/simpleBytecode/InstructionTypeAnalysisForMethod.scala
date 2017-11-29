@@ -3,8 +3,8 @@ package deltas.bytecode.simpleBytecode
 import core.deltas.Language
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
@@ -25,9 +25,9 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
     val codeAnnotation = method.codeAttribute
     val instructions = codeAnnotation.instructions
 
-    val instructionVariableUpdateRegistry = CodeAttribute.getRegistry(language).localUpdates
-    val instructionSignatureRegistry = CodeAttribute.getInstructionSignatureRegistry(language)
-    val jumpBehaviorRegistry = CodeAttribute.getRegistry(language).jumpBehaviorRegistry
+    val instructionVariableUpdateRegistry = CodeAttributeDelta.getRegistry(language).localUpdates
+    val instructionSignatureRegistry = CodeAttributeDelta.getInstructionSignatureRegistry(language)
+    val jumpBehaviorRegistry = CodeAttributeDelta.getRegistry(language).jumpBehaviorRegistry
     new InstructionTypeAnalysis(instructions) {
       override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
         instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)

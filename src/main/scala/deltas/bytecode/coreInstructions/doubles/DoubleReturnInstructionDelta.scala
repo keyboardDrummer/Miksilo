@@ -3,8 +3,8 @@ package deltas.bytecode.coreInstructions.doubles
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.DoubleTypeC
@@ -13,7 +13,7 @@ object DoubleReturnInstructionDelta extends InstructionDelta {
 
   override val key = DoubleReturn
 
-  def create: Node = CodeAttribute.instruction(DoubleReturn)
+  def create: Node = CodeAttributeDelta.instruction(DoubleReturn)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 

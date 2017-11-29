@@ -5,13 +5,13 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
-import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionC, NotInstructionC}
+import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionC}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 import deltas.javac.types.BooleanTypeC
 
 object EqualityDelta extends ExpressionInstance {
-  override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionC)
+  override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
   def getFirst[T <: NodeLike](equality: T) = equality(FirstKey).asInstanceOf[T]
 
@@ -48,7 +48,7 @@ object EqualityDelta extends ExpressionInstance {
     val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
     val equalityInstructions: Seq[Node] = inputType.clazz match {
       case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionC.not)
-      case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionC.equals)
+      case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions
   }

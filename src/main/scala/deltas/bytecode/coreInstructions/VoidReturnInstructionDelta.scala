@@ -3,15 +3,15 @@ package deltas.bytecode.coreInstructions
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object VoidReturnInstructionDelta extends InstructionDelta {
 
   override val key = VoidReturn
 
-  def voidReturn: Node = CodeAttribute.instruction(VoidReturn)
+  def voidReturn: Node = CodeAttributeDelta.instruction(VoidReturn)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 

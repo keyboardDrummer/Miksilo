@@ -3,7 +3,7 @@ package deltas.bytecode.coreInstructions.objects
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
@@ -11,7 +11,7 @@ import deltas.bytecode.types.IntTypeC
 object PushNullDelta extends InstructionDelta {
 
   override val key = PushNullKey
-  val pushNull = CodeAttribute.instruction(key)
+  val pushNull = CodeAttributeDelta.instruction(key)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("01")
 

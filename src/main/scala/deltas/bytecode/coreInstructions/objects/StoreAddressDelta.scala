@@ -3,17 +3,17 @@ package deltas.bytecode.coreInstructions.objects
 import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object StoreAddressDelta extends InstructionDelta {
   override val key = AddressStore
 
-  def addressStore(location: Int): Node = CodeAttribute.instruction(AddressStore, Seq(location))
+  def addressStore(location: Int): Node = CodeAttributeDelta.instruction(AddressStore, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
-    val arguments = CodeAttribute.getInstructionArguments(instruction)
+    val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)
       hexToBytes("3a") ++ byteToBytes(location)
@@ -28,7 +28,7 @@ object StoreAddressDelta extends InstructionDelta {
   }
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] = {
-    val variableLocation: Int = CodeAttribute.getInstructionArguments(instruction)(0)
+    val variableLocation: Int = CodeAttributeDelta.getInstructionArguments(instruction)(0)
     val _type = typeState.stackTypes.last
     Map(variableLocation -> _type)
   }

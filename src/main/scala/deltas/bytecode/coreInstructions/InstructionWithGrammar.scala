@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, NodeClass}
 import core.deltas.{DeltaWithGrammar, Language}
-import deltas.bytecode.attributes.{CodeAttribute, InstructionArgumentsKey}
+import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 
 object ConstantPoolIndexGrammar extends GrammarKey
 trait InstructionWithGrammar extends DeltaWithGrammar
@@ -12,7 +12,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar
   val key: NodeClass
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val instructionGrammar = grammars.find(CodeAttribute.InstructionGrammar)
+    val instructionGrammar = grammars.find(CodeAttributeDelta.InstructionGrammar)
     instructionGrammar.addOption(grammars.create(key, getGrammarForThisInstruction(grammars)))
   }
 

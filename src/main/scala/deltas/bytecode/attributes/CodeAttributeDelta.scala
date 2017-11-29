@@ -12,36 +12,44 @@ import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSi
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
+import scala.collection.mutable
+
 object InstructionArgumentsKey extends NodeField
 
-object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
+object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
-  implicit class CodeWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class CodeAttribute[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def maxStack: Int = node(MaxStack).asInstanceOf[Int]
     def maxStack_=(value: Int): Unit = node(MaxStack) = value
 
     def instructions: Seq[T] = node(Instructions).asInstanceOf[Seq[T]]
     def instructions_=(value: Seq[T]): Unit = node(Instructions) = value
+
+    def maxLocals: Int = node(CodeMaxLocalsKey).asInstanceOf[Int]
+
+    def exceptionTable: Seq[Node] = node(CodeExceptionTableKey).asInstanceOf[Seq[Node]]
+    def attributes: Seq[Node] = node(CodeAttributesKey).asInstanceOf[Seq[Node]]
+    def attributes_=(value: Seq[Node]): Unit = node(CodeAttributesKey) = value
   }
 
   def instruction(_type: NodeClass, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
-  def getInstructionArguments(instruction: Node) = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
+  def getInstructionArguments(instruction: Node): Seq[Int] = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
   def setInstructionArguments(instruction: Node, arguments: Seq[Any]) {
     instruction(InstructionArgumentsKey) = arguments
   }
 
-  def getInstructionSizeRegistry(state: Language) = getRegistry(state).getInstructionSizeRegistry
+  def getInstructionSizeRegistry(state: Language): mutable.HashMap[NodeClass, Int] = getRegistry(state).getInstructionSizeRegistry
 
-  def getInstructionSignatureRegistry(state: Language) = getRegistry(state).getInstructionSignatureRegistry
+  def getInstructionSignatureRegistry(state: Language): mutable.HashMap[NodeClass, InstructionSignatureProvider] = getRegistry(state).getInstructionSignatureRegistry
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
                     instructions: Seq[Node],
                     exceptionTable: Seq[Node],
-                    attributes: Seq[Node]): CodeWrapper[Node] = {
+                    attributes: Seq[Node]): CodeAttribute[Node] = {
     new Node(CodeKey,
       AttributeNameKey -> nameIndex,
       MaxStack -> maxStack,
@@ -71,7 +79,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
     val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
   }
 
-  val constantEntry = Utf8ConstantDelta.create("Code")
+  val constantEntry: Node = Utf8ConstantDelta.create("Code")
 
   override def inject(state: Language): Unit = {
     super.inject(state)
@@ -80,35 +88,27 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
       AttributeNameKey -> Utf8ConstantDelta.key))
   }
 
-  def getCodeAttributeBytes(attribute: CodeWrapper[Node], state: Language): Seq[Byte] = {
+  def getCodeAttributeBytes(code: CodeAttribute[Node], state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Node): Seq[Byte] = {
       ByteCodeSkeleton.getRegistry(state).getBytes(instruction.clazz)(instruction)
     }
 
-    val exceptionTable = CodeAttribute.getCodeExceptionTable(attribute)
-    shortToBytes(attribute.maxStack) ++
-      shortToBytes(CodeAttribute.getCodeMaxLocals(attribute)) ++
-      prefixWithIntLength(() => attribute.instructions.flatMap(getInstructionByteCode)) ++
+    val exceptionTable = code.exceptionTable
+    shortToBytes(code.maxStack) ++
+      shortToBytes(code.maxLocals) ++
+      prefixWithIntLength(() => code.instructions.flatMap(getInstructionByteCode)) ++
       shortToBytes(exceptionTable.length) ++
       exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-      getAttributesByteCode(state, CodeAttribute.getCodeAttributes(attribute))
+      getAttributesByteCode(state, code.attributes)
   }
 
 
-  def getCodeAnnotations[T <: NodeLike](clazz: ClassFile[T]): Seq[T] = {
+  def getCodeAnnotations[T <: NodeLike](clazz: ClassFile[T]): Seq[CodeAttribute[T]] = {
     clazz.methods
       .flatMap(methodInfo => methodInfo.attributes)
-      .flatMap(annotation => if (annotation.clazz == CodeKey) Some(annotation) else None)
+      .flatMap(annotation => if (annotation.clazz == CodeKey) Some(new CodeAttribute(annotation)) else None)
   }
-
-  def getCodeMaxStack(code: Node) = code(MaxStack).asInstanceOf[Int]
-
-  def getCodeMaxLocals(code: Node) = code(CodeMaxLocalsKey).asInstanceOf[Int]
-
-  def getCodeExceptionTable(code: Node) = code(CodeExceptionTableKey).asInstanceOf[Seq[Node]]
-
-  def getCodeAttributes(code: Node) = code(CodeAttributesKey).asInstanceOf[Seq[Node]]
 
   object CodeKey extends NodeClass
 

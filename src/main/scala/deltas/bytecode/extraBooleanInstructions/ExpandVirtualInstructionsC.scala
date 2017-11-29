@@ -4,8 +4,8 @@ import core.deltas._
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.bytecode.attributes.CodeAttribute
-import deltas.bytecode.attributes.CodeAttribute.CodeWrapper
+import deltas.bytecode.attributes.CodeAttributeDelta
+import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
@@ -24,17 +24,17 @@ object ExpandVirtualInstructionsC extends DeltaWithPhase with WithLanguageRegist
   override def transformProgram(program: Node, state: Compilation): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[Path] = CodeAttribute.getCodeAnnotations(PathRoot(clazz))
+    val codeAnnotations: Seq[Path] = CodeAttributeDelta.getCodeAnnotations(PathRoot(clazz))
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: CodeWrapper[Path]): Unit = {
+    def processCodeAnnotation(codeAnnotation: CodeAttribute[Path]): Unit = {
       val methodInfo = codeAnnotation.ancestors.find(p => p.current.clazz == ByteCodeMethodInfo.MethodInfoKey).get
       val instructions = codeAnnotation.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions, methodInfo)
-      codeAnnotation(CodeAttribute.Instructions) = newInstructions
+      codeAnnotation(CodeAttributeDelta.Instructions) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[Node], methodInfo: Node) = {

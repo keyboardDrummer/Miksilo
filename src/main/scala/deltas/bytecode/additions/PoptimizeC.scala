@@ -3,7 +3,7 @@ package deltas.bytecode.additions
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions._
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysisForMethod
 import deltas.bytecode.types.TypeSkeleton
@@ -27,7 +27,7 @@ object PoptimizeC extends DeltaWithPhase {
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(compilation.language)(instruction.clazz)
+        val signatureProvider = CodeAttributeDelta.getInstructionSignatureRegistry(compilation.language)(instruction.clazz)
         val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
         getSignatureInOutLengths(compilation.language, signature)
       }
@@ -71,7 +71,7 @@ object PoptimizeC extends DeltaWithPhase {
       for (instructionIndex <- instructions.indices.reverse) {
         processInstruction(instructionIndex)
       }
-      codeAnnotation(CodeAttribute.Instructions) = newInstructions.toSeq
+      codeAnnotation(CodeAttributeDelta.Instructions) = newInstructions.toSeq
     }
   }
 

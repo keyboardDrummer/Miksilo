@@ -2,14 +2,14 @@ package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Contract, Language}
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareLessDelta
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
 
 object LessThanInstructionC extends ExpandInstruction {
 
-  def lessThanInstruction = CodeAttribute.instruction(LessThanInstructionKey)
+  def lessThanInstruction = CodeAttributeDelta.instruction(LessThanInstructionKey)
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfIntegerCompareLessDelta)
 

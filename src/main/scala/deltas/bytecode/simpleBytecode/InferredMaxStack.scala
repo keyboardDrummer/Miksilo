@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.attributes.CodeAttribute
+import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.simpleBytecode.LabelDelta.LabelKey
 import deltas.bytecode.types.TypeSkeleton
 
@@ -34,7 +34,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    grammars.find(CodeAttribute.CodeKey).findLabelled(CodeAttribute.MaxStackGrammar).removeMe()
+    grammars.find(CodeAttributeDelta.CodeKey).findLabelled(CodeAttributeDelta.MaxStackGrammar).removeMe()
   }
 
   override def description: String = "Generates the code max stack value for code attributes which is required by the JVM."

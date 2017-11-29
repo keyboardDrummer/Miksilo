@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
 import core.deltas.node.{Node, NodeClass}
-import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
+import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 import util.DataFlowAnalysis
 
