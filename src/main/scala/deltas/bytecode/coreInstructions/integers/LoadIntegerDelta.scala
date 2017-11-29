@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract}
+import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -23,7 +23,7 @@ object LoadIntegerDelta extends InstructionDelta {
       byteToBytes(hexToInt("1a") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   object IntegerLoad extends NodeClass
 

@@ -5,8 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, SequenceElement}
 import deltas.bytecode.ByteCodeMethodInfo
-import deltas.bytecode.additions.LabelledLocations
-import deltas.bytecode.simpleBytecode.InferredStackFrames
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
 
 object WhileDelta extends StatementInstance with WithLanguageRegistry {

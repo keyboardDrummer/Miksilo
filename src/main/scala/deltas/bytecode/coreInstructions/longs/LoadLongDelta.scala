@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
@@ -23,7 +23,7 @@ object LoadLongDelta extends InstructionDelta {
       byteToBytes(hexToInt("1e") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   object LongLoad extends NodeClass

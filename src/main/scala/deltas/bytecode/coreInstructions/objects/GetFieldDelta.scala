@@ -22,7 +22,7 @@ object GetFieldDelta extends InstructionDelta {
     hexToBytes("b4") ++ shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "getField")
     new InstructionSignature(Seq(stackTop), Seq(getReturnType(instruction)))

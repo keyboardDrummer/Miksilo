@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions
 
+import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField}
-import core.deltas.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import deltas.bytecode.constants._
@@ -13,21 +13,21 @@ import deltas.javac.types.MethodType._
 
 abstract class InvokeDelta extends InstructionDelta {
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction)
     val nameAndType = methodRef.nameAndType
     val descriptor = nameAndType._type.value
-    getMethodStackModification(descriptor, state)
+    getMethodStackModification(descriptor, language)
   }
 
-  def getInstanceInstructionSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  def getInstanceInstructionSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction)
     val nameAndType = methodRef.nameAndType
     val classRef = methodRef(MethodRefConstant.ClassRef).asInstanceOf[Node]
     val className = classRef(ClassInfoConstant.Name).asInstanceOf[Node]
     val classType = ObjectTypeDelta.objectType(QualifiedClassNameConstantDelta.get(className))
     val descriptor = nameAndType._type.value
-    val InstructionSignature(ins, outs) = getMethodStackModification(descriptor, state)
+    val InstructionSignature(ins, outs) = getMethodStackModification(descriptor, language)
     InstructionSignature(Seq(classType) ++ ins, outs)
   }
 
@@ -42,10 +42,10 @@ abstract class InvokeDelta extends InstructionDelta {
     find(ConstantPoolIndexGrammar).as(MethodRef)
   }
 
-  def getMethodStackModification(methodType: Node, state: Compilation): InstructionSignature = {
-    val ins = methodType.parameterTypes.map(_type => TypeSkeleton.toStackType(_type, state))
-    val outs = Seq(TypeSkeleton.toStackType(methodType.returnType, state))
-    InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, state) > 0))
+  def getMethodStackModification(methodType: Node, language: Language): InstructionSignature = {
+    val ins = methodType.parameterTypes.map(_type => TypeSkeleton.toStackType(_type, language))
+    val outs = Seq(TypeSkeleton.toStackType(methodType.returnType, language))
+    InstructionSignature(ins, outs.filter(p => TypeSkeleton.getTypeSize(p, language) > 0))
   }
 
   def getInvokeTargetMethodRef(instruction: Node): MethodRefWrapper[Node] = {

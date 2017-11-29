@@ -16,8 +16,8 @@ object InvokeVirtualDelta extends InvokeDelta {
     hexToBytes("b6") ++ shortToBytes(instruction(MethodRef).asInstanceOf[Int])
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
-    getInstanceInstructionSignature(instruction, typeState, state)
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
+    getInstanceInstructionSignature(instruction, typeState, language)
   }
 
   object InvokeVirtual extends NodeClass

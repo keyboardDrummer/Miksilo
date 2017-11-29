@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
@@ -15,7 +15,7 @@ object PushNullDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("01")
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize: Int = 1
 

@@ -1,9 +1,8 @@
-package deltas.bytecode.simplebytecode
+package deltas.bytecode.simplebytecode.test
 
 import application.compilerCockpit.MarkOutputGrammar
 import core.deltas.Delta
-import deltas.bytecode.additions.LabelledLocations
-import deltas.bytecode.simpleBytecode.InlineConstantPool
+import deltas.bytecode.simpleBytecode.{InlineConstantPool, LabelledLocations}
 import deltas.javac.JavaCompilerDeltas
 import org.scalatest.FunSuite
 import util.{CompilerBuilder, SourceUtils, TestUtils}

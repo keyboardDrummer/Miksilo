@@ -4,12 +4,11 @@ import core.deltas._
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.CodeWrapper
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
-import deltas.bytecode.simpleBytecode.InferredStackFrames
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
 import deltas.javac.classes.MethodInfo
 
 import scala.collection.mutable

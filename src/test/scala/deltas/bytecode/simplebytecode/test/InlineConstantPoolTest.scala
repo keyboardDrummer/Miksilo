@@ -1,4 +1,4 @@
-package deltas.bytecode.simplebytecode
+package deltas.bytecode.simplebytecode.test
 
 import application.compilerCockpit.MarkOutputGrammar
 import core.bigrammar.TestCompilerGrammarUtils

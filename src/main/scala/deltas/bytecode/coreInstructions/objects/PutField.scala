@@ -21,7 +21,7 @@ object PutField extends InstructionDelta {
     PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
 
     if (stackTop.size != 2)

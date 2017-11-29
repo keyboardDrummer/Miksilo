@@ -4,7 +4,7 @@ import core.deltas.{Compilation, Language}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
 import core.deltas.path.Path
-import deltas.bytecode.additions.LabelledLocations
+import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {
   override val key = GotoKey

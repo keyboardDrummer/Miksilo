@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -19,7 +19,7 @@ object CompareLongDelta extends InstructionDelta {
     PrintByteCode.hexToBytes("94")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(LongTypeC.longType, LongTypeC.longType), Seq(IntTypeC.intType))
 
   override def grammarName = "lcmp"

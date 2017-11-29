@@ -9,7 +9,7 @@ import javax.swing.text.AbstractDocument
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.deltas.{CompilerFromDeltas, Delta}
-import deltas.bytecode.additions.LabelledLocations
+import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer

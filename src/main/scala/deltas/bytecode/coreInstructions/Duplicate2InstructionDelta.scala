@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
@@ -17,9 +17,9 @@ object Duplicate2InstructionDelta extends InstructionDelta {
     PrintByteCode.hexToBytes("5c")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val input: Node = typeState.stackTypes.last
-    assertDoubleWord(state, input)
+    assertDoubleWord(language, input)
     new InstructionSignature(Seq(input),Seq(input, input))
   }
 

@@ -5,7 +5,6 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.StackMapTableAttribute
 import deltas.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
 import deltas.bytecode.types.TypeSkeleton
@@ -14,24 +13,21 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String) = new Node(LabelledLocations.LabelKey, LabelledLocations.LabelName -> name)
+  def label(name: String) = LabelDelta.key.create(LabelDelta.Name -> name)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: ClassFile[Node] = program
     for (method <- clazz.methods) {
-      val codeAnnotation = method.codeAttribute
-      val instructions = codeAnnotation.instructions
+      val instructions = method.codeAttribute.instructions
 
-      val stackLayouts = new InstructionTypeAnalysisFromState(compilation, method)
+      val stackLayouts = new InstructionTypeAnalysisForMethod(program, compilation, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
-      for (indexedLabel <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelledLocations.LabelKey)) {
-        val index = indexedLabel._2
-        val label = indexedLabel._1
-        val currentStack = stackLayouts.typeStatePerInstruction(index).stackTypes
-        val localTypes = stackLayouts.typeStatePerInstruction(index).variableTypes
-        val locals = getLocalTypesSequenceFromMap(localTypes)
-        label(LabelledLocations.LabelStackFrame) = getStackMap(previousStack, currentStack, previousLocals, locals)
+      for ((label, index) <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelDelta.key)) {
+        val typeState = stackLayouts.typeStatePerInstruction(index)
+        val currentStack = typeState.stackTypes
+        val locals = getLocalTypesSequenceFromMap(typeState.variableTypes)
+        label(LabelDelta.StackFrame) = getStackMap(previousStack, currentStack, previousLocals, locals)
         previousStack = currentStack
         previousLocals = locals
       }
@@ -77,8 +73,8 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    grammars.find(LabelledLocations.LabelKey).
-      findAs(LabelledLocations.LabelStackFrame).
+    grammars.find(LabelDelta.LabelKey).
+      findAs(LabelDelta.StackFrame).
       asInstanceOf[GrammarReference].removeMe()
   }
 }

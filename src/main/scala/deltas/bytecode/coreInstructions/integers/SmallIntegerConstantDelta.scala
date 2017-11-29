@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
@@ -22,7 +22,7 @@ object SmallIntegerConstantDelta extends InstructionDelta {
     byteToBytes(3 + CodeAttribute.getInstructionArguments(instruction).head)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize: Int = 1

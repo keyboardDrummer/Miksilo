@@ -4,10 +4,9 @@ import core.bigrammar.TestCompilerGrammarUtils
 import core.deltas.Delta
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.additions.LabelledLocations
-import deltas.bytecode.additions.LabelledLocations.LabelKey
 import deltas.bytecode.attributes.CodeAttribute.CodeKey
 import deltas.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
+import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.skeleton.QualifiedClassName
 
@@ -35,7 +34,7 @@ class TestParseTypes extends FunSuite {
     val input = "label \"start-4962768465676381896\"\n        append frame int int"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttribute.InstructionGrammar)
-    assertResult(LabelKey)(result.asInstanceOf[Node].clazz)
+    assertResult(LabelDelta.LabelKey)(result.asInstanceOf[Node].clazz)
   }
 
   test("labelWithAppendFrameInInstructions1") {

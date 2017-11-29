@@ -3,7 +3,7 @@ package deltas.javac
 import application.compilerCockpit.PrettyPrint
 import core.deltas._
 import deltas.bytecode._
-import deltas.bytecode.additions.{LabelledLocations, PoptimizeC}
+import deltas.bytecode.additions.PoptimizeC
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions._
@@ -15,7 +15,7 @@ import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
 import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
-import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool}
+import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._

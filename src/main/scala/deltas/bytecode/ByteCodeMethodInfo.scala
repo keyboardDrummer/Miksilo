@@ -31,15 +31,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       MethodDescriptor -> descriptorIndex,
       AccessFlagsKey -> flags)
 
-  def getMethodAttributes[T <: NodeLike](method: T) = method(MethodAttributes).asInstanceOf[Seq[T]]
-
-    def getMethodAccessFlags(method: Node) = method(AccessFlagsKey).asInstanceOf[Set[MethodAccessFlag]]
-
-  def getMethodNameIndex(methodInfo: Node) = methodInfo(MethodNameIndex).asInstanceOf[Int]
-
-  def getMethodDescriptorIndex(methodInfo: Node) = methodInfo(MethodDescriptor).asInstanceOf[Int]
-
-  implicit class ByteCodeMethodInfoWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class MethodInfo[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: MethodTypeWrapper[T] = new MethodTypeWrapper[T](typeConstant.value)
 
     def nameIndex: Int = node(MethodNameIndex).asInstanceOf[Int]
@@ -67,7 +59,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       MethodDescriptor -> Utf8ConstantDelta.key))
   }
 
-  def getMethodByteCode(methodInfo: ByteCodeMethodInfoWrapper[Node], state: Language) = {
+  def getMethodByteCode(methodInfo: MethodInfo[Node], state: Language) = {
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(methodInfo.nameIndex) ++
         shortToBytes(methodInfo.typeIndex) ++

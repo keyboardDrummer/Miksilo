@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Key, Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
@@ -16,7 +16,7 @@ object SwapInstruction extends InstructionDelta {
     PrintByteCode.hexToBytes("5f")
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val stackTop = typeState.stackTypes.takeRight(2)
     new InstructionSignature(stackTop, stackTop.reverse)
   }

@@ -2,11 +2,10 @@ package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.{Contract, Language}
-import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfZeroDelta
-import deltas.bytecode.simpleBytecode.InferredStackFrames
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
 
 object NotInstructionC extends ExpandInstruction {
 

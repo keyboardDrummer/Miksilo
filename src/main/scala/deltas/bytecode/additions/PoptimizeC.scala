@@ -5,7 +5,7 @@ import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions._
-import deltas.bytecode.simpleBytecode.InstructionTypeAnalysisFromState
+import deltas.bytecode.simpleBytecode.InstructionTypeAnalysisForMethod
 import deltas.bytecode.types.TypeSkeleton
 
 object PoptimizeC extends DeltaWithPhase {
@@ -18,18 +18,18 @@ object PoptimizeC extends DeltaWithPhase {
     (inputLength, outputLength)
   }
 
-  override def transformProgram(_clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(_clazz: Node, compilation: Compilation): Unit = {
     val clazz = new ClassFile(_clazz)
     for (method <- clazz.methods) {
-      val typeAnalysis = new InstructionTypeAnalysisFromState(state, method)
+      val typeAnalysis =  new InstructionTypeAnalysisForMethod(_clazz, compilation, method)
       val codeAnnotation = method.codeAttribute
       val instructions = codeAnnotation.instructions
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(state.language)(instruction.clazz)
-        val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), state)
-        getSignatureInOutLengths(state.language, signature)
+        val signatureProvider = CodeAttribute.getInstructionSignatureRegistry(compilation.language)(instruction.clazz)
+        val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
+        getSignatureInOutLengths(compilation.language, signature)
       }
 
       var newInstructions = List.empty[Node]

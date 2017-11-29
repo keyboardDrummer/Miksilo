@@ -24,7 +24,7 @@ object NewByteCodeDelta extends InstructionDelta {
   }
   override def getInstructionSize: Int = 3
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val classRef = instruction(ClassRef).asInstanceOf[Node]
     val className = QualifiedClassNameConstantDelta.get(classRef(ClassInfoConstant.Name).asInstanceOf[Node])
     val classType = ObjectTypeDelta.objectType(className)

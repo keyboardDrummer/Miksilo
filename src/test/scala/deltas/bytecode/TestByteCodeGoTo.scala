@@ -2,11 +2,11 @@ package deltas.bytecode
 
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.{CodeAttribute, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions._
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
+import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.bytecode.types.IntTypeC
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.ConstantPool
@@ -47,14 +47,14 @@ class TestByteCodeGoTo extends FunSuite {
     val instructions = Seq(
       SmallIntegerConstantDelta.integerConstant(0),
       StoreIntegerDelta.integerStore(0),
-      LabelledLocations.label("start", new Node(StackMapTableAttribute.AppendFrame,
+      LabelDelta.label("start", new Node(StackMapTableAttribute.AppendFrame,
         StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
       LoadIntegerDelta.load(0),
       SmallIntegerConstantDelta.integerConstant(3),
       LabelledLocations.ifIntegerCompareGreaterEquals("end"),
       IncrementIntegerDelta.integerIncrement(0, 1),
       LabelledLocations.goTo("start"),
-      LabelledLocations.label("end", new Node(StackMapTableAttribute.SameFrameKey))
+      LabelDelta.label("end", new Node(StackMapTableAttribute.SameFrameKey))
     )
 
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttribute.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

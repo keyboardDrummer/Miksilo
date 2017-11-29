@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
-import deltas.bytecode.additions.LabelledLocations
+import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ForLoopC.ForLoop
 

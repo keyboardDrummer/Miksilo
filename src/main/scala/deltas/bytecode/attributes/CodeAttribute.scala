@@ -53,7 +53,7 @@ object CodeAttribute extends ByteCodeAttribute with WithLanguageRegistry {
 
   trait InstructionSignatureProvider
   {
-    def getSignature(instruction: Node, programTypeState: ProgramTypeState, state: Compilation): InstructionSignature
+    def getSignature(instruction: Node, programTypeState: ProgramTypeState, language: Language): InstructionSignature
   }
 
   trait InstructionSideEffectProvider

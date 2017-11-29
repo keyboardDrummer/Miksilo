@@ -22,11 +22,11 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     manager.parse(state.grammars.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
   }
 
-  def toStackType(_type: Node, state: Language) : Node = {
-    getRegistry(state).instances(_type.clazz).getStackType(_type, state)
+  def toStackType(_type: Node, language: Language) : Node = {
+    getRegistry(language).instances(_type.clazz).getStackType(_type, language)
   }
 
-  def getTypeSize(_type: Node, state: Language): Int = getRegistry(state).stackSize(_type.clazz)
+  def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.clazz)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)

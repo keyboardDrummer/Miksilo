@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
@@ -19,7 +19,7 @@ object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO supercl
     hexToBytes("a4") ++ shortToBytes(arguments.head)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
 
   object Clazz extends NodeClass

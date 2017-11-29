@@ -22,7 +22,7 @@ object GetStaticDelta extends InstructionDelta {
     hexToBytes("b2") ++ shortToBytes(arguments)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(), Seq(getReturnType(instruction)))
 
   def getReturnType(getStatic: Node): Node = {

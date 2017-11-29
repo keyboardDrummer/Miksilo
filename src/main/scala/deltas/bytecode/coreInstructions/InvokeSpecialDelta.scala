@@ -18,8 +18,8 @@ object InvokeSpecialDelta extends InvokeDelta {
   }
 
   override def getInstructionSize: Int = 3
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
-    getInstanceInstructionSignature(instruction, typeState, state)
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
+    getInstanceInstructionSignature(instruction, typeState, language)
   }
 
   object InvokeSpecialKey extends NodeClass

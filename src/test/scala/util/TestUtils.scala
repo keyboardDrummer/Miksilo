@@ -7,7 +7,7 @@ import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.deltas.Compilation
 import core.deltas.node.{ComparisonOptions, Node}
 import org.scalatest.FunSuite
-import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
+import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaCompilerDeltas
@@ -38,7 +38,7 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     }
   }
 
-  def getMethodInstructions(method: ByteCodeMethodInfoWrapper[Node]): Seq[Node] = method.codeAttribute.instructions
+  def getMethodInstructions(method: MethodInfo[Node]): Seq[Node] = method.codeAttribute.instructions
 
   def printByteCode(byteCode: Node): String = {
     PrintByteCode.printBytes(SourceUtils.getBytes(byteCode))

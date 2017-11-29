@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.doubles
 
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract}
+import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.JumpBehavior
@@ -19,7 +19,7 @@ object DoubleReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature =
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(DoubleTypeC.doubleType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("af")

@@ -6,7 +6,7 @@ import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node._
 import deltas.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
-import deltas.bytecode.ByteCodeMethodInfo.ByteCodeMethodInfoWrapper
+import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
 import deltas.bytecode.constants.{ClassInfoConstant, ConstantEntry}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -33,7 +33,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
     def attributes: Seq[T] = node(ClassAttributes).asInstanceOf[Seq[T]]
 
-    def methods: Seq[ByteCodeMethodInfoWrapper[T]] = NodeWrapper.wrapList(node(Methods).asInstanceOf[Seq[T]])
+    def methods: Seq[MethodInfo[T]] = NodeWrapper.wrapList(node(Methods).asInstanceOf[Seq[T]])
   }
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]

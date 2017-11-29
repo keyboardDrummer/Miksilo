@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
 import core.deltas.node.{Key, Node, NodeClass}
-import core.deltas.{Compilation, Contract}
+import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -15,7 +15,7 @@ object SubtractIntegerDelta extends InstructionDelta {
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("64")
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = binary(IntTypeC.intType)
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = binary(IntTypeC.intType)
 
   override def getInstructionSize: Int = 1
 

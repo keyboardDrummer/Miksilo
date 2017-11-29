@@ -2,8 +2,7 @@ package deltas.bytecode
 
 import core.deltas.Language
 import core.deltas.node.Node
-import deltas.bytecode.additions.LabelledLocations
-import deltas.bytecode.additions.LabelledLocations.LabelKey
+import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.classes.ConstantPool
 
 object Instructions {
@@ -13,7 +12,7 @@ object Instructions {
 
   def getInstructionInAndOutputs(constantPool: ConstantPool, instruction: Node, state: Language): (Seq[Node], Seq[Node]) =
     instruction.clazz match {
-      case LabelKey => (Seq(), Seq())
+      case LabelDelta.LabelKey => (Seq(), Seq())
     }
 
   def getInstructionOutputTypes(constantPool: ConstantPool, instruction: Node, state: Language): Seq[Node] =

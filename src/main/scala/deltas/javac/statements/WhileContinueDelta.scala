@@ -4,7 +4,7 @@ import core.deltas.{Compilation, Language, NodeGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.path.Path
-import deltas.bytecode.additions.LabelledLocations
+import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object WhileContinueDelta extends StatementInstance {
   override val key = ContinueKey

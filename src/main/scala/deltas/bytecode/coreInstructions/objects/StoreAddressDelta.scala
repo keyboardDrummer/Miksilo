@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
@@ -21,7 +21,7 @@ object StoreAddressDelta extends InstructionDelta {
       byteToBytes(hexToInt("4b") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val stackTop = typeState.stackTypes.last
     assertObjectTypeStackTop(stackTop, "StoreAddress")
     InstructionSignature(Seq(stackTop), Seq())

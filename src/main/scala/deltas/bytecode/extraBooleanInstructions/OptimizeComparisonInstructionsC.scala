@@ -3,7 +3,6 @@ package deltas.bytecode.extraBooleanInstructions
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.additions.LabelledLocations
 import deltas.bytecode.attributes.CodeAttribute
 import deltas.bytecode.attributes.CodeAttribute.CodeWrapper
 import deltas.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareNotEqualDelta, IfNotZero, IfZeroDelta}
@@ -11,6 +10,7 @@ import deltas.bytecode.extraBooleanInstructions.GreaterThanInstructionC.GreaterT
 import deltas.bytecode.extraBooleanInstructions.IntegerEqualsInstructionC.IntegerEqualsInstructionKey
 import deltas.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
 import deltas.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
+import deltas.bytecode.simpleBytecode.LabelledLocations
 
 import scala.collection.mutable
 

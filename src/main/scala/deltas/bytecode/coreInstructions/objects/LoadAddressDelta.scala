@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttribute
@@ -22,7 +22,7 @@ object LoadAddressDelta extends InstructionDelta {
       PrintByteCode.byteToBytes(PrintByteCode.hexToInt("2a") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = {
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val arguments = CodeAttribute.getInstructionArguments(instruction)
     val location = arguments(0)
 

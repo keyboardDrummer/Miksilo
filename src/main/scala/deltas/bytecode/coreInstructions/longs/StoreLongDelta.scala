@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.Compilation
+import core.deltas.{Compilation, Language}
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttribute
@@ -23,7 +23,7 @@ object StoreLongDelta  extends InstructionDelta {
       byteToBytes(hexToInt("3f") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, state: Compilation): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttribute.getInstructionArguments(instruction)(0) -> LongTypeC.longType)
