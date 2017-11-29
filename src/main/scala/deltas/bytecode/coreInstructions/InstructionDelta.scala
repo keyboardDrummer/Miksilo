@@ -15,13 +15,10 @@ class ByteCodeTypeException(message: String) extends Exception(message)
 trait InstructionDelta extends InstructionWithGrammar
   with InstructionSignatureProvider with InstructionSideEffectProvider {
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    CodeAttributeDelta.getInstructionSignatureRegistry(state).put(key, this)
-    ByteCodeSkeleton.getRegistry(state).getBytes.put(key, getInstructionByteCode)
-    CodeAttributeDelta.getInstructionSizeRegistry(state).put(key, getInstructionSize)
-    CodeAttributeDelta.getRegistry(state).jumpBehaviorRegistry.put(key, jumpBehavior)
-    CodeAttributeDelta.getRegistry(state).localUpdates.put(key, this)
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.getRegistry(language).getBytes.put(key, getInstructionByteCode)
+    CodeAttributeDelta.getRegistry(language).instructions.put(key, this)
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
@@ -46,7 +43,7 @@ trait InstructionDelta extends InstructionWithGrammar
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
   def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature
 
-  def jumpBehavior: JumpBehavior = new JumpBehavior(true, false)
+  def jumpBehavior: JumpBehavior = JumpBehavior(true, false)
 
   def getInstructionSize: Int = getInstructionByteCode(new Node(key, InstructionArgumentsKey -> List.range(0,10))).size
   def getInstructionByteCode(instruction: Node): Seq[Byte]

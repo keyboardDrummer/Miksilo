@@ -8,7 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta
-import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionSignature}
+import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
@@ -40,10 +40,6 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
     instruction(InstructionArgumentsKey) = arguments
   }
 
-  def getInstructionSizeRegistry(state: Language): mutable.HashMap[NodeClass, Int] = getRegistry(state).getInstructionSizeRegistry
-
-  def getInstructionSignatureRegistry(state: Language): mutable.HashMap[NodeClass, InstructionSignatureProvider] = getRegistry(state).getInstructionSignatureRegistry
-
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def codeAttribute(nameIndex: Integer, maxStack: Integer, maxLocals: Integer,
@@ -73,10 +69,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   def createRegistry = new Registry()
   class Registry {
-    val getInstructionSignatureRegistry = new ClassRegistry[InstructionSignatureProvider]
-    val getInstructionSizeRegistry = new ClassRegistry[Int]
-    val jumpBehaviorRegistry = new ClassRegistry[JumpBehavior]
-    val localUpdates = new ClassRegistry[InstructionSideEffectProvider]
+    val instructions = new ClassRegistry[InstructionDelta] //TODO make this registry obsolete by storing all the data in the NodeClass of the instruction.
   }
 
   val constantEntry: Node = Utf8ConstantDelta.create("Code")

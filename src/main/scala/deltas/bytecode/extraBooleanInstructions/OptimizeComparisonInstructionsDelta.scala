@@ -14,7 +14,7 @@ import deltas.bytecode.simpleBytecode.LabelledLocations
 
 import scala.collection.mutable
 
-object OptimizeComparisonInstructionsC extends DeltaWithPhase {
+object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
     NotInstructionC, IntegerEqualsInstructionDelta)

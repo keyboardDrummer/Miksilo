@@ -68,7 +68,7 @@ object JavaCompilerDeltas {
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
-  def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsC) ++
+  def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionC, GreaterThanInstructionDelta, NotInstructionC, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsC) ++
     simpleByteCodeTransformations
 

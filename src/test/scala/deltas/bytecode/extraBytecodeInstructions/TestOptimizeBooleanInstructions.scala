@@ -3,7 +3,7 @@ package deltas.bytecode.extraBytecodeInstructions
 import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsC
+import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsDelta
 import deltas.javac.JavaCompilerDeltas
 import util.CompilerBuilder
 import util.TestUtils
@@ -14,7 +14,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
 
   test("ForFibonacci") {
     val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
-    val withoutOptimizationTransformations = JavaCompilerDeltas.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsC)
+    val withoutOptimizationTransformations = JavaCompilerDeltas.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
     val withoutOptimization = new TestUtils(CompilerBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)

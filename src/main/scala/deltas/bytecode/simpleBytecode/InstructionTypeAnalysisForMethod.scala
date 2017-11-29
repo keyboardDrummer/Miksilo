@@ -25,17 +25,15 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
     val codeAnnotation = method.codeAttribute
     val instructions = codeAnnotation.instructions
 
-    val instructionVariableUpdateRegistry = CodeAttributeDelta.getRegistry(language).localUpdates
-    val instructionSignatureRegistry = CodeAttributeDelta.getInstructionSignatureRegistry(language)
-    val jumpBehaviorRegistry = CodeAttributeDelta.getRegistry(language).jumpBehaviorRegistry
+    val instructionDeltas = CodeAttributeDelta.getRegistry(language).instructions
     new InstructionTypeAnalysis(instructions) {
       override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
-        instructionVariableUpdateRegistry(instruction.clazz).getVariableUpdates(instruction, typeState)
+        instructionDeltas(instruction.clazz).getVariableUpdates(instruction, typeState)
 
       override def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature =
-        instructionSignatureRegistry(instruction.clazz).getSignature(instruction, typeState, language)
+        instructionDeltas(instruction.clazz).getSignature(instruction, typeState, language)
 
-      override def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior = jumpBehaviorRegistry(instructionClazz)
+      override def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior = instructionDeltas(instructionClazz).jumpBehavior
     }
   }
 
