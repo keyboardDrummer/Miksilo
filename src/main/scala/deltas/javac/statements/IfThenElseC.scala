@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, SequenceElement}
 import deltas.bytecode.ByteCodeMethodInfo
-import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.statements.IfThenC._
 
@@ -14,8 +14,8 @@ object IfThenElseC extends StatementInstance {
   override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
     val methodInfo = ifThenElse.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
-    val elseLabelName = LabelledLocations.getUniqueLabel("else", methodInfo, compilation)
+    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
+    val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo, compilation)
     val endLabel = InferredStackFrames.label(endLabelName)
     val elseLabel = InferredStackFrames.label(elseLabelName)
     val thenBody = getThenStatements(ifThenElse)

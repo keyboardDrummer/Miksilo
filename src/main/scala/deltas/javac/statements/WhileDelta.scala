@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, SequenceElement}
 import deltas.bytecode.ByteCodeMethodInfo
-import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
 
 object WhileDelta extends StatementInstance with WithLanguageRegistry {
@@ -14,8 +14,8 @@ object WhileDelta extends StatementInstance with WithLanguageRegistry {
 
   override def toByteCode(_while: Path, compilation: Compilation): Seq[Node] = {
     val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val startLabel = LabelledLocations.getUniqueLabel("start", methodInfo, compilation)
-    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
+    val startLabel = LabelDelta.getUniqueLabel("start", methodInfo, compilation)
+    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
 
     val conditionInstructions = ExpressionSkeleton.getToInstructions(compilation)(getCondition(_while))
     getRegistry(compilation).whileStartLabels += _while.current -> startLabel

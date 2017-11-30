@@ -5,7 +5,7 @@ import core.deltas.{Contract, Language}
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareEqualDelta
-import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 
 object IntegerEqualsInstructionDelta extends ExpandInstruction {
 
@@ -16,8 +16,8 @@ object IntegerEqualsInstructionDelta extends ExpandInstruction {
   override val key = IntegerEqualsInstructionKey
 
   override def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node] = {
-    val falseStartLabel = LabelledLocations.getUniqueLabel("falseStart", methodInfo, state)
-    val endLabel = LabelledLocations.getUniqueLabel("end", methodInfo, state)
+    val falseStartLabel = LabelDelta.getUniqueLabel("falseStart", methodInfo, state)
+    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo, state)
     Seq(LabelledLocations.ifIntegerCompareEquals(falseStartLabel),
       SmallIntegerConstantDelta.integerConstant(0),
       LabelledLocations.goTo(endLabel),

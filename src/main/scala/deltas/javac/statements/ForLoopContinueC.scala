@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
-import deltas.bytecode.simpleBytecode.LabelledLocations
+import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ForLoopC.ForLoop
 
@@ -32,7 +32,7 @@ object ForLoopContinueC extends DeltaWithPhase {
   def transformForLoop(forLoopPath: Path, state: Language): String = {
     val forLoop = forLoopPath.current
     val method = forLoopPath.findAncestorClass(MethodDelta.Clazz)
-    val beforeIncrementLabel = LabelledLocations.getUniqueLabel("beforeIncrement", method, state)
+    val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method, state)
     forLoop(ForLoopC.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel
   }

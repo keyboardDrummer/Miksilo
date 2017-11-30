@@ -8,6 +8,8 @@ import core.deltas.node._
 import deltas.bytecode.attributes.StackMapTableAttribute.StackMapFrameGrammar
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 
+import scala.collection.mutable
+
 object LabelDelta extends InstructionDelta {
   override val key = LabelKey
 
@@ -44,4 +46,19 @@ object LabelDelta extends InstructionDelta {
   override def description: String = "Used to mark a specific point in an instruction list."
 
   override def grammarName: String = "label"
+
+  object GeneratedLabels extends NodeField
+  def getUniqueLabel(suggestion: String, methodInfo: Node, language: Language): String = {
+    val taken: mutable.Set[String] = methodInfo.data.getOrElseUpdate(GeneratedLabels, mutable.Set.empty).
+      asInstanceOf[mutable.Set[String]]
+    var result = suggestion
+    var increment = 0
+    while(taken.contains(result))
+    {
+      increment += 1
+      result = suggestion + "_" + increment
+    }
+    taken.add(result)
+    "<" + result + ">"
+  }
 }

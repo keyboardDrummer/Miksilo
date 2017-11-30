@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
 import deltas.bytecode.ByteCodeMethodInfo
-import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
+import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeC
 
@@ -64,10 +64,10 @@ object TernaryC extends ExpressionInstance {
     val truePath = TernaryC.trueBranch(_ternary)
     val falsePath = TernaryC.falseBranch(_ternary)
     val methodInfo = _ternary.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val falseLabelName = LabelledLocations.getUniqueLabel("false", methodInfo, compilation)
+    val falseLabelName = LabelDelta.getUniqueLabel("false", methodInfo, compilation)
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
-    val endLabelName = LabelledLocations.getUniqueLabel("end", methodInfo, compilation)
+    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledLocations.goTo(endLabelName)
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)

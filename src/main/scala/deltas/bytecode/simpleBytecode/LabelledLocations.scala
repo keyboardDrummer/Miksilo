@@ -28,21 +28,6 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifIntegerCompareNotEquals(target: String): Node = jump(IfIntegerCompareNotEqualDelta, target)
   def ifIntegerCompareLessEquals(target: String): Node = jump(IfIntegerCompareLessOrEqualDelta, target)
 
-  object GeneratedLabels extends NodeField
-  def getUniqueLabel(suggestion: String, methodInfo: Node, language: Language): String = {
-    val taken: mutable.Set[String] = methodInfo.data.getOrElseUpdate(GeneratedLabels, mutable.Set.empty).
-      asInstanceOf[mutable.Set[String]]
-    var result = suggestion
-    var increment = 0
-    while(taken.contains(result))
-    {
-      increment += 1
-      result = suggestion + "_" + increment
-    }
-    taken.add(result)
-    "<" + result + ">"
-  }
-
   override def inject(state: Language): Unit = {
     super.inject(state)
     LabelDelta.inject(state)
@@ -62,12 +47,12 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
     def processCodeAnnotation(codeAnnotation: CodeAttribute[Node]): Unit = {
       val instructions = codeAnnotation.instructions
-      val labelLocations: Map[String, Int] = determineTargetLocations(instructions)
+      val labelLocations: Map[String, Int] = determineLabelLocations(instructions)
       codeAnnotation.attributes = codeAnnotation.attributes ++ getStackMapTable(labelLocations, instructions)
       codeAnnotation.instructions = getNewInstructions(instructions, labelLocations)
     }
 
-    def determineTargetLocations(instructions: Seq[Node]): Map[String, Int] = {
+    def determineLabelLocations(instructions: Seq[Node]): Map[String, Int] = {
       val targetLocations = mutable.Map[String, Int]()
       var location = 0
       for (instruction <- instructions) {
@@ -150,8 +135,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   object JumpName extends NodeField
   def replaceJumpIndicesWithLabels(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val instructionDeltas = CodeAttributeDelta.getRegistry(language).instructions
-    val jumpInstructionDeltas = instructionDeltas.values.filter(v => v.jumpBehavior.hasJumpInFirstArgument)
+    val instructionDeltas = CodeAttributeDelta.getRegistry(language).instructions.values
+    val jumpInstructionDeltas = instructionDeltas.filter(v => v.jumpBehavior.hasJumpInFirstArgument)
     for(jump <- jumpInstructionDeltas)
     {
       val grammar = find(jump.key)
