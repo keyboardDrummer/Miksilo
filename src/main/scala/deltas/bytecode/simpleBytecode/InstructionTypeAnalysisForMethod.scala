@@ -1,11 +1,10 @@
 package deltas.bytecode.simpleBytecode
 
 import core.deltas.Language
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.Node
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
-import deltas.bytecode.attributes.CodeAttributeDelta
-import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.constants.ClassInfoConstant
+import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
@@ -25,15 +24,12 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
     val codeAnnotation = method.codeAttribute
     val instructions = codeAnnotation.instructions
 
-    val instructionDeltas = CodeAttributeDelta.getRegistry(language).instructions
     new InstructionTypeAnalysis(instructions) {
-      override def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects =
-        instructionDeltas(instruction.clazz).getVariableUpdates(instruction, typeState)
+      override def getSideEffects(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSideEffects =
+        instruction.clazz.getVariableUpdates(instruction, typeState)
 
-      override def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature =
-        instructionDeltas(instruction.clazz).getSignature(instruction, typeState, language)
-
-      override def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior = instructionDeltas(instructionClazz).jumpBehavior
+      override def getSignature(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSignature =
+        instruction.clazz.getSignature(instruction, typeState, language)
     }
   }
 

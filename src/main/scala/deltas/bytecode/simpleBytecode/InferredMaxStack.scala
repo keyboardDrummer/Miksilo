@@ -6,7 +6,6 @@ import core.deltas.node.Node
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
-import deltas.bytecode.simpleBytecode.LabelDelta.LabelKey
 import deltas.bytecode.types.TypeSkeleton
 
 object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
@@ -27,10 +26,6 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
       val code = method.codeAttribute
       code.maxStack = getMaxStack(method)
     }
-  }
-
-  def getInstructionStackSizeModification(constantPool: Seq[Any], instruction: Node): Integer = instruction.clazz match {
-      case LabelKey => 0
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

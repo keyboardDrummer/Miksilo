@@ -27,8 +27,7 @@ object PoptimizeC extends DeltaWithPhase {
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signatureProvider = CodeAttributeDelta.getRegistry(compilation).instructions(instruction.clazz)
-        val signature = signatureProvider.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
+        val signature = instruction.clazz.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
         getSignatureInOutLengths(compilation.language, signature)
       }
 
@@ -37,12 +36,12 @@ object PoptimizeC extends DeltaWithPhase {
 
       def processInstruction(instructionIndex: Int) {
         val instruction = instructions(instructionIndex)
-        if (instruction.clazz == PopDelta.PopKey) {
+        if (instruction.clazz == PopDelta.key) {
           consumptions ::= true
           return
         }
 
-        if (instruction.clazz == Pop2Delta.Pop2Key) {
+        if (instruction.clazz == Pop2Delta.key) {
           consumptions = List(true,true) ++ consumptions
           return
         }

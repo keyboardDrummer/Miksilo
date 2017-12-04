@@ -8,11 +8,10 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta
+import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-
-import scala.collection.mutable
 
 object InstructionArgumentsKey extends NodeField
 
@@ -22,7 +21,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
     def maxStack: Int = node(MaxStack).asInstanceOf[Int]
     def maxStack_=(value: Int): Unit = node(MaxStack) = value
 
-    def instructions: Seq[T] = node(Instructions).asInstanceOf[Seq[T]]
+    def instructions: Seq[Instruction[T]] = NodeWrapper.wrapList(node(Instructions).asInstanceOf[Seq[T]])
     def instructions_=(value: Seq[T]): Unit = node(Instructions) = value
 
     def maxLocals: Int = node(CodeMaxLocalsKey).asInstanceOf[Int]
@@ -83,7 +82,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   def getCodeAttributeBytes(code: CodeAttribute[Node], state: Language): Seq[Byte] = {
 
-    def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+    def getInstructionByteCode(instruction: Instruction[Node]): Seq[Byte] = {
       ByteCodeSkeleton.getRegistry(state).getBytes(instruction.clazz)(instruction)
     }
 

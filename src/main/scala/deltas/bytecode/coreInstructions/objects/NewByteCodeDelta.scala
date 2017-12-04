@@ -11,13 +11,8 @@ import deltas.bytecode.types.ObjectTypeDelta
 import deltas.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 object NewByteCodeDelta extends InstructionDelta {
-
-  object NewByteCodeKey extends NodeClass
   
-  def newInstruction(classRef: Any) = NewByteCodeKey.create(ClassRef -> classRef)
-  
-  override val key = NewByteCodeKey
-
+  def newInstruction(classRef: Any) = key.create(ClassRef -> classRef)
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val location = instruction(ClassRef).asInstanceOf[Int]
     PrintByteCode.hexToBytes("bb") ++ PrintByteCode.shortToBytes(location)

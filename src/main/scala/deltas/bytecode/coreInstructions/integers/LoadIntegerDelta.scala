@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.node.Node
+import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,9 +10,7 @@ import deltas.bytecode.types.IntTypeC
 
 object LoadIntegerDelta extends InstructionDelta {
 
-  override val key = IntegerLoad
-
-  def load(location: Integer) = CodeAttributeDelta.instruction(IntegerLoad, Seq(location))
+  def load(location: Integer) = CodeAttributeDelta.instruction(key, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -24,8 +22,6 @@ object LoadIntegerDelta extends InstructionDelta {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
-
-  object IntegerLoad extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

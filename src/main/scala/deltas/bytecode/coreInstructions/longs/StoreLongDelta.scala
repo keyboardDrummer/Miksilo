@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,9 +10,7 @@ import deltas.bytecode.types.LongTypeC
 
 object StoreLongDelta  extends InstructionDelta {
 
-  override val key = LongStore
-
-  def longStore(location: Int) = CodeAttributeDelta.instruction(LongStore, Seq(location))
+  def longStore(location: Int) = CodeAttributeDelta.instruction(key, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -27,8 +25,6 @@ object StoreLongDelta  extends InstructionDelta {
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
     Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> LongTypeC.longType)
-
-  object LongStore extends NodeClass
 
   override def grammarName = "lstore"
 }

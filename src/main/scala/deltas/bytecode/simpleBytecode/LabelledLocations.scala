@@ -1,6 +1,5 @@
 package deltas.bytecode.simpleBytecode
 
-import core.bigrammar.grammars.StringLiteral
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
@@ -9,6 +8,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta._
 import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions.GotoDelta
+import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 
@@ -56,9 +56,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       val targetLocations = mutable.Map[String, Int]()
       var location = 0
       for (instruction <- instructions) {
-        instruction.clazz match {
-          case LabelDelta.LabelKey => targetLocations(new Label(instruction).name) = location
-          case _ =>
+        if (instruction.clazz == LabelDelta.key) {
+          targetLocations(new Label(instruction).name) = location
         }
 
         location += instructionSize(instruction)
@@ -66,19 +65,19 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       targetLocations.toMap
     }
 
-    def getNewInstructions(instructions: Seq[Node], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
+    def getNewInstructions(instructions: Seq[Instruction[Node]], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
       var newInstructions = mutable.ArrayBuffer[Node]()
       newInstructions.sizeHint(instructions.length)
 
       var location = 0
       for (instruction <- instructions) {
 
-        if (instructionDeltas(instruction.clazz).jumpBehavior.hasJumpInFirstArgument) {
+        if (instruction.jumpBehavior.hasJumpInFirstArgument) {
           setInstructionArguments(instruction, Seq(targetLocations(getJumpInstructionLabel(instruction)) - location))
           instruction.data.remove(JumpName)
         }
 
-        if (instruction.clazz != LabelDelta.LabelKey)
+        if (instruction.clazz != LabelDelta.key)
           newInstructions += instruction
 
         location += instructionSize(instruction)
@@ -140,7 +139,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumpInstructionDeltas)
     {
       val grammar = find(jump.key)
-      grammar.inner = jump.grammarName ~~> StringLiteral.as(JumpName) asNode jump.key
+      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammer.as(JumpName) asNode jump.key
     }
   }
 }

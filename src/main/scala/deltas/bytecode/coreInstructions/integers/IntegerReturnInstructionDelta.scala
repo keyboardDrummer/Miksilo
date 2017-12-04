@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
@@ -11,9 +11,7 @@ import deltas.bytecode.types.IntTypeC
 
 object IntegerReturnInstructionDelta extends InstructionDelta {
 
-  override val key = IntegerReturn
-
-  def integerReturn: Node = CodeAttributeDelta.instruction(IntegerReturn)
+  def integerReturn: Node = CodeAttributeDelta.instruction(key)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -22,8 +20,6 @@ object IntegerReturnInstructionDelta extends InstructionDelta {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ac")
-
-  object IntegerReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
 

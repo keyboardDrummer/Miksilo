@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.node.Node
+import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
@@ -11,9 +11,7 @@ import deltas.bytecode.types.LongTypeC
 
 object LongReturnInstructionDelta extends InstructionDelta {
 
-  override val key = LongReturn
-
-  def longReturn: Node = CodeAttributeDelta.instruction(LongReturn)
+  def longReturn: Node = CodeAttributeDelta.instruction(key)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -23,8 +21,6 @@ object LongReturnInstructionDelta extends InstructionDelta {
     InstructionSignature(Seq(LongTypeC.longType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ad")
-
-  object LongReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LongTypeC)
 

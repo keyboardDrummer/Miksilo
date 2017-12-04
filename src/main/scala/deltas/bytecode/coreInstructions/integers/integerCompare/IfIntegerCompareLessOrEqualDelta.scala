@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
@@ -9,8 +9,6 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeC
 
 object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO superclasse maken om wat van deze jump instructies onder te schuiven
-
-  override val key = Clazz
 
   def create(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
 
@@ -21,8 +19,6 @@ object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO supercl
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
-
-  object Clazz extends NodeClass
 
   override def grammarName = "if_icmple"
 }

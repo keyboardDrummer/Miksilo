@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.objects
 
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
@@ -10,9 +10,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object AddressReturnInstructionDelta extends InstructionDelta {
 
-  override val key = AddressReturn
-
-  def create: Node = CodeAttributeDelta.instruction(AddressReturn)
+  def create: Node = CodeAttributeDelta.instruction(key)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -22,8 +20,6 @@ object AddressReturnInstructionDelta extends InstructionDelta {
     InstructionSignature(Seq(typeState.stackTypes.head), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("b0")
-
-  object AddressReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set()
 

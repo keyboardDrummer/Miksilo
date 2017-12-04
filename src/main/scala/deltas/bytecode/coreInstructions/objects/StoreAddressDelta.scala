@@ -1,16 +1,15 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object StoreAddressDelta extends InstructionDelta {
-  override val key = AddressStore
 
-  def addressStore(location: Int): Node = CodeAttributeDelta.instruction(AddressStore, Seq(location))
+  def addressStore(location: Int): Node = CodeAttributeDelta.instruction(key, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -32,8 +31,6 @@ object StoreAddressDelta extends InstructionDelta {
     val _type = typeState.stackTypes.last
     Map(variableLocation -> _type)
   }
-
-  object AddressStore extends NodeClass
 
   override def grammarName = "astore" //TODO astore_0 etc..
 }

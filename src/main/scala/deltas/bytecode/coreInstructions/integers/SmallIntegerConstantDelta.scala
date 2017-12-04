@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,12 +10,10 @@ import deltas.bytecode.types.IntTypeC
 
 object SmallIntegerConstantDelta extends InstructionDelta {
 
-  override val key = IntegerConstantKey
-
   def integerConstant(value: Int) = {
     require (value <= 5)
     require (value >= -1)
-    CodeAttributeDelta.instruction(IntegerConstantKey, Seq(value))
+    CodeAttributeDelta.instruction(key, Seq(value))
   }
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
@@ -26,8 +24,6 @@ object SmallIntegerConstantDelta extends InstructionDelta {
     InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize: Int = 1
-
-  object IntegerConstantKey extends NodeClass
 
   override def description: String = "Defines the integer constant instruction, which places an integer between -1 and 5 on the stack."
 

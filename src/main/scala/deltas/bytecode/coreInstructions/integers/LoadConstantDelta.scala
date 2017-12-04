@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.IntegerInfoConstant
@@ -12,11 +12,9 @@ import deltas.bytecode.types.IntTypeC
 
 object LoadConstantDelta extends InstructionDelta
 {
-  object LoadConstantKey extends NodeClass
   object IntegerConstantIndex extends NodeField
-  override val key = LoadConstantKey
 
-  def integerConstant(value: Any) = LoadConstantKey.create(IntegerConstantIndex -> value)
+  def integerConstant(value: Any) = key.create(IntegerConstantIndex -> value)
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     InstructionSignature(Seq.empty, Seq(IntTypeC.intType))

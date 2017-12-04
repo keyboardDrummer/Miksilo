@@ -9,17 +9,14 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.LongTypeC
 
 object AddLongsDelta extends InstructionDelta {
-  override val key = AddLongsKey
 
-  def addLongs() = CodeAttributeDelta.instruction(AddLongsKey)
+  def addLongs() = CodeAttributeDelta.instruction(key)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = hexToBytes("61")
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = binary(LongTypeC.longType)
 
   override def getInstructionSize: Int = 1
-
-  object AddLongsKey extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LongTypeC)
 

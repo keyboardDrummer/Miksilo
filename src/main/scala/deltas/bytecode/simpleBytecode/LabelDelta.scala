@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.StringLiteral
+import core.bigrammar.grammars.RegexGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
@@ -11,9 +11,8 @@ import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import scala.collection.mutable
 
 object LabelDelta extends InstructionDelta {
-  override val key = LabelKey
 
-  object LabelKey extends NodeClass
+  def LabelKey = key //TODO inline
 
   object Name extends NodeField
 
@@ -36,10 +35,11 @@ object LabelDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 0
 
+  def getNameGrammer: BiGrammar = new RegexGrammar("""[\w<>]*""".r)
   override def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val stackMapFrameGrammar = find(StackMapFrameGrammar)
-    grammarName ~~> StringLiteral.as(Name) %
+    grammarName ~~> getNameGrammer.as(Name) %
       stackMapFrameGrammar.indent().as(StackFrame) asNode LabelKey
   }
 

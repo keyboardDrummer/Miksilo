@@ -2,6 +2,7 @@ package deltas.bytecode.simpleBytecode
 
 import core.deltas.exceptions.BadInputException
 import core.deltas.node.Node
+import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import deltas.bytecode.types.ObjectTypeDelta
@@ -12,11 +13,11 @@ object InstructionTypeAnalysis {
   type InstructionSideEffects = Map[Int, Node]
 }
 
-abstract class InstructionTypeAnalysis(instructions: Seq[Node])
+abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
   extends InstructionFlowAnalysis[ProgramTypeState](instructions) {
 
-  def getSideEffects(typeState: ProgramTypeState, instruction: Node): InstructionSideEffects
-  def getSignature(typeState: ProgramTypeState, instruction: Node): InstructionSignature
+  def getSideEffects(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSideEffects
+  def getSignature(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSignature
   
   case class StackDoesNotFitInstructionInput(instruction: Any, inputTypes: Seq[Any], stack: Seq[Any]) extends RuntimeException {
     override def toString = s"StackDoesNotFitInstructionInput: instruction = $instruction; inputTypes = $inputTypes; stack = $stack"

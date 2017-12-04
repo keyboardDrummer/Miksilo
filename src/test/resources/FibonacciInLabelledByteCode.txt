@@ -32,10 +32,10 @@ class Fibonacci extends java/lang/Object with interfaces: ()
       name: Code, stack:3, locals:1
         iload 0
         iconst 2
-        if_icmpge "<false>"
+        if_icmpge <false>
         iconst 1
-        goto "<end>"
-        label "<false>"
+        goto <end>
+        label <false>
           same frame
         iload 0
         iconst 1
@@ -46,7 +46,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
         isub
         invokestatic Fibonacci.fibonacci (I)I
         iadd
-        label "<end>"
+        label <end>
           same locals, 1 stack item
             int
         ireturn

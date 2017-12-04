@@ -1,6 +1,6 @@
 package deltas.bytecode
 
-import core.deltas.node.Node
+import core.deltas.node.{Node, NodeWrapper}
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.PoptimizeC
 import deltas.bytecode.attributes.CodeAttributeDelta
@@ -68,7 +68,7 @@ class TestPoptimize extends FunSuite {
     assertResult(instructions)(newInstructions)
   }
 
-  def transformInstructions(instructions: Seq[Node]) = {
+  def transformInstructions(instructions: Seq[Node]): Seq[Node] = {
     val codeAnnotation = CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.MethodInfoKey.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
@@ -79,7 +79,7 @@ class TestPoptimize extends FunSuite {
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
     val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompilerDeltas.byteCodeDeltas)
     compiler.transform(clazz)
-    codeAnnotation.instructions
+    NodeWrapper.unwrapList(codeAnnotation.instructions)
   }
 
   test("Pop2") {

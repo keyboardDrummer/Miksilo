@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
 import core.deltas._
-import core.deltas.node.Node
+import core.deltas.node.{Node, NodeClass, NodeLike, NodeWrapper}
 import deltas.bytecode._
 import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
@@ -12,8 +12,17 @@ case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
 class ByteCodeTypeException(message: String) extends Exception(message)
 
+object InstructionDelta {
+  implicit class Instruction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    override def clazz: InstructionDelta = node.clazz.asInstanceOf[InstructionDelta]
+    def jumpBehavior: JumpBehavior = clazz.jumpBehavior
+  }
+}
+
 trait InstructionDelta extends InstructionWithGrammar
-  with InstructionSignatureProvider with InstructionSideEffectProvider {
+  with InstructionSignatureProvider with InstructionSideEffectProvider with NodeClass {
+
+  final override val key: InstructionDelta = this
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -43,7 +52,7 @@ trait InstructionDelta extends InstructionWithGrammar
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
   def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature
 
-  def jumpBehavior: JumpBehavior = JumpBehavior(true, false)
+  def jumpBehavior: JumpBehavior = JumpBehavior(movesToNext = true, hasJumpInFirstArgument = false)
 
   def getInstructionSize: Int = getInstructionByteCode(new Node(key, InstructionArgumentsKey -> List.range(0,10))).size
   def getInstructionByteCode(instruction: Node): Seq[Byte]

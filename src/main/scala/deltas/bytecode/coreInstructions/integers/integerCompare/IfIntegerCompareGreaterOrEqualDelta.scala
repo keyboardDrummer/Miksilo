@@ -10,9 +10,7 @@ import deltas.bytecode.types.IntTypeC
 
 object IfIntegerCompareGreaterOrEqualDelta extends JumpInstruction {
 
-  override val key = Clazz
-
-  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(Clazz, Seq(target))
+  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -21,8 +19,6 @@ object IfIntegerCompareGreaterOrEqualDelta extends JumpInstruction {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
-
-  object Clazz extends NodeClass
 
   override def grammarName = "if_icmpge"
 }

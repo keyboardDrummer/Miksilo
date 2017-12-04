@@ -1,23 +1,21 @@
 package deltas.bytecode.simpleBytecode
 
-import core.deltas.node.{Node, NodeClass}
-import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
+import core.deltas.node.Node
+import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 import util.DataFlowAnalysis
 
-abstract class InstructionFlowAnalysis[State](instructions: Seq[Node])
+abstract class InstructionFlowAnalysis[State](instructions: Seq[Instruction[Node]])
   extends DataFlowAnalysis[Int, State] {
-
-  def getJumpBehavior(instructionClazz: NodeClass): JumpBehavior
   
   val labelIndices = instructions.zipWithIndex.
     filter(indexedInstruction => indexedInstruction._1.clazz == LabelDelta.LabelKey).
-    map(indexedInstruction => (new Label(indexedInstruction._1).name, indexedInstruction._2)).toMap
+    map(indexedInstruction => (new Label(indexedInstruction._1.node).name, indexedInstruction._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)
 
-    val jumpBehavior = getJumpBehavior(instruction.clazz)
+    val jumpBehavior = instruction.clazz.jumpBehavior
     var result = Set.empty[Int]
     if (jumpBehavior.movesToNext)
       result += instructionIndex + 1

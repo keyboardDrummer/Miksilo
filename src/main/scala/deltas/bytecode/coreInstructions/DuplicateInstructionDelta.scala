@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
 import core.deltas.Language
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
@@ -9,10 +9,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object DuplicateInstructionDelta extends InstructionDelta {
 
-  object DuplicateKey extends NodeClass
-  def duplicate = CodeAttributeDelta.instruction(DuplicateKey, Seq.empty)
-
-  override val key = DuplicateKey
+  def duplicate = CodeAttributeDelta.instruction(key, Seq.empty)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("59")

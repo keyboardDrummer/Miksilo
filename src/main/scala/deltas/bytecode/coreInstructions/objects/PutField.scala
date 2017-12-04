@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions.objects
 
+import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
-import core.deltas.{Compilation, Language}
+import core.deltas.node.{Node, NodeField}
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
@@ -10,11 +10,9 @@ import deltas.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 object PutField extends InstructionDelta {
 
-  object PutFieldKey extends NodeClass
   object FieldRef extends NodeField
-  override val key = PutFieldKey
 
-  def putField(index: Any) = PutFieldKey.create(FieldRef -> index)
+  def putField(index: Any) = key.create(FieldRef -> index)
 
   override def getInstructionSize: Int = 3
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {

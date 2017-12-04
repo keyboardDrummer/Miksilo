@@ -1,9 +1,9 @@
 package deltas.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
+import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
-import core.deltas.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.FieldRefConstant
@@ -12,10 +12,9 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object GetStaticDelta extends InstructionDelta {
 
-  override val key = GetStaticKey
   object FieldRef extends NodeField
 
-  def getStatic(fieldRefIndex: Any): Node = GetStaticKey.create(FieldRef -> fieldRefIndex)
+  def getStatic(fieldRefIndex: Any): Node = key.create(FieldRef -> fieldRefIndex)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = instruction(FieldRef).asInstanceOf[Int]
@@ -41,8 +40,6 @@ object GetStaticDelta extends InstructionDelta {
   }
 
   override def getInstructionSize: Int = 3
-
-  object GetStaticKey extends NodeClass
 
   override def description: String = "Defines the getStatic instruction, which retrieves a value from a static field."
 

@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.floats
 
 import core.deltas.node.{Node, NodeClass}
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
@@ -11,9 +11,7 @@ import deltas.bytecode.types.FloatTypeC
 
 object FloatReturnInstructionDelta extends InstructionDelta {
 
-  override val key = FloatReturn
-
-  def create: Node = CodeAttributeDelta.instruction(FloatReturn)
+  def create: Node = CodeAttributeDelta.instruction(key)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -23,8 +21,6 @@ object FloatReturnInstructionDelta extends InstructionDelta {
     InstructionSignature(Seq(FloatTypeC.floatType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ae")
-
-  object FloatReturn extends NodeClass
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(FloatTypeC)
 

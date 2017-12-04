@@ -9,9 +9,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object IncrementIntegerDelta extends InstructionDelta {
 
-  override val key = IntegerIncrementKey
-
-  def integerIncrement(location: Int, amount: Int) = CodeAttributeDelta.instruction(IntegerIncrementKey, Seq(location, amount))
+  def integerIncrement(location: Int, amount: Int) = CodeAttributeDelta.instruction(key, Seq(location, amount))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -24,8 +22,6 @@ object IncrementIntegerDelta extends InstructionDelta {
     InstructionSignature(Seq.empty, Seq.empty)
 
   override def getInstructionSize(): Int = 3
-
-  object IntegerIncrementKey extends NodeClass
 
   override def description: String = "Defines the increment integer instruction, which increments an integer variable by a specific amount."
 

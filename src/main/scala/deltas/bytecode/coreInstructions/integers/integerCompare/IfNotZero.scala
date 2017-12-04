@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
@@ -10,9 +10,7 @@ import deltas.bytecode.types.IntTypeC
 
 object IfNotZero extends JumpInstruction {
 
-  override val key = Clazz
-
-  def ifZero(target: Int) = CodeAttributeDelta.instruction(Clazz, Seq(target))
+  def ifZero(target: Int) = CodeAttributeDelta.instruction(key, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -20,8 +18,6 @@ object IfNotZero extends JumpInstruction {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
-
-  object Clazz extends NodeClass
 
   override def grammarName = "ifne"
 }

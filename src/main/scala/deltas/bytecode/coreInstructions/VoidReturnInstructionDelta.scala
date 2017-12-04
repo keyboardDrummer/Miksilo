@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Language
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
@@ -9,9 +9,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object VoidReturnInstructionDelta extends InstructionDelta {
 
-  override val key = VoidReturn
-
-  def voidReturn: Node = CodeAttributeDelta.instruction(VoidReturn)
+  def voidReturn: Node = CodeAttributeDelta.instruction(key)
 
   override def jumpBehavior: JumpBehavior = new JumpBehavior(false, false)
 
@@ -21,8 +19,6 @@ object VoidReturnInstructionDelta extends InstructionDelta {
     InstructionSignature(Seq(), Seq())
 
   override def getInstructionSize: Int = 1
-
-  object VoidReturn extends NodeClass
 
   override def description: String = "Defines the void return instruction, which returns from the current method."
 

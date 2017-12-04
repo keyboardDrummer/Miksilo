@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Language
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
@@ -10,9 +10,7 @@ import deltas.bytecode.types.IntTypeC
 
 object IfIntegerCompareEqualDelta extends JumpInstruction {
 
-  override val key = Clazz
-
-  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(Clazz, Seq(target))
+  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -21,8 +19,6 @@ object IfIntegerCompareEqualDelta extends JumpInstruction {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
     InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
-
-  object Clazz extends NodeClass
 
   override def description: String = "Defines the if-integer-compare-equal instruction, which will to a target instruction if the two top stack integers are equal."
 

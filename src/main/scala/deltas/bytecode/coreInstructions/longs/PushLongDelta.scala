@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.{Compilation, Language}
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.Language
+import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
@@ -10,11 +10,9 @@ import deltas.bytecode.types.LongTypeC
 
 object PushLongDelta extends InstructionDelta {
 
-  override val key = LongConstantKey
-
   def constant(value: Int) = {
     require (0 <= value && value <= 1)
-    CodeAttributeDelta.instruction(LongConstantKey, Seq(value))
+    CodeAttributeDelta.instruction(key, Seq(value))
   }
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
@@ -25,8 +23,6 @@ object PushLongDelta extends InstructionDelta {
     InstructionSignature(Seq(), Seq(LongTypeC.longType))
 
   override def getInstructionSize: Int = 1
-
-  object LongConstantKey extends NodeClass
 
   override def grammarName = "lconst" //TODO lconst_0 & lconst_1
 }

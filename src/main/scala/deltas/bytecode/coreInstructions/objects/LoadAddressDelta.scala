@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Language
 import core.deltas.node.{Node, NodeClass}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
@@ -9,9 +9,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object LoadAddressDelta extends InstructionDelta {
 
-  override val key = AddressLoad
-
-  def addressLoad(location: Int): Node = CodeAttributeDelta.instruction(AddressLoad, Seq(location))
+  def addressLoad(location: Int): Node = CodeAttributeDelta.instruction(key, Seq(location))
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
@@ -28,8 +26,6 @@ object LoadAddressDelta extends InstructionDelta {
 
     InstructionSignature(Seq(), Seq(typeState.variableTypes(location)))
   }
-
-  object AddressLoad extends NodeClass
 
   override def grammarName = "aload" //TODO aload_0 etc..
 }

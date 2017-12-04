@@ -10,7 +10,6 @@ import deltas.bytecode.types.IntTypeC
 
 object PushNullDelta extends InstructionDelta {
 
-  override val key = PushNullKey
   val pushNull = CodeAttributeDelta.instruction(key)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("01")
@@ -18,8 +17,6 @@ object PushNullDelta extends InstructionDelta {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(), Seq(IntTypeC.intType))
 
   override def getInstructionSize: Int = 1
-
-  object PushNullKey extends NodeClass
 
   override def grammarName = "aconst_null"
 }

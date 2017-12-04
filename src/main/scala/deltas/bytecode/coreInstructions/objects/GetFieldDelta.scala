@@ -1,9 +1,9 @@
 package deltas.bytecode.coreInstructions.objects
 
 import core.bigrammar.BiGrammar
+import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
-import core.deltas.{Compilation, Language}
+import core.deltas.node.{Node, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.FieldRefConstant
@@ -13,10 +13,9 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object GetFieldDelta extends InstructionDelta {
 
-  override val key = GetFieldKey
   object FieldRef extends NodeField
 
-  def construct(fieldRefIndex: Any): Node = GetFieldKey.create(FieldRef -> fieldRefIndex)
+  def construct(fieldRefIndex: Any): Node = key.create(FieldRef -> fieldRefIndex)
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
     hexToBytes("b4") ++ shortToBytes(instruction(FieldRef).asInstanceOf[Int])
@@ -44,8 +43,6 @@ object GetFieldDelta extends InstructionDelta {
   }
 
   override def getInstructionSize: Int = 3
-
-  object GetFieldKey extends NodeClass
 
   override def grammarName = "getfield"
 }
