@@ -9,7 +9,7 @@ import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, Labelled
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeC
 
-object TernaryC extends ExpressionInstance {
+object TernaryDelta extends ExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
 
   def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueKey).asInstanceOf[T]
@@ -49,9 +49,9 @@ object TernaryC extends ExpressionInstance {
 
   override def getType(_ternary: Path, compilation: Compilation): Node = {
     val getExpressionType = ExpressionSkeleton.getType(compilation)
-    val condition = TernaryC.getCondition(_ternary)
-    val truePath = TernaryC.trueBranch(_ternary)
-    val falsePath = TernaryC.falseBranch(_ternary)
+    val condition = TernaryDelta.getCondition(_ternary)
+    val truePath = TernaryDelta.trueBranch(_ternary)
+    val falsePath = TernaryDelta.falseBranch(_ternary)
     TypeSkeleton.checkAssignableTo(compilation)(BooleanTypeC.booleanType, getExpressionType(condition))
 
     val trueType = getExpressionType(truePath)
@@ -60,14 +60,14 @@ object TernaryC extends ExpressionInstance {
   }
 
   override def toByteCode(_ternary: Path, compilation: Compilation): Seq[Node] = {
-    val condition = TernaryC.getCondition(_ternary)
-    val truePath = TernaryC.trueBranch(_ternary)
-    val falsePath = TernaryC.falseBranch(_ternary)
+    val condition = TernaryDelta.getCondition(_ternary)
+    val truePath = TernaryDelta.trueBranch(_ternary)
+    val falsePath = TernaryDelta.falseBranch(_ternary)
     val methodInfo = _ternary.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val falseLabelName = LabelDelta.getUniqueLabel("false", methodInfo, compilation)
+    val falseLabelName = LabelDelta.getUniqueLabel("false", methodInfo)
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
-    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
+    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledLocations.goTo(endLabelName)
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)

@@ -7,21 +7,9 @@ import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.ExpressionSkeleton.Expression
 import deltas.javac.statements.StatementSkeleton.Statement
 
-object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
+object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
-  implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def initializer: Statement[T] = node(Initializer).asInstanceOf[T]
-    def initializer_=(value: T) = node(Initializer) = value
-
-    def condition: Expression = node(Condition).asInstanceOf[Node]
-    def condition_=(value: T) = node(Condition) = value
-
-    def increment: Expression = node(Increment).asInstanceOf[Node]
-    def increment_=(value: Node) = node(Increment) = value
-
-    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
-    def body_=(value: Node) = node(Body) = value
-  }
+  override def description: String = "Enables using the non-iterator for loop."
 
   override def dependencies: Set[Contract] = Set(WhileDelta)
 
@@ -34,7 +22,35 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
       expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %
       blockGrammar.as(Body) asNode ForLoopType
-    statementGrammar.inner = statementGrammar.inner | forLoopGrammar
+    statementGrammar.addOption(forLoopGrammar)
+  }
+
+  override def transformProgram(program: Node, state: Compilation): Unit = {
+    PathRoot(program).visitClass(ForLoopType).foreach(transformForLoop)
+  }
+  
+  def transformForLoop(forLoopPath: Path): Unit = {
+    val forLoop: ForLoop[Node] = forLoopPath.current
+    val whileBody = forLoop.body ++
+      Seq(ExpressionAsStatementDelta.create(forLoop.increment))
+    val _while = WhileDelta.create(forLoop.condition, whileBody)
+
+    val newStatements = Seq[Node](forLoop.initializer, _while)
+    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
+  }
+
+  implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def initializer: Statement[T] = node(Initializer).asInstanceOf[T]
+    def initializer_=(value: T): Unit = node(Initializer) = value
+
+    def condition: Expression = node(Condition).asInstanceOf[Node]
+    def condition_=(value: T): Unit = node(Condition) = value
+
+    def increment: Expression = node(Increment).asInstanceOf[Node]
+    def increment_=(value: Node): Unit = node(Increment) = value
+
+    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
+    def body_=(value: Node): Unit = node(Body) = value
   }
 
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
@@ -49,23 +65,4 @@ object ForLoopC extends DeltaWithPhase with DeltaWithGrammar {
   object Increment extends NodeField
 
   object Body extends NodeField
-
-  override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visit(path => path.clazz match {
-      case ForLoopType => transformForLoop(path)
-      case _ =>
-    })
-  }
-  
-  def transformForLoop(forLoopPath: Path): Unit = {
-    val forLoop: ForLoop[Node] = forLoopPath.current
-    val whileBody = forLoop.body ++
-      Seq(ExpressionAsStatementC.create(forLoop.increment))
-    val _while = WhileDelta.create(forLoop.condition, whileBody)
-
-    val newStatements = Seq[Node](forLoop.initializer, _while)
-    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
-  }
-
-  override def description: String = "Enables using the non-iterator for loop."
 }

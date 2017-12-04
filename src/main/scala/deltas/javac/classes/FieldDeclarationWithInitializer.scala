@@ -9,8 +9,8 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallC
-import deltas.javac.methods.{MethodDelta, VariableC}
-import deltas.javac.statements.ExpressionAsStatementC
+import deltas.javac.methods.{MethodDelta, VariableDelta}
+import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 
 import scala.collection.mutable.ArrayBuffer
@@ -33,8 +33,8 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val _type = LocalDeclarationC.getDeclarationType(fieldWithInitialiser)
     val declaration = FieldDeclaration.field(_type, name)
 
-    val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), LocalDeclarationWithInitializerC.getInitializer(fieldWithInitialiser))
-    val assignmentStatement = ExpressionAsStatementC.create(assignment)
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), LocalDeclarationWithInitializerC.getInitializer(fieldWithInitialiser))
+    val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
     fieldWithInitialiser.replaceWith(declaration)
   }
@@ -59,7 +59,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
-        val callToFieldInitialiser = ExpressionAsStatementC.create(CallC.call(VariableC.variable(getFieldInitialiserMethodName)))
+        val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallC.call(VariableDelta.variable(getFieldInitialiserMethodName)))
         constructor(MethodDelta.Body) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }
@@ -70,7 +70,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   }
 
   def statementIsSuperCall(statement: Node): Boolean = {
-    statement.clazz == ExpressionAsStatementC.key &&
-      ExpressionAsStatementC.getExpression(statement).clazz == SuperCallExpression.SuperCall
+    statement.clazz == ExpressionAsStatementDelta.key &&
+      ExpressionAsStatementDelta.getExpression(statement).clazz == SuperCallExpression.SuperCall
   }
 }

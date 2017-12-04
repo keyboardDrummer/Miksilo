@@ -7,15 +7,15 @@ import core.deltas.path.{Path, SequenceElement}
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.statements.IfThenC._
+import deltas.javac.statements.IfThenDelta._
 
-object IfThenElseC extends StatementInstance {
+object IfThenElseDelta extends StatementInstance {
 
   override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
     val methodInfo = ifThenElse.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
-    val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo, compilation)
+    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
+    val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo)
     val endLabel = InferredStackFrames.label(endLabelName)
     val elseLabel = InferredStackFrames.label(elseLabelName)
     val thenBody = getThenStatements(ifThenElse)
@@ -39,7 +39,7 @@ object IfThenElseC extends StatementInstance {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
-    val ifThenGrammar = find(IfThenC.key)
+    val ifThenGrammar = find(IfThenDelta.key)
     val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode key
     statementGrammar.addOption(ifThenElseGrammar)
   }
@@ -55,7 +55,7 @@ object IfThenElseC extends StatementInstance {
 
   override def getLabels(obj: Path): Map[Any, Path] = {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
-    Map(IfThenC.getNextLabel(getThenStatements(obj).last) -> next, IfThenC.getNextLabel(getElseStatements(obj).last) -> next) ++
+    Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }
 

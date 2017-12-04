@@ -8,7 +8,7 @@ import deltas.javac.statements.locals.LocalDeclarationC
 
 object JavaSimpleStatement extends TransformationGroup {
 
-  override def dependencies: Set[Contract] = Set(LocalDeclarationC, IfThenC, ExpressionAsStatementC, ForLoopC)
+  override def dependencies: Set[Contract] = Set(LocalDeclarationC, IfThenDelta, ExpressionAsStatementDelta, ForLoopDelta)
 
   override def dependants: Set[Contract] = Set(JavaClassSkeleton)
 }

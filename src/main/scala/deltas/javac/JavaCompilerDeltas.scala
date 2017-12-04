@@ -3,7 +3,7 @@ package deltas.javac
 import application.compilerCockpit.PrettyPrint
 import core.deltas._
 import deltas.bytecode._
-import deltas.bytecode.additions.PoptimizeC
+import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions._
@@ -44,7 +44,7 @@ object JavaCompilerDeltas {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoC)
+      TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -56,23 +56,23 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ForLoopContinueC, JavaGotoC, ForLoopC, LocalDeclarationWithInitializerC) ++
+  def javaMethod = Seq(ForLoopContinueDelta, JavaGotoDelta, ForLoopDelta, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementC, VariableC) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
+    AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenElseC, IfThenC, WhileContinueDelta, WhileDelta, BlockDelta,
-    ExpressionAsStatementC, StatementSkeleton) ++ javaSimpleExpression
+  def javaSimpleStatement = Seq(IfThenElseDelta, IfThenDelta, WhileContinueDelta, WhileDelta, BlockDelta,
+    ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
-  def javaSimpleExpression: Seq[Delta] = Seq(TernaryC, EqualityDelta,
+  def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
     BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
-    Seq(LessThanInstructionC, GreaterThanInstructionDelta, NotInstructionC, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsC) ++
+    Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++
     simpleByteCodeTransformations
 
-  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeC) ++
+  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeDelta) ++
     Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool) ++ byteCodeDeltas
 
   def byteCodeDeltas: Seq[Delta] = byteCodeInstructions ++ byteCodeWithoutInstructions

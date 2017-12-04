@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
 import org.scalatest.FunSuite
-import deltas.bytecode.additions.PoptimizeC
+import deltas.bytecode.additions.PoptimizeDelta
 import deltas.javac.JavaCompilerDeltas
 import util.{CompilerBuilder, TestUtils}
 
@@ -13,7 +13,7 @@ class TestLong extends FunSuite {
 
   test("longWithoutPoptimize") {
     val regularParticles = JavaCompilerDeltas.javaCompilerDeltas
-    val withoutPoptimize = regularParticles.filter(p => p != PoptimizeC)
+    val withoutPoptimize = regularParticles.filter(p => p != PoptimizeDelta)
     new TestUtils(CompilerBuilder.build(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
   }
 

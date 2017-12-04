@@ -15,7 +15,7 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Instruction[Node
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {
     val instruction = instructions(instructionIndex)
 
-    val jumpBehavior = instruction.clazz.jumpBehavior
+    val jumpBehavior = instruction.jumpBehavior
     var result = Set.empty[Int]
     if (jumpBehavior.movesToNext)
       result += instructionIndex + 1

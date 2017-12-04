@@ -3,8 +3,8 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.path.Path
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{MemberSelector, VariableC}
-import deltas.javac.methods.VariableC.VariableKey
+import deltas.javac.methods.{MemberSelector, VariableDelta}
+import deltas.javac.methods.VariableDelta.VariableKey
 
 object VariableReferenceKind extends Delta {
   override def inject(state: Language): Unit = {
@@ -16,7 +16,7 @@ object VariableReferenceKind extends Delta {
 
   def getReferenceKind(variable: Path, classCompiler: ClassCompiler): ReferenceKind = {
 
-    val name = VariableC.getVariableName(variable)
+    val name = VariableDelta.getVariableName(variable)
     val isClass = classCompiler.classNames.contains(name)
     if (isClass)
       new ClassOrObjectReference(classCompiler.findClass(name), true)
@@ -30,7 +30,7 @@ object VariableReferenceKind extends Delta {
     }
   }
 
-  override def dependencies: Set[Contract] = Set(VariableC, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(VariableDelta, JavaClassSkeleton)
 
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 }

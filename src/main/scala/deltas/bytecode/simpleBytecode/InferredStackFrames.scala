@@ -13,7 +13,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String) = LabelDelta.key.create(LabelDelta.Name -> name)
+  def label(name: String): Node = LabelDelta.key.create(LabelDelta.Name -> name)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: ClassFile[Node] = program

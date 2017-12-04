@@ -1,6 +1,6 @@
 package deltas.javac.statements
 
-import core.deltas.{Compilation, Language, NodeGrammar}
+import core.deltas.{Compilation, Contract, Language, NodeGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass}
 import core.deltas.path.Path
@@ -13,10 +13,10 @@ object WhileContinueDelta extends StatementInstance {
   def continue = new Node(ContinueKey)
 
 
-  override def dependencies = super.dependencies ++ Set(WhileDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(WhileDelta)
 
   override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
-    val startLabel = WhileDelta.getRegistry(compilation).whileStartLabels(getWhileParent(statement))
+    val startLabel = WhileDelta.getState(compilation).whileStartLabels(getWhileParent(statement))
     Seq(LabelledLocations.goTo(startLabel))
   }
 
@@ -33,8 +33,6 @@ object WhileContinueDelta extends StatementInstance {
   }
 
   def getWhileParent(obj: Path): Path = {
-    val ancestors = obj.ancestors
-    val _whileParent = ancestors.filter(ancestor => ancestor.clazz == WhileDelta.WhileKey).head
-    _whileParent
+    obj.findAncestorClass(WhileDelta.key)
   }
 }

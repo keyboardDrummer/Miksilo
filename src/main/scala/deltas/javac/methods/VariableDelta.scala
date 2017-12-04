@@ -11,7 +11,7 @@ import deltas.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeC
 
-object VariableC extends ExpressionInstance {
+object VariableDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
 
@@ -39,7 +39,7 @@ object VariableC extends ExpressionInstance {
   }
 
   def getVariableInfo(variable: Path, compilation: Compilation): VariableInfo = {
-    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(VariableC.getVariableName(variable))
+    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(VariableDelta.getVariableName(variable))
   }
 
   override def toByteCode(variable: Path, compilation: Compilation): Seq[Node] = {

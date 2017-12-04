@@ -26,10 +26,10 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
 
     new InstructionTypeAnalysis(instructions) {
       override def getSideEffects(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSideEffects =
-        instruction.clazz.getVariableUpdates(instruction, typeState)
+        instruction.delta.getVariableUpdates(instruction, typeState)
 
       override def getSignature(typeState: ProgramTypeState, instruction: Instruction[Node]): InstructionSignature =
-        instruction.clazz.getSignature(instruction, typeState, language)
+        instruction.delta.getSignature(instruction, typeState, language)
     }
   }
 

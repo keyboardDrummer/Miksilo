@@ -2,7 +2,7 @@ package deltas.bytecode
 
 import core.deltas.node.{Node, NodeWrapper}
 import org.scalatest.FunSuite
-import deltas.bytecode.additions.PoptimizeC
+import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, StoreIntegerDelta}
@@ -77,7 +77,7 @@ class TestPoptimize extends FunSuite {
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
-    val compiler = CompilerBuilder.build(Seq(PoptimizeC) ++ JavaCompilerDeltas.byteCodeDeltas)
+    val compiler = CompilerBuilder.build(Seq(PoptimizeDelta) ++ JavaCompilerDeltas.byteCodeDeltas)
     compiler.transform(clazz)
     NodeWrapper.unwrapList(codeAnnotation.instructions)
   }

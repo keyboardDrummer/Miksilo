@@ -3,7 +3,7 @@ package deltas.javac.constructor
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.javac.methods.MethodDelta
-import deltas.javac.statements.ExpressionAsStatementC
+import deltas.javac.statements.ExpressionAsStatementDelta
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorDelta)
@@ -23,7 +23,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
       }
 
       if (addSuperCall)
-        constructor(MethodDelta.Body) = Seq(ExpressionAsStatementC.create(SuperCallExpression.superCall())) ++ statements
+        constructor(MethodDelta.Body) = Seq(ExpressionAsStatementDelta.create(SuperCallExpression.superCall())) ++ statements
     }
   }
 

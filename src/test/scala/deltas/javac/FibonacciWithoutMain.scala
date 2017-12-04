@@ -9,7 +9,7 @@ import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.expressions.relational.LessThanC
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.methods.ReturnExpressionDelta
-import deltas.javac.methods.VariableC._
+import deltas.javac.methods.VariableDelta._
 import deltas.javac.methods.call.CallC._
 import util.CompilerBuilder
 import util.TestUtils
@@ -35,7 +35,7 @@ class FibonacciWithoutMain {
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralDelta.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionC.subtraction(variable("i"), IntLiteralDelta.literal(2))))
     val condition = LessThanC.lessThan(variable("i"), IntLiteralDelta.literal(2))
-    val returnValue = TernaryC.ternary(condition, IntLiteralDelta.literal(1), AdditionDelta.addition(recursiveCall1, recursiveCall2))
+    val returnValue = TernaryDelta.ternary(condition, IntLiteralDelta.literal(1), AdditionDelta.addition(recursiveCall1, recursiveCall2))
     val body = Seq(ReturnExpressionDelta._return(returnValue))
     method("fibonacci", IntTypeC.intType, parameters, body, static = true)
   }

@@ -8,22 +8,21 @@ import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareNotEqualDelta, IfNotZero, IfZeroDelta}
 import deltas.bytecode.extraBooleanInstructions.GreaterThanInstructionDelta.GreaterThanInstructionKey
 import deltas.bytecode.extraBooleanInstructions.IntegerEqualsInstructionDelta.IntegerEqualsInstructionKey
-import deltas.bytecode.extraBooleanInstructions.LessThanInstructionC.LessThanInstructionKey
-import deltas.bytecode.extraBooleanInstructions.NotInstructionC.NotInstructionKey
+import deltas.bytecode.extraBooleanInstructions.LessThanInstructionDelta.LessThanInstructionKey
+import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta.NotInstructionKey
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 import scala.collection.mutable
 
 object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionC, IfIntegerCompareNotEqualDelta,
-    NotInstructionC, IntegerEqualsInstructionDelta)
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, LessThanInstructionDelta, IfIntegerCompareNotEqualDelta,
+    NotInstructionDelta, IntegerEqualsInstructionDelta)
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
 
     val clazz = program
-    val codeAnnotations: Seq[Node] = CodeAttributeDelta.getCodeAnnotations(clazz)
-
+    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(clazz)
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }

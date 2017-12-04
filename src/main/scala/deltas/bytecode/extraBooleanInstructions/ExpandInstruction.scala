@@ -6,12 +6,12 @@ import deltas.bytecode.coreInstructions.InstructionWithGrammar
 
 trait ExpandInstruction extends Delta with InstructionWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(ExpandVirtualInstructionsC)
+  override def dependencies: Set[Contract] = Set(ExpandVirtualInstructionsDelta)
 
   def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node]
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ExpandVirtualInstructionsC.getRegistry(state).expandInstruction.put(key, this)
+    ExpandVirtualInstructionsDelta.getRegistry(state).expandInstruction.put(key, this)
   }
 }

@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
-import core.deltas.{Language, Delta, DeltaWithGrammar}
+import core.deltas.{Delta, Language}
 
-object JavaGotoC extends Delta {
+object JavaGotoDelta extends Delta {
 
   override def inject(state: Language): Unit = {
     JustJavaGoto.inject(state)

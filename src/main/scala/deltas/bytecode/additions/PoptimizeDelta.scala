@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions._
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysisForMethod
 import deltas.bytecode.types.TypeSkeleton
 
-object PoptimizeC extends DeltaWithPhase {
+object PoptimizeDelta extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(PopDelta)
 
@@ -27,7 +27,7 @@ object PoptimizeC extends DeltaWithPhase {
 
       def getInOutSizes(instructionIndex: Int) = {
         val instruction = instructions(instructionIndex)
-        val signature = instruction.clazz.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
+        val signature = instruction.delta.getSignature(instruction, typeAnalysis.typeStatePerInstruction(instructionIndex), compilation)
         getSignatureInOutLengths(compilation.language, signature)
       }
 

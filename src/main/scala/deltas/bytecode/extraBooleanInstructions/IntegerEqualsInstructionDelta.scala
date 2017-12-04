@@ -16,8 +16,8 @@ object IntegerEqualsInstructionDelta extends ExpandInstruction {
   override val key = IntegerEqualsInstructionKey
 
   override def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node] = {
-    val falseStartLabel = LabelDelta.getUniqueLabel("falseStart", methodInfo, state)
-    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo, state)
+    val falseStartLabel = LabelDelta.getUniqueLabel("falseStart", methodInfo)
+    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo)
     Seq(LabelledLocations.ifIntegerCompareEquals(falseStartLabel),
       SmallIntegerConstantDelta.integerConstant(0),
       LabelledLocations.goTo(endLabel),

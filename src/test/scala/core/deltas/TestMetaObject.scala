@@ -4,7 +4,7 @@ import core.deltas.node.{Node, NodeClass, NodeField}
 import org.scalatest.FunSuite
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.methods.call.CallC
-import deltas.javac.methods.{MemberSelector, VariableC}
+import deltas.javac.methods.{MemberSelector, VariableDelta}
 
 class TestMetaObject extends FunSuite {
 
@@ -15,10 +15,10 @@ class TestMetaObject extends FunSuite {
   }
 
   test("EqualsOnJavaModel") {
-    val first = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
-      List(CallC.call(VariableC.variable("fibonacci"), List(IntLiteralDelta.literal(5)))))
-    val second = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableC.variable("System"), "out"), "print"),
-      List(CallC.call(VariableC.variable("fibonacci"), List(IntLiteralDelta.literal(5)))))
+    val first = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableDelta.variable("System"), "out"), "print"),
+      List(CallC.call(VariableDelta.variable("fibonacci"), List(IntLiteralDelta.literal(5)))))
+    val second = CallC.call(MemberSelector.selector(MemberSelector.selector(VariableDelta.variable("System"), "out"), "print"),
+      List(CallC.call(VariableDelta.variable("fibonacci"), List(IntLiteralDelta.literal(5)))))
     assertResult(first)(second)
   }
 

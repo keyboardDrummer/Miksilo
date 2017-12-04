@@ -12,7 +12,7 @@ import deltas.javac.statements.StatementSkeleton
 object JavaSimpleExpression extends TransformationGroup {
 
   override def dependencies: Set[Contract] =
-    Set(LessThanC, AdditionDelta, BooleanLiteralC, IntLiteralDelta, SubtractionC, TernaryC, ParenthesisC, NullC, EqualityDelta) ++
+    Set(LessThanC, AdditionDelta, BooleanLiteralC, IntLiteralDelta, SubtractionC, TernaryDelta, ParenthesisC, NullC, EqualityDelta) ++
       Set[Contract](AssignmentPrecedence) //TODO not sure
 
   override def dependants: Set[Contract] = Set(StatementSkeleton)

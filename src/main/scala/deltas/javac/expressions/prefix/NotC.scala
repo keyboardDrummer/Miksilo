@@ -4,7 +4,7 @@ import core.deltas.{Compilation, Language}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
 import core.deltas.path.Path
-import deltas.bytecode.extraBooleanInstructions.NotInstructionC
+import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeC
 
@@ -19,7 +19,7 @@ object NotC extends ExpressionInstance {
   override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
 
   override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = {
-    ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionC.not)
+    ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionDelta.not)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

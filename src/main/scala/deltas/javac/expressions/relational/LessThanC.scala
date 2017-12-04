@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
-import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionC}
+import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.bytecode.types.{IntTypeC, TypeSkeleton}
 import deltas.javac.types.BooleanTypeC
@@ -14,7 +14,7 @@ object GreaterThanC extends ExpressionInstance {
 
   val key = GreaterThanKey
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 
   override def toByteCode(lessThan: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
@@ -58,13 +58,13 @@ object LessThanC extends ExpressionInstance {
 
   val key = LessThanKey
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionC)
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 
   override def toByteCode(lessThan: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
-    firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionC.lessThanInstruction)
+    firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionDelta.lessThanInstruction)
   }
 
   def getFirst[T <: NodeLike](lessThan: T) = lessThan(LessThanFirst).asInstanceOf[T]

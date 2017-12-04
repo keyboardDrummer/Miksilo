@@ -6,10 +6,10 @@ import core.deltas.node.{Node, NodeClass, NodeField}
 import core.deltas.path.{Path, PathRoot, SequenceElement}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.methods.VariableC
+import deltas.javac.methods.VariableDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.statements.locals.LocalDeclarationC.{Name, Type}
-import deltas.javac.statements.{ExpressionAsStatementC, StatementSkeleton}
+import deltas.javac.statements.{ExpressionAsStatementDelta, StatementSkeleton}
 
 object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -41,9 +41,9 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
     val declaration = LocalDeclarationC.declaration(name, _type)
-    val assignment = AssignmentSkeleton.assignment(VariableC.variable(name), getInitializer(declarationWithInitializer))
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), getInitializer(declarationWithInitializer))
 
-    val assignmentStatement = ExpressionAsStatementC.create(assignment)
+    val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     val originSequence = declarationWithInitializer.asInstanceOf[SequenceElement]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }

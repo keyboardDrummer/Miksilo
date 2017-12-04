@@ -9,7 +9,7 @@ import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MemberSelector.{Member, Target, Clazz}
-import deltas.javac.methods.{MemberSelector, VariableC}
+import deltas.javac.methods.{MemberSelector, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 
 object AssignToMember extends DeltaWithGrammar {
@@ -34,7 +34,7 @@ object AssignToMember extends DeltaWithGrammar {
     import grammars._
     val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
-    val variableGrammar = find(VariableC.VariableGrammar)
+    val variableGrammar = find(VariableDelta.VariableGrammar)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Clazz)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addOption(selectGrammar)

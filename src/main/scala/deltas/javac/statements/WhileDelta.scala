@@ -8,19 +8,19 @@ import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object WhileDelta extends StatementInstance with WithLanguageRegistry {
+object WhileDelta extends StatementInstance with WithCompilationState {
 
-  override val key = WhileKey
+  override def description: String = "Enables using the while construct."
 
   override def toByteCode(_while: Path, compilation: Compilation): Seq[Node] = {
     val methodInfo = _while.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val startLabel = LabelDelta.getUniqueLabel("start", methodInfo, compilation)
-    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo, compilation)
+    val startLabel = LabelDelta.getUniqueLabel("start", methodInfo)
+    val endLabel = LabelDelta.getUniqueLabel("end", methodInfo)
 
-    val conditionInstructions = ExpressionSkeleton.getToInstructions(compilation)(getCondition(_while))
-    getRegistry(compilation).whileStartLabels += _while.current -> startLabel
+    val conditionInstructions = ExpressionSkeleton.getToInstructions(compilation)(_while.condition)
+    getState(compilation).whileStartLabels += _while -> startLabel
 
-    val body = getBody(_while)
+    val body = _while.body
     val bodyInstructions = body.flatMap(statement => StatementSkeleton.getToInstructions(compilation)(statement))
 
     Seq(InferredStackFrames.label(startLabel)) ++
@@ -28,10 +28,6 @@ object WhileDelta extends StatementInstance with WithLanguageRegistry {
       Seq(LabelledLocations.ifZero(endLabel)) ++
       bodyInstructions ++ Seq(LabelledLocations.goTo(startLabel), InferredStackFrames.label(endLabel))
   }
-
-  def getCondition[T <: NodeLike](_while: T) = _while(Condition).asInstanceOf[T]
-
-  def getBody[T <: NodeLike](_while: T) = _while(Body).asInstanceOf[Seq[T]]
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 
@@ -46,20 +42,10 @@ object WhileDelta extends StatementInstance with WithLanguageRegistry {
     statementGrammar.addOption(whileGrammar)
   }
 
-  def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
-
-  object WhileKey extends NodeClass
-
-  object Condition extends NodeField
-
-  object Body extends NodeField
-
-  override def description: String = "Enables using the while construct."
-
   def startKey(_while: NodeLike) = (_while,"start")
   def endKey(_while: NodeLike) = (_while,"end")
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
-    super.getNextStatements(obj, labels) ++ getBody(obj).take(1)
+    super.getNextStatements(obj, labels) ++ obj.body.take(1)
   }
 
   override def getLabels(_whilePath: Path): Map[Any, Path] = {
@@ -67,15 +53,30 @@ object WhileDelta extends StatementInstance with WithLanguageRegistry {
     val current = _while.current
     val next = _while.next
     var result: Map[Any,Path] = Map(startKey(current) -> _while, endKey(current) -> next)
-    val body = getBody(_whilePath)
+    val body = _whilePath.body
     if (body.nonEmpty)
       result += getNextLabel(body.last) -> next
     result
   }
 
-  class Registry {
-    var whileStartLabels: Map[Node, String] = Map.empty
+  class State {
+    var whileStartLabels: Map[Path, String] = Map.empty
   }
 
-  override def createRegistry = new Registry()
+  override def createState = new State()
+
+  implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def condition: T = node(Condition).asInstanceOf[T]
+    def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
+  }
+
+  def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
+
+  override val key = WhileKey
+
+  object WhileKey extends NodeClass
+
+  object Condition extends NodeField
+
+  object Body extends NodeField
 }

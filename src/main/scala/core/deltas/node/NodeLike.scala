@@ -2,25 +2,6 @@ package core.deltas.node
 
 import scala.collection.mutable
 
-object NodeWrapper
-{
-  implicit def wrapList[TNodeWrapper, T <: NodeLike](list: Seq[T])(implicit wrap: T => TNodeWrapper): Seq[TNodeWrapper] =
-    list.map(n => wrap(n))
-  implicit def unwrapList[T <: NodeLike](list: Seq[NodeWrapper[T]]): Seq[T] = list.map(n => n.node)
-  implicit def unwrap[T <: NodeLike] (wrapper: NodeWrapper[T]): T = wrapper.node
-}
-
-trait NodeWrapper[T <: NodeLike] {
-  def node: T
-
-  def get(key: NodeField): Option[Any] = node.get(key)
-  def apply(key: NodeField): Any = node.apply(key)
-  def update(key: NodeField, value: Any): Unit = node.update(key, value)
-  def clazz = node.clazz
-  def clazz_=(value: NodeClass) = node.clazz = value
-  def dataView: Map[NodeField, Any] = node.dataView
-}
-
 trait NodeLike {
   type Self <: NodeLike
   def get(key: NodeField): Option[Any]
@@ -34,6 +15,10 @@ trait NodeLike {
     var result = List.empty[Self]
     visit(node => result = node :: result)
     result
+  }
+
+  def visitClass(clazz: NodeClass): Seq[Self] = {
+    selfAndDescendants.filter(p => p.clazz == clazz)
   }
 
   def visit(afterChildren: (Self) => Unit = _ => {},

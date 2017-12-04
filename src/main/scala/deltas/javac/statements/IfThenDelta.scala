@@ -8,7 +8,7 @@ import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object IfThenC extends StatementInstance {
+object IfThenDelta extends StatementInstance {
 
   object IfThenKey extends NodeClass
 
@@ -23,7 +23,7 @@ object IfThenC extends StatementInstance {
   override def toByteCode(ifThen: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
     val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelDelta.getUniqueLabel("end", method, compilation)
+    val endLabelName = LabelDelta.getUniqueLabel("end", method)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 
@@ -63,7 +63,7 @@ object IfThenC extends StatementInstance {
 
   override def getLabels(obj: Path): Map[Any, Path] = {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
-    Map(IfThenC.getNextLabel(getThenStatements(obj).last) -> next) ++
+    Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }
 }

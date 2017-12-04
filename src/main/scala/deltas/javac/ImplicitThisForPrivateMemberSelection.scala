@@ -10,7 +10,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.call.CallC
-import deltas.javac.methods.{MemberSelector, MethodDelta, VariableC}
+import deltas.javac.methods.{MemberSelector, MethodDelta, VariableDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
   val thisName: String = "this"
@@ -20,7 +20,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   def addThisToVariable(compilation: Compilation, variable: Path) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val name = VariableC.getVariableName(variable)
+    val name = VariableDelta.getVariableName(variable)
     val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
     if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
@@ -36,10 +36,10 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     }
   }
 
-  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: Path) = {
-    val name = VariableC.getVariableName(variable)
+  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: Path): Unit = {
+    val name = VariableDelta.getVariableName(variable)
     val newVariableName = if (classMember._static) currentClass.name else thisName
-    val selector = MemberSelector.selector(VariableC.variable(newVariableName), name)
+    val selector = MemberSelector.selector(VariableDelta.variable(newVariableName), name)
     variable.replaceWith(selector)
   }
 
@@ -58,19 +58,19 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.clazz match {
-            case ByteCodeSkeleton.Clazz =>
-              JavaLang.loadIntoClassPath(compilation)
+        case ByteCodeSkeleton.Clazz =>
+          JavaLang.loadIntoClassPath(compilation)
 
-              val classCompiler = ClassCompiler(obj, compilation)
-              getState(compilation).classCompiler = classCompiler
-              classCompiler.bind()
+          val classCompiler = ClassCompiler(obj, compilation)
+          getState(compilation).classCompiler = classCompiler
+          classCompiler.bind()
 
-            case MethodDelta.Clazz => MethodDelta.setMethodCompiler(obj, compilation)
-            case VariableC.VariableKey => addThisToVariable(compilation, obj)
-            case _ =>
-          }
-          true
-        })
+        case MethodDelta.Clazz => MethodDelta.setMethodCompiler(obj, compilation)
+        case VariableDelta.VariableKey => addThisToVariable(compilation, obj)
+        case _ =>
+      }
+      true
+    })
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

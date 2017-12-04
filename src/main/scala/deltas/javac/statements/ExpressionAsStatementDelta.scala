@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.bytecode.types.TypeSkeleton
 
-object ExpressionAsStatementC extends StatementInstance {
+object ExpressionAsStatementDelta extends StatementInstance {
 
   object Clazz extends NodeClass
 
