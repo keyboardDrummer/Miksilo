@@ -7,11 +7,8 @@ import core.deltas.path.Path
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object WhileContinueDelta extends StatementInstance {
-  override val key = ContinueKey
 
-  object ContinueKey extends NodeClass
-  def continue = new Node(ContinueKey)
-
+  override def description: String = "Jumps the program to the start of the loop."
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(WhileDelta)
 
@@ -25,7 +22,10 @@ object WhileContinueDelta extends StatementInstance {
     statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey))
   }
 
-  override def description: String = "Jumps the program to the start of the loop."
+  override val key = ContinueKey
+
+  object ContinueKey extends NodeClass
+  def continue = new Node(ContinueKey)
 
   override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
     val _whileParent: Path = getWhileParent(obj)

@@ -21,14 +21,14 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
       expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %
-      blockGrammar.as(Body) asNode ForLoopType
+      blockGrammar.as(Body) asNode Clazz
     statementGrammar.addOption(forLoopGrammar)
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visitClass(ForLoopType).foreach(transformForLoop)
+    PathRoot(program).visitClass(Clazz).foreach(transformForLoop)
   }
-  
+
   def transformForLoop(forLoopPath: Path): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
@@ -54,9 +54,9 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
-    new Node(ForLoopType, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
+    new Node(Clazz, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
-  object ForLoopType extends NodeClass
+  object Clazz extends NodeClass
 
   object Initializer extends NodeField
 
