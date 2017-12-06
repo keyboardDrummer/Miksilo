@@ -22,7 +22,7 @@ trait NodeLike {
   }
 
   def visitClass(clazz: NodeClass, afterChildren: (Self) => Unit): Unit = {
-    visit(afterChildren, node => node.clazz == clazz)
+    visit(node => if (node.clazz == clazz) afterChildren(node))
   }
 
   def visit(afterChildren: (Self) => Unit = _ => {},
