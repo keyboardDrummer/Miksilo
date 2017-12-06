@@ -7,6 +7,6 @@ trait DeltaWithPhase extends Delta {
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    state.compilerPhases ::= new Phase(this.name, description, compilation => transformProgram(compilation.program, compilation))
+    state.compilerPhases ::= Phase(this, compilation => transformProgram(compilation.program, compilation))
   }
 }

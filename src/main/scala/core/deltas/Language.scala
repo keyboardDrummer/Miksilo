@@ -8,7 +8,7 @@ import core.deltas.node.Node
 import scala.collection.mutable
 import scala.util.Random
 
-case class Phase(name: String, description: String, action: Compilation => Unit)
+case class Phase(key: Delta, action: Compilation => Unit)
 
 class Language {
 

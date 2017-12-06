@@ -31,7 +31,7 @@ class TestParseTypes extends FunSuite {
   }
 
   test("labelWithAppendFrame") {
-    val input = "label \"start-4962768465676381896\"\n        append frame int int"
+    val input = "label start-4962768465676381896\n        append frame int int"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttributeDelta.InstructionGrammar)
     assertResult(LabelDelta.LabelKey)(result.asInstanceOf[Node].clazz)
@@ -39,7 +39,7 @@ class TestParseTypes extends FunSuite {
 
   test("labelWithAppendFrameInInstructions1") {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
-      "label \"start-4962768465676381896\"\n        same frame\n iload 2 \n    Exceptions:"
+      "label start-4962768465676381896\n        same frame\n iload 2 \n    Exceptions:"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].clazz)

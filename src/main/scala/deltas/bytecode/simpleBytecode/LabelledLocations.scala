@@ -139,7 +139,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for(jump <- jumpInstructionDeltas)
     {
       val grammar = find(jump.key)
-      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammer.as(JumpName) asNode jump.key
+      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammar.as(JumpName) asNode jump.key
     }
   }
 }

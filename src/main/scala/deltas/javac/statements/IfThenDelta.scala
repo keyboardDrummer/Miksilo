@@ -10,6 +10,8 @@ import deltas.javac.expressions.ExpressionSkeleton
 
 object IfThenDelta extends StatementInstance {
 
+  def neww(condition: Node, thenBody: Seq[Node]): Node = key.create(Condition -> condition, Then -> thenBody)
+
   object IfThenKey extends NodeClass
 
   object Condition extends NodeField

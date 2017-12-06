@@ -21,6 +21,10 @@ trait NodeLike {
     selfAndDescendants.filter(p => p.clazz == clazz)
   }
 
+  def visitClass(clazz: NodeClass, afterChildren: (Self) => Unit): Unit = {
+    visit(afterChildren, node => node.clazz == clazz)
+  }
+
   def visit(afterChildren: (Self) => Unit = _ => {},
             beforeChildren: (Self) => Boolean = _ => true,
             visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {

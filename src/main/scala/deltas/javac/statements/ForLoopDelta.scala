@@ -25,8 +25,8 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     statementGrammar.addOption(forLoopGrammar)
   }
 
-  override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visitClass(Clazz).foreach(transformForLoop)
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    PathRoot(program).visitClass(Clazz, path => transformForLoop(path))
   }
 
   def transformForLoop(forLoopPath: Path): Unit = {

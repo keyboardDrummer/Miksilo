@@ -23,11 +23,11 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
   def apply(key: NodeField) = get(key).get
   def update(key: NodeField, value: Any): Unit = current(key) = value
   def get(key: NodeField): Option[Any] = current.data.get(key).map {
-    case childObject: Node => new FieldValue(this, key)
+    case childObject: Node => FieldValue(this, key)
     case sequence: Seq[_] => sequence.indices.map(index => {
       val element = sequence(index)
       element match {
-        case childObject: Node => new SequenceElement(this, key, index)
+        case childObject: Node => SequenceElement(this, key, index)
         case _ => element
       }
     })

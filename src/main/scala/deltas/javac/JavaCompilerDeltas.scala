@@ -56,12 +56,12 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ForLoopContinueDelta, JavaGotoDelta, ForLoopDelta, LocalDeclarationWithInitializerC) ++
+  def javaMethod = Seq(ForLoopContinueDelta, JavaGotoDelta, ForLoopDelta, WhileContinueDelta, WhileDelta, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
   def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenElseDelta, IfThenDelta, WhileContinueDelta, WhileDelta, BlockDelta,
+  def javaSimpleStatement = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
