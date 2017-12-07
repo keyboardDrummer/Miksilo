@@ -92,18 +92,18 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def getStackMapTable(labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
-    val framesPerLocation = instructions.filter(i => i.clazz == LabelDelta.LabelKey).map(i => new Label(i)).
-      map(i => (labelLocations(i.name), i.stackFrame)).toMap
+    val locationsWithFrame = instructions.filter(i => i.clazz == LabelDelta.LabelKey).map(i => new Label(i)).
+      map(i => (labelLocations(i.name), i.stackFrame))
     var locationAfterPreviousFrame = 0
     var stackFrames = ArrayBuffer[Node]()
-    stackFrames.sizeHint(framesPerLocation.size)
-    for (location <- framesPerLocation.keys.toSeq.sorted) {
-      val frame = framesPerLocation(location)
+    stackFrames.sizeHint(locationsWithFrame.size)
+    for ((location, frame) <- locationsWithFrame) {
       val offset = location - locationAfterPreviousFrame
-
-      frame(StackMapTableAttribute.FrameOffset) = offset
-      stackFrames += frame
-      locationAfterPreviousFrame = location + 1
+      if (offset >= 0) { //TODO add a test-case for consecutive labels.
+        frame(StackMapTableAttribute.FrameOffset) = offset
+        stackFrames += frame
+        locationAfterPreviousFrame = location + 1
+      }
     }
     if (stackFrames.nonEmpty) {
       Seq(StackMapTableAttribute.Clazz.create(

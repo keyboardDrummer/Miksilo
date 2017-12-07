@@ -16,7 +16,6 @@ object WhileDelta extends DeltaWithPhase with DeltaWithGrammar {
     PathRoot(program).visitClass(WhileKey, path => transformWhileLoop(path, compilation))
   }
 
-  object WhileStart extends NodeField
   def transformWhileLoop(whileLoopPath: Path, compilation: Compilation): Unit = {
     val method = whileLoopPath.findAncestorClass(MethodDelta.Clazz)
     val whileLoop: While[Node] = whileLoopPath.current
@@ -24,7 +23,6 @@ object WhileDelta extends DeltaWithPhase with DeltaWithGrammar {
     val startLabel = JustJavaLabel.label(label)
     val ifBody = whileLoop.body ++ Seq(JustJavaGoto.goto(label))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
-    _if(WhileStart) = label
 
     val newStatements = Seq[Node](startLabel, _if)
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)

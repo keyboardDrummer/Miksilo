@@ -19,7 +19,7 @@ object InstructionDelta {
     def jumpBehavior: JumpBehavior = delta.jumpBehavior
   }
   case class InstructionClazz(delta: InstructionDelta) extends NodeClass {
-    override lazy val toString: String = delta.toString
+    override lazy val toString: String = delta.name
   }
 }
 

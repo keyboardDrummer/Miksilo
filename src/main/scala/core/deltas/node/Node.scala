@@ -76,7 +76,7 @@ class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
   }
 
   override def toString: String = {
-    val className = Node.classDebugRepresentation(clazz)
+    val className = clazz.toString
     if (data.isEmpty)
       return className
     s"$className: ${data.map(kv => (Node.classDebugRepresentation(kv._1), kv._2))}"
