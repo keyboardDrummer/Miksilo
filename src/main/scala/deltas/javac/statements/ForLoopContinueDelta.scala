@@ -20,7 +20,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Path, String], language: Language): Unit = {
-    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopDelta.Clazz || ancestor.clazz == WhileDelta.WhileKey)
+    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopDelta.Clazz || ancestor.clazz == WhileLoopDelta.WhileKey)
     containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopDelta.Clazz).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, addAndReturnBeforeIncrementLabel(containingForLoop))
       continuePath.replaceWith(JustJavaGoto.goto(label))

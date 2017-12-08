@@ -6,8 +6,9 @@ import core.deltas.node._
 import core.deltas.path.{Path, PathRoot}
 import deltas.javac.expressions.additive.AdditionDelta
 
-//TODO refactor so it uses a phase to reduce itself.
-object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
+object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
+
+  override def description: String = "Defines the += operator."
 
   override def dependencies: Set[Contract] = Set(AdditionDelta, AssignmentSkeleton)
 
@@ -22,12 +23,6 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
     assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
-  object IncrementAssignmentKey extends NodeClass
-
-  object TargetKey extends NodeField
-
-  object ValueKey extends NodeField
-
   def transformIncrementAssignment(incrementAssignment: Path, state: Language): Unit = {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
@@ -37,11 +32,17 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    new PathRoot(program).visit(obj => obj.clazz match {
+    PathRoot(program).visit(obj => obj.clazz match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })
   }
+
+  object IncrementAssignmentKey extends NodeClass
+
+  object TargetKey extends NodeField
+
+  object ValueKey extends NodeField
 
   def getValue[T <: NodeLike](incrementAssignment: T): T = {
     incrementAssignment(ValueKey).asInstanceOf[T]
@@ -50,6 +51,4 @@ object IncrementAssignmentC extends DeltaWithPhase with DeltaWithGrammar {
   def getTarget[T <: NodeLike](incrementAssignment: T): T = {
     incrementAssignment(TargetKey).asInstanceOf[T]
   }
-
-  override def description: String = "Defines the += operator."
 }

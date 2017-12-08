@@ -11,7 +11,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Enables using the non-iterator for loop."
 
-  override def dependencies: Set[Contract] = Set(WhileDelta)
+  override def dependencies: Set[Contract] = Set(WhileLoopDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -33,7 +33,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementDelta.create(forLoop.increment))
-    val _while = WhileDelta.create(forLoop.condition, whileBody)
+    val _while = WhileLoopDelta.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
     forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)

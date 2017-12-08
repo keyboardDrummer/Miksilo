@@ -81,6 +81,14 @@ class TestUtils(val compiler: TestingCompiler) extends FunSuite {
     state.output
   }
 
+  def compareWithJavacAfterRunning(className: String, input: String): Unit = {
+    val tempDirectory = Directory.makeTemp()
+    tempDirectory.createDirectory()
+    val file = (tempDirectory / (className + ".java")).toFile
+    file.writeAll(input)
+    compareWithJavacAfterRunning(file.name, file.parent)
+  }
+
   def compareWithJavacAfterRunning(fileName: String, inputDirectory: Path = Path("")) {
     val className = SourceUtils.fileNameToClassName(fileName)
 

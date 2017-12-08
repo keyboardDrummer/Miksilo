@@ -13,7 +13,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Moves the control flow to the start of the while loop."
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(WhileDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(WhileLoopDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[Path, String]()
@@ -21,19 +21,19 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def transformContinue(continuePath: Path, startLabels: mutable.Map[Path, String], language: Language): Unit = {
-    val containingWhile = continuePath.findAncestorClass(WhileDelta.WhileKey)
+    val containingWhile = continuePath.findAncestorClass(WhileLoopDelta.WhileKey)
     val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(containingWhile))
     continuePath.replaceWith(JustJavaGoto.goto(label))
   }
 
   def addStartLabel(whilePath: Path): String = {
     val method = whilePath.findAncestorClass(MethodDelta.Clazz)
-    val startLabel = LabelDelta.getUniqueLabel("start", method)
+    val startLabel = LabelDelta.getUniqueLabel("whileStart", method)
     whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(JustJavaLabel.label(startLabel), whilePath.current))
     startLabel
   }
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey))
   }

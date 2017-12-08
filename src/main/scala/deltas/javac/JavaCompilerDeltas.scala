@@ -29,7 +29,7 @@ import deltas.javac.expressions.postfix.PostFixIncrementC
 import deltas.javac.expressions.prefix.NotC
 import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
 import deltas.javac.methods._
-import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentC}
+import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceC
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
@@ -56,9 +56,9 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ForLoopContinueDelta, JavaGotoDelta, ForLoopDelta, WhileContinueDelta, WhileDelta, LocalDeclarationWithInitializerC) ++
+  def javaMethod = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
-  def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentC, AssignToVariable, AssignmentSkeleton,
+  def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,

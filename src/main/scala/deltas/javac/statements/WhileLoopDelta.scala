@@ -8,7 +8,7 @@ import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MethodDelta
 
-object WhileDelta extends DeltaWithPhase with DeltaWithGrammar {
+object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Adds a while loop."
 
@@ -28,7 +28,7 @@ object WhileDelta extends DeltaWithPhase with DeltaWithGrammar {
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, BlockDelta, JavaGotoDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._

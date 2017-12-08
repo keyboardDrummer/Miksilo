@@ -9,7 +9,7 @@ import deltas.javac.expressions.additive.{AdditionDelta, SubtractionC}
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.expressions.relational.LessThanC
 import deltas.javac.methods._
-import deltas.javac.methods.assignment.IncrementAssignmentC
+import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallC
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.JavaCompilerDeltas
@@ -87,7 +87,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("IncrementAssignment") {
     val input = "x += 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation = IncrementAssignmentC.incrementAssignment(VariableDelta.variable("x"), IntLiteralDelta.literal(1))
+    val expectation = IncrementAssignmentDelta.incrementAssignment(VariableDelta.variable("x"), IntLiteralDelta.literal(1))
     assertResult(expectation)(result)
   }
 

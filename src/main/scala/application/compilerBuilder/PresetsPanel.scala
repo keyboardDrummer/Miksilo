@@ -14,7 +14,7 @@ import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
-import deltas.javac.methods.assignment.IncrementAssignmentC
+import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.{BlockCompilerDelta, ImplicitReturnAtEndOfMethod}
 import deltas.javac.statements.{ForLoopDelta, ForLoopContinueDelta}
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
@@ -76,7 +76,7 @@ object PresetsPanel
 
   def getRevealSyntaxSugar: Preset = {
     val implicits = Seq[Delta](DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
-      ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentC, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerC,
+      ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
     new Preset("Reveal Syntax Sugar", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
