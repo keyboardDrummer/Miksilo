@@ -8,8 +8,6 @@ import org.fife.ui.rsyntaxtextarea._
 import scala.util.matching.Regex
 import scala.util.parsing.input.CharArrayReader
 
-
-
 class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
 
   class Converter extends GrammarToParserConverter

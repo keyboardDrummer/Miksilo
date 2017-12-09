@@ -25,6 +25,7 @@ The operators have the following meaning:
 - `indent` indents the grammar on which it is applied, but only when printing.
 
 With the defined BiGrammar, we can parse the following program (ugly formatting is intentional)
+
 ```java
 while (i){
   i--; x += 2;
@@ -48,7 +49,8 @@ Body:
       Value: 2  
 ```
 which can be pretty printed to
-```Java
+
+```java
 while(i) {
   i--;
   x += 2;

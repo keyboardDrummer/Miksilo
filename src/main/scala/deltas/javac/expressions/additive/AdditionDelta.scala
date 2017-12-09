@@ -11,12 +11,14 @@ import deltas.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
 object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
+  override def description: String = "Adds the + operator."
+
   val key = Clazz
 
   override def toByteCode(addition: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
-    val firstInstructions = toInstructions(getFirst(addition))
-    val secondInstructions = toInstructions(getSecond(addition))
+    val firstInstructions = toInstructions(addition.left)
+    val secondInstructions = toInstructions(addition.right)
     firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {
       case x if x == IntTypeC.intType => Seq(AddIntegersDelta.addIntegers())
       case x if x == LongTypeC.longType => Seq(AddLongsDelta.addLongs())
@@ -26,8 +28,8 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def getType(expression: Path, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
-    val firstType = getType(getFirst(expression))
-    val secondType = getType(getSecond(expression))
+    val firstType = getType(expression.left)
+    val secondType = getType(expression.right)
     firstType match
     {
       case x if x == IntTypeC.intType =>
@@ -40,29 +42,29 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
         LongTypeC.longType
       case _ => throw new NotImplementedError()
     }
-
   }
-
-  def getFirst[T <: NodeLike](addition: T) = addition(First).asInstanceOf[T]
-
-  def getSecond[T <: NodeLike](addition: T) = addition(Second).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val additiveGrammar = find(AddAdditivePrecedence.Grammar)
-    val parseAddition = additiveGrammar.as(First) ~~< "+" ~~ additiveGrammar.as(Second) asNode Clazz
+    val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Clazz
     additiveGrammar.addOption(parseAddition)
   }
 
-  def addition(first: Node, second: Node) = new Node(Clazz, First -> first, Second -> second)
+implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  def left: T = node(Left).asInstanceOf[T]
+  def left_=(value: T): Unit = node(Left) = value
+
+  def right: T = node(Right).asInstanceOf[T]
+  def right_=(value: T): Unit = node(Right) = value
+}
+
+  def addition(first: Node, second: Node) = new Node(Clazz, Left -> first, Right -> second)
 
   object Clazz extends NodeClass
 
-  object First extends NodeField
-
-  object Second extends NodeField
-
-  override def description: String = "Adds the + operator."
+  object Left extends NodeField
+  object Right extends NodeField
 }

@@ -1,12 +1,12 @@
 ---
-title: Effective Blender
+title: No boilerplate
 category: Core
 order: 4
 ---
 
 > This article is under construction.
 
-To use Blender effectively requires writing some boilerplate. For each type of `Node`, we need to define one `NodeClass` object, and a `NodeField` object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of `NodeWrapper`. Scala macro's might help us here in the future, but currently they are not mature enough. For now we've written a generator for the boilerplate. Here follows an example of the generator in action:
+To use Blender effectively, we have to write some boilerplate. For each type of `Node`, we need to define one `NodeClass` object, and a `NodeField` object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of `NodeWrapper`. In the future, Scala macro's might help us to generate this boilerplate, but currently they are not mature enough. For now we've written a generator instead. Here follows an example of the generator in action:
 
 Given the following input:
 ```scala
@@ -17,6 +17,7 @@ object ClassFileDelta {
     "methods" -> wrapSeq("Seq[MethodInfo]"),
     "attributes" -> "Seq[Node]"
   )
+}
 ```
 It outputs:
 ```scala

@@ -5,7 +5,7 @@ layout: default
 
 {% include home-banner.html %}
 
-Blender is a language workbench, which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>. Language workbenches often define one or several _metalanguages_, which are used to define (parts of) a language.
+Blender is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. A popular example of a language workbench is <a href="https://www.jetbrains.com/mps/">Jetbrain's Meta Programming System</a>. Language workbenches often define one or several _metalanguages_, which are used to define (parts of) a language.
 
 Blender's focus is on modular language design. These are the properties that make it so modular:
 
@@ -20,4 +20,4 @@ The best way to show Blender's modularity is by example. Here are examples of la
 
 - [Add support for comments to an automatic refactoring, in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
 - [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
-- [Remove stack frames in Java bytecode by inferring them.](http://keyboarddrummer.github.io/Blender/deltas/infer-stack-frames/)
+- [Interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)

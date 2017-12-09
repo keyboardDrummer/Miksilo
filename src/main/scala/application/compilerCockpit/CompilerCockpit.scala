@@ -76,14 +76,14 @@ class CompilerCockpit(val name: String, val particles: Seq[Delta],
 
   def setOutputText(text: String, useThisGrammar: Grammar = null) {
     outputDocument.replace(0, outputDocument.getLength, text, null)
-    if (useThisGrammar != null)
-    {
-      outputDocument.setSyntaxStyle(new TokenMakerFromGrammar(useThisGrammar))
-    }
-    else
-    {
+//    if (useThisGrammar != null)
+//    {
+//      outputDocument.setSyntaxStyle(new TokenMakerFromGrammar(useThisGrammar))
+//    }
+//    else
+//    {
       outputDocument.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_NONE)
-    }
+    //}
   }
 
   def setInputText(text: String) {

@@ -9,6 +9,9 @@ import deltas.javac.methods.MethodDelta
 
 import scala.collection.mutable
 
+/*
+For each while loop containing a continue, as start label is placed before the while loop, and the continue's are translated to go-to statements that target the start label.
+ */
 object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Moves the control flow to the start of the while loop."

@@ -25,7 +25,7 @@ object IfThenDelta extends StatementInstance {
   override def toByteCode(ifThen: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
     val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
-    val endLabelName = LabelDelta.getUniqueLabel("end", method)
+    val endLabelName = LabelDelta.getUniqueLabel("ifEnd", method)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
 
@@ -51,7 +51,7 @@ object IfThenDelta extends StatementInstance {
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
-    val ifThenGrammar = create(IfThenKey, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") ~ bodyGrammar.as(Then)).
+    val ifThenGrammar = create(IfThenKey, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") % bodyGrammar.as(Then)).
       asNode(IfThenKey))
     statementGrammar.addOption(ifThenGrammar)
   }

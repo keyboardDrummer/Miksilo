@@ -1,5 +1,5 @@
 ---
-title: Related projects
+title: Related work
 category: Discussion
 order: 1
 ---

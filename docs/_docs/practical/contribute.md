@@ -1,5 +1,5 @@
 ---
-title: Contributions
+title: Contribute
 category: Practical
 order: 2
 ---

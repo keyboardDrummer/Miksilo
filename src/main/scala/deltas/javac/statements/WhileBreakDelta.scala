@@ -15,12 +15,12 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val statementGrammar = grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(new NodeGrammar("break;", BreakKey))
+    statementGrammar.addOption(new NodeGrammar("break;", BreakClazz))
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val endLabels = new mutable.HashMap[Path, String]()
-    PathRoot(program).visitClass(BreakKey, path => transformBreak(path, endLabels, compilation))
+    PathRoot(program).visitClass(BreakClazz, path => transformBreak(path, endLabels, compilation))
   }
 
   def transformBreak(continuePath: Path, endLabels: mutable.Map[Path, String], language: Language): Unit = {
@@ -36,5 +36,5 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
     endLabel
   }
 
-  object BreakKey extends NodeClass
+  object BreakClazz extends NodeClass
 }
