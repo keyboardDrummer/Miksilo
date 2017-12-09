@@ -18,6 +18,6 @@ Blender's focus is on modular language design. These are the properties that mak
 
 The best way to show Blender's modularity is by example. Here are examples of language transformations demonstrating the power of Blender:
 
-- [Add support for comments to an automatic refactoring, in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
+- [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
 - [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
-- [Interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
+- [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)

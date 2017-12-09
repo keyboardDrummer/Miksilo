@@ -1,8 +1,8 @@
----
-title: What is a language?
-category: Core
-order: 1
----
+<!-- --- -->
+<!-- title: What is a language? -->
+<!-- category: Core -->
+<!-- order: 1 -->
+<!-- --- -->
 
 > This article is under construction
 

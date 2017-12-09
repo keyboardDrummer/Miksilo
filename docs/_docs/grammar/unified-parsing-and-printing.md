@@ -59,21 +59,25 @@ while(i) {
 
 ### Choice, ignore and value
 Here is another example grammar:
+
 ```scala
 "yes" ~> value(true) | "no" ~> value(false)
 ```
+
 - `|` is the choice operator. If the left grammar fails to parse/print, then the right grammar is used.
-- The `<` and `>` symbols can be added to the end of existing operators to create a variation, `<` means ignore the result of the grammar to the right, so `a ~> b` means `a` left of `b`, but ignore the result of `a` when parsing.
+- The `<` and `>` symbols can be added to the end of existing sequence operators to create a variation of that operator, `<` means ignore the result of the grammar to the right. For example, `a ~> b` means `a` left of `b`, but ignore the result of `a` when parsing.
 - `value` has no effect on the syntax, it will produce a value when parsing and consume one while printing.
 
 ### Regex and map
 Here is another example:
+
 ```scala
 new RegexGrammar("""-?\d+""".r).map(
   afterParsing = (s: String) => Integer.parseInt(s), 
   beforePrinting =  (i: Int) => Some(i.toString)
 )
 ```
+
 - `RegexGrammar` turns a regular expression into a grammar
 - `map` transforms the grammar's value using a bidirectional mapping. The argument `beforePrinting` returns an `Option` to allow printing to fail if the passed value does not belong to the grammar.
 
