@@ -2,7 +2,7 @@ package application.compilerBuilder
 
 import javax.swing.JPanel
 
-import core.deltas.Delta
+import core.deltas.{Contract, Delta}
 import util.Cache
 
 import scala.collection.mutable
@@ -10,15 +10,15 @@ import scala.collection.mutable
 class ParticleLabelPainter(container: JPanel, availableDeltas: Set[Delta]) {
   val dependants = getDependants
   var selection: Seq[Delta] = Seq.empty
-  val dependenciesCache = new Cache[Set[Delta]](() => selection.flatMap(s => s.dependencies2).toSet)
-  val dependantsCache = new Cache[Set[Delta]](() => selection.flatMap(s => dependants(s)).toSet)
+  val dependenciesCache = new Cache[Set[Contract]](() => selection.flatMap(s => s.dependencies).toSet)
+  val dependantsCache = new Cache[Set[Contract]](() => selection.flatMap(s => dependants(s)).toSet)
 
-  def getDependants = {
-    val dependants = new mutable.HashMap[Delta, mutable.Set[Delta]]()
-      with mutable.MultiMap[Delta, Delta]
+  private def getDependants = {
+    val dependants = new mutable.HashMap[Contract, mutable.Set[Contract]]()
+      with mutable.MultiMap[Contract, Contract]
 
     for (particle <- availableDeltas) {
-      for (dependency <- particle.dependencies2) {
+      for (dependency <- particle.dependencies) {
         dependants.addBinding(dependency, particle)
       }
     }

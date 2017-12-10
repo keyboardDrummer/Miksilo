@@ -81,14 +81,14 @@ class Language(val deltas: Seq[Delta]) {
 
   //Bad order error
   //All missing dependencies.
-  def validateDependencies(transformations: Seq[Delta]): Unit = {
+  def validateDependencies(deltas: Seq[Delta]): Unit = {
     var available = Set.empty[Contract]
-    for (transformation <- transformations.reverse) {
-      transformation.dependencies.foreach(dependency =>
+    for (delta <- deltas.reverse) {
+      delta.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
-          throw DeltaDependencyViolation(dependency, transformation)
+          throw DeltaDependencyViolation(dependency, delta)
       )
-      available += transformation
+      available += delta
     }
   }
 }

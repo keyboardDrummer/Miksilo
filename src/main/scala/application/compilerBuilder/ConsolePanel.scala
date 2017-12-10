@@ -2,13 +2,11 @@ package application.compilerBuilder
 
 import java.awt.BorderLayout
 import javax.swing.event.{ListDataEvent, ListDataListener}
-import javax.swing.{BorderFactory, DefaultListModel, JPanel, JTextArea}
+import javax.swing.{BorderFactory, JPanel, JTextArea}
 
-import core.document.Empty
 import core.deltas.{Contract, Delta}
+import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
-
-import scala.collection.convert.Wrappers.JEnumerationWrapper
 
 class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new BorderLayout()) {
 
@@ -26,7 +24,7 @@ class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new
     override def contentsChanged(e: ListDataEvent): Unit = refreshConsolePanel()
   })
 
-  def refreshConsolePanel() = {
+  def refreshConsolePanel(): Unit = {
     val errors = getDependencyErrors(selectedParticles.scalaElements)
     val document = errors.map(e => e.toDocument).fold[ResponsiveDocument](Empty)((a, b) => a %% b)
     console.setText(document.renderString())
@@ -38,20 +36,20 @@ class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new
   object MissingDependenciesError extends DependencyError {
     override def toDocument: ResponsiveDocument = "Some dependencies are missing."
   }
-  case class BadOrderError(dependency: Delta, dependant: Delta) extends DependencyError {
+  case class BadOrderError(dependency: Contract, dependant: Contract) extends DependencyError {
     override def toDocument: ResponsiveDocument = s"Dependency ${dependency.name} should be placed below ${dependant.name}."
   }
 
-  def getDependencyErrors(transformations: Seq[Delta]) : Set[DependencyError] = {
-    val allTransformations = transformations.toSet
+  def getDependencyErrors(deltas: Seq[Delta]) : Set[DependencyError] = {
+    val allDeltas = deltas.toSet[Contract]
     var available = Set.empty[Contract]
     var result = Set.empty[DependencyError]
-    var badOrderErrors = Map.empty[Delta, BadOrderError]
-    for (transformation <- transformations.reverse) {
-      transformation.dependencies2.foreach(dependency =>
+    var badOrderErrors = Map.empty[Contract, BadOrderError]
+    for (transformation <- deltas.reverse) {
+      transformation.dependencies.foreach(dependency =>
         if (!available.contains(dependency))
         {
-          if (!allTransformations.contains(dependency))
+          if (!allDeltas.contains(dependency))
           {
             result += MissingDependenciesError
           } else

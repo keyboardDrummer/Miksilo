@@ -74,12 +74,24 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     state
   }
 
-  class WrappedDelta(delta: Delta) extends Delta {
+  class WrappedContract(contract: Contract) extends Contract {
+
+    override def toString: String = contract.toString
+
+    override def dependencies: Set[Contract] = contract.dependencies.map(dependency => new WrappedContract(dependency))
+
+    override def equals(obj: scala.Any): Boolean = obj.equals(contract)
+
+    override def hashCode(): Int = contract.hashCode()
+
+  }
+
+  class WrappedDelta(delta: Delta) extends WrappedContract(delta) with Delta {
     override def description: String = delta.description
 
-    override def inject(language: Language): Unit = statistics.profile("inject " + delta.name, delta.inject(language))
+    override lazy val toString: String = delta.toString
 
-    override def dependencies: Set[Contract] = delta.dependencies
+    override def inject(language: Language): Unit = statistics.profile("inject " + delta.name, delta.inject(language))
 
     override def equals(obj: scala.Any): Boolean = obj.equals(delta)
 
