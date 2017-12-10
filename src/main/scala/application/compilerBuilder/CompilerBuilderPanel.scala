@@ -18,7 +18,7 @@ object CompilerBuilderPanel {
 
 class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
 
-  val painter = new ParticleLabelPainter(this, CompilerBuilderPanel.availableParticles)
+  val painter = new DeltaLabelPainter(this, CompilerBuilderPanel.availableParticles)
 
   setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED))
   setAutoscrolls(true)

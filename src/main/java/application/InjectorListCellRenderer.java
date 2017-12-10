@@ -1,7 +1,7 @@
 package application;
 
 import application.compilerBuilder.DeltaInstance;
-import application.compilerBuilder.ParticleLabelPainter;
+import application.compilerBuilder.DeltaLabelPainter;
 import application.compilerCockpit.MarkOutputGrammar$;
 import core.deltas.Delta;
 
@@ -9,9 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class InjectorListCellRenderer extends DefaultListCellRenderer {
-  private ParticleLabelPainter painter;
+  private DeltaLabelPainter painter;
 
-  public InjectorListCellRenderer(ParticleLabelPainter painter) {
+  public InjectorListCellRenderer(DeltaLabelPainter painter) {
     this.painter = painter;
   }
 
