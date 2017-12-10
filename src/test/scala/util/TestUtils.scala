@@ -19,7 +19,7 @@ import scala.sys.process.Process
 object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
 }
 
-class TestUtils(val compiler: TestingCompiler) extends FunSuite {
+class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
   def toFile(program: String): String = {
     val fileName = File.makeTemp(suffix = ".java")

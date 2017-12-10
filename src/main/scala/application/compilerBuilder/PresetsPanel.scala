@@ -8,7 +8,7 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.deltas.{CompilerFromDeltas, Delta}
+import core.deltas.{Delta, Language}
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
@@ -16,31 +16,30 @@ import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.{BlockCompilerDelta, ImplicitReturnAtEndOfMethod}
-import deltas.javac.statements.{ForLoopDelta, ForLoopContinueDelta}
+import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
 
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset = {
-    new Preset("Simplified bytecode", new CompilerFromDeltas(JavaCompilerDeltas.simpleByteCodeTransformations).
-      spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar)),
-      "Simplified JVM bytecode.")
+    val deltas = Language.spliceBeforeTransformations(JavaCompilerDeltas.simpleByteCodeTransformations, JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))
+    Preset("Simplified bytecode", deltas, "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
-    new Preset("Java to simplified bytecode",
+    Preset("Java to simplified bytecode",
       JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
 
   def getJavaToExtendedByteCodePreset = {
-    new Preset("Java to extended bytecode",
+    Preset("Java to extended bytecode",
       JavaCompilerDeltas.spliceBeforeTransformations(JavaCompilerDeltas.allByteCodeDeltas, Seq(MarkOutputGrammar)),
       "Compiles Java into extended bytecode")
   }
 
   def getJavaCompilerPreset: Preset = {
-    new Preset("JavaSubset", getJavaCompilerParticles, "Compiles a subset of Java.")
+    Preset("JavaSubset", getJavaCompilerParticles, "Compiles a subset of Java.")
   }
 
   def getJavaCompilerParticles: Seq[Delta] = {
@@ -48,12 +47,12 @@ object PresetsPanel
   }
 
   def getPrettyPrintPreset = {
-    new Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompilerDeltas.javaCompilerDeltas,
+    Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaCompilerDeltas.javaCompilerDeltas,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
   def getFibonacciExpressionMethodPreset = {
-    new Preset("Java with expression method", Seq(ExpressionMethodDelta) ++ getJavaCompilerParticles,
+    Preset("Java with expression method", Seq(ExpressionMethodDelta) ++ getJavaCompilerParticles,
       "Allows you to use an expression as the body of a method.")
   }
 

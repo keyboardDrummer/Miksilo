@@ -12,12 +12,12 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.MethodDelta._
-import deltas.javac.methods.call.CallStaticOrInstanceC
+import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements.BlockDelta
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceC, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceDelta, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
 
   case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
 

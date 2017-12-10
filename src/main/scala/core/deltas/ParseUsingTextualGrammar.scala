@@ -4,7 +4,7 @@ import core.deltas.node.Node
 
 object ParseUsingTextualGrammar extends Delta {
   override def inject(language: Language): Unit = {
-    language.parse = input => {
+    language._parse = input => {
       val inputString = scala.io.Source.fromInputStream(input).mkString
       val manager = new DeltasToParserConverter()
       manager.parse(language.grammars.root, inputString).asInstanceOf[Node]

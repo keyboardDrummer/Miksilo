@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecia
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.call.{CallC, CallStaticOrInstanceC}
+import deltas.javac.methods.call.{CallC, CallStaticOrInstanceDelta}
 import deltas.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
@@ -26,7 +26,7 @@ object NewC extends ExpressionInstance {
     expressionGrammar.addOption(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
   override val key = NewCallKey
 

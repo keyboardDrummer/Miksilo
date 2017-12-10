@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, CompilerFromDeltas}
+import core.deltas.{Compilation, Language}
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.PackageSignature
@@ -9,7 +9,7 @@ import util.SourceUtils
 
 object JavaLang {
 
-  val compiler = new CompilerFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
+  val compiler = new Language(ClassFileSignatureDecompiler.getDecompiler)
 
   val systemClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("System.class")).program
   val printStreamClass: Node = compiler.parseAndTransform(SourceUtils.getTestFile("PrintStream.class")).program

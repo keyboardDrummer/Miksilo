@@ -26,7 +26,7 @@ class JavaStyleCommentsTest
   object ChildName extends NodeField
 
   test("comments with trivia inside node on tiny grammar") {
-    val language = new Language
+    val language = new Language(Seq.empty)
     val grammars = language.grammars
     import grammars._
 
@@ -124,7 +124,7 @@ class JavaStyleCommentsTest
     val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
-    val language = new Language()
+    val language = new Language(Seq.empty)
     language.grammars.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammars, language)
 

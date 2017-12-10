@@ -1,0 +1,92 @@
+package util
+
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.StandardCharsets
+
+import core.deltas._
+import core.deltas.node.Node
+
+import scala.reflect.io.{Directory, File}
+
+class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
+  val statistics = new Statistics(CompilerBuilder.statistics)
+
+  lazy val language: Language = statistics.profile("build language", buildLanguage)
+
+  def parseAndTransform(input: File): Compilation = {
+    val state: Compilation = parseAndTransform(input.inputStream())
+    state
+  }
+
+  def compile(input: File, outputDirectory: Directory): Compilation = {
+    val state: Compilation = parseAndTransform(input.inputStream())
+
+    PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
+    state
+  }
+
+  def transform(program: Node): Compilation = {
+    val state = new Compilation(language)
+    state.program = program
+    runPhases(state)
+    state
+  }
+
+  def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = implicits.toSet
+    deltas.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+  }
+
+  def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = implicits.toSet
+    implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
+  }
+
+  def replace(marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
+    val pivot = deltas.indexWhere(particle => marker == particle)
+    val (before,after) = deltas.splitAt(pivot)
+    before ++ splice ++ after.drop(1)
+  }
+
+  private def runPhases(state: Compilation): Unit = {
+    statistics.profile("running phases", {
+      for(phase <- language.compilerPhases)
+        statistics.profile("run " + phase.key.description, phase.action(state))
+    })
+  }
+
+  def parse(input: InputStream): Node = {
+    val state = new Compilation(language)
+    justParse(input, state)
+    state.program
+  }
+
+  private def justParse(input: InputStream, state: Compilation): Unit = {
+    statistics.profile("parse", state.program = language.parse(input))
+  }
+
+  def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+
+  def parseAndTransform(input: InputStream): Compilation = {
+    val state = new Compilation(language)
+    justParse(input, state)
+    runPhases(state)
+    state
+  }
+
+  class WrappedDelta(delta: Delta) extends Delta {
+    override def description: String = delta.description
+
+    override def inject(language: Language): Unit = statistics.profile("inject " + delta.name, delta.inject(language))
+
+    override def dependencies: Set[Contract] = delta.dependencies
+
+    override def equals(obj: scala.Any): Boolean = obj.equals(delta)
+
+    override def hashCode(): Int = delta.hashCode()
+  }
+
+  def buildLanguage: Language = {
+    new Language(deltas.map(delta => new WrappedDelta(delta)))
+  }
+}

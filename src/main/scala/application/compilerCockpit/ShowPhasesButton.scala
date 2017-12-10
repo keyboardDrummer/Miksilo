@@ -1,19 +1,16 @@
 package application.compilerCockpit
 
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.ActionEvent
 import javax.swing.JButton
 
 import core.deltas.Phase
 
 class ShowPhasesButton(compilerCockpit: CompilerCockpit) extends JButton("Show phases") {
-  addActionListener(new ActionListener {
-    override def actionPerformed(e: ActionEvent): Unit = {
-      val state = compilerCockpit.compiler.buildLanguage
-      val text: String = state.compilerPhases.zipWithIndex.
-        map(indexedPhase => getIndexedPhaseDescription(indexedPhase)).
-        reduce((a,b) => a + "\n\n" + b)
-      compilerCockpit.setOutputText(text)
-    }
+  addActionListener((e: ActionEvent) => {
+    val text: String = compilerCockpit.language.compilerPhases.zipWithIndex.
+      map(indexedPhase => getIndexedPhaseDescription(indexedPhase)).
+      reduce((a, b) => a + "\n\n" + b)
+    compilerCockpit.setOutputText(text)
   })
 
   def getIndexedPhaseDescription(indexedPhase: (Phase, Int)): String = {

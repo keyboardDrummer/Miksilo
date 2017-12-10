@@ -30,7 +30,7 @@ import deltas.javac.expressions.prefix.NotC
 import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
-import deltas.javac.methods.call.CallStaticOrInstanceC
+import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
@@ -38,7 +38,7 @@ import deltas.javac.types._
 
 object JavaCompilerDeltas {
 
-  def getCompiler = new CompilerFromDeltas(javaCompilerDeltas)
+  def getJava = new Language(javaCompilerDeltas)
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
@@ -56,12 +56,13 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerC) ++
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceC, SelectField, MemberSelector) ++ methodBlock
-  def methodBlock = Seq(LocalDeclarationC, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+  def javaMethod: Seq[Delta] = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerC) ++
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ methodBlock
+
+  def methodBlock: Seq[Delta] = Seq(LocalDeclarationC, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
-  def javaSimpleStatement = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,
+  def javaSimpleStatement: Seq[Delta] = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
@@ -110,19 +111,19 @@ object JavaCompilerDeltas {
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
 
-  def typeTransformations = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
+  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
     SuperTypeArgument, TypeApplication, MethodType) ++
     Seq(ObjectTypeDelta, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
       ShortTypeC, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    getCompiler.spliceBeforeTransformations(implicits, splice)
+    Language.spliceBeforeTransformations(javaCompilerDeltas, implicits, splice)
 
   def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    getCompiler.spliceAfterTransformations(implicits, splice)
+    Language.spliceAfterTransformations(javaCompilerDeltas, implicits, splice)
 
-  def getPrettyPrintJavaToByteCodeCompiler = {
-    new CompilerFromDeltas(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(new PrettyPrint)))
+  def getPrettyPrintJavaToByteCodeCompiler: Language = {
+    new Language(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(new PrettyPrint)))
   }
 }
 

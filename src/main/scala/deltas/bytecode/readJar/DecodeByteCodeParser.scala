@@ -8,7 +8,7 @@ import core.deltas.{Language, Delta}
 
 object DecodeByteCodeParser extends Delta {
   override def inject(state: Language): Unit = {
-    state.parse = decodeStream
+    state._parse = decodeStream
   }
 
   def decodeStream(inputStream: InputStream): Node = {

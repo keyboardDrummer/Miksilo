@@ -12,7 +12,7 @@ import core.bigrammar.BiGrammarToGrammar
 import core.grammar.Grammar
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.deltas.exceptions.CompileException
-import core.deltas.{CompilerFromDeltas, Delta}
+import core.deltas.{Delta, Language}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import deltas.bytecode.ByteCodeSkeleton
@@ -21,13 +21,13 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class CompilerCockpit(val name: String, val particles: Seq[Delta],
+class CompilerCockpit(val name: String, val deltas: Seq[Delta],
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
 
   this.title = name
-  val compiler = new CompilerFromDeltas(particles)
-  val grammar = BiGrammarToGrammar.toGrammar(compiler.language.grammars.root)
+  val language = new Language(deltas)
+  private val grammar = BiGrammarToGrammar.toGrammar(language.grammars.root)
   val factory = new TokenMakerFactoryFromGrammar(grammar)
 
   private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
@@ -45,7 +45,7 @@ class CompilerCockpit(val name: String, val particles: Seq[Delta],
 
   def getCompileOptions: Seq[CompileOption] = {
     val selection = Set(MarkOutputGrammar, ByteCodeSkeleton)
-    val orderedSelection = particles.filter(o => selection.contains(o))
+    val orderedSelection = deltas.filter(o => selection.contains(o))
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
     Seq(PrettyPrintOption) ++ byteCodeActions
   }

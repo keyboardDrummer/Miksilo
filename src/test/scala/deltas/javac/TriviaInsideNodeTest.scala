@@ -17,7 +17,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object ChildName extends NodeField
 
   test("Trivia is moved inside Child Node") {
-    val language = new Language
+    val language = new Language(Seq.empty)
     val grammars = language.grammars
     import grammars._
 
@@ -37,13 +37,13 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   }
 
   test("No doubles") {
-    val language = new Language
+    val language = new Language(Seq.empty)
     val grammars = language.grammars
     import grammars._
 
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
     language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
-    TriviaInsideNode.transformGrammars(grammars, new Language)
+    TriviaInsideNode.transformGrammars(grammars, new Language(Seq.empty))
     val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
@@ -55,7 +55,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object Add extends NodeClass
   object Expression extends GrammarKey
   test("Left Recursive") {
-    val language = new Language
+    val language = new Language(Seq.empty)
     val grammars = language.grammars
     import grammars._
 

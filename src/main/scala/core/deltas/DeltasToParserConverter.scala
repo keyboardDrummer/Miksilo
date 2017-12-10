@@ -6,8 +6,8 @@ import core.grammar.{GrammarToParserConverter, ParseException}
 import scala.util.parsing.input.CharArrayReader
 
 class DeltasToParserConverter extends GrammarToParserConverter {
-  def buildParser(transformations: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
-    val language = new CompilerFromDeltas(transformations).language
+  def buildParser(deltas: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
+    val language = new Language(deltas)
     buildParser(language.grammars.root)
   }
 

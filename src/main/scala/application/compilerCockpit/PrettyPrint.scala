@@ -1,10 +1,8 @@
 package application.compilerCockpit
 
-import java.io.InputStream
-
+import core.bigrammar.BiGrammar
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import core.bigrammar.{BiGrammarToGrammar, BiGrammar}
-import core.deltas.{Phase, Language, CompilerFromDeltas, Delta}
+import core.deltas.{Delta, Language, Phase}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
@@ -31,20 +29,5 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
 
   override def description: String = "Prints the program by generating a pretty printer from its grammar."
 
-  def getOutputGrammar(language: Language) = language.data(this).asInstanceOf[BiGrammar]
-}
-
-object PrettyPrintOption extends CompileOption {
-
-  override def perform(cockpit: CompilerCockpit, input: InputStream): TextWithGrammar = {
-    val prettyPrint = PrettyPrint(recover = true)
-    val splicedParticles = cockpit.compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
-    val compiler = new CompilerFromDeltas(splicedParticles)
-
-    val state = compiler.parseAndTransform(input)
-    val outputGrammar = prettyPrint.getOutputGrammar(state.language)
-    TextWithGrammar(state.output, BiGrammarToGrammar.toGrammar(outputGrammar))
-  }
-
-  override def toString = "Pretty Print"
+  def getOutputGrammar(language: Language): BiGrammar = language.data(this).asInstanceOf[BiGrammar]
 }

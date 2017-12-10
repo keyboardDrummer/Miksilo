@@ -11,14 +11,14 @@ import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.call.{CallC, CallStaticOrInstanceC}
+import deltas.javac.methods.call.{CallC, CallStaticOrInstanceDelta}
 import deltas.javac.statements.StatementSkeleton
 
 object SuperCallExpression extends ExpressionInstance {
   override val key = SuperCall
   val constructorName: String = "<init>"
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceC) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta) ++ super.dependencies
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallC.CallArguments -> arguments)
 

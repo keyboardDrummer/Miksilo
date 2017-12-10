@@ -6,7 +6,7 @@ import core.deltas.path.Path
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 
-object CallStaticOrInstanceC extends GenericCall {
+object CallStaticOrInstanceDelta extends GenericCall {
 
   override def description: String = "Enables calling static and virtual methods."
 
