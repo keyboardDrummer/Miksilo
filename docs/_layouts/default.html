@@ -50,7 +50,7 @@
 				</ul>
 
 				<ul>
-					{% assign categories = "Core, Grammar, Deltas, Practical, Discussion" | split: ", " %}
+					{% assign categories = "Core, BiGrammar, Deltas, Practical, Discussion" | split: ", " %}
 					{% for category in categories %}
 						<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
 							<a href="{{ site.baseurl }}{{ items.first.url }}">{{ category }}</a>

@@ -1,7 +1,7 @@
 ---
-title: BiGrammar
-category: Grammar
-order: 1
+title: Related work
+category: BiGrammar
+order: 4
 ---
 
 Blender's metalanguage for everything syntax related is called BiGrammar, which defines both a parser and a printer at the same time. The techniques underlying this are similar to those described in the paper [Invertible Syntax Descriptions: Unifying Parsing and Pretty Printing](http://www.informatik.uni-marburg.de/~rendel/unparse/rendel10invertible.pdf).

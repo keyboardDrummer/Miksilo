@@ -1,7 +1,7 @@
 ---
 title: Trivia
-category: Grammar
-order: 4
+category: BiGrammar
+order: 3
 ---
 
 In [Modularity](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/) we showed some of the features of BiGrammar that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.

@@ -15,7 +15,4 @@ Once you've composed a language from a set of Delta's you can play around with i
 
 ![Language playground](http://keyboarddrummer.github.io/Blender/images/languagePlayground.png)
 
-
-> Show and mention architecture panel
-
-To see Blender's sandbox in action, watch our [introduction video](http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k).
+To see Blender's sandbox in action, [run it yourself](http://keyboarddrummer.github.io/Blender/practical/build/) or watch our [introduction video](http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k).
