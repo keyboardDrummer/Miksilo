@@ -1,8 +1,7 @@
 package application
 
-import java.awt.Dimension
+import java.awt.event.{FocusEvent, FocusListener}
 import javax.swing._
-import javax.swing.plaf.TabbedPaneUI
 
 import application.compilerBuilder.LanguageWorkbench
 import application.graphing.GraphView
@@ -21,17 +20,16 @@ object Program extends SimpleSwingApplication {
     val tabbedPane = new JTabbedPane()
     
     val compilerBuilder = new LanguageWorkbench()
-    tabbedPane.add("Language construction workbench", compilerBuilder)
+    tabbedPane.add("Language builder", compilerBuilder)
     tabbedPane.setFont(StyleSheet.tabFont)
 
-    val architecturePanel = getGraphComponent
-    tabbedPane.add("Delta dependency graph", architecturePanel)
+    val dependencyGraph = getDependencyGraph
+    tabbedPane.add("Delta dependency graph", dependencyGraph)
 
     contents = Component.wrap(tabbedPane)
-    //architecturePanel.scrollToCenter(true)
   }
 
-  def getGraphComponent = {
+  def getDependencyGraph: mxGraphComponent = {
     val graph = new DeltaGraph()
 
     val mxGraph = new GraphView(graph)
@@ -39,6 +37,19 @@ object Program extends SimpleSwingApplication {
     val graphComponent = new mxGraphComponent(mxGraph)
     graphComponent.setConnectable(false)
     graphComponent.setEnabled(true)
+    graphComponent.addFocusListener(new FocusListener {
+      var firstTime = true
+
+      override def focusGained(e: FocusEvent): Unit = {
+        if (firstTime) {
+          graphComponent.scrollToCenter(true)
+          graphComponent.scrollToCenter(false)
+          firstTime = false
+        }
+      }
+
+      override def focusLost(e: FocusEvent): Unit = {}
+    })
     graphComponent
   }
 }

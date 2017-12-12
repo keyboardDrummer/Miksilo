@@ -43,4 +43,4 @@ implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
 
 The generic type `T` and the type `NodeLike` are used to make the wrapper work on both `Node` and `Path` types. Because `Addition` is an implicit class, we can access `left` and `right` on any value of type `Node`, and Scala will automatically know to use the getters and setters from `Addition`.
 
-If you feel that most of what you've read in this article smells of boilerplate, then don't fret. Instead, read the follow-up article: [no boilerplate](http://keyboarddrummer.github.io/Blender/core/no-boilerplate/) to find a solution.
+If you feel that most of what you've read in this article smells of boilerplate, then don't fret. Instead, read the follow-up article, [no boilerplate](http://keyboarddrummer.github.io/Blender/core/no-boilerplate/), to find a solution.
