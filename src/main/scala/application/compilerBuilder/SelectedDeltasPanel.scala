@@ -1,10 +1,11 @@
 package application.compilerBuilder
 
 import java.awt.BorderLayout
-import java.awt.event.{MouseEvent, ActionEvent, ActionListener}
+import java.awt.event.{ActionEvent, MouseEvent}
 import javax.swing._
-import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
+import javax.swing.event.ListSelectionEvent
 
+import application.StyleSheet
 import core.deltas.Delta
 import org.jdesktop.swingx.JXList
 
@@ -37,26 +38,26 @@ class DeltaInstanceJXList() extends JXList() {
   }
 }
 
-object SelectedParticlesPanel {
-  def getPanel(panel: CompilerBuilderPanel, compilerParticles: DefaultListModel[DeltaInstance]) = {
+object SelectedDeltasPanel {
+  def getPanel(panel: LanguageWorkbench, compilerParticles: DefaultListModel[DeltaInstance]): JPanel = {
     val compilerList = new DeltaInstanceJXList()
-    compilerList.setTransferHandler(new SelectedParticlesTransferHandler(compilerList, compilerParticles))
+    compilerList.setTransferHandler(new SelectedDeltasTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)
     compilerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
     val compilerListPanel = panel.getInjectorListVisuals(compilerList)
-    compilerListPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Selected"))
+    val titledBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Selected")
+    titledBorder.setTitleFont(StyleSheet.defaultFont)
+    compilerListPanel.setBorder(titledBorder)
 
     val removeButton = new JButton("Remove")
-    compilerList.addListSelectionListener(new ListSelectionListener {
-      override def valueChanged(e: ListSelectionEvent): Unit = removeButton.setEnabled(compilerList.getSelectedValues.nonEmpty)
-    })
+    removeButton.setFont(StyleSheet.defaultFont)
+    compilerList.addListSelectionListener((e: ListSelectionEvent) =>
+      removeButton.setEnabled(compilerList.getSelectedValues.nonEmpty))
 
-    removeButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        for (selectedValue <- compilerList.getSelectedValues)
-          compilerParticles.removeElement(selectedValue)
-      }
+    removeButton.addActionListener((e: ActionEvent) => {
+      for (selectedValue <- compilerList.getSelectedValues)
+        compilerParticles.removeElement(selectedValue)
     })
     compilerListPanel.add(removeButton, BorderLayout.PAGE_END)
     compilerListPanel

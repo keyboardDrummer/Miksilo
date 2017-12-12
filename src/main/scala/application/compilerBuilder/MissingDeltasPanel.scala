@@ -1,39 +1,38 @@
 package application.compilerBuilder
 
 import java.awt.BorderLayout
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.ActionEvent
 import javax.swing._
-import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent, ListSelectionListener}
+import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent}
 
+import application.StyleSheet
 import application.graphing.model.DepthFirstTraversal
 import core.deltas.Delta
 
-object MissingParticlesPanel {
+object MissingDeltasPanel {
 
-  def getPanel(panel: CompilerBuilderPanel, selectedParticles: DeltaInstanceList) = {
+  def getPanel(panel: LanguageWorkbench, selectedParticles: DeltaInstanceList): JPanel = {
     val dependentItems = new DefaultListModel[Delta]()
     val dependentList = new ParticleList()
     dependentList.setModel(dependentItems)
     dependentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-    dependentList.setTransferHandler(new ParticleProviderTransferHandler(dependentList))
+    dependentList.setTransferHandler(new DeltaProviderTransferHandler(dependentList))
     dependentList.setDragEnabled(true)
     val dependentPanel = panel.getInjectorListVisuals(dependentList)
     dependentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Missing"))
 
 
     val addButton = new JButton("Add")
-    dependentList.addListSelectionListener(new ListSelectionListener {
-      override def valueChanged(e: ListSelectionEvent): Unit = addButton.setEnabled(dependentList.getSelectedValues.nonEmpty)
-    })
-    addButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        for (selectedValue <- dependentList.getSelectedValues)
-          selectedParticles.addElement(new DeltaInstance(selectedValue.asInstanceOf[Delta]))
-      }
+    addButton.setFont(StyleSheet.defaultFont)
+    dependentList.addListSelectionListener((e: ListSelectionEvent) =>
+      addButton.setEnabled(dependentList.getSelectedValues.nonEmpty))
+    addButton.addActionListener((e: ActionEvent) => {
+      for (selectedValue <- dependentList.getSelectedValues)
+        selectedParticles.addElement(new DeltaInstance(selectedValue.asInstanceOf[Delta]))
     })
     dependentPanel.add(addButton, BorderLayout.PAGE_END)
 
-    def setDependentItems() = {
+    def setDependentItems(): Unit = {
       dependentItems.clear()
       val missingDependencies = getMissingDependencies(selectedParticles.scalaElements)
       for (missingDependency <- missingDependencies)

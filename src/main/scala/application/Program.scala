@@ -1,8 +1,10 @@
 package application
 
+import java.awt.Dimension
 import javax.swing._
+import javax.swing.plaf.TabbedPaneUI
 
-import application.compilerBuilder.CompilerBuilderPanel
+import application.compilerBuilder.LanguageWorkbench
 import application.graphing.GraphView
 import application.graphing.model.DeltaGraph
 import com.mxgraph.swing.mxGraphComponent
@@ -18,8 +20,9 @@ object Program extends SimpleSwingApplication {
 
     val tabbedPane = new JTabbedPane()
     
-    val compilerBuilder = new CompilerBuilderPanel()
+    val compilerBuilder = new LanguageWorkbench()
     tabbedPane.add("Language construction workbench", compilerBuilder)
+    tabbedPane.setFont(StyleSheet.tabFont)
 
     val architecturePanel = getGraphComponent
     tabbedPane.add("Delta dependency graph", architecturePanel)

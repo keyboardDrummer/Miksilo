@@ -3,27 +3,27 @@ package application.compilerBuilder
 import java.awt._
 import javax.swing._
 import javax.swing.border.BevelBorder
-import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
+import javax.swing.event.ListSelectionEvent
 
+import application.compilerBuilder.DeltaInstance._
 import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
 import core.deltas.Delta
-import org.jdesktop.swingx.JXList
 import deltas.javac.JavaCompilerDeltas
-import application.compilerBuilder.DeltaInstance._
+import org.jdesktop.swingx.JXList
 
-object CompilerBuilderPanel {
+object LanguageWorkbench {
   val availableParticles = JavaCompilerDeltas.allDeltas ++ Seq(MarkOutputGrammar)
 }
 
-class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
+class LanguageWorkbench extends JPanel(new GridBagLayout()) {
 
-  val painter = new DeltaLabelPainter(this, CompilerBuilderPanel.availableParticles)
+  val painter = new DeltaLabelPainter(this, LanguageWorkbench.availableParticles)
 
   setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED))
   setAutoscrolls(true)
 
-  val programPanel = new CompilerStatePanel(this)
+  val programPanel = new CurrentLanguagePanel(this)
   val compilerParticles = programPanel.selectedParticles
   val presetsPanel: JPanel = new PresetsPanel(programPanel.compilerName, compilerParticles)
 
@@ -38,16 +38,14 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
   programPanelConstraints.weightx = if (!StyleSheet.presentationMode) 2 else 1
   add(programPanel, programPanelConstraints)
 
-  def getInjectorListVisuals(list: JXList) = {
+  def getInjectorListVisuals(list: JXList): JPanel = {
 
     val result = new JPanel(new BorderLayout())
 
     list.setAutoCreateRowSorter(true)
 
-    list.addListSelectionListener(new ListSelectionListener {
-      override def valueChanged(e: ListSelectionEvent): Unit = {
-        painter.select(list.getSelectedValues.map(i => i.getParticle).toSeq)
-      }
+    list.addListSelectionListener((e: ListSelectionEvent) => {
+      painter.select(list.getSelectedValues.map(i => i.getParticle).toSeq)
     })
 
     val listener = new SearchFieldListener(list)
@@ -63,15 +61,15 @@ class CompilerBuilderPanel extends JPanel(new GridBagLayout()) {
     result
   }
 
-  def getAvailableScrollPane = {
-    val availableItems: Seq[Delta] = CompilerBuilderPanel.availableParticles.toStream.sortBy(i => i.name)
+  def getAvailableScrollPane: JPanel = {
+    val availableItems: Seq[Delta] = LanguageWorkbench.availableParticles.toStream.sortBy(i => i.name)
     val availableList = new ParticleList()
     availableList.setModel(new AbstractListModel[Delta] {
       def getSize: Int = availableItems.length
       def getElementAt(i: Int): Delta = availableItems(i)
     })
 
-    availableList.setTransferHandler(new ParticleProviderTransferHandler(availableList))
+    availableList.setTransferHandler(new DeltaProviderTransferHandler(availableList))
     availableList.setDragEnabled(true)
 
     val result = getInjectorListVisuals(availableList)

@@ -8,7 +8,7 @@ import core.deltas.Delta
 
 import scala.collection.convert.Wrappers.JListWrapper
 
-class ParticleProviderTransferHandler(val availableList: JList[_]) extends TransferHandler {
+class DeltaProviderTransferHandler(val availableList: JList[_]) extends TransferHandler {
 
   @Override
   override def createTransferable(comp: JComponent): Transferable = {

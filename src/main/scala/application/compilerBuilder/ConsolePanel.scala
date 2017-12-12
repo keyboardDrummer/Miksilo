@@ -4,6 +4,7 @@ import java.awt.BorderLayout
 import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, JPanel, JTextArea}
 
+import application.StyleSheet
 import core.deltas.{Contract, Delta}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
@@ -13,7 +14,9 @@ class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new
   val console = new JTextArea()
   console.setBorder(BorderFactory.createLoweredBevelBorder())
 
-  setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Console"))
+  private val titledBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Console")
+  titledBorder.setTitleFont(StyleSheet.defaultFont)
+  setBorder(titledBorder)
   add(console)
 
   selectedParticles.addListDataListener(new ListDataListener {

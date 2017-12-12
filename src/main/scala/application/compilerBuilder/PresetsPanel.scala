@@ -3,7 +3,7 @@ package application.compilerBuilder
 import java.awt.event._
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing._
-import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
+import javax.swing.event.ListSelectionEvent
 import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
@@ -16,12 +16,12 @@ import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.{BlockCompilerDelta, ImplicitReturnAtEndOfMethod}
-import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
+import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 
 object PresetsPanel
 {
-  def getSimplifiedByteCodePreset = {
+  def getSimplifiedByteCodePreset: Preset = {
     val deltas = Language.spliceBeforeTransformations(JavaCompilerDeltas.simpleByteCodeTransformations, JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))
     Preset("Simplified bytecode", deltas, "Simplified JVM bytecode.")
   }
@@ -78,12 +78,12 @@ object PresetsPanel
       ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerC,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
-    new Preset("Reveal Syntax Sugar", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
+    Preset("Reveal Syntax Sugar", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
       "Performs all compiler phases that still maintain a valid Java program.")
   }
 
   def getLabelledLocations = {
-    new Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeDeltas,
+    Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeDeltas,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 
@@ -104,7 +104,8 @@ object PresetsPanel
   }
 }
 
-class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInstanceList) extends JPanel(new GridBagLayout()) {
+class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInstanceList)
+  extends JPanel(new GridBagLayout()) {
 
   initialise()
 
@@ -156,16 +157,13 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInsta
   def getApplyButton(presetsList: JList[Preset]): JButton = {
     val applyButton = new JButton()
     applyButton.setText("Apply")
-    presetsList.addListSelectionListener(new ListSelectionListener {
-      override def valueChanged(e: ListSelectionEvent): Unit =
-        applyButton.setEnabled(!presetsList.isSelectionEmpty)
+    presetsList.addListSelectionListener((e: ListSelectionEvent) =>
+      applyButton.setEnabled(!presetsList.isSelectionEmpty))
+    applyButton.addActionListener((e: ActionEvent) => {
+      val preset: Preset = presetsList.getSelectedValue
+      applyPreset(preset)
     })
-    applyButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        val preset: Preset = presetsList.getSelectedValue
-        applyPreset(preset)
-      }
-    })
+    applyButton.setFont(StyleSheet.defaultFont)
     applyButton
   }
 
@@ -178,5 +176,5 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInsta
 }
 
 case class Preset(name: String, deltas: Seq[Delta], description: String = "") {
-  override def toString = name
+  override def toString: String = name
 }

@@ -1,7 +1,7 @@
 package application.compilerBuilder
 
 import java.awt._
-import java.awt.event.{ActionEvent, ActionListener}
+import java.awt.event.ActionEvent
 import javax.swing._
 import javax.swing.text.PlainDocument
 
@@ -16,7 +16,7 @@ class DeltaInstanceList extends DefaultListModel[DeltaInstance]
   def scalaElements: Seq[Delta] = JEnumerationWrapper(super.elements()).map(instance => instance.delta).toSeq
 }
 
-class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBagLayout()) {
+class CurrentLanguagePanel(panel: LanguageWorkbench) extends JPanel(new GridBagLayout()) {
   val selectedParticles = new DeltaInstanceList()
   val compilerName = new PlainDocument()
 
@@ -44,33 +44,38 @@ class CompilerStatePanel(panel: CompilerBuilderPanel) extends JPanel(new GridBag
     actionButtonsLayout.setAlignment(FlowLayout.RIGHT)
     val actionButtons = new JPanel(actionButtonsLayout)
     val launchCockpitButton = new JButton("Build")
-    launchCockpitButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        val cockpit = new CompilerCockpit(compilerName.getText(0,compilerName.getLength), selectedParticles.scalaElements)
-        cockpit.pack()
-        cockpit.maximize()
-        cockpit.visible = true
-      }
-    })
-    val compilerNameField = new JTextField(20)
+    launchCockpitButton.setFont(StyleSheet.defaultFont)
+    launchCockpitButton.addActionListener((e: ActionEvent) => launchCockpit())
+    val compilerNameField = new JTextField(15)
     compilerNameField.setDocument(compilerName)
-    actionButtons.add(new JLabel("Name:"))
+    compilerNameField.setFont(StyleSheet.defaultFont)
+    val nameLabel = new JLabel("Name:")
+    nameLabel.setFont(StyleSheet.defaultFont)
+    actionButtons.add(nameLabel)
     actionButtons.add(compilerNameField)
     actionButtons.add(launchCockpitButton)
     actionButtons
   }
 
+  private def launchCockpit(): Unit = {
+    val name = compilerName.getText(0, compilerName.getLength)
+    val cockpit = new CompilerCockpit(name, selectedParticles.scalaElements)
+    cockpit.pack()
+    cockpit.maximize()
+    cockpit.visible = true
+  }
+
   def getCompilerTopPanel: JPanel = {
     val firstPanel = new JPanel(new GridBagLayout())
 
-    val compilerListPanel = SelectedParticlesPanel.getPanel(panel, selectedParticles)
+    val compilerListPanel = SelectedDeltasPanel.getPanel(panel, selectedParticles)
     val compilerListConstraints = getConstraints
     compilerListConstraints.gridx = 0
     firstPanel.add(compilerListPanel, compilerListConstraints)
 
     if (!StyleSheet.presentationMode)
     {
-      val dependentPanel: JPanel = MissingParticlesPanel.getPanel(panel, selectedParticles)
+      val dependentPanel: JPanel = MissingDeltasPanel.getPanel(panel, selectedParticles)
       val dependentConstraints = getConstraints
       dependentConstraints.gridx = 1
       firstPanel.add(dependentPanel, dependentConstraints)

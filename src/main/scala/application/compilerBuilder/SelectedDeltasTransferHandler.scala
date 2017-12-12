@@ -7,8 +7,8 @@ import javax.swing.{DefaultListModel, JComponent, JList}
 
 import core.deltas.Delta
 
-class SelectedParticlesTransferHandler(availableList: JList[_], val model: DefaultListModel[DeltaInstance])
-  extends ParticleProviderTransferHandler(availableList) {
+class SelectedDeltasTransferHandler(availableList: JList[_], val model: DefaultListModel[DeltaInstance])
+  extends DeltaProviderTransferHandler(availableList) {
   override def canImport(support: TransferSupport): Boolean = {
     val injectors = getInjectors(support.getTransferable)
     injectors != null
