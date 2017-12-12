@@ -8,7 +8,7 @@ import deltas.javac.methods.assignment.{AssignToVariable, IncrementAssignmentDel
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelector}
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
 
-object JavaMethod extends TransformationGroup {
+object JavaMethod extends DeltaGroup {
 
   override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, LocalDeclarationWithInitializerC, IncrementAssignmentDelta, PostFixIncrementC, AssignToVariable)
 

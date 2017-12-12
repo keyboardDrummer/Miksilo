@@ -2,7 +2,7 @@ package application.compilerCockpit
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import core.deltas.{Delta, Language, Phase}
+import core.deltas.{Contract, Delta, Language, Phase}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
@@ -30,4 +30,6 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
   override def description: String = "Prints the program by generating a pretty printer from its grammar."
 
   def getOutputGrammar(language: Language): BiGrammar = language.data(this).asInstanceOf[BiGrammar]
+
+  override def dependencies: Set[Contract] = Set.empty
 }

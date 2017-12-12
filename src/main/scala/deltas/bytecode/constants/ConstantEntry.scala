@@ -29,5 +29,5 @@ trait ConstantEntry extends DeltaWithGrammar {
   def getName: BiGrammar
   def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 }

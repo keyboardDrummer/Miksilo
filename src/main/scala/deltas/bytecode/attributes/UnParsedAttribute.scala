@@ -2,17 +2,21 @@ package deltas.bytecode.attributes
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton
 
 object UnParsedAttribute extends DeltaWithGrammar {
 
+  override def description: String = "An attribute whose data has not been parsed yet"
+
+  override def dependencies: Set[Contract] = Set[Contract](ByteCodeSkeleton)
+
   class UnParsedAttribute(val node: Node) {
     def nameIndex: Int = node(UnParsedAttribute.Name).asInstanceOf[Int]
-    def nameIndex_=(value: Int) = node(UnParsedAttribute.Name) = value
+    def nameIndex_=(value: Int): Unit = node(UnParsedAttribute.Name) = value
 
     def data = node(UnParsedAttribute.Data).asInstanceOf[Seq[Byte]]
-    def data_=(value: Seq[Byte]) = node(UnParsedAttribute.Data) = value
+    def data_=(value: Seq[Byte]): Unit = node(UnParsedAttribute.Data) = value
   }
 
   def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(Clazz, Name -> nameIndex, Data -> bytes)
@@ -26,6 +30,4 @@ object UnParsedAttribute extends DeltaWithGrammar {
     val grammar = "UnParsed attribute with nameIndex:" ~~> integer.as(Name) asNode Clazz
     find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }
-
-  override def description: String = "An attribute whose data has not been parsed yet"
 }

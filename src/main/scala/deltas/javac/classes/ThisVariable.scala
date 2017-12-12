@@ -16,7 +16,7 @@ object ThisVariable extends DeltaWithGrammar
     variable.addOption(thisGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(VariableDelta) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(VariableDelta)
 
   override def description: String = "Enables using the 'this' qualifier to refer to the current instance."
 }

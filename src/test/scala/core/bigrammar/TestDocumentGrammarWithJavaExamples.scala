@@ -110,7 +110,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
-    val parseTransformations = JavaCompilerDeltas.byteCodeDeltas ++ Seq(RunWithJVM)
+    val parseTransformations = Seq(RunWithJVM) ++ JavaCompilerDeltas.byteCodeDeltas
     val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }

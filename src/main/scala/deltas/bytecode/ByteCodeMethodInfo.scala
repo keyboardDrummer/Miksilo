@@ -93,7 +93,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
     create(MethodInfoKey, methodInfoGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   override def description: String = "Adds method members to bytecode."
 }

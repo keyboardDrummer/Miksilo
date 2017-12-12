@@ -28,7 +28,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, BlockDelta, JavaGotoDelta)
+  override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._

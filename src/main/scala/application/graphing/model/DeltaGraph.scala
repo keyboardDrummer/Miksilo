@@ -10,11 +10,11 @@ import deltas.javac.JavaCompilerDeltas
 import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
-class TransformationGraph
+class DeltaGraph
   extends GraphFromDeltas(JavaCompilerDeltas.allDeltas) {
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
-    JavaSimpleStatement, JavaMethod, JavaC)
+    JavaSimpleStatement, JavaMethod, JavaGroup)
   addSimplifications()
 
   val sources: JSetWrapper[DeltaVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
@@ -39,7 +39,7 @@ class TransformationGraph
         for (derivedDependant <- getOutgoingNodes(dependency)) {
           val dijkstra = DijkstraShortestPath.findPathBetween[DeltaVertex, DefaultEdge](this, derivedDependant, simplification)
           if (dijkstra == null)
-            dependants += derivedDependant.transformation
+            dependants += derivedDependant.contract
         }
       }
       for (incoming <- dependants) {
@@ -50,7 +50,7 @@ class TransformationGraph
   }
 
   def getOutgoingNodes(vertex: DeltaVertex): Set[DeltaVertex] = {
-    new JSetWrapper(this.outgoingEdgesOf(vertex)).map(outgoingEdge => getEdgeTarget(outgoingEdge)).toSet
+    JSetWrapper(this.outgoingEdgesOf(vertex)).map(outgoingEdge => getEdgeTarget(outgoingEdge)).toSet
   }
 
   def optimizeDependencies() {

@@ -16,8 +16,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
   object Type extends NodeField
   object Name extends NodeField
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(JavaClassSkeleton, TypeConstant,
-    AccessibilityFieldsDelta)
+  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, TypeConstant, AccessibilityFieldsDelta)
 
   def field(_type: Node, name: String) = new Node(Clazz, Type -> _type, Name -> name)
 

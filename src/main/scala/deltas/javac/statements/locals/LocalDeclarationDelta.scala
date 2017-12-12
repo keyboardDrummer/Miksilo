@@ -9,7 +9,7 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
-object LocalDeclarationC extends StatementInstance {
+object LocalDeclarationDelta extends StatementInstance {
 
   def getDeclarationType(declaration: Node) = declaration(Type).asInstanceOf[Node]
 

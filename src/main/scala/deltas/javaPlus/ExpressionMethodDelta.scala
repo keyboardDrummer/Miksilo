@@ -11,7 +11,7 @@ import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpres
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(ReturnExpressionDelta, MethodDelta, JavaClassSkeleton) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(ReturnExpressionDelta, MethodDelta, JavaClassSkeleton)
 
   object Clazz extends NodeClass
   object Expression extends NodeField

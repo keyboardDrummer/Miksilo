@@ -1,7 +1,7 @@
 package deltas.bytecode.readJar
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, DeltaWithPhase, Language}
+import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
@@ -16,6 +16,11 @@ import deltas.javac.types.{MethodType, TypeAbstraction}
 import scala.collection.mutable.ArrayBuffer
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
+
+  override def description: String = "Decompiles the field and method signatures in a classfile."
+
+  override def dependencies: Set[Contract] = Set[Contract](SignatureAttribute, ClassInfoConstant)
+
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
     val classReference = constantPool.getNode(program(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Int])
@@ -104,6 +109,4 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
       field
     })
   }
-
-  override def description: String = "Decompiles the field and method signatures in a classfile."
 }

@@ -3,15 +3,17 @@ package core.deltas
 trait Contract {
   def dependencies: Set[Contract] = Set.empty
 
+  override def toString: String = name
+  def suffix: String
   def name: String = {
     try
     {
       val simpleName = getClass.getSimpleName
-      var result = simpleName.dropRight(1)
-      if (result.last == 'C')
-        result = result.dropRight(1)
-      if (result.endsWith("Delta"))
-        result = result.dropRight(5)
+      var result = simpleName
+      if (simpleName.endsWith("$"))
+        result = simpleName.dropRight(1)
+      if (result.endsWith(suffix))
+        result = result.dropRight(suffix.length)
       splitCamelCase(result).toLowerCase
     }
     catch

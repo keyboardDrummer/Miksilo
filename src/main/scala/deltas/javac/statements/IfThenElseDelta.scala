@@ -1,6 +1,6 @@
 package deltas.javac.statements
 
-import core.deltas.{Compilation, Language, NodeGrammar}
+import core.deltas.{Compilation, Contract, Language, NodeGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, SequenceElement}
@@ -10,6 +10,10 @@ import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.statements.IfThenDelta._
 
 object IfThenElseDelta extends StatementInstance {
+
+  override def description: String = "Enables using the if-then-else construct."
+
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, LabelledLocations, InferredStackFrames, BlockDelta)
 
   override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
@@ -58,6 +62,4 @@ object IfThenElseDelta extends StatementInstance {
     Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }
-
-  override def description: String = "Enables using the if-then-else construct."
 }

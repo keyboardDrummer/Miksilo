@@ -4,7 +4,7 @@ import javax.swing._
 
 import application.compilerBuilder.CompilerBuilderPanel
 import application.graphing.GraphView
-import application.graphing.model.TransformationGraph
+import application.graphing.model.DeltaGraph
 import com.mxgraph.swing.mxGraphComponent
 
 import scala.swing.{Component, MainFrame, SimpleSwingApplication}
@@ -29,7 +29,7 @@ object Program extends SimpleSwingApplication {
   }
 
   def getGraphComponent = {
-    val graph = new TransformationGraph()
+    val graph = new DeltaGraph()
 
     val mxGraph = new GraphView(graph)
 

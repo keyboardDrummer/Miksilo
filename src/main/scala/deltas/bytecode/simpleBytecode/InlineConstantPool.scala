@@ -4,13 +4,17 @@ import core.bigrammar.{BiGrammar, GrammarReference}
 import core.bigrammar.grammars.{IgnoreLeft, Labelled}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.{Compilation, DeltaWithGrammar, DeltaWithPhase, Language}
+import core.deltas._
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ClassFile, ConstantPoolGrammar}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.javac.classes.ConstantPool
 
 object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
+
+  override def description: String = "Removes the constant pool in favor of inline constant entries"
+
+  override def dependencies: Set[Contract] = Set[Contract](ByteCodeSkeleton)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val constantPool = new ConstantPool()
@@ -69,6 +73,4 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
     val constantPoolGrammar: GrammarReference = root.findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.removeMe()
   }
-
-  override def description: String = "Removes the constant pool in favor of inline constant entries"
 }

@@ -5,7 +5,7 @@ import deltas.javac._
 import deltas.javac.classes.{SelectorReferenceKind, VariableReferenceKind}
 import deltas.javac.constructor.{DefaultConstructorDelta, ImplicitSuperConstructorCall}
 
-object JavaC extends TransformationGroup {
+object JavaGroup extends DeltaGroup {
   override def dependencies: Set[Contract] =
     Set(ImplicitSuperConstructorCall, DefaultConstructorDelta, ImplicitObjectSuperClass, VariableReferenceKind, SelectorReferenceKind,
     ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)

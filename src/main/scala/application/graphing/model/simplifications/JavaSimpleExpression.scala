@@ -9,7 +9,7 @@ import deltas.javac.expressions.relational.LessThanC
 import deltas.javac.methods.assignment.AssignmentPrecedence
 import deltas.javac.statements.StatementSkeleton
 
-object JavaSimpleExpression extends TransformationGroup {
+object JavaSimpleExpression extends DeltaGroup {
 
   override def dependencies: Set[Contract] =
     Set(LessThanC, AdditionDelta, BooleanLiteralC, IntLiteralDelta, SubtractionC, TernaryDelta, ParenthesisC, NullC, EqualityDelta) ++

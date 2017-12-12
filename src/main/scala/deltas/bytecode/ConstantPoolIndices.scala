@@ -4,10 +4,14 @@ import core.bigrammar._
 import core.bigrammar.grammars.ManyVertical
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeClass, NodeField}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolGrammar, ConstantPoolItemContentGrammar}
 
 object ConstantPoolIndices extends DeltaWithGrammar {
+
+  override def description: String = "Add indices to the constant pool entries"
+
+  override def dependencies: Set[Contract] = Set[Contract](ByteCodeSkeleton)
 
   private object WithIndexClass extends NodeClass
 
@@ -33,6 +37,4 @@ object ConstantPoolIndices extends DeltaWithGrammar {
       WithIndexClass.create(Index -> (p._2 + 1), Content -> p._1)))
     listGrammar ^^ ( removeIndexForParsing, addIndexForPrinting )
   }
-
-  override def description: String = "Add indices to the constant pool entries"
 }

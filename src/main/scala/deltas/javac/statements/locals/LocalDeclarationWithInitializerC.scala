@@ -8,12 +8,12 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.VariableDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
-import deltas.javac.statements.locals.LocalDeclarationC.{Name, Type}
+import deltas.javac.statements.locals.LocalDeclarationDelta.{Name, Type}
 import deltas.javac.statements.{ExpressionAsStatementDelta, StatementSkeleton}
 
 object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationC)
+  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationDelta)
 
   def getInitializer(withInitializer: Node) = withInitializer(Initializer).asInstanceOf[Node]
 
@@ -38,9 +38,9 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
   def transformDeclarationWithInitializer(declarationWithInitializer: Path, state: Language): Unit = {
-    val name: String = LocalDeclarationC.getDeclarationName(declarationWithInitializer)
-    val _type = LocalDeclarationC.getDeclarationType(declarationWithInitializer)
-    val declaration = LocalDeclarationC.declaration(name, _type)
+    val name: String = LocalDeclarationDelta.getDeclarationName(declarationWithInitializer)
+    val _type = LocalDeclarationDelta.getDeclarationType(declarationWithInitializer)
+    val declaration = LocalDeclarationDelta.declaration(name, _type)
     val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), getInitializer(declarationWithInitializer))
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)

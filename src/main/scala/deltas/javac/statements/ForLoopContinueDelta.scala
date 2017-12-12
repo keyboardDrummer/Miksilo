@@ -13,6 +13,8 @@ object ForLoopContinueDelta extends DeltaWithPhase {
 
   override def description: String = "Add proper C-style for-loop continue semantics."
 
+  override def dependencies: Set[Contract] = Set(ForLoopDelta, WhileContinueDelta)
+
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val beforeIncrementLabels = new mutable.HashMap[Path, String]()
     PathRoot(program).visitClass(WhileContinueDelta.ContinueKey).foreach(
@@ -34,6 +36,4 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     forLoop(ForLoopDelta.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel
   }
-
-  override def dependencies: Set[Contract] = Set(ForLoopDelta, WhileContinueDelta)
 }

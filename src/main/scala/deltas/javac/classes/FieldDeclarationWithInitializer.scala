@@ -11,12 +11,12 @@ import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallC
 import deltas.javac.methods.{MethodDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
+import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerC}
 
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(FieldDeclaration) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(FieldDeclaration)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -29,8 +29,8 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def description: String = "Enables fields to have initialisers."
 
   def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
-    val name: String = LocalDeclarationC.getDeclarationName(fieldWithInitialiser)
-    val _type = LocalDeclarationC.getDeclarationType(fieldWithInitialiser)
+    val name: String = LocalDeclarationDelta.getDeclarationName(fieldWithInitialiser)
+    val _type = LocalDeclarationDelta.getDeclarationType(fieldWithInitialiser)
     val declaration = FieldDeclaration.field(_type, name)
 
     val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), LocalDeclarationWithInitializerC.getInitializer(fieldWithInitialiser))

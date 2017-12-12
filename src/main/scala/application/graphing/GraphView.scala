@@ -2,8 +2,8 @@ package application.graphing
 
 import java.util
 
-import application.graphing.model.simplifications.TransformationGroup
-import application.graphing.model.{TransformationGraph, DeltaVertex}
+import application.graphing.model.simplifications.DeltaGroup
+import application.graphing.model.{DeltaGraph, DeltaVertex}
 import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
@@ -14,7 +14,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
-class GraphView(origin: TransformationGraph) extends mxGraph {
+class GraphView(origin: DeltaGraph) extends mxGraph {
 
   initialise()
 
@@ -82,13 +82,12 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
   }
 
   def getVertex(parent: AnyRef, vertex: DeltaVertex, vertexMap: Map[DeltaVertex, mxCell]): mxCell = {
-    val vertexLabel = vertex.toString
+    val vertexLabel = vertex.contract.name
     val height: Double = 30
     val width = Math.max(getCellWidthBasedOnLabel(vertexLabel), getCellWidthBasedOnDependencies(vertex, vertexMap))
-    val cell = insertVertex(parent, null, "", 20, 20, width, height).asInstanceOf[mxCell]
-    cell.setValue(vertexLabel)
-    vertex.transformation match {
-      case _: TransformationGroup =>
+    val cell = insertVertex(parent, null, vertexLabel, 20, 20, width, height).asInstanceOf[mxCell]
+    vertex.contract match {
+      case _: DeltaGroup =>
         cell.setStyle("SIMPLIFICATION")
 
       case _: DeltaWithPhase =>
@@ -104,7 +103,7 @@ class GraphView(origin: TransformationGraph) extends mxGraph {
   }
 
 
-  def getCellWidthBasedOnDependencies(vertex: DeltaVertex, vertexMap: Map[DeltaVertex, mxCell]) = {
+  def getCellWidthBasedOnDependencies(vertex: DeltaVertex, vertexMap: Map[DeltaVertex, mxCell]): Int = {
     val incoming = origin.inDegreeOf(vertex)
     val outgoing = origin.outDegreeOf(vertex)
     val maximum = Math.max(incoming, outgoing)

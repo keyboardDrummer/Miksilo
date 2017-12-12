@@ -16,7 +16,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Moves the control flow to the start of the while loop."
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(WhileLoopDelta)
+  override def dependencies: Set[Contract] = Set(WhileLoopDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[Path, String]()

@@ -5,7 +5,9 @@ import java.io.InputStream
 import core.deltas._
 import core.deltas.node.Node
 import deltas.bytecode.ByteCodeSkeleton._
+import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
+import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import util.SourceUtils
 
@@ -21,6 +23,8 @@ object RunWithJVM extends DeltaWithPhase
   }
 
   override def description: String = "Takes the bytecode program and runs it using the JVM."
+
+  override def dependencies: Set[Contract] = Set[Contract](ClassInfoConstant, QualifiedClassNameConstantDelta)
 }
 
 object CompileAndRunOption extends CompileOption {

@@ -12,4 +12,6 @@ object ParseUsingTextualGrammar extends Delta {
   }
 
   override def description: String = "Parses the input file using a textual grammar."
+
+  override def dependencies: Set[Contract] = Set.empty
 }

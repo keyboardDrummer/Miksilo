@@ -1,12 +1,18 @@
 package deltas.javaPlus
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, DeltaWithPhase}
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
+import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
-import deltas.javac.methods.MethodDelta
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 
 object ReorderMembers extends DeltaWithPhase {
+
+  override def description: String = "Moves static before instance fields, and fields before members"
+
+  override def dependencies: Set[Contract] = Set[Contract](JavaClassSkeleton, AccessibilityFieldsDelta, MethodDelta)
+
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val clazz: JavaClass[Node] = program
 
@@ -17,6 +23,4 @@ object ReorderMembers extends DeltaWithPhase {
 
     clazz.members = orderedFields ++ methods
   }
-
-  override def description: String = "Moves static before instance fields, and fields before members"
 }

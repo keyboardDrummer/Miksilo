@@ -76,6 +76,8 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   class WrappedContract(contract: Contract) extends Contract {
 
+    override def name: String = contract.name
+
     override def toString: String = contract.toString
 
     override def dependencies: Set[Contract] = contract.dependencies.map(dependency => new WrappedContract(dependency))
@@ -84,6 +86,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
     override def hashCode(): Int = contract.hashCode()
 
+    override def suffix: String = contract.suffix
   }
 
   class WrappedDelta(delta: Delta) extends WrappedContract(delta) with Delta {
@@ -96,6 +99,8 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     override def equals(obj: scala.Any): Boolean = obj.equals(delta)
 
     override def hashCode(): Int = delta.hashCode()
+
+    override def suffix: String = delta.suffix
   }
 
   def buildLanguage: Language = {

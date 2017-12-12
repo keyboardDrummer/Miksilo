@@ -30,14 +30,13 @@ object SourceFileAttribute extends ByteCodeAttribute {
 
   def getSourceFileFileNameIndex(sourceFile: Node) = sourceFile(SourceFileFileNameIndex).asInstanceOf[Int]
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   override def description: String = "Defines the source file attribute. It identifies which source file a particular class file was compiled from."
 
   override def key = SourceFileAttributeKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
-    import grammars._
     ("Not implemented" : BiGrammar).asNode(key)
   } // TODO implement.
 

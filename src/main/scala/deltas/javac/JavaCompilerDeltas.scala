@@ -32,7 +32,7 @@ import deltas.javac.methods._
 import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
-import deltas.javac.statements.locals.{LocalDeclarationC, LocalDeclarationWithInitializerC}
+import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerC}
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 
@@ -59,7 +59,7 @@ object JavaCompilerDeltas {
   def javaMethod: Seq[Delta] = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerC) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ methodBlock
 
-  def methodBlock: Seq[Delta] = Seq(LocalDeclarationC, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+  def methodBlock: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement: Seq[Delta] = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,

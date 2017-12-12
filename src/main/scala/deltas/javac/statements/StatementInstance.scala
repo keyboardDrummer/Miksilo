@@ -15,7 +15,7 @@ trait StatementInstance extends DeltaWithGrammar {
 
   def toByteCode(statement: Path, compilation: Compilation): Seq[Node]
 
-  override def dependencies: Set[Contract] = Set(StatementSkeleton) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
   case class SequenceDoesNotEndInJump(sequence: Seq[Node]) extends Exception
   {

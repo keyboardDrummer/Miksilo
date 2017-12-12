@@ -2,6 +2,7 @@ package application.graphing.model.simplifications
 
 import core.deltas.Contract
 
-trait TransformationGroup extends Contract {
+trait DeltaGroup extends Contract {
   def dependants: Set[Contract]
+  def suffix = "Group"
 }

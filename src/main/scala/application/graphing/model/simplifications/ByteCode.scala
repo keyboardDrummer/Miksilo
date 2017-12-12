@@ -3,7 +3,7 @@ package application.graphing.model.simplifications
 import core.deltas.Contract
 import deltas.javac.JavaCompilerDeltas
 
-object ByteCode extends TransformationGroup {
+object ByteCode extends DeltaGroup {
 
   override def dependencies: Set[Contract] = JavaCompilerDeltas.byteCodeDeltas.toSet
 
