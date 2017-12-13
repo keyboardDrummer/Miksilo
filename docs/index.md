@@ -11,7 +11,7 @@ Blender's focus is on modular language design. These are the properties that mak
 
 - Languages are composed of many small transformations
 - Language transformations are packaged as reusable units with well-defined dependencies
-- Metalanguages are embedded in [Scala](http://www.scala-lang.org/"), making them first class objects and allowing arbitrary computations over them. This enables transforming between arbitrary languages.
+- Metalanguages are embedded in [Scala](http://www.scala-lang.org), making them first class objects and allowing arbitrary computations over them. This enables transforming between arbitrary languages.
 - Metalanguages are designed to be transformed. For example, early binding to fields in the grammar allows easy & safe editing.
 - Compiler phases are defined generically, making them resilient to changes in the language
 - Abstract syntax trees are stored unstructured, which provides many benefits such as fast transformations and language composition at run-time
