@@ -6,13 +6,7 @@ order: 3
 
 In Blender, the abstract-syntax tree (AST) is untyped. This is at the heart of what makes Blender modular. However, working without types in Scala, a typed language, produces code that seems far from idiomatic. This article describes the types involved in defining Blender AST's, and the idiomatic way to use them.
 
-[Node](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/core/deltas/node/Node.scala) is the type used to define abstract syntax tree nodes in Blender. A node only has two properties:
- - `data: Map[NodeField, Any]`
- - `clazz: NodeClass`
-
-The value of `clazz` represents a run-time type that says something about what keys `data` contains.
-
-In Blender, instances of `NodeClass` and `NodeField` are commonly defined using Scala's `object` concept, which defines a singleton.
+[Node](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/core/deltas/node/Node.scala) is the type used to define AST nodes in Blender. A node only has two properties: `data: Map[NodeField, Any]` and `clazz: NodeClass`. The value of `clazz` represents a run-time type that says something about what keys `data` contains. Instances of `NodeClass` and `NodeField` are commonly defined using a Scala object, which defines a singleton.
 
 Here is an example of how you could define the `NodeClass` and `NodeField` values for a binary addition type. You can see that there is a `create` method defined on `NodeClass`.
 
@@ -27,9 +21,9 @@ object AdditionDelta extends Delta {
 }
 ```
 
-A data structure that compliments `Node` is `Path`, which described a path from one `Node`, usually the root node of the program, to another `Node`. For the readers familiar with the concept of a zipper: a `Path` is zipper for `Node`. `Path` is useful because it allows one to traverse not just forward but also backward in the tree. Also, two Nodes in different locations in a program may be equal, such as the 2's in `2 + 2`. However, two Paths in a program are never equal, so a Path can be useful to identify specific a specific part of a program.
+A data structure that compliments `Node` is `Path`, which describes a path from one `Node`, usually the root node of the program, to another. For the readers familiar with the concept of a [zipper](https://en.wikipedia.org/wiki/Zipper_(data_structure)): a `Path` is zipper for programs. `Path` is useful because it allows one to traverse not just forward but also backward in the tree. Also, two nodes in different locations in a program may be equal, such as the 2's in `2 + 2`. However, two paths in a program are never equal, so a path can be useful to identify specific a specific part of a program.
 
-Blender relies on the Nodes in the AST to be untyped, but sometimes we know the type of a Node, and we'd like to make accessing that Node easier and safer by using that knowledge. For this case, we can define a typed wrapper around a `NodeClass`. Here is a typed wrapper for `AdditionDelta.Clazz` from earlier:
+Blender relies on the Nodes in the AST to be untyped, but sometimes we know the clazz of a node, and we'd like to make accessing that node easier and safer by using that knowledge. For this case, we can define a typed wrapper around a `NodeClass`. Here is a typed wrapper for `AdditionDelta.Clazz` from earlier:
 
 ```scala
 implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
