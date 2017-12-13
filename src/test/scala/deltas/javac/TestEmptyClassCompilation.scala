@@ -48,10 +48,10 @@ class TestEmptyClassCompilation extends FunSuite {
     val instructions = Seq(LoadAddressDelta.addressLoad(0), InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
     val codeAttribute = Seq(CodeAttributeDelta.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))
     val defaultConstructor = ByteCodeMethodInfo.methodInfo(3, 4, codeAttribute, Set(ByteCodeMethodInfo.PublicAccess))
-    ByteCodeSkeleton.clazz(2, 3, constantPool, Seq(defaultConstructor))
+    ByteCodeSkeleton.neww(2, 3, constantPool, Seq(defaultConstructor))
   }
 
   def getEmptyClass: Node = {
-    JavaClassSkeleton.clazz(classPackage, className, members = Seq[Node]())
+    JavaClassSkeleton.neww(classPackage, className, members = Seq[Node]())
   }
 }

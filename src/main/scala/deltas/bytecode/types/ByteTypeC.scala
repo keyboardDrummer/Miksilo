@@ -4,11 +4,11 @@ import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object ByteTypeC extends TypeInstance
 {
-  object ByteTypeKey extends NodeClass
+  object ByteTypeKey extends NodeShape
   override val key = ByteTypeKey
   val me = new Node(ByteTypeKey)
 

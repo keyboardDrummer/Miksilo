@@ -7,7 +7,7 @@ import deltas.bytecode.ByteCodeMethodInfo
 
 object AccessibilityFieldsDelta extends DeltaWithGrammar {
 
-  trait Visibility extends NodeClass
+  trait Visibility extends NodeShape
 
   object PublicVisibility extends Visibility
 

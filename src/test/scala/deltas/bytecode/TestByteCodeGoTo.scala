@@ -17,7 +17,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   def testMain(instructions: Seq[Node]): Node = {
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
+    ByteCodeSkeleton.neww(2, 3, new ConstantPool(), Seq(method))
   }
 
   test("compareCompiledVersusNativeCode") {
@@ -40,7 +40,7 @@ class TestByteCodeGoTo extends FunSuite {
     val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
-    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(Seq(StackMapTableAttribute.entry)), Seq(method))
+    ByteCodeSkeleton.neww(2, 3, new ConstantPool(Seq(StackMapTableAttribute.entry)), Seq(method))
   }
 
   def getLabelledJumpWhile: Node = {
@@ -58,6 +58,6 @@ class TestByteCodeGoTo extends FunSuite {
     )
 
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))
-    ByteCodeSkeleton.clazz(2, 3, new ConstantPool(), Seq(method))
+    ByteCodeSkeleton.neww(2, 3, new ConstantPool(), Seq(method))
   }
 }

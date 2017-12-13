@@ -3,14 +3,14 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodTypeConstant extends ConstantEntry {
 
-  object MethodTypeConstantKey extends NodeClass
+  object MethodTypeConstantKey extends NodeShape
   object MethodTypeDescriptorIndex extends NodeField
   override def key = MethodTypeConstantKey
 

@@ -2,7 +2,7 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
@@ -27,7 +27,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   def _return: Node = new Node(ReturnVoidKey)
 
-  object ReturnVoidKey extends NodeClass
+  object ReturnVoidKey extends NodeShape
 
   override val key = ReturnVoidKey
 

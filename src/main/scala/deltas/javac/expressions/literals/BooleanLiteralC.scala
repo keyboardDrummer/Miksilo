@@ -2,7 +2,7 @@ package deltas.javac.expressions.literals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -30,7 +30,7 @@ object BooleanLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
 
-  object LiteralBooleanKey extends NodeClass
+  object LiteralBooleanKey extends NodeShape
 
   object ValueKey extends NodeField
 

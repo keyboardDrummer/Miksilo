@@ -6,13 +6,13 @@ order: 4
 
 > This article is under construction.
 
-To use Blender effectively, we have to write some boilerplate. For each type of `Node`, we need to define one `NodeClass` object, and a `NodeField` object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of `NodeWrapper`. In the future, Scala macro's might help us to generate this boilerplate, but currently they are not mature enough. For now we've written a generator instead. Here follows an example of the generator in action:
+To use Blender effectively, we have to write some boilerplate. For each type of `Node`, we need to define one `NodeShape` object, and a `NodeField` object for each field. Then, to make using the accessing fields of the new Node type easier, we need a subclass of `NodeWrapper`. In the future, Scala macro's might help us to generate this boilerplate, but currently they are not mature enough. For now we've written a generator instead. Here follows an example of the generator in action:
 
 Given the following input:
 
 ```scala
 object ClassFileDelta {
-  val input = new NodeClassDefinition("ClassFile", 
+  val input = new NodeShapeDefinition("ClassFile",
     "classInfoIndex" -> "Int",
     "interfaces" -> "Seq[Int]",
     "methods" -> wrapSeq("Seq[MethodInfo]"),
@@ -24,7 +24,7 @@ It outputs:
 
 ```scala
 object ClassFileDelta {
-  val input = new NodeClassDefinition("ClassFile", 
+  val input = new NodeShapeDefinition("ClassFile",
     "classInfoIndex" -> "Int",
     "interfaces" -> "Seq[Int]",
     "methods" -> wrapSeq("Seq[MethodInfo]"),
@@ -32,13 +32,13 @@ object ClassFileDelta {
   )
 
   //region Generated Node boilerplate
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Interfaces extends NodeField
   object Methods extends NodeField
   object Attributes extends NodeField
 
   implicit class ClassFile[T <: NodeLike](val node: T) extends NodeWrapper {
-    assert(node.clazz == Clazz)
+    assert(node.shape == Shape)
 
     def interfaces: Seq[Int] = node(Interfaces).asInstanceOf[Seq[Int]]
     def interfaces_(value: Seq[Int]): Unit = node(Interfaces) = value

@@ -2,14 +2,14 @@ package deltas.javac.statements
 
 import core.deltas.{Compilation, Language}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {
   override val key = LabelKey
 
-  object LabelKey extends NodeClass
+  object LabelKey extends NodeShape
   object Name extends NodeField
 
   def label(name: String) = new Node(LabelKey, Name -> name)

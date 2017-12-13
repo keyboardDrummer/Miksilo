@@ -2,7 +2,7 @@ package core.deltas.node
 
 trait Key extends AnyRef
 {
-  override lazy val toString: String = Node.classDebugRepresentation(this)
+  override lazy val toString: String = Node.shapeDebugRepresentation(this)
 
   /**
     * This hashcode does not change over runs, while the default hashcode does.
@@ -19,7 +19,7 @@ trait NodeField extends GrammarKey
 /**
   * Defines a new Node class
   */
-trait NodeClass extends GrammarKey {
+trait NodeShape extends GrammarKey {
   def create(values: (NodeField, Any)*): Node = {
     new Node(this, values: _*)
   }

@@ -31,7 +31,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
     def attributes_=(value: Seq[Node]): Unit = node(CodeAttributesKey) = value
   }
 
-  def instruction(_type: NodeClass, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
+  def instruction(_type: NodeShape, arguments: Seq[Any] = Seq()) = new Node(_type, InstructionArgumentsKey -> arguments)
 
   def getInstructionArguments(instruction: Node): Seq[Int] = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
@@ -68,7 +68,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   def createRegistry = new Registry()
   class Registry {
-    val instructions = new ClassRegistry[InstructionDelta] //TODO make this registry obsolete by storing all the data in the NodeClass of the instruction.
+    val instructions = new ShapeRegistry[InstructionDelta] //TODO make this registry obsolete by storing all the data in the NodeShape of the instruction.
   }
 
   val constantEntry: Node = Utf8ConstantDelta.create("Code")
@@ -83,7 +83,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
   def getCodeAttributeBytes(code: CodeAttribute[Node], state: Language): Seq[Byte] = {
 
     def getInstructionByteCode(instruction: Instruction[Node]): Seq[Byte] = {
-      ByteCodeSkeleton.getRegistry(state).getBytes(instruction.clazz)(instruction)
+      ByteCodeSkeleton.getRegistry(state).getBytes(instruction.shape)(instruction)
     }
 
     val exceptionTable = code.exceptionTable
@@ -96,13 +96,13 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
   }
 
 
-  def getCodeAnnotations[T <: NodeLike](clazz: ClassFile[T]): Seq[CodeAttribute[T]] = {
-    clazz.methods
+  def getCodeAnnotations[T <: NodeLike](shape: ClassFile[T]): Seq[CodeAttribute[T]] = {
+    shape.methods
       .flatMap(methodInfo => methodInfo.attributes)
-      .flatMap(annotation => if (annotation.clazz == CodeKey) Some(new CodeAttribute(annotation)) else None)
+      .flatMap(annotation => if (annotation.shape == CodeKey) Some(new CodeAttribute(annotation)) else None)
   }
 
-  object CodeKey extends NodeClass
+  object CodeKey extends NodeShape
 
   object MaxStack extends NodeField
 
@@ -116,7 +116,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   object InstructionGrammar extends GrammarKey
 
-  override def key: NodeClass = CodeKey
+  override def key: NodeShape = CodeKey
 
   object MaxStackGrammar extends GrammarKey
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {

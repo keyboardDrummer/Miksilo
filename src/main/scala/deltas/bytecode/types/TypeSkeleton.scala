@@ -23,10 +23,10 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def toStackType(_type: Node, language: Language) : Node = {
-    getRegistry(language).instances(_type.clazz).getStackType(_type, language)
+    getRegistry(language).instances(_type.shape).getStackType(_type, language)
   }
 
-  def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.clazz)
+  def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.shape)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
@@ -49,7 +49,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     fromSuperTypes.exists(_type => _type.equals(to))
   }
 
-  def getSuperTypes(state: Language)(_type: Node) = getSuperTypesRegistry(state)(_type.clazz)(_type)
+  def getSuperTypes(state: Language)(_type: Node) = getSuperTypesRegistry(state)(_type.shape)(_type)
 
   def getSuperTypesRegistry(state: Language) = {
     getRegistry(state).superTypes
@@ -82,9 +82,9 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def createRegistry = new Registry
   
   class Registry {
-    val superTypes = new ClassRegistry[Node => Seq[Node]]()
-    val stackSize = new ClassRegistry[Int]()
-    val instances = new ClassRegistry[TypeInstance]
+    val superTypes = new ShapeRegistry[Node => Seq[Node]]()
+    val stackSize = new ShapeRegistry[Int]()
+    val instances = new ShapeRegistry[TypeInstance]
   }
 
   object JavaTypeGrammar extends GrammarKey

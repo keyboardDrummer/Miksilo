@@ -2,17 +2,17 @@ package deltas.javac.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
-import core.deltas.node.{GrammarKey, Node, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
 import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import deltas.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
 
-  object TypeAbstractionKey extends NodeClass
+  object TypeAbstractionKey extends NodeShape
   object Body extends NodeField
   object Parameters extends NodeField
-  object ParameterKey extends NodeClass
+  object ParameterKey extends NodeShape
   object ParameterName extends NodeField
   object ParameterClassBound extends NodeField
   object ParameterInterfaceBound extends NodeField

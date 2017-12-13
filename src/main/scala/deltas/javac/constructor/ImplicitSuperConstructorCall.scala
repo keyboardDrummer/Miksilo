@@ -8,16 +8,16 @@ import deltas.javac.statements.ExpressionAsStatementDelta
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorDelta)
 
-  override def transformProgram(clazz: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
 
-    for (constructor <- ConstructorDelta.getConstructors(clazz)) {
+    for (constructor <- ConstructorDelta.getConstructors(program)) {
       val statements = constructor.body
       var addSuperCall = false
       if (statements.isEmpty)
         addSuperCall = true
       else {
         val firstStatement = statements.head
-        if (firstStatement.clazz != SuperCallExpression.SuperCall && firstStatement.clazz != ThisCallExpression.ThisCall) {
+        if (firstStatement.shape != SuperCallExpression.SuperCall && firstStatement.shape != ThisCallExpression.ThisCall) {
           addSuperCall = true
         }
       }

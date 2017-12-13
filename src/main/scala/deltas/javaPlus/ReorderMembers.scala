@@ -14,13 +14,13 @@ object ReorderMembers extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set[Contract](JavaClassSkeleton, AccessibilityFieldsDelta, MethodDelta)
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    val clazz: JavaClass[Node] = program
+    val javaClass: JavaClass[Node] = program
 
-    val methods = clazz.members.filter(member => member.clazz == MethodDelta.Clazz)
-    val fields = clazz.members.filter(member => member.clazz != MethodDelta.Clazz)
+    val methods = javaClass.members.filter(member => member.shape == MethodDelta.Shape)
+    val fields = javaClass.members.filter(member => member.shape != MethodDelta.Shape)
 
     val orderedFields = fields.sortBy(f => !new HasAccessibility(f).isStatic)
 
-    clazz.members = orderedFields ++ methods
+    javaClass.members = orderedFields ++ methods
   }
 }

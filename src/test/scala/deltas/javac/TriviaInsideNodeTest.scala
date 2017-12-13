@@ -3,15 +3,15 @@ package deltas.javac
 import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, LeftRight, WithTrivia}
 import core.deltas.grammars.BodyGrammar
-import core.deltas.node.{GrammarKey, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, NodeShape, NodeField}
 import core.deltas.{Language, NodeGrammarWriter}
 import org.scalatest.FunSuite
 import deltas.javac.trivia.TriviaInsideNode
 
 class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
 
-  object ParentClass extends NodeClass
-  object ChildClass extends NodeClass
+  object ParentClass extends NodeShape
+  object ChildClass extends NodeShape
   object ParentName extends NodeField
   object ParentChild extends NodeField
   object ChildName extends NodeField
@@ -48,11 +48,11 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
 
-  object IntegerClass extends NodeClass
+  object IntegerClass extends NodeShape
   object Value extends NodeField
   object Left extends NodeField
   object Right extends NodeField
-  object Add extends NodeClass
+  object Add extends NodeShape
   object Expression extends GrammarKey
   test("Left Recursive") {
     val language = new Language(Seq.empty)

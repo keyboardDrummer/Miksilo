@@ -30,7 +30,7 @@ object VariableDelta extends ExpressionInstance {
 
   object VariableNameKey extends NodeField
 
-  object VariableKey extends NodeClass
+  object VariableKey extends NodeShape
 
   override val key = VariableKey
 
@@ -46,7 +46,7 @@ object VariableDelta extends ExpressionInstance {
     val variableInfo: VariableInfo = getVariableInfo(variable, compilation)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
-    Seq(_type.clazz match {
+    Seq(_type.shape match {
       case BooleanTypeC.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
       case IntTypeC.IntTypeKey => LoadIntegerDelta.load(variableAddress)
       case LongTypeC.LongTypeKey => LoadLongDelta.load(variableAddress)

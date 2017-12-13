@@ -32,13 +32,13 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visit(obj => obj.clazz match {
+    PathRoot(program).visit(obj => obj.shape match {
       case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
       case _ =>
     })
   }
 
-  object IncrementAssignmentKey extends NodeClass
+  object IncrementAssignmentKey extends NodeShape
 
   object TargetKey extends NodeField
 

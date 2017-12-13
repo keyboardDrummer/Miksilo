@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import deltas.bytecode.types.{IntTypeC, StackType, TypeInstance}
 
 object BooleanTypeC extends TypeInstance
@@ -29,7 +29,7 @@ object BooleanTypeC extends TypeInstance
   def booleanType = new Node(BooleanTypeKey)
 
 
-  object BooleanTypeKey extends NodeClass
+  object BooleanTypeKey extends NodeShape
 
   override def description: String = "Defines the boolean type."
 

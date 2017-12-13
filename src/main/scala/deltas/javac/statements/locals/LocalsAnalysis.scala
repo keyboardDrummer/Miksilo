@@ -12,7 +12,7 @@ class LocalsAnalysis(compilation: Compilation, method: Node)
   override def updateState(state: VariablePool, node: Path): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances
     var newState = state
-    for(entry <- instances(node.clazz).definedVariables(compilation, node.current))
+    for(entry <- instances(node.shape).definedVariables(compilation, node.current))
       newState = newState.add(entry._1,entry._2)
     newState
   }

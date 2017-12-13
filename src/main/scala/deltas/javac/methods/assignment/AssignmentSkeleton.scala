@@ -32,7 +32,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
 
-  object AssignmentKey extends NodeClass
+  object AssignmentKey extends NodeShape
 
   object AssignmentTarget extends NodeField
 
@@ -47,14 +47,14 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   def createRegistry = new Registry()
   class Registry {
-    val assignFromStackByteCodeRegistry = new ClassRegistry[(Compilation, Path) => Seq[Node]]
+    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, Path) => Seq[Node]]
   }
 
   override def toByteCode(assignment: Path, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
-    val assignInstructions = getRegistry(compilation).assignFromStackByteCodeRegistry(target.clazz)(compilation, target)
+    val assignInstructions = getRegistry(compilation).assignFromStackByteCodeRegistry(target.shape)(compilation, target)
     val valueType = ExpressionSkeleton.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {

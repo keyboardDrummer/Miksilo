@@ -18,10 +18,10 @@ object PoptimizeDelta extends DeltaWithPhase {
     (inputLength, outputLength)
   }
 
-  override def transformProgram(_clazz: Node, compilation: Compilation): Unit = {
-    val clazz = new ClassFile(_clazz)
-    for (method <- clazz.methods) {
-      val typeAnalysis =  new InstructionTypeAnalysisForMethod(_clazz, compilation, method)
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    val classFile = new ClassFile(program)
+    for (method <- classFile.methods) {
+      val typeAnalysis =  new InstructionTypeAnalysisForMethod(program, compilation, method)
       val codeAnnotation = method.codeAttribute
       val instructions = codeAnnotation.instructions
 
@@ -36,12 +36,12 @@ object PoptimizeDelta extends DeltaWithPhase {
 
       def processInstruction(instructionIndex: Int) {
         val instruction = instructions(instructionIndex)
-        if (instruction.clazz == PopDelta.key) {
+        if (instruction.shape == PopDelta.key) {
           consumptions ::= true
           return
         }
 
-        if (instruction.clazz == Pop2Delta.key) {
+        if (instruction.shape == Pop2Delta.key) {
           consumptions = List(true,true) ++ consumptions
           return
         }

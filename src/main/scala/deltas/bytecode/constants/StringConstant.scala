@@ -4,13 +4,13 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object StringConstant extends ConstantEntry {
 
-  object StringKey extends NodeClass
+  object StringKey extends NodeShape
   object StringIndex extends NodeField
 
   def construct(index: Int) = new Node(StringKey, StringIndex -> index)

@@ -7,7 +7,7 @@ import deltas.javac.types.TypeVariable
 
 object ClassifyTypeIdentifiers extends DeltaWithPhase {
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    program.visit(node => node.clazz match {
+    program.visit(node => node.shape match {
       case TypeVariable.TypeVariableKey =>
         val objectType = ObjectTypeDelta.objectType(TypeVariable.getTypeVariableName(node))
         node.replaceWith(objectType)

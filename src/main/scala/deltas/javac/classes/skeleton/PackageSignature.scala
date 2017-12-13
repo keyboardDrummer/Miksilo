@@ -1,8 +1,8 @@
 package deltas.javac.classes.skeleton
 
-import core.deltas.Language
 import core.deltas.node.Node
-import JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassSkeleton._
+
 import scala.collection.mutable
 
 class PackageMember(parent: Option[PackageSignature], name: String)
@@ -23,8 +23,8 @@ class PackageSignature(val parent: Option[PackageSignature], val name: String, v
    })
   }
 
-  def findPackageSignature(clazz: Node): PackageSignature = {
-   clazz._package.foldLeft(this)((currentPackage, packageName) => currentPackage.findOrCreate(packageName))
+  def findPackageSignature(javaClass: JavaClass[Node]): PackageSignature = {
+   javaClass._package.foldLeft(this)((currentPackage, packageName) => currentPackage.findOrCreate(packageName))
   }
 
   def findOrCreate(packageName: String): PackageSignature = {

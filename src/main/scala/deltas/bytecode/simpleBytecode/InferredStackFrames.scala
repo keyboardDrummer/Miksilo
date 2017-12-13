@@ -16,14 +16,14 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
   def label(name: String): Node = LabelDelta.key.create(LabelDelta.Name -> name)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val clazz: ClassFile[Node] = program
-    for (method <- clazz.methods) {
+    val classFile: ClassFile[Node] = program
+    for (method <- classFile.methods) {
       val instructions = method.codeAttribute.instructions
 
       val stackLayouts = new InstructionTypeAnalysisForMethod(program, compilation, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
-      for ((label, index) <- instructions.zipWithIndex.filter(i => i._1.clazz == LabelDelta.key)) {
+      for ((label, index) <- instructions.zipWithIndex.filter(i => i._1.shape == LabelDelta.key)) {
         val typeState = stackLayouts.typeStatePerInstruction(index)
         val currentStack = typeState.stackTypes
         val locals = getLocalTypesSequenceFromMap(typeState.variableTypes)

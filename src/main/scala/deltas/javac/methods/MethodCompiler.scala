@@ -68,7 +68,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
 
   def getVariables(obj: Path): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances
-    val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.clazz)).head
+    val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
     val variablesPerStatement: Map[Path, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
     try
     {

@@ -25,7 +25,7 @@ object MethodType extends TypeInstance {
       ThrowsSignature -> Seq.empty[Node])
   }
 
-  object MethodTypeKey extends NodeClass
+  object MethodTypeKey extends NodeShape
 
   object Parameters extends NodeField
 

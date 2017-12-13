@@ -7,8 +7,8 @@ trait NodeLike {
   def get(key: NodeField): Option[Any]
   def apply(key: NodeField): Any
   def update(key: NodeField, value: Any): Unit
-  def clazz: NodeClass
-  def clazz_=(value: NodeClass): Unit
+  def shape: NodeShape
+  def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
 
   def selfAndDescendants: List[Self] = {
@@ -17,12 +17,12 @@ trait NodeLike {
     result
   }
 
-  def visitClass(clazz: NodeClass): Seq[Self] = {
-    selfAndDescendants.filter(p => p.clazz == clazz)
+  def visitShape(shape: NodeShape): Seq[Self] = {
+    selfAndDescendants.filter(p => p.shape == shape)
   }
 
-  def visitClass(clazz: NodeClass, afterChildren: (Self) => Unit): Unit = {
-    visit(node => if (node.clazz == clazz) afterChildren(node))
+  def visitShape(shape: NodeShape, afterChildren: (Self) => Unit): Unit = {
+    visit(node => if (node.shape == shape) afterChildren(node))
   }
 
   def visit(afterChildren: (Self) => Unit = _ => {},

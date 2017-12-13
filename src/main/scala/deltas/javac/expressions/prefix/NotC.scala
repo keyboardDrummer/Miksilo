@@ -2,7 +2,7 @@ package deltas.javac.expressions.prefix
 
 import core.deltas.{Compilation, Language}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -10,7 +10,7 @@ import deltas.javac.types.BooleanTypeC
 
 object NotC extends ExpressionInstance {
 
-  object NotKey extends NodeClass
+  object NotKey extends NodeShape
 
   object NotExpression extends NodeField
 

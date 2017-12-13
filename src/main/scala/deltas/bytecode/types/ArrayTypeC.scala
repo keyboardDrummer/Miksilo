@@ -3,7 +3,7 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Language, NodeGrammar}
 
 object ArrayTypeC extends TypeInstance with StackType {
@@ -31,7 +31,7 @@ object ArrayTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ArrayTypeKey extends NodeClass
+  object ArrayTypeKey extends NodeShape
 
   object ArrayElementType extends NodeField
 

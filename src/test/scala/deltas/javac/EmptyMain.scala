@@ -26,7 +26,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getJava: Node = {
-    clazz(defaultPackage, className, Seq(getMainMethodJava))
+    neww(defaultPackage, className, Seq(getMainMethodJava))
   }
 
   def getMainMethodJava: Node = {

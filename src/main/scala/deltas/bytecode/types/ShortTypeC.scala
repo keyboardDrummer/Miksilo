@@ -4,7 +4,7 @@ import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object ShortTypeC extends TypeInstance with StackType {
 
@@ -27,7 +27,7 @@ object ShortTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object ShortTypeKey extends NodeClass
+  object ShortTypeKey extends NodeShape
 
   override def description: String = "Defines the short type."
 }

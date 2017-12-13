@@ -14,12 +14,12 @@ import util.SourceUtils
 object RunWithJVM extends DeltaWithPhase
 {
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    val clazz: ClassFile[Node] = state.program
-    val classRefIndex = clazz.classInfoIndex
-    val constantPool = clazz.constantPool
+    val classFile: ClassFile[Node] = state.program
+    val classRefIndex = classFile.classInfoIndex
+    val constantPool = classFile.constantPool
     val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex
     val className = new QualifiedClassNameConstant(constantPool.getValue(classNameIndex).asInstanceOf[Node]).value.toString
-    state.output = SourceUtils.runByteCode(className, clazz)
+    state.output = SourceUtils.runByteCode(className, classFile)
   }
 
   override def description: String = "Takes the bytecode program and runs it using the JVM."

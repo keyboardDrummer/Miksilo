@@ -5,7 +5,7 @@ import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import deltas.javac.expressions.literals.IntLiteralDelta
@@ -19,8 +19,8 @@ class JavaStyleCommentsTest
   extends TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta) ++ JavaCompilerDeltas.javaCompilerDeltas))
   with NodeGrammarWriter
 {
-  object ParentClass extends NodeClass
-  object ChildClass extends NodeClass
+  object ParentClass extends NodeShape
+  object ChildClass extends NodeShape
   object ParentName extends NodeField
   object ParentChild extends NodeField
   object ChildName extends NodeField

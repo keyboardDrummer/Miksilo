@@ -14,7 +14,7 @@ import deltas.bytecode.types.ObjectTypeDelta
 
 object NewC extends ExpressionInstance {
 
-  object NewCallKey extends NodeClass
+  object NewCallKey extends NodeShape
   object NewObject extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

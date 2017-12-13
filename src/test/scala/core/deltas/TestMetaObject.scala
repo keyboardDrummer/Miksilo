@@ -1,6 +1,6 @@
 package core.deltas
 
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import org.scalatest.FunSuite
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.methods.call.CallC
@@ -9,8 +9,8 @@ import deltas.javac.methods.{MemberSelector, VariableDelta}
 class TestMetaObject extends FunSuite {
 
   test("Equals") {
-    val first = new Node(ClazzKey, FieldKey -> FieldValue)
-    val second = new Node(ClazzKey, FieldKey -> FieldValue)
+    val first = new Node(ShapeKey, FieldKey -> FieldValue)
+    val second = new Node(ShapeKey, FieldKey -> FieldValue)
     assertResult(first)(second)
   }
 
@@ -22,7 +22,7 @@ class TestMetaObject extends FunSuite {
     assertResult(first)(second)
   }
 
-  object ClazzKey extends NodeClass
+  object ShapeKey extends NodeShape
 
   object FieldKey extends NodeField
 

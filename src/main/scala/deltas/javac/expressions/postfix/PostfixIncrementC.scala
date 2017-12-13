@@ -1,7 +1,7 @@
 package deltas.javac.expressions.postfix
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
@@ -31,7 +31,7 @@ object PostFixIncrementC extends ExpressionInstance {
     coreGrammar.addOption(postFixIncrement)
   }
 
-  object PostfixIncrementKey extends NodeClass
+  object PostfixIncrementKey extends NodeShape
 
   object VariableKey extends NodeField
 

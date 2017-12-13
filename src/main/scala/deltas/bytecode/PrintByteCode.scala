@@ -21,45 +21,45 @@ object PrintByteCode {
 
   def getBytes(byteCode: Node, language: Language): Seq[Byte] = {
 
-    val clazz = new ClassFile(byteCode)
+    val classFile = new ClassFile(byteCode)
     def getBytes(byteCode: Node): Seq[Byte] = {
       var result = List[Byte]()
 
       result ++= cafeBabeBytes
       result ++= versionNumber
-      val constantPool = clazz.constantPool.constants
+      val constantPool = classFile.constantPool.constants
       val constantPoolItemCountPlusOne = shortToBytes(constantPool.length + 1)
       result ++= constantPoolItemCountPlusOne
       for (constantPoolEntry <- constantPool) {
         result ++= getConstantEntryByteCode(constantPoolEntry)
       }
-      result ++= getAccessFlagsByteCode(clazz)
-      result ++= shortToBytes(clazz.classInfoIndex)
-      result ++= shortToBytes(clazz.parentIndex)
-      result ++= getInterfacesByteCode(clazz)
-      result ++= getFieldsByteCode(clazz)
-      result ++= getMethodsByteCode(clazz)
-      result ++= getAttributesByteCode(language, clazz.attributes)
+      result ++= getAccessFlagsByteCode(classFile)
+      result ++= shortToBytes(classFile.classInfoIndex)
+      result ++= shortToBytes(classFile.parentIndex)
+      result ++= getInterfacesByteCode(classFile)
+      result ++= getFieldsByteCode(classFile)
+      result ++= getMethodsByteCode(classFile)
+      result ++= getAttributesByteCode(language, classFile.attributes)
       result
     }
 
-    def getMethodsByteCode(clazz: ClassFile[Node]): Seq[Byte] = {
-      val methods = clazz.methods
+    def getMethodsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
+      val methods = classFile.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
-        ByteCodeSkeleton.getRegistry(language).getBytes(method.clazz)(method)
+        ByteCodeSkeleton.getRegistry(language).getBytes(method.shape)(method)
       })
     }
 
-    def getFieldsByteCode(clazz: ClassFile[Node]): Seq[Byte] = {
-      val fields = clazz.fields
+    def getFieldsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
+      val fields = classFile.fields
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
-        ByteCodeSkeleton.getRegistry(language).getBytes(field.clazz)(field)
+        ByteCodeSkeleton.getRegistry(language).getBytes(field.shape)(field)
       })
     }
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-        case metaEntry: Node => ByteCodeSkeleton.getRegistry(language).getBytes(metaEntry.clazz)(metaEntry)
+        case metaEntry: Node => ByteCodeSkeleton.getRegistry(language).getBytes(metaEntry.shape)(metaEntry)
         case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
         case utf8: String => toUTF8ConstantEntry(utf8)
       }
@@ -77,12 +77,12 @@ object PrintByteCode {
     Ints.toByteArray(bytes.length) ++ bytes
   }
 
-  def getInterfacesByteCode(clazz: Node): Seq[Byte] = {
-    val interfaces = clazz.interfaceIndices
+  def getInterfacesByteCode(shape: Node): Seq[Byte] = {
+    val interfaces = shape.interfaceIndices
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
-  def getAccessFlagsByteCode(clazz: Node): Seq[Byte] = {
+  def getAccessFlagsByteCode(shape: Node): Seq[Byte] = {
     shortToBytes(classAccessFlags("super"))
   }
 
@@ -99,7 +99,7 @@ object PrintByteCode {
 
     def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
-        prefixWithIntLength(() => ByteCodeSkeleton.getRegistry(state).getBytes(attribute.clazz)(attribute))
+        prefixWithIntLength(() => ByteCodeSkeleton.getRegistry(state).getBytes(attribute.shape)(attribute))
     }
 
     shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))

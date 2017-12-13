@@ -3,13 +3,13 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
 
 trait ConstantEntry extends DeltaWithGrammar {
 
-  def key: NodeClass
+  def key: NodeShape
 
   def getByteCode(constant: Node, state: Language): Seq[Byte]
 

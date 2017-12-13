@@ -2,7 +2,7 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
@@ -11,7 +11,7 @@ import deltas.bytecode.readJar.ClassFileParser._
 
 object SourceFileAttribute extends ByteCodeAttribute {
 
-  object SourceFileAttributeKey extends NodeClass
+  object SourceFileAttributeKey extends NodeShape
 
   object SourceFileFileNameIndex extends NodeField
 

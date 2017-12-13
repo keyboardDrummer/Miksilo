@@ -6,7 +6,7 @@ import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node.{GrammarKey, Node, NodeField, NodeLike}
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.Clazz
+import deltas.bytecode.ByteCodeSkeleton.Shape
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
@@ -37,30 +37,30 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
-    def transformClass(clazz: Node) {
+    def transformClass(javaClass: Node) {
       JavaLang.loadIntoClassPath(compilation)
-      val classCompiler: ClassCompiler = ClassCompiler(clazz, compilation)
+      val classCompiler: ClassCompiler = ClassCompiler(javaClass, compilation)
       getState(compilation).classCompiler = classCompiler
       classCompiler.bind()
 
       val classInfo = classCompiler.currentClassInfo
-      clazz(ByteCodeSkeleton.ClassAttributes) = Seq()
+      javaClass(ByteCodeSkeleton.ClassAttributes) = Seq()
 
       val classRef = classCompiler.getClassRef(classInfo)
-      clazz(ByteCodeSkeleton.ClassNameIndexKey) = classRef
-      val parentName = clazz.parent.get
+      javaClass(ByteCodeSkeleton.ClassNameIndexKey) = classRef
+      val parentName = javaClass.parent.get
       val parentRef = ClassInfoConstant.classRef(classCompiler.fullyQualify(parentName))
-      clazz(ByteCodeSkeleton.ClassParentIndex) = parentRef
-      clazz(ByteCodeSkeleton.ClassInterfaces) = Seq()
+      javaClass(ByteCodeSkeleton.ClassParentIndex) = parentRef
+      javaClass(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
       for(member <- getRegistry(compilation).members)
-        member.compile(compilation, clazz)
+        member.compile(compilation, javaClass)
 
-      clazz.data.remove(Members)
+      javaClass.data.remove(Members)
     }
   }
 
-  def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.clazz match {
+  def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.shape match {
     case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
     case ObjectTypeDelta.ObjectTypeKey =>
         val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
@@ -70,8 +70,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   def getClassCompiler(compilation: Compilation) = getState(compilation).classCompiler
 
-  def getQualifiedClassName(clazz: Node): QualifiedClassName = {
-    QualifiedClassName(clazz._package ++ Seq(clazz.name))
+  def getQualifiedClassName(javaClass: JavaClass[Node]): QualifiedClassName = {
+    QualifiedClassName(javaClass._package ++ Seq(javaClass.name))
   }
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
@@ -88,14 +88,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val nameGrammar: BiGrammar = "class" ~~> identifier
     val membersGrammar = "{" % (classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount) % "}"
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
-    val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Clazz
+    val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Shape
     find(BodyGrammar).inner = classGrammar
   }
 
   object ImportGrammar extends GrammarKey
 
-  def clazz(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
-    new Node(ByteCodeSkeleton.Clazz,
+  def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
+    new Node(ByteCodeSkeleton.Shape,
     Members -> members,
     ClassPackage -> _package,
     ClassName -> name,
@@ -105,7 +105,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   def createRegistry = new Registry()
   class Registry {
     var members = List.empty[ClassMemberDelta]
-    val importToClassMap = new ClassRegistry[(Compilation, Node) => Map[String, QualifiedClassName]]()
+    val importToClassMap = new ShapeRegistry[(Compilation, Node) => Map[String, QualifiedClassName]]()
   }
 
   def createState = new State()

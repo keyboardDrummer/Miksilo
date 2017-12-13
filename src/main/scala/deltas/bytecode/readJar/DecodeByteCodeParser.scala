@@ -25,7 +25,6 @@ object DecodeByteCodeParser extends Delta {
     if (!parseResult.successful)
       throw ParseException(parseResult.toString)
 
-    val clazz = parseResult.get
-    clazz
+    parseResult.get
   }
 }

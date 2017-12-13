@@ -30,7 +30,7 @@ case class ComparisonOptions(compareIntegers: Boolean = true, takeAllLeftKeys: B
       if (!closed.add(key))
         return true
 
-      if (!first.clazz.equals(second.clazz))
+      if (!first.shape.equals(second.shape))
         return false
 
       val sharedKeys = (takeAllLeftKeys, takeAllRightKeys) match {

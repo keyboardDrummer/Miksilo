@@ -4,13 +4,13 @@ import core.deltas._
 import core.deltas.path.Path
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature, PackageSignature}
 import deltas.javac.methods.MemberSelector
-import deltas.javac.methods.MemberSelector.Clazz
+import deltas.javac.methods.MemberSelector.Shape
 
 object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(Clazz, (compilation, selector) => {
+    MemberSelector.getReferenceKindRegistry(state).put(Shape, (compilation, selector) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(selector, compiler)
     })

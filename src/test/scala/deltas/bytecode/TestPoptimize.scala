@@ -76,9 +76,9 @@ class TestPoptimize extends FunSuite {
       ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
-    val clazz = ByteCodeSkeleton.clazz(0, 0, new ConstantPool(Seq()), Seq(method))
+    val shape = ByteCodeSkeleton.neww(0, 0, new ConstantPool(Seq()), Seq(method))
     val compiler = CompilerBuilder.build(Seq(PoptimizeDelta) ++ JavaCompilerDeltas.byteCodeDeltas)
-    compiler.transform(clazz)
+    compiler.transform(shape)
     NodeWrapper.unwrapList(codeAnnotation.instructions)
   }
 

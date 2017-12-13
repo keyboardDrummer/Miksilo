@@ -2,7 +2,7 @@ package deltas.javac.expressions.literals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -20,7 +20,7 @@ object NullC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullDelta)
 
-  object NullKey extends NodeClass
+  object NullKey extends NodeShape
 
   override val key = NullKey
 

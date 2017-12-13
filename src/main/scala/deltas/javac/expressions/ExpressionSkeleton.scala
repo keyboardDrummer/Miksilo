@@ -13,11 +13,11 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
   def getType(compilation: Compilation): Path => Node = expression => {
-    getRegistry(compilation).instances(expression.clazz).getType(expression, compilation)
+    getRegistry(compilation).instances(expression.shape).getType(expression, compilation)
   }
 
   def getToInstructions(compilation: Compilation): Path => Seq[Node] = {
-    expression => getRegistry(compilation).instances(expression.clazz).toByteCode(expression, compilation)
+    expression => getRegistry(compilation).instances(expression.shape).toByteCode(expression, compilation)
   }
 
   def getToInstructionsRegistry(state: Language) = getRegistry(state).instances
@@ -29,7 +29,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def createRegistry = new Registry()
   class Registry {
-    val instances = new ClassRegistry[ExpressionInstance]
+    val instances = new ShapeRegistry[ExpressionInstance]
   }
 
   object CoreGrammar extends GrammarKey

@@ -26,7 +26,7 @@ object EqualityDelta extends ExpressionInstance {
 
   def equality(first: Node, second: Node) = new Node(EqualityKey, FirstKey -> first, SecondKey -> second)
 
-  object EqualityKey extends NodeClass
+  object EqualityKey extends NodeShape
 
   object FirstKey extends NodeField
 
@@ -46,7 +46,7 @@ object EqualityDelta extends ExpressionInstance {
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
-    val equalityInstructions: Seq[Node] = inputType.clazz match {
+    val equalityInstructions: Seq[Node] = inputType.shape match {
       case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
       case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
     }

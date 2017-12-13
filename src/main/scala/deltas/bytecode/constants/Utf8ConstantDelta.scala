@@ -11,7 +11,7 @@ import deltas.bytecode.PrintByteCode
 object Utf8ConstantDelta extends ConstantEntry {
   override def key = Utf8ConstantKey
 
-  object Utf8ConstantKey extends NodeClass
+  object Utf8ConstantKey extends NodeShape
   object Value extends NodeField
   def create(value: String) = new Node(key, Value -> value)
   def get(constant: Node): String = constant(Value).asInstanceOf[String]

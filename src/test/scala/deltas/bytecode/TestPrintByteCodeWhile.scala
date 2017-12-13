@@ -41,7 +41,7 @@ class TestPrintByteCodeWhile extends FunSuite {
     val _while: Node = getWhile
     val methods = Seq(constructor, _while)
     val classAttributes = Seq(SourceFileAttribute.sourceFile(10, 11))
-    ByteCodeSkeleton.clazz(2, 3, constantPool, methods, attributes = classAttributes)
+    ByteCodeSkeleton.neww(2, 3, constantPool, methods, attributes = classAttributes)
   }
 
   def getConstructor: Node = {

@@ -4,7 +4,7 @@ import core.bigrammar.grammars.Keyword
 import core.bigrammar.{BiGrammar}
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object DoubleTypeC extends TypeInstance with StackType {
 
@@ -26,7 +26,7 @@ object DoubleTypeC extends TypeInstance with StackType {
 
   val doubleType = new Node(key)
 
-  object DoubleTypeKey extends NodeClass
+  object DoubleTypeKey extends NodeShape
 
   override def description: String = "Defines the double type."
 }

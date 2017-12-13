@@ -3,6 +3,7 @@ package deltas.bytecode.simpleBytecode
 import core.deltas.Language
 import core.deltas.node.Node
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
@@ -40,9 +41,9 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
       methodParameters
     }
     else {
-      val clazz = program
-      val clazzRef = clazz(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
-      val className = clazzRef(ClassInfoConstant.Name).asInstanceOf[Node]
+      val classFile: ClassFile[Node] = program
+      val classRef = classFile(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
+      val className = classRef(ClassInfoConstant.Name).asInstanceOf[Node]
       Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }

@@ -2,7 +2,7 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
@@ -21,11 +21,11 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val memberGrammar = find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerC.Clazz).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
+    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerC.Shape).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 
-  object FieldWithInitializerKey extends NodeClass
+  object FieldWithInitializerKey extends NodeShape
   override def description: String = "Enables fields to have initialisers."
 
   def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
@@ -41,7 +41,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new PathRoot(program).visit(obj => obj.clazz match {
+    new PathRoot(program).visit(obj => obj.shape match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })
@@ -70,7 +70,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   }
 
   def statementIsSuperCall(statement: Node): Boolean = {
-    statement.clazz == ExpressionAsStatementDelta.key &&
-      ExpressionAsStatementDelta.getExpression(statement).clazz == SuperCallExpression.SuperCall
+    statement.shape == ExpressionAsStatementDelta.key &&
+      ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpression.SuperCall
   }
 }

@@ -1,7 +1,7 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
@@ -12,17 +12,17 @@ import deltas.javac.methods.AccessibilityFieldsDelta
 
 object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Type extends NodeField
   object Name extends NodeField
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, TypeConstant, AccessibilityFieldsDelta)
 
-  def field(_type: Node, name: String) = new Node(Clazz, Type -> _type, Name -> name)
+  def field(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
 
-  def bind(compilation: Compilation, signature: ClassSignature, clazz: Node): Unit = {
+  def bind(compilation: Compilation, signature: ClassSignature, javaClass: Node): Unit = {
 
-    val fields = getFields(clazz)
+    val fields = getFields(javaClass)
     for (field <- fields)
       bindField(field)
 
@@ -41,15 +41,15 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
     field(Name).asInstanceOf[String]
   }
 
-  def getFields(clazz: Node): Seq[Node] = {
-    clazz.members.filter(member => member.clazz == Clazz)
+  def getFields(javaClass: JavaClass[Node]): Seq[Node] = {
+    javaClass.members.filter(member => member.shape == Shape)
   }
 
-  def compile(compilation: Compilation, clazz: Node): Unit = {
+  def compile(compilation: Compilation, javaClass: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val fields = getFields(clazz)
-    clazz(ByteCodeSkeleton.ClassFields) = fields.map(field => {
+    val fields = getFields(javaClass)
+    javaClass(ByteCodeSkeleton.ClassFields) = fields.map(field => {
       convertField(field, classCompiler, compilation)
       field
     })
@@ -59,7 +59,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
     val nameIndex = classCompiler.getNameIndex(getFieldName(field))
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
-    field.clazz = ByteCodeFieldInfo.FieldKey
+    field.shape = ByteCodeFieldInfo.FieldKey
 
     val fieldDescriptor = TypeConstant.constructor(getFieldType(field))
     field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
@@ -76,7 +76,7 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
-      typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Clazz
+      typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     memberGrammar.addOption(fieldGrammar)
   }
 

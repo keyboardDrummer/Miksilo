@@ -2,12 +2,12 @@ package deltas.bytecode.constants
 
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.PrintByteCode._
 
 object InterfaceMethodRefConstant extends ConstantEntry {
 
-  object InterfaceMethodRefConstantKey extends NodeClass
+  object InterfaceMethodRefConstantKey extends NodeShape
 
   object MethodRefClassName extends NodeField
 

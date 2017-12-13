@@ -12,7 +12,7 @@ object IfThenDelta extends StatementInstance {
 
   def neww(condition: Node, thenBody: Seq[Node]): Node = key.create(Condition -> condition, Then -> thenBody)
 
-  object IfThenKey extends NodeClass
+  object IfThenKey extends NodeShape
 
   object Condition extends NodeField
 
@@ -24,7 +24,7 @@ object IfThenDelta extends StatementInstance {
 
   override def toByteCode(ifThen: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
-    val method = ifThen.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val method = ifThen.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
     val endLabelName = LabelDelta.getUniqueLabel("ifEnd", method)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)

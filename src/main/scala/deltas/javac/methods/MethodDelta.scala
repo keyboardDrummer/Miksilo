@@ -33,21 +33,21 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
   }
 
-  def compile(compilation: Compilation, clazz: Node): Unit = {
+  def compile(compilation: Compilation, program: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val methods = getMethods(clazz)
-    clazz(ByteCodeSkeleton.Methods) = methods.map(method => {
+    val methods = getMethods(program)
+    program(ByteCodeSkeleton.Methods) = methods.map(method => {
       convertMethod(method, classCompiler, compilation)
       method.node
     })
   }
 
-  def bind(compilation: Compilation, signature: ClassSignature, clazz: Node): Unit = {
+  def bind(compilation: Compilation, signature: ClassSignature, program: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
     val classInfo = classCompiler.currentClassInfo
 
-    val methods = getMethods(clazz)
+    val methods = getMethods(program)
     for (method <- methods)
       bindMethod(method)
 
@@ -77,7 +77,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
 
-    method.clazz = ByteCodeMethodInfo.MethodInfoKey
+    method.shape = ByteCodeMethodInfo.MethodInfoKey
     AccessibilityFieldsDelta.addAccessFlags(method)
     method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(MethodNameKey)
@@ -117,7 +117,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method(MethodNameKey).asInstanceOf[String]
   }
 
-  def getMethods[T <: NodeLike](clazz: T): Seq[Method[T]] = NodeWrapper.wrapList(clazz.members.filter(member => member.clazz == Clazz))
+  def getMethods[T <: NodeLike](javaClass: JavaClass[T]): Seq[Method[T]] = NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == Shape))
 
   def getParameterName(metaObject: Node) = metaObject(ParameterNameKey).asInstanceOf[String]
 
@@ -139,7 +139,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     val methodUnmapped: TopBottom = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(Body)
-    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Clazz))
+    val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))
 
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     memberGrammar.addOption(methodGrammar)
@@ -147,7 +147,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def method(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],
              static: Boolean = false, visibility: AccessibilityFieldsDelta.Visibility = PrivateVisibility, typeParameters: Seq[Node] = Seq.empty) = {
-    new Node(Clazz,
+    new Node(Shape,
       MethodNameKey -> name,
       ReturnTypeKey -> _returnType,
       MethodParametersKey -> _parameters,
@@ -157,7 +157,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       TypeParameters -> typeParameters)
   }
 
-  object ParameterKey extends NodeClass
+  object ParameterKey extends NodeShape
   def parameter(name: String, _type: Any) = {
     new Node(ParameterKey,
       ParameterNameKey -> name,
@@ -169,7 +169,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     var methodCompiler: MethodCompiler = _
   }
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object MethodGrammar extends GrammarKey
 

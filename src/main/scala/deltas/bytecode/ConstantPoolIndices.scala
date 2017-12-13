@@ -3,7 +3,7 @@ package deltas.bytecode
 import core.bigrammar._
 import core.bigrammar.grammars.ManyVertical
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolGrammar, ConstantPoolItemContentGrammar}
 
@@ -13,7 +13,7 @@ object ConstantPoolIndices extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set[Contract](ByteCodeSkeleton)
 
-  private object WithIndexClass extends NodeClass
+  private object WithIndexClass extends NodeShape
 
   private object Index extends NodeField
 

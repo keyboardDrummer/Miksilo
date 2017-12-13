@@ -30,7 +30,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
 
   def getByteCode: Node = {
     val classAttributes = Seq(SourceFileAttribute.sourceFile(16, 17))
-    ByteCodeSkeleton.clazz(5, 6, getConstantPool, Seq[Node](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
+    ByteCodeSkeleton.neww(5, 6, getConstantPool, Seq[Node](getConstructorByteCode, getMainByteCode, getFibonacciMethod), attributes = classAttributes)
   }
 
   test("runCompiledFibonacci") {
@@ -42,7 +42,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: Node = {
     val constantPool = getConstantPool
     val method: Node = getFibonacciMethod
-    val nativeClass = ByteCodeSkeleton.clazz(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
+    val nativeClass = ByteCodeSkeleton.neww(3, 4, constantPool, Seq(getConstructorByteCode, getMainByteCode, method))
     nativeClass
   }
 

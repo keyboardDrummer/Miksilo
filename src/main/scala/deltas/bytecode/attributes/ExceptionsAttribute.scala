@@ -2,12 +2,12 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Key, Node, NodeClass}
+import core.deltas.node.{Key, Node, NodeShape}
 import deltas.bytecode.readJar.ClassFileParser
 
 object ExceptionsAttribute extends ByteCodeAttribute {
 
-  object ExceptionsKey extends NodeClass
+  object ExceptionsKey extends NodeShape
   override def key: Key = ExceptionsKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = ???

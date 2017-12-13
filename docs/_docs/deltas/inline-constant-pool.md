@@ -78,7 +78,7 @@ override def transformProgram(program: Node, compilation: Compilation): Unit = {
 
   def extractReferencesInNode(node: Node): Unit = {
     for {
-      fieldConstantTypes <- fieldConstantTypesPerClass.get(node.clazz)
+      fieldConstantTypes <- fieldConstantTypesPerClass.get(node.shape)
       field <- fieldConstantTypes.keys
       constantPoolElement <- node.get(field)
     } {
@@ -111,9 +111,9 @@ private def inlineConstantPoolReferences(language: Language): Unit = {
   val constantReferences = ByteCodeSkeleton.getRegistry(language).constantReferences
   val constantPoolIndexGrammar = find(ConstantPoolIndexGrammar)
   for (classWithConstantReferences <- constantReferences) {
-    val clazz: NodeClass = classWithConstantReferences._1
-    val constantReferences: Map[NodeField, NodeClass] = classWithConstantReferences._2
-    val classGrammar: BiGrammar = find(clazz)
+    val shape: NodeShape = classWithConstantReferences._1
+    val constantReferences: Map[NodeField, NodeShape] = classWithConstantReferences._2
+    val classGrammar: BiGrammar = find(shape)
     for (constantReference <- constantReferences) {
       val field = constantReference._1
       val constantType = constantReference._2

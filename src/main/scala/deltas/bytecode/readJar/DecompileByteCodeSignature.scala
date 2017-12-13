@@ -32,14 +32,14 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     //    val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
     val members = new ArrayBuffer[Node]()
-    val javaClazz = JavaClassSkeleton.clazz(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
+    val javaClass = JavaClassSkeleton.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
     
     val fieldInfos = program(ByteCodeSkeleton.ClassFields).asInstanceOf[Seq[Node]]
 
     members ++= getFields(state, constantPool, fieldInfos)
     members ++= getMethods(state, constantPool, program(ByteCodeSkeleton.Methods).asInstanceOf[Seq[Node]])
 
-    program.replaceWith(javaClazz)
+    program.replaceWith(javaClass)
   }
 
   val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = AccessibilityFieldsDelta.visibilityAccessFlagLinks.
@@ -49,7 +49,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
       val attributes = methodInfo(ByteCodeMethodInfo.MethodAttributes).asInstanceOf[Seq[Node]]
-      val signatureAttribute = attributes.find(node => node.clazz == SignatureAttribute.key)
+      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.key)
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
@@ -64,7 +64,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
       val name: String = constantPool.getUtf8(nameIndex)
 
       val (methodType, typeParameters) =
-        if (_type.clazz == TypeAbstraction.TypeAbstractionKey)
+        if (_type.shape == TypeAbstraction.TypeAbstractionKey)
           (TypeAbstraction.getBody(_type),TypeAbstraction.getParameters(_type))
         else
           (_type,Seq.empty)
@@ -91,7 +91,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     fieldInfos.map(fieldInfo => {
       val nameIndex: Int = fieldInfo(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]
       val attributes = fieldInfo(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[Node]]
-      val signatureAttribute = attributes.find(node => node.clazz == SignatureAttribute.key)
+      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.key)
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]

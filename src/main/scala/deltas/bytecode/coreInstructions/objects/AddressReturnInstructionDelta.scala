@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta

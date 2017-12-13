@@ -4,7 +4,7 @@ import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object LongTypeC extends TypeInstance with StackType {
 
@@ -26,7 +26,7 @@ object LongTypeC extends TypeInstance with StackType {
 
   val longType = new Node(LongTypeKey)
 
-  object LongTypeKey extends NodeClass
+  object LongTypeKey extends NodeShape
 
   override def description: String = "Defines the long type."
 }

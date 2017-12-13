@@ -3,7 +3,7 @@ package deltas.javac.statements.locals
 import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -34,7 +34,7 @@ object LocalDeclarationDelta extends StatementInstance {
     override def toString = s"variable '$variable' was defined more than once."
   }
 
-  object DeclarationKey extends NodeClass
+  object DeclarationKey extends NodeShape
   object Name extends NodeField
   object Type extends NodeField
 

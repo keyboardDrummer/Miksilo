@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.node.{Key, Node, NodeClass}
+import core.deltas.node.{Key, Node, NodeShape}
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta

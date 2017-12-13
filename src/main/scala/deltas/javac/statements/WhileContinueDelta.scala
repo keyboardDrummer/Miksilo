@@ -2,7 +2,7 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{Path, PathRoot, SequenceElement}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
@@ -20,17 +20,17 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[Path, String]()
-    PathRoot(program).visitClass(ContinueKey, path => transformContinue(path, startLabels, compilation))
+    PathRoot(program).visitShape(ContinueKey, path => transformContinue(path, startLabels, compilation))
   }
 
   def transformContinue(continuePath: Path, startLabels: mutable.Map[Path, String], language: Language): Unit = {
-    val containingWhile = continuePath.findAncestorClass(WhileLoopDelta.WhileKey)
+    val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.WhileKey)
     val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(containingWhile))
     continuePath.replaceWith(JustJavaGoto.goto(label))
   }
 
   def addStartLabel(whilePath: Path): String = {
-    val method = whilePath.findAncestorClass(MethodDelta.Clazz)
+    val method = whilePath.findAncestorShape(MethodDelta.Shape)
     val startLabel = LabelDelta.getUniqueLabel("whileStart", method)
     whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(JustJavaLabel.label(startLabel), whilePath.current))
     startLabel
@@ -41,7 +41,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
     statementGrammar.addOption(new NodeGrammar("continue;", ContinueKey))
   }
 
-  object ContinueKey extends NodeClass
+  object ContinueKey extends NodeShape
   def continue = new Node(ContinueKey)
 }
 

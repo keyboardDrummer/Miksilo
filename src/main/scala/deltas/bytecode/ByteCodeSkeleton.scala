@@ -40,8 +40,8 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def createRegistry = new Registry()
 
-  def clazz(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
-            classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(Clazz,
+  def neww(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
+           classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(Shape,
     Methods ->  methods,
     ClassNameIndexKey ->  name,
     ClassParentIndex ->  parent,
@@ -54,21 +54,21 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   override def dependencies: Set[Contract] = Set.empty
 
   class Registry {
-    val getBytes = new ClassRegistry[Node => Seq[Byte]]
+    val getBytes = new ShapeRegistry[Node => Seq[Byte]]
     val attributes = new mutable.HashMap[String, ByteCodeAttribute]
-    val constantReferences = new ClassRegistry[Map[NodeField, NodeClass]]
+    val constantReferences = new ShapeRegistry[Map[NodeField, NodeShape]]
     val constantEntries = mutable.Set.empty[ConstantEntry]
   }
 
   override def inject(state: Language): Unit = {
     super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Clazz, Map(
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Shape, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
       ClassParentIndex -> ClassInfoConstant.key,
       ClassNameIndexKey -> ClassInfoConstant.key))
   }
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Methods extends NodeField
 
@@ -100,9 +100,9 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     val attributesGrammar = create(AttributesGrammar, attributeGrammar.manyVertical)
     val membersGrammar = create(MembersGrammar, print(Empty))
     val bodyGrammar = "{" % (membersGrammar % attributesGrammar.as(ClassAttributes)).indent() % "}"
-    val classGrammar = create(Clazz,
+    val classGrammar = create(Shape,
       (classIndexGrammar.as(ClassNameIndexKey) ~~ parseIndexGrammar.as(ClassParentIndex) ~~ interfacesGrammar.as(ClassInterfaces) %
-        constantPool % bodyGrammar).asNode(Clazz))
+        constantPool % bodyGrammar).asNode(Shape))
 
     find(BodyGrammar).inner = classGrammar
   }

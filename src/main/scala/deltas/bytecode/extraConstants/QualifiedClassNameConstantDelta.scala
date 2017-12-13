@@ -14,7 +14,7 @@ import deltas.javac.classes.skeleton.QualifiedClassName
 object QualifiedClassNameConstantDelta extends ConstantEntry {
   override def key = Key
 
-  object Key extends NodeClass
+  object Key extends NodeShape
   object Value extends NodeField
 
   implicit class QualifiedClassNameConstant[T <: NodeLike](val node: T) extends NodeWrapper[T] {

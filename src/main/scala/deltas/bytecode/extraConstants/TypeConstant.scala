@@ -3,7 +3,7 @@ package deltas.bytecode.extraConstants
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField, NodeLike}
+import core.deltas.node.{Node, NodeShape, NodeField, NodeLike}
 import deltas.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodInfoKey, MethodNameIndex}
 import deltas.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
@@ -12,7 +12,7 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
 object TypeConstant extends ConstantEntry {
-  object Key extends NodeClass
+  object Key extends NodeShape
   object Type extends NodeField
 
   def constructor(_type: Node) = new Node(Key, Type -> _type)

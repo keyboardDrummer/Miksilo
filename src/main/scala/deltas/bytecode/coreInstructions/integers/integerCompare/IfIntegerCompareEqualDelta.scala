@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
 import core.deltas.Language
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature

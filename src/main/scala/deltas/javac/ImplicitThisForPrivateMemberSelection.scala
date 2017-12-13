@@ -44,7 +44,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   }
 
   def getVariableWithCorrectPath(obj: Path): Path = {
-    if (obj.clazz == MethodDelta.Clazz)
+    if (obj.shape == MethodDelta.Shape)
       return PathRoot(obj.current)
 
     obj match {
@@ -57,15 +57,15 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin = PathRoot(program)
-    programWithOrigin.visit(beforeChildren = obj => { obj.clazz match {
-        case ByteCodeSkeleton.Clazz =>
+    programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
+        case ByteCodeSkeleton.Shape =>
           JavaLang.loadIntoClassPath(compilation)
 
           val classCompiler = ClassCompiler(obj, compilation)
           getState(compilation).classCompiler = classCompiler
           classCompiler.bind()
 
-        case MethodDelta.Clazz => MethodDelta.setMethodCompiler(obj, compilation)
+        case MethodDelta.Shape => MethodDelta.setMethodCompiler(obj, compilation)
         case VariableDelta.VariableKey => addThisToVariable(compilation, obj)
         case _ =>
       }

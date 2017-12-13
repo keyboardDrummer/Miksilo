@@ -1,7 +1,7 @@
 package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
@@ -29,8 +29,8 @@ object SuperCallExpression extends ExpressionInstance {
     transformSuperCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformSuperCall(clazz: Node, call: Path, compilation: Compilation): Seq[Node] = {
-    transformToByteCode(call, compilation, clazz.parent.get)
+  def transformSuperCall(program: Node, call: Path, compilation: Compilation): Seq[Node] = {
+    transformToByteCode(call, compilation, program.parent.get)
   }
 
   def transformToByteCode(call: Path, compilation: Compilation, className: String): Seq[Node] = {
@@ -51,7 +51,7 @@ object SuperCallExpression extends ExpressionInstance {
     expressionGrammar.addOption(superCallGrammar)
   }
 
-  object SuperCall extends NodeClass
+  object SuperCall extends NodeShape
 
   override def description: String = "Enables calling a super constructor."
 }

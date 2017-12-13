@@ -1,6 +1,6 @@
 package deltas.bytecode.extraBooleanInstructions
 
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -13,7 +13,7 @@ object NotInstructionDelta extends ExpandInstruction {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfZeroDelta)
 
-  object NotInstructionKey extends NodeClass
+  object NotInstructionKey extends NodeShape
 
   override val key = NotInstructionKey
 

@@ -12,17 +12,17 @@ import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 
 object NameAndTypeConstant extends ConstantEntry {
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Name extends NodeField
 
   object Type extends NodeField
 
-  def nameAndType(nameIndex: Node, typeIndex: Node): Node = new Node(Clazz,
+  def nameAndType(nameIndex: Node, typeIndex: Node): Node = new Node(Shape,
     Name -> nameIndex,
     Type -> typeIndex)
 
-  def nameAndType(nameIndex: Int, typeIndex: Int): Node = new Node(Clazz,
+  def nameAndType(nameIndex: Int, typeIndex: Int): Node = new Node(Shape,
     Name -> nameIndex,
     Type -> typeIndex)
 
@@ -30,7 +30,7 @@ object NameAndTypeConstant extends ConstantEntry {
 
   def getTypeIndex(nameAndType: Node): Int = nameAndType(Type).asInstanceOf[Int]
 
-  override def key = Clazz
+  override def key = Shape
 
   implicit class NameAndTypeConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: TypeConstantWrapper[T] = node(Type).asInstanceOf[T]

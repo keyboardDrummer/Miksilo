@@ -13,11 +13,11 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Adds a while loop."
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitClass(WhileKey, path => transformWhileLoop(path, compilation))
+    PathRoot(program).visitShape(WhileKey, path => transformWhileLoop(path, compilation))
   }
 
   def transformWhileLoop(whileLoopPath: Path, compilation: Compilation): Unit = {
-    val method = whileLoopPath.findAncestorClass(MethodDelta.Clazz)
+    val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
     val startLabel = JustJavaLabel.label(label)
@@ -48,7 +48,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
 
-  object WhileKey extends NodeClass
+  object WhileKey extends NodeShape
 
   object Condition extends NodeField
 

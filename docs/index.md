@@ -23,3 +23,5 @@ The best way to show Blender's modularity is by example. Here are examples of la
 - [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
 
 Before diving into the above, it might help to get [an introduction of BiGrammar](http://keyboarddrummer.github.io/Blender/bigrammar/introduction/), one of Blender's metalanguages.
+
+Another way to get to know Blender is to play around with its [Sandbox](http://keyboarddrummer.github.io/Blender/core/sandbox/) application, which lets you create languages by composing predefined language transformations.

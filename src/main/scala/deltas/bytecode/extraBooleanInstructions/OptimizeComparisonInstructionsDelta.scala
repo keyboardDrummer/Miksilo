@@ -3,6 +3,7 @@ package deltas.bytecode.extraBooleanInstructions
 import core.deltas.node.Node
 import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.bytecode.ByteCodeSkeleton
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.coreInstructions.integers.integerCompare.{IfIntegerCompareNotEqualDelta, IfNotZero, IfZeroDelta}
@@ -21,8 +22,8 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
 
-    val clazz = program
-    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(clazz)
+    val classFile: ClassFile[Node] = program
+    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(classFile)
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
@@ -42,7 +43,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
         val first = instructions(i)
         val second = instructions(i + 1)
 
-        val replacementInstruction : Option[Node] = first.clazz match {
+        val replacementInstruction : Option[Node] = first.shape match {
           case LessThanInstructionKey => findLessThanReplacement(second)
           case GreaterThanInstructionKey => findGreaterThanReplacement(second)
           case NotInstructionKey => findNotReplacement(second)
@@ -64,7 +65,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
   }
 
   def findIntegerEqualsReplacement(second: Node): Option[Node] = {
-    second.clazz match {
+    second.shape match {
       case IfZeroDelta.key =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareNotEquals(target))
@@ -76,7 +77,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
   }
 
   def findNotReplacement(second: Node): Option[Node] = {
-    second.clazz match {
+    second.shape match {
       case IfZeroDelta.key =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifNotZero(target))
@@ -88,7 +89,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
   }
 
   def findGreaterThanReplacement(second: Node): Option[Node] = {
-    second.clazz match {
+    second.shape match {
       case IfZeroDelta.key =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareLessEquals(target))
@@ -100,7 +101,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
   }
 
   def findLessThanReplacement(second: Node): Option[Node] = {
-    second.clazz match {
+    second.shape match {
       case IfZeroDelta.key =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareGreaterEquals(target))

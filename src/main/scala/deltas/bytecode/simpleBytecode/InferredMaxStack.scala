@@ -12,7 +12,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val clazz: ClassFile[Node] = program
+    val classFile: ClassFile[Node] = program
 
     def getMaxStack(method: MethodInfo[Node]): Int = {
       val stackLayoutAnalysis = new InstructionTypeAnalysisForMethod(program, compilation, method)
@@ -22,7 +22,7 @@ object InferredMaxStack extends DeltaWithPhase with DeltaWithGrammar {
       maxStack
     }
 
-    for (method <- clazz.methods) {
+    for (method <- classFile.methods) {
       val code = method.codeAttribute
       code.maxStack = getMaxStack(method)
     }

@@ -3,7 +3,7 @@ package core.deltas
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarSequenceMethodsExtension}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.NodeClass
+import core.deltas.node.NodeShape
 
 class GrammarWithTrivia(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
   with BiGrammarSequenceMethodsExtension
@@ -11,7 +11,7 @@ class GrammarWithTrivia(val grammar: BiGrammar, grammars: LanguageGrammars) exte
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
     if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
 
-  def asLabelledNode(key: NodeClass): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
+  def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
   def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 

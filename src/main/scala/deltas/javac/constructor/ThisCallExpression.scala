@@ -1,7 +1,7 @@
 package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.types.VoidTypeC
@@ -12,7 +12,7 @@ import deltas.javac.methods.call.CallC
 
 object ThisCallExpression extends ExpressionInstance {
   override val key = ThisCall
-  object ThisCall extends NodeClass
+  object ThisCall extends NodeShape
 
   def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallC.CallArguments -> arguments)
 
@@ -25,8 +25,8 @@ object ThisCallExpression extends ExpressionInstance {
     transformThisCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformThisCall(clazz: Node, call: Path, compilation: Compilation): Seq[Node] = {
-    SuperCallExpression.transformToByteCode(call, compilation, clazz.name)
+  def transformThisCall(program: Node, call: Path, compilation: Compilation): Seq[Node] = {
+    SuperCallExpression.transformToByteCode(call, compilation, program.name)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

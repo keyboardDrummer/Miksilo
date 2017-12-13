@@ -2,13 +2,13 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Key, Node, NodeClass, NodeField}
+import core.deltas.node.{Key, Node, NodeShape, NodeField}
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.readJar.ClassFileParser._
 
 object SignatureAttribute extends ByteCodeAttribute {
 
-  object SignatureKey extends NodeClass
+  object SignatureKey extends NodeShape
   object SignatureIndex extends NodeField
   override def key: Key = SignatureKey
 

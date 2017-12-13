@@ -1,7 +1,7 @@
 package deltas.bytecode.attributes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.bytecode.ByteCodeSkeleton
 
@@ -19,15 +19,15 @@ object UnParsedAttribute extends DeltaWithGrammar {
     def data_=(value: Seq[Byte]): Unit = node(UnParsedAttribute.Data) = value
   }
 
-  def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(Clazz, Name -> nameIndex, Data -> bytes)
+  def construct(nameIndex: Int, bytes: Seq[Byte]) = new Node(Shape, Name -> nameIndex, Data -> bytes)
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Name extends NodeField
   object Data extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val grammar = "UnParsed attribute with nameIndex:" ~~> integer.as(Name) asNode Clazz
+    val grammar = "UnParsed attribute with nameIndex:" ~~> integer.as(Name) asNode Shape
     find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
   }
 }

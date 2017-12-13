@@ -10,13 +10,13 @@ import deltas.bytecode.types.TypeSkeleton
 
 object ExpressionAsStatementDelta extends StatementInstance {
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Expression extends NodeField
 
-  def create(expression: Node): Node = new Node(Clazz, Expression -> expression)
+  def create(expression: Node): Node = new Node(Shape, Expression -> expression)
 
-  override val key = Clazz
+  override val key = Shape
 
   override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
@@ -37,7 +37,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
     import grammars._
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Clazz
+    val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Shape
     statementGrammar.addOption(expressionAsStatement)
   }
 

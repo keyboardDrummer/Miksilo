@@ -11,7 +11,7 @@ import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object FieldRefConstant extends ConstantEntry {
 
-  object FieldRef extends NodeClass
+  object FieldRef extends NodeShape
 
   object ClassInfo extends NodeField
 

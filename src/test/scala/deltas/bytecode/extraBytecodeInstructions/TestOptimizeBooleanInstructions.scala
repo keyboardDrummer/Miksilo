@@ -24,8 +24,8 @@ class TestOptimizeBooleanInstructions extends FunSuite {
       s"optimizedInstructions.size (${optimizedInstructions.size}) + 5 < unoptimizedInstructions.size (${unoptimizedInstructions.size})")
   }
 
-  def getFibonacciInstructions(clazz: ClassFile[Node]) = {
-    clazz.methods.flatMap(methodInfo => methodInfo.codeAttribute.instructions)
+  def getFibonacciInstructions(classFile: ClassFile[Node]) = {
+    classFile.methods.flatMap(methodInfo => methodInfo.codeAttribute.instructions)
   }
 }
 

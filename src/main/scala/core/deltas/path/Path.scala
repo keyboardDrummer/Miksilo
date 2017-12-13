@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.{Node, NodeClass, NodeField, NodeLike}
+import core.deltas.node.{Node, NodeShape, NodeField, NodeLike}
 
 object Path {
   implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
@@ -15,10 +15,10 @@ trait Path extends NodeLike { //TODO rename path to something that imports more 
   def pathAsString: String
   def parentOption: Option[Path]
   def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
-  def findAncestorClass(clazz: NodeClass): Path = ancestors.find(p => p.clazz == clazz).get
+  def findAncestorShape(shape: NodeShape): Path = ancestors.find(p => p.shape == shape).get
   def root = ancestors.last
-  def clazz = current.clazz
-  def clazz_=(value: NodeClass): Unit = current.clazz = value
+  def shape = current.shape
+  def shape_=(value: NodeShape): Unit = current.shape = value
 
   def apply(key: NodeField) = get(key).get
   def update(key: NodeField, value: Any): Unit = current(key) = value

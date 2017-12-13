@@ -1,6 +1,6 @@
 package deltas.bytecode.extraBooleanInstructions
 
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -26,7 +26,7 @@ object LessThanInstructionDelta extends ExpandInstruction {
       InferredStackFrames.label(endLabel))
   }
 
-  object LessThanInstructionKey extends NodeClass
+  object LessThanInstructionKey extends NodeShape
 
   override def description: String = "Defines a custom instruction which applies < to the top stack values."
 

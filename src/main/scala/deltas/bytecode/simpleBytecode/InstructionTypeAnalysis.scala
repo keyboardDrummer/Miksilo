@@ -75,7 +75,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
   }
 
   def convertObjectTypesToObjectKey(input: Seq[Node]): Seq[Object] = {
-    input.map(_type => _type.clazz match {
+    input.map(_type => _type.shape match {
       case ObjectTypeDelta.ObjectTypeKey => ObjectTypeDelta.ObjectTypeKey
       case _ => _type
     })

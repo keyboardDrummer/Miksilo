@@ -36,10 +36,10 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def transformProgram(program: Node, compilation: Compilation): Unit = {
 
     val instructionDeltas = CodeAttributeDelta.getRegistry(compilation.language).instructions
-    def instructionSize(instruction: Node) = instructionDeltas(instruction.clazz).getInstructionSize
+    def instructionSize(instruction: Node) = instructionDeltas(instruction.shape).getInstructionSize
 
-    val clazz = program
-    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(clazz)
+    val classFile = program
+    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(classFile)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
@@ -56,7 +56,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       val targetLocations = mutable.Map[String, Int]()
       var location = 0
       for (instruction <- instructions) {
-        if (instruction.clazz == LabelDelta.key) {
+        if (instruction.shape == LabelDelta.key) {
           targetLocations(new Label(instruction).name) = location
         }
 
@@ -77,7 +77,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
           instruction.data.remove(JumpName)
         }
 
-        if (instruction.clazz != LabelDelta.key)
+        if (instruction.shape != LabelDelta.key)
           newInstructions += instruction
 
         location += instructionSize(instruction)
@@ -92,7 +92,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def getStackMapTable(labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
-    val locationsWithFrame = instructions.filter(i => i.clazz == LabelDelta.LabelKey).map(i => new Label(i)).
+    val locationsWithFrame = instructions.filter(i => i.shape == LabelDelta.LabelKey).map(i => new Label(i)).
       map(i => (labelLocations(i.name), i.stackFrame))
     var locationAfterPreviousFrame = 0
     var stackFrames = ArrayBuffer[Node]()
@@ -106,7 +106,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       }
     }
     if (stackFrames.nonEmpty) {
-      Seq(StackMapTableAttribute.Clazz.create(
+      Seq(StackMapTableAttribute.Shape.create(
         AttributeNameKey -> StackMapTableAttribute.entry,
         StackMapTableAttribute.Maps -> stackFrames))
     }
@@ -122,7 +122,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     replaceJumpIndicesWithLabels(grammars, language)
     removeOffsetFromStackMapFrameGrammars(grammars)
-    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttribute.Clazz).removeMeFromOption()
+    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttribute.Shape).removeMeFromOption()
   }
 
   def removeOffsetFromStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {

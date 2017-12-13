@@ -9,7 +9,7 @@ import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
-  object FieldKey extends NodeClass
+  object FieldKey extends NodeShape
   object NameIndex extends NodeField
   object DescriptorIndex extends NodeField
   object FieldAttributes extends NodeField

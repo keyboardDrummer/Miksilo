@@ -17,13 +17,13 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
-    val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Clazz
+    val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Shape
     create(SelectGrammar, selection)
   }
 
   object SelectGrammar extends GrammarKey
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Target  extends NodeField
 
@@ -32,7 +32,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   def selector(_object: Any, member: Any): Node = selector(_object.asInstanceOf[Node], member.asInstanceOf[String])
 
   def selector(_object: Node, member: String): Node = {
-    new Node(Clazz,
+    new Node(Shape,
       Target -> _object,
       Member -> member)
   }
@@ -43,7 +43,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def getReferenceKind(classCompiler: ClassCompiler, expression: Path): ReferenceKind = {
-    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.compilation).get(expression.clazz)
+    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.compilation).get(expression.shape)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(classCompiler.compilation, expression))
@@ -56,7 +56,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getReferenceKindRegistry(state: Language) = getRegistry(state).referenceKindRegistry
   class Registry {
-    val referenceKindRegistry = new ClassRegistry[(Compilation, Path) => ReferenceKind]()
+    val referenceKindRegistry = new ShapeRegistry[(Compilation, Path) => ReferenceKind]()
   }
 
   override def createRegistry = new Registry()

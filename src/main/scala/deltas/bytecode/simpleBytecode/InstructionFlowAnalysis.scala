@@ -9,7 +9,7 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Instruction[Node
   extends DataFlowAnalysis[Int, State] {
   
   val labelIndices = instructions.zipWithIndex.
-    filter(indexedInstruction => indexedInstruction._1.clazz == LabelDelta.LabelKey).
+    filter(indexedInstruction => indexedInstruction._1.shape == LabelDelta.LabelKey).
     map(indexedInstruction => (new Label(indexedInstruction._1.node).name, indexedInstruction._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {

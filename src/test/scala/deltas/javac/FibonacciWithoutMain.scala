@@ -27,7 +27,7 @@ class FibonacciWithoutMain {
   }
 
   def getJavaFibonacciWithoutMain: Node = {
-    clazz(defaultPackage, className, Seq(getFibonacciMethodJava))
+    neww(defaultPackage, className, Seq(getFibonacciMethodJava))
   }
 
   def getFibonacciMethodJava: Node = {

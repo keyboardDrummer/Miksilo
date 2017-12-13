@@ -13,7 +13,7 @@ import deltas.javac.methods.MemberSelector._
 
 object SelectField extends ExpressionInstance {
 
-  override val key = Clazz
+  override val key = Shape
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 

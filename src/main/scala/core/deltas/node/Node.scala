@@ -7,29 +7,29 @@ import scala.util.hashing.Hashing
 
 object Node {
 
-  def classDebugRepresentation(_clazz: Any): String = _clazz match {
+  def shapeDebugRepresentation(_shape: Any): String = _shape match {
     case string: String => string
     case anyRef: AnyRef =>
       try
       {
-        val clazz = anyRef.getClass
-        getClassName(clazz)
+        val shape = anyRef.getClass
+        getClassName(shape)
       }
       catch
       {
         case e: java.lang.InternalError => e.toString
       }
-    case _ => _clazz.toString
+    case _ => _shape.toString
   }
 
-  private def getClassName(clazz: Class[_]): String = {
-    val enclosing = clazz.getEnclosingClass
+  private def getClassName(shape: Class[_]): String = {
+    val enclosing = shape.getEnclosingClass
     val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
-    addition + getDirectClassName(clazz)
+    addition + getDirectClassName(shape)
   }
 
-  private def getDirectClassName(clazz: Class[_]): String = {
-    val simpleName: String = clazz.getSimpleName
+  private def getDirectClassName(shape: Class[_]): String = {
+    val simpleName: String = shape.getSimpleName
     if (simpleName.last == '$')
       simpleName.dropRight(1)
     else
@@ -37,17 +37,17 @@ object Node {
   }
 }
 
-class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
+class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
   type Self = Node
 
   def shallowClone: Node = {
-    val result = new Node(clazz)
+    val result = new Node(shape)
     result.data ++= data
     result
   }
 
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
-    clazz = node.clazz
+    shape = node.shape
     if (!keepData)
       data.clear()
     data ++= node.data
@@ -76,10 +76,10 @@ class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
   }
 
   override def toString: String = {
-    val className = clazz.toString
+    val className = shape.toString
     if (data.isEmpty)
       return className
-    s"$className: ${data.map(kv => (Node.classDebugRepresentation(kv._1), kv._2))}"
+    s"$className: ${data.map(kv => (Node.shapeDebugRepresentation(kv._1), kv._2))}"
   }
 
   override def equals(other: Any): Boolean = other match {
@@ -87,14 +87,14 @@ class Node(var clazz: NodeClass, entries: (NodeField, Any)*) extends NodeLike {
       val dataEquals: Boolean = data == that.data
       (that canEqual this) &&
         dataEquals &&
-        clazz == that.clazz
+        shape == that.shape
     case _ => false
   }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Node]
 
   override def hashCode(): Int = {
-    val state = Seq(data, clazz)
+    val state = Seq(data, shape)
     Hashing.default.hash(state)
   }
 

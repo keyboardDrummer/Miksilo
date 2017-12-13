@@ -17,13 +17,13 @@ object ForLoopContinueDelta extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val beforeIncrementLabels = new mutable.HashMap[Path, String]()
-    PathRoot(program).visitClass(WhileContinueDelta.ContinueKey).foreach(
+    PathRoot(program).visitShape(WhileContinueDelta.ContinueKey).foreach(
       path => transformContinue(path, beforeIncrementLabels, compilation))
   }
 
   def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Path, String], language: Language): Unit = {
-    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.clazz == ForLoopDelta.Clazz || ancestor.clazz == WhileLoopDelta.WhileKey)
-    containingLoopOption.filter(ancestor => ancestor.clazz == ForLoopDelta.Clazz).foreach(containingForLoop => {
+    val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.shape == ForLoopDelta.Shape || ancestor.shape == WhileLoopDelta.WhileKey)
+    containingLoopOption.filter(ancestor => ancestor.shape == ForLoopDelta.Shape).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, addAndReturnBeforeIncrementLabel(containingForLoop))
       continuePath.replaceWith(JustJavaGoto.goto(label))
     })
@@ -31,7 +31,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
 
   def addAndReturnBeforeIncrementLabel(forLoopPath: Path): String = {
     val forLoop = forLoopPath.current
-    val method = forLoopPath.findAncestorClass(MethodDelta.Clazz)
+    val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
     val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)
     forLoop(ForLoopDelta.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
     beforeIncrementLabel

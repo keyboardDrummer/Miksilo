@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.methods.MemberSelector.{Member, Target, Clazz}
+import deltas.javac.methods.MemberSelector.{Member, Target, Shape}
 import deltas.javac.methods.{MemberSelector, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 
@@ -17,7 +17,7 @@ object AssignToMember extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(state: Language): Unit = {
-    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.Clazz,
+    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.Shape,
       (compilation: Compilation, selector: Path) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
@@ -35,7 +35,7 @@ object AssignToMember extends DeltaWithGrammar {
     val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
     val variableGrammar = find(VariableDelta.VariableGrammar)
-    val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Clazz)
+    val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Shape)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addOption(selectGrammar)
   }

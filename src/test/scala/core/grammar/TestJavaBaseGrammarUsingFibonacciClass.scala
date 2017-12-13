@@ -22,7 +22,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("BasicClass") {
     val input = "package bla; class Help {}"
     val result = TestCompilerGrammarUtils.getGrammarResult(input)
-    val expectation = JavaClassSkeleton.clazz(Seq("bla"), "Help")
+    val expectation = JavaClassSkeleton.neww(Seq("bla"), "Help")
     assertResult(expectation)(result)
   }
 

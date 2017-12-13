@@ -1,13 +1,13 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
 import core.deltas.{Contract, DeltaWithGrammar, Language}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
 object BasicImportC extends DeltaWithGrammar {
 
-  object ImportKey extends NodeClass
+  object ImportKey extends NodeShape
   object ElementsKey extends NodeField
 
   object ImportPathGrammar extends GrammarKey

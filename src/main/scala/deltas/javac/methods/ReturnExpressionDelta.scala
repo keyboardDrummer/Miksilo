@@ -46,7 +46,7 @@ object ReturnExpressionDelta extends StatementInstance {
 
   def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
 
-  object ReturnInteger extends NodeClass
+  object ReturnInteger extends NodeShape
 
   object ReturnValue extends NodeField
 

@@ -2,14 +2,14 @@ package deltas.javac.statements
 
 import core.deltas.{Compilation, Language}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {
   override val key = GotoKey
 
-  object GotoKey extends NodeClass
+  object GotoKey extends NodeShape
   object Target extends NodeField
 
   def goto(label: String) = new Node(GotoKey, Target -> label)

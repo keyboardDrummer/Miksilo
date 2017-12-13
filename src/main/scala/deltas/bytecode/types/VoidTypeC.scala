@@ -4,7 +4,7 @@ import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object VoidTypeC extends TypeInstance with StackType {
 
@@ -26,7 +26,7 @@ object VoidTypeC extends TypeInstance with StackType {
 
   def voidType = new Node(VoidTypeKey)
 
-  object VoidTypeKey extends NodeClass
+  object VoidTypeKey extends NodeShape
 
   override def description: String = "Defines the void type."
 }

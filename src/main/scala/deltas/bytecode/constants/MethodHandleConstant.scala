@@ -3,12 +3,12 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.PrintByteCode._
 
 object MethodHandleConstant extends ConstantEntry {
 
-  object MethodHandleKey extends NodeClass
+  object MethodHandleKey extends NodeShape
   object MethodHandleReference extends NodeField
   object MethodHandleIndex extends NodeField
 

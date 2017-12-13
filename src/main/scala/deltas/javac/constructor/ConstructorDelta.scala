@@ -19,16 +19,16 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceDelta, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
 
-  case class BadConstructorNameException(clazz: Node, constructor: Node) extends BadInputException
+  case class BadConstructorNameException(javaClass: Node, constructor: Node) extends BadInputException
 
-  override def transformProgram(clazz: Node, state: Compilation): Unit = {
-    val className = clazz.name
-    for (constructor <- getConstructors(clazz)) {
+  override def transformProgram(program: Node, state: Compilation): Unit = {
+    val className = program.name
+    for (constructor <- getConstructors(program)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
       if (!constructorClassName.equals(className))
-        throw BadConstructorNameException(clazz, constructor.node)
+        throw BadConstructorNameException(program, constructor.node)
 
-      constructor.clazz = MethodDelta.Clazz
+      constructor.shape = MethodDelta.Shape
       constructor(MethodDelta.MethodNameKey) = SuperCallExpression.constructorName
       constructor(MethodDelta.ReturnTypeKey) = VoidTypeC.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
@@ -37,8 +37,8 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     }
   }
 
-  def getConstructors[T <: NodeLike](clazz: JavaClass[T]): Seq[Method[T]] = {
-    NodeWrapper.wrapList(clazz.members.filter(member => member.clazz == ConstructorKey))
+  def getConstructors[T <: NodeLike](javaClass: JavaClass[T]): Seq[Method[T]] = {
+    NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == ConstructorKey))
   }
 
   def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],
@@ -47,7 +47,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     ConstructorClassNameKey -> className)
 
 
-  object ConstructorKey extends NodeClass
+  object ConstructorKey extends NodeShape
 
   object ConstructorClassNameKey extends NodeField
 

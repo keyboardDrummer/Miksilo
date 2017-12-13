@@ -1,14 +1,14 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar, Language}
 import deltas.javac.classes.BasicImportC._
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
 
 object WildcardImportC extends DeltaWithGrammar {
 
-  object WildcardImportKey extends NodeClass
+  object WildcardImportKey extends NodeShape
 
   def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 

@@ -3,12 +3,12 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.PrintByteCode
 
 object IntegerInfoConstant extends ConstantEntry {
 
-  object IntegerKey extends NodeClass
+  object IntegerKey extends NodeShape
   object IntegerValue extends NodeField
 
   def construct(index: Int) = new Node(IntegerKey, IntegerValue -> index)

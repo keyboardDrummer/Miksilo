@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Labelled}
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName
@@ -71,9 +71,9 @@ object ObjectTypeDelta extends TypeInstance with StackType {
 
   object Name  extends NodeField
 
-  object ObjectTypeKey extends NodeClass
+  object ObjectTypeKey extends NodeShape
 
-  object ObjectStackType extends NodeClass
+  object ObjectStackType extends NodeShape
 
   override def getStackType(_type: Node, state: Language): Node = {
     ObjectStackType.create(Name -> ClassInfoConstant.classRef(ObjectTypeDelta.getObjectTypeName(_type).right.get))

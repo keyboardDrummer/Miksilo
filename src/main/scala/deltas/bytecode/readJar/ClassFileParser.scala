@@ -27,7 +27,7 @@ object ClassFileParser extends ByteParsers with PackratParsers {
       fields <- sizedSequenceParser(fieldParser)
       methods <- sizedSequenceParser(methodParser)
       attributes <- attributesParser
-    } yield ByteCodeSkeleton.clazz(thisIndex, superIndex, constantPool, methods, interfaces, fields, attributes)
+    } yield ByteCodeSkeleton.neww(thisIndex, superIndex, constantPool, methods, interfaces, fields, attributes)
   }
 
   def attributesParser: ClassFileParser.Parser[Seq[Node]] = {

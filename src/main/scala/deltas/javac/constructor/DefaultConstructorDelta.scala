@@ -8,11 +8,12 @@ import deltas.javac.methods.AccessibilityFieldsDelta
 object DefaultConstructorDelta extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorDelta)
 
-  def transformProgram(clazz: Node, state: Compilation): Unit = {
-    val noConstructors = !clazz.members.exists(member => member.clazz == ConstructorDelta.ConstructorKey)
+  def transformProgram(program: Node, state: Compilation): Unit = {
+    val javaClass: JavaClass[Node] = program
+    val noConstructors = !javaClass.members.exists(member => member.shape == ConstructorDelta.ConstructorKey)
     if (noConstructors) {
-      val defaultConstructor = ConstructorDelta.constructor(clazz.name, Seq(), Seq(), AccessibilityFieldsDelta.PublicVisibility)
-      clazz.members = Seq(defaultConstructor) ++ clazz.members
+      val defaultConstructor = ConstructorDelta.constructor(javaClass.name, Seq(), Seq(), AccessibilityFieldsDelta.PublicVisibility)
+      javaClass.members = Seq(defaultConstructor) ++ javaClass.members
     }
   }
 

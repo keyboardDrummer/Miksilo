@@ -1,11 +1,11 @@
 package deltas.bytecode.coreInstructions
 
 import core.deltas._
-import core.deltas.node.{Node, NodeClass, NodeLike, NodeWrapper}
+import core.deltas.node.{Node, NodeShape, NodeLike, NodeWrapper}
 import deltas.bytecode._
 import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
-import deltas.bytecode.coreInstructions.InstructionDelta.InstructionClazz
+import deltas.bytecode.coreInstructions.InstructionDelta.InstructionShape
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
@@ -15,18 +15,18 @@ class ByteCodeTypeException(message: String) extends Exception(message)
 
 object InstructionDelta {
   implicit class Instruction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def delta: InstructionDelta = node.clazz.asInstanceOf[InstructionClazz].delta
+    def delta: InstructionDelta = node.shape.asInstanceOf[InstructionShape].delta
     def jumpBehavior: JumpBehavior = delta.jumpBehavior
   }
-  case class InstructionClazz(delta: InstructionDelta) extends NodeClass {
+  case class InstructionShape(delta: InstructionDelta) extends NodeShape {
     override lazy val toString: String = delta.name
   }
 }
 
 trait InstructionDelta extends InstructionWithGrammar
-  with InstructionSignatureProvider with InstructionSideEffectProvider with NodeClass {
+  with InstructionSignatureProvider with InstructionSideEffectProvider with NodeShape {
 
-  final override val key = InstructionClazz(this)
+  final override val key = InstructionShape(this)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -35,7 +35,7 @@ trait InstructionDelta extends InstructionWithGrammar
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
-    if (stackTop.clazz != ObjectTypeDelta.ObjectTypeKey)
+    if (stackTop.shape != ObjectTypeDelta.ObjectTypeKey)
       throw new ByteCodeTypeException(s"$name requires an object on top of the stack and not a $stackTop.")
   }
 

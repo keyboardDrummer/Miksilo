@@ -13,7 +13,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the + operator."
 
-  val key = Clazz
+  val key = Shape
 
   override def toByteCode(addition: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
@@ -49,7 +49,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val additiveGrammar = find(AddAdditivePrecedence.Grammar)
-    val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Clazz
+    val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Shape
     additiveGrammar.addOption(parseAddition)
   }
 
@@ -61,9 +61,9 @@ implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
   def right_=(value: T): Unit = node(Right) = value
 }
 
-  def addition(first: Node, second: Node) = new Node(Clazz, Left -> first, Right -> second)
+  def addition(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Left extends NodeField
   object Right extends NodeField

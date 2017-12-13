@@ -45,7 +45,7 @@ object GreaterThanC extends ExpressionInstance {
 
   def lessThan(first: Node, second: Node) = new Node(GreaterThanKey, GreaterThanFirst -> first, GreaterThanSecond -> second)
 
-  object GreaterThanKey extends NodeClass
+  object GreaterThanKey extends NodeShape
 
   object GreaterThanFirst extends NodeField
 
@@ -89,7 +89,7 @@ object LessThanC extends ExpressionInstance {
 
   def lessThan(first: Node, second: Node) = new Node(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
 
-  object LessThanKey extends NodeClass
+  object LessThanKey extends NodeShape
 
   object LessThanFirst extends NodeField
 

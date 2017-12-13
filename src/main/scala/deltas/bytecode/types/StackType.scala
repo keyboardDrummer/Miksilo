@@ -1,11 +1,11 @@
 package deltas.bytecode.types
 
-import core.deltas.node.NodeClass
+import core.deltas.node.NodeShape
 import core.deltas.{Delta, Language}
 
 trait StackType extends Delta
 {
-  val key: NodeClass
+  val key: NodeShape
   def getStackSize: Int
 
   override def inject(state: Language): Unit = {

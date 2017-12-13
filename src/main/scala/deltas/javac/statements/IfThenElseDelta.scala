@@ -17,7 +17,7 @@ object IfThenElseDelta extends StatementInstance {
 
   override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
-    val methodInfo = ifThenElse.findAncestorClass(ByteCodeMethodInfo.MethodInfoKey)
+    val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
     val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
     val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo)
     val endLabel = InferredStackFrames.label(endLabelName)
@@ -35,8 +35,8 @@ object IfThenElseDelta extends StatementInstance {
       Seq(endLabel)
   }
 
-  def key = Clazz
-  object Clazz extends NodeClass
+  def key = Shape
+  object Shape extends NodeShape
   object ElseKey extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

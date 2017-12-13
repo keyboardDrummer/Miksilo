@@ -13,12 +13,12 @@ import deltas.javac.classes.skeleton.QualifiedClassName
 
 object ClassInfoConstant extends ConstantEntry {
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Name extends NodeField
 
-  def classRef(name: QualifiedClassName): Node = new Node(Clazz, Name -> QualifiedClassNameConstantDelta.create(name))
-  def classRef(classRefNameIndex: Int): Node = new Node(Clazz, Name -> classRefNameIndex)
+  def classRef(name: QualifiedClassName): Node = new Node(Shape, Name -> QualifiedClassNameConstantDelta.create(name))
+  def classRef(classRefNameIndex: Int): Node = new Node(Shape, Name -> classRefNameIndex)
 
   implicit class ClassInfoConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def nameIndex: Int = node(Name).asInstanceOf[Int]
@@ -28,7 +28,7 @@ object ClassInfoConstant extends ConstantEntry {
     def name_=(value: QualifiedClassNameConstant[T]): Unit = node(Name) = value
   }
 
-  override def key = Clazz
+  override def key = Shape
 
   override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
     byteToBytes(7) ++ shortToBytes(new ClassInfoConstantWrapper(constant).nameIndex)

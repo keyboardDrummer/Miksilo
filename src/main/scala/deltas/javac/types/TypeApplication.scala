@@ -2,14 +2,14 @@ package deltas.javac.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, NodeClass, NodeField}
+import core.deltas.node.{GrammarKey, NodeShape, NodeField}
 import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 
 object TypeApplication extends DeltaWithGrammar {
 
-  object TypeApplicationKey extends NodeClass
+  object TypeApplicationKey extends NodeShape
   object TypeApplicationFunc extends NodeField
   object TypeApplicationArgument extends NodeField
 

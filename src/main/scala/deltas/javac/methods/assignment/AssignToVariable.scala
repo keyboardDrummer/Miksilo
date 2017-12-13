@@ -30,7 +30,7 @@ object AssignToVariable extends DeltaWithGrammar {
   }
 
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
-    byteCodeType.clazz match {
+    byteCodeType.shape match {
       case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
       case ObjectTypeDelta.ObjectStackType => StoreAddressDelta.addressStore(variableInfo.offset)
       case ArrayTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)

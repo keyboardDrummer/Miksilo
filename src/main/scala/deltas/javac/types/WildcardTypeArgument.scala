@@ -2,11 +2,11 @@ package deltas.javac.types
 
 import core.deltas.{DeltaWithGrammar, Language}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object WildcardTypeArgument extends DeltaWithGrammar {
 
-  object WildcardArgumentKey extends NodeClass
+  object WildcardArgumentKey extends NodeShape
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val byteCodeArgumentGrammar = find(TypeApplication.ByteCodeTypeArgumentGrammar)

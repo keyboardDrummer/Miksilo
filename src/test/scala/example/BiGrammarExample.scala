@@ -4,33 +4,33 @@ import core.bigrammar._
 import core.bigrammar.grammars.Labelled
 import core.grammar.~
 import core.deltas.NodeGrammarWriter
-import core.deltas.node.{NodeClass, NodeField}
+import core.deltas.node.{NodeShape, NodeField}
 import org.scalatest.FunSuite
 
 object While {
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Condition extends NodeField
   object Body extends NodeField
 }
 
 object PlusEquals {
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Target extends NodeField
   object Value extends NodeField
 }
 
 object Decrement {
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Target extends NodeField
 }
 
 object Variable {
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Name extends NodeField
 }
 
 object Constant {
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
   object Value extends NodeField
 }
 
@@ -41,18 +41,18 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
 
   test("whileWithAsNode") {
     val expression = new Labelled(StringKey("expression"))
-    expression.addOption(identifier.as(Variable.Name).asNode(Variable.Clazz))
-    expression.addOption(number.as(Constant.Value).asNode(Constant.Clazz))
+    expression.addOption(identifier.as(Variable.Name).asNode(Variable.Shape))
+    expression.addOption(number.as(Constant.Value).asNode(Constant.Shape))
     val assignment = identifier ~~ keywordClass("=") ~~ expression |
-      (identifier.as(PlusEquals.Target) ~~ "+=" ~~ expression.as(PlusEquals.Value)).asNode(PlusEquals.Clazz)
+      (identifier.as(PlusEquals.Target) ~~ "+=" ~~ expression.as(PlusEquals.Value)).asNode(PlusEquals.Shape)
     expression.addOption(assignment)
-    expression.addOption(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Clazz)
+    expression.addOption(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Shape)
     expression.addOption(expression ~~ "-" ~~ expression)
     val statement = new Labelled(StringKey("statement"))
     val _while =
       "while" ~ expression.inParenthesis.as(While.Condition) ~~ "{" %
         statement.manyVertical.indent(2).as(While.Body) %<
-        "}" asNode While.Clazz
+        "}" asNode While.Shape
 
     statement.addOption(_while)
     statement.addOption(expression ~< ";")
@@ -77,7 +77,7 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
   test("orOperatorWithoutAs") {
     case class Assignment(target: Any, value: Any)
     case class Or(left: Any, right: Any, strict: Boolean)
-    object Or extends NodeClass
+    object Or extends NodeShape
 
     val expression: BiGrammar = "true" ~> value(true) | "false" ~> value(false)
 

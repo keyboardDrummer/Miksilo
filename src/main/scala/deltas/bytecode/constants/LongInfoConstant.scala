@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import deltas.bytecode.PrintByteCode
 
 object LongInfoConstant extends ConstantEntry {
@@ -14,7 +14,7 @@ object LongInfoConstant extends ConstantEntry {
 
   def construct(value: Long) = new Node(LongEntryKey, LongEntryValue -> value)
 
-  object LongEntryKey extends NodeClass
+  object LongEntryKey extends NodeShape
   object LongEntryValue extends NodeField
   override def key = LongEntryKey
 

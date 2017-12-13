@@ -1,11 +1,11 @@
 package deltas.javac.expressions
 
 import core.deltas._
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
 
 trait ExpressionInstance extends DeltaWithGrammar {
-  val key: NodeClass
+  val key: NodeShape
 
   override def inject(state: Language): Unit = {
     ExpressionSkeleton.getRegistry(state).instances.put(key, this)

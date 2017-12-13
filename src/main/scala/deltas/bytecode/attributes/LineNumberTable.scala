@@ -2,7 +2,7 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
@@ -33,7 +33,7 @@ object LineNumberTable extends ByteCodeAttribute {
 
   def getLineNumberTableEntries(lineNumberTable: Node) = lineNumberTable(LineNumberTableLines).asInstanceOf[Seq[LineNumberRef]]
 
-  object LineNumberTableKey extends NodeClass
+  object LineNumberTableKey extends NodeShape
 
   object LineNumberTableLines extends NodeField
 

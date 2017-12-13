@@ -16,7 +16,7 @@ import deltas.javac.types.MethodType.MethodTypeWrapper
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
-  object MethodInfoKey extends NodeClass
+  object MethodInfoKey extends NodeShape
 
   object MethodNameIndex extends NodeField
 
@@ -49,7 +49,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
     def attributes: Seq[T] = node(MethodAttributes).asInstanceOf[Seq[T]]
 
-    def codeAttribute: CodeAttribute[T] = attributes.find(r => r.clazz == CodeAttributeDelta.key).get
+    def codeAttribute: CodeAttribute[T] = attributes.find(r => r.shape == CodeAttributeDelta.key).get
   }
 
   override def inject(state: Language): Unit = {

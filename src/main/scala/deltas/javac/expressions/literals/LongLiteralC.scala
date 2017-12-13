@@ -3,7 +3,7 @@ package deltas.javac.expressions.literals
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.Path
 import core.deltas.{Compilation, Contract, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
@@ -36,7 +36,7 @@ object LongLiteralC extends ExpressionInstance {
 
   override def getType(expression: Path, compilation: Compilation): Node = LongTypeC.longType
 
-  object LongLiteralKey extends NodeClass
+  object LongLiteralKey extends NodeShape
 
   object ValueKey extends NodeField
 

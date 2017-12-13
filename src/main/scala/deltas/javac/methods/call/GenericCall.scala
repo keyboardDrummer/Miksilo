@@ -13,7 +13,7 @@ import deltas.javac.types.MethodType._
 
 object CallC
 {
-  object CallKey extends NodeClass
+  object CallKey extends NodeShape
 
   object CallCallee extends NodeField
 

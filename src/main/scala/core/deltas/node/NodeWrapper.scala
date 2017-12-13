@@ -6,8 +6,8 @@ trait NodeWrapper[T <: NodeLike] {
   def get(key: NodeField): Option[Any] = node.get(key)
   def apply(key: NodeField): Any = node.apply(key)
   def update(key: NodeField, value: Any): Unit = node.update(key, value)
-  def clazz = node.clazz
-  def clazz_=(value: NodeClass) = node.clazz = value
+  def shape = node.shape
+  def shape_=(value: NodeShape) = node.shape = value
   def dataView: Map[NodeField, Any] = node.dataView
 }
 

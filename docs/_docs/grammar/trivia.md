@@ -41,7 +41,7 @@ We can allow comment parsing using a very simple delta, but to understand how th
     val nameGrammar = "class" ~~> identifier.as(ClassName)
     val membersGrammar = classMember.manyVertical.indent(4).as(Members)
     val classGrammar = packageGrammar % importsGrammar % 
-      nameGrammar ~< "{" % membersGrammar %< "}" asLabelledNode Clazz
+      nameGrammar ~< "{" % membersGrammar %< "}" asLabelledNode Shape
 
     //BodyGrammar is the file's top level grammar
     find(BodyGrammar).inner = classGrammar 

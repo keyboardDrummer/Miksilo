@@ -2,7 +2,7 @@ package deltas.javac.statements.locals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass, NodeField}
+import core.deltas.node.{Node, NodeShape, NodeField}
 import core.deltas.path.{Path, PathRoot, SequenceElement}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
@@ -22,16 +22,16 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
-    val parseDeclarationWithInitializer = create(Clazz,
+    val parseDeclarationWithInitializer = create(Shape,
       (typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(Initializer)) ~< ";").
-      asNode(Clazz))
+      asNode(Shape))
     statement.addOption(parseDeclarationWithInitializer)
   }
 
-  def declarationWithInitializer(name: String, _type: Node, initializer: Node) = new Node(Clazz,
+  def declarationWithInitializer(name: String, _type: Node, initializer: Node) = new Node(Shape,
     Name -> name, Type -> _type, Initializer -> initializer)
 
-  object Clazz extends NodeClass
+  object Shape extends NodeShape
 
   object Initializer extends NodeField
 
@@ -49,8 +49,8 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visit(obj => obj.clazz match {
-      case Clazz => transformDeclarationWithInitializer(obj, state)
+    PathRoot(program).visit(obj => obj.shape match {
+      case Shape => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })
   }

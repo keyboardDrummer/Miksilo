@@ -1,13 +1,13 @@
 package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{NodeClass, NodeField}
+import core.deltas.node.{NodeShape, NodeField}
 import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.types.TypeSkeleton
 
 object ExtendsTypeArgument extends DeltaWithGrammar {
 
-  object ExtendsKey extends NodeClass
+  object ExtendsKey extends NodeShape
   object ExtendsBody extends NodeField
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._

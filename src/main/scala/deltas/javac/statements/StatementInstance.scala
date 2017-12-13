@@ -1,7 +1,7 @@
 package deltas.javac.statements
 
 import core.deltas._
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{Path, SequenceElement}
 
 trait StatementInstance extends DeltaWithGrammar {
@@ -11,7 +11,7 @@ trait StatementInstance extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  def key: NodeClass
+  def key: NodeShape
 
   def toByteCode(statement: Path, compilation: Compilation): Seq[Node]
 

@@ -9,7 +9,7 @@ import deltas.bytecode.types.{IntTypeC, TypeSkeleton}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SubtractionC extends ExpressionInstance {
-  object SubtractionKey extends NodeClass
+  object SubtractionKey extends NodeShape
   object FirstKey extends NodeField
   object SecondKey extends NodeField
 

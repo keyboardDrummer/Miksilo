@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeClass}
+import core.deltas.node.{Node, NodeShape}
 
 object IntTypeC extends TypeInstance with StackType {
 
@@ -26,7 +26,7 @@ object IntTypeC extends TypeInstance with StackType {
 
   override def getStackSize: Int = 1
 
-  object IntTypeKey extends NodeClass
+  object IntTypeKey extends NodeShape
 
   override def description: String = "Defines the integer type."
 }

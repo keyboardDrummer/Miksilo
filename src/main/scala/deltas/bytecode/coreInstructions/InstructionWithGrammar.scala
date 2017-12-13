@@ -2,14 +2,14 @@ package deltas.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, NodeClass}
+import core.deltas.node.{GrammarKey, NodeShape}
 import core.deltas.{DeltaWithGrammar, Language}
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 
 object ConstantPoolIndexGrammar extends GrammarKey
 trait InstructionWithGrammar extends DeltaWithGrammar
 {
-  val key: NodeClass
+  val key: NodeShape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val instructionGrammar = grammars.find(CodeAttributeDelta.InstructionGrammar)

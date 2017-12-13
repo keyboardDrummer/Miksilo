@@ -11,7 +11,7 @@ import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
 object MethodRefConstant extends ConstantEntry {
 
-  object MethodRefKey extends NodeClass
+  object MethodRefKey extends NodeShape
 
   object ClassRef extends NodeField
 
