@@ -3,9 +3,9 @@ title: Modularity
 category: BiGrammar
 order: 2
 ---
-The #1 focus of Blender is to enable _modular_ language design. This page explains how BiGrammar supports that goal.
+The goal of Blender is to enable _modular_ language design. This article shows how BiGrammar supports that.
 
-In [Unified parsing and printing](http://keyboarddrummer.github.io/Blender/bigrammar/unified-parsing-and-printing/) we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is a bit peculiar. It is common when using parser combinators, to first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node, for example:
+In [Unified parsing and printing](http://keyboarddrummer.github.io/Blender/bigrammar/unified-parsing-and-printing/) we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is peculiar. More commonly, users of parser combinators first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node. We can demonstrate this approach using BiGrammar:
 
 ```scala
 (expression ~< "|" ~ expression).map(

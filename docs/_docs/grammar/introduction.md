@@ -4,7 +4,7 @@ category: BiGrammar
 order: 1
 ---
 
-Blender's metalanguage for everything syntax related is called BiGrammar. Part of its strength is that it defines both a parser and a printer at the same time. Operators and methods in BiGrammar will often have an effect on both the parser and the printer, both can sometimes influence only one of both.
+Blender's metalanguage for everything syntax related is called BiGrammar, whose main strength is that it defines both a parser and a printer at the same time. Operators and methods in BiGrammar will often have an effect on both the parser and the printer, both can sometimes influence only one of both.
 
 ### Example
 Here follows an example of a small piece of grammar defined using BiGrammar:
