@@ -4,7 +4,7 @@ category: Practical
 order: 2
 ---
 
-> Decide on a license, mention it. Mention open source. Don't mention rgv.willems@gmail.com, instead use the gitter room.
+> Decide on a license, mention it. Mention open source.
 
 There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor's or Master's thesis.
 
@@ -18,7 +18,7 @@ Some examples of cool features:
 - Add a new language front-end or back-end.
 
 #### How to contribute
-1. Reach out to rgv.willems@gmail.com, so he can help you out where the documentation is lacking.
+1. Reach out on [the Gitter](https://gitter.im/LanguageBlender/Lobby), so other contributors can help you out where the documentation is lacking.
 1. Look through the open issues to see if you find something interesting
 1. Enjoy the work ;-)
 1. Once you're done, submit a pull request and make sure the build server approves it.

@@ -4,10 +4,10 @@ category: BiGrammar
 order: 1
 ---
 
-BiGrammar is Blender's metalanguage for everything syntax related, whose main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In the rest of this article we'll go through some examples that showcase the most important operators. Afterwards you will comfortably read grammars defined using BiGrammar.
+BiGrammar is Blender's metalanguage for everything syntax related, whose main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In this article we'll go through code examples showcasing the most important operators. Afterwards you will comfortably read BiGrammar code.
 
-#### Basics
-Here is a grammar for a while loop:
+#### Parsing & printing
+Here is a grammar for a common while loop:
 
 ```scala
 "while" ~ expression.inParenthesis.as(Condition) ~~ "{" %
@@ -37,17 +37,17 @@ while (i){
 which yields this AST:
 
 ```yml
-Class: While
+Shape: While
 Condition: 
-  Class: Variable
+  Shape: Variable
   Name: i
 Body:
-  - Class: Decrement
+  - Shape: Decrement
     Target: i
-  - Class: PlusEquals
+  - Shape: PlusEquals
     Target: x
     Value: 
-      Class: Constant
+      Shape: Constant
       Value: 2  
 ```
 
@@ -61,7 +61,7 @@ while(i) {
 ```
 
 #### Choice, ignore and value
-This grammar maps yes and no strings to their corresponding boolean values:
+The following grammar maps yes and no strings to their corresponding boolean values:
 
 ```scala
 "yes" ~> value(true) | "no" ~> value(false)
@@ -72,7 +72,7 @@ This grammar maps yes and no strings to their corresponding boolean values:
 - `value` has no effect on the syntax, it will produce a value when parsing and consume one while printing.
 
 #### Regex and map
-This grammar maps integers to their string representation:
+The following grammar maps integers to their string representation:
 
 ```scala
 new RegexGrammar("""-?\d+""".r).map(

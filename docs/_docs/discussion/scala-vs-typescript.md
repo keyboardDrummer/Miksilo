@@ -1,1 +1,3 @@
-Fill in
+This article should explain the differences between using Scala and using Typescript as a host language. Because of Typescript's native unstructured data and hybrid type system, it should be a great match for Blender's architecture. How does Scala compare to this? To make this comparison correctly, we should create a prototype in Typescript.
+
+Looking at ScalaJS and how it works together with Typescript libraries should provide some insight into how well Scala's type system performs in a hybrid role.

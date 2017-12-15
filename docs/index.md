@@ -20,7 +20,7 @@ Because languages share many properties, the quickest way to build a language is
 
 The best way to show Blender's modularity is by example, so we've picked these language transformations as showcases:
 
-1. [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
+1. [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/trivia/)
 1. [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
 1. [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
 

@@ -30,7 +30,7 @@ Now let's use the `as` and `asNode` style to bind our grammar to the AST. The in
 val grammar = expression.as(Left) ~ "|" ~ expression.as(Right) asNode Or
 ```
 
-The immediate advantage is that we don't have to unwrap and wrap the tuples values any more, saving us some boilerplate. However, a more important advantage is that we can easily transform this grammar to include the strict operator:
+An immediate advantage is that we don't have to unwrap and wrap the tuples any more, saving us some boilerplate. However, a more important advantage is that we can easily transform this grammar. This example shows how we can add the strict operator:
 
 ```scala
 val strict = ("|" ~> value(false) | value(true)).as(Strict)
@@ -48,3 +48,5 @@ Here are explanations for the methods used:
 - `findAs` traverses a `BiGrammar` to find a particular `as` binding, and returns the path it took through the grammar. The return type is a `GrammarPath`, which is a [zipper](https://en.wikipedia.org/wiki/Zipper_(data_structure)) for `BiGrammar`.
 - `replace` takes the latest reference traversed by the grammar path and sets it to the grammar that is passed to `replace`.
 - `removeFromSequence` assumes that the grammar is the `first` or `second` field of a sequence operator such as `~`, and replaces that sequence operator with the field (`first` or `second`) that is not the current grammar. Here is an example: `(a ~ b).findAs(a).removeFromSequence()` results in `b`
+
+This article has demonstrated how BiGrammar supports modularity. Early binding of grammars to fields makes mutation easier to write, and the zipper `GrammarPath` provides utilities for easily editing grammars. If you'd like to see the extend of BiGrammar's modularity, check out [this transformation](http://keyboarddrummer.github.io/Blender/bigrammar/trivia/) which adds comments to a language in a language agnostic way.
