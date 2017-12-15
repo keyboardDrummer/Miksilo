@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.{BiGrammar, WithMapG}
-import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToParser.WithMap
 
 //TODO deze nog wat meer typed maken met WithState
 

@@ -1,7 +1,8 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, WithMapG}
 import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToParser.WithMap
 import core.bigrammar.printer.{Printer, TryState}
 import core.grammar.{Grammar, GrammarToParserConverter}
 
@@ -21,7 +22,7 @@ case class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = fal
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
-  override def write(from: WithMap) = {
+  override def write(from: WithMapG[Any]) = {
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {

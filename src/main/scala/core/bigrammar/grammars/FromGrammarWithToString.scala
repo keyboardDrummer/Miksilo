@@ -1,6 +1,6 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToParser.WithMap
 import core.bigrammar.WithMapG
 import core.bigrammar.printer.TryState
 import core.grammar.Grammar

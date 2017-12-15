@@ -1,6 +1,6 @@
 package core.deltas
 
-import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToParser.WithMap
 import core.bigrammar.grammars.MapGrammarWithMap
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMapG}

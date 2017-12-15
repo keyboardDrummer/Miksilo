@@ -2,6 +2,7 @@ package core.grammar
 
 import core.bigrammar.BiGrammarToGrammar
 import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
+import core.bigrammar.BiGrammarToParser
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons
