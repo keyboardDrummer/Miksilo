@@ -1,27 +1,11 @@
 package core.grammar
 
+import core.bigrammar.BiGrammarToParser
+import core.bigrammar.grammars.StringGrammar
+
 import scala.util.matching.Regex
 
-trait GrammarWriter {
-
-  def identifier = Identifier
-
-  def number = NumberG
-
-  def failure = FailureG
-
-  def produce(value: Any) = new Produce(value)
-
-  def keyword(word: String) = new Keyword(word)
-
-  implicit def stringToGrammar(value: String): Grammar =
-    if (value.forall(c => Character.isLetterOrDigit(c)))
-      new Keyword(value)
-    else new Delimiter(value)
-}
-
-
-trait Grammar extends GrammarWriter {
+trait Grammar {
 
   def expand: Grammar = this
 
@@ -112,16 +96,6 @@ case class Sequence(first: Grammar, second: Grammar) extends Grammar
 
 case class Produce(result: Any) extends Grammar
 
-case class Delimiter(value: String) extends Grammar {
-  if (value.length == 0)
-    throw new RuntimeException("value must have non-zero length")
-}
-
-case class Keyword(value: String, reserved: Boolean = true) extends Grammar {
-  if (value.length == 0)
-    throw new RuntimeException("value must have non-zero length")
-}
-
 case class MapGrammar(inner: Grammar, map: Any => Any) extends Grammar
 
 class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
@@ -133,9 +107,3 @@ class Labelled(val name: AnyRef, var inner: Grammar = null) extends Grammar {
 
 case class FailureG(message: String = "failure") extends Grammar {
 }
-
-object StringLiteral extends Grammar
-
-object NumberG extends Grammar
-
-object Identifier extends Grammar

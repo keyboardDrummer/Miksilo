@@ -1,7 +1,11 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.BiGrammarToParser
 
-case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false) extends BiGrammarWithoutChildren {
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false)
+  extends StringGrammar(verifyWhenPrinting) {
+  if (value.length == 0)
+    throw new RuntimeException("value must have non-zero length")
+
+  override def getParser: BiGrammarToParser.Parser[String] = BiGrammarToParser.literal(value)
 }

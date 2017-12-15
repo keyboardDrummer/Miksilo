@@ -28,10 +28,10 @@ object BiGrammarToGrammar {
             } yield WithMapG(core.grammar.~(firstValue.value, secondValue.value), firstValue.map ++ secondValue.map)
           }
         case choice: Choice => core.grammar.Choice(children(0), children(1), choice.firstBeforeSecond)
-        case custom: CustomGrammarWithoutChildren => custom.getGrammar ^^ valueToResult
-        case custom: CustomGrammar => custom.createGrammar(children, recursive)
-        case Keyword(keyword, reserved, _) => core.grammar.Keyword(keyword, reserved) ^^ valueToResult
-        case Delimiter(keyword) => core.grammar.Delimiter(keyword) ^^ valueToResult
+//        case custom: CustomGrammarWithoutChildren => custom.getGrammar ^^ valueToResult
+//        case custom: CustomGrammar => custom.createGrammar(children, recursive)
+//        case Keyword(keyword, reserved, _) => core.bigrammar.grammars.Keyword(keyword, reserved) ^^ valueToResult
+//        case Delimiter(keyword) => core.bigrammar.grammars.Delimiter(keyword) ^^ valueToResult
         case _: Many => core.grammar.Many(children.head) ^^ { untyped =>
           val elements = untyped.asInstanceOf[Seq[Result]]
           StateFull.flattenMonads(elements).map(withMaps => {

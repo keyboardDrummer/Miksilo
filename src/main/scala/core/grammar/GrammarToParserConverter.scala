@@ -1,6 +1,8 @@
 package core.grammar
 
 
+import core.bigrammar.grammars.Keyword
+
 import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader._
@@ -45,12 +47,7 @@ class GrammarToParserConverter extends JavaTokenParsers with PackratParsers {
           case l ~ r => new core.grammar.~(l, r)
         }
         case regexG: RegexG => regex(regexG.regex)
-        case NumberG => wholeNumber
-        case StringLiteral => stringLiteral ^^ (s => s.dropRight(1).drop(1))
         case many: Many => helper(many.inner).*
-        case originalDelimiter: Delimiter => whitespaceG ~> literal(originalDelimiter.value) //TODO What's that whitespace here? remove or explain.
-        case originalKeyword: core.grammar.Keyword => literal(originalKeyword.value)
-        case core.grammar.Identifier => ident.filter(identifier => !keywords.contains(identifier))
         case labelled: Labelled => helper(labelled.inner)
         case map: MapGrammar => helper(map.inner) ^^ map.map
         case produce: Produce => success(produce.result)

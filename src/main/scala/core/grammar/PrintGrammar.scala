@@ -1,8 +1,6 @@
 package core.grammar
 
-import core.bigrammar.BiGrammarToGrammar
-import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
-import core.bigrammar.BiGrammarToParser
+import core.deltas.grammars.KeyGrammar
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.immutable.Stream.Cons
@@ -40,18 +38,18 @@ object PrintGrammar {
     case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case Many(inner: Labelled) => toDocumentInner(inner) ~ "*"
     case Many(inner) => toDocumentInner(inner).inParenthesis ~ "*"
-    case Keyword(value, _) => ResponsiveDocument.text(value)
+    //case Keyword(value, _) => ResponsiveDocument.text(value)
     case Option(inner: Labelled) => toDocumentInner(inner) ~ "?"
     case Option(inner) => toDocumentInner(inner).inParenthesis ~ "?"
     case RegexG(value) => s"Regex($value)"
     case Produce(value) => "produce"
     case FailureG(message) => message
-    case NumberG => "number"
-    case Identifier => "identifier"
-    case labelled: Labelled =>
-      val key: AnyRef = labelled.name
-      grammarKeyToName(key)
-    case StringLiteral => "string"
+//    case NumberG => "number"
+//    case Identifier => "identifier"
+//    case labelled: Labelled =>
+//      val key: AnyRef = labelled.name
+//      grammarKeyToName(key)
+//    case StringLiteral => "string"
   }
 
   def grammarKeyToName(key: Any): String = key match {
@@ -92,7 +90,7 @@ object PrintGrammar {
 
       Sequence(left, right)
     case Many(inner) => Many(transform(inner))
-    case Delimiter(value) => Keyword(value)
+    //case Delimiter(value) => Keyword(value)
     case _ => grammar
   }
 

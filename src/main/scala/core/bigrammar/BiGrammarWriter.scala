@@ -2,16 +2,15 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.document.{Document, WhiteSpace}
-import core.grammar.{Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
 
 trait BiGrammarWriter {
 
-  def identifier: BiGrammar = new FromStringGrammar(Identifier)
+  def identifier: BiGrammar = Identifier()
 
-  def number: BiGrammar = new FromGrammarWithToString(NumberG)
+  def number: BiGrammar = NumberG
 
   def integer = number ^^ (
     (s: Any) => Integer.parseInt(s.asInstanceOf[String]),

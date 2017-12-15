@@ -1,11 +1,10 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.grammar.GrammarToParserConverter
-import scala.util.parsing.input.CharArrayReader._
 
 import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
+import scala.util.parsing.input.CharArrayReader._
 
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
@@ -16,6 +15,13 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   def valueToResult(value: Any): Result = (state: State) => (state, WithMapG(value, Map.empty))
 
   def toParser(grammar: BiGrammar): PackratParser[Any] = {
+
+    val allGrammars: Set[BiGrammar] = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
+    keywords ++= allGrammars.flatMap({
+      case keyword: Keyword => if (keyword.reserved) Set(keyword.value) else Set.empty[String]
+      case _ => Set.empty[String]
+    })
+
     val cache: mutable.Map[BiGrammar, PackratParser[Result]] = mutable.Map.empty
     lazy val recursive: BiGrammar => PackratParser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, memo(toParser(recursive, grammar)))
@@ -25,7 +31,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
     phrase(valueParser)
   }
 
-  def toParser(recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
+  private def toParser(recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
       case sequence: Sequence =>
         val firstParser = recursive(sequence.first)
@@ -49,19 +55,9 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
         val secondParser = recursive(choice.right)
         if (choice.firstBeforeSecond) firstParser | secondParser else firstParser ||| secondParser
 
-      case custom: CustomGrammarWithoutChildren =>
-        val parser: GrammarToParserConverter.PackratParser[Any] =
-          GrammarToParserConverter.convert(custom.getGrammar).map(valueToResult)
-        Parser { //This approach does not work (I think). Identifier needs to know what keywords there are so it doesn't parse keywords.
-          in: Input => parser(in) match {
-            case GrammarToParserConverter.Success(result, next) => Success[Result](result.asInstanceOf[Result], next)
-            case GrammarToParserConverter.Failure(msg, next) => Failure(msg, next)
-          }
-        }
+      case custom: CustomGrammarWithoutChildren => custom.getParser.map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
 
-      case Keyword(keyword, _, _) => literal(keyword).map(valueToResult)
-      case Delimiter(keyword) => whitespaceG ~> literal(keyword).map(valueToResult)
       case many: Many =>
         val innerParser = recursive(many.inner)
         val manyInners = innerParser.* //TODO by implementing * ourselves we can get rid of the intermediate List.

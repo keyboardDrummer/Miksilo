@@ -1,8 +1,7 @@
 package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.{FromStringGrammar, StringLiteral}
-import core.grammar.Identifier
+import core.bigrammar.grammars.{Identifier, StringLiteral}
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
@@ -25,7 +24,7 @@ object Utf8ConstantDelta extends ConstantEntry {
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
-    (new FromStringGrammar(Identifier, verifyWhenPrinting = true) |
+    (new Identifier(verifyWhenPrinting = true) |
       keywordClass("<init>") |
       keywordClass("<clinit>") |
       StringLiteral

@@ -1,6 +1,10 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammarToParser
+
 import scala.util.matching.Regex
 
 class RegexGrammar(val regex: Regex, verifyWhenPrinting: Boolean = false)
-  extends FromStringGrammar(core.grammar.RegexG(regex), verifyWhenPrinting)
+  extends StringGrammar(verifyWhenPrinting) {
+  override def getParser = BiGrammarToParser.regex(regex)
+}

@@ -5,7 +5,6 @@ import javax.swing.text.Segment
 import core.grammar._
 import org.fife.ui.rsyntaxtextarea._
 
-import scala.util.matching.Regex
 import scala.util.parsing.input.CharArrayReader
 
 class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
@@ -21,22 +20,23 @@ class TokenMakerFromGrammar(grammar: Grammar) extends AbstractTokenMaker {
   val parser = getParser
 
   def getParser: converter.Parser[Any] = {
-    val reachables = grammar.getGrammars
-    val tokenParsers = reachables.collect({
-      case keyword: Keyword => keyword ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s.asInstanceOf[String]))
-      case delimiter: Delimiter => Keyword(delimiter.value, false) ^^ (s => MyToken(TokenTypes.SEPARATOR, s.asInstanceOf[String]))
-      case Identifier => Identifier ^^ (s => MyToken(TokenTypes.IDENTIFIER, s.asInstanceOf[String]))
-      case NumberG => NumberG ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s.asInstanceOf[String]))
-      case StringLiteral => StringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, '"' + s.asInstanceOf[String] + '"'))
-      case regex: RegexG => regex ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s.asInstanceOf[String]))
-    })
-
-    val whiteSpaceToken = RegexG(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
-    val errorToken = new RegexG(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s.asInstanceOf[String]))
-    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
-
-    val tokenGrammar = allTokenParsers.reduce((a, b) => new Choice(a, b)).*
-    converter.convert(new Choice(tokenGrammar, errorToken, true))
+    ???
+//    val reachables = grammar.getGrammars
+//    val tokenParsers = reachables.collect({
+//      case keyword: Keyword => keyword ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s.asInstanceOf[String]))
+//      case delimiter: Delimiter => Keyword(delimiter.value, false) ^^ (s => MyToken(TokenTypes.SEPARATOR, s.asInstanceOf[String]))
+//      case Identifier => Identifier ^^ (s => MyToken(TokenTypes.IDENTIFIER, s.asInstanceOf[String]))
+//      case NumberG => NumberG ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s.asInstanceOf[String]))
+//      case StringLiteral => StringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, '"' + s.asInstanceOf[String] + '"'))
+//      case regex: RegexG => regex ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s.asInstanceOf[String]))
+//    })
+//
+//    val whiteSpaceToken = RegexG(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s.asInstanceOf[String]))
+//    val errorToken = new RegexG(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s.asInstanceOf[String]))
+//    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
+//
+//    val tokenGrammar = allTokenParsers.reduce((a, b) => new Choice(a, b)).*
+//    converter.convert(new Choice(tokenGrammar, errorToken, true))
   }
 
   override def getWordsToHighlight: TokenMap = new TokenMap()

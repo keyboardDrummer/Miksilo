@@ -61,19 +61,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       )
     }
 
-    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
-      recursive(triviaGrammar) ^^ { untyped =>
-        val result = untyped.asInstanceOf[StateFull[WithMap]]
-        for {
-          key <- getKeyAndIncrementCounter
-          inner <- result
-        } yield {
-          val innerValue = inner.value.asInstanceOf[Seq[_]]
-          WithMapG[Any](Unit, if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty)
-        }
-      }
-    }
-
     override def createPrinter(recursive: BiGrammar => NodePrinter) = new NodePrinter {
       val triviaPrinter: NodePrinter = recursive(triviaGrammar)
 
@@ -108,13 +95,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def toParser(recursive: BiGrammar => Parser): Parser = {
       recursive(node).map(result => resetAndRestoreCounter(result))
-    }
-
-    override def createGrammar(children: Seq[Grammar], recursive: (BiGrammar) => Grammar): Grammar = {
-      children.head ^^ { untyped =>
-        val result = untyped.asInstanceOf[Result]
-        resetAndRestoreCounter(result)
-      }
     }
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {

@@ -4,12 +4,12 @@ import core.bigrammar.printer.{Printer, TryState}
 import core.bigrammar.{BiGrammar, WithMapG}
 import core.document.Empty
 
-object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
-  val regex = """\s+""".r
+import scala.util.matching.Regex
 
-  override def getGrammar = {
-    core.grammar.RegexG(regex)
-  }
+object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
+  val regex: Regex = """\s+""".r
+
+  override def getParser = new RegexGrammar(regex).getParser
 
   override def write(from: WithMapG[Any]) =
     if (regex.replaceSomeIn(from.value.asInstanceOf[String], _ => Some("")).isEmpty) TryState.value(Empty)

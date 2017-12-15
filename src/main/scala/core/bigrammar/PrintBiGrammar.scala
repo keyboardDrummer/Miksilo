@@ -1,9 +1,9 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.document.Empty
-import core.grammar.{PrintGrammar, Produce}
 import core.deltas.node.GrammarKey
+import core.document.Empty
+import core.grammar.Produce
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
@@ -40,8 +40,9 @@ object PrintBiGrammar {
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
-    case fromString:FromStringGrammar => PrintGrammar.toDocument(fromString.grammar)
+    //case fromString: StringGrammar => ???
     case labelled: Labelled => grammarKeyToName(labelled.name)
+    case NumberG => "number"
     case StringLiteral => "string"
     case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
