@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.grammar.GrammarToParserConverter
+import scala.util.parsing.input.CharArrayReader._
 
 import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
@@ -60,7 +61,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
       case custom: CustomGrammar => custom.toParser(recursive)
 
       case Keyword(keyword, _, _) => literal(keyword).map(valueToResult)
-      case Delimiter(keyword) => literal(keyword).map(valueToResult)
+      case Delimiter(keyword) => whitespaceG ~> literal(keyword).map(valueToResult)
       case many: Many =>
         val innerParser = recursive(many.inner)
         val manyInners = innerParser.* //TODO by implementing * ourselves we can get rid of the intermediate List.
@@ -96,4 +97,17 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
         Parser { in => inner.apply(in) } //Laziness to prevent infinite recursion
     }
   }
+
+  override val whiteSpace = "".r
+
+  var keywords: Set[String] = Set.empty
+
+  def whitespaceG: Parser[Any] = rep(
+    whitespaceChar
+    //| '/' ~ '*' ~ comment
+    //| '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
+    //| '/' ~ '*' ~ failure("unclosed comment")
+  )
+
+  def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != EofCh)
 }
