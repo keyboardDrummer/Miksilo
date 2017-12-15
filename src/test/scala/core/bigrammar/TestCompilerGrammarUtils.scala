@@ -2,9 +2,8 @@ package core.bigrammar
 
 import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
-import core.grammar.{Grammar, GrammarToParserConverter}
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.{Contract, Delta, DeltaWithGrammar, Language}
 import core.deltas.node.GrammarKey
 import org.scalatest.FunSuite
 import deltas.javac.JavaCompilerDeltas
@@ -40,9 +39,7 @@ object TestGrammarUtils extends FunSuite {
   }
 
   def parse(example: String, grammarDocument: BiGrammar) = {
-    val grammar: Grammar = BiGrammarToGrammar.toGrammar(grammarDocument)
-
-    val packratParser = GrammarToParserConverter.convert(grammar)
+    val packratParser = BiGrammarToParser.toParser(grammarDocument)
     val parseResult = packratParser(new CharArrayReader(example.toCharArray))
     parseResult
   }

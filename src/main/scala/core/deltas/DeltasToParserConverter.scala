@@ -6,7 +6,7 @@ import core.grammar.{GrammarToParserConverter, ParseException}
 import scala.util.parsing.input.CharArrayReader
 
 class DeltasToParserConverter extends GrammarToParserConverter {
-  def buildParser(deltas: Seq[DeltaWithGrammar]): String => ParseResult[Any] = {
+  def buildParser(deltas: Seq[DeltaWithGrammar]): String => BiGrammarToParser.ParseResult[Any] = {
     val language = new Language(deltas)
     buildParser(language.grammars.root)
   }
@@ -24,8 +24,7 @@ class DeltasToParserConverter extends GrammarToParserConverter {
     parseResult.get
   }
 
-  def buildParser(grammar: BiGrammar): (String) => ParseResult[Any] = {
-    val programGrammar = BiGrammarToGrammar.toGrammar(grammar)
-    input => convert(programGrammar)(new CharArrayReader(input.toCharArray))
+  def buildParser(grammar: BiGrammar): (String) => BiGrammarToParser.ParseResult[Any] = {
+    input => BiGrammarToParser.toParser(grammar)(new CharArrayReader(input.toCharArray))
   }
 }

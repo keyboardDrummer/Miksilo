@@ -21,7 +21,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
     }
     val resultParser = toParser(recursive, grammar)
     val valueParser = resultParser.map(result => result(Map.empty[Any,Any])._2.value)
-    valueParser
+    phrase(valueParser)
   }
 
   def toParser(recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
@@ -51,7 +51,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
       case custom: CustomGrammarWithoutChildren =>
         val parser: GrammarToParserConverter.PackratParser[Any] =
           GrammarToParserConverter.convert(custom.getGrammar).map(valueToResult)
-        Parser {
+        Parser { //This approach does not work (I think). Identifier needs to know what keywords there are so it doesn't parse keywords.
           in: Input => parser(in) match {
             case GrammarToParserConverter.Success(result, next) => Success[Result](result.asInstanceOf[Result], next)
             case GrammarToParserConverter.Failure(msg, next) => Failure(msg, next)
