@@ -18,10 +18,12 @@ Because languages share many properties, the quickest way to build a language is
 - Compiler phases are defined generically, making them resilient to changes in the language.
 - Abstract syntax trees are stored unstructured, which provides benefits such as fast transformations and language composition at run-time.
 
-The best way to show Blender's modularity is by example, so we've picked some language transformations to showcase this, listed below. Before diving into them, we recommend to get [an introduction to BiGrammar](http://keyboarddrummer.github.io/Blender/bigrammar/introduction/), one of Blender's metalanguages.
+The best way to show Blender's modularity is by example, so we've picked these language transformations as showcases:
 
-- [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
-- [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
-- [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
+1. [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/)
+1. [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
+1. [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
 
-If you would prefer to learn Blender through experimenting instead of reading, then try out its [sandbox](http://keyboarddrummer.github.io/Blender/core/sandbox/) application, which lets you create languages by composing predefined language transformations.
+Before diving into the above, we recommend to get [an introduction to BiGrammar](http://keyboarddrummer.github.io/Blender/bigrammar/introduction/), one of Blender's metalanguages.
+
+If you would prefer to learn Blender by experimenting instead of reading, then try out its [sandbox](http://keyboarddrummer.github.io/Blender/core/sandbox/) application, which lets you create languages by composing predefined language transformations.
