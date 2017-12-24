@@ -2,14 +2,13 @@ package core.bigrammar.printer
 
 import core.bigrammar.WithMapG
 import core.bigrammar.printer.Printer.NonePrintFailureException
-import core.grammar.~
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.{Failure, Success}
 
 class BindPrinter[T, U](first: WithMapG[T] => TryState[ResponsiveDocument => ResponsiveDocument], second: Printer[U])
-  extends Printer[~[T,U]] {
-  override def write(from: WithMapG[~[T, U]]) = state => {
+  extends Printer[(T,U)] {
+  override def write(from: WithMapG[(T, U)]): TryState[ResponsiveDocument] = state => {
     val firstValue = from.value._1
     val secondValue = from.value._2
 

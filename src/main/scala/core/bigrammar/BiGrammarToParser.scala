@@ -6,6 +6,8 @@ import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader._
 
+case class WithMapG[T](value: T, map: Map[Any,Any]) {}
+
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   type WithMap = WithMapG[Any]
@@ -43,7 +45,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
           val result: Result = (state: State) => {
             val firstMap = firstResult(state)
             val secondMap = secondResult(firstMap._1)
-            val resultValue = core.grammar.~(firstMap._2.value, secondMap._2.value)
+            val resultValue = (firstMap._2.value, secondMap._2.value)
             val resultMap = firstMap._2.map ++ secondMap._2.map
             (secondMap._1, WithMapG[Any](resultValue, resultMap)): (State, WithMapG[Any])
           }

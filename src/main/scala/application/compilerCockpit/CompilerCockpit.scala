@@ -8,8 +8,7 @@ import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
-import core.bigrammar.BiGrammarToGrammar
-import core.grammar.Grammar
+import core.bigrammar.{BiGrammar}
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.deltas.exceptions.CompileException
 import core.deltas.{Delta, Language}
@@ -27,8 +26,7 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
 
   this.title = name
   val language = new Language(deltas)
-  private val grammar = BiGrammarToGrammar.toGrammar(language.grammars.root)
-  val factory = new TokenMakerFactoryFromGrammar(grammar)
+  val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
 
   private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   inputDocument.setTokenMakerFactory(factory)
@@ -74,7 +72,7 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
 
   def inputOption = inputOptionModel.getSelectedItem.asInstanceOf[InputOption]
 
-  def setOutputText(text: String, useThisGrammar: Grammar = null) {
+  def setOutputText(text: String, useThisGrammar: BiGrammar = null) {
     outputDocument.replace(0, outputDocument.getLength, text, null)
     if (useThisGrammar != null)
     {

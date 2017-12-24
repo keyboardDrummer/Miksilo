@@ -1,11 +1,15 @@
 package core.deltas
 
 import core.bigrammar._
-import core.grammar.{GrammarToParserConverter, ParseException}
+import core.deltas.exceptions.BadInputException
 
 import scala.util.parsing.input.CharArrayReader
 
-class DeltasToParserConverter extends GrammarToParserConverter {
+case class ParseException(message: String) extends BadInputException {
+  override def toString: String = message
+}
+
+class DeltasToParserConverter {
   def buildParser(deltas: Seq[DeltaWithGrammar]): String => BiGrammarToParser.ParseResult[Any] = {
     val language = new Language(deltas)
     buildParser(language.grammars.root)

@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 class TestFailureFeedback extends FunSuite with BiGrammarSequenceWriter {
 
   test("FailureFeedback") {
-    val input = core.grammar.~("1", "2")
+    val input = ("1", "2")
     val grammar: BiGrammar = ("1": BiGrammar) *
 
     try {

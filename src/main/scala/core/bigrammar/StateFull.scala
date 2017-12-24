@@ -24,5 +24,5 @@ trait StateFull[T] {
     f(value).run(newState)
   }
 
-  def apply(state: State) = run(state)
+  def apply(state: State): (State, T) = run(state)
 }

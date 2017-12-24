@@ -3,7 +3,6 @@ package core.bigrammar
 import core.bigrammar.grammars._
 import core.deltas.node.GrammarKey
 import core.document.Empty
-import core.grammar.Produce
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
@@ -108,14 +107,14 @@ object PrintBiGrammar {
       val right = choice.right
 
       right match {
-        case produce: Produce =>
-          return OptionGrammar(left, produce.result)
+        case produce: ValueGrammar =>
+          return OptionGrammar(left, produce.value)
         case _ =>
       }
 
       left match {
-        case produce: Produce =>
-          return OptionGrammar(right, produce.result)
+        case produce: ValueGrammar =>
+          return OptionGrammar(right, produce.value)
         case _ =>
       }
 

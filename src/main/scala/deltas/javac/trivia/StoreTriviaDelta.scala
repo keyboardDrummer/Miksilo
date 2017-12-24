@@ -1,7 +1,6 @@
 package deltas.javac.trivia
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.BiGrammarToGrammar.{Result, WithMap}
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
@@ -9,7 +8,6 @@ import core.bigrammar.{BiGrammar, StateFull, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.node.{Key, NodeField}
 import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
-import core.grammar.Grammar
 import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {

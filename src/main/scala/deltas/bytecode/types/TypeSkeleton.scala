@@ -1,8 +1,7 @@
 package deltas.bytecode.types
 
-import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.exceptions.BadInputException
-import core.grammar.ParseException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Key, Node}

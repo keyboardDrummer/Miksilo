@@ -32,7 +32,7 @@ class TestRecursion extends FunSuite with BiGrammarSequenceWriter {
   }
 
   def getExpectedRightRecursiveResult: AnyRef = {
-    new StringOps("!!!!!").map(s => s.toString).foldRight[AnyRef](null)((a, b) => core.grammar.~(a, b))
+    new StringOps("!!!!!").map(s => s.toString).foldRight[AnyRef](null)((a, b) => (a, b))
   }
 
   ignore("LeftRecursion") {
@@ -56,7 +56,7 @@ class TestRecursion extends FunSuite with BiGrammarSequenceWriter {
   }
 
   def getExpectedLeftRecursiveResult: AnyRef = {
-    new StringOps("!!!!!").map(s => s.toString).foldLeft[AnyRef](null)((a, b) => core.grammar.~(a, b))
+    new StringOps("!!!!!").map(s => s.toString).foldLeft[AnyRef](null)((a, b) => (a, b))
   }
 
   test("PrintingIndirectLeftRecursion") {
