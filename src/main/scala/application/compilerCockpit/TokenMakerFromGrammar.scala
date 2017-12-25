@@ -14,14 +14,16 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
   case class MyToken(tokenType: Int, text: String)
 
-  val parser = getParser
-
-  def getParser: BiGrammarToParser.Parser[Any] = {
-    val reachables = new RootGrammar(grammar).selfAndDescendants.map(p => p.value)
-    val tokenParsers: Seq[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
-      case keyword: Keyword => literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
+  val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
+    var keywords: Set[String] = Set.empty
+    val reachables = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
+    val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
+      case keyword: Keyword => {
+        keywords += keyword.value
+        literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
+      }
       case delimiter: Delimiter => literal(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
-      case _:Identifier => ident ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
+      case identifier:Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberG => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s))
       case StringLiteral => stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
       case regexGrammar: RegexGrammar => regex(regexGrammar.regex) ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s))
@@ -29,10 +31,10 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     val whiteSpaceToken = regex(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s))
     val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
-    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
+    val allTokenParsers = Seq(whiteSpaceToken) ++ tokenParsers //++ Seq(whiteSpaceToken, errorToken)
 
-    val tokenGrammar = allTokenParsers.reduce((a, b) => a | b).*
-    tokenGrammar | errorToken
+    val tokenGrammar: BiGrammarToParser.Parser[Seq[MyToken]] = allTokenParsers.reduce((a, b) => a | b).*
+    tokenGrammar //| errorToken
   }
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
@@ -42,7 +44,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     resetTokenList()
 
     val charArrayReader = new CharArrayReader(text.toString.toCharArray)
-    val resultOption: ParseResult[Any] = parser(charArrayReader)
+    val resultOption: ParseResult[Seq[MyToken]] = parser(charArrayReader)
     var start = text.offset
     if (resultOption.isEmpty)
     {
@@ -50,7 +52,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     } 
     else
     {
-      val tokens = resultOption.get.asInstanceOf[Seq[MyToken]]
+      val tokens = resultOption.get
       for(token <- tokens)
       {
         val end = start + token.text.length - 1

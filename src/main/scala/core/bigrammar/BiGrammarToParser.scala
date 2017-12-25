@@ -18,6 +18,8 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
   def toParser(grammar: BiGrammar): PackratParser[Any] = {
 
+
+    var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
     keywords ++= allGrammars.flatMap({
       case keyword: Keyword => if (keyword.reserved) Set(keyword.value) else Set.empty[String]
@@ -26,14 +28,14 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
     val cache: mutable.Map[BiGrammar, PackratParser[Result]] = mutable.Map.empty
     lazy val recursive: BiGrammar => PackratParser[Result] = grammar => {
-      cache.getOrElseUpdate(grammar, memo(toParser(recursive, grammar)))
+      cache.getOrElseUpdate(grammar, memo(toParser(keywords, recursive, grammar)))
     }
-    val resultParser = toParser(recursive, grammar)
+    val resultParser = toParser(keywords, recursive, grammar)
     val valueParser = resultParser.map(result => result(Map.empty[Any,Any])._2.value)
     phrase(valueParser)
   }
 
-  private def toParser(recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
+  private def toParser(keywords: Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
       case sequence: Sequence =>
         val firstParser = recursive(sequence.first)
@@ -57,7 +59,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
         val secondParser = recursive(choice.right)
         if (choice.firstBeforeSecond) firstParser | secondParser else firstParser ||| secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParser.map(valueToResult)
+      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
 
       case many: Many =>
@@ -97,8 +99,6 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   }
 
   override val whiteSpace = "".r
-
-  var keywords: Set[String] = Set.empty
 
   def whitespaceG: Parser[Any] = rep(
     whitespaceChar

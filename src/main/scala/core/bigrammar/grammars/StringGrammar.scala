@@ -14,7 +14,7 @@ import scala.util.parsing.input.CharArrayReader
 abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
-  lazy val parser = getParser
+  lazy val parser = getParser(Set.empty) //TODO hacky Set.empty
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 

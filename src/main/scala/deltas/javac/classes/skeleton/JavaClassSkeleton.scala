@@ -86,7 +86,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> identifier
-    val membersGrammar = "{" % (classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount) % "}"
+    val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"
     val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
     val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Shape
     find(BodyGrammar).inner = classGrammar
