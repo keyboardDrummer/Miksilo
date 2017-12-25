@@ -1,50 +1,54 @@
 Profiling global results:
-012259ms total, 645.2ms average, for javac
-006100ms total, 095.3ms average, for running phases
-003350ms total, 043.5ms average, for build language
-003309ms total, 051.7ms average, for parse
-003254ms total, 098.6ms average, for run Implicitly prefixes references to private methods with the 'this' qualified if it is missing.
-002840ms total, 149.5ms average, for Java run expected
-002569ms total, 135.2ms average, for Java run actual
-001450ms total, 090.6ms average, for run Prints the program by generating a pretty printer from its grammar.
-001269ms total, 074.6ms average, for inject trivia inside node
-001082ms total, 056.9ms average, for blender compile
-000625ms total, 034.7ms average, for inject capture trivia
-000419ms total, 104.7ms average, for run Decompiles the field and method signatures in a classfile.
-000324ms total, 161.9ms average, for run Takes the bytecode program and runs it using the JVM.
-000193ms total, 006.0ms average, for run Defines a skeleton for the Java class.
-000189ms total, 003.3ms average, for inject remove constant pool
-000071ms total, 001.9ms average, for run Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop.
-000067ms total, 001.1ms average, for inject labelled locations
-000065ms total, 010.9ms average, for run Writes the current program as JVM class file bytes to a function.
+013903ms total, 662.0ms average, for javac
+005833ms total, 094.1ms average, for running phases
+005748ms total, 092.7ms average, for parse
+003424ms total, 047.6ms average, for build language
+002994ms total, 093.6ms average, for run Implicitly prefixes references to private methods with the 'this' qualified if it is missing.
+002938ms total, 139.9ms average, for Java run expected
+002904ms total, 138.3ms average, for Java run actual
+002703ms total, 128.7ms average, for blender compile
+001331ms total, 095.1ms average, for run Prints the program by generating a pretty printer from its grammar.
+001178ms total, 069.3ms average, for inject trivia inside node
+000601ms total, 033.4ms average, for inject store trivia
+000491ms total, 122.8ms average, for run Decompiles the field and method signatures in a classfile.
+000289ms total, 144.7ms average, for run Takes the bytecode program and runs it using the JVM.
+000186ms total, 003.4ms average, for inject inline constant pool
+000185ms total, 006.0ms average, for run Defines a skeleton for the Java class.
+000094ms total, 001.6ms average, for inject labelled locations
+000065ms total, 001.8ms average, for run Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop.
+000062ms total, 010.3ms average, for run Writes the current program as JVM class file bytes to a function.
 000059ms total, 001.9ms average, for run Removes the constant pool in favor of inline constant entries
-000047ms total, 000.6ms average, for inject byte code skeleton
-000037ms total, 001.2ms average, for run Enables fields to have initialisers.
-000036ms total, 000.5ms average, for inject store long
-000036ms total, 001.1ms average, for run Generates a stack frame for each label instruction. Stack frames can be used to determine the stack and variable types at a particular instruction.
-000027ms total, 002.1ms average, for inject pretty prin
-000026ms total, 000.4ms average, for inject stack map table attribute
+000058ms total, 005.3ms average, for inject pretty print
+000054ms total, 000.7ms average, for inject byte code skeleton
+000046ms total, 001.4ms average, for run Replaces the jump instructions from bytecode. The new instructions are similar to the old ones except that they use labels as target instead of instruction indices.
+000040ms total, 001.3ms average, for run Adds a while loop.
+000033ms total, 001.1ms average, for run Enables fields to have initialisers.
+000033ms total, 001.1ms average, for run Generates a stack frame for each label instruction. Stack frames can be used to determine the stack and variable types at a particular instruction.
+000031ms total, 000.2ms average, for inject method type
+000025ms total, 000.3ms average, for inject type application
+000025ms total, 000.4ms average, for inject stack map table attribute
+000024ms total, 000.3ms average, for inject byte code method info
+000024ms total, 000.8ms average, for run Generates the code max stack value for code attributes which is required by the JVM.
 000023ms total, 000.7ms average, for run Determines which TypeVariables are actually object types.
-000023ms total, 000.7ms average, for run Generates the code max stack value for code attributes which is required by the JVM.
-000022ms total, 000.1ms average, for inject method type
-000020ms total, 000.2ms average, for inject object type
-000020ms total, 000.2ms average, for inject type abstraction
-000020ms total, 000.6ms average, for run Add proper C-style for-loop continue semantics.
-000019ms total, 000.3ms average, for inject code attribute
-000019ms total, 000.3ms average, for inject inferred max stack
-000019ms total, 000.2ms average, for inject byte code method info
-000018ms total, 000.6ms average, for run Enables declaring a local and initializing it in one statement.
-000017ms total, 000.5ms average, for run Enables using the non-iterator for loop.
-000016ms total, 000.2ms average, for inject store address
-000014ms total, 000.2ms average, for inject type application
-000013ms total, 000.2ms average, for inject duplicate instruction
-000013ms total, 002.6ms average, for run In the initial parsing of bytecode, the attributes are not parsed. This phase parses the attributes, but only if the attribute type is known by the compiler.
-000013ms total, 000.3ms average, for inject method
-000013ms total, 000.4ms average, for run Combines instructions to reduce the instruction count. Applies mostly to custom instructions related to comparison operations, followed by a jumps.
-000012ms total, 000.4ms average, for run Defines the += operator.
-000012ms total, 000.4ms average, for run Replaces the jump instructions from bytecode. The new instructions are similar to the old ones except that they use labels as target instead of instruction indices.
-000012ms total, 000.1ms average, for inject byte code field info
+000023ms total, 000.3ms average, for inject byte code field info
+000022ms total, 000.7ms average, for run Add proper C-style for-loop continue semantics.
+000020ms total, 000.3ms average, for inject code attribute
+000019ms total, 000.3ms average, for inject type abstraction
+000019ms total, 000.6ms average, for run Adds the break statement to the language
+000017ms total, 000.2ms average, for inject object type
+000017ms total, 000.2ms average, for inject boolean type c
+000016ms total, 000.3ms average, for inject inferred max stack
+000016ms total, 003.3ms average, for run In the initial parsing of bytecode, the attributes are not parsed. This phase parses the attributes, but only if the attribute type is known by the compiler.
+000016ms total, 000.5ms average, for run Moves the control flow to the start of the while loop.
+000015ms total, 000.5ms average, for run Enables using the non-iterator for loop.
+000014ms total, 000.2ms average, for inject array type c
+000012ms total, 000.3ms average, for inject method
+000012ms total, 000.4ms average, for run Enables declaring a local and initializing it in one statement.
+000012ms total, 000.2ms average, for inject name and type constant
+000012ms total, 000.2ms average, for inject integer equals instruction
+000011ms total, 000.4ms average, for run Defines the += operator.
+000011ms total, 000.1ms average, for inject type constant
+000011ms total, 000.1ms average, for inject float type c
+000011ms total, 000.1ms average, for inject string constant
 000011ms total, 000.2ms average, for inject java class skeleton
-000011ms total, 000.2ms average, for inject pop
-000011ms total, 000.1ms average, for inject field ref constant
-000010ms total, 000.1ms average, for inject invoke dynamic constant
+000011ms total, 000.1ms average, for inject int type c
