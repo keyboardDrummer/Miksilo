@@ -21,11 +21,12 @@ object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.java
 
 class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
-  def toFile(program: String): String = {
-    val fileName = File.makeTemp(suffix = ".java")
-    val file = fileName.createFile()
+  def toFile(fileName: String, program: String): String = {
+    val directory = Directory.makeTemp()
+    val file = File(Path(directory.path) / fileName + ".java")
+    file.createFile()
     file.writeAll(program)
-    fileName.toString()
+    file.path
   }
 
   def currentDir = new File(new java.io.File("."))
@@ -97,7 +98,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
     val expectedOutputDirectory = rootOutput / "expected"
     expectedOutputDirectory.createDirectory()
-    val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaC(currentDir, input, expectedOutputDirectory))
+    val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(currentDir, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
 
     val state = profile("blender compile", compiler.compile(input, Directory(actualOutputDirectory / inputDirectory)))
@@ -143,7 +144,15 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     logger.line
   }
 
-  def runJavaC(directory: Path, input: File, output: Path): String = {
+  def runJavaCIfNeeded(directory: Path, input: File, output: Path): String = {
+    val outputFileName = input.stripExtension + ".class"
+    if (Directory(output).files.exists(f => f.name == outputFileName))
+      return ""
+
+    runJavaC(directory, input, output)
+  }
+
+  private def runJavaC(directory: Path, input: File, output: Path) = {
     val processBuilder = Process.apply(s"javac -d $output $input", directory.jfile)
     val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger

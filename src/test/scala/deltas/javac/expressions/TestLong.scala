@@ -19,7 +19,7 @@ class TestLong extends FunSuite {
 
   test("overloadedLongMethod") {
     val program =
-      """class Fibonacci
+      """class OverloadedLongMethod
         |{
         |    public static void main(java.lang.String[] args)
         |    {
@@ -38,8 +38,7 @@ class TestLong extends FunSuite {
         |    }
         |}""".stripMargin
 
-    val regularParticles = JavaCompilerDeltas.javaCompilerDeltas
-    TestUtils.compareWithJavacAfterRunning(TestUtils.toFile(program))
+    TestUtils.compareWithJavacAfterRunning(TestUtils.toFile("OverloadedLongMethod", program))
   }
 
 }

@@ -1,6 +1,5 @@
 package deltas.javac.expressions
 
-import org.junit.Test
 import org.scalatest.FunSuite
 import util.TestUtils
 
@@ -10,6 +9,6 @@ class TestPostfixIncrement extends FunSuite {
 
   test("basic") {
     val inputDirectory = Path("")
-    TestUtils.compareWithJavacAfterRunning("postFixIncrement", inputDirectory)
+    TestUtils.compareWithJavacAfterRunning("PostFixIncrement", inputDirectory)
   }
 }
