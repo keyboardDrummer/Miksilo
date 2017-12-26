@@ -8,7 +8,7 @@ import core.responsiveDocument.ResponsiveDocument
 object PrintBiGrammar {
 
   def printReachableGrammars(program: BiGrammar): ResponsiveDocument = {
-    val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
+    val reachableGrammars = getLabelled(program)
     reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
   }
 
@@ -25,7 +25,7 @@ object PrintBiGrammar {
     result
   }
 
-  def toDocument(grammar: BiGrammar) = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
+  def toDocument(grammar: BiGrammar): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
   private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
     case sequence: LeftRight => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
@@ -139,6 +139,6 @@ object PrintBiGrammar {
   }
 
   def getLabelled(grammar: BiGrammar): Seq[Labelled] = {
-    new RootGrammar(grammar).selfAndDescendants.flatMap((p: GrammarPath) => p.value match { case x: Labelled => Some(x); case _ => None} )
+    grammar.selfAndDescendants.collect({ case x: Labelled => x})
   }
 }

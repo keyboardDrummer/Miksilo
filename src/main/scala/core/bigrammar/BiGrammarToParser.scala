@@ -23,7 +23,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   def toParser(grammar: BiGrammar): PackratParser[Any] = {
 
     var keywords: Set[String] = Set.empty
-    val allGrammars: Set[BiGrammar] = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
+    val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
     keywords ++= allGrammars.flatMap({
       case keyword: Keyword => if (keyword.reserved) Set(keyword.value) else Set.empty[String]
       case _ => Set.empty[String]

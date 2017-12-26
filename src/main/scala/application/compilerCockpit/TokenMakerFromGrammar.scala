@@ -16,7 +16,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
   val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
     var keywords: Set[String] = Set.empty
-    val reachables = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
+    val reachables = grammar.selfAndDescendants.toSet
     val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
       case keyword: Keyword => {
         keywords += keyword.value
