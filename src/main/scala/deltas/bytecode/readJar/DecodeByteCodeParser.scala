@@ -1,8 +1,7 @@
 package deltas.bytecode.readJar
 
-import java.io.{BufferedInputStream, InputStream}
+import java.io.BufferedInputStream
 
-import core.deltas.node.Node
 import core.deltas.{Contract, Delta, Language, ParseException}
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
@@ -14,16 +13,17 @@ object DecodeByteCodeParser extends Delta {
   override def dependencies: Set[Contract] = Set[Contract](UnParsedAttribute, ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton)
 
   override def inject(state: Language): Unit = {
-    state._parse = decodeStream
-  }
+    state.buildParser = () => {
+      val parser = ClassFileParser.classFileParser
+      inputStream => {
+        val bis = new BufferedInputStream(inputStream)
+        val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
+        val parseResult = parser(new ArrayReader(0, inputBytes))
+        if (!parseResult.successful)
+          throw ParseException(parseResult.toString)
 
-  def decodeStream(inputStream: InputStream): Node = {
-    val bis = new BufferedInputStream(inputStream)
-    val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
-    val parseResult = ClassFileParser.packratParser(new ArrayReader(0, inputBytes))
-    if (!parseResult.successful)
-      throw ParseException(parseResult.toString)
-
-    parseResult.get
+        parseResult.get
+      }
+    }
   }
 }

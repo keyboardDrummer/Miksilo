@@ -104,6 +104,16 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def buildLanguage: Language = {
-    new Language(deltas.map(delta => new WrappedDelta(delta)))
+    new Language(Seq(new Delta {
+      override def description: String = "Instrument buildParser"
+
+      override def inject(language: Language): Unit = {
+        val old = language.buildParser
+        language.buildParser = () => {
+          statistics.profile("build parser", old())
+        }
+        super.inject(language)
+      }
+    }) ++ deltas.map(delta => new WrappedDelta(delta)))
   }
 }

@@ -11,11 +11,7 @@ import scala.util.parsing.input.Reader
 
 object ClassFileParser extends ByteParsers with PackratParsers {
 
-  def packratParser(reader: Reader[Byte]): ParseResult[Node] = {
-    classFileParser(new ClassFileParser.PackratReader[Byte](reader))
-  }
-
-  private def classFileParser: Parser[Node] = {
+  def classFileParser: Parser[Node] = {
     for {
       _ <- elems(PrintByteCode.cafeBabeBytes)
       versionCode <- ParseInteger

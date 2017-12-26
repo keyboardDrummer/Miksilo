@@ -4,6 +4,7 @@ import core.bigrammar.grammars._
 
 import scala.collection.mutable
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
+import scala.util.parsing.input.CharArrayReader
 import scala.util.parsing.input.CharArrayReader._
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
@@ -16,8 +17,10 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMapG(value, Map.empty))
 
-  def toParser(grammar: BiGrammar): PackratParser[Any] = {
+  def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
+    input => toParser(grammar)(new CharArrayReader(input.toCharArray))
 
+  def toParser(grammar: BiGrammar): PackratParser[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = new RootGrammar(grammar).selfAndDescendants.map(p => p.value).toSet
