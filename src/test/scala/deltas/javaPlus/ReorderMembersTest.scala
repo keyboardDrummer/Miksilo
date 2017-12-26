@@ -4,8 +4,9 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.PrettyPrint
+import core.deltas.ParseException
 import deltas.javac.JavaCompilerDeltas
-import deltas.javac.trivia.{StoreTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
+import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
 import util.CompilerBuilder
 
@@ -27,7 +28,7 @@ class ReorderMembersTest extends FunSuite {
     val compiler = CompilerBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    assertThrows[core.grammar.ParseException]({
+    assertThrows[ParseException]({
       val state = compiler.parseAndTransform(inputStream)
       assertResult(null)(state.output)
     })

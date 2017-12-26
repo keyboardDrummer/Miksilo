@@ -3,8 +3,7 @@ package deltas.bytecode.readJar
 import java.io
 
 import application.compilerCockpit.PrettyPrint
-import core.bigrammar.TestCompilerGrammarUtils
-import core.deltas.DeltasToParserConverter
+import core.bigrammar.{BiGrammarToParser, TestCompilerGrammarUtils}
 import core.deltas.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton
@@ -22,8 +21,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildLanguage
 
-    val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar), signature).asInstanceOf[Node]
+    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar))
+    val result = parser(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable") {
@@ -31,8 +30,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildLanguage
 
-    val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val result = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
@@ -40,8 +38,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildLanguage
 
-    val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val result = parser(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable3") {
@@ -49,8 +47,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = CompilerBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.buildLanguage
 
-    val manager = new DeltasToParserConverter()
-    val result = manager.parse(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar), signature).asInstanceOf[Node]
+    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val result = parser(signature).get.asInstanceOf[Node]
   }
 
   ignore("decompileRuntimeJar") {

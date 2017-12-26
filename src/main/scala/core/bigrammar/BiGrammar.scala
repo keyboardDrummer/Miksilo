@@ -1,8 +1,9 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Choice, Labelled, MapGrammar, LeftRight}
+import core.bigrammar.grammars.{Choice, Labelled, LeftRight, MapGrammar}
 import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
+import util.GraphBasics
 
 object BiGrammar {
   type State = Map[Any, Any]
@@ -63,4 +64,6 @@ trait BiGrammar extends BiGrammarWriter {
   }
 
   protected def containsParser(recursive: BiGrammar => Boolean): Boolean
+
+  def selfAndDescendants: Seq[BiGrammar] = GraphBasics.traverseBreadth[BiGrammar](Seq(this), grammar => grammar.children)
 }

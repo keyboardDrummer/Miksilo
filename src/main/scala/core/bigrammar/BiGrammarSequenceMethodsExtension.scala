@@ -3,7 +3,6 @@ package core.bigrammar
 import core.bigrammar.grammars._
 import core.deltas.node.Node
 import core.document.BlankLine
-import core.grammar.~
 
 trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
@@ -36,12 +35,13 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
   private def someMap(grammar: BiGrammar): BiGrammar = {
     grammar ^^
       ( {
-        case first ~ rest => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
+        case (first, rest) => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
       }, {
-        case seq: Seq[Any] => if (seq.nonEmpty) Some(core.grammar.~(seq.head, seq.tail)) else None
+        case seq: Seq[Any] => if (seq.nonEmpty) Some((seq.head, seq.tail)) else None
       })
   }
-  def inParenthesis = ("(": BiGrammar) ~> grammar ~< ")"
+
+  def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
 
   def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
 

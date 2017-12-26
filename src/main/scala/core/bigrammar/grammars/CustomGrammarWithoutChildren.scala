@@ -1,9 +1,8 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammar
 import core.bigrammar.printer.Printer.NodePrinter
-import core.grammar.Grammar
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 
 trait CustomGrammarWithoutChildren extends BiGrammar with NodePrinter {
-  def getGrammar: Grammar
+  def getParser(keywords: Set[String]): BiGrammarToParser.Parser[Any]
 }

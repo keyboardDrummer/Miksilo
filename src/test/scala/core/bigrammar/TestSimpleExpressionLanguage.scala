@@ -2,7 +2,6 @@ package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.PrintError
-import core.grammar.~
 import org.scalatest.FunSuite
 
 class TestSimpleExpressionLanguage extends FunSuite with BiGrammarSequenceWriter {
@@ -102,9 +101,9 @@ Partial:
 
     val multipleLabel = new Labelled(StringKey("multiply"))
     val multiply = (multipleLabel ~~< "*") ~~ multipleLabel ^^( {
-      case core.grammar.~(l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
+      case (l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
-      case Multiply(l, r) => Some(core.grammar.~(l, r))
+      case Multiply(l, r) => Some(l, r)
       case _ => None
     })
     multipleLabel.addOption(multiply)
@@ -113,18 +112,18 @@ Partial:
 
     val addLabel = new Labelled(StringKey("add"))
     val add: BiGrammar = (addLabel ~~< "+") ~~ addLabel ^^( {
-      case core.grammar.~(l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
+      case (l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
     }, {
-      case Add(l, r) => Some(core.grammar.~(l, r))
+      case Add(l, r) => Some((l, r))
       case _ => None
     })
     addLabel.addOption(add)
     addLabel.addOption(multipleLabel)
 
     val _if: BiGrammar = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
-      case cond ~ _then ~ _else => IfNotZero(cond.asInstanceOf[TestExpression], _then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
+      case ((cond, _then), _else) => IfNotZero(cond.asInstanceOf[TestExpression], _then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
     }, {
-      case IfNotZero(cond, _then, _else) => Some(core.grammar.~(core.grammar.~(cond, _then), _else))
+      case IfNotZero(cond, _then, _else) => Some((cond, _then), _else)
       case _ => None
     })
 

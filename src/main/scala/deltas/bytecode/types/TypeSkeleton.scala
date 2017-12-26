@@ -1,8 +1,8 @@
 package deltas.bytecode.types
 
-import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$}
+import core.bigrammar.BiGrammarToParser
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.exceptions.BadInputException
-import core.grammar.ParseException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Key, Node}
@@ -17,10 +17,6 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
-  def getTypeFromByteCodeString(state: Language, typeString: String): Node = {
-    val manager = new DeltasToParserConverter()
-    manager.parse(state.grammars.find(ByteCodeTypeGrammar), typeString).asInstanceOf[Node]
-  }
 
   def toStackType(_type: Node, language: Language) : Node = {
     getRegistry(language).instances(_type.shape).getStackType(_type, language)

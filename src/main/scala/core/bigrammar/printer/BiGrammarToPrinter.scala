@@ -23,14 +23,14 @@ class BiGrammarToPrinter {
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
         case choice: Choice => new OrPrinter(toPrinterCached(choice.left), toPrinterCached(choice.right))
-        case custom: CustomGrammarWithoutChildren => custom
-        case custom: CustomGrammar => new CachingPrinter(custom.createPrinter(toPrinterCached))
+        case Delimiter(keyword) => _ => succeed(keyword)
         case Keyword(keyword, _, verify) => (value) =>
           if (!verify || value.value == keyword)
             succeed(keyword)
           else
             failureToGrammar("keyword didn't match", grammar)
-        case Delimiter(keyword) => _ => succeed(keyword)
+        case custom: CustomGrammarWithoutChildren => custom
+        case custom: CustomGrammar => new CachingPrinter(custom.createPrinter(toPrinterCached))
         case labelled: Labelled =>
           new NestPrinter(labelled.inner, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)

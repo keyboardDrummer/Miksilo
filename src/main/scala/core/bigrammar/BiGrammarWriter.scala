@@ -2,16 +2,16 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.document.{Document, WhiteSpace}
-import core.grammar.{Identifier, NumberG}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
 
+object BiGrammarWriter extends BiGrammarWriter
 trait BiGrammarWriter {
 
-  def identifier: BiGrammar = new FromStringGrammar(Identifier)
+  def identifier: BiGrammar = Identifier()
 
-  def number: BiGrammar = new FromGrammarWithToString(NumberG)
+  def number: BiGrammar = NumberG
 
   def integer = number ^^ (
     (s: Any) => Integer.parseInt(s.asInstanceOf[String]),
@@ -35,5 +35,6 @@ trait BiGrammarWriter {
   implicit def stringToGrammar(value: String): BiGrammar =
     if (value.exists(c => Character.isLetterOrDigit(c))) //either exists or forall is a bit of an arbitrary choice. exists works better for syntax highlighting
       new Keyword(value)
-    else new Delimiter(value)
+    else
+      new Delimiter(value)
 }

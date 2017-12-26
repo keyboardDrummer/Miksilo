@@ -3,7 +3,7 @@ package core.deltas
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
-import core.deltas.exceptions.DeltaDependencyViolation
+import core.deltas.exceptions.{BadInputException, DeltaDependencyViolation}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 
@@ -11,6 +11,10 @@ import scala.collection.mutable
 import scala.reflect.io.{Directory, File}
 
 case class Phase(key: Delta, action: Compilation => Unit)
+
+case class ParseException(message: String) extends BadInputException {
+  override def toString: String = message
+}
 
 object Language {
 
@@ -39,12 +43,16 @@ class Language(val deltas: Seq[Delta]) {
   val grammars = new LanguageGrammars
 
   var compilerPhases: List[Phase] = List.empty
-  var _parse: InputStream => Node = _
+  var buildParser: () => (InputStream => Node) = () => null
 
   for(particle <- deltas.reverse)
   {
     particle.inject(this)
   }
+
+  val parser = buildParser()
+
+  def parse(input: InputStream): Node = parser(input)
 
   def parseAndTransform(input: File): Compilation = {
     parseAndTransform(input.inputStream())
@@ -64,17 +72,11 @@ class Language(val deltas: Seq[Delta]) {
     state
   }
 
-  def parse(input: InputStream): Node = {
-    val compilation = new Compilation(this)
-    compilation.program = _parse(input)
-    compilation.program
-  }
-
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(input: InputStream): Compilation = {
     val compilation = new Compilation(this)
-    compilation.program = _parse(input)
+    compilation.program = parse(input)
     compilation.runPhases()
     compilation
   }

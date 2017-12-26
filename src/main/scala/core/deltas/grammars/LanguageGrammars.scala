@@ -22,6 +22,7 @@ class LanguageGrammars extends GrammarCatalogue {
 
   def root: Labelled = find(ProgramGrammar)
 
-  implicit def stringToAstGrammar(value: String) = new GrammarWithTrivia(Keyword(value), this)
-  implicit def grammarToAstGrammar(value: BiGrammar) = new GrammarWithTrivia(value, this)
+  implicit def stringToAstGrammar(value: String): GrammarWithTrivia =
+    new GrammarWithTrivia(BiGrammarWriter.stringToGrammar(value), this)
+  implicit def grammarToAstGrammar(value: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(value, this)
 }

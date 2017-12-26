@@ -2,9 +2,8 @@ package example
 
 import core.bigrammar._
 import core.bigrammar.grammars.Labelled
-import core.grammar.~
 import core.deltas.NodeGrammarWriter
-import core.deltas.node.{NodeShape, NodeField}
+import core.deltas.node.{NodeField, NodeShape}
 import org.scalatest.FunSuite
 
 object While {
@@ -82,8 +81,8 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
     val expression: BiGrammar = "true" ~> value(true) | "false" ~> value(false)
 
     val orGrammar = expression ~< "|" ~ ("|" ~> value(false) | value(true)) ~ expression ^^ (
-      { case ~(~(left: Any, strict: Boolean), right: Any) => Or(left, right, strict) },
-      { case or: Or => Some(new ~(new ~(or.left, or.strict), or.right)); case _ => None })
+      { case (left: Any, strict: Boolean, right: Any) => Or(left, right, strict) },
+      { case or: Or => Some(or.left, or.strict, or.right); case _ => None })
 
     object Left extends NodeField
     object Right extends NodeField

@@ -1,6 +1,6 @@
 package core.bigrammar.printer
 
-import core.bigrammar.BiGrammarToGrammar.WithMap
+import core.bigrammar.BiGrammarToParser.WithMap
 import core.bigrammar.WithMapG
 import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument

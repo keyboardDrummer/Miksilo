@@ -1,11 +1,12 @@
 package deltas.bytecode.readJar
 
+import core.bigrammar.BiGrammarToParser
+import core.deltas._
 import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.bytecode.types.TypeSkeleton
+import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.classes.{ConstantPool, FieldDeclaration}
@@ -15,11 +16,24 @@ import deltas.javac.types.{MethodType, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 
-object DecompileByteCodeSignature extends DeltaWithPhase {
+object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegistry {
 
   override def description: String = "Decompiles the field and method signatures in a classfile."
 
   override def dependencies: Set[Contract] = Set[Contract](SignatureAttribute, ClassInfoConstant)
+
+  class Registry {
+    var parseType: String => Node = _
+  }
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
+    val parser = BiGrammarToParser.toStringParser(typeGrammar)
+    getRegistry(language).parseType = input => parser(input).get.asInstanceOf[Node]
+  }
+
+  override def createRegistry = new Registry()
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
@@ -46,6 +60,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
 
   def getMethods(language: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
+    val parseType = getRegistry(language).parseType
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
       val attributes = methodInfo(ByteCodeMethodInfo.MethodAttributes).asInstanceOf[Seq[Node]]
@@ -54,11 +69,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
           val signatureTypeString = constantPool.getUtf8(signatureIndex)
-          TypeSkeleton.getTypeFromByteCodeString(language, signatureTypeString)
+          parseType(signatureTypeString)
         case None =>
           val methodDescriptorIndex = methodInfo(ByteCodeMethodInfo.MethodDescriptor).asInstanceOf[Int]
           val descriptor = constantPool.getUtf8(methodDescriptorIndex)
-          val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(language, descriptor)
+          val descriptorType: Node = parseType(descriptor)
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)
@@ -87,7 +102,8 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     target(Static) = false
   }
 
-  def getFields(state: Language, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
+  def getFields(language: Language, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
+    val parseType = getRegistry(language).parseType
     fieldInfos.map(fieldInfo => {
       val nameIndex: Int = fieldInfo(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]
       val attributes = fieldInfo(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[Node]]
@@ -96,11 +112,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
           val signatureTypeString = constantPool.getUtf8(signatureIndex)
-          TypeSkeleton.getTypeFromByteCodeString(state, signatureTypeString)
+          parseType(signatureTypeString)
         case None =>
           val fieldDescriptorIndex = fieldInfo(ByteCodeFieldInfo.DescriptorIndex).asInstanceOf[Int]
           val descriptor = constantPool.getUtf8(fieldDescriptorIndex)
-          val descriptorType: Node = TypeSkeleton.getTypeFromByteCodeString(state, descriptor)
+          val descriptorType: Node = parseType(descriptor)
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)

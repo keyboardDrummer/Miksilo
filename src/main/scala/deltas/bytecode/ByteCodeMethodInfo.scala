@@ -59,7 +59,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       MethodDescriptor -> Utf8ConstantDelta.key))
   }
 
-  def getMethodByteCode(methodInfo: MethodInfo[Node], state: Language) = {
+  def getMethodByteCode(methodInfo: MethodInfo[Node], state: Language): Seq[Byte] = {
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(methodInfo.nameIndex) ++
         shortToBytes(methodInfo.typeIndex) ++

@@ -1,15 +1,14 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.document.Empty
-import core.grammar.{PrintGrammar, Produce}
 import core.deltas.node.GrammarKey
+import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
 
   def printReachableGrammars(program: BiGrammar): ResponsiveDocument = {
-    val reachableGrammars = getLabelled(program).collect({ case x: Labelled => x})
+    val reachableGrammars = getLabelled(program)
     reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
   }
 
@@ -26,7 +25,7 @@ object PrintBiGrammar {
     result
   }
 
-  def toDocument(grammar: BiGrammar) = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
+  def toDocument(grammar: BiGrammar): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
   private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
     case sequence: LeftRight => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
@@ -40,8 +39,8 @@ object PrintBiGrammar {
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
-    case fromString:FromStringGrammar => PrintGrammar.toDocument(fromString.grammar)
     case labelled: Labelled => grammarKeyToName(labelled.name)
+    case NumberG => "number"
     case StringLiteral => "string"
     case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
@@ -107,14 +106,14 @@ object PrintBiGrammar {
       val right = choice.right
 
       right match {
-        case produce: Produce =>
-          return OptionGrammar(left, produce.result)
+        case produce: ValueGrammar =>
+          return OptionGrammar(left, produce.value)
         case _ =>
       }
 
       left match {
-        case produce: Produce =>
-          return OptionGrammar(right, produce.result)
+        case produce: ValueGrammar =>
+          return OptionGrammar(right, produce.value)
         case _ =>
       }
 
@@ -139,6 +138,6 @@ object PrintBiGrammar {
   }
 
   def getLabelled(grammar: BiGrammar): Seq[Labelled] = {
-    new RootGrammar(grammar).selfAndDescendants.flatMap((p: GrammarPath) => p.value match { case x: Labelled => Some(x); case _ => None} )
+    grammar.selfAndDescendants.collect({ case x: Labelled => x})
   }
 }

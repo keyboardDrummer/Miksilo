@@ -1,9 +1,8 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammar
-import core.bigrammar.BiGrammarToGrammar.WithMap
 import core.bigrammar.printer.{Printer, TryState}
-import core.grammar.{Grammar, GrammarToParserConverter}
+import core.bigrammar.{BiGrammar, WithMapG}
+import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.parsing.input.CharArrayReader
 
@@ -12,16 +11,14 @@ import scala.util.parsing.input.CharArrayReader
   * so the result of the grammar is exactly what has been consumed.
   * verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
-case class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = false)
+abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
-  override def getGrammar = grammar
-
-  lazy val parser = GrammarToParserConverter.convert(grammar)
+  lazy val parser = getParser(Set.empty) //TODO hacky Set.empty
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
-  override def write(from: WithMap) = {
+  override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = {
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
@@ -29,12 +26,12 @@ case class FromStringGrammar(grammar: Grammar, verifyWhenPrinting: Boolean = fal
           if (parseResult.successful && parseResult.get.equals(from.value))
             TryState.value(string)
           else
-            Printer.fail("FromGrammarWithToString could not parse string")
+            Printer.fail("StringGrammar could not parse string")
         }
         else
           TryState.value(string)
 
-      case _ => Printer.fail(s"FromStringGrammar expects a string value, and not a $from")
+      case _ => Printer.fail(s"StringGrammar expects a string value, and not a $from")
     }
   }
 }

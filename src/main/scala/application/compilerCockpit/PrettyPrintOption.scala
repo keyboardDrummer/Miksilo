@@ -2,7 +2,6 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.bigrammar.BiGrammarToGrammar
 import core.deltas.Language
 
 object PrettyPrintOption extends CompileOption {
@@ -14,7 +13,7 @@ object PrettyPrintOption extends CompileOption {
 
     val state = language.parseAndTransform(input)
     val outputGrammar = prettyPrint.getOutputGrammar(state.language)
-    TextWithGrammar(state.output, BiGrammarToGrammar.toGrammar(outputGrammar))
+    TextWithGrammar(state.output, outputGrammar)
   }
 
   override def toString = "Pretty Print"
