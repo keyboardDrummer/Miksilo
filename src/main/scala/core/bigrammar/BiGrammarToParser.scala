@@ -3,6 +3,7 @@ package core.bigrammar
 import core.bigrammar.grammars._
 
 import scala.collection.mutable
+import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
 import scala.util.parsing.input.CharArrayReader._
@@ -101,14 +102,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
     }
   }
 
-  override val whiteSpace = "".r
+  override val whiteSpace: Regex = "".r
 
-  def whitespaceG: Parser[Any] = rep(
-    whitespaceChar
-    //| '/' ~ '*' ~ comment
-    //| '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
-    //| '/' ~ '*' ~ failure("unclosed comment")
-  )
-
-  def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != EofCh)
+  def whitespaceChar: BiGrammarToParser.Parser[Char] = elem("space char", ch => ch <= ' ' && ch != EofCh)
 }

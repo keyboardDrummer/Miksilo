@@ -39,7 +39,6 @@ object PrintBiGrammar {
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
-    //case fromString: StringGrammar => ???
     case labelled: Labelled => grammarKeyToName(labelled.name)
     case NumberG => "number"
     case StringLiteral => "string"
