@@ -103,6 +103,4 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   }
 
   override val whiteSpace: Regex = "".r
-
-  def whitespaceChar: BiGrammarToParser.Parser[Char] = elem("space char", ch => ch <= ' ' && ch != EofCh)
 }
