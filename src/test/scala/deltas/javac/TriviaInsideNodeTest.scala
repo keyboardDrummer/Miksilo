@@ -54,6 +54,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object Right extends NodeField
   object Add extends NodeShape
   object Expression extends GrammarKey
+
   test("Left Recursive") {
     val language = new Language(Seq.empty)
     val grammars = language.grammars
@@ -75,7 +76,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
 
     val expectedAdditionGrammar = expressionGrammar.as(Left) ~ new LeftRight("+", expressionGrammar.as(Right))
     val expectedNumberGrammar = new WithTrivia((number : BiGrammar).as(Value), grammars.trivia)
-    assertResult(expectedAdditionGrammar.toString)(additionGrammar.inner.toString) //TODO use actual equality instead of toString
-    assertResult(expectedNumberGrammar.toString)(numberGrammar.inner.toString) //TODO use actual equality instead of toString
+    assertResult("1" + expectedAdditionGrammar.toString)("1" + additionGrammar.inner.toString) //TODO use actual equality instead of toString
+    assertResult("2" + expectedNumberGrammar.toString)("2" + numberGrammar.inner.toString) //TODO use actual equality instead of toString
   }
 }

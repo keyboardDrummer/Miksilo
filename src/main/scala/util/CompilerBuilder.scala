@@ -21,8 +21,8 @@ object CompilerBuilder {
 
   class MyThread extends TimerTask {
     override def run(): Unit = {
-      System.out.println("\nProfiling global results:")
-      statistics.printAll()
+//      System.out.println("\nProfiling global results:")
+//      statistics.printAll()
     }
   }
 }
