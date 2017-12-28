@@ -53,13 +53,11 @@
 					{% assign categories = "Core, BiGrammar, Deltas, Practical, Discussion" | split: ", " %}
 					{% for category in categories %}
 						<li class="nav-item top-level {% if group.name == page.category %}current{% endif %}">
+							{% assign items = site.docs | sort: 'order' | where:'category',category %}
 							<a href="{{ site.baseurl }}{{ items.first.url }}">{{ category }}</a>
 							<ul>
-								{% assign items = site.docs | sort: 'order' %}
 								{% for doc in items %}
-									{% if doc.category == category %}
-										<li class="nav-item {% if doc.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ doc.url }}">{{ doc.title }}</a></li>
-									{% endif %}
+									<li class="nav-item {% if doc.url == page.url %}current{% endif %}"><a href="{{ site.baseurl }}{{ doc.url }}">{{ doc.title }}</a></li>
 								{% endfor %}
 							</ul>
 						</li>
