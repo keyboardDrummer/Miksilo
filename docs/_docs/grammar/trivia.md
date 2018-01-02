@@ -4,11 +4,13 @@ category: BiGrammar
 order: 3
 ---
 
-> Refer to the delta article as a dependency
+> As an introduction to this article, please read about [BiGrammar's modularity](http://keyboarddrummer.github.io/Blender/grammar/modularity/) and about [deltas](http://keyboarddrummer.github.io/Blender/core/delta/).
 
-In [this previous article on modularity](http://keyboarddrummer.github.io/Blender/grammar/modularity/), we showed some of BiGrammar's features that enable modularity. Here, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.
+In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off a sequence deltas that change the entire grammar of a language.
 
-To demonstrate these deltas, we need a program transformation, such as a refactoring or a compilation, for them to transform. We choose a simple refactoring called _reorder members_, that reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three deltas will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.
+To demonstrate these deltas, we need a program transformation, such as a refactoring or a compilation, for them to transform. We choose a simple refactoring called _reorder members_, that reorders the members of a Java class, so that static fields are placed before instance fields.
+
+The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three deltas will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.
 
 Our input program for this case is:
 
@@ -29,7 +31,7 @@ If we apply reorder members on this program, we get the following exception:
     ^
 ```
 
-We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our earlier program:
+We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our input program:
 
 ```scala
   override def transformGrammars(language: Language): Unit = {
