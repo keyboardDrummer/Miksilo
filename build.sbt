@@ -11,6 +11,8 @@ scalacOptions += "-language:postfixOps"
 
 libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8"
 
+libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2"
+
 libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1"
 
 libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0"

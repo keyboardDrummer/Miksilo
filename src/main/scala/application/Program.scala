@@ -1,5 +1,6 @@
 package application
 
+import java.awt.Toolkit
 import java.awt.event.{FocusEvent, FocusListener}
 import javax.swing._
 
@@ -12,8 +13,9 @@ import scala.swing.{Component, MainFrame, SimpleSwingApplication}
 
 object Program extends SimpleSwingApplication {
 
+  Toolkit.getDefaultToolkit.getSystemEventQueue.push(new ShowExceptionsInDialog)
 
-  def top = new MainFrame {
+  def top: MainFrame = new MainFrame {
     maximize()
     title = "Blender"
 
@@ -28,6 +30,7 @@ object Program extends SimpleSwingApplication {
 
     contents = Component.wrap(tabbedPane)
   }
+
 
   def getDependencyGraph: mxGraphComponent = {
     val graph = new DeltaGraph()
