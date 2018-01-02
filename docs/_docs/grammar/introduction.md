@@ -67,12 +67,12 @@ The following grammar maps "yes" and "no" strings to their corresponding boolean
 "yes" ~> value(true) | "no" ~> value(false)
 ```
 
-- `|` is the choice operator. If the left grammar fails to parse/print, then the right grammar is used.
+- `|` is the choice operator. If the left grammar fails, then the right grammar is used.
 - The `<` and `>` symbols can be added to the end of existing sequence operators to create a variation of that operator, `<` means ignore the result of the grammar to the right. For example, `a ~> b` means `a` left of `b`, but ignore the result of `a` when parsing.
 - `value` has no effect on the syntax, it will produce a value when parsing and consume one while printing.
 
 #### Regex and map
-The following grammar maps integers to their string representation:
+The following grammar maps an integer to its string representation:
 
 ```scala
 new RegexGrammar("""-?\d+""".r).map[String, Int](
@@ -83,7 +83,7 @@ new RegexGrammar("""-?\d+""".r).map[String, Int](
 
 - `"""-?\d+""".r` returns a regular expression that machines a sequence of digits, with an optional minus sign in front of it.
 - `RegexGrammar` turns a regular expression into a grammar
-- `map` transforms the subject grammar's value using a bidirectional mapping. The argument `afterParsing` transforms the value after parsing. In this case it converts the string of digits into an `Int`. The argument `beforePrinting` transforms the value before printing, in this case it converts the `Int` back into a `String`. returns an `Option`, of which `Some` is a subtype, to allow printing to fail if the passed value is not mapped by the grammar.
+- `map` transforms the subject grammar's value using a bidirectional mapping. The argument `afterParsing` is called after parsing. In this case it parses the string of digits into an `Int`. The argument `beforePrinting` is called before printing. In this case it converts the `Int` back into its string representation.
 
 #### Next
 Now that you're comfortable reading BiGrammar, continue to see [how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Blender/grammar/modularity/).

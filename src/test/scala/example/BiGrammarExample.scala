@@ -40,8 +40,8 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
 
   test("mapAndRegexExample") {
     new RegexGrammar("""-?\d+""".r).map[String, Int](
-      afterParsing = s => Integer.parseInt(s),
-      beforePrinting = i => i.toString
+      afterParsing = digits => Integer.parseInt(digits),
+      beforePrinting = int => int.toString
     )
   }
 
