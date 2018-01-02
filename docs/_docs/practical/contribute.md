@@ -4,8 +4,6 @@ category: Practical
 order: 2
 ---
 
-> Decide on a license, mention it. Mention open source.
-
 There's an infinite amount of work to be done for Blender, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor's or Master's thesis.
 
 Some examples of cool features:
