@@ -14,9 +14,9 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
   implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension
 
-  def ~<(right: BiGrammar) = (this ~ right).ignoreRight
+  def ~<(right: BiGrammar): BiGrammar = (this ~ right).ignoreRight
 
-  def ~~<(right: BiGrammar) = this ~< new LeftRight(space, right)
+  def ~~<(right: BiGrammar): BiGrammar = this ~< new LeftRight(space, right)
 
   def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
 
@@ -33,27 +33,24 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
   def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))
 
   private def someMap(grammar: BiGrammar): BiGrammar = {
-    grammar ^^
-      ( {
-        case (first, rest) => Seq(first) ++ rest.asInstanceOf[Seq[Any]]
-      }, {
-        case seq: Seq[Any] => if (seq.nonEmpty) Some((seq.head, seq.tail)) else None
-      })
+    grammar.mapSome[(Any, Seq[Any]), Seq[Any]](
+      t => Seq(t._1) ++ t._2,
+      seq => if (seq.nonEmpty) Some((seq.head, seq.tail)) else None)
   }
 
   def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
 
   def ~>(right: BiGrammar): BiGrammar = (this ~ right).ignoreLeft
 
-  def ~~>(right: BiGrammar) = new LeftRight(grammar, space) ~> right
+  def ~~>(right: BiGrammar): BiGrammar = new LeftRight(grammar, space) ~> right
 
-  def * = many
+  def * : ManyHorizontal = many
 
   def %%(bottom: BiGrammar): BiGrammar = {
     (this %< BlankLine) % bottom
   }
 
-  def %>(bottom: BiGrammar) = (this % bottom).ignoreLeft
+  def %>(bottom: BiGrammar): BiGrammar = (this % bottom).ignoreLeft
 
-  def %<(bottom: BiGrammar) = (this % bottom).ignoreRight
+  def %<(bottom: BiGrammar): BiGrammar = (this % bottom).ignoreRight
 }

@@ -70,7 +70,6 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
       ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
     val newTransformations = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
-
     val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)
     val output = state.output
 

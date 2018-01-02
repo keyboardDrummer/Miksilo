@@ -32,9 +32,9 @@ object ConstantPoolIndices extends DeltaWithGrammar {
   }
 
   def addIndicesToList(listGrammar: BiGrammar): BiGrammar = {
-    val removeIndexForParsing: (Any) => Seq[Any] = items => items.asInstanceOf[Seq[Node]].map(i => i(Content))
-    val addIndexForPrinting: (Any) => Some[Seq[Node]] = items => Some(items.asInstanceOf[Seq[Any]].zipWithIndex.map((p: (Any, Int)) =>
-      WithIndexClass.create(Index -> (p._2 + 1), Content -> p._1)))
-    listGrammar ^^ ( removeIndexForParsing, addIndexForPrinting )
+    val removeIndexForParsing: Seq[Node] => Seq[Any] = items => items.map(i => i(Content))
+    val addIndexForPrinting: Seq[Any] => Seq[Node] = items => items.zipWithIndex.map((p: (Any, Int)) =>
+      WithIndexClass.create(Index -> (p._2 + 1), Content -> p._1))
+    listGrammar.map[Seq[Node], Seq[Any]](removeIndexForParsing, addIndexForPrinting)
   }
 }

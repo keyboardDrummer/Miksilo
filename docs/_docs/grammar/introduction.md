@@ -4,7 +4,7 @@ category: BiGrammar
 order: 1
 ---
 
-BiGrammar is Blender's metalanguage for everything syntax related, whose main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In this article we'll go through code examples showcasing the most important operators. Afterwards you will comfortably read BiGrammar code.
+BiGrammar is Blender's metalanguage for everything syntax related. Its main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In this article we'll go through code examples showcasing the most important operators. Afterwards you will comfortably read BiGrammar code.
 
 #### Parsing & printing
 Here is a grammar for a common while loop:
@@ -51,7 +51,7 @@ Body:
       Value: 2  
 ```
 
-Also using the above grammar, we can then pretty printed the AST to get:
+Also using the above grammar, we can then pretty print the AST to get:
 
 ```java
 while(i) {
@@ -61,7 +61,7 @@ while(i) {
 ```
 
 #### Choice, ignore and value
-The following grammar maps yes and no strings to their corresponding boolean values:
+The following grammar maps "yes" and "no" strings to their corresponding boolean values:
 
 ```scala
 "yes" ~> value(true) | "no" ~> value(false)
@@ -75,14 +75,15 @@ The following grammar maps yes and no strings to their corresponding boolean val
 The following grammar maps integers to their string representation:
 
 ```scala
-new RegexGrammar("""-?\d+""".r).map(
-  afterParsing = (s: String) => Integer.parseInt(s), 
-  beforePrinting =  (i: Int) => Some(i.toString)
+new RegexGrammar("""-?\d+""".r).map[String, Int](
+  afterParsing = digits => Integer.parseInt(digits),
+  beforePrinting = int => int.toString
 )
 ```
 
+- `"""-?\d+""".r` returns a regular expression that machines a sequence of digits, with an optional minus sign in front of it.
 - `RegexGrammar` turns a regular expression into a grammar
-- `map` transforms the grammar's value using a bidirectional mapping. The argument `beforePrinting` returns an `Option` to allow printing to fail if the passed value is not mapped by the grammar.
+- `map` transforms the subject grammar's value using a bidirectional mapping. The argument `afterParsing` transforms the value after parsing. In this case it converts the string of digits into an `Int`. The argument `beforePrinting` transforms the value before printing, in this case it converts the `Int` back into a `String`. returns an `Option`, of which `Some` is a subtype, to allow printing to fail if the passed value is not mapped by the grammar.
 
 #### Next
-Now that you're comfortable reading BiGrammar, continue to see [how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/).
+Now that you're comfortable reading BiGrammar, continue to see [how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Blender/grammar/modularity/).

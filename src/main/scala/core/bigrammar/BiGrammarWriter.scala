@@ -13,16 +13,16 @@ trait BiGrammarWriter {
 
   def number: BiGrammar = NumberG
 
-  def integer = number ^^ (
-    (s: Any) => Integer.parseInt(s.asInstanceOf[String]),
-    (i: Any) => Some(i).filter(i => i.isInstanceOf[Int]).map(i => i.toString)
+  def integer: BiGrammar = number.map[String, Int](
+    s => Integer.parseInt(s),
+    i => i.toString
   )
 
   def failure: BiGrammar = BiFailure()
 
   def value(value: Any): BiGrammar = ValueGrammar(value)
 
-  def keywordClass(value: String) = Keyword(value, false, true)
+  def keywordClass(value: String) = Keyword(value, reserved = false, verifyWhenPrinting = true)
 
   def space: BiGrammar = print(WhiteSpace(1, 1))
 

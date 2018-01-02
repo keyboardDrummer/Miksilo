@@ -94,38 +94,27 @@ Partial:
     val expression = new Labelled(StringKey("expression"))
     val parenthesis: BiGrammar = "(" ~> expression ~< ")"
 
-    val numberValue: BiGrammar = integer ^^ (v => Value(v.asInstanceOf[Int]), {
-      case Value(i) => Some(i)
-      case _ => None
-    })
+    val numberValue: BiGrammar = integer.map[Int, Value](v => Value(v), value => value.value)
 
     val multipleLabel = new Labelled(StringKey("multiply"))
-    val multiply = (multipleLabel ~~< "*") ~~ multipleLabel ^^( {
-      case (l, r) => Multiply(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
-    }, {
-      case Multiply(l, r) => Some(l, r)
-      case _ => None
-    })
+    val multiply = (multipleLabel ~~< "*" ~~ multipleLabel).map[(TestExpression, TestExpression), Multiply](
+      t => Multiply(t._1, t._2)
+    , multiply => (multiply.first, multiply.second))
+
     multipleLabel.addOption(multiply)
     multipleLabel.addOption(numberValue)
     multipleLabel.addOption(parenthesis)
 
     val addLabel = new Labelled(StringKey("add"))
-    val add: BiGrammar = (addLabel ~~< "+") ~~ addLabel ^^( {
-      case (l, r) => Add(l.asInstanceOf[TestExpression], r.asInstanceOf[TestExpression])
-    }, {
-      case Add(l, r) => Some((l, r))
-      case _ => None
-    })
+    val add: BiGrammar = (addLabel ~~< "+" ~~ addLabel).map[(TestExpression, TestExpression), Add](
+      t => Add(t._1, t._2)
+      , add => (add.first, add.second))
     addLabel.addOption(add)
     addLabel.addOption(multipleLabel)
 
-    val _if: BiGrammar = expression % ("?" ~~> expression) % (":" ~~> expression) ^^( {
-      case ((cond, _then), _else) => IfNotZero(cond.asInstanceOf[TestExpression], _then.asInstanceOf[TestExpression], _else.asInstanceOf[TestExpression])
-    }, {
-      case IfNotZero(cond, _then, _else) => Some((cond, _then), _else)
-      case _ => None
-    })
+    val _if: BiGrammar = (expression % ("?" ~~> expression) % (":" ~~> expression)).map[((TestExpression, TestExpression), TestExpression), IfNotZero](
+      t => IfNotZero(t._1._1, t._1._2, t._2),
+      ifNotZero => ((ifNotZero.condition, ifNotZero._then), ifNotZero._else))
 
     expression.addOption(_if)
     expression.addOption(addLabel)

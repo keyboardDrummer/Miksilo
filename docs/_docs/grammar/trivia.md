@@ -4,9 +4,11 @@ category: BiGrammar
 order: 3
 ---
 
-In [this article on modularity](http://keyboarddrummer.github.io/Blender/bigrammar/modularity/), we showed some of BiGrammar's features that enable modularity. In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.
+> Refer to the delta article as a dependency
 
-To demonstrate these delta's, we need a program transformation, such as a refactoring or a compilation, for them to transform. We choose a simple refactoring called _reorder members_, that reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three delta's will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.
+In [this previous article on modularity](http://keyboarddrummer.github.io/Blender/grammar/modularity/), we showed some of BiGrammar's features that enable modularity. Here, we’ll demonstrate the extent of BiGrammar’s modularity by showing off delta’s that change the entire grammar of a language.
+
+To demonstrate these deltas, we need a program transformation, such as a refactoring or a compilation, for them to transform. We choose a simple refactoring called _reorder members_, that reorders the members of a Java class, so that static fields are placed before instance fields. The problem is that this refactoring is incomplete: it only works on Java programs without comments. A series of three deltas will enable the refactoring to accept Java block comments in the input program, and to output them in the refactored program, in an way that matches with how programmers use comments.
 
 Our input program for this case is:
 
@@ -89,4 +91,4 @@ class Example {
 
 Perfect!
 
-The refactoring used as a demonstration in this article is a minimal example, but since the three delta's we used are all language agnostic, they can used in any context, for example when transforming from `Java` to `C#`.
+The refactoring used as a demonstration in this article is a minimal example, but since the three deltas we used are all language agnostic, they can be used in any context, for example when transforming from `Java` to `C#`.

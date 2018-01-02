@@ -13,7 +13,7 @@ object BlockDelta extends DeltaWithGrammar {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
-    val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementGrammar ^^(statement => Seq(statement), x => Some(x.asInstanceOf[Seq[Any]].head)))
+    val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head))
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
   }
 

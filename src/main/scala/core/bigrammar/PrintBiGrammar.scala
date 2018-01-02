@@ -76,7 +76,7 @@ object PrintBiGrammar {
 
   case class OptionGrammar(inner: BiGrammar, value: Any) extends FakeBiGrammar
 
-  def simplify(grammar: BiGrammar): BiGrammar = grammar.map {
+  def simplify(grammar: BiGrammar): BiGrammar = grammar.deepMap {
     case choice: Choice =>
       val left = choice.left
       val right = choice.right
@@ -100,7 +100,7 @@ object PrintBiGrammar {
     case x => x
   }
 
-  def contract(grammar: BiGrammar): BiGrammar = grammar.map {
+  def contract(grammar: BiGrammar): BiGrammar = grammar.deepMap {
     case choice: Choice =>
       val left = choice.left
       val right = choice.right
@@ -121,7 +121,7 @@ object PrintBiGrammar {
     case x => x
   }
 
-  def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.map {
+  def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.deepMap {
     case sequence: Sequence =>
       val left = sequence.first
       val right = sequence.second

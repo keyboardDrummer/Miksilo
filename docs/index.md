@@ -9,7 +9,7 @@ Blender is a [language workbench](https://en.wikipedia.org/wiki/Language_workben
 
 Language construction is notoriously hard, and these days involves not just writing a compiler or interpreter, but also tooling to include in an [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment). Language workbenches make language design accessible to a larger audience; they allow writing more [domain-specific languages](https://en.wikipedia.org/wiki/Domain-specific_language), and prototyping new languages.
 
-Because languages share many properties, the quickest way to build a language is to build on top of existing ones. Although most languages workbenches allow some language reuse, Blender is built for modular language design. To achieve that goal, it has the following properties:
+Because languages share many properties, the quickest way to build a language is to build on top of existing ones. Although most language workbenches allow some language reuse, Blender is built for modular language design. To achieve that goal, it has the following properties:
 
 - Languages are composed of many small transformations.
 - Language transformations are packaged as reusable units with explicit dependencies between them.
@@ -18,12 +18,10 @@ Because languages share many properties, the quickest way to build a language is
 - Compiler phases are defined generically, making them resilient to changes in the language.
 - Abstract syntax trees are stored unstructured, which provides benefits such as fast transformations and language composition at run-time.
 
-The best way to show Blender's modularity is by example, so we've picked these language transformations as showcases:
+The best way to show Blender's modularity is by example, so we've picked a few language transformations as showcases. Before diving into them however, we recommend to get [an introduction to BiGrammar](http://keyboarddrummer.github.io/Blender/grammar/introduction/), one of Blender's metalanguages. Here are the showcases:
 
-1. [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/bigrammar/trivia/)
+1. [Add support for comments in a language agnostic way.](http://keyboarddrummer.github.io/Blender/grammar/trivia/)
 1. [Inline the constant pool in Java bytecode.](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool/)
-1. [Resolving interactions between independent delta's.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
-
-Before diving into the above, we recommend to get [an introduction to BiGrammar](http://keyboarddrummer.github.io/Blender/bigrammar/introduction/), one of Blender's metalanguages.
+1. [Resolving interactions between independent deltas.](http://keyboarddrummer.github.io/Blender/deltas/delta-interactions/)
 
 If you would prefer to learn Blender by experimenting instead of reading, then try out its [sandbox](http://keyboarddrummer.github.io/Blender/core/sandbox/) application, which lets you create languages by composing predefined language transformations.

@@ -16,7 +16,7 @@ object IntLiteralDelta extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val inner = number ^^(number => Integer.parseInt(number.asInstanceOf[String]), i => Some(i))
+    val inner = integer
     val parseNumber = inner.as(Value).asLabelledNode(Shape)
     find(ExpressionSkeleton.ExpressionGrammar).addOption(parseNumber)
   }

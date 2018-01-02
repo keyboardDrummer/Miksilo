@@ -1,9 +1,11 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Choice, Labelled, LeftRight, MapGrammar}
+import core.bigrammar.grammars._
 import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
-import util.GraphBasics
+import util.{GraphBasics, Utility}
+
+import scala.reflect.ClassTag
 
 object BiGrammar {
   type State = Map[Any, Any]
@@ -14,30 +16,33 @@ A grammar that maps to both a parser and a printer
  */
 trait BiGrammar extends BiGrammarWriter {
 
-  override def toString = PrintBiGrammar.toDocument(this).renderString(trim = false)
+  override def toString: String = PrintBiGrammar.toDocument(this).renderString(trim = false)
 
   lazy val height = 1
 
   def |(other: BiGrammar) = new Choice(this, other)
-  def option: BiGrammar = this ^^ (x => Some(x), x => x.asInstanceOf[Option[Any]]) | value(None)
+  def option: BiGrammar = this.mapSome[Any, Option[Any]](x => Some(x), x => x) | value(None)
 
-  def indent(width: Int = 2) = new LeftRight(WhiteSpace(width, 0), this).ignoreLeft
+  def indent(width: Int = 2): BiGrammar = new LeftRight(WhiteSpace(width, 0), this).ignoreLeft
 
-  def optionToSeq: BiGrammar = new MapGrammar(this,
-    option => option.asInstanceOf[Option[Any]].fold(Seq.empty[Any])(x => Seq(x)), {
-      case seq: Seq[Any] => Some(if (seq.isEmpty) None else Some(seq))
-      case _ => None
-    })
-  def seqToSet: BiGrammar = new MapGrammar(this,
-    seq => seq.asInstanceOf[Seq[Any]].toSet,
-    set => Some(set.asInstanceOf[Set[Any]].toSeq))
+  def optionToSeq: BiGrammar = this.map[Option[Any], Seq[Any]](
+    option => option.fold[Seq[Any]](Seq.empty)(v => Seq(v)),
+    seq => if (seq.isEmpty) None else Some(seq))
 
-  def ^^(afterParsing: Any => Any, beforePrinting: Any => Option[Any]): BiGrammar =
-    new MapGrammar(this, afterParsing, beforePrinting)
+  def seqToSet: BiGrammar = this.map[Seq[Any], Set[Any]](
+    seq => seq.toSet,
+    set => set.toSeq)
+
+  def map[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => T): BiGrammar =
+    mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))
+
+  def mapSome[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => Option[T]): BiGrammar =
+    new MapGrammar(this, value => afterParsing(value.asInstanceOf[T]),
+      value => Utility.cast[U](value).flatMap(value => beforePrinting(value)))
 
   def children: Seq[BiGrammar]
   def withChildren(newChildren: Seq[BiGrammar]): BiGrammar
-  def map(function: BiGrammar => BiGrammar): BiGrammar = new BiGrammarObserver[BiGrammar] {
+  def deepMap(function: BiGrammar => BiGrammar): BiGrammar = new BiGrammarObserver[BiGrammar] {
     override def getReference(name: GrammarKey): BiGrammar = new Labelled(name)
 
     override def setReference(result: BiGrammar, reference: BiGrammar): Unit = {
@@ -47,7 +52,7 @@ trait BiGrammar extends BiGrammarWriter {
     override def handleGrammar(self: BiGrammar, children: Seq[BiGrammar], recursive: (BiGrammar) => BiGrammar): BiGrammar = self.withChildren(children)
   }.observe(this)
 
-  def deepClone = map(x => x)
+  def deepClone: BiGrammar = deepMap(x => x)
   def containsParser(): Boolean = {
     var map: Map[BiGrammar, Boolean] = Map.empty
     lazy val recursive: BiGrammar => Boolean = grammar => {

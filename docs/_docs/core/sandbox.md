@@ -7,7 +7,7 @@ Blender can be run as a desktop application, which provides a sandbox for constr
 
 ![Language workbench panel](http://keyboarddrummer.github.io/Blender/images/languageBuilder.png)
 
-To get an overview of the different delta's in Blender and how they relate, you can view the dependency graph. Here is a screenshot showing part of the graph:
+To get an overview of the different deltas in Blender and how they relate, you can view the dependency graph. Here is a screenshot showing part of the graph:
 
 ![Delta dependency graph example](http://keyboarddrummer.github.io/Blender/images/dependencyGraphExample.png)
 

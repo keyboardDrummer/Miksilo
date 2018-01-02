@@ -113,9 +113,9 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     import grammars._
     val constantPoolItemContent = create(ConstantPoolItemContentGrammar)
     val entries = constantPoolItemContent.manyVertical.indent()
-    val result = "Constant pool:" %> entries ^^ (
-      entries => new ConstantPool(entries.asInstanceOf[Seq[Any]]),
-      constantPool => Some(constantPool.asInstanceOf[ConstantPool].constants.toSeq))
+    val result = "Constant pool:" %> entries.map[Seq[Any], ConstantPool] (
+      entries => new ConstantPool(entries),
+      constantPool => constantPool.constants.toSeq)
     create(ConstantPoolGrammar, result.as(ClassConstantPool))
   }
 

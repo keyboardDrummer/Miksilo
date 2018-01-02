@@ -1,7 +1,7 @@
 package example
 
 import core.bigrammar._
-import core.bigrammar.grammars.Labelled
+import core.bigrammar.grammars.{Labelled, RegexGrammar}
 import core.deltas.NodeGrammarWriter
 import core.deltas.node.{NodeField, NodeShape}
 import org.scalatest.FunSuite
@@ -37,6 +37,13 @@ object Constant {
   * Contains some examples for the wiki.
   */
 class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSequenceWriter {
+
+  test("mapAndRegexExample") {
+    new RegexGrammar("""-?\d+""".r).map[String, Int](
+      afterParsing = s => Integer.parseInt(s),
+      beforePrinting = i => i.toString
+    )
+  }
 
   test("whileWithAsNode") {
     val expression = new Labelled(StringKey("expression"))
@@ -80,9 +87,9 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
 
     val expression: BiGrammar = "true" ~> value(true) | "false" ~> value(false)
 
-    val orGrammar = expression ~< "|" ~ ("|" ~> value(false) | value(true)) ~ expression ^^ (
-      { case (left: Any, strict: Boolean, right: Any) => Or(left, right, strict) },
-      { case or: Or => Some(or.left, or.strict, or.right); case _ => None })
+    val orGrammar = expression ~< "|" ~ ("|" ~> value(false) | value(true)) ~ expression.map[((Any, Boolean), Any), Or](
+      t => Or(t._1._1, t._2, t._1._2),
+      or => ((or.left, or.strict), or.right))
 
     object Left extends NodeField
     object Right extends NodeField

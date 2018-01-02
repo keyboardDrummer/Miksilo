@@ -4,10 +4,11 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Labelled}
 import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName
+import util.Utility
 
 object ObjectTypeDelta extends TypeInstance with StackType {
   override val key = ObjectTypeKey
@@ -23,20 +24,19 @@ object ObjectTypeDelta extends TypeInstance with StackType {
   object ObjectTypeJavaGrammar extends GrammarKey
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    val construct: Any => Any = {
-      case ids: Seq[Any] =>
-        val stringIds = ids.collect({ case v: String => v})
-        if (stringIds.size > 1)
-          Right(QualifiedClassName(stringIds))
-        else
-          Left(stringIds.last)
+    val construct: Seq[String] => Either[String, QualifiedClassName] = stringIds => {
+      if (stringIds.size > 1)
+        Right(QualifiedClassName(stringIds))
+      else
+        Left(stringIds.last)
     }
-    def deconstruct(value: Any): Option[Any] = Some(value match {
+    def deconstruct(value: Either[String, QualifiedClassName]): Seq[String] = value match {
       case Right(QualifiedClassName(stringIds)) => stringIds
       case Left(string) => Seq(string)
-    })
+    }
     val parseObjectType = create(ObjectTypeJavaGrammar,
-      (identifier.someSeparated(".") ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
+      identifier.someSeparated(".").map[Seq[String], Either[String, QualifiedClassName]](construct, deconstruct).
+        as(Name).asNode(ObjectTypeKey))
     parseObjectType
   }
 
@@ -49,10 +49,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
   object ObjectTypeByteCodeGrammar extends GrammarKey
   object ObjectTypeByteCodeGrammarInner extends GrammarKey
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
-    val construct: Any => Any = {
-      case name: QualifiedClassName =>
-        Right(name)
-    }
+    val construct: QualifiedClassName => Either[String, QualifiedClassName] = Right[String, QualifiedClassName]
     def deconstruct(value: Any): Option[Any] = Some(value match {
       case Right(name) => name
     })
@@ -60,7 +57,9 @@ object ObjectTypeDelta extends TypeInstance with StackType {
     val qualifiedClassNameParser = QualifiedClassNameConstantDelta.getQualifiedClassNameParser(grammars)
     import grammars._
     val inner: Labelled = create(ObjectTypeByteCodeGrammarInner,
-      (qualifiedClassNameParser ^^ (construct, deconstruct)).as(Name).asNode(ObjectTypeKey))
+      qualifiedClassNameParser.mapSome[QualifiedClassName, Either[String, QualifiedClassName]](
+        Right[String, QualifiedClassName],
+        v => Utility.cast[Right[String, QualifiedClassName]](v).map(v => v.value)).as(Name).asNode(ObjectTypeKey))
     val grammar: BiGrammar = Keyword("L", reserved = false) ~> inner ~< ";"
     create(ObjectTypeByteCodeGrammar, grammar)
   }

@@ -33,16 +33,7 @@ object QualifiedClassNameConstantDelta extends ConstantEntry {
 
   def getQualifiedClassNameParser(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    val construct: Any => Any = {
-      case ids: Seq[Any] =>
-        val stringIds = ids.collect({ case v: String => v})
-        QualifiedClassName(stringIds)
-    }
-    val parseQualifiedClassName = identifier.someSeparated("/") ^^ (construct, {
-      case QualifiedClassName(stringIds) => Some(stringIds)
-      case _ => None
-    })
-    parseQualifiedClassName
+    identifier.someSeparated("/").map[Seq[String], QualifiedClassName](QualifiedClassName, qualifiedClassName => qualifiedClassName.parts)
   }
 
   override def description: String = "A qualified class name constant"

@@ -4,7 +4,7 @@ category: Deltas
 order: 2
 ---
 
-Sometimes a programmer targeting the [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine) may want to write [class files](https://en.wikipedia.org/wiki/Java_class_file) directly, instead of writing in some JVM language and compiling that. A simple reason for this could be to get better performance. Predefined delta's in Blender allow you to write Java bytecode using a grammar inspired by _javap_, and convert that to a Java classfile. An existing project that does this is [Jasmin](https://en.wikipedia.org/wiki/Jasmin_(software)).
+Sometimes a programmer targeting the [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine) may want to write [class files](https://en.wikipedia.org/wiki/Java_class_file) directly, instead of writing in some JVM language and compiling that. A simple reason for this could be to get better performance. Predefined deltas in Blender allow you to write Java bytecode using a grammar inspired by _javap_, and convert that to a Java classfile. An existing project that does this is [Jasmin](https://en.wikipedia.org/wiki/Jasmin_(software)).
 
 The constant pool in a class file is useful because it reduces code duplication. However, for a programmer it is awkward because the elements in the pool are referenced by index, which are hard to remember when trying to refer to a constant pool element. To make writing Java bytecode more programmer-friendly, it's better to inline elements from the constant pool, which is what the delta [Inline constant pool](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) does.
 
@@ -64,7 +64,7 @@ References to the constant pool occur throughout the entire class file, so inlin
    1. References to the constant pool are replaced by constant pool entries
    1. Constant pool entries always start with stating their type, to disambiguate the grammar. After inlining, the entries are in locations where a specific type is expected, so we can remove the type label from the grammar.
 
-An important input for this Delta is the language variable `constantReferences`. It contains for each class, for each field of that class, the type of constant pool element that field references, if any. `constantReferences` is constructed by the different delta's that create the elements of bytecode.
+An important input for this Delta is the language variable `constantReferences`. It contains for each class, for each field of that class, the type of constant pool element that field references, if any. `constantReferences` is constructed by the different deltas that create the elements of bytecode.
 
 Now we're ready to look at some source. Here is the code for the previously mentioned task 1:
 
