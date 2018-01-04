@@ -23,14 +23,9 @@ The best way to show Blender's modularity is by example, so we've picked a few l
 If you would prefer to learn Blender by experimenting instead of reading, then try out its [sandbox](http://keyboarddrummer.github.io/Blender/core/sandbox/) application, which lets you create languages by composing predefined language transformations.
 
 ### Build instructions
-Building Blender is as simple as:
 
-1. Grab [the source](https://github.com/keyboardDrummer/Blender) from GitHub.
-1. Make sure you have installed the Java 8 JDK, or a higher version. To check what version you have installed, open the terminal and type:
-
-   `javac -version`
-
-   If you don't have it installed, download the JDK <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.
+1. Grab [the source](https://github.com/keyboardDrummer/Blender) from GitHub
+1. Make sure you have installed the Java 8 JDK, or a higher version.
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
 1. Call 'sbt run' in the project root to build Blender and start the sandbox desktop application.
 
@@ -45,7 +40,7 @@ Some examples of cool features:
 - Incremental compilation: incremental parsing, incremental type checking, etc.
 - Add a new language front-end or back-end.
 
-#### How to contribute
+If you would like to contribute then:
 1. Reach out on [the Gitter](https://gitter.im/LanguageBlender/Lobby), so other contributors can help you out where the documentation is lacking.
 1. Look through the open issues to see if you find something interesting
 1. Enjoy the work ;-)

@@ -1,15 +1,18 @@
 package application
 
-import java.awt.Toolkit
 import java.awt.event.{FocusEvent, FocusListener}
+import java.awt.{AWTEvent, EventQueue, Toolkit}
 import javax.swing._
 
 import application.compilerBuilder.LanguageWorkbench
 import application.graphing.GraphView
 import application.graphing.model.DeltaGraph
 import com.mxgraph.swing.mxGraphComponent
+import org.oxbow.swingbits.dialog.task.TaskDialogs
 
 import scala.swing.{Component, MainFrame, SimpleSwingApplication}
+
+
 
 object Program extends SimpleSwingApplication {
 
