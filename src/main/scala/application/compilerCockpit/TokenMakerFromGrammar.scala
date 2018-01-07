@@ -3,7 +3,7 @@ package application.compilerCockpit
 import javax.swing.text.Segment
 
 import core.bigrammar.BiGrammarToParser._
-import core.bigrammar.grammars.{RegexGrammar, _}
+import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import org.fife.ui.rsyntaxtextarea._
 
@@ -18,23 +18,26 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
   val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
     var keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
-    val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
+    val tokenParsers: Seq[BiGrammarToParser.Parser[MyToken]] = reachables.toSeq.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
         literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
       case delimiter: Delimiter => literal(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
-      case identifier:Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
+      case identifier: Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberG => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s))
       case StringLiteral => stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
-      case regexGrammar: RegexGrammar => regex(regexGrammar.regex) ^^ (s => MyToken(TokenTypes.COMMENT_MULTILINE, s))
+    }) ++ reachables.toSeq.collect({
+      case regexGrammar: RegexGrammar =>
+        regex(regexGrammar.regex) ^^
+          (s => MyToken(TokenTypes.COMMENT_MULTILINE, s))
     })
 
     val whiteSpaceToken = regex(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s))
     val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
-    val allTokenParsers = Seq(whiteSpaceToken) ++ tokenParsers //++ Seq(whiteSpaceToken, errorToken)
+    val allTokenParsers = Seq(whiteSpaceToken) ++ tokenParsers ++ Seq(errorToken)
 
     val tokenGrammar: BiGrammarToParser.Parser[Seq[MyToken]] = allTokenParsers.reduce((a, b) => a | b).*
-    tokenGrammar //| errorToken
+    phrase(tokenGrammar)
   }
 
   override def getWordsToHighlight: TokenMap = new TokenMap()

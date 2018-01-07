@@ -35,7 +35,7 @@ object LabelDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 0
 
-  def getNameGrammar: BiGrammar = new RegexGrammar("""[\w<>\-]*""".r)
+  def getNameGrammar: BiGrammar = RegexGrammar("""[\w<>\-]+""".r)
   override def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val stackMapFrameGrammar = find(StackMapFrameGrammar)
