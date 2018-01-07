@@ -1,4 +1,4 @@
-class 52 extends 0 with interfaces: ()
+class 52 extends 0 with: ()
 ConstantPool:
   Integer 500000
   Integer 999999

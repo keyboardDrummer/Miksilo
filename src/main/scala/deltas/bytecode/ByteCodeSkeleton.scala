@@ -94,7 +94,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     import grammars._
     val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
     val attributeGrammar: BiGrammar = create(AttributeGrammar)
-    val interfacesGrammar: BiGrammar = "with" ~~ "interfaces" ~ ":" ~~> (constantIndexGrammar *).inParenthesis
+    val interfacesGrammar: BiGrammar = "with" ~ ":" ~~> (constantIndexGrammar *).inParenthesis
     val classIndexGrammar: BiGrammar = "class" ~~> constantIndexGrammar
     val parseIndexGrammar: BiGrammar = "extends" ~~> constantIndexGrammar
     val attributesGrammar = create(AttributesGrammar, attributeGrammar.manyVertical)

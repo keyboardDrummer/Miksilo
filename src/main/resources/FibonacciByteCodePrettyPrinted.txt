@@ -1,4 +1,4 @@
-class 6 extends 26 with interfaces: ()
+class 6 extends 26 with: ()
 ConstantPool:
   Utf8 java/lang/Object
   Utf8 Fibonacci

@@ -1,4 +1,4 @@
-class Fibonacci extends java/lang/Object with interfaces: ()
+class Fibonacci extends java/lang/Object with: ()
 {
   Method;
     name: <init>

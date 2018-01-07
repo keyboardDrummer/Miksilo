@@ -1,4 +1,4 @@
-class 4 extends 26 with interfaces: ()
+class 4 extends 26 with: ()
 ConstantPool:
   Utf8 Fibonacci
   Utf8 fibonacci

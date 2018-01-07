@@ -11,7 +11,7 @@ import util.{CompilerBuilder, TestUtils}
 class InlineConstantPoolTest extends FunSuite {
 
   private val inlinedConstantPoolFibonacci =
-    """class Fibonacci extends java/lang/Object with interfaces: ()
+    """class Fibonacci extends java/lang/Object with: ()
       |{
       |  Method;
       |    name: <init>
@@ -67,7 +67,7 @@ class InlineConstantPoolTest extends FunSuite {
     """.stripMargin
 
   private val bytecodeFibonacci =
-    """class 4 extends 26 with interfaces: ()
+    """class 4 extends 26 with: ()
       |ConstantPool:
       |  Utf8 Fibonacci
       |  Utf8 fibonacci
@@ -152,7 +152,7 @@ class InlineConstantPoolTest extends FunSuite {
     """.stripMargin
 
   private val emptyInlined =
-    """class Empty extends java/lang/Object with interfaces: ()
+    """class Empty extends java/lang/Object with: ()
       |{
       |  Method;
       |    name: <init>
@@ -167,7 +167,7 @@ class InlineConstantPoolTest extends FunSuite {
       |}""".stripMargin
 
   private val emptyByteCode =
-    """class 9 extends 5 with interfaces: ()
+    """class 9 extends 5 with: ()
       |ConstantPool:
       |  Utf8 Empty
       |  Utf8 java/lang/Object
@@ -192,7 +192,7 @@ class InlineConstantPoolTest extends FunSuite {
       |}""".stripMargin
 
   private val emptyByteCodeWithLineNumbers =
-    """class 9 extends 5 with interfaces: ()
+    """class 9 extends 5 with: ()
       |ConstantPool:
       |  #1 = Utf8 Empty
       |  #2 = Utf8 java/lang/Object

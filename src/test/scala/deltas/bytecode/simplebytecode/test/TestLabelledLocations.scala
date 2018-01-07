@@ -32,7 +32,7 @@ class TestLabelledLocations extends FunSuite {
     val utils = new TestUtils(CompilerBuilder.build(labelledByteCodeCompiler.spliceBeforeTransformations(Seq(InlineConstantPool) ++ JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
     val expectedResult =
-      """class Fibonacci extends java/lang/Object with interfaces: ()
+      """class Fibonacci extends java/lang/Object with: ()
         |{
         |  Method;
         |    name: <init>
