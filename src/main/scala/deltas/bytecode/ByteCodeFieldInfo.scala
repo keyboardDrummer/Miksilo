@@ -44,7 +44,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags {
 
     val attributesGrammar = find(AttributesGrammar)
     val constantIndex = find(ConstantPoolIndexGrammar)
-    val fieldGrammar = "Field" ~> ("name:" ~> constantIndex.as(NameIndex) %
+    val fieldGrammar = "Field" ~> ("name" ~ ":" ~> constantIndex.as(NameIndex) %
       ("descriptor" ~> constantIndex.as(DescriptorIndex)) %
       attributesGrammar.as(FieldAttributes)).asLabelledNode(FieldKey)
     val parseFields = (fieldGrammar ~< BlankLine).manyVertical.as(ClassFields)

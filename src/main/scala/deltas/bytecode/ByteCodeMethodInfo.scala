@@ -84,10 +84,10 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
         "ACC_STATIC" ~> value(StaticAccess) |
         "ACC_PRIVATE" ~> value(PrivateAccess))
 
-    val methodInfoGrammar: BiGrammar = "Method;" %>
-      ("name:" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
-      "descriptor:" ~~> find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
-      "flags:" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
+    val methodInfoGrammar: BiGrammar = "Method" ~ ";"  %>
+      ("name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
+      "descriptor" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
+      "flags" ~ ":" ~~> parseAccessFlag.manySeparated(", ").seqToSet.as(AccessFlagsKey) %
       attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
 
     create(MethodInfoKey, methodInfoGrammar)

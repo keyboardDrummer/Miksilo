@@ -1,6 +1,7 @@
 package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
@@ -123,16 +124,16 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
     import grammars._
     val attributesGrammar = find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = create(InstructionGrammar)
-    val maxStackGrammar = create(MaxStackGrammar, ("stack:" ~> integer ~< ", ").as(MaxStack))
-    val maxLocalGrammar = "locals:" ~> integer.as(CodeMaxLocalsKey)
-    val nameGrammar = "name:" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val maxStackGrammar = create(MaxStackGrammar, "stack" ~ ":" ~> integer.as(MaxStack) ~< ", ")
+    val maxLocalGrammar = "locals" ~ ":" ~> integer.as(CodeMaxLocalsKey)
+    val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = instructionGrammar.manyVertical.indent().as(Instructions)
-    val exceptionTableGrammar = "Exceptions:" %> value(Seq.empty[Any])
+    val exceptionTableGrammar = "Exceptions" ~ ":" %> value(Seq.empty[Any])
     val body = (nameGrammar ~ ("," ~~ maxStackGrammar ~ maxLocalGrammar) %
       instructionsGrammar %
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
-    val codeGrammar: BiGrammar = ("Code:" %> body).asNode(CodeKey)
+    val codeGrammar: BiGrammar = (Keyword("Code", reserved = false) ~ ":" %> body).asNode(CodeKey)
     create(CodeKey, codeGrammar)
   }
 

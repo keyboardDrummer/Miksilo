@@ -1,7 +1,8 @@
 package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
-import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
+import core.bigrammar.grammars.Keyword
+import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.deltas.node._
 import core.deltas.{Contract, Language}
 import deltas.bytecode.ByteCodeSkeleton
@@ -15,6 +16,7 @@ import deltas.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
 object StackMapTableAttribute extends ByteCodeAttribute {
 
   val entry = Utf8ConstantDelta.create("StackMapTable")
+
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   object FrameOffset extends NodeField
@@ -122,18 +124,18 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
     val verificationGrammar : BiGrammar = getVerificationInfoGrammar(grammars)
     import grammars._
-    val offsetGrammar = create(offsetGrammarKey, ", offset:" ~> integer as FrameOffset)
+    val offsetGrammar = create(offsetGrammarKey, "," ~~ "offset" ~ ":" ~> integer.as(FrameOffset))
 
-    val sameLocals1StackItemGrammar = (("same locals, 1 stack item" ~ offsetGrammar) %
+    val sameLocals1StackItemGrammar = (("sameLocalsOneStackItem" ~ offsetGrammar) %
       verificationGrammar.as(SameLocals1StackItemType).indent()).
       asLabelledNode(SameLocals1StackItem)
-    val appendFrameGrammar = ("append frame" ~ offsetGrammar % verificationGrammar.manyVertical.indent().as(AppendFrameTypes)).
+    val appendFrameGrammar = ("appendFrame" ~ offsetGrammar % verificationGrammar.manyVertical.indent().as(AppendFrameTypes)).
       asLabelledNode(AppendFrame)
-    val sameFrameGrammar = "same frame" ~ offsetGrammar asNode SameFrameKey
-    val chopFrameGrammar = "chop frame" ~> offsetGrammar ~> (", count = " ~> integer.as(ChopFrameCount)) asNode ChopFrame
-    val nameGrammar = "name:" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
+    val sameFrameGrammar = "sameFrame" ~ offsetGrammar asNode SameFrameKey
+    val chopFrameGrammar = "chopFrame" ~> offsetGrammar ~> ("," ~~ "count" ~ ":" ~> integer.as(ChopFrameCount)) asNode ChopFrame
+    val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val stackMapGrammar: BiGrammar = create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
-    val stackMapTableGrammar = ("StackMapTable:" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
+    val stackMapTableGrammar = (Keyword("StackMapTable", reserved = false) ~ ":" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
       asNode(Shape)
 
     create(Shape, stackMapTableGrammar)

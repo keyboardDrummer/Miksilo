@@ -80,8 +80,8 @@ class TestLabelledLocations extends FunSuite {
         |        iadd
         |        ireturn
         |      StackMapTable: name: StackMapTable
-        |        same frame, offset:9
-        |        same locals, 1 stack item, offset:12
+        |        sameFrame, offset:9
+        |        sameLocalsOneStackItem, offset:12
         |          int
         |      Exceptions:
         |}""".stripMargin

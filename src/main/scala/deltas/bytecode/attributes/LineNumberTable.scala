@@ -2,7 +2,7 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
+import core.deltas.node.{Node, NodeField, NodeShape}
 import core.deltas.{Contract, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
@@ -43,8 +43,7 @@ object LineNumberTable extends ByteCodeAttribute {
   override def key = LineNumberTableKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
-    import grammars._
-    ("Not implemented" : BiGrammar).asNode(key)
+    ("NotImplemented" : BiGrammar).asNode(key)
   } // TODO implement. Also figure out why I can't use failure here.
 
   override def constantPoolKey: String = "LineNumberTable"

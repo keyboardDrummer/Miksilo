@@ -36,7 +36,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
         iconst 1
         goto <end>
         label <false>
-          same frame
+          sameFrame
         iload 0
         iconst 1
         isub
@@ -47,7 +47,7 @@ class Fibonacci extends java/lang/Object with interfaces: ()
         invokestatic Fibonacci.fibonacci (I)I
         iadd
         label <end>
-          same locals, 1 stack item
+          sameLocalsOneStackItem
             int
         ireturn
       Exceptions:

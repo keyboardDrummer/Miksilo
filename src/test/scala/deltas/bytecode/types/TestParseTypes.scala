@@ -25,13 +25,13 @@ class TestParseTypes extends FunSuite {
   }
 
   test("appendFrame") {
-    val input = "append frame int int int"
+    val input = "appendFrame int int int"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, StackMapTableAttribute.StackMapFrameGrammar)
     assertResult(StackMapTableAttribute.AppendFrame)(result.asInstanceOf[Node].shape)
   }
 
   test("labelWithAppendFrame") {
-    val input = "label start-4962768465676381896\n        append frame int int"
+    val input = "label start-4962768465676381896\n        appendFrame int int"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttributeDelta.InstructionGrammar)
     assertResult(LabelDelta.LabelKey)(result.asInstanceOf[Node].shape)
@@ -39,7 +39,7 @@ class TestParseTypes extends FunSuite {
 
   test("labelWithAppendFrameInInstructions1") {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
-      "label start-4962768465676381896\n        same frame\n iload 2 \n    Exceptions:"
+      "label start-4962768465676381896\n        sameFrame\n iload 2 \n    Exceptions:"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)
@@ -47,7 +47,7 @@ class TestParseTypes extends FunSuite {
 
   ignore("labelWithAppendFrameInInstructions2") {
     val input = "code: name:9, stack:2, locals:3\n    \n " +
-      "label \"start-4962768465676381896\"\n        append frame int int\n iload 2 \n    Exceptions:"
+      "label \"start-4962768465676381896\"\n        appendFrame int int\n iload 2 \n    Exceptions:"
     val result = TestCompilerGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).
       getGrammarResult(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)

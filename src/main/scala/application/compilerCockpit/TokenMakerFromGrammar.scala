@@ -2,26 +2,26 @@ package application.compilerCockpit
 
 import javax.swing.text.Segment
 
-import core.bigrammar.{BiGrammar, BiGrammarToParser, RootGrammar}
+import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars.{RegexGrammar, _}
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import org.fife.ui.rsyntaxtextarea._
 
+import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.input.CharArrayReader
-import BiGrammarToParser._
 
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
   case class MyToken(tokenType: Int, text: String)
 
   val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
-    var keywords: Set[String] = Set.empty
+    var keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
     val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
-      case keyword: Keyword => {
-        keywords += keyword.value
+      case keyword: Keyword if keyword.reserved =>
+        keywords.add(keyword.value)
         literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
-      }
       case delimiter: Delimiter => literal(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
       case identifier:Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberG => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s))

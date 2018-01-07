@@ -10,7 +10,7 @@ class TestColumnAlignment extends FunSuite with BiGrammarSequenceWriter {
   test("test") {
     val input = "Hallo.              Hier staat een tweede gesprek." + System.lineSeparator() +
                 "Hoe gaat het met je?"
-    val grammar: BiGrammar = (("Hallo." : BiGrammar) % "Hoe gaat het met je?") ~ "Hier staat een tweede gesprek."
+    val grammar: BiGrammar = (keyword("Hallo.") % keyword("Hoe gaat het met je?")) ~ keyword("Hier staat een tweede gesprek.")
     assertThrows[TestFailedException](TestGrammarUtils.parseAndPrintSame(input, None, grammar))
   }
 }

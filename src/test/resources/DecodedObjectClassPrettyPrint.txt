@@ -1,5 +1,5 @@
 class 52 extends 0 with interfaces: ()
-Constant pool:
+ConstantPool:
   Integer 500000
   Integer 999999
   String 17
@@ -83,7 +83,7 @@ Constant pool:
     name: 16
     descriptor: 9
     flags:
-    UnParsed attribute with nameIndex: 18
+    UnParsedAttribute, nameIndex: 18
 
   Method;
     name: 42
@@ -94,7 +94,7 @@ Constant pool:
     name: 28
     descriptor: 55
     flags:
-    UnParsed attribute with nameIndex: 21
+    UnParsedAttribute, nameIndex: 21
 
   Method;
     name: 30
@@ -105,19 +105,19 @@ Constant pool:
     name: 26
     descriptor: 13
     flags:
-    UnParsed attribute with nameIndex: 18
+    UnParsedAttribute, nameIndex: 18
 
   Method;
     name: 25
     descriptor: 7
     flags:
-    UnParsed attribute with nameIndex: 19
+    UnParsedAttribute, nameIndex: 19
 
   Method;
     name: 45
     descriptor: 8
     flags:
-    UnParsed attribute with nameIndex: 18
+    UnParsedAttribute, nameIndex: 18
 
   Method;
     name: 40
@@ -133,33 +133,33 @@ Constant pool:
     name: 46
     descriptor: 11
     flags:
-    UnParsed attribute with nameIndex: 19
+    UnParsedAttribute, nameIndex: 19
 
   Method;
     name: 46
     descriptor: 12
     flags:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
+    UnParsedAttribute, nameIndex: 18
+    UnParsedAttribute, nameIndex: 19
 
   Method;
     name: 46
     descriptor: 9
     flags:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
+    UnParsedAttribute, nameIndex: 18
+    UnParsedAttribute, nameIndex: 19
 
   Method;
     name: 27
     descriptor: 9
     flags:
-    UnParsed attribute with nameIndex: 18
-    UnParsed attribute with nameIndex: 19
+    UnParsedAttribute, nameIndex: 18
+    UnParsedAttribute, nameIndex: 19
 
   Method;
     name: 15
     descriptor: 9
     flags:
-    UnParsed attribute with nameIndex: 18
-  UnParsed attribute with nameIndex: 22
+    UnParsedAttribute, nameIndex: 18
+  UnParsedAttribute, nameIndex: 22
 }

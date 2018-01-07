@@ -22,8 +22,8 @@ object InvokeDynamicConstant extends ConstantEntry {
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    "bootstrap index:" ~~> integer.as(InvokeDynamicBootstrapMethodIndex) ~<
-      ", nameAndTypeIndex:" ~~
+    "bootstrapIndex" ~ ":" ~~> integer.as(InvokeDynamicBootstrapMethodIndex) ~<
+      "," ~~ "nameAndTypeIndex" ~ ":" ~~
       integer.as(InvokeDynamicNameAndTypeIndex)
   }
 

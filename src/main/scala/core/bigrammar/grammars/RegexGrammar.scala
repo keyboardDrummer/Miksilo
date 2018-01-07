@@ -6,5 +6,6 @@ import scala.util.matching.Regex
 
 class RegexGrammar(val regex: Regex, verifyWhenPrinting: Boolean = false)
   extends StringGrammar(verifyWhenPrinting) {
-  override def getParser(keywords: Set[String]): BiGrammarToParser.Parser[Any] = BiGrammarToParser.regex(regex)
+  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any] =
+    BiGrammarToParser.regex(regex)
 }

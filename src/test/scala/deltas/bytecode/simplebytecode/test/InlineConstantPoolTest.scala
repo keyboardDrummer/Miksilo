@@ -68,7 +68,7 @@ class InlineConstantPoolTest extends FunSuite {
 
   private val bytecodeFibonacci =
     """class 4 extends 26 with interfaces: ()
-      |Constant pool:
+      |ConstantPool:
       |  Utf8 Fibonacci
       |  Utf8 fibonacci
       |  Utf8 (I)I
@@ -168,7 +168,7 @@ class InlineConstantPoolTest extends FunSuite {
 
   private val emptyByteCode =
     """class 9 extends 5 with interfaces: ()
-      |Constant pool:
+      |ConstantPool:
       |  Utf8 Empty
       |  Utf8 java/lang/Object
       |  Utf8 <init>
@@ -193,7 +193,7 @@ class InlineConstantPoolTest extends FunSuite {
 
   private val emptyByteCodeWithLineNumbers =
     """class 9 extends 5 with interfaces: ()
-      |Constant pool:
+      |ConstantPool:
       |  #1 = Utf8 Empty
       |  #2 = Utf8 java/lang/Object
       |  #3 = Utf8 <init>

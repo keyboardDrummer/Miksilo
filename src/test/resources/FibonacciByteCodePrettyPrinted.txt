@@ -1,5 +1,5 @@
 class 4 extends 26 with interfaces: ()
-Constant pool:
+ConstantPool:
   Utf8 Fibonacci
   Utf8 fibonacci
   Utf8 (I)I
@@ -75,8 +75,8 @@ Constant pool:
         iadd
         ireturn
       StackMapTable: name: 7
-        same frame, offset:9
-        same locals, 1 stack item, offset:12
+        sameFrame, offset:9
+        sameLocalsOneStackItem, offset:12
           int
       Exceptions:
 }

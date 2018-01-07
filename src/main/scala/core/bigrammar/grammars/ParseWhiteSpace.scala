@@ -9,7 +9,7 @@ import scala.util.matching.Regex
 object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
   val regex: Regex = """\s+""".r
 
-  override def getParser(keywords: Set[String]): BiGrammarToParser.Parser[Any] =
+  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any] =
     new RegexGrammar(regex).getParser(keywords)
 
   override def write(from: WithMapG[Any]) =

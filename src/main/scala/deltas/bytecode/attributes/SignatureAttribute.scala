@@ -14,7 +14,7 @@ object SignatureAttribute extends ByteCodeAttribute {
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    ("signature with index:" ~~> integer.as(SignatureIndex)).asNode(SignatureKey)
+    ("signatureIndex" ~ ":" ~~> integer.as(SignatureIndex)).asNode(SignatureKey)
   }
 
   override def constantPoolKey: String = "Signature"
