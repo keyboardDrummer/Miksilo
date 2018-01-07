@@ -33,6 +33,9 @@ trait BiGrammarWriter {
   implicit def print(document: Document): BiGrammar = Print(document)
 
   implicit def stringToGrammar(value: String): BiGrammar = {
+    if (value.contains(' '))
+      throw new RuntimeException(s"Can't implicitly convert $value to BiGrammar because it contains a space")
+
     val count = value.count(c => Character.isLetterOrDigit(c) || c == '_')
     if (count == value.length)
       Keyword(value)

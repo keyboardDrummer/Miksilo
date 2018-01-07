@@ -124,7 +124,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
     import grammars._
     val attributesGrammar = find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = create(InstructionGrammar)
-    val maxStackGrammar = create(MaxStackGrammar, "stack" ~ ":" ~> integer.as(MaxStack) ~< ", ")
+    val maxStackGrammar = create(MaxStackGrammar, "stack" ~ ":" ~> integer.as(MaxStack) ~< "," ~ space)
     val maxLocalGrammar = "locals" ~ ":" ~> integer.as(CodeMaxLocalsKey)
     val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = instructionGrammar.manyVertical.indent().as(Instructions)

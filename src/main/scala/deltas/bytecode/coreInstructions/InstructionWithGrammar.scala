@@ -19,7 +19,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar
   def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val constantPoolIndex: BiGrammar = find(ConstantPoolIndexGrammar)
-    (constantPoolIndex | integer).manySeparated(" ").as(InstructionArgumentsKey)
+    (constantPoolIndex | integer).many.as(InstructionArgumentsKey)
   }
 
   def grammarName: String

@@ -137,7 +137,8 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodUnmapped: TopBottom = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
+    val methodUnmapped: TopBottom = find(AccessibilityFieldsDelta.VisibilityField) ~
+      find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnTypeKey) ~~ identifier.as(MethodNameKey) ~ parseParameters.as(MethodParametersKey) % block.as(Body)
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))
 
