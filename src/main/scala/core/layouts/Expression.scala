@@ -2,13 +2,14 @@ package core.layouts
 
 object Expression
 {
-  implicit def constant(value: Double): Constant = new Constant(value)
+  implicit def constant(value: Double): Constant = Constant(value)
+  implicit def constant(value: Int): Constant = Constant(value)
 }
 
 trait Expression {
-  def +(right: Expression) = new Add(this, right)
+  def +(right: Expression) = Add(this, right)
 
-  def *(right: Double) = new Multiply(this, right)
+  def *(right: Double) = Multiply(this, right)
 
   def -(right: Expression): Expression = this + (right * -1)
 
@@ -16,7 +17,7 @@ trait Expression {
 
   def getConstant: Double
 
-  def toEquation = new Equation(getElements, getConstant)
+  def toEquation = Equation(getElements, getConstant)
 }
 
 case class Add(left: Expression, right: Expression) extends Expression {

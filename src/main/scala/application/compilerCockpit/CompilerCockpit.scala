@@ -157,7 +157,6 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
       innerLayout.addLeftToRight(innerLayout.container, inputPanel, outputPanel, innerLayout.container)
       innerLayout.addLeftToRight(exampleDropdown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
       innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, choosePanels)
-
     }
     addHorizontalEquations()
 
@@ -197,6 +196,7 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
       innerLayout.addTopToBottom(innerLayout.container, chooseCompile, inputPanel, innerLayout.container)
     }
     addVerticalEquations()
+    panel.setLayout(equationLayout)
   }
 
   def getInputPanel: JPanel = {

@@ -9,11 +9,11 @@ case class Equation(elements: Map[Variable, Double], constant: Double)
 
 class EquationLayout() {
   private var components = Set.empty[Component]
-  val container = createComponent
+  val container: Component = createComponent
   var expressions = Set.empty[Expression]
 
-  def createComponent = {
-    val result = new Component(components.size)
+  def createComponent: Component = {
+    val result = Component(components.size)
     components += result
     result
   }
@@ -53,17 +53,19 @@ class EquationLayout() {
     val expectedVariables = components.flatMap(component => Seq(component.bottom, component.top, component.left, component.right))
     val variables: Set[Variable] = equations.flatMap(equation => equation.elements.keySet).toSet
 
-    val intersection = expectedVariables.intersect(variables)
-    val union = expectedVariables.union(variables)
-    val diff = union.diff(intersection)
-    if (diff.nonEmpty)
-      throw new RuntimeException(s"variable issue, diff = $diff")
+    val missingExpectedVariables = expectedVariables.diff(variables)
+    if (missingExpectedVariables.nonEmpty)
+      throw new RuntimeException(s"missing expected variables: $missingExpectedVariables")
+
+    val unexpectedVariables = variables.diff(expectedVariables)
+    if (missingExpectedVariables.nonEmpty)
+      throw new RuntimeException(s"unexpected variables: $unexpectedVariables")
 
     val orderedVariables = variables.toSeq
     def elementsToRow(elements: Map[Variable, Double]) = orderedVariables.map(variable => elements.getOrElse(variable, 0.0))
     val a = MatrixUtils.createRealMatrix(equations.map(equation => elementsToRow(equation.elements).toArray).toArray)
     val solver : DecompositionSolver = Try(new LUDecomposition(a).getSolver).
-      recover({ case e: NonSquareMatrixException => throw new TooManyEquationsError(e.getArgument.intValue() - 4,e.getDimension - 4)}).get
+      recover({ case e: NonSquareMatrixException => throw TooManyEquationsError(e.getArgument.intValue() - 4, e.getDimension - 4)}).get
     val b = MatrixUtils.createRealVector(equations.map(equation => -1 * equation.constant).toArray)
     val x = solver.solve(b)
     orderedVariables.zipWithIndex.map(indexedVariable => indexedVariable._1 -> x.getEntry(indexedVariable._2)).toMap
