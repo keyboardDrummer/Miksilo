@@ -1,5 +1,8 @@
 package util
 
+import java.io.{BufferedReader, InputStream, InputStreamReader}
+import java.util.stream.Collectors
+
 import core.deltas._
 import core.deltas.node.Node
 import deltas.bytecode.PrintByteCode
@@ -10,7 +13,7 @@ import scala.sys.process.{Process, ProcessLogger}
 
 object SourceUtils {
 
-  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): File = {
+  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
     val className = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     SourceUtils.getTestFile(relativeFilePath)
@@ -71,8 +74,9 @@ object SourceUtils {
     runJavaClass(className, testDirectory)
   }
 
-  def fileNameToClassName(fileName: String): String = {
-    if (fileName.endsWith(".java")) fileName.dropRight(5) else fileName
+  def fileNameToClassName(fileName: Path): String = {
+    val name = fileName.name
+    if (name.endsWith(".java")) name.dropRight(5) else name
   }
 
   def getJavaTestFileContents(fileName: String, inputDirectory: Path = Path("")): String = {
@@ -81,22 +85,24 @@ object SourceUtils {
     getTestFileContents(relativeFilePath)
   }
 
-  def getTestFile(relativeFilePath: Path): File = {
+  def getTestFile(relativeFilePath: Path): InputStream = {
     if (relativeFilePath.isAbsolute)
-      return File(relativeFilePath)
+      return File(relativeFilePath).inputStream()
 
     val fullPath = relativeFilePath
-    var testResources = ClassLoader.getSystemResource("/" + fullPath.path)
+    var testResources: InputStream = ClassLoader.getSystemResourceAsStream("/" + fullPath.path)
+
     if (testResources == null)
-      testResources = getClass.getResource("/" + fullPath.path)
+      testResources = getClass.getResourceAsStream("/" + fullPath.path)
+
     if (testResources == null)
-    {
       throw new RuntimeException(s"Test file ${fullPath.path} not found")
-    }
-    File(testResources.getPath)
+    testResources
   }
 
   def getTestFileContents(relativeFilePath: Path): String = {
-    getTestFile(relativeFilePath).slurp().replaceAll("\r\n","\n").replaceAll("\n", System.lineSeparator())
+    val result = new BufferedReader(new InputStreamReader(getTestFile(relativeFilePath)))
+      .lines().collect(Collectors.joining("\n"))
+    result.replaceAll("\n", System.lineSeparator())
   }
 }

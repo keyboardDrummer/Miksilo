@@ -1,18 +1,14 @@
 package core.deltas
 
 import deltas.bytecode.PrintByteCode
-import util.FileNameUtils
 
-import scala.reflect.io.{Directory, File, Path}
+import scala.reflect.io.File
 
 object PrintByteCodeToOutputDirectory {
 
-  def perform(inputFile: File, outputDirectory: Directory, state: Compilation): Unit = {
+  def perform(outputFile: File, state: Compilation): Unit = {
     val bytes = PrintByteCode.getBytes(state.program, state.language).toArray
-    val fileName = FileNameUtils.removeExtension(inputFile.name)
-    outputDirectory.createDirectory()
-    val byteCodeFile = File.apply(outputDirectory / Path(fileName).addExtension("class"))
-    val writer = byteCodeFile.outputStream(append = false)
+    val writer = outputFile.outputStream(append = false)
     writer.write(bytes)
     writer.close()
   }

@@ -8,7 +8,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 
 import scala.collection.mutable
-import scala.reflect.io.{Directory, File}
+import scala.reflect.io.File
 
 case class Phase(key: Delta, action: Compilation => Unit)
 
@@ -58,10 +58,10 @@ class Language(val deltas: Seq[Delta]) {
     parseAndTransform(input.inputStream())
   }
 
-  def compile(input: File, outputDirectory: Directory): Compilation = {
-    val state: Compilation = parseAndTransform(input.inputStream())
+  def compile(inputStream: InputStream, outputFile: File): Compilation = {
+    val state: Compilation = parseAndTransform(inputStream)
 
-    PrintByteCodeToOutputDirectory.perform(input, outputDirectory, state)
+    PrintByteCodeToOutputDirectory.perform(outputFile, state)
     state
   }
 
