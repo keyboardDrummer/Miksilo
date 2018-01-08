@@ -17,8 +17,27 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getComparisonOptimization = {
-    val content = SourceUtils.getTestFileContents("ComparisonOptimization.java")
-    new Example("ComparisonOptimization", content)
+    Example("ComparisonOptimization",
+      """class ComparisonOptimization
+        |{
+        |    public static void main(java.lang.String[] args)
+        |    {
+        |        canOptimize();
+        |        cannotOptimize();
+        |    }
+        |
+        |    private static void cannotOptimize() {
+        |        boolean x = 2 < 3;
+        |        if (x)
+        |            System.out.print(x);
+        |    }
+        |
+        |    private static void canOptimize() {
+        |        if (2 < 3)
+        |            System.out.print(5);
+        |    }
+        |}
+      """.stripMargin)
   }
 
   def getFibonacciSimplifiedByteCode = {
@@ -60,7 +79,20 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
   }
 
   def getFibonacciWithComments = {
-    new Example("Fibonacci with comments", SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
+    Example("Fibonacci with comments",
+    """class Fibonacci
+      |{
+      |    /* Program starts here */
+      |    public static void main(java.lang.String[] args)
+      |    {
+      |        System.out.print(Fibonacci.fibonacci(5));
+      |    }
+      |
+      |    public static int fibonacci(int index)
+      |    {
+      |        return index < /* Placed left of 2 */ 2 ? 1 : Fibonacci.fibonacci(index - 1) + Fibonacci.fibonacci(index - 2);
+      |    }
+      |}""".stripMargin)
   }
 
   def getMethodOverloading = {
@@ -87,7 +119,7 @@ class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
     }
     catch
     {
-      case e:RuntimeException => compilerCockpit.setOutputText("Could not load example dropdown, because: " + e.toString) //TODO move to Logger.
+      case e:Exception => compilerCockpit.setOutputText("Could not load example dropdown, because: " + e.toString) //TODO move to Logger.
     }
   }
 

@@ -36,7 +36,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     val allTokenParsers = Seq(whiteSpaceToken) ++ tokenParsers ++ Seq(errorToken)
 
-    val tokenGrammar: BiGrammarToParser.Parser[Seq[MyToken]] = allTokenParsers.reduce((a, b) => a | b).*
+    val tokenGrammar: BiGrammarToParser.Parser[Seq[MyToken]] = allTokenParsers.reduce((a, b) => a | b).* //TODO using ||| would slower but give better behavior
     phrase(tokenGrammar)
   }
 
