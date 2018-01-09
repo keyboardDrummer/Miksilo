@@ -64,14 +64,13 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    val testOutput = Directory(actualOutputDirectory)
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
-    val outputDirectory = Directory(Path(testOutput.path) / inputDirectory)
+    val outputDirectory = actualOutputDirectory / inputDirectory
     outputDirectory.createDirectory(force = true)
     val outputFile = outputDirectory / className addExtension "class"
     compiler.compile(input, outputFile.toFile)
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
-    SourceUtils.runJavaClass(qualifiedClassName, testOutput)
+    SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
   }
 
   def compileAndPrettyPrint(input: String): String = {
@@ -105,8 +104,10 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
     val relativeFilePath = inputFile.changeExtension("java")
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
+    input.mark(Integer.MAX_VALUE)
 
     val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
+    input.reset()
     assertResult("")(javaCompilerOutput)
 
     val outputFile = File((actualOutputDirectory / className).addExtension("class"))

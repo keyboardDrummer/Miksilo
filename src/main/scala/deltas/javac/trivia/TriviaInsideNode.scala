@@ -16,7 +16,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
     var visited = Set.empty[BiGrammar]
     val descendants = grammars.root.descendants
     System.out.println("descendants = " + descendants.toString())
-    for(path <- descendants)
+    for(path <- descendants.sortBy(ref => ref.ancestors.length))
     {
       if (!visited.contains(path.value)) {
         visited += path.value
@@ -45,9 +45,11 @@ object TriviaInsideNode extends DeltaWithGrammar {
           injectTrivia(grammars, grammar.children.head, horizontal)
         else
           injectTrivia(grammars, grammar.children(1), horizontal)
-      case _:NodeGrammar => if (!isLeftRecursive(grammar.children.head))
+      case _:NodeGrammar =>
         System.out.println("NodeGrammar")
-        placeTrivia(grammars, grammar.children.head, horizontal)
+        if (!isLeftRecursive(grammar.children.head)) {
+          placeTrivia(grammars, grammar.children.head, horizontal)
+        }
       case _:Choice =>
         System.out.println("Choice")
         injectTrivia(grammars, grammar.children(0), horizontal)
@@ -65,13 +67,16 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    System.out.println("placing trivia in " + grammar.value.toString)
-    if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser())
+    System.out.println("maybe placing trivia in " + grammar.value.toString)
+    if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser()) {
+      System.out.println("actually placing")
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
+    }
   }
 
   def isLeftRecursive(grammar: GrammarPath): Boolean = {
-    if (grammar.ancestorGrammars.size != grammar.ancestors.size)
+    val edges = grammar.ancestors.collect({ case ref: GrammarReference => ref }).map(p => (p.property, p.parent)).toList
+    if (edges.distinct.size != edges.size)
       return true
 
     grammar.value match {
