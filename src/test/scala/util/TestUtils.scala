@@ -109,7 +109,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
 
-    val outputFile = File((actualOutputDirectory /* inputDirectory */ / className).addExtension("class"))
+    val outputFile = File((actualOutputDirectory / className).addExtension("class"))
     val state = profile("blender compile", compiler.compile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
