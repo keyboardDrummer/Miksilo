@@ -1,6 +1,6 @@
 package util
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
@@ -103,7 +103,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val className = inputFile.stripExtension
 
     val relativeFilePath = inputFile.changeExtension("java")
-    val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
+    val input: BufferedInputStream = new BufferedInputStream(SourceUtils.getTestFile(relativeFilePath))
     input.mark(Integer.MAX_VALUE)
 
     val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))

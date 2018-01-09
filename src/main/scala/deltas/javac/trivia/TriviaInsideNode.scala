@@ -14,9 +14,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    val descendants = grammars.root.descendants
+    val descendants = grammars.root.descendants.sortBy(ref => ref.ancestors.length)
     System.out.println("descendants = " + descendants.toString())
-    for(path <- descendants.sortBy(ref => ref.ancestors.length))
+    for(path <- descendants)
     {
       if (!visited.contains(path.value)) {
         visited += path.value
@@ -76,6 +76,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def isLeftRecursive(grammar: GrammarPath): Boolean = {
     val edges = grammar.ancestors.collect({ case ref: GrammarReference => ref }).map(p => (p.property, p.parent)).toList
+    System.out.println("edges = " + edges.toString())
     if (edges.distinct.size != edges.size)
       return true
 
