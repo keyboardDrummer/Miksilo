@@ -40,18 +40,24 @@ object TriviaInsideNode extends DeltaWithGrammar {
     System.out.println("inject trivia called for " + grammar.value.toString())
     grammar.value match {
       case sequence: Sequence =>
+        System.out.println("Sequence")
         if (sequence.first.containsParser())
           injectTrivia(grammars, grammar.children.head, horizontal)
         else
           injectTrivia(grammars, grammar.children(1), horizontal)
       case _:NodeGrammar => if (!isLeftRecursive(grammar.children.head))
+        System.out.println("NodeGrammar")
         placeTrivia(grammars, grammar.children.head, horizontal)
       case _:Choice =>
+        System.out.println("Choice")
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
       case _:WithTrivia => //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
+        System.out.println("WithTrivia")
       case _:BiFailure =>
+        System.out.println("BiFailure")
       case _ =>
+        System.out.println("fallback")
         if (grammar.children.length == 1)
           injectTrivia(grammars, grammar.children.head, horizontal)
         else placeTrivia(grammars, grammar, horizontal)
