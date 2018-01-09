@@ -30,9 +30,12 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     file
   }
 
-  def currentDir = Directory.Current.get
-  def rootOutput: Path = currentDir / Path("testOutput")
-  def actualOutputDirectory: Path = rootOutput / "actual"
+  def currentDir: Directory = Directory.Current.get
+  def rootOutput: Directory = Directory(currentDir / "testOutput")
+  def actualOutputDirectory: Directory = Directory(rootOutput / "actual")
+  def expectedOutputDirectory: Directory = Directory(rootOutput / "expected")
+  actualOutputDirectory.createDirectory(force = true)
+  expectedOutputDirectory.createDirectory(force = true)
 
   def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
@@ -61,10 +64,12 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    val currentDir = new File(new java.io.File("."))
-    val testOutput = Directory(currentDir / Path("testOutput"))
+    val testOutput = Directory(actualOutputDirectory)
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
-    compiler.compile(input, File(Path(testOutput.path) / inputDirectory / className).addExtension("class"))
+    val outputDirectory = Directory(Path(testOutput.path) / inputDirectory)
+    outputDirectory.createDirectory(force = true)
+    val outputFile = outputDirectory / className addExtension "class"
+    compiler.compile(input, outputFile.toFile)
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
     SourceUtils.runJavaClass(qualifiedClassName, testOutput)
   }
@@ -100,11 +105,6 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
     val relativeFilePath = inputFile.changeExtension("java")
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
-
-    val expectedOutputDirectory = rootOutput / "expected"
-    val directory = expectedOutputDirectory.createDirectory(force = true)
-    if (!directory.exists)
-      throw new Exception(s"directory $directory does not exist : (")
 
     val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
@@ -153,20 +153,20 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     logger.line
   }
 
-  def runJavaCIfNeeded(name: String, inputStream: InputStream, output: Path): String = {
+  def runJavaCIfNeeded(name: String, inputStream: InputStream, output: Directory): String = {
     val outputFileName = name + ".class"
-    if (Directory(output).files.exists(f => f.name == outputFileName))
+    if (output.files.exists(f => f.name == outputFileName))
       return ""
 
     runJavaC(name, inputStream, output)
   }
 
-  private def runJavaC(name: String, inputStream: InputStream, output: Path) = {
+  private def runJavaC(name: String, inputStream: InputStream, output: Directory) = {
     val path = Files.createTempDirectory("input")
     val fileName = name + ".java"
-    Files.copy(inputStream, path.resolve(fileName))
-    Directory(output).createDirectory(force = true)
-    val processBuilder = Process.apply(s"javac -d $output $fileName", path.toFile)
+    val inputFile = path.resolve(fileName)
+    Files.copy(inputStream, inputFile)
+    val processBuilder = Process.apply(s"javac -d $output ${inputFile.toString}")
     val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
     assertResult(0, s"Java compiler did not exit successfully.\nMessage was ${logger.line}")(exitValue)
