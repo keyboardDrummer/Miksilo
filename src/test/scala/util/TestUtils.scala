@@ -30,7 +30,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     file
   }
 
-  def currentDir = new File(new java.io.File("."))
+  def currentDir = Directory.Current.get
   def rootOutput: Path = currentDir / Path("testOutput")
   def actualOutputDirectory: Path = rootOutput / "actual"
 
@@ -102,7 +102,10 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
 
     val expectedOutputDirectory = rootOutput / "expected"
-    expectedOutputDirectory.createDirectory()
+    val directory = expectedOutputDirectory.createDirectory(force = true)
+    if (!directory.exists)
+      throw new Exception(s"directory $directory does not exist : (")
+
     val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
     assertResult("")(javaCompilerOutput)
 
