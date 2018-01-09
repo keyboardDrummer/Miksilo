@@ -18,6 +18,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
     System.out.println("descendants = " + descendants.toString())
     for(path <- descendants)
     {
+      System.out.println("descendant = " + path)
       if (!visited.contains(path.value)) {
         visited += path.value
         path.value match {
@@ -28,7 +29,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
           case _ =>
         }
-      }
+      } else
+        System.out.println("skipped " + path)
     }
   }
 
