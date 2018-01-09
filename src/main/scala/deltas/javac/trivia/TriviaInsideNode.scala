@@ -14,13 +14,16 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    for(path <- grammars.root.descendants)
+    val descendants = grammars.root.descendants
+    System.out.println("descendants = " + descendants.toString())
+    for(path <- descendants)
     {
       if (!visited.contains(path.value)) {
         visited += path.value
         path.value match {
           case trivia: WithTrivia
             if hasLeftNode(trivia.getGrammar) =>
+              System.out.println("moving trivia in " + trivia.toString())
               path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
           case _ =>
@@ -34,6 +37,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
+    System.out.println("inject trivia called for " + grammar.value.toString())
     grammar.value match {
       case sequence: Sequence =>
         if (sequence.first.containsParser())
@@ -54,7 +58,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
     }
   }
 
-  def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean) = {
+  def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
+    System.out.println("placing trivia in " + grammar.value.toString)
     if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser())
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
   }

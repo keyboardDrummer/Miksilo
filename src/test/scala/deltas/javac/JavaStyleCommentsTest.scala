@@ -25,7 +25,7 @@ class JavaStyleCommentsTest
   object ParentChild extends NodeField
   object ChildName extends NodeField
 
-  test("comments with trivia inside node on tiny grammar") {
+  ignore("comments with trivia inside node on tiny grammar") {
     val language = new Language(Seq.empty)
     val grammars = language.grammars
     import grammars._
@@ -119,7 +119,7 @@ class JavaStyleCommentsTest
     grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
   }
 
-  test("block transformation") {
+  ignore("block transformation") {
     val java = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).buildLanguage
     val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
@@ -154,7 +154,7 @@ class JavaStyleCommentsTest
     assertResult("3")( output)
   }
 
-  test("comments are maintained in bytecode") {
+  ignore("comments are maintained in bytecode") {
     val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
     val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))

@@ -78,5 +78,8 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     val expectedNumberGrammar = new WithTrivia((number : BiGrammar).as(Value), grammars.trivia)
     assertResult("1" + expectedAdditionGrammar.toString)("1" + additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult("2" + expectedNumberGrammar.toString)("2" + numberGrammar.inner.toString) //TODO use actual equality instead of toString
+
+    //Expected "2[TriviasGrammar ](number).As(TriviaIn...", but got "2[](number).As(TriviaIn..." (TriviaInsideNodeTest.scala:80)
+    //De TriviasGrammar is niet ge-insert bij number terwijl die wel is weggehaald bij de rechterhand v.d. +.
   }
 }
