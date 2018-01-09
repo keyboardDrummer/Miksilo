@@ -162,7 +162,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val path = Files.createTempDirectory("input")
     val fileName = name + ".java"
     Files.copy(inputStream, path.resolve(fileName))
-    Directory(output).createDirectory()
+    Directory(output).createDirectory(true)
     val processBuilder = Process.apply(s"javac -d $output $fileName", path.toFile)
     val logger = new LineProcessLogger()
     val exitValue = processBuilder ! logger
