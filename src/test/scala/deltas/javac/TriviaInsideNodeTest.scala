@@ -16,37 +16,37 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object ParentChild extends NodeField
   object ChildName extends NodeField
 
-  test("Trivia is moved inside Child Node") {
-    val language = new Language(Seq.empty)
-    val grammars = language.grammars
-    import grammars._
+//  test("Trivia is moved inside Child Node") {
+//    val language = new Language(Seq.empty)
+//    val grammars = language.grammars
+//    import grammars._
+//
+//    val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
+//      ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
+//    language.grammars.root.inner = grammar
+//    assert(grammars.find(ChildClass).inner != grammars.trivia)
+//    val input = """ChildStart judith ChildEnd""".stripMargin
+//    val inputWithSpace = " " + input
+//    val beforeTransformationWithSpace = TestGrammarUtils.parse(inputWithSpace, grammars.find(ChildClass))
+//    val beforeTransformation = TestGrammarUtils.parse(input, grammars.find(ChildClass))
+//    assert(!beforeTransformationWithSpace.successful)
+//    assert(beforeTransformation.successful, beforeTransformation.toString)
+//    TriviaInsideNode.transformGrammars(grammars, language)
+//    val afterTransformation = TestGrammarUtils.parse(inputWithSpace, grammars.find(ChildClass))
+//    assert(afterTransformation.successful, afterTransformation.toString)
+//  }
 
-    val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
-      ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
-    language.grammars.root.inner = grammar
-    assert(grammars.find(ChildClass).inner != grammars.trivia)
-    val input = """ChildStart judith ChildEnd""".stripMargin
-    val inputWithSpace = " " + input
-    val beforeTransformationWithSpace = TestGrammarUtils.parse(inputWithSpace, grammars.find(ChildClass))
-    val beforeTransformation = TestGrammarUtils.parse(input, grammars.find(ChildClass))
-    assert(!beforeTransformationWithSpace.successful)
-    assert(beforeTransformation.successful, beforeTransformation.toString)
-    TriviaInsideNode.transformGrammars(grammars, language)
-    val afterTransformation = TestGrammarUtils.parse(inputWithSpace, grammars.find(ChildClass))
-    assert(afterTransformation.successful, afterTransformation.toString)
-  }
-
-  test("No doubles") {
-    val language = new Language(Seq.empty)
-    val grammars = language.grammars
-    import grammars._
-
-    val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
-    language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
-    TriviaInsideNode.transformGrammars(grammars, new Language(Seq.empty))
-    val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
-    assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
-  }
+//  test("No doubles") {
+//    val language = new Language(Seq.empty)
+//    val grammars = language.grammars
+//    import grammars._
+//
+//    val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
+//    language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
+//    TriviaInsideNode.transformGrammars(grammars, new Language(Seq.empty))
+//    val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
+//    assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
+//  }
 
   object IntegerClass extends NodeShape
   object Value extends NodeField
