@@ -42,7 +42,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   private def hasLeftNode(path: GrammarPath) = {
-    getLeftChildren(path).exists(p => p.value.isInstanceOf[NodeGrammar])
+    val leftChildren = getLeftChildren(path)
+    debugPrint(leftChildren.toString())
+    leftChildren.exists(p => p.value.isInstanceOf[NodeGrammar])
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
