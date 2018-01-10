@@ -12,25 +12,29 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def description: String = "Moves trivia grammars left of a node to the inside of the node"
 
+  def debugPrint(value: String): Unit = {
+    //System.out.println(value)
+  }
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
     val descendants = grammars.root.descendants.sortBy(ref => ref.ancestors.length)
-    System.out.println("descendants = " + descendants.toString())
+    debugPrint("descendants = " + descendants.toString())
     for(path <- descendants)
     {
-      System.out.println("descendant = " + path)
+      debugPrint("descendant = " + path)
       if (!visited.contains(path.value)) {
         visited += path.value
         path.value match {
           case trivia: WithTrivia
             if hasLeftNode(trivia.getGrammar) =>
-              System.out.println("moving trivia in " + trivia.toString())
+              debugPrint("moving trivia in " + trivia.toString())
               path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
           case _ =>
         }
       } else
-        System.out.println("skipped " + path)
+        debugPrint("skipped " + path)
     }
   }
 
@@ -39,29 +43,29 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    System.out.println("inject trivia called for " + grammar.value.toString())
+    debugPrint("inject trivia called for " + grammar.value.toString())
     grammar.value match {
       case sequence: Sequence =>
-        System.out.println("Sequence")
+        debugPrint("Sequence")
         if (sequence.first.containsParser())
           injectTrivia(grammars, grammar.children.head, horizontal)
         else
           injectTrivia(grammars, grammar.children(1), horizontal)
       case _:NodeGrammar =>
-        System.out.println("NodeGrammar")
+        debugPrint("NodeGrammar")
         if (!isLeftRecursive(grammar.children.head)) {
           placeTrivia(grammars, grammar.children.head, horizontal)
         }
       case _:Choice =>
-        System.out.println("Choice")
+        debugPrint("Choice")
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
       case _:WithTrivia => //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
-        System.out.println("WithTrivia")
+        debugPrint("WithTrivia")
       case _:BiFailure =>
-        System.out.println("BiFailure")
+        debugPrint("BiFailure")
       case _ =>
-        System.out.println("fallback")
+        debugPrint("fallback")
         if (grammar.children.length == 1)
           injectTrivia(grammars, grammar.children.head, horizontal)
         else placeTrivia(grammars, grammar, horizontal)
@@ -69,16 +73,16 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    System.out.println("maybe placing trivia in " + grammar.value.toString)
+    debugPrint("maybe placing trivia in " + grammar.value.toString)
     if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser()) {
-      System.out.println("actually placing")
+      debugPrint("actually placing")
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
     }
   }
 
   def isLeftRecursive(grammar: GrammarPath): Boolean = {
     val edges = grammar.ancestors.collect({ case ref: GrammarReference => ref }).map(p => (p.property, p.parent)).toList
-    System.out.println("edges = " + edges.toString())
+    debugPrint("edges = " + edges.toString())
     if (edges.distinct.size != edges.size)
       return true
 
@@ -99,7 +103,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
     val tail: List[GrammarPath] = reference.value match {
-      case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
+      case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //inner(Ignore).second(Sequence) TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
       case sequence: Sequence =>
         if (sequence.first.containsParser())
           getLeftChildren(reference.children.head)

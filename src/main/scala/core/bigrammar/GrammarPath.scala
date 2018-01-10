@@ -3,11 +3,10 @@ package core.bigrammar
 import core.bigrammar.grammars._
 import core.deltas.node.{Key, NodeField}
 import util.{ExtendedType, GraphBasics, Property}
-
-import scala.collection.mutable
+import scala.collection.concurrent._
 
 object GrammarPath {
-  val cache: mutable.Map[Class[_], List[Property[BiGrammar, AnyRef]]] = mutable.Map.empty
+  val cache: TrieMap[Class[_], List[Property[BiGrammar, AnyRef]]] = TrieMap.empty
 
   def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar, AnyRef]] = {
     cache.getOrElseUpdate(clazz, new ExtendedType(clazz).properties.
