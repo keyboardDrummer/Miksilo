@@ -13,7 +13,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   override def description: String = "Moves trivia grammars left of a node to the inside of the node"
 
   def debugPrint(value: String): Unit = {
-    //System.out.println(value)
+    System.out.println(value)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
