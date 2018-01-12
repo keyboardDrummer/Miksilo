@@ -115,8 +115,10 @@ object TriviaInsideNode extends DeltaWithGrammar {
       case sequence: Sequence =>
         if (sequence.first.containsParser())
           getLeftChildren(reference.children.head)
-        else
+        else {
+          debugPrint("did not contain parser: " + sequence.first.toString)
           getLeftChildren(reference.children(1))
+        }
       case _: Choice => getLeftChildren(reference.children(0)) ++ getLeftChildren(reference.children(1))
       case _ => reference.newChildren.flatMap(c => getLeftChildren(c))
     }
