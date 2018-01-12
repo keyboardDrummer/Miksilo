@@ -25,19 +25,22 @@ object TriviaInsideNode extends DeltaWithGrammar {
     debugPrint("descendants = " + descString)
     for(path <- descendants)
     {
-      if (!visited.contains(path.value)) {
-        debugPrint("visiting: " + path)
-        visited += path.value
-        path.value match {
-          case trivia: WithTrivia
-            if hasLeftNode(trivia.getGrammar) =>
-              debugPrint("moving trivia in " + trivia.toString())
+      path.value match {
+        case trivia: WithTrivia =>
+          if (!visited.contains(path.value)) {
+            debugPrint("visiting: " + path)
+            visited += path.value
+
+            if (hasLeftNode(trivia.getGrammar)) {
+              debugPrint("moving trivia in: " + trivia.toString())
               path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
-          case _ =>
-        }
-      } else
-        debugPrint("skipped: " + path)
+            }
+          }
+          else
+            debugPrint("skipped: " + path)
+        case _ =>
+      }
     }
   }
 
