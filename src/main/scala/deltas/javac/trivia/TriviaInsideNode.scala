@@ -25,8 +25,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
     debugPrint("descendants = " + descString)
     for(path <- descendants)
     {
-      debugPrint("descendant = " + path)
       if (!visited.contains(path.value)) {
+        debugPrint("visiting: " + path)
         visited += path.value
         path.value match {
           case trivia: WithTrivia
@@ -37,13 +37,13 @@ object TriviaInsideNode extends DeltaWithGrammar {
           case _ =>
         }
       } else
-        debugPrint("skipped " + path)
+        debugPrint("skipped: " + path)
     }
   }
 
   private def hasLeftNode(path: GrammarPath) = {
     val leftChildren = getLeftChildren(path)
-    debugPrint(leftChildren.toString())
+    debugPrint("leftChildren: " + leftChildren.toString())
     leftChildren.exists(p => p.value.isInstanceOf[NodeGrammar])
   }
 
