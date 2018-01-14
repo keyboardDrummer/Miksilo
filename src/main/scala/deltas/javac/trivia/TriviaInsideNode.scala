@@ -12,7 +12,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     var visited = Set.empty[BiGrammar]
-    val descendants = grammars.root.descendants.sortBy(ref => ref.toString())
+    val descendants = grammars.root.descendants
     for(path <- descendants)
     {
       path.value match {
