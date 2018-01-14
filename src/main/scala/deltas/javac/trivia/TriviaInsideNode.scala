@@ -43,7 +43,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
         val child = grammar.children.find(ref => ref.value == left).get
         injectTrivia(grammars, child, horizontal)
       case _:NodeGrammar =>
-        if (!isLeftRecursive(grammar.children.head)) {
+        if (!grammar.children.head.value.isLeftRecursive) {
           placeTrivia(grammars, grammar.children.head, horizontal)
         }
       case _:Choice =>
@@ -61,26 +61,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
   def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
     if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser()) {
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
-    }
-  }
-
-  def isLeftRecursive(grammar: GrammarPath): Boolean = {
-    val edges = grammar.ancestors.collect({ case ref: GrammarReference => ref }).map(p => (p.property, p.parent)).toList
-    if (edges.distinct.size != edges.size)
-      return true
-
-    grammar.value match {
-      case _:Sequence => isLeftRecursive(grammar.children.head)
-      case _:NodeGrammar =>
-        false
-      case _:Choice => isLeftRecursive(grammar.children(0)) || isLeftRecursive(grammar.children(1))
-      case _:BiFailure =>
-        false
-      case _ =>
-        if (grammar.children.length == 1)
-          isLeftRecursive(grammar.children.head)
-        else
-          false
     }
   }
 }
