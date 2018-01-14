@@ -68,19 +68,19 @@ trait BiGrammar extends BiGrammarWriter {
     this.containsParser(recursive)
   }
 
-  def getLeftChildren(): Seq[BiGrammar] = {
+  def getLeftChildren: Seq[BiGrammar] = {
     var map: Map[BiGrammar, Seq[BiGrammar]] = Map.empty
     lazy val recursive: BiGrammar => Seq[BiGrammar] = grammar => {
       map.get(grammar) match {
         case Some(result) => result
         case _ =>
           map += grammar -> Seq.empty
-          val result = grammar.getLeftChildren(recursive)
+          val result = Seq(grammar) ++ grammar.getLeftChildren(recursive)
           map += grammar -> result
           result
       }
     }
-    this.getLeftChildren(recursive)
+    Seq(this) ++ this.getLeftChildren(recursive)
   }
 
   protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] =
