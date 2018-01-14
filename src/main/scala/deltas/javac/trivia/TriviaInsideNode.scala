@@ -33,7 +33,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
             val grammar = trivia.getGrammar
             debugPrint("grammar = " + grammar.toString)
-            if (hasLeftNode(grammar)) {
+            if (hasLeftNode(new RootGrammar(grammar))) {
               debugPrint("moving trivia in: " + trivia.toString())
               path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
