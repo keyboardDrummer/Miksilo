@@ -1,8 +1,8 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
+import core.document.WhiteSpace
 import util.{GraphBasics, Utility}
 
 import scala.reflect.ClassTag
@@ -67,6 +67,24 @@ trait BiGrammar extends BiGrammarWriter {
     }
     this.containsParser(recursive)
   }
+
+  def getLeftChildren(): Seq[BiGrammar] = {
+    var map: Map[BiGrammar, Seq[BiGrammar]] = Map.empty
+    lazy val recursive: BiGrammar => Seq[BiGrammar] = grammar => {
+      map.get(grammar) match {
+        case Some(result) => result
+        case _ =>
+          map += grammar -> Seq.empty
+          val result = grammar.getLeftChildren(recursive)
+          map += grammar -> result
+          result
+      }
+    }
+    this.getLeftChildren(recursive)
+  }
+
+  protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] =
+    children.flatMap(c => recursive(c))
 
   protected def containsParser(recursive: BiGrammar => Boolean): Boolean
 

@@ -5,8 +5,6 @@ import core.bigrammar.grammars._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
 
-import scala.collection.immutable.List
-
 //noinspection ZeroIndexToHead
 object TriviaInsideNode extends DeltaWithGrammar {
 
@@ -48,9 +46,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   private def hasLeftNode(path: GrammarPath) = {
     debugPrint("hasLeftNode with: " + path.toString)
-    val leftChildren = getLeftChildren(path)
-    debugPrint("leftChildren: " + leftChildren.toString())
-    leftChildren.exists(p => p.value.isInstanceOf[NodeGrammar])
+    val leftChildren = path.value.getLeftChildren()
+    leftChildren.exists(p => p.isInstanceOf[NodeGrammar])
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
@@ -111,22 +108,4 @@ object TriviaInsideNode extends DeltaWithGrammar {
           false
     }
   }
-
-  def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
-    debugPrint("getLeftChildren with: " + reference.toString)
-    val tail: List[GrammarPath] = reference.value match {
-      case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //inner(Ignore).second(Sequence) TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
-      case sequence: Sequence =>
-        if (sequence.first.containsParser())
-          getLeftChildren(reference.children.head)
-        else {
-          debugPrint("did not contain parser: " + sequence.first.toString)
-          getLeftChildren(reference.children(1))
-        }
-      case _: Choice => getLeftChildren(reference.children(0)) ++ getLeftChildren(reference.children(1))
-      case _ => reference.newChildren.flatMap(c => getLeftChildren(c))
-    }
-    reference :: tail
-  }
-
 }

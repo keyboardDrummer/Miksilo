@@ -17,4 +17,12 @@ trait Sequence extends BiGrammar with Layout {
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean =
     recursive(first) || recursive(second)
+
+  override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] = {
+    if (first.containsParser())
+      recursive(first)
+    else {
+      recursive(second)
+    }
+  }
 }
