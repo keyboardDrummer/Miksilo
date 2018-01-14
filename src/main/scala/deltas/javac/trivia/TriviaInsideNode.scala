@@ -55,11 +55,10 @@ object TriviaInsideNode extends DeltaWithGrammar {
     debugPrint("inject trivia called for " + grammar.value.toString())
     grammar.value match {
       case sequence: Sequence =>
+        val left = sequence.getLeftChildren.drop(1).head
+        val child = grammar.children.find(ref => ref.value == left).get
         debugPrint("Sequence")
-        if (sequence.first.containsParser())
-          injectTrivia(grammars, grammar.children.head, horizontal)
-        else
-          injectTrivia(grammars, grammar.children(1), horizontal)
+        injectTrivia(grammars, child, horizontal)
       case _:NodeGrammar =>
         debugPrint("NodeGrammar")
         if (!isLeftRecursive(grammar.children.head)) {
