@@ -3,7 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammar
 import core.deltas.node.GrammarKey
 
-class Labelled  (val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
+class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
   def addOption(addition: BiGrammar) {
     inner = inner | addition
