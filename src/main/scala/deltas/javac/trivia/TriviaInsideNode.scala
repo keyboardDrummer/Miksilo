@@ -31,7 +31,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
             debugPrint("visiting: " + path)
             visited += path.value
 
-            if (hasLeftNode(trivia.getGrammar)) {
+            val grammar = trivia.getGrammar
+            debugPrinter("grammar = " + grammar.toString)
+            if (hasLeftNode(grammar)) {
               debugPrint("moving trivia in: " + trivia.toString())
               path.set(trivia.getGrammar)
               injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
@@ -45,6 +47,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   private def hasLeftNode(path: GrammarPath) = {
+    debugPrint("hasLeftNode with: " + path.toString)
     val leftChildren = getLeftChildren(path)
     debugPrint("leftChildren: " + leftChildren.toString())
     leftChildren.exists(p => p.value.isInstanceOf[NodeGrammar])
