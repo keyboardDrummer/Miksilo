@@ -5,7 +5,7 @@ layout: default
 
 {% include home-banner.html %}
 
-Blender is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. An important part of these tools is that they often define one or several _metalanguages_, which are used to define (parts of) a language.
+Blender is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. Blender let's you create languages quickly, by building on top of existing languages.
 
 Language construction is notoriously hard, and these days involves not just writing a compiler or interpreter, but also tooling to include in an [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment). Language workbenches make language design accessible to a larger audience; they allow writing more [domain-specific languages](https://en.wikipedia.org/wiki/Domain-specific_language), and prototyping new languages.
 
@@ -13,7 +13,7 @@ Because languages share many properties, the quickest way to build a language is
 
 - Languages are composed of many small transformations.
 - Language transformations are packaged as reusable units with explicit dependencies between them.
-- Metalanguages are embedded in [Scala](http://www.scala-lang.org), which allows arbitrary computations over them, and enables transforming between arbitrary languages.
+- An important part of language workbenches is that they often define one or several _metalanguages_, which are used to define (parts of) a language. Blender's metalanguages are embedded in [Scala](http://www.scala-lang.org), which allows arbitrary computations over them, and enables transforming between arbitrary languages.
 - Metalanguages are designed to be transformed. For example, early binding to fields in the grammar allows easy & safe editing.
 - Compiler phases are defined generically, making them resilient to changes in the language.
 - Abstract syntax trees are stored unstructured, which provides benefits such as fast transformations and language composition at run-time.
