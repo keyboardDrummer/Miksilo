@@ -113,6 +113,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def getLeftChildren(reference: GrammarPath): List[GrammarPath] = {
+    debugPrint("getLeftChildren with: " + reference.toString)
     val tail: List[GrammarPath] = reference.value match {
       case _: WithTrivia => getLeftChildren(reference.children.head.children(1)) //inner(Ignore).second(Sequence) TODO maybe if we can remove all the WithTrivia's first we wouldn't need this hack.
       case sequence: Sequence =>
