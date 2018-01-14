@@ -3,10 +3,10 @@ package deltas.javac
 import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, LeftRight, WithTrivia}
 import core.deltas.grammars.BodyGrammar
-import core.deltas.node.{GrammarKey, NodeShape, NodeField}
+import core.deltas.node.{GrammarKey, NodeField, NodeShape}
 import core.deltas.{Language, NodeGrammarWriter}
-import org.scalatest.FunSuite
 import deltas.javac.trivia.TriviaInsideNode
+import org.scalatest.FunSuite
 
 class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
 

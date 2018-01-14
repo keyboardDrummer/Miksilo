@@ -1,8 +1,8 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.document.WhiteSpace
 import core.deltas.node.GrammarKey
+import core.document.WhiteSpace
 import util.{GraphBasics, Utility}
 
 import scala.reflect.ClassTag
@@ -67,6 +67,44 @@ trait BiGrammar extends BiGrammarWriter {
     }
     this.containsParser(recursive)
   }
+
+  def isLeftRecursive: Boolean = {
+    var isRecursive = false
+    var seen = Set.empty[BiGrammar]
+    lazy val recursive: BiGrammar => Seq[BiGrammar] = grammar => {
+      if (grammar == this || isRecursive) {
+        isRecursive = true
+        Seq.empty
+      }
+      else {
+        if (!seen.contains(grammar)) {
+          seen += grammar
+          grammar.getLeftChildren(recursive)
+        } else
+          Seq.empty
+      }
+    }
+    this.getLeftChildren(recursive)
+    isRecursive
+  }
+
+  def getLeftChildren: Seq[BiGrammar] = {
+    var map: Map[BiGrammar, Seq[BiGrammar]] = Map.empty
+    lazy val recursive: BiGrammar => Seq[BiGrammar] = grammar => {
+      map.get(grammar) match {
+        case Some(result) => result
+        case _ =>
+          map += grammar -> Seq.empty
+          val result = Seq(grammar) ++ grammar.getLeftChildren(recursive)
+          map += grammar -> result
+          result
+      }
+    }
+    Seq(this) ++ this.getLeftChildren(recursive)
+  }
+
+  protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] =
+    children.flatMap(c => recursive(c))
 
   protected def containsParser(recursive: BiGrammar => Boolean): Boolean
 
