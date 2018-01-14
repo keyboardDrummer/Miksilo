@@ -32,7 +32,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
             visited += path.value
 
             val grammar = trivia.getGrammar
-            debugPrinter("grammar = " + grammar.toString)
+            debugPrint("grammar = " + grammar.toString)
             if (hasLeftNode(grammar)) {
               debugPrint("moving trivia in: " + trivia.toString())
               path.set(trivia.getGrammar)
