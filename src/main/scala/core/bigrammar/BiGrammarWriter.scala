@@ -11,7 +11,7 @@ trait BiGrammarWriter {
 
   def identifier: BiGrammar = Identifier()
 
-  def number: BiGrammar = NumberG
+  def number: BiGrammar = NumberGrammar
 
   def integer: BiGrammar = number.map[String, Int](
     s => Integer.parseInt(s),

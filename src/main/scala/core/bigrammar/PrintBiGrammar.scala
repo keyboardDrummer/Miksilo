@@ -40,7 +40,7 @@ object PrintBiGrammar {
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
     case labelled: Labelled => grammarKeyToName(labelled.name)
-    case NumberG => "number"
+    case NumberGrammar => "number"
     case StringLiteral => "string"
     case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
