@@ -4,14 +4,16 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import core.deltas._
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 
 import scala.reflect.io.File
 
 class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
-  val statistics = new Statistics(CompilerBuilder.statistics)
+  val statistics = new Statistics(TestLanguageBuilder.statistics)
 
-  lazy val language: Language = statistics.profile("build language", buildLanguage)
+  lazy val language: Language = buildLanguage
+  lazy val grammars: LanguageGrammars = language.grammars
 
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())
@@ -104,16 +106,18 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def buildLanguage: Language = {
-    new Language(Seq(new Delta {
-      override def description: String = "Instrument buildParser"
+    statistics.profile("build language", {
+      new Language(Seq(new Delta {
+        override def description: String = "Instrument buildParser"
 
-      override def inject(language: Language): Unit = {
-        val old = language.buildParser
-        language.buildParser = () => {
-          statistics.profile("build parser", old())
+        override def inject(language: Language): Unit = {
+          val old = language.buildParser
+          language.buildParser = () => {
+            statistics.profile("build parser", old())
+          }
+          super.inject(language)
         }
-        super.inject(language)
-      }
-    }) ++ deltas.map(delta => new WrappedDelta(delta)))
+      }) ++ deltas.map(delta => new WrappedDelta(delta)))
+    })
   }
 }

@@ -5,38 +5,38 @@ import javax.swing.text.Segment
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
-import org.fife.ui.rsyntaxtextarea._
+import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.input.CharArrayReader
 
+case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
-  case class MyToken(tokenType: Int, text: String)
 
   val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
-    var keywords: mutable.Set[String] = mutable.Set.empty
+    val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
-    val tokenParsers: Seq[BiGrammarToParser.Parser[MyToken]] = reachables.toSeq.collect({
+
+    val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
         literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
       case delimiter: Delimiter => literal(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
       case identifier: Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
-      case NumberG => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s))
-      case StringLiteral => stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
-    }) ++ reachables.toSeq.collect({
-      case regexGrammar: RegexGrammar =>
-        regex(regexGrammar.regex) ^^
-          (s => MyToken(TokenTypes.COMMENT_MULTILINE, s))
+      case NumberGrammar => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO shoud support other numbers as well.
+      case StringLiteral =>
+        stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
+      case TokenColor(inner, _type) =>
+        BiGrammarToParser.toParser(inner, keywords) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
     })
 
     val whiteSpaceToken = regex(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s))
     val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
-    val allTokenParsers = Seq(whiteSpaceToken) ++ tokenParsers ++ Seq(errorToken)
+    val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
-    val tokenGrammar: BiGrammarToParser.Parser[Seq[MyToken]] = allTokenParsers.reduce((a, b) => a | b).* //TODO using ||| would slower but give better behavior
+    val tokenGrammar = (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
     phrase(tokenGrammar)
   }
 

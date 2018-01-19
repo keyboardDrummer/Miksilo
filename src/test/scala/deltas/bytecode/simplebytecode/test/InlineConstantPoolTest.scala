@@ -6,7 +6,7 @@ import deltas.bytecode.ConstantPoolIndices
 import deltas.bytecode.simpleBytecode.InlineConstantPool
 import deltas.javac.JavaCompilerDeltas
 import org.scalatest.FunSuite
-import util.{CompilerBuilder, TestUtils}
+import util.{TestLanguageBuilder, TestUtils}
 
 class InlineConstantPoolTest extends FunSuite {
 
@@ -223,14 +223,14 @@ class InlineConstantPoolTest extends FunSuite {
 
   test("inline to numbered bytecode") {
     val deltas = Seq(InlineConstantPool, MarkOutputGrammar, ConstantPoolIndices) ++ JavaCompilerDeltas.byteCodeDeltas
-    val compiler = CompilerBuilder.build(deltas)
+    val compiler = TestLanguageBuilder.build(deltas)
     val result = new TestUtils(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCodeWithLineNumbers)(result)
   }
 
   test("inline to bytecode") {
     val deltas = Seq(InlineConstantPool, MarkOutputGrammar) ++ JavaCompilerDeltas.byteCodeDeltas
-    val compiler = CompilerBuilder.build(deltas)
+    val compiler = TestLanguageBuilder.build(deltas)
     val result = new TestUtils(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCode)(result)
   }

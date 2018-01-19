@@ -4,7 +4,7 @@ import java.util.{Timer, TimerTask}
 
 import core.deltas._
 
-object CompilerBuilder {
+object TestLanguageBuilder {
   val statistics = new Statistics()
 
   var compilers : Map[Seq[Delta], TestingLanguage] = Map.empty

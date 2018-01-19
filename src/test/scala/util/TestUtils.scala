@@ -17,7 +17,7 @@ import util.SourceUtils.LineProcessLogger
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object TestUtils extends TestUtils(CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
+object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
 }
 
 class TestUtils(val compiler: TestingLanguage) extends FunSuite {
@@ -81,7 +81,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
     val prettyPrint = PrettyPrint(recover = true)
     val splicedDeltas = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
-    val newCompiler = CompilerBuilder.build(splicedDeltas)
+    val newCompiler = TestLanguageBuilder.build(splicedDeltas)
 
     val state = newCompiler.parseAndTransform(input)
     state.output
@@ -106,7 +106,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val input: BufferedInputStream = new BufferedInputStream(SourceUtils.getTestFile(relativeFilePath))
     input.mark(Integer.MAX_VALUE)
 
-    val javaCompilerOutput = CompilerBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
+    val javaCompilerOutput = TestLanguageBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
     input.reset()
     assertResult("")(javaCompilerOutput)
 
@@ -125,7 +125,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     }
   }
 
-  def profile[T](description: String, action: => T): T = CompilerBuilder.profile(description, action)
+  def profile[T](description: String, action: => T): T = TestLanguageBuilder.profile(description, action)
 
 
   def getErrorMessage(inputFile: Path, expectedOutputDirectory: Path, state: Compilation, e: AssertionError): String = {
@@ -133,7 +133,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = CompilerBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas)
+    val prettyPrintByteCodeCompiler = TestLanguageBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas)
     val output = prettyPrintByteCodeCompiler.transform(state.program).output
     val prettyPrintActualByteCode = output
 

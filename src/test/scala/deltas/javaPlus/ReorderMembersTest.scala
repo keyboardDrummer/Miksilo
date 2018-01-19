@@ -8,7 +8,7 @@ import core.deltas.ParseException
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
-import util.CompilerBuilder
+import util.TestLanguageBuilder
 
 class ReorderMembersTest extends FunSuite {
 
@@ -25,7 +25,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = CompilerBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     assertThrows[ParseException]({
@@ -54,7 +54,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = CompilerBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)
@@ -85,7 +85,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = CompilerBuilder.build(Seq(ReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta) ++
       JavaCompilerDeltas.javaCompilerDeltas)
 
@@ -118,7 +118,7 @@ class ReorderMembersTest extends FunSuite {
         |    /* third comes last */
         |    int third;
         |}""".stripMargin
-    val compiler = CompilerBuilder.build(Seq(ReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
       JavaCompilerDeltas.javaCompilerDeltas)
 
