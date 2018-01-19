@@ -18,7 +18,7 @@ object ParseUsingTextualGrammar extends Delta {
         val reader = new CharArrayReader(scala.io.Source.fromInputStream(input).mkString.toCharArray)
         val parseResult: BiGrammarToParser.ParseResult[Any] = parser(reader)
         if (!parseResult.successful)
-          throw ParseException(parseResult.asInstanceOf[BiGrammarToParser.NoSuccess].msg)
+          throw ParseException(parseResult.toString)
 
         if(!parseResult.next.atEnd)
           throw ParseException("Did not parse until end.")
