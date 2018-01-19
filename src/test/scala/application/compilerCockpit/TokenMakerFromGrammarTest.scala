@@ -1,7 +1,6 @@
 package application.compilerCockpit
 
 import core.bigrammar.BiGrammarToParser
-import core.bigrammar.grammars.RegexGrammar
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
@@ -52,6 +51,21 @@ class TokenMakerFromGrammarTest extends FunSuite {
       delimiter("}"), newLine(0),
       delimiter("}")
     )
+
+    assertResult(expectedTokens)(tokens)
+  }
+
+  test("failure") {
+    val grammar = language.grammars.root
+    val tokenMaker = new TokenMakerFromGrammar(grammar)
+
+    val text = "^"
+
+    val charArrayReader = new CharArrayReader(text.toString.toCharArray)
+    val resultOption = tokenMaker.parser(charArrayReader)
+    assert(resultOption.successful, resultOption.toString)
+    val tokens = resultOption.get
+    val expectedTokens = List(MyToken(TokenTypes.ERROR_CHAR, "^"))
 
     assertResult(expectedTokens)(tokens)
   }
