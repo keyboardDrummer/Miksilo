@@ -38,7 +38,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   object TriviaCounter extends Key
   case class Trivia(index: Int) extends NodeField
 
-  class StoreTrivia(triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammarWithoutChildren {
+  class StoreTrivia(var triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammar {
 
     def getKeyAndIncrementCounter: StateFull[NodeField] = (state: State) => {
       val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
@@ -59,7 +59,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       )
     }
 
-    override def createPrinter(recursive: BiGrammar => NodePrinter) = new NodePrinter {
+    override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new NodePrinter {
       val triviaPrinter: NodePrinter = recursive(triviaGrammar)
 
       override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = for {
@@ -72,6 +72,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = "StoreTrivias"
 
     override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+
+    override def children: Seq[BiGrammar] = Seq(triviaGrammar)
+
+    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = new StoreTrivia(newChildren.head)
   }
 
   case class NodeCounterReset(var node: BiGrammar) extends CustomGrammar {

@@ -13,7 +13,7 @@ import deltas.bytecode.types.VoidTypeC
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.ConstantPool
 import deltas.javac.types.MethodType
-import util.CompilerBuilder
+import util.TestLanguageBuilder
 
 class TestPoptimize extends FunSuite {
 
@@ -77,7 +77,7 @@ class TestPoptimize extends FunSuite {
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val shape = ByteCodeSkeleton.neww(0, 0, new ConstantPool(Seq()), Seq(method))
-    val compiler = CompilerBuilder.build(Seq(PoptimizeDelta) ++ JavaCompilerDeltas.byteCodeDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(PoptimizeDelta) ++ JavaCompilerDeltas.byteCodeDeltas)
     compiler.transform(shape)
     NodeWrapper.unwrapList(codeAnnotation.instructions)
   }

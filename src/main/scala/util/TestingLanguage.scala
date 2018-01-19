@@ -4,14 +4,16 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import core.deltas._
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 
 import scala.reflect.io.File
 
 class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
-  val statistics = new Statistics(CompilerBuilder.statistics)
+  val statistics = new Statistics(TestLanguageBuilder.statistics)
 
   lazy val language: Language = statistics.profile("build language", buildLanguage)
+  lazy val grammars: LanguageGrammars = language.grammars
 
   def parseAndTransform(input: File): Compilation = {
     val state: Compilation = parseAndTransform(input.inputStream())
@@ -103,7 +105,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     override def suffix: String = delta.suffix
   }
 
-  def buildLanguage: Language = {
+  private def buildLanguage: Language = {
     new Language(Seq(new Delta {
       override def description: String = "Instrument buildParser"
 

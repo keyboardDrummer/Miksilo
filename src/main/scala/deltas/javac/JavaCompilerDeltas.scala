@@ -24,7 +24,7 @@ import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
-import deltas.javac.expressions.literals.{BooleanLiteralC, IntLiteralDelta, LongLiteralC, NullC}
+import deltas.javac.expressions.literals.{BooleanLiteralC, IntLiteralDelta, LongLiteralDelta, NullC}
 import deltas.javac.expressions.postfix.PostFixIncrementC
 import deltas.javac.expressions.prefix.NotC
 import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
@@ -67,7 +67,7 @@ object JavaCompilerDeltas {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
-    BooleanLiteralC, LongLiteralC, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
+    BooleanLiteralC, LongLiteralDelta, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

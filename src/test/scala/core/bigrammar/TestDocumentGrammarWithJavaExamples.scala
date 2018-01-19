@@ -8,7 +8,7 @@ import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.javac.statements.BlockDelta
 import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaCompilerDeltas}
-import util.{CompilerBuilder, SourceUtils}
+import util.{TestLanguageBuilder, SourceUtils}
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -68,9 +68,9 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection)
-    val newTransformations = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+    val newTransformations = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
-    val state = CompilerBuilder.build(newTransformations).parseAndTransform(input)
+    val state = TestLanguageBuilder.build(newTransformations).parseAndTransform(input)
     val output = state.output
 
     assertResult(expectation)(output)
@@ -96,21 +96,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas
-    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(RunWithJVM) ++ JavaCompilerDeltas.byteCodeDeltas
-    val output = CompilerBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
     assertResult("8")(output)
   }
 }

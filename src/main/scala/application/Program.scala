@@ -12,8 +12,6 @@ import org.oxbow.swingbits.dialog.task.TaskDialogs
 
 import scala.swing.{Component, MainFrame, SimpleSwingApplication}
 
-
-
 object Program extends SimpleSwingApplication {
 
   Toolkit.getDefaultToolkit.getSystemEventQueue.push(new ShowExceptionsInDialog)

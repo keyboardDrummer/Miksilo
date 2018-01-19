@@ -106,7 +106,7 @@ trait BiGrammar extends BiGrammarWriter {
   protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] =
     children.flatMap(c => recursive(c))
 
-  protected def containsParser(recursive: BiGrammar => Boolean): Boolean
+  def containsParser(recursive: BiGrammar => Boolean): Boolean
 
   def selfAndDescendants: Seq[BiGrammar] = GraphBasics.traverseBreadth[BiGrammar](Seq(this), grammar => grammar.children)
 }

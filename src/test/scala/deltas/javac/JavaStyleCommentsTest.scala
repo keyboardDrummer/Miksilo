@@ -11,12 +11,12 @@ import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, 
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.trivia.{StoreTriviaDelta, JavaStyleCommentsDelta, TriviaInsideNode}
-import util.{CompilerBuilder, SourceUtils, TestUtils}
+import util.{TestLanguageBuilder, SourceUtils, TestUtils}
 
 import scala.reflect.io.Path
 
 class JavaStyleCommentsTest
-  extends TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta) ++ JavaCompilerDeltas.javaCompilerDeltas))
+  extends TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta) ++ JavaCompilerDeltas.javaCompilerDeltas))
   with NodeGrammarWriter
 {
   object ParentClass extends NodeShape
@@ -69,7 +69,7 @@ class JavaStyleCommentsTest
   }
 
   test("relational") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(JavaStyleCommentsDelta, ExpressionAsRoot) ++
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(JavaStyleCommentsDelta, ExpressionAsRoot) ++
       JavaCompilerDeltas.javaCompilerDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
@@ -77,7 +77,7 @@ class JavaStyleCommentsTest
   }
 //Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
   test("addition") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -88,7 +88,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition2") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionC, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -99,7 +99,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition3") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       Seq(SubtractionC, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
     JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
@@ -110,7 +110,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition4") {
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
       JavaCompilerDeltas.javaCompilerDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
@@ -120,7 +120,7 @@ class JavaStyleCommentsTest
   }
 
   test("block transformation") {
-    val java = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).buildLanguage
+    val java = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).language
     val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
@@ -155,8 +155,8 @@ class JavaStyleCommentsTest
   }
 
   test("comments are maintained in bytecode") {
-    val initialCompiler = CompilerBuilder.build(PresetsPanel.getJavaCompilerParticles)
-    val utils = new TestUtils(CompilerBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
+    val initialCompiler = TestLanguageBuilder.build(PresetsPanel.getJavaCompilerParticles)
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)

@@ -11,16 +11,16 @@ import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeC
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
-object LongLiteralC extends ExpressionInstance {
+object LongLiteralDelta extends ExpressionInstance {
   val key = LongLiteralKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
-  def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
+  private def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val longGrammar : BiGrammar = new RegexGrammar("""-?\d+l""".r).map[String, Long](
+    val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r).map[String, Long](
       number => parseLong(number), l => s"${l}l") as ValueKey asNode LongLiteralKey
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(longGrammar)
@@ -32,7 +32,7 @@ object LongLiteralC extends ExpressionInstance {
     Seq(PushLongDelta.constant(getValue(literal).toInt))
   }
 
-  def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Long]
+  def getValue(literal: Node): Long = literal(ValueKey).asInstanceOf[Long]
 
   override def getType(expression: Path, compilation: Compilation): Node = LongTypeC.longType
 

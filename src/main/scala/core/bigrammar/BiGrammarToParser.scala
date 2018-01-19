@@ -6,7 +6,6 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
 import scala.util.parsing.input.CharArrayReader
-import scala.util.parsing.input.CharArrayReader._
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
@@ -30,16 +29,21 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
       case _ => Set.empty[String]
     })
 
+    val valueParser: BiGrammarToParser.Parser[Any] = toParser(grammar, keywords)
+    phrase(valueParser)
+  }
+
+  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any] = {
     val cache: mutable.Map[BiGrammar, PackratParser[Result]] = mutable.Map.empty
     lazy val recursive: BiGrammar => PackratParser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, memo(toParser(keywords, recursive, grammar)))
     }
     val resultParser = toParser(keywords, recursive, grammar)
-    val valueParser = resultParser.map(result => result(Map.empty[Any,Any])._2.value)
-    phrase(valueParser)
+    val valueParser = resultParser.map(result => result(Map.empty[Any, Any])._2.value)
+    valueParser
   }
 
-  private def toParser(keywords: Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
+  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
       case sequence: Sequence =>
         val firstParser = recursive(sequence.first)

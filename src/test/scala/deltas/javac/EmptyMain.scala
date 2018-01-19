@@ -7,7 +7,7 @@ import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.javac.methods.MethodDelta._
 import org.scalatest.FunSuite
-import util.{CompilerBuilder, SourceUtils}
+import util.{TestLanguageBuilder, SourceUtils}
 
 class EmptyMain extends FunSuite {
   val className = "EmptyMain"
@@ -21,7 +21,7 @@ class EmptyMain extends FunSuite {
 
   def getByteCode: Node = {
     val java = getJava
-    val byteCode = CompilerBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(java).program
+    val byteCode = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(java).program
     byteCode
   }
 

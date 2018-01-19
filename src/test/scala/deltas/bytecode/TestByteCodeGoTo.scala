@@ -10,7 +10,7 @@ import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.bytecode.types.IntTypeC
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.ConstantPool
-import util.CompilerBuilder
+import util.TestLanguageBuilder
 import util.TestUtils
 
 class TestByteCodeGoTo extends FunSuite {
@@ -22,7 +22,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = CompilerBuilder.build(Seq(LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).transform(labelledWhile).program
+    val compiledWhile = TestLanguageBuilder.build(Seq(LabelledLocations) ++ JavaCompilerDeltas.byteCodeDeltas).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
   }

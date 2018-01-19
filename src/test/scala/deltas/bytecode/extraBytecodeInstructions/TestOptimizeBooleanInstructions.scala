@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsDelta
 import deltas.javac.JavaCompilerDeltas
-import util.CompilerBuilder
+import util.TestLanguageBuilder
 import util.TestUtils
 
 import scala.reflect.io.Path
@@ -15,7 +15,7 @@ class TestOptimizeBooleanInstructions extends FunSuite {
   test("ForFibonacci") {
     val withOptimization = TestUtils.parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaCompilerDeltas.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
-    val withoutOptimization = new TestUtils(CompilerBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
+    val withoutOptimization = new TestUtils(TestLanguageBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)
