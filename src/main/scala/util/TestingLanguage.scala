@@ -12,7 +12,7 @@ import scala.reflect.io.File
 class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   val statistics = new Statistics(TestLanguageBuilder.statistics)
 
-  lazy val language: Language = statistics.profile("build language", buildLanguage)
+  lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
   def parseAndTransform(input: File): Compilation = {
@@ -105,17 +105,19 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     override def suffix: String = delta.suffix
   }
 
-  private def buildLanguage: Language = {
-    new Language(Seq(new Delta {
-      override def description: String = "Instrument buildParser"
+  def buildLanguage: Language = {
+    statistics.profile("build language", {
+      new Language(Seq(new Delta {
+        override def description: String = "Instrument buildParser"
 
-      override def inject(language: Language): Unit = {
-        val old = language.buildParser
-        language.buildParser = () => {
-          statistics.profile("build parser", old())
+        override def inject(language: Language): Unit = {
+          val old = language.buildParser
+          language.buildParser = () => {
+            statistics.profile("build parser", old())
+          }
+          super.inject(language)
         }
-        super.inject(language)
-      }
-    }) ++ deltas.map(delta => new WrappedDelta(delta)))
+      }) ++ deltas.map(delta => new WrappedDelta(delta)))
+    })
   }
 }

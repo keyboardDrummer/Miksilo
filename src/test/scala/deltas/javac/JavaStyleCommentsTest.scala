@@ -120,7 +120,7 @@ class JavaStyleCommentsTest
   }
 
   test("block transformation") {
-    val java = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).language
+    val java = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).buildLanguage
     val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
@@ -156,7 +156,8 @@ class JavaStyleCommentsTest
 
   test("comments are maintained in bytecode") {
     val initialCompiler = TestLanguageBuilder.build(PresetsPanel.getJavaCompilerParticles)
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++ initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
+    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++
+      initialCompiler.spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
