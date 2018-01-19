@@ -18,12 +18,6 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
   val parser: BiGrammarToParser.Parser[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
-    val tokenParsers2 = reachables.collect({
-      case TokenColor(inner, _type) =>
-        BiGrammarToParser.toParser(inner) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
-    })
-    val fwwe = tokenParsers2.head
-    val result = fwwe(new CharArrayReader("/* head */".toCharArray))
 
     val tokenParsers: Set[BiGrammarToParser.Parser[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
