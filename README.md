@@ -1,4 +1,4 @@
-Miksilo [![Build Status](https://travis-ci.org/keyboardDrummer/Miksilo.svg?branch=master)](https://travis-ci.org/keyboardDrummer/Miksilo) [![Join the chat at https://gitter.im/Miksilo/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LanguageMiksilo/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Miksilo [![Build Status](https://travis-ci.org/keyboardDrummer/Miksilo.svg?branch=master)](https://travis-ci.org/keyboardDrummer/Miksilo) [![Join the chat at https://gitter.im/Miksilo/Lobby#](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Miksilo/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============
 
 Miksilo is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. Miksilo let's you create languages quickly, by building on top of existing languages.
@@ -41,7 +41,7 @@ Some examples of cool features:
 - Add a new language front-end or back-end.
 
 If you would like to contribute then:
-1. Reach out on [the Gitter](https://gitter.im/LanguageMiksilo/Lobby), so other contributors can help you out where the documentation is lacking.
+1. Reach out on [the Gitter](https://gitter.im/Miksilo/Lobby), so other contributors can help you out where the documentation is lacking.
 1. Look through the open issues to see if you find something interesting
 1. Enjoy the work ;-)
 1. Once you're done, submit a pull request and make sure the build server approves it.
