@@ -6,7 +6,7 @@ Profiling global results:
 003871ms total, 056.9ms average, for parse
 003112ms total, 088.9ms average, for run Implicitly prefixes references to private methods with the 'this' qualified if it is missing.
 002284ms total, 134.4ms average, for run Prints the program by generating a pretty printer from its grammar.
-001665ms total, 075.7ms average, for blender compile
+001665ms total, 075.7ms average, for Miksilo compile
 001467ms total, 086.3ms average, for inject trivia inside node
 000825ms total, 045.8ms average, for inject store trivia
 000435ms total, 217.7ms average, for run Takes the bytecode program and runs it using the JVM.

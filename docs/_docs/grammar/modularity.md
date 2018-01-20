@@ -3,9 +3,9 @@ title: Modularity
 category: BiGrammar
 order: 2
 ---
-The goal of Blender is to enable _modular_ language design. This article shows how BiGrammar supports that.
+The goal of Miksilo is to enable _modular_ language design. This article shows how BiGrammar supports that.
 
-In [the introduction to BiGrammar](http://keyboarddrummer.github.io/Blender/grammar/introduction/), we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is peculiar. More commonly, users of parser combinators first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node. We can demonstrate this approach using BiGrammar; as an example we define the strict boolean or operator `|`:
+In [the introduction to BiGrammar](http://keyboarddrummer.github.io/Miksilo/grammar/introduction/), we introduced the `as` operator which binds a grammar to a field in the AST. This method of mapping a grammar to an AST, where the binding to a field is separate from the binding to a node, is peculiar. More commonly, users of parser combinators first parse tuples of values using the sequence combinator, `~` in our case, and then apply a function to map those tuples to an AST node. We can demonstrate this approach using BiGrammar; as an example we define the strict boolean or operator `|`:
 
 ```scala
 case class Or(left: Expression, right: Expression) extends Expression
@@ -63,5 +63,5 @@ orGrammar.findAs(Lazy).removeFromSequence()
 
 `removeFromSequence` assumes that the grammar is the `first` or `second` field of a sequence operator such as `~`, and replaces that sequence operator with the field (`first` or `second`) that is not the current grammar. Here is an example: `(a ~ b).find(a).removeFromSequence()` results in `b`
 
-This article has demonstrated how BiGrammar supports modularity. Early binding of grammars to fields makes mutations easier to write, and the zipper `GrammarPath` provides utilities for easily editing grammars. Note that early binding to fields requires sidestepping the type system. If you'd like to see the extent of BiGrammar's modularity, check out [this transformation](http://keyboarddrummer.github.io/Blender/grammar/trivia/) which adds comments to a language in a language agnostic way.
+This article has demonstrated how BiGrammar supports modularity. Early binding of grammars to fields makes mutations easier to write, and the zipper `GrammarPath` provides utilities for easily editing grammars. Note that early binding to fields requires sidestepping the type system. If you'd like to see the extent of BiGrammar's modularity, check out [this transformation](http://keyboarddrummer.github.io/Miksilo/grammar/trivia/) which adds comments to a language in a language agnostic way.
 

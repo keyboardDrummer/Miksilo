@@ -4,7 +4,7 @@ category: BiGrammar
 order: 3
 ---
 
-> As an introduction to this article, please read about [BiGrammar's modularity](http://keyboarddrummer.github.io/Blender/grammar/modularity/) and about [deltas](http://keyboarddrummer.github.io/Blender/core/delta/).
+> As an introduction to this article, please read about [BiGrammar's modularity](http://keyboarddrummer.github.io/Miksilo/grammar/modularity/) and about [deltas](http://keyboarddrummer.github.io/Miksilo/core/delta/).
 
 In this article, we’ll demonstrate the extent of BiGrammar’s modularity by showing off a sequence deltas that change the entire grammar of a language.
 
@@ -31,7 +31,7 @@ If we apply reorder members on this program, we get the following exception:
     ^
 ```
 
-We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Blender define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our input program:
+We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Miksilo define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our input program:
 
 ```scala
   override def transformGrammars(language: Language): Unit = {
@@ -69,7 +69,7 @@ class Example {
 }
 ```
 
-The reordering has completed but all of the comments are gone! To retain our comments in the output, we'll add another delta, [StoreTriviaDelta](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/StoreTriviaDelta.scala), that causes the results from `TriviaGrammar` to be stored in the AST. With this delta added to reorder members, we get the following output:
+The reordering has completed but all of the comments are gone! To retain our comments in the output, we'll add another delta, [StoreTriviaDelta](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/trivia/StoreTriviaDelta.scala), that causes the results from `TriviaGrammar` to be stored in the AST. With this delta added to reorder members, we get the following output:
 
 ```scala
 class Example {
@@ -81,7 +81,7 @@ class Example {
 
 Now we're getting somewhere. All the comments are still present in the output, and the `/* bar */` comment inside the second field has moved with the field. However, one last thing still bothers us. The comment `/* second is used for foo */` is in the same position as before, in front of the field `first`, even though it is meant to clarify the meaning of the field `second`.
 
-The reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta, [TriviaInsideNode](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/trivia/TriviaInsideNode.scala), that will improve this behavior, so that trivia located right in front of a node will be stored inside that node, instead of the parent node. The resulting output is then:
+The reason for this is that the comment, because it is located between two fields, is stored not in one of the field nodes, but in the class node. We can add one last delta, [TriviaInsideNode](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/trivia/TriviaInsideNode.scala), that will improve this behavior, so that trivia located right in front of a node will be stored inside that node, instead of the parent node. The resulting output is then:
 
 ```scala
 class Example {

@@ -18,7 +18,7 @@ object Program extends SimpleSwingApplication {
 
   def top: MainFrame = new MainFrame {
     maximize()
-    title = "Blender"
+    title = "Miksilo"
 
     val tabbedPane = new JTabbedPane()
     
