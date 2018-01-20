@@ -16,7 +16,7 @@ Some examples of cool features:
 - Add a new language front-end or back-end.
 
 #### How to contribute
-1. Reach out on [the Gitter](https://gitter.im/LanguageMiksilo/Lobby), so other contributors can help you out where the documentation is lacking.
+1. Reach out on [the Gitter](https://gitter.im/Miksilo/Lobby), so other contributors can help you out where the documentation is lacking.
 1. Look through the open issues to see if you find something interesting
 1. Enjoy the work ;-)
 1. Once you're done, submit a pull request and make sure the build server approves it.
