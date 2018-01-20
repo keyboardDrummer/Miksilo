@@ -15,4 +15,4 @@ Once you've composed a language from a set of Delta's you can play around with i
 
 ![Language playground](http://keyboarddrummer.github.io/Miksilo/images/languagePlayground.png)
 
-To see Miksilo's sandbox in action, [run it yourself](http://keyboarddrummer.github.io/Miksilo/practical/build/) or watch our [introduction video](http://www.youtube.com/watch?feature=player_embedded&v=IHFHcf61g-k).
+To see Miksilo's sandbox in action, [run it yourself](http://keyboarddrummer.github.io/Miksilo/practical/build/).
