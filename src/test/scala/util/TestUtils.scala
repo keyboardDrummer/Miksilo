@@ -111,7 +111,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     assertResult("")(javaCompilerOutput)
 
     val outputFile = File((actualOutputDirectory / className).addExtension("class"))
-    val state = profile("blender compile", compiler.compile(input, outputFile))
+    val state = profile("Miksilo compile", compiler.compile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = profile("Java run expected", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))

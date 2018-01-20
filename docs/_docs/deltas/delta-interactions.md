@@ -8,13 +8,13 @@ In this article we'll look at interactions between independent deltas. We show a
 
 We'll start by looking at the interaction between the following deltas:
 
-- [WhileLoop](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/WhileLoopDelta.scala), which adds a while loop to the language.
-- [WhileBreak](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/WhileBreakDelta.scala), which adds a break statement for while loops.
-- [ForLoop](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/ForLoopDelta.scala), which adds a C-style for loop to the language. It depends on the WhileLoop delta because it compiles by transforming the for loop to an equivalent while loop.
+- [WhileLoop](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/statements/WhileLoopDelta.scala), which adds a while loop to the language.
+- [WhileBreak](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/statements/WhileBreakDelta.scala), which adds a break statement for while loops.
+- [ForLoop](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/statements/ForLoopDelta.scala), which adds a C-style for loop to the language. It depends on the WhileLoop delta because it compiles by transforming the for loop to an equivalent while loop.
 
 If we compose these deltas in the order `[ForLoop, WhileBreak, WhileLoop]`, then we get a language where the break statements works both in the for loop and in the while loop, even though the break was only designed to work with a while loop. Basically we get a feature for free!
 
-Now let's look at the delta [WhileContinue](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/WhileContinueDelta.scala), which introduces the continue statement for while loops.
+Now let's look at the delta [WhileContinue](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/statements/WhileContinueDelta.scala), which introduces the continue statement for while loops.
 
 If we compose this in the order `[ForLoop, WhileContinue, WhileLoop]`, will we then get a free language feature like with `WhileBreak`? At first it seems like it, because the compiler will accept a continue statement inside a for loop. However, let's see what happens if we run the following program:
 
@@ -42,9 +42,9 @@ while(i < 3)
 
 We see that the continue statement has been translated to `goto <whileStart>`, which jumps to `label <whileStart>`. However, this skips over the increment statement `i++`, so our while loop never progresses and our program won't terminate.
 
-To solve this problem, one thing we could do is change the delta ForLoop, so that we put `i++` at the start of the while. Note that this requires other changes as well, which reduce the quality of the ForLoop compilation. Our ideology is that every delta should be self-centered, meaning it should be the best it can be, instead of accommodating for possible future deltas. We decide not to change ForLoop. Luckily with Blender, every problem can be solved with another delta.
+To solve this problem, one thing we could do is change the delta ForLoop, so that we put `i++` at the start of the while. Note that this requires other changes as well, which reduce the quality of the ForLoop compilation. Our ideology is that every delta should be self-centered, meaning it should be the best it can be, instead of accommodating for possible future deltas. We decide not to change ForLoop. Luckily with Miksilo, every problem can be solved with another delta.
 
-The delta [ForLoopContinue](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/javac/statements/ForLoopContinueDelta.scala) depends on both ForLoop and WhileContinue. It solves the above problem by transforming our initial program containing the for loop, so that it becomes:
+The delta [ForLoopContinue](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/javac/statements/ForLoopContinueDelta.scala) depends on both ForLoop and WhileContinue. It solves the above problem by transforming our initial program containing the for loop, so that it becomes:
 
 ```java
 for(int i = 0; i < 3; i++) {

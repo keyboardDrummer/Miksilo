@@ -4,7 +4,7 @@ category: BiGrammar
 order: 1
 ---
 
-BiGrammar is Blender's metalanguage for everything syntax related. Its main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In this article we'll go through code examples showcasing the most important operators. Afterwards you will comfortably read BiGrammar code.
+BiGrammar is Miksilo's metalanguage for everything syntax related. Its main strength is that it defines both a parser and a printer at the same time. Operators in BiGrammar will often have an equivalent effect on both the parser and the printer, although some are asymmetrical. In this article we'll go through code examples showcasing the most important operators. Afterwards you will comfortably read BiGrammar code.
 
 #### Parsing & printing
 Here is a grammar for a common while loop:
@@ -86,4 +86,4 @@ new RegexGrammar("""-?\d+""".r).map[String, Int](
 - `map` transforms the subject grammar's value using a bidirectional mapping. The argument `afterParsing` is called after parsing. In this case it parses the string of digits into an `Int`. The argument `beforePrinting` is called before printing. In this case it converts the `Int` back into its string representation.
 
 #### Next
-Now that you're comfortable reading BiGrammar, continue to see [how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Blender/grammar/modularity/).
+Now that you're comfortable reading BiGrammar, continue to see [how BiGrammar supports modular language design](http://keyboarddrummer.github.io/Miksilo/grammar/modularity/).

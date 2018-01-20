@@ -1,8 +1,8 @@
 # ----
 # Site
 
-title: Blender
-url: "https://keyboarddrummer.github.io/Blender/"
+title: Miksilo
+url: "https://keyboarddrummer.github.io/Miksilo/"
 baseurl:
 google_analytics_key:
 show_full_navigation: true
@@ -15,10 +15,10 @@ author:
   email: rgv.willems@gmailcom
   twitter: # twitter username without the @ symbol
 social:
-  name: Blender
+  name: Miksilo
   links:
-    - https://github.com/keyboardDrummer/Blender/
-    - https://gitter.im/LanguageBlender
+    - https://github.com/keyboardDrummer/Miksilo/
+    - https://gitter.im/LanguageMiksilo
 
 # -----
 # Build

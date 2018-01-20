@@ -4,9 +4,9 @@ category: Deltas
 order: 2
 ---
 
-Sometimes a programmer targeting the [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine) may want to write [class files](https://en.wikipedia.org/wiki/Java_class_file) directly, instead of writing in some JVM language and compiling that. A simple reason for this could be to get better performance. Predefined deltas in Blender allow you to write Java bytecode using a grammar inspired by _javap_, and convert that to a Java classfile. An existing project that does this is [Jasmin](https://en.wikipedia.org/wiki/Jasmin_(software)).
+Sometimes a programmer targeting the [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine) may want to write [class files](https://en.wikipedia.org/wiki/Java_class_file) directly, instead of writing in some JVM language and compiling that. A simple reason for this could be to get better performance. Predefined deltas in Miksilo allow you to write Java bytecode using a grammar inspired by _javap_, and convert that to a Java classfile. An existing project that does this is [Jasmin](https://en.wikipedia.org/wiki/Jasmin_(software)).
 
-The constant pool in a class file is useful because it reduces code duplication. However, for a programmer it is awkward because the elements in the pool are referenced by index, which are hard to remember when trying to refer to a constant pool element. To make writing Java bytecode more programmer-friendly, it's better to inline elements from the constant pool, which is what the delta [Inline constant pool](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) does.
+The constant pool in a class file is useful because it reduces code duplication. However, for a programmer it is awkward because the elements in the pool are referenced by index, which are hard to remember when trying to refer to a constant pool element. To make writing Java bytecode more programmer-friendly, it's better to inline elements from the constant pool, which is what the delta [Inline constant pool](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) does.
 
 It allows the programmer to write:
 
@@ -56,7 +56,7 @@ Constant pool:
 
 Note that the bytecode here is simply what is generated when compiling an empty Java class. The method is the default constructor that calls the constructor of `Object`, the type from which an empty class implicitly extends.
 
-References to the constant pool occur throughout the entire class file, so inlining them is quite a big change. Let's go through [the source](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) to understand the work involved. We can split the work into the following tasks:
+References to the constant pool occur throughout the entire class file, so inlining them is quite a big change. Let's go through [the source](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/bytecode/simpleBytecode/InlineConstantPool.scala) to understand the work involved. We can split the work into the following tasks:
 
 1. Add a compilation phase that moves all the constant pool entries in the program to a newly created constant pool, and updates the original locations with references.
 1. Change the grammar, so that:

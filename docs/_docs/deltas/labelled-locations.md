@@ -4,7 +4,7 @@ category: Deltas
 order: 3
 ---
 
-In the article [Inline constant pool](http://keyboarddrummer.github.io/Blender/deltas/inline-constant-pool), we showed a delta to make programming Java bytecode easier. In this article, we'll take another step towards that end. In bytecode, there are no structured programming statements, instead there are jump instructions. These instructions take an integer as a argument, that specifies an offset in number of bytes, from the jump instruction to another instruction further along the list of instructions. Here is an example of a Code attribute that contains a list of instructions and a StackMapTable:
+In the article [Inline constant pool](http://keyboarddrummer.github.io/Miksilo/deltas/inline-constant-pool), we showed a delta to make programming Java bytecode easier. In this article, we'll take another step towards that end. In bytecode, there are no structured programming statements, instead there are jump instructions. These instructions take an integer as a argument, that specifies an offset in number of bytes, from the jump instruction to another instruction further along the list of instructions. Here is an example of a Code attribute that contains a list of instructions and a StackMapTable:
 
 ```
 Code:
@@ -34,7 +34,7 @@ The instruction `if_icmpge 7`, takes two values from the top of the stack, compa
 
  Note also that below the instruction the StackMapTable is specified. It must contain an entry for each instruction that is jumped to, in order to tell the JVM what the stack and local variables look like at that point. Each entry has an offset property that specifies to which instruction the entry applies. The first entry has offset 9, counted from the start of the program, which points to the `iload 0` instruction that `if_icmge 7` jumps to. The second entry has offset 12, counted from the previous offset 9, which points to the `ireturn` instruction at the end, which is jumped to be the `goto 16` instruction.
 
- Understanding the above code by calculating to what instruction each jump goes, and for what instruction each stack map table entry is, is cumbersome. Let's remove all the byte offsets with the delta [LabelledLocations](https://github.com/keyboardDrummer/Blender/blob/master/src/main/scala/deltas/bytecode/additions/LabelledLocations.scala). Our example from earlier now becomes:
+ Understanding the above code by calculating to what instruction each jump goes, and for what instruction each stack map table entry is, is cumbersome. Let's remove all the byte offsets with the delta [LabelledLocations](https://github.com/keyboardDrummer/Miksilo/blob/master/src/main/scala/deltas/bytecode/additions/LabelledLocations.scala). Our example from earlier now becomes:
 
 ```
 Code:

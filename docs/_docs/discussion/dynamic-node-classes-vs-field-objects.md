@@ -2,7 +2,7 @@ Currently we use Scala's `object` to define keys for fields and for shapes. How 
 
 Using just literal strings as keys for fields as shapes does not seem ideal, since strings are guaranteed to be unique.
 
-Is there a use to using Scala's dynamic type for Blender?
+Is there a use to using Scala's dynamic type for Miksilo?
 
 # Field objects
 - Have intellisense
