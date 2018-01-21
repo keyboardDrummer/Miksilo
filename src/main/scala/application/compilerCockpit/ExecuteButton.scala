@@ -3,7 +3,7 @@ package application.compilerCockpit
 import java.awt.event.ActionEvent
 import javax.swing.JButton
 
-class ExecuteButton(compilerCockpit: CompilerCockpit) extends JButton("Execute") {
+class ExecuteButton(compilerCockpit: LanguageSandbox) extends JButton("Execute") {
 
   addActionListener((e: ActionEvent) => {
     compilerCockpit.execute(() => executeClicked())

@@ -5,7 +5,7 @@ import javax.swing.JButton
 
 import core.bigrammar.PrintBiGrammar
 
-class ShowInputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show input grammar") {
+class ShowInputGrammarButton(compilerCockpit: LanguageSandbox) extends JButton("Show input grammar") {
   addActionListener((e: ActionEvent) => {
     val language = compilerCockpit.language
     val grammarString = PrintBiGrammar.toTopLevelDocument(language.grammars.root).renderString()

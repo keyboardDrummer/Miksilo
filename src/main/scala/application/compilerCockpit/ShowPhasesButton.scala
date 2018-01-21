@@ -5,7 +5,7 @@ import javax.swing.JButton
 
 import core.deltas.Phase
 
-class ShowPhasesButton(compilerCockpit: CompilerCockpit) extends JButton("Show phases") {
+class ShowPhasesButton(compilerCockpit: LanguageSandbox) extends JButton("Show phases") {
   addActionListener((e: ActionEvent) => {
     val text: String = compilerCockpit.language.compilerPhases.zipWithIndex.
       map(indexedPhase => getIndexedPhaseDescription(indexedPhase)).

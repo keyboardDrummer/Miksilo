@@ -2,7 +2,6 @@ package application.compilerCockpit
 
 import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
-import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener}
@@ -10,20 +9,18 @@ import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammar
-import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
+import core.deltas.Language
 import core.deltas.exceptions.CompileException
-import core.deltas.node.Node
-import core.deltas.{Delta, Language, ParseException}
+import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
+import deltas.bytecode.ByteCodeSkeleton
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
-import deltas.bytecode.ByteCodeSkeleton
-import org.fife.ui.rsyntaxtextarea.parser._
 
 import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
-import scala.util.{Failure, Try}
+import scala.util.Try
 
-class CompilerCockpit(val name: String, val language: Language,
+class LanguageSandbox(val name: String, val language: Language,
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
 

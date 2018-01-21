@@ -7,5 +7,5 @@ import core.bigrammar.BiGrammar
 case class TextWithGrammar(text: String, grammar: BiGrammar = null)
 
 trait CompileOption {
-  def perform(cockpit: CompilerCockpit, input: InputStream): TextWithGrammar
+  def perform(cockpit: LanguageSandbox, input: InputStream): TextWithGrammar
 }

@@ -6,7 +6,7 @@ import javax.swing.JButton
 import core.bigrammar.PrintBiGrammar
 import core.deltas.Language
 
-class ShowOutputGrammarButton(compilerCockpit: CompilerCockpit) extends JButton("Show output grammar") {
+class ShowOutputGrammarButton(compilerCockpit: LanguageSandbox) extends JButton("Show output grammar") {
   addActionListener((e: ActionEvent) => {
     val deltas = compilerCockpit.language.deltas.dropWhile(p => p != MarkOutputGrammar)
     val language = new Language(deltas)

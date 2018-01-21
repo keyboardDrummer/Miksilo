@@ -7,7 +7,7 @@ import util.SourceUtils
 
 import scala.reflect.io.Path
 
-class ExampleDropdown(val compilerCockpit: CompilerCockpit) extends JPanel {
+class ExampleDropdown(val compilerCockpit: LanguageSandbox) extends JPanel {
 
   initialise()
 
