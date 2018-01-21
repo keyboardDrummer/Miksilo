@@ -2,54 +2,54 @@ package application.compilerCockpit
 
 import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
+import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
-import core.bigrammar.{BiGrammar}
+import core.bigrammar.BiGrammar
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import core.deltas.exceptions.CompileException
-import core.deltas.{Delta, Language}
+import core.deltas.node.Node
+import core.deltas.{Delta, Language, ParseException}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 import deltas.bytecode.ByteCodeSkeleton
+import org.fife.ui.rsyntaxtextarea.parser._
 
 import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
-import scala.util.Try
+import scala.util.{Failure, Try}
 
-class CompilerCockpit(val name: String, val deltas: Seq[Delta],
+class CompilerCockpit(val name: String, val language: Language,
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
 
   this.title = name
-  val language = new Language(deltas)
-  val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
 
-  private val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
-  inputDocument.setTokenMakerFactory(factory)
+  private val inputPanel = new EditorFromLanguage(language)
+  initializeTextArea(inputPanel.inputTextArea)
 
   private val outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   val textAreaInput: ParseFromFunction = new ParseFromFunction(() => {
-    val stringText = inputDocument.getText(0, inputDocument.getLength)
+    val stringText = inputPanel.inputDocument.getText(0, inputPanel.inputDocument.getLength)
     new ByteArrayInputStream(stringText.getBytes(StandardCharsets.UTF_8))
   })
 
   val textAreaOutput: TextAreaOutput =
     new TextAreaOutput(textWithGrammar => setOutputText(textWithGrammar.text, textWithGrammar.grammar))
-  val compileOptions = getCompileOptions.toArray
+  private val compileOptions = getCompileOptions.toArray
 
   def getCompileOptions: Seq[CompileOption] = {
     val selection = Set(MarkOutputGrammar, ByteCodeSkeleton)
-    val orderedSelection = deltas.filter(o => selection.contains(o))
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
     Seq(PrettyPrintOption) ++ byteCodeActions
   }
 
-  val outputOptions = Array[OutputOption](textAreaOutput)
-  val inputOptions = Array[InputOption](textAreaInput)
+  private val outputOptions = Array[OutputOption](textAreaOutput)
+  private val inputOptions = Array[InputOption](textAreaInput)
 
   var inputOptionModel = new DefaultComboBoxModel[InputOption](inputOptions)
   inputOptionModel.setSelectedItem(textAreaInput)
@@ -85,7 +85,7 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
   }
 
   def setInputText(text: String) {
-    inputDocument.replace(0, inputDocument.getLength, text, null)
+    inputPanel.inputDocument.replace(0, inputPanel.inputDocument.getLength, text, null)
   }
 
   def execute(action: () => Unit) = {
@@ -134,7 +134,7 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
     val chooseOutput = equationLayout.addComponent(getChooseOutput)
     val choosePanels = equationLayout.addComponent(getChoosePanels)
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
-    val inputPanel = equationLayout.addComponent(getInputPanel)
+    val inputPanelComponent = equationLayout.addComponent(inputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
     val showPhasesButton = equationLayout.addComponent(new ShowPhasesButton(this))
     val inputGrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
@@ -154,15 +154,15 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
     equationLayout.makePreferredSize(executeButton)
 
     def addHorizontalEquations() {
-      innerLayout.addLeftToRight(innerLayout.container, inputPanel, outputPanel, innerLayout.container)
+      innerLayout.addLeftToRight(innerLayout.container, inputPanelComponent, outputPanel, innerLayout.container)
       innerLayout.addLeftToRight(exampleDropdown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
       innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, choosePanels)
     }
     addHorizontalEquations()
 
-    val inputOutputModeEquations: Map[PanelMode, Expression] = Map(Both -> inputPanel.width.-(outputPanel.width),
+    val inputOutputModeEquations: Map[PanelMode, Expression] = Map(Both -> inputPanelComponent.width.-(outputPanel.width),
       Input -> outputPanel.width,
-      Output -> inputPanel.width)
+      Output -> inputPanelComponent.width)
 
     panelsOptionModel.addListDataListener(new ListDataListener {
 
@@ -192,21 +192,13 @@ class CompilerCockpit(val name: String, val deltas: Seq[Delta],
         exampleDropdown.verticalCenter2,
         executeButton.verticalCenter2)
 
-      innerLayout.addRow(inputPanel, outputPanel)
-      innerLayout.addTopToBottom(innerLayout.container, chooseCompile, inputPanel, innerLayout.container)
+      innerLayout.addRow(inputPanelComponent, outputPanel)
+      innerLayout.addTopToBottom(innerLayout.container, chooseCompile, inputPanelComponent, innerLayout.container)
     }
     addVerticalEquations()
     panel.setLayout(equationLayout)
   }
 
-  def getInputPanel: JPanel = {
-    val cardLayout = new CardLayout()
-    val panel = new JPanel(cardLayout)
-    val inputTextArea = new RSyntaxTextArea(inputDocument)
-    initializeTextArea(inputTextArea)
-    panel.add(new RTextScrollPane(inputTextArea))
-    panel
-  }
 
   def getOutputPanel: JPanel = {
     val cardLayout = new CardLayout()

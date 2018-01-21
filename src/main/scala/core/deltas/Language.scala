@@ -9,12 +9,15 @@ import core.deltas.node.Node
 
 import scala.collection.mutable
 import scala.reflect.io.File
+import scala.util.Try
 
 case class Phase(key: Delta, action: Compilation => Unit)
 
 case class ParseException(message: String) extends BadInputException {
   override def toString: String = message
 }
+
+object NoSourceException extends BadInputException
 
 object Language {
 
@@ -43,7 +46,7 @@ class Language(val deltas: Seq[Delta]) {
   val grammars = new LanguageGrammars
 
   var compilerPhases: List[Phase] = List.empty
-  var buildParser: () => (InputStream => Node) = () => null
+  var buildParser: () => (InputStream => Try[Node]) = () => null
 
   for(particle <- deltas.reverse)
   {
@@ -52,7 +55,7 @@ class Language(val deltas: Seq[Delta]) {
 
   val parser = buildParser()
 
-  def parse(input: InputStream): Node = parser(input)
+  def parse(input: InputStream): Try[Node] = parser(input)
 
   def parseAndTransform(input: File): Compilation = {
     parseAndTransform(input.inputStream())
@@ -76,7 +79,7 @@ class Language(val deltas: Seq[Delta]) {
 
   def parseAndTransform(input: InputStream): Compilation = {
     val compilation = new Compilation(this)
-    compilation.program = parse(input)
+    compilation.program = parse(input).get
     compilation.runPhases()
     compilation
   }

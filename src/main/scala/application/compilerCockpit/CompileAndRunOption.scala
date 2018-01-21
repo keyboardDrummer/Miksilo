@@ -30,7 +30,7 @@ object RunWithJVM extends DeltaWithPhase
 object CompileAndRunOption extends CompileOption {
 
   override def perform(cockpit: CompilerCockpit, inputStream: InputStream): TextWithGrammar = {
-    val compiler = new Language(cockpit.deltas ++ Seq(RunWithJVM))
+    val compiler = new Language(cockpit.language.deltas ++ Seq(RunWithJVM))
     val state = compiler.parseAndTransform(inputStream)
 
     TextWithGrammar(state.output)

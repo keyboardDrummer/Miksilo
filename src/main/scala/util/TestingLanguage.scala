@@ -64,7 +64,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   private def justParse(input: InputStream, state: Compilation): Unit = {
-    statistics.profile("parse", state.program = language.parse(input))
+    statistics.profile("parse", state.program = language.parse(input).get)
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))

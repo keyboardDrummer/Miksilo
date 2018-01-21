@@ -106,5 +106,26 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
     }
   }
 
+  /**
+    * Improves the error message slightly over the original
+    */
+  override implicit def literal(s: String): Parser[String] = (in: Input) => {
+    val source = in.source
+    val offset = in.offset
+    val start = offset
+    var i = 0
+    var j = start
+    while (i < s.length && j < source.length && s.charAt(i) == source.charAt(j)) {
+      i += 1
+      j += 1
+    }
+    if (i == s.length)
+      Success(source.subSequence(start, j).toString, in.drop(j - offset))
+    else {
+      val found = if (start == source.length()) "end of source" else "`" + source.subSequence(start, start + i + 1) + "'"
+      Failure("`" + s + "' expected but " + found + " found", in.drop(i + start - offset))
+    }
+  }
+
   override val whiteSpace: Regex = "".r
 }
