@@ -6,6 +6,8 @@ import core.deltas.{Contract, Delta, Language, ParseException}
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 
+import scala.util.{Failure, Success}
+
 object DecodeByteCodeParser extends Delta {
 
   override def description: String = "Decodes a binary bytecode classfile."
@@ -20,9 +22,9 @@ object DecodeByteCodeParser extends Delta {
         val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
         val parseResult = parser(new ArrayReader(0, inputBytes))
         if (!parseResult.successful)
-          throw ParseException(parseResult.toString)
-
-        parseResult.get
+          Failure(ParseException(parseResult.toString))
+        else
+          Success(parseResult.get)
       }
     }
   }

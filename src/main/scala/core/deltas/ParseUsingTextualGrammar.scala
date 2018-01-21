@@ -5,6 +5,7 @@ import java.io.InputStream
 import core.bigrammar.BiGrammarToParser
 import core.deltas.node.Node
 
+import scala.util.{Failure, Success, Try}
 import scala.util.parsing.input.CharArrayReader
 
 object ParseUsingTextualGrammar extends Delta {
@@ -14,16 +15,16 @@ object ParseUsingTextualGrammar extends Delta {
 
       val parser: BiGrammarToParser.PackratParser[Any] = BiGrammarToParser.toParser(language.grammars.root)
 
-      def parse(input: InputStream): Node = {
+      def parse(input: InputStream): Try[Node] = {
         val reader = new CharArrayReader(scala.io.Source.fromInputStream(input).mkString.toCharArray)
+        if (reader.source.length() == 0)
+          return Failure(NoSourceException)
+
         val parseResult: BiGrammarToParser.ParseResult[Any] = parser(reader)
         if (!parseResult.successful)
-          throw ParseException(parseResult.toString)
-
-        if(!parseResult.next.atEnd)
-          throw ParseException("Did not parse until end.")
-
-        parseResult.get.asInstanceOf[Node]
+          Failure(ParseException(parseResult.toString))
+        else
+          Success(parseResult.get.asInstanceOf[Node])
       }
 
       parse

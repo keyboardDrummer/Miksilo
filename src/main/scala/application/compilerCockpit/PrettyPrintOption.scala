@@ -6,7 +6,7 @@ import core.deltas.Language
 
 object PrettyPrintOption extends CompileOption {
 
-  override def perform(cockpit: CompilerCockpit, input: InputStream): TextWithGrammar = {
+  override def perform(cockpit: LanguageSandbox, input: InputStream): TextWithGrammar = {
     val prettyPrint = PrettyPrint(recover = true)
     val splicedParticles = Language.replace(cockpit.language.deltas, MarkOutputGrammar,Seq(prettyPrint))
     val language = new Language(splicedParticles)

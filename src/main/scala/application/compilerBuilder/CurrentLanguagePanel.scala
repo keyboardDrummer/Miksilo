@@ -6,8 +6,8 @@ import javax.swing._
 import javax.swing.text.PlainDocument
 
 import application.StyleSheet
-import application.compilerCockpit.CompilerCockpit
-import core.deltas.Delta
+import application.compilerCockpit.LanguageSandbox
+import core.deltas.{Delta, Language}
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 
@@ -59,7 +59,7 @@ class CurrentLanguagePanel(panel: LanguageWorkbench) extends JPanel(new GridBagL
 
   private def launchCockpit(): Unit = {
     val name = compilerName.getText(0, compilerName.getLength)
-    val cockpit = new CompilerCockpit(name, selectedParticles.scalaElements)
+    val cockpit = new LanguageSandbox(name, new Language(selectedParticles.scalaElements))
     cockpit.pack()
     cockpit.maximize()
     cockpit.visible = true
