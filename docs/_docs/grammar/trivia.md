@@ -31,11 +31,11 @@ If we apply reorder members on this program, we get the following exception:
     ^
 ```
 
-We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Miksilo define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our input program:
+We can enable the parsing of comment using a very simple delta, but to understand how that works first we need to see how whitespace parsing is defined in our example Java language. By default, languages in Miksilo define a grammar called `TriviaGrammar` that parses whitespace. Given a `Language`, we can use `import core.nabl.language.grammars._` to get a set of language specific parser combinators. These combinators, such as `~`, will use the language's `TriviaGrammar` as a separator when placing other grammars in sequence. Here is an example that defines part of the Java grammar used for our input program:
 
 ```scala
   override def transformGrammars(language: Language): Unit = {
-    import language.grammars._
+    import core.nabl.language.grammars._
 
     //Create an empty named grammar, that we can modify in another delta.
     val classMember = create(ClassMemberGrammar) 
