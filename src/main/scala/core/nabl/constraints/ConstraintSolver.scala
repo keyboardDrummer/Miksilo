@@ -8,6 +8,15 @@ import core.nabl.constraints.types.{CheckSubType, TypeGraph, TypeNode}
 
 import scala.collection.mutable
 
+/*
+Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
+The output consists of
+- a graph of scopes
+- a graph of types
+- a mapping of declarations to types.
+
+If constraints generate new ones, how do we guarantee termination?
+*/
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint],
                        val maxCycles: Int = 100)
 {
@@ -22,25 +31,34 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
   def run() : Boolean = {
     var progress = true
-    var cycles = 9
-    while(progress && constraints.nonEmpty && cycles < maxCycles)
+    var cycleCount = 0
+    while(progress && constraints.nonEmpty && cycleCount < maxCycles)
     {
       progress = cycle()
-      cycles += 1
+      cycleCount += 1
     }
     constraints.isEmpty
   }
 
+  /*
+  Loop over all the constraints once.
+   */
   def cycle() : Boolean = {
-    val remainingConstraints = constraints.filter(c =>
-      !c.apply(this)
-    )
-    val result = constraints.size > remainingConstraints.size || generatedConstraints.nonEmpty
+    var progress = false
+    val remainingConstraints = constraints.filter(constraint => {
+      val result = !constraint.apply(this)
+      progress |= result
+      result
+    })
+    progress |= generatedConstraints.nonEmpty
     constraints = remainingConstraints ++ generatedConstraints
     generatedConstraints = Seq.empty
-    result
+    progress
   }
 
+  /*
+  Create a declaration, if this declaration already exists, unify the existing and new type.
+   */
   def declare(declaration: NamedDeclaration, _type: Type): Boolean = {
     var result = true
     val currentValue: Option[Type] = environment.get(declaration)
@@ -57,32 +75,38 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
   def allConstraints: Seq[Constraint] = constraints ++ generatedConstraints
 
-  def instantiateType(v: TypeVariable, t: Type): Boolean = {
-    if (t.variables.contains(v))
+  /*
+  Replace a type variable with another type.
+   */
+  def instantiateType(variable: TypeVariable, _type: Type): Boolean = {
+    if (_type.variables.contains(variable))
       return false
 
-    mappedTypeVariables += v -> t
-    allConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
-    environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
+    mappedTypeVariables += variable -> _type
+    allConstraints.foreach(c => c.instantiateType(variable, _type)) //TODO startingConstraints mag ook gewoon constraints zijn.
+    environment = environment.mapValues(existingType => existingType.instantiateType(variable, _type))
     true
   }
 
-  def instantiateScope(v: ScopeVariable, s: Scope): Unit = {
-    allConstraints.foreach(c => c.instantiateScope(v, s))
+  def instantiateScope(variable: ScopeVariable, scope: Scope): Unit = {
+    allConstraints.foreach(c => c.instantiateScope(variable, scope))
   }
 
   def unifyScopes(left: Scope, right: Scope): Boolean = (left, right) match {
-    case (v: ScopeVariable, _) =>
-      instantiateScope(v, right); true
-    case (_, v: ScopeVariable) =>
-      instantiateScope(v, left); true
+    case (variable: ScopeVariable, _) =>
+      instantiateScope(variable, right); true
+    case (_, variable: ScopeVariable) =>
+      instantiateScope(variable, left); true
     case (ConcreteScope(x), ConcreteScope(y)) => if (x == y) true else false
     case _ => false
   }
 
-  def canAssignTo(target: Type, value: Type): Boolean = (resolveType(target), resolveType(value)) match {
-    case (v: TypeVariable,_) => false
-    case (_,v: TypeVariable) => false
+  /*
+  Checks whether the type superType is a super set of the type subType.
+   */
+  def isSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
+    case (_: TypeVariable,_) => false
+    case (_,_: TypeVariable) => false
     case (closure: ConstraintClosureType, app: TypeApplication) => canAssignClosure(closure, app)
     case (app: TypeApplication, closure: ConstraintClosureType) => canAssignClosure(closure, app)
     case (l, r) =>
