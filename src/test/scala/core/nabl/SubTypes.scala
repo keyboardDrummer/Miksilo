@@ -140,7 +140,7 @@ class SubTypes extends FunSuite with LanguageWriter {
     Checker.check(program)
   }
 
-  test("lambdaTakingParentAndChildStructLambda") {
+  test("lambdaTakingParentOrChildStruct") {
     val structParent = Struct("parent", Seq(Field("x", IntType)))
     val structChild = Struct("child", Seq(Field("y", IntType)), Some("parent"))
     val newParent = Binding("newParent", New("parent", Seq(StructFieldInit("x", Const(3)))), Some(new StructType("parent")))
@@ -164,10 +164,41 @@ class SubTypes extends FunSuite with LanguageWriter {
     val takesSuperStruct = Lambda("struct", Variable("struct").access("x"))
     val structUse = Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
       Add(Variable("takesSuperStruct") $ "newChild",
-          Variable("takesSuperStruct") $ "newParent")), Some(IntType))
+        Variable("takesSuperStruct") $ "newParent")), Some(IntType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program)
+  }
+
+  test("succeed function subtyping") {
+    val structParent = Struct("parent", Seq("x" of IntType))
+    val structChild = Struct("child", Seq("y" of IntType), Some("parent"))
+    val newChild = New("child", Seq("x" is 3, "y" is 2))
+    val takesChild = Lambda("child", Variable("child"), Some(new StructType("child")))
+    val takesParent = Lambda("parent", Variable("parent"), Some(new StructType("parent")))
+    val takesFunction = Lambda("x", Variable("x").apply(newChild).access("x"), Some(FunctionLanguageType(new StructType("child"), new StructType("parent"))))
+    val structUse = Binding("structUse", Let("takesFunction", takesFunction,
+      Add(Variable("takesFunction") $ takesChild,
+        Variable("takesFunction") $ takesParent)), Some(IntType))
+    val module = Module("module", Seq(structUse), Seq(structParent, structChild))
+    val program: Program = Program(Seq(module))
+    Checker.check(program)
+  }
+
+
+  test("fail function subtyping") {
+    val structParent = Struct("parent", Seq("x" of IntType))
+    val structChild = Struct("child", Seq("y" of IntType))
+    val newChild = New("child", Seq("x" is 3, "y" is 2))
+    val takesChild = Lambda("child", Variable("child"), Some(new StructType("child")))
+    val takesParent = Lambda("parent", Variable("parent"), Some(new StructType("parent")))
+    val takesFunction = Lambda("x", Variable("x").apply(newChild).access("x"), Some(FunctionLanguageType(new StructType("child"), new StructType("parent"))))
+    val structUse = Binding("structUse", Let("takesFunction", takesFunction,
+      Add(Variable("takesFunction") $ takesChild,
+        Variable("takesFunction") $ takesParent)), Some(IntType))
+    val module = Module("module", Seq(structUse), Seq(structParent, structChild))
+    val program: Program = Program(Seq(module))
+    Checker.fail(program)
   }
 
   test("polymorphic function with subtype constraint complex") {

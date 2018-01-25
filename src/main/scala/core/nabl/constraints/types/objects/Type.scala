@@ -1,9 +1,8 @@
 package core.nabl.constraints.types.objects
 
 import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.objects._
+import core.nabl.constraints.objects.{DeclarationVariable, _}
 import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.objects.DeclarationVariable
 
 trait Type {
   def specialize(mapping: Map[TypeVariable, TypeVariable]): Type
@@ -42,6 +41,13 @@ case class ConstraintClosureType(parentScope: Scope, name: String, id: AnyRef, b
   override def instantiateType(variable: TypeVariable, instance: Type): Type = this
 
   override def fullyApplied: Boolean = true
+
+  def instantiate(builder: ConstraintBuilder, input: Type): Type = {
+    val bodyScope = builder.newScope(Some(parentScope))
+    builder.declaration(name, id, bodyScope, Some(input))
+    val actualOutput = body.getType(builder, bodyScope)
+    actualOutput
+  }
 }
 
 trait ConstraintExpression

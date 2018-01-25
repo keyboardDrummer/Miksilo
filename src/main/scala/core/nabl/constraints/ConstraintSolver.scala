@@ -4,7 +4,7 @@ import core.nabl.constraints.objects.{Declaration, DeclarationVariable, NamedDec
 import core.nabl.constraints.scopes._
 import core.nabl.constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
 import core.nabl.constraints.types.objects._
-import core.nabl.constraints.types.{CheckSubType, TypeGraph, TypeNode}
+import core.nabl.constraints.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 
 import scala.collection.mutable
 
@@ -107,8 +107,16 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def isSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
-    case (closure: ConstraintClosureType, app: TypeApplication) => canAssignClosure(closure, app)
-    case (app: TypeApplication, closure: ConstraintClosureType) => canAssignClosure(closure, app)
+    case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(output, closureOutput))
+      generatedConstraints ++= builder.getConstraints
+      true
+    case (FunctionType(input, output, _), closure: ConstraintClosureType) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(closureOutput, output))
+      generatedConstraints ++= builder.getConstraints
+      true
     case (l, r) =>
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
@@ -141,27 +149,16 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       false
   }
 
-  def canAssignClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input, output), _) =>
-      val bodyScope = builder.newScope(Some(closure.parentScope))
-      builder.declaration(closure.name, closure.id, bodyScope, Some(input))
-      val actualOutput = closure.body.getType(builder, bodyScope)
-      builder.add(CheckSubType(actualOutput, output))
-      generatedConstraints ++= builder.getConstraints
-      true
-    case _ => false
-  }
-
   val unifiedClosures: mutable.Set[(ConstraintClosureType, AnyRef)] = mutable.Set.empty
-  def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input, output), origin) =>
+  def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean =
+    typeApplication match {
+    case FunctionType(input, output, origin) =>
       if (!unifiedClosures.add((closure, origin)))
       {
         return true
       }
-      val bodyScope = builder.newScope(Some(closure.parentScope))
-      builder.declaration(closure.name, closure.id, bodyScope, Some(input))
-      closure.body.constraints(builder, output, bodyScope)
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(TypesAreEqual(closureOutput, output))
       generatedConstraints ++= builder.getConstraints
       true
     case _ => false

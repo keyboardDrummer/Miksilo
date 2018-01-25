@@ -25,7 +25,6 @@ class ConstraintBuilder(factory: Factory) {
 
   var constraints: List[Constraint] = List.empty
 
-  def getFunctionType(argument: Type, result: Type, origin: AnyRef) = TypeApplication(PrimitiveType("Func"), Seq(argument, result), origin)
   def newScope(parent: Option[Scope]) : ConcreteScope = {
     val result = factory.newScope
     parent.foreach(p => constraints ::= ParentScope(result, p))

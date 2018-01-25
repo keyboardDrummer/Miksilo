@@ -12,6 +12,22 @@ case class PrimitiveType(name: String) extends ConcreteType {
   override def toString: String = name
 }
 
+object FuncPrimitive extends PrimitiveType("Func")
+
+/*
+ */
+object FunctionType {
+
+
+  def apply(argument: Type, result: Type, origin: AnyRef): Type =
+    TypeApplication(PrimitiveType("Func"), Seq(argument, result), origin)
+
+  def unapply(_type: Type): Option[(Type, Type, AnyRef)] = _type match {
+    case TypeApplication(FuncPrimitive, Seq(input, output), origin) => Some(input, output, origin)
+    case _ => None
+  }
+}
+
 case class TypeApplication(override val function: Type, var arguments: Seq[Type], origin: AnyRef) extends ConcreteType {
   override def variables: Set[TypeVariable] = arguments.flatMap(t => t.variables).toSet
 
