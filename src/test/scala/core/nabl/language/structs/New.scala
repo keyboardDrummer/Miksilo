@@ -1,10 +1,10 @@
 package core.nabl.language.structs
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.objects.Declaration
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.InstantiateDeclarationConstraint
-import core.nabl.constraints.types.objects.{StructConstraintType, Type}
+import core.nabl.ConstraintBuilder
+import core.nabl.objects.Declaration
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.InstantiateDeclarationConstraint
+import core.nabl.types.objects.{StructConstraintType, Type}
 import core.nabl.language.expressions.Expression
 import core.nabl.language.types.LanguageType
 

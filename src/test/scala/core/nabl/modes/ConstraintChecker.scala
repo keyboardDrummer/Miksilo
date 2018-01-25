@@ -1,6 +1,7 @@
 package core.nabl.modes
 
-import core.nabl.constraints.{ConstraintBuilder, ConstraintSolver, Factory}
+import core.nabl.{ConstraintBuilder, ConstraintSolver, Factory}
+import core.nabl.Factory
 import core.nabl.language.Program
 import core.nabl.language.expressions.Expression
 import core.nabl.language.types.LanguageType

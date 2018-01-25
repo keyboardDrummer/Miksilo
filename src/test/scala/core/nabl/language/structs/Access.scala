@@ -1,9 +1,9 @@
 package core.nabl.language.structs
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.CheckSubType
-import core.nabl.constraints.types.objects.{StructConstraintType, Type}
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.CheckSubType
+import core.nabl.types.objects.{StructConstraintType, Type}
 import core.nabl.language.expressions.Expression
 
 case class TypeCase(typeName: String, bindingName: String, body: Expression)

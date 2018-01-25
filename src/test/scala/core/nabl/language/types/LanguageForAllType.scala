@@ -1,8 +1,8 @@
 package core.nabl.language.types
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.objects.Type
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 
 case class LanguageForAllType(variable: String, body: LanguageType) extends LanguageType {
 

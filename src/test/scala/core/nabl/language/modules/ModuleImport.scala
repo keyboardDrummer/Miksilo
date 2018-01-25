@@ -1,8 +1,8 @@
 package core.nabl.language.modules
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.imports.ScopeImport
-import core.nabl.constraints.scopes.objects.Scope
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.imports.ScopeImport
+import core.nabl.scopes.objects.Scope
 
 class ModuleImport(name: String) {
 

@@ -1,6 +1,6 @@
 package core.nabl
 
-import core.nabl.constraints.types.objects.{PrimitiveType, Type, TypeApplication}
+import core.nabl.types.objects.{PrimitiveType, Type, TypeApplication}
 import core.nabl.language.expressions._
 import core.nabl.language.structs.{Access, Field, StructFieldInit}
 import core.nabl.language.types.{FunctionLanguageType, LanguageType, LanguageTypeVariable}

@@ -1,9 +1,9 @@
 package core.nabl.language.expressions
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.objects.{ConcreteType, IntConstraintType, LongConstraintType, Type}
-import core.nabl.constraints.types.{CheckSubType, TypesAreEqual}
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{IntConstraintType, LongConstraintType, Type}
+import core.nabl.types.{CheckSubType, TypesAreEqual}
 
 case class OverloadedAdd(left: Expression, right: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {

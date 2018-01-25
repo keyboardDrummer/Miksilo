@@ -1,8 +1,8 @@
 package core.nabl.language.expressions
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.objects.{FunctionType, Type}
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{FunctionType, Type}
 
 case class Application(function: Expression, value: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {

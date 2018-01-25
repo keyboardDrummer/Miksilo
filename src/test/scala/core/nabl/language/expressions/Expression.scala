@@ -1,6 +1,6 @@
 package core.nabl.language.expressions
 
-import core.nabl.constraints.types.objects.ConstraintExpression
+import core.nabl.types.objects.ConstraintExpression
 import core.nabl.language.structs.Access
 
 trait Expression extends ConstraintExpression {

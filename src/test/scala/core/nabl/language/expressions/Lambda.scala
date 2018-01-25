@@ -1,10 +1,10 @@
 package core.nabl.language.expressions
 
-import core.nabl.constraints.ConstraintBuilder
-import core.nabl.constraints.scopes.objects.Scope
-import core.nabl.constraints.types.CheckSubType
-import core.nabl.constraints.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
+import core.nabl.ConstraintBuilder
 import core.nabl.language.types.LanguageType
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.CheckSubType
+import core.nabl.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
 
 case class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
