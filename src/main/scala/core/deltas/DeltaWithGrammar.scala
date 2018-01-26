@@ -1,6 +1,7 @@
 package core.deltas
 
 import core.deltas.grammars.LanguageGrammars
+import core.language.Language
 
 trait DeltaWithGrammar extends Delta with NodeGrammarWriter {
 

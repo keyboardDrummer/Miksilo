@@ -3,8 +3,9 @@ package deltas.javac.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.node.{Node, NodeField, NodeShape}
+import core.deltas.DeltaWithGrammar
+import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 
 object TypeVariable extends DeltaWithGrammar {

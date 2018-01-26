@@ -1,6 +1,6 @@
 package deltas.javac.methods
 
-import core.deltas.Language
+import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.call.{CallC, CallStaticOrInstanceDelta}
 import org.scalatest.FunSuite

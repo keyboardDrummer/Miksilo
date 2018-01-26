@@ -1,9 +1,10 @@
 package deltas.javac.statements
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
+import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.deltas.path.Path
+import core.language.Language
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {

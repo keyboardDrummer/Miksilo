@@ -1,6 +1,7 @@
 package core.nabl.language.structs
 
 import core.nabl.ConstraintBuilder
+import core.nabl.language.modules.FakeSourceElement
 import core.nabl.objects.NamedDeclaration
 import core.nabl.scopes.objects.Scope
 import core.nabl.types.{AssignSubType, DeclarationOfType}
@@ -11,7 +12,8 @@ trait TypeDefinition
   def constraints(builder: ConstraintBuilder, parentScope: Scope) : Unit
 }
 
-case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None) extends TypeDefinition
+case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
+  extends TypeDefinition with FakeSourceElement
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {

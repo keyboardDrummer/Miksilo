@@ -2,7 +2,7 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
-import core.deltas.Language
+import core.language.Language
 
 object PrettyPrintOption extends CompileOption {
 

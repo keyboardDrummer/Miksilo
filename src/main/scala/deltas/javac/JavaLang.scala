@@ -1,7 +1,8 @@
 package deltas.javac
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
+import core.language.Language
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.PackageSignature

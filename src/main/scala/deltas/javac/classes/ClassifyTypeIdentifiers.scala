@@ -1,6 +1,6 @@
 package deltas.javac.classes
 
-import core.deltas.{Compilation, DeltaWithPhase, Language}
+import core.deltas.{Compilation, DeltaWithPhase}
 import core.deltas.node.Node
 import deltas.bytecode.types.ObjectTypeDelta
 import deltas.javac.types.TypeVariable

@@ -7,7 +7,8 @@ import javax.swing.text.PlainDocument
 
 import application.StyleSheet
 import application.compilerCockpit.LanguageSandbox
-import core.deltas.{Delta, Language}
+import core.deltas.Delta
+import core.language.Language
 
 import scala.collection.convert.Wrappers.JEnumerationWrapper
 

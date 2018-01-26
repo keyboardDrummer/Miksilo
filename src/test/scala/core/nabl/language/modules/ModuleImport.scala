@@ -4,7 +4,7 @@ import core.nabl.ConstraintBuilder
 import core.nabl.scopes.imports.ScopeImport
 import core.nabl.scopes.objects.Scope
 
-class ModuleImport(name: String) {
+class ModuleImport(name: String) extends FakeSourceElement {
 
   def constraints(builder: ConstraintBuilder, scope: Scope): Unit = {
     val importedDeclaration = builder.declarationVariable()

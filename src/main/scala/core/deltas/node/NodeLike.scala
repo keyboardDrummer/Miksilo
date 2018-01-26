@@ -11,6 +11,8 @@ trait NodeLike {
   def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
 
+  def children: Seq[Self] = ???
+
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
     visit(node => result = node :: result)

@@ -3,12 +3,13 @@ package deltas.javac.classes
 import core.deltas.grammars.LanguageGrammars
 import core.deltas._
 import core.deltas.path.Path
+import core.language.Language
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.methods.MemberSelector.{Member, Target, Shape}
+import deltas.javac.methods.MemberSelector.{Member, Shape, Target}
 import deltas.javac.methods.{MemberSelector, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 

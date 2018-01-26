@@ -4,6 +4,7 @@ import core.bigrammar.GrammarReference
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.StackMapTableAttribute
 import deltas.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}

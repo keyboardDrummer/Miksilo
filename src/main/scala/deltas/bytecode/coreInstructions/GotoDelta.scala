@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
-import core.deltas.Language
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior

@@ -1,8 +1,9 @@
 package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{NodeShape, NodeField}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.node.{NodeField, NodeShape}
+import core.deltas.DeltaWithGrammar
+import core.language.Language
 import deltas.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
 
 object SelectInnerClassC extends DeltaWithGrammar {

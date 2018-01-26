@@ -1,8 +1,8 @@
 package core.nabl.scopes
 
-import core.nabl._
+import core.language.SourceElement
 import core.nabl.objects.{NamedDeclaration, Reference}
-import core.nabl.scopes.objects.{ConcreteScope, Scope}
+import core.nabl.scopes.objects.ConcreteScope
 
 import scala.collection.mutable
 
@@ -44,6 +44,8 @@ case class DeclaresScope(target: ScopeNode) extends GraphEdge {
 
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
+  def findReference(location: SourceElement): Reference = ???
+
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
 
   def resolveScope(importedModule: NamedDeclaration): ConcreteScope = {

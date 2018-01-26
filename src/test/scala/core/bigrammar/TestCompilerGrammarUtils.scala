@@ -3,8 +3,9 @@ package core.bigrammar
 import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.{Contract, Delta, DeltaWithGrammar, Language}
+import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.deltas.node.GrammarKey
+import core.language.Language
 import org.scalatest.FunSuite
 import deltas.javac.JavaCompilerDeltas
 import util.{TestLanguageBuilder, TestUtils}

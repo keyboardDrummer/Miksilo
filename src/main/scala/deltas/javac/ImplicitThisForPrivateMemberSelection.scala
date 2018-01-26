@@ -4,6 +4,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 import core.deltas.path.{FieldValue, Path, PathRoot, SequenceElement}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState

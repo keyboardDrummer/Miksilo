@@ -2,9 +2,9 @@ package deltas.javac.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.language.Language
 import deltas.bytecode.types.{IntTypeC, StackType, TypeInstance}
 
 object BooleanTypeC extends TypeInstance

@@ -1,11 +1,13 @@
 package core.nabl
 
+import core.language.SourceElement
 import core.nabl.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.nabl.scopes.imports.DeclarationOfScope
 import core.nabl.scopes.objects.{ConcreteScope, _}
 import core.nabl.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
-import core.nabl.types.objects.{PrimitiveType, Type, TypeApplication, TypeVariable}
+import core.nabl.types.objects.{Type, TypeVariable}
 import core.nabl.types.{DeclarationOfType, Specialization, TypesAreEqual}
+
 import scala.collection.mutable
 
 case class Copy(key: AnyRef, counter: Int)
@@ -31,27 +33,27 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def resolve(name: String, id: AnyRef, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
+  def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
     val result = _type.fold(declarationVariable())(t => declarationVariable(t))
-    reference(name, id, scope, result)
+    reference(name, origin, scope, result)
     result
   }
 
-  def reference(name: String, id: AnyRef, scope: Scope, declaration: Declaration) : Reference = {
-    val result = new Reference(name, id)
+  def reference(name: String, origin: SourceElement, scope: Scope, declaration: Declaration) : Reference = {
+    val result = new Reference(name, origin)
     constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
     constraints ::= ResolvesTo(result, declaration)
     result
   }
 
-  def declarationType(name: String, id: AnyRef, container: Scope) : Type  = {
+  def declarationType(name: String, origin: SourceElement, container: Scope) : Type  = {
     val result = typeVariable()
-    declaration(name, id, container, Some(result))
+    declaration(name, origin, container, Some(result))
     result
   }
 
-  def declaration(name: String, id: AnyRef, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
-    val result = new NamedDeclaration(name, id)
+  def declaration(name: String, origin: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
+    val result = new NamedDeclaration(name, origin)
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationOfType(result, t))
     result

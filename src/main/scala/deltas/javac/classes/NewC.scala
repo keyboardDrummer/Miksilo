@@ -4,6 +4,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas._
 import core.deltas.node._
 import core.deltas.path.Path
+import core.language.Language
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}

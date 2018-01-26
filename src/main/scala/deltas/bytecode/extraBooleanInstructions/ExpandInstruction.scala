@@ -1,7 +1,8 @@
 package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas.node.Node
-import core.deltas.{Language, Contract, Delta}
+import core.deltas.{Contract, Delta}
+import core.language.Language
 import deltas.bytecode.coreInstructions.InstructionWithGrammar
 
 trait ExpandInstruction extends Delta with InstructionWithGrammar {

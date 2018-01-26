@@ -2,6 +2,7 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.path.Path
+import core.language.Language
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{MemberSelector, VariableDelta}
 import deltas.javac.methods.VariableDelta.VariableKey

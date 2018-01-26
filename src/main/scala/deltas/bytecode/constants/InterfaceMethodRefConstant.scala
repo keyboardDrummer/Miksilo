@@ -1,8 +1,8 @@
 package deltas.bytecode.constants
 
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
+import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.Language
 import deltas.bytecode.PrintByteCode._
 
 object InterfaceMethodRefConstant extends ConstantEntry {

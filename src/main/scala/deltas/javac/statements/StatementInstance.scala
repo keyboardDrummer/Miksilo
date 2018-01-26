@@ -3,6 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{Path, SequenceElement}
+import core.language.Language
 
 trait StatementInstance extends DeltaWithGrammar {
 

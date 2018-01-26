@@ -3,7 +3,8 @@ package deltas.javac.statements
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
+import core.language.Language
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.bytecode.types.TypeSkeleton

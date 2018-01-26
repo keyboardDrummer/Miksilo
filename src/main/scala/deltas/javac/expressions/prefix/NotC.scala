@@ -1,9 +1,10 @@
 package deltas.javac.expressions.prefix
 
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
+import core.deltas.node.{Node, NodeField, NodeShape}
 import core.deltas.path.Path
+import core.language.Language
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeC

@@ -6,6 +6,7 @@ import core.deltas.exceptions.BadInputException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Key, Node}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: Node, from: Node) extends BadInputException {

@@ -1,8 +1,9 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
-import core.deltas.{Compilation, Contract, DeltaWithGrammar, Language}
+import core.deltas.node.{Node, NodeField, NodeShape}
+import core.deltas.{Compilation, Contract, DeltaWithGrammar}
+import core.language.Language
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}

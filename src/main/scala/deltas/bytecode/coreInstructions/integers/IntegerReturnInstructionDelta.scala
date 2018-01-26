@@ -1,7 +1,8 @@
 package deltas.bytecode.coreInstructions.integers
 
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.{Contract, Language}
+import core.deltas.Contract
+import core.language.Language
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior

@@ -1,9 +1,10 @@
 package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
+import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.{Contract, DeltaWithGrammar, Language}
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 
 trait TypeInstance extends DeltaWithGrammar {

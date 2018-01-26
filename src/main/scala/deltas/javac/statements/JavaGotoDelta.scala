@@ -1,6 +1,7 @@
 package deltas.javac.statements
 
-import core.deltas.{Contract, Delta, Language}
+import core.deltas.{Contract, Delta}
+import core.language.Language
 
 object JavaGotoDelta extends Delta {
 

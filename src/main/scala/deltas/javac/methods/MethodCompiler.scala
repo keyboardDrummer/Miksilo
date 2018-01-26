@@ -3,7 +3,8 @@ package deltas.javac.methods
 import core.deltas.exceptions.BadInputException
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
+import core.language.Language
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.statements.StatementSkeleton

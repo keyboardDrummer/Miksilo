@@ -1,9 +1,10 @@
 package deltas.javac.expressions.postfix
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
+import core.deltas.node.{Node, NodeField, NodeShape}
 import core.deltas.path.Path
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.{Compilation, Contract}
+import core.language.Language
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
 import deltas.bytecode.types.IntTypeC
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

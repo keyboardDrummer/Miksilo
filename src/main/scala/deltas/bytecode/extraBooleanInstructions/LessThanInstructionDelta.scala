@@ -1,7 +1,8 @@
 package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.{Contract, Language}
+import core.deltas.Contract
+import core.language.Language
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareLessDelta

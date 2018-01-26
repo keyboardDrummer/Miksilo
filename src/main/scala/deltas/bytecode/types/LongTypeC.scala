@@ -2,9 +2,9 @@ package deltas.bytecode.types
 
 import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.language.Language
 
 object LongTypeC extends TypeInstance with StackType {
 

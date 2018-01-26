@@ -1,10 +1,20 @@
 package core.nabl.language.modules
 
+import core.language.SourceElement
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
 import core.nabl.language.structs.TypeDefinition
 
-case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty, imports: Seq[ModuleImport] = Seq.empty)
+import scala.util.parsing.input.Position
+
+trait FakeSourceElement extends SourceElement {
+
+  override def start: Position = ???
+  override def end: Position = ???
+}
+
+case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,
+                  imports: Seq[ModuleImport] = Seq.empty) extends FakeSourceElement
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit = {
     val moduleDeclaration = builder.declaration(name, this, parentScope)

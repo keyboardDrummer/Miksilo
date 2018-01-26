@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.objects
 
-import core.deltas.Language
 import core.deltas.node.{Node, NodeShape}
+import core.language.Language
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}

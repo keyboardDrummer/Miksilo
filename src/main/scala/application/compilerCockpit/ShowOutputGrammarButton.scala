@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent
 import javax.swing.JButton
 
 import core.bigrammar.PrintBiGrammar
-import core.deltas.Language
+import core.language.Language
 
 class ShowOutputGrammarButton(compilerCockpit: LanguageSandbox) extends JButton("Show output grammar") {
   addActionListener((e: ActionEvent) => {

@@ -3,6 +3,7 @@ package deltas.javac.expressions
 import core.deltas._
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
+import core.language.Language
 
 trait ExpressionInstance extends DeltaWithGrammar {
   val key: NodeShape

@@ -1,8 +1,9 @@
-package core.deltas
+package core.language
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
+import core.deltas._
 import core.deltas.exceptions.{BadInputException, DeltaDependencyViolation}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
@@ -44,7 +45,7 @@ class Language(val deltas: Seq[Delta]) {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
-
+  var capabilities: Seq[Capability] = Seq.empty
   var compilerPhases: List[Phase] = List.empty
   var buildParser: () => (InputStream => Try[Node]) = () => null
 

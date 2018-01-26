@@ -1,9 +1,10 @@
 package deltas.javac.statements
 
-import core.deltas.{Compilation, Contract, Language, NodeGrammar}
+import core.deltas.{Compilation, Contract, NodeGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{Path, SequenceElement}
+import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton

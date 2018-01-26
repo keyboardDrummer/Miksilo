@@ -2,9 +2,10 @@ package core.nabl.language.structs
 
 import core.nabl.ConstraintBuilder
 import core.nabl.language.expressions.Expression
+import core.nabl.language.modules.FakeSourceElement
 import core.nabl.scopes.objects.Scope
 
-case class StructFieldInit(fieldName: String, value: Expression) {
+case class StructFieldInit(fieldName: String, value: Expression) extends FakeSourceElement {
   def constraints(builder: ConstraintBuilder, structScope: Scope, parentScope: Scope): Unit = {
     val fieldDeclaration = builder.resolve(fieldName, this, structScope)
     val fieldType = builder.getType(fieldDeclaration)

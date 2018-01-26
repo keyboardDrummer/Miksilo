@@ -1,6 +1,8 @@
 package core.nabl.objects
 
-class NamedDeclaration(val name: String, val id: AnyRef) extends Declaration
+import core.language.SourceElement
+
+class NamedDeclaration(val name: String, val origin: SourceElement) extends Declaration
 {
-  override def toString = s"NamedDeclaration($name, $id)"
+  override def toString = s"NamedDeclaration($name, $origin)"
 }

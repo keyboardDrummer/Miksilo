@@ -3,7 +3,8 @@ package deltas.bytecode
 import core.document.BlankLine
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.{Contract, DeltaWithGrammar, Language}
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields}
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar

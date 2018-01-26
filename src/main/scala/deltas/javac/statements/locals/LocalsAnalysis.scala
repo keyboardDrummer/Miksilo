@@ -2,7 +2,8 @@ package deltas.javac.statements.locals
 
 import core.deltas.node.Node
 import core.deltas.path.Path
-import core.deltas.{Compilation, Language}
+import core.deltas.Compilation
+import core.language.Language
 import deltas.javac.methods.VariablePool
 import deltas.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 

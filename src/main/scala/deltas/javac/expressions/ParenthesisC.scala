@@ -1,7 +1,8 @@
 package deltas.javac.expressions
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.{Language, Contract, DeltaWithGrammar}
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.Language
 
 object ParenthesisC extends DeltaWithGrammar {
 

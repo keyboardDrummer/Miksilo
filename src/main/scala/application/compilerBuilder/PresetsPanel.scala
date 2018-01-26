@@ -8,7 +8,8 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.deltas.{Delta, Language}
+import core.deltas.Delta
+import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._

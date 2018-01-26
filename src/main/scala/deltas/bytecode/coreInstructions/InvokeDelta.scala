@@ -1,8 +1,8 @@
 package deltas.bytecode.coreInstructions
 
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import deltas.bytecode.constants._

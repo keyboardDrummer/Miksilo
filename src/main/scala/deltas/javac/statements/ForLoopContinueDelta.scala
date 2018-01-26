@@ -2,7 +2,8 @@ package deltas.javac.statements
 
 import core.deltas.node.Node
 import core.deltas.path.{Path, PathRoot}
-import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
+import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ForLoopDelta.ForLoop

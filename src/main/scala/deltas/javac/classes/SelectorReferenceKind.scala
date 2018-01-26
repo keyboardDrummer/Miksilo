@@ -2,7 +2,8 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.path.Path
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, ClassSignature, PackageSignature}
+import core.language.Language
+import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.MemberSelector
 import deltas.javac.methods.MemberSelector.Shape
 

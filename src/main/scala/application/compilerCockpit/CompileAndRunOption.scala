@@ -4,6 +4,7 @@ import java.io.InputStream
 
 import core.deltas._
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper

@@ -5,6 +5,7 @@ import core.document.BlankLine
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node.{GrammarKey, Node, NodeField, NodeLike}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.Shape
 import deltas.bytecode.constants.ClassInfoConstant

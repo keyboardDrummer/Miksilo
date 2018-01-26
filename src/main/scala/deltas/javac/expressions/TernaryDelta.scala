@@ -4,6 +4,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.Path
+import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton

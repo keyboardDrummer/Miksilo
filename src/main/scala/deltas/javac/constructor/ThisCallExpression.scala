@@ -3,7 +3,8 @@ package deltas.javac.constructor
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.Path
-import core.deltas.{Compilation, Contract, Language}
+import core.deltas.{Compilation, Contract}
+import core.language.Language
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._

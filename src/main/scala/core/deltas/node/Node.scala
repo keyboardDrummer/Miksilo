@@ -1,7 +1,6 @@
 package core.deltas.node
 
 import core.deltas.path.Path
-
 import scala.collection.mutable
 import scala.util.hashing.Hashing
 
@@ -37,7 +36,8 @@ object Node {
   }
 }
 
-class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
+class Node(var shape: NodeShape, entries: (NodeField, Any)*)
+  extends NodeLike {
   type Self = Node
 
   def shallowClone: Node = {
@@ -56,7 +56,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
-  def dataView = data.toMap
+  def dataView: Map[NodeField, Any] = data.toMap
 
   def apply(key: NodeField) = data(key)
 
@@ -99,6 +99,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
   }
 
   override def get(key: NodeField): Option[Any] = data.get(key)
+
 }
 
 

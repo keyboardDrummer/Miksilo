@@ -4,7 +4,8 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.deltas.node._
-import core.deltas.{Contract, Language}
+import core.deltas.Contract
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}

@@ -1,8 +1,9 @@
 package deltas.javac.types
 
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.language.Language
 
 object WildcardTypeArgument extends DeltaWithGrammar {
 
