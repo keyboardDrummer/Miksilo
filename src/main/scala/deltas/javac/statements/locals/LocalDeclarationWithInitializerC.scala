@@ -3,7 +3,7 @@ package deltas.javac.statements.locals
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{Path, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, NodePathRoot, NodeSequenceElement}
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
@@ -38,19 +38,19 @@ object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithP
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(declarationWithInitializer: Path, state: Language): Unit = {
+  def transformDeclarationWithInitializer(declarationWithInitializer: NodePath, state: Language): Unit = {
     val name: String = LocalDeclarationDelta.getDeclarationName(declarationWithInitializer)
     val _type = LocalDeclarationDelta.getDeclarationType(declarationWithInitializer)
     val declaration = LocalDeclarationDelta.declaration(name, _type)
     val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), getInitializer(declarationWithInitializer))
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = declarationWithInitializer.asInstanceOf[SequenceElement]
+    val originSequence = declarationWithInitializer.asInstanceOf[NodeSequenceElement]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visit(obj => obj.shape match {
+    NodePathRoot(program).visit(obj => obj.shape match {
       case Shape => transformDeclarationWithInitializer(obj, state)
       case _ =>
     })

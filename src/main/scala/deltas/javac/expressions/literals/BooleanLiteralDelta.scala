@@ -3,13 +3,16 @@ package deltas.javac.expressions.literals
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.types.BooleanTypeC
+import deltas.javac.types.BooleanTypeDelta
 
-object BooleanLiteralC extends ExpressionInstance {
+object BooleanLiteralDelta extends ExpressionInstance {
   val key = LiteralBooleanKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
@@ -23,17 +26,21 @@ object BooleanLiteralC extends ExpressionInstance {
 
   def literal(value: Boolean) = new Node(LiteralBooleanKey, ValueKey -> value)
 
-  override def toByteCode(literal: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(literal: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(SmallIntegerConstantDelta.integerConstant(if (getValue(literal)) 1 else 0))
   }
 
   def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Boolean]
 
-  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
+  override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
   object LiteralBooleanKey extends NodeShape
 
   object ValueKey extends NodeField
 
   override def description: String = "Adds the boolean literals 'true' and 'false'"
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
+  }
 }

@@ -8,7 +8,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object IntegerReturnInstructionDelta extends InstructionDelta {
 
@@ -18,11 +18,11 @@ object IntegerReturnInstructionDelta extends InstructionDelta {
 
   override def getInstructionSize: Int = 1
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeDelta.intType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ac")
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeDelta)
 
   override def description: String = "Defines the integer return instruction, which returns an integer from the current method."
 

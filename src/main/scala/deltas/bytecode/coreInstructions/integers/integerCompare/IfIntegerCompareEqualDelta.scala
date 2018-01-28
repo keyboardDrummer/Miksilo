@@ -6,7 +6,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object IfIntegerCompareEqualDelta extends JumpInstruction {
 
@@ -18,7 +18,7 @@ object IfIntegerCompareEqualDelta extends JumpInstruction {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
+    InstructionSignature(Seq(IntTypeDelta.intType, IntTypeDelta.intType), Seq())
 
   override def description: String = "Defines the if-integer-compare-equal instruction, which will to a target instruction if the two top stack integers are equal."
 

@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeLike, NodeWrapper}
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 
@@ -14,7 +14,7 @@ object StatementSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def getToInstructions(compilation: Compilation): Path => Seq[Node] = {
+  def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
     statement => getRegistry(compilation).instances(statement.shape).toByteCode(statement, compilation)
   }
 

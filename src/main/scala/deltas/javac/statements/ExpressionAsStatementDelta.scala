@@ -2,7 +2,7 @@ package deltas.javac.statements
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.deltas.Compilation
 import core.language.Language
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
@@ -19,7 +19,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override val key = Shape
 
-  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
     val _type = ExpressionSkeleton.getType(compilation)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {

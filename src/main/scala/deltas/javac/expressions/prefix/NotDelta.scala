@@ -3,13 +3,16 @@ package deltas.javac.expressions.prefix
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.types.BooleanTypeC
+import deltas.javac.types.BooleanTypeDelta
 
-object NotC extends ExpressionInstance {
+object NotDelta extends ExpressionInstance {
 
   object NotKey extends NodeShape
 
@@ -17,9 +20,9 @@ object NotC extends ExpressionInstance {
 
   override val key = NotKey
 
-  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
+  override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
-  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
     ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionDelta.not)
   }
 
@@ -30,4 +33,10 @@ object NotC extends ExpressionInstance {
   }
 
   override def description: String = "Adds the ! (not) operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val targetType = ExpressionSkeleton.getType(compilation, builder, expression(NotExpression).asInstanceOf[NodePath], parentScope)
+    builder.typesAreEqual(targetType, BooleanTypeDelta.constraintType)
+    builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
+  }
 }

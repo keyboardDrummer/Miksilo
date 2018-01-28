@@ -3,12 +3,15 @@ package deltas.javac.expressions.additive
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
+import core.nabl.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
+import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
 
 object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -16,31 +19,31 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val key = Shape
 
-  override def toByteCode(addition: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(addition.left)
     val secondInstructions = toInstructions(addition.right)
     firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {
-      case x if x == IntTypeC.intType => Seq(AddIntegersDelta.addIntegers())
-      case x if x == LongTypeC.longType => Seq(AddLongsDelta.addLongs())
+      case x if x == IntTypeDelta.intType => Seq(AddIntegersDelta.addIntegers())
+      case x if x == LongTypeDelta.longType => Seq(AddLongsDelta.addLongs())
       case _ => throw new NotImplementedError()
     })
   }
 
-  override def getType(expression: Path, compilation: Compilation): Node = {
+  override def getType(expression: NodePath, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(expression.left)
     val secondType = getType(expression.right)
     firstType match
     {
-      case x if x == IntTypeC.intType =>
-        TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
-        TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
-        IntTypeC.intType
-      case x if x == LongTypeC.longType =>
-        TypeSkeleton.checkAssignableTo(compilation)(LongTypeC.longType, firstType)
-        TypeSkeleton.checkAssignableTo(compilation)(LongTypeC.longType, secondType)
-        LongTypeC.longType
+      case x if x == IntTypeDelta.intType =>
+        TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)
+        TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, secondType)
+        IntTypeDelta.intType
+      case x if x == LongTypeDelta.longType =>
+        TypeSkeleton.checkAssignableTo(compilation)(LongTypeDelta.longType, firstType)
+        TypeSkeleton.checkAssignableTo(compilation)(LongTypeDelta.longType, secondType)
+        LongTypeDelta.longType
       case _ => throw new NotImplementedError()
     }
   }
@@ -54,13 +57,13 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
     additiveGrammar.addOption(parseAddition)
   }
 
-implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-  def left: T = node(Left).asInstanceOf[T]
-  def left_=(value: T): Unit = node(Left) = value
+  implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def left: T = node(Left).asInstanceOf[T]
+    def left_=(value: T): Unit = node(Left) = value
 
-  def right: T = node(Right).asInstanceOf[T]
-  def right_=(value: T): Unit = node(Right) = value
-}
+    def right: T = node(Right).asInstanceOf[T]
+    def right_=(value: T): Unit = node(Right) = value
+  }
 
   def addition(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
 
@@ -68,4 +71,22 @@ implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {
 
   object Left extends NodeField
   object Right extends NodeField
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val firstType = ExpressionSkeleton.getType(compilation, builder, expression.left, parentScope)
+    val secondType = ExpressionSkeleton.getType(compilation, builder, expression.right, parentScope)
+    builder.add((solver: ConstraintSolver) => {
+      val resolved = solver.resolveType(firstType)
+      val additionTypeOption: Option[Type] = resolved match {
+        case IntTypeDelta.constraintType => Some(IntTypeDelta.constraintType)
+        case LongTypeDelta.constraintType => Some(LongTypeDelta.constraintType)
+        case _ => None
+      }
+      additionTypeOption.fold(false)(additionType => {
+        builder.typesAreEqual(additionType, secondType)
+        builder.typesAreEqual(additionType, _type)
+        true
+      })
+    })
+  }
 }

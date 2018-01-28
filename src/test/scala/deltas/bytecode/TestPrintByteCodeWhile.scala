@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompare
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.{IntTypeC, VoidTypeC}
+import deltas.bytecode.types.{IntTypeDelta, VoidTypeC}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.types.MethodType
@@ -62,7 +62,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
+    val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeDelta.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttributeDelta.codeAttribute(6, 2, 1, Seq(
       SmallIntegerConstantDelta.integerConstant(0),

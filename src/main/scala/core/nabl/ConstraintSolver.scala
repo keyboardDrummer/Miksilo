@@ -8,6 +8,10 @@ import core.nabl.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 
 import scala.collection.mutable
 
+case class BindingsAndTypes(scopes: ScopeGraph,
+                            types: TypeGraph,
+                            declarations: Map[Declaration, Type])
+
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of

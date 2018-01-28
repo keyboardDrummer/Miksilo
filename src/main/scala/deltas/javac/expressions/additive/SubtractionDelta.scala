@@ -3,13 +3,16 @@ package deltas.javac.expressions.additive
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
-import deltas.bytecode.types.{IntTypeC, TypeSkeleton}
+import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
-object SubtractionC extends ExpressionInstance {
+object SubtractionDelta extends ExpressionInstance {
   object SubtractionKey extends NodeShape
   object FirstKey extends NodeField
   object SecondKey extends NodeField
@@ -36,16 +39,16 @@ object SubtractionC extends ExpressionInstance {
 
   override val key = SubtractionKey
 
-  override def getType(expression: Path, compilation: Compilation): Node = {
+  override def getType(expression: NodePath, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
-    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, firstType)
-    TypeSkeleton.checkAssignableTo(compilation)(IntTypeC.intType, secondType)
-    IntTypeC.intType
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)
+    TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, secondType)
+    IntTypeDelta.intType
   }
 
-  override def toByteCode(subtraction: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(subtraction: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
@@ -53,4 +56,6 @@ object SubtractionC extends ExpressionInstance {
   }
 
   override def description: String = "Adds the - operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ??? //TODO reuse code from addition
 }

@@ -2,9 +2,12 @@ package deltas.javac.expressions
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Key, Node, NodeWrapper}
-import core.deltas.path.Path
+import core.deltas.node._
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.types.TypeSkeleton
 
 object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
@@ -13,12 +16,22 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
-  def getType(compilation: Compilation): Path => Node = expression => {
-    getRegistry(compilation).instances(expression.shape).getType(expression, compilation)
+  def getType(compilation: Compilation): NodePath => Node = expression => {
+    ???
+    //getRegistry(compilation).instances(expression.shape).getType(builder, expression, parentScope)
   }
 
-  def getToInstructions(compilation: Compilation): Path => Seq[Node] = {
-    expression => getRegistry(compilation).instances(expression.shape).toByteCode(expression, compilation)
+  def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
+    getInstance(compilation)(expression).getType(compilation, builder, expression, parentScope)
+  }
+
+  def getInstance(language: Language): NodeLike => ExpressionInstance = {
+    expression => getRegistry(language).instances(expression.shape)
+  }
+
+  def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
+    val getInstance2 = getInstance(compilation)
+    expression => getInstance2(expression).toByteCode(expression, compilation)
   }
 
   def getToInstructionsRegistry(state: Language) = getRegistry(state).instances

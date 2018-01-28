@@ -5,8 +5,9 @@ import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.language.Language
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object LongTypeC extends TypeInstance with StackType {
+object LongTypeDelta extends TypeInstance with StackType {
 
   override val key = LongTypeKey
 
@@ -29,4 +30,6 @@ object LongTypeC extends TypeInstance with StackType {
   object LongTypeKey extends NodeShape
 
   override def description: String = "Defines the long type."
+
+  val constraintType: Type = PrimitiveType("Long")
 }

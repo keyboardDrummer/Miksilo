@@ -4,7 +4,7 @@ import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -41,7 +41,7 @@ object LocalDeclarationDelta extends StatementInstance {
 
   override val key = DeclarationKey
 
-  override def toByteCode(declaration: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]
   }
 

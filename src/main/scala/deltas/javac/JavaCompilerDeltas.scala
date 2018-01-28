@@ -23,12 +23,12 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.constructor._
 import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
+import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
-import deltas.javac.expressions.literals.{BooleanLiteralC, IntLiteralDelta, LongLiteralDelta, NullC}
-import deltas.javac.expressions.postfix.PostFixIncrementC
-import deltas.javac.expressions.prefix.NotC
-import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanC, LessThanC}
+import deltas.javac.expressions.literals.{BooleanLiteralDelta, IntLiteralDelta, LongLiteralDelta, NullC}
+import deltas.javac.expressions.postfix.PostFixIncrementDelta
+import deltas.javac.expressions.prefix.NotDelta
+import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanDelta, LessThanDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
@@ -49,7 +49,7 @@ object JavaCompilerDeltas {
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewC, FieldDeclarationWithInitializer, ConstructorDelta, SelectorReferenceKind, VariableReferenceKind) ++
+      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, SelectorReferenceKind, VariableReferenceKind) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
       javaMethod
   }
@@ -61,14 +61,14 @@ object JavaCompilerDeltas {
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ methodBlock
 
   def methodBlock: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementC, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
+    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(JavaClassSkeleton) ++ javaSimpleStatement
 
   def javaSimpleStatement: Seq[Delta] = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
-    AddEqualityPrecedence, LessThanC, GreaterThanC, AddRelationalPrecedence, AdditionDelta, SubtractionC, AddAdditivePrecedence,
-    BooleanLiteralC, LongLiteralDelta, IntLiteralDelta, NullC, NotC, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
+    AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AddAdditivePrecedence,
+    BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta, NullC, NotDelta, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++
@@ -114,7 +114,7 @@ object JavaCompilerDeltas {
 
   def typeTransformations: Seq[Delta] = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
     SuperTypeArgument, TypeApplication, MethodType) ++
-    Seq(ObjectTypeDelta, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeC, DoubleTypeC, LongTypeC, VoidTypeC, IntTypeC,
+    Seq(ObjectTypeDelta, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeDelta, DoubleTypeC, LongTypeDelta, VoidTypeC, IntTypeDelta,
       ShortTypeC, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =

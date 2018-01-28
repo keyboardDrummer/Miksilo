@@ -8,7 +8,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node.{Node, NodeField, NodeShape}
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionC}
+import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
@@ -90,7 +90,7 @@ class JavaStyleCommentsTest
 
   test("addition2") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, SubtractionC, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(AdditionDelta, SubtractionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
       JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 
@@ -101,7 +101,7 @@ class JavaStyleCommentsTest
 
   test("addition3") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
-      Seq(SubtractionC, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(SubtractionDelta, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
     JavaCompilerDeltas.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.compiler.deltas)
 

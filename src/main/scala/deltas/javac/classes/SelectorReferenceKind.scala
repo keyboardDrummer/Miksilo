@@ -1,7 +1,7 @@
 package deltas.javac.classes
 
 import core.deltas._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.MemberSelector
@@ -17,8 +17,8 @@ object SelectorReferenceKind extends Delta {
     })
   }
 
-  def getReferenceKind(selector: Path, compiler: ClassCompiler): ReferenceKind = {
-    val obj = MemberSelector.getSelectorObject(selector)
+  def getReferenceKind(selector: NodePath, compiler: ClassCompiler): ReferenceKind = {
+    val obj = MemberSelector.getSelectorTarget(selector)
     val member = MemberSelector.getSelectorMember(selector)
     MemberSelector.getReferenceKind(compiler, obj) match {
       case PackageReference(info) => info.content(member) match {

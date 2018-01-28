@@ -3,17 +3,17 @@ package deltas.javac.classes
 import core.deltas.grammars.LanguageGrammars
 import core.deltas._
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.call.{CallC, CallStaticOrInstanceDelta}
+import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.bytecode.types.ObjectTypeDelta
 
-object NewC extends ExpressionInstance {
+object NewDelta extends ExpressionInstance {
 
   object NewCallKey extends NodeShape
   object NewObject extends NodeField
@@ -21,8 +21,8 @@ object NewC extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val objectGrammar = find(ObjectTypeDelta.ObjectTypeJavaGrammar)
-    val callArgumentsGrammar = find(CallC.CallArgumentsGrammar)
-    val newGrammar = "new" ~~> objectGrammar.as(NewObject) ~ callArgumentsGrammar.as(CallC.CallArguments) asNode NewCallKey
+    val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
+    val newGrammar = "new" ~~> objectGrammar.as(NewObject) ~ callArgumentsGrammar.as(CallDelta.CallArguments) asNode NewCallKey
     val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }
@@ -31,17 +31,17 @@ object NewC extends ExpressionInstance {
 
   override val key = NewCallKey
 
-  override def getType(expression: Path, compilation: Compilation): Node = {
-    expression(NewObject).asInstanceOf[Path]
+  override def getType(expression: NodePath, compilation: Compilation): Node = {
+    expression(NewObject).asInstanceOf[NodePath]
   }
 
-  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
     val objectType = getNewObject(expression)
     val classInfo: ClassSignature = compiler.findClass(objectType)
     val classRef = compiler.getClassRef(classInfo)
-    val callArguments = CallC.getCallArguments(expression)
+    val callArguments = CallDelta.getCallArguments(expression)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
 

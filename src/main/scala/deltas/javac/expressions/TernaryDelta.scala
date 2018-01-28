@@ -3,12 +3,15 @@ package deltas.javac.expressions
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.types.BooleanTypeC
+import deltas.javac.types.BooleanTypeDelta
 
 object TernaryDelta extends ExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
@@ -48,19 +51,19 @@ object TernaryDelta extends ExpressionInstance {
 
   override val key = TernaryKey
 
-  override def getType(_ternary: Path, compilation: Compilation): Node = {
+  override def getType(_ternary: NodePath, compilation: Compilation): Node = {
     val getExpressionType = ExpressionSkeleton.getType(compilation)
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
-    TypeSkeleton.checkAssignableTo(compilation)(BooleanTypeC.booleanType, getExpressionType(condition))
+    TypeSkeleton.checkAssignableTo(compilation)(BooleanTypeDelta.booleanType, getExpressionType(condition))
 
     val trueType = getExpressionType(truePath)
     val falseType = getExpressionType(falsePath)
     TypeSkeleton.union(compilation)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(_ternary: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
@@ -81,4 +84,18 @@ object TernaryDelta extends ExpressionInstance {
   }
 
   override def description: String = "Adds the ternary operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, _ternary: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val condition = TernaryDelta.getCondition(_ternary)
+    val truePath = TernaryDelta.trueBranch(_ternary)
+    val falsePath = TernaryDelta.falseBranch(_ternary)
+    val conditionType = ExpressionSkeleton.getType(compilation, builder, condition, parentScope)
+    builder.typesAreEqual(BooleanTypeDelta.constraintType, conditionType)
+
+    val trueType = ExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
+    val falseType = ExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
+
+    builder.checkSubType(_type, trueType)
+    builder.checkSubType(_type, falseType)
+  }
 }

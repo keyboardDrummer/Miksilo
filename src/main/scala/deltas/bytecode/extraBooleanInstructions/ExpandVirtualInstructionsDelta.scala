@@ -2,7 +2,7 @@ package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas._
 import core.deltas.node.Node
-import core.deltas.path.{Path, PathRoot}
+import core.deltas.path.{NodePath, NodePathRoot}
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttribute, Instructions}
@@ -18,14 +18,14 @@ object ExpandVirtualInstructionsDelta extends DeltaWithPhase with WithLanguageRe
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
 
-    val classFile: ClassFile[Path] = PathRoot(program)
-    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations[Path](classFile)
+    val classFile: ClassFile[NodePath] = NodePathRoot(program)
+    val codeAnnotations = CodeAttributeDelta.getCodeAnnotations[NodePath](classFile)
 
     for (codeAnnotation <- codeAnnotations) {
       processCodeAnnotation(codeAnnotation)
     }
 
-    def processCodeAnnotation(codeAnnotation: CodeAttribute[Path]): Unit = {
+    def processCodeAnnotation(codeAnnotation: CodeAttribute[NodePath]): Unit = {
       val methodInfo = codeAnnotation.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
       val instructions = codeAnnotation.current.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions, methodInfo)

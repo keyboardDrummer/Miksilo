@@ -2,7 +2,7 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{Path, SequenceElement}
+import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.language.Language
 
 trait StatementInstance extends DeltaWithGrammar {
@@ -14,7 +14,7 @@ trait StatementInstance extends DeltaWithGrammar {
 
   def key: NodeShape
 
-  def toByteCode(statement: Path, compilation: Compilation): Seq[Node]
+  def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node]
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
@@ -23,9 +23,9 @@ trait StatementInstance extends DeltaWithGrammar {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
 
-  def getNextLabel(statement: Path) = (statement, "next") //TODO volgens mij kan dit weg.
-  def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = {
-    val selection = obj.asInstanceOf[SequenceElement]
+  def getNextLabel(statement: NodePath) = (statement, "next") //TODO volgens mij kan dit weg.
+  def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = {
+    val selection = obj.asInstanceOf[NodeSequenceElement]
     if (selection.hasNext)
       return Set(selection.next)
 
@@ -36,7 +36,7 @@ trait StatementInstance extends DeltaWithGrammar {
     throw SequenceDoesNotEndInJump(selection.parent.current(selection.field).asInstanceOf[Seq[Node]])
   }
 
-  def getLabels(obj: Path): Map[Any, Path] = Map.empty
+  def getLabels(obj: NodePath): Map[Any, NodePath] = Map.empty
 
   def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
 }

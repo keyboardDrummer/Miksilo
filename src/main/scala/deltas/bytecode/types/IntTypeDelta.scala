@@ -5,8 +5,11 @@ import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.language.Language
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object IntTypeC extends TypeInstance with StackType {
+object IntTypeDelta extends TypeInstance with StackType {
+  val constraintType: Type = PrimitiveType("Int")
+
 
   override val key = IntTypeKey
 

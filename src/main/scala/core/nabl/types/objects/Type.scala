@@ -50,14 +50,3 @@ case class ConstraintClosureType(parentScope: Scope, name: String, variableOrigi
     actualOutput
   }
 }
-
-trait ConstraintExpression
-{
-  def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit
-
-  def getType(builder: ConstraintBuilder, parentScope: Scope): Type = {
-    val result = builder.typeVariable()
-    constraints(builder, result, parentScope)
-    result
-  }
-}

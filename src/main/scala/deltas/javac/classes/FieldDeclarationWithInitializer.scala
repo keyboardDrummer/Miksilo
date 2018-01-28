@@ -3,13 +3,13 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{Path, PathRoot}
+import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
 import deltas.bytecode.types.VoidTypeC
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import deltas.javac.methods.assignment.AssignmentSkeleton
-import deltas.javac.methods.call.CallC
+import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerC}
@@ -29,7 +29,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   object FieldWithInitializerKey extends NodeShape
   override def description: String = "Enables fields to have initialisers."
 
-  def transformDeclarationWithInitializer(fieldWithInitialiser: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
+  def transformDeclarationWithInitializer(fieldWithInitialiser: NodePath, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
     val name: String = LocalDeclarationDelta.getDeclarationName(fieldWithInitialiser)
     val _type = LocalDeclarationDelta.getDeclarationType(fieldWithInitialiser)
     val declaration = FieldDeclaration.field(_type, name)
@@ -42,7 +42,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new PathRoot(program).visit(obj => obj.shape match {
+    new NodePathRoot(program).visit(obj => obj.shape match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })
@@ -60,7 +60,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
-        val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallC.call(VariableDelta.variable(getFieldInitialiserMethodName)))
+        val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallDelta.call(VariableDelta.variable(getFieldInitialiserMethodName)))
         constructor(MethodDelta.Body) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }

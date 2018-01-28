@@ -6,7 +6,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object IfNotZero extends JumpInstruction {
 
@@ -17,7 +17,7 @@ object IfNotZero extends JumpInstruction {
     hexToBytes("9a") ++ shortToBytes(arguments(0))
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeC.intType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(IntTypeDelta.intType), Seq())
 
   override def grammarName = "ifne"
 }

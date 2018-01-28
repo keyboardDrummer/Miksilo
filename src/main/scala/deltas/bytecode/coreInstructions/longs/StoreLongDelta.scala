@@ -6,7 +6,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.LongTypeC
+import deltas.bytecode.types.LongTypeDelta
 
 object StoreLongDelta  extends InstructionDelta {
 
@@ -21,10 +21,10 @@ object StoreLongDelta  extends InstructionDelta {
       byteToBytes(hexToInt("3f") + location)
   }
 
-  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(LongTypeC.longType), Seq())
+  override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = InstructionSignature(Seq(LongTypeDelta.longType), Seq())
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
-    Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> LongTypeC.longType)
+    Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> LongTypeDelta.longType)
 
   override def grammarName = "lstore"
 }

@@ -45,6 +45,7 @@ case class DeclaresScope(target: ScopeNode) extends GraphEdge {
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def findReference(location: SourceElement): Reference = ???
+  def resolveLocation(location: SourceElement): SourceElement = resolve(findReference(location)).origin
 
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
 

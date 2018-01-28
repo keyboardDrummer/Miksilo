@@ -6,7 +6,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO superclasse maken om wat van deze jump instructies onder te schuiven
 
@@ -18,7 +18,7 @@ object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO supercl
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
+    InstructionSignature(Seq(IntTypeDelta.intType, IntTypeDelta.intType), Seq())
 
   override def grammarName = "if_icmple"
 }

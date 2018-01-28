@@ -6,7 +6,7 @@ import core.nabl.scopes.imports.DeclarationOfScope
 import core.nabl.scopes.objects.{ConcreteScope, _}
 import core.nabl.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
 import core.nabl.types.objects.{Type, TypeVariable}
-import core.nabl.types.{DeclarationOfType, Specialization, TypesAreEqual}
+import core.nabl.types.{CheckSubType, DeclarationOfType, Specialization, TypesAreEqual}
 
 import scala.collection.mutable
 
@@ -59,6 +59,13 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  def getCommonSuperType(first: Type, second: Type): Type = {
+    val superType = typeVariable()
+    checkSubType(superType, first)
+    checkSubType(superType, second)
+    superType
+  }
+
   def specialization(first: Type, second: Type, debugInfo: Any = null): Unit = add(Specialization(first, second, debugInfo))
   def typesAreEqual(first: Type, second: Type): Unit = add(TypesAreEqual(first, second))
 
@@ -81,6 +88,9 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  /*
+  Get the scope declared by the given declaration
+   */
   def declaredScopeVariable(declaration: Declaration, parent: Option[Scope] = None): ScopeVariable = {
     val result = scopeVariable(parent)
     constraints ::= DeclarationOfScope(declaration, result)
@@ -97,5 +107,9 @@ class ConstraintBuilder(factory: Factory) {
     val result = constraints.reverse
     constraints = List.empty
     result
+  }
+
+  def checkSubType(superType: Type, subType: Type): Unit = {
+    add(CheckSubType(subType, superType))
   }
 }

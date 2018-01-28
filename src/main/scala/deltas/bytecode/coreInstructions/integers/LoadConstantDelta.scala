@@ -8,7 +8,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.IntegerInfoConstant
 import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object LoadConstantDelta extends InstructionDelta
 {
@@ -17,7 +17,7 @@ object LoadConstantDelta extends InstructionDelta
   def integerConstant(value: Any) = key.create(IntegerConstantIndex -> value)
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
-    InstructionSignature(Seq.empty, Seq(IntTypeC.intType))
+    InstructionSignature(Seq.empty, Seq(IntTypeDelta.intType))
   }
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = {

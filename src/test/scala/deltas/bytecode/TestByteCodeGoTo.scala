@@ -7,7 +7,7 @@ import deltas.bytecode.coreInstructions._
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.ConstantPool
 import util.TestLanguageBuilder
@@ -37,7 +37,7 @@ class TestByteCodeGoTo extends FunSuite {
       IncrementIntegerDelta.integerIncrement(0, 1),
       GotoDelta.goTo(-8))
 
-    val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeC.intType)),
+    val stackMapTable = StackMapTableAttribute.stackMapTable(1, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeDelta.intType)),
       StackMapTableAttribute.sameFrame(10)))
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq(stackMapTable))))
     ByteCodeSkeleton.neww(2, 3, new ConstantPool(Seq(StackMapTableAttribute.entry)), Seq(method))
@@ -48,7 +48,7 @@ class TestByteCodeGoTo extends FunSuite {
       SmallIntegerConstantDelta.integerConstant(0),
       StoreIntegerDelta.integerStore(0),
       LabelDelta.label("start", new Node(StackMapTableAttribute.AppendFrame,
-        StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeC.intType))),
+        StackMapTableAttribute.AppendFrameTypes -> Seq(IntTypeDelta.intType))),
       LoadIntegerDelta.load(0),
       SmallIntegerConstantDelta.integerConstant(3),
       LabelledLocations.ifIntegerCompareGreaterEquals("end"),

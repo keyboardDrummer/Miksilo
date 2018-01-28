@@ -12,7 +12,7 @@ import deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.types.ObjectTypeDelta.ObjectStackType
-import deltas.bytecode.types.{IntTypeC, LongTypeC, ObjectTypeDelta}
+import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, ObjectTypeDelta}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
@@ -107,8 +107,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getVerificationInfoBytes(_type: Node, state: Language): Seq[Byte] = {
     _type.shape match {
-      case IntTypeC.key => hexToBytes("01")
-      case LongTypeC.key => hexToBytes("04")
+      case IntTypeDelta.key => hexToBytes("01")
+      case LongTypeDelta.key => hexToBytes("04")
       case ObjectTypeDelta.ObjectStackType => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeDelta.Name).asInstanceOf[Int])
     }
   }
@@ -144,7 +144,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getVerificationInfoGrammar(grammars: LanguageGrammars): BiGrammar = {
     val index = grammars.find(ConstantPoolIndexGrammar)
-    val basic = grammars.find(IntTypeC.key) |  grammars.find(LongTypeC.key)
+    val basic = grammars.find(IntTypeDelta.key) |  grammars.find(LongTypeDelta.key)
     import grammars._
     val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(ObjectStackType)
 

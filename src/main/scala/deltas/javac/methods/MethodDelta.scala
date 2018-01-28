@@ -5,7 +5,7 @@ import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot}
+import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
@@ -84,11 +84,11 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method.data.remove(MethodNameKey)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptor) = methodDescriptorIndex
-    addCodeAnnotation(PathRoot(method))
+    addCodeAnnotation(NodePathRoot(method))
     method.data.remove(ReturnTypeKey)
     method.data.remove(MethodParametersKey)
 
-    def addCodeAnnotation(method: Path) {
+    def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
       val statements = method.body
       method.current.data.remove(Body)

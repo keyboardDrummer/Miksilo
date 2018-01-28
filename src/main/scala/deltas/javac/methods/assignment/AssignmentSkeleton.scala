@@ -4,7 +4,7 @@ import core.bigrammar.grammars.BiFailure
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
@@ -41,17 +41,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   override val key = AssignmentKey
 
-  override def getType(assignment: Path, compilation: Compilation): Node = {
+  override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(compilation)(target)
   }
 
   def createRegistry = new Registry()
   class Registry {
-    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, Path) => Seq[Node]]
+    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, NodePath) => Seq[Node]]
   }
 
-  override def toByteCode(assignment: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)

@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{Path, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, NodePathRoot, NodeSequenceElement}
 import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
@@ -21,20 +21,20 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val endLabels = new mutable.HashMap[Path, String]()
-    PathRoot(program).visitShape(BreakShape, path => transformBreak(path, endLabels, compilation))
+    val endLabels = new mutable.HashMap[NodePath, String]()
+    NodePathRoot(program).visitShape(BreakShape, path => transformBreak(path, endLabels, compilation))
   }
 
-  def transformBreak(continuePath: Path, endLabels: mutable.Map[Path, String], language: Language): Unit = {
+  def transformBreak(continuePath: NodePath, endLabels: mutable.Map[NodePath, String], language: Language): Unit = {
     val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.WhileKey)
     val label = endLabels.getOrElseUpdate(containingWhile, addEndLabel(containingWhile))
     continuePath.replaceWith(JustJavaGoto.goto(label))
   }
 
-  def addEndLabel(whilePath: Path): String = {
+  def addEndLabel(whilePath: NodePath): String = {
     val method = whilePath.findAncestorShape(MethodDelta.Shape)
     val endLabel = LabelDelta.getUniqueLabel("whileEnd", method)
-    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, JustJavaLabel.label(endLabel)))
+    whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(whilePath.current, JustJavaLabel.label(endLabel)))
     endLabel
   }
 

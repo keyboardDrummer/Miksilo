@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers._
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.{ArrayTypeC, IntTypeC, ObjectTypeDelta, VoidTypeC}
+import deltas.bytecode.types.{ArrayTypeC, IntTypeDelta, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.constructor.SuperCallExpression
@@ -66,7 +66,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
     )
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
     val stackMapTable = StackMapTableAttribute.stackMapTable(15, Seq(StackMapTableAttribute.sameFrame(9),
-      StackMapTableAttribute.sameLocals1StackItem(12, IntTypeC.intType)))
+      StackMapTableAttribute.sameLocals1StackItem(12, IntTypeDelta.intType)))
     val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttributeDelta.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     method
@@ -87,7 +87,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(
         ArrayTypeC.arrayType(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
-      TypeConstant.constructor(MethodType.construct(IntTypeC.intType, Seq(IntTypeC.intType))),
+      TypeConstant.constructor(MethodType.construct(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
       StackMapTableAttribute.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
@@ -104,7 +104,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       TypeConstant.constructor(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(IntTypeC.intType)))
+      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(IntTypeDelta.intType)))
     )
     new ConstantPool(constantPool)
   }

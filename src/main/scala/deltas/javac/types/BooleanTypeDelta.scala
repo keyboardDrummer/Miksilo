@@ -5,11 +5,14 @@ import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.language.Language
-import deltas.bytecode.types.{IntTypeC, StackType, TypeInstance}
+import core.nabl.types.objects.{PrimitiveType, Type}
+import deltas.bytecode.types.{IntTypeDelta, StackType, TypeInstance}
 
-object BooleanTypeC extends TypeInstance
+object BooleanTypeDelta extends TypeInstance
   with StackType //TODO remove this and change VariablePool accordingly.
 {
+  val constraintType: Type = PrimitiveType("Boolean")
+
   override val key = BooleanTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty
@@ -19,7 +22,7 @@ object BooleanTypeC extends TypeInstance
     new Keyword("Z",false) ~> value(booleanType)
   }
 
-  override def getStackType(_type: Node, state: Language): Node = IntTypeC.intType
+  override def getStackType(_type: Node, state: Language): Node = IntTypeDelta.intType
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
@@ -33,5 +36,5 @@ object BooleanTypeC extends TypeInstance
 
   override def description: String = "Defines the boolean type."
 
-  override def getStackSize: Int = IntTypeC.getStackSize
+  override def getStackSize: Int = IntTypeDelta.getStackSize
 }

@@ -2,15 +2,13 @@ package core.nabl.language.modules
 
 import core.language.SourceElement
 import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
 import core.nabl.language.structs.TypeDefinition
-
-import scala.util.parsing.input.Position
+import core.nabl.scopes.objects.Scope
 
 trait FakeSourceElement extends SourceElement {
 
-  override def start: Position = ???
-  override def end: Position = ???
+//  override def start: Position = ???
+//  override def end: Position = ???
 }
 
 case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,

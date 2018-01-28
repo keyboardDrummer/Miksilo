@@ -2,7 +2,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, NodePathRoot, NodeSequenceElement}
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.ExpressionSkeleton.Expression
@@ -27,17 +27,17 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(Shape, path => transformForLoop(path))
+    NodePathRoot(program).visitShape(Shape, path => transformForLoop(path))
   }
 
-  def transformForLoop(forLoopPath: Path): Unit = {
+  def transformForLoop(forLoopPath: NodePath): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementDelta.create(forLoop.increment))
     val _while = WhileLoopDelta.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
-    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
+    forLoopPath.asInstanceOf[NodeSequenceElement].replaceWith(newStatements)
   }
 
   implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {

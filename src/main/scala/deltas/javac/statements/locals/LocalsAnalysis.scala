@@ -1,16 +1,15 @@
 package deltas.javac.statements.locals
 
-import core.deltas.node.Node
-import core.deltas.path.Path
 import core.deltas.Compilation
-import core.language.Language
+import core.deltas.node.Node
+import core.deltas.path.NodePath
 import deltas.javac.methods.VariablePool
 import deltas.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 
 class LocalsAnalysis(compilation: Compilation, method: Node)
-  extends StatementFlowAnalysis[VariablePool](compilation: Language, method: Node) {
-  
-  override def updateState(state: VariablePool, node: Path): VariablePool = {
+  extends StatementFlowAnalysis[VariablePool](compilation, method) {
+
+  override def updateState(state: VariablePool, node: NodePath): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances
     var newState = state
     for(entry <- instances(node.shape).definedVariables(compilation, node.current))
@@ -22,6 +21,6 @@ class LocalsAnalysis(compilation: Compilation, method: Node)
     if (first.typedVariables.keys == second.typedVariables.keys)
       return None
 
-    Some(VariablePool(first.state, first.typedVariables.filterKeys(second.typedVariables.contains)))
+    Some(VariablePool(first.language, first.typedVariables.filterKeys(second.typedVariables.contains)))
   }
 }

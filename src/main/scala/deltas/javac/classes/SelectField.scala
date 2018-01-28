@@ -3,8 +3,11 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import core.deltas.path.Path
+import core.deltas.path.{NodePath, Path}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -18,7 +21,7 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
-  override def getType(selector: Path, compilation: Compilation): Node = {
+  override def getType(selector: NodePath, compilation: Compilation): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -26,7 +29,7 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(selector: NodePath, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
@@ -34,13 +37,13 @@ object SelectField extends ExpressionInstance {
       Seq(GetStaticDelta.getStatic(fieldRefIndex))
     else
     {
-      val obj = getSelectorObject(selector)
+      val obj = getSelectorTarget(selector)
       val objInstructions = ExpressionSkeleton.getToInstructions(compilation)(obj)
       objInstructions ++ Seq(GetFieldDelta.construct(fieldRefIndex))
     }
   }
 
-  def getFieldRef(selector: Node, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference) = {
+  def getFieldRef(selector: Node, compiler: ClassCompiler, classOrObjectReference: ClassOrObjectReference): Node = {
     val member = getSelectorMember(selector)
     val fieldInfo = classOrObjectReference.info.getField(member)
     val fieldRef = compiler.getFieldRef(fieldInfo)
@@ -54,4 +57,10 @@ object SelectField extends ExpressionInstance {
 
   override def description: String = "Enables using the . operator to select a member from a class."
 
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val target = getSelectorTarget(selector)
+    val targetScope = MemberSelector.getScope(compilation, builder, target, parentScope)
+    val member = getSelectorMember(selector)
+    builder.resolve(member, selector(Member).asInstanceOf[Path], targetScope, Some(_type))
+  }
 }

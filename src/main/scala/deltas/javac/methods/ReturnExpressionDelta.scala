@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import deltas.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
 import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
@@ -17,16 +17,16 @@ object ReturnExpressionDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 
-  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
+  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
 
-  def returnToLines(_return: Path, compiler: MethodCompiler): Seq[Node] = {
-    val returnValue: Path = getReturnValue(_return)
+  def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
+    val returnValue: NodePath = getReturnValue(_return)
     val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.compilation)(returnValue)
     val getType = ExpressionSkeleton.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
     {
-      case x if x == IntTypeC.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
-      case x if x == LongTypeC.longType => Seq(LongReturnInstructionDelta.longReturn)
+      case x if x == IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
+      case x if x == LongTypeDelta.longType => Seq(LongReturnInstructionDelta.longReturn)
       case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
       case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
       case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
@@ -53,7 +53,7 @@ object ReturnExpressionDelta extends StatementInstance {
 
   override val key = ReturnInteger
 
-  override def toByteCode(_return: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
     returnToLines(_return, methodCompiler)
   }
