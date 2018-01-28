@@ -1,17 +1,15 @@
 package deltas.javac.methods
 
+import core.deltas.Compilation
 import core.deltas.exceptions.BadInputException
 import core.deltas.node.Node
 import core.deltas.path.{NodePath, NodePathRoot}
-import core.deltas.Compilation
-import core.language.Language
-import core.nabl.BindingsAndTypes
+import deltas.bytecode.types.ObjectTypeDelta
+import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.statements.StatementSkeleton
 import deltas.javac.statements.locals.LocalsAnalysis
-import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
-import deltas.javac.classes.ClassCompiler
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   val parameters: Seq[Node] = method.parameters

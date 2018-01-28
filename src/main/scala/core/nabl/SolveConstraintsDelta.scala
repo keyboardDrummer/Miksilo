@@ -4,7 +4,7 @@ import core.deltas.Delta
 import core.deltas.exceptions.BadInputException
 import core.language.{Language, Phase}
 
-object SolveConstraints extends Delta {
+object SolveConstraintsDelta extends Delta {
 
   override def inject(language: Language): Unit = {
     super.inject(language)

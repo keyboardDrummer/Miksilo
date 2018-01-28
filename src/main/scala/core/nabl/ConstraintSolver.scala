@@ -50,6 +50,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       progress |= result
       result
     })
+    generatedConstraints ++= builder.getConstraints //TODO add a test for this line.
     progress |= generatedConstraints.nonEmpty
     constraints = remainingConstraints ++ generatedConstraints
     generatedConstraints = Seq.empty

@@ -1,21 +1,24 @@
 package deltas.javac.expressions
 
+import core.nabl.SolveConstraintsDelta
+import core.nabl.SolveConstraintsDelta.ConstraintException
+import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
-import deltas.javac.expressions.additive.AdditionDelta
-import deltas.javac.expressions.literals.{IntLiteralDelta, LongLiteralDelta}
-import org.scalatest.FunSuite
 import util.{TestLanguageBuilder, TestUtils}
 
-class ExpressionTypeTest
-  extends TestUtils(TestLanguageBuilder.build(Seq(ExpressionLanguageDelta) ++ JavaCompilerDeltas.javaSimpleExpression)) {
+class ExpressionTypeTest extends TestUtils(TestLanguageBuilder.build(
+  Seq(SolveConstraintsDelta,
+    ExpressionLanguageDelta,
+    ClearPhases) ++
+    JavaCompilerDeltas.javaSimpleExpression)) {
 
   test("int + int") {
     val program = "3 + 2"
-    language.
-
+    compile(program)
   }
 
   test("int + long") {
     val program = "3 + 2l"
+    assertThrows[ConstraintException](compile(program))
   }
 }
