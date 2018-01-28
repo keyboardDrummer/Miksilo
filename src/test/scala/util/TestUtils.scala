@@ -61,7 +61,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     compiler.parseAndTransform(stringToInputStream(input)).program
   }
 
-  def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
+    def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)

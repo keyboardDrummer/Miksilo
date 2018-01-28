@@ -9,7 +9,7 @@ import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.StatementSkeleton
 
-object BlockCompilerDelta extends DeltaWithGrammar with DeltaWithPhase
+object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 {
   object ProgramKey extends NodeShape
   object ProgramStatements extends NodeField

@@ -45,7 +45,7 @@ object JavaCompilerDeltas {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockCompilerDelta, JavaGotoDelta)
+      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, JavaGotoDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -68,7 +68,7 @@ object JavaCompilerDeltas {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AddAdditivePrecedence,
-    BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta, NullC, NotDelta, ParenthesisC, ExpressionSkeleton) ++ allByteCodeDeltas
+    BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta, NullC, NotDelta, ParenthesisDelta, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

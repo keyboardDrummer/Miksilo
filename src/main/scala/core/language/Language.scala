@@ -7,38 +7,11 @@ import core.deltas._
 import core.deltas.exceptions.{BadInputException, DeltaDependencyViolation}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
+import core.nabl.ConstraintBuilder
 
 import scala.collection.mutable
 import scala.reflect.io.File
 import scala.util.Try
-
-case class Phase(key: Delta, action: Compilation => Unit)
-
-case class ParseException(message: String) extends BadInputException {
-  override def toString: String = message
-}
-
-object NoSourceException extends BadInputException
-
-object Language {
-
-  def replace(deltas: Seq[Delta], marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
-    val pivot = deltas.indexWhere(particle => marker == particle)
-    val (before,after) = deltas.splitAt(pivot)
-    before ++ splice ++ after.drop(1)
-  }
-
-  def spliceBeforeTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
-    val implicitsSet = implicits.toSet
-    deltas.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
-  }
-
-  def spliceAfterTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
-    val implicitsSet = implicits.toSet
-    implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
-  }
-
-}
 
 class Language(val deltas: Seq[Delta]) {
   validateDependencies(deltas)
@@ -48,6 +21,7 @@ class Language(val deltas: Seq[Delta]) {
   var capabilities: Seq[Capability] = Seq.empty
   var compilerPhases: List[Phase] = List.empty
   var buildParser: () => (InputStream => Try[Node]) = () => null
+  var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
 
   for(particle <- deltas.reverse)
   {
@@ -98,3 +72,32 @@ class Language(val deltas: Seq[Delta]) {
     }
   }
 }
+
+object Language {
+
+  def replace(deltas: Seq[Delta], marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
+    val pivot = deltas.indexWhere(particle => marker == particle)
+    val (before,after) = deltas.splitAt(pivot)
+    before ++ splice ++ after.drop(1)
+  }
+
+  def spliceBeforeTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = implicits.toSet
+    deltas.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+  }
+
+  def spliceAfterTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = implicits.toSet
+    implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
+  }
+
+}
+
+case class Phase(key: Delta, action: Compilation => Unit)
+
+case class ParseException(message: String) extends BadInputException {
+  override def toString: String = message
+}
+
+object NoSourceException extends BadInputException
+

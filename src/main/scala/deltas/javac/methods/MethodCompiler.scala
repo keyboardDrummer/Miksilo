@@ -13,36 +13,6 @@ import deltas.javac.statements.locals.LocalsAnalysis
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
 import deltas.javac.classes.ClassCompiler
 
-case class VariableDoesNotExist(name: String) extends BadInputException {
-  override def toString = s"variable '$name' does not exist."
-}
-
-case class VariableInfo(offset: Integer, _type: Node)
-
-case class VariablePool(language: Language, typedVariables: Map[String, Node] = Map.empty) {
-  private var variables = Map.empty[String, VariableInfo]
-  var offset = 0
-  for(typedVariable <- typedVariables)
-    privateAdd(typedVariable._1, typedVariable._2)
-
-  def localCount: Int = offset
-
-  def get(name: String): Option[VariableInfo] = variables.get(name)
-
-  def apply(name: String): VariableInfo = variables.getOrElse(name, throw VariableDoesNotExist(name))
-
-  def contains(name: String): Boolean = variables.contains(name)
-
-  private def privateAdd(variable: String, _type: Node) {
-    variables = variables.updated(variable, VariableInfo(offset, _type))
-    offset += TypeSkeleton.getTypeSize(_type, language)
-  }
-
-  def add(variable: String, _type: Node): VariablePool = {
-    VariablePool(language, typedVariables.updated(variable, _type))
-  }
-}
-
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   val parameters: Seq[Node] = method.parameters
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
@@ -67,8 +37,6 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   {
     override def toString = s"the following statement is unreachable:\n$statement"
   }
-
-  var bindingsAndTypes: BindingsAndTypes = ???
 
   def getVariables(obj: NodePath): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances

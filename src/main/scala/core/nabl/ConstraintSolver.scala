@@ -8,10 +8,6 @@ import core.nabl.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 
 import scala.collection.mutable
 
-case class BindingsAndTypes(scopes: ScopeGraph,
-                            types: TypeGraph,
-                            declarations: Map[Declaration, Type])
-
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of
@@ -23,6 +19,7 @@ If constraints generate new ones, how do we guarantee termination?
 */
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint],
                        val maxCycles: Int = 100)
+  extends Proofs
 {
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
@@ -31,7 +28,6 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
   var generatedConstraints: Seq[Constraint] = Seq.empty
-
 
   def run() : Boolean = {
     var progress = true

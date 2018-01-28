@@ -4,7 +4,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 
-object ParenthesisC extends DeltaWithGrammar {
+object ParenthesisDelta extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 

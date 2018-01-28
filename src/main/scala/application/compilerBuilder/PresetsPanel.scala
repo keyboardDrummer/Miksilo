@@ -16,7 +16,7 @@ import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
-import deltas.javac.methods.{BlockCompilerDelta, ImplicitReturnAtEndOfMethod}
+import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
 import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 
@@ -58,7 +58,7 @@ object PresetsPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockCompilerDelta) ++ getJavaCompilerParticles,
+    new Preset("Java statement block", Seq(BlockLanguageDelta) ++ getJavaCompilerParticles,
       "The program consists only of a single statement block.")
   }
 
