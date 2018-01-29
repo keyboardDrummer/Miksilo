@@ -15,7 +15,7 @@ object SolveConstraintsDelta extends Delta {
       val builder = new ConstraintBuilder(factory)
       language.collectConstraints(compilation, builder)
 
-      val solver = new ConstraintSolver(builder, builder.getConstraints)
+      val solver = new ConstraintSolver(builder, builder.getConstraints, allowDuplicateDeclaration = false)
       solver.run() match {
         case Success(_) => compilation.proofs = solver
         case Failure(e:SolveException) => throw ConstraintException(e)

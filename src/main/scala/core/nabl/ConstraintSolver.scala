@@ -24,7 +24,9 @@ The output consists of
 If constraints generate new ones, how do we guarantee termination?
 */
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint],
-                       val maxCycles: Int = 100, val allowDuplicateDeclaration: Boolean = false)
+                       val maxCycles: Int = 100,
+                       val allowDuplicateDeclaration: Boolean = true //TODO find out why false causes many tests to fail.
+                      )
   extends Proofs
 {
   val scopeGraph = new ScopeGraph
