@@ -33,7 +33,7 @@ import deltas.javac.methods._
 import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
-import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerC}
+import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 
@@ -57,7 +57,7 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod: Seq[Delta] = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerC) ++
+  def javaMethod: Seq[Delta] = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerDelta) ++
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ methodBlock
 
   def methodBlock: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,

@@ -11,9 +11,9 @@ import core.nabl.types.objects.Type
 trait ExpressionInstance extends DeltaWithGrammar {
   val key: NodeShape
 
-  override def inject(state: Language): Unit = {
-    ExpressionSkeleton.getRegistry(state).instances.put(key, this)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    ExpressionSkeleton.getRegistry(language).instances.put(key, this)
+    super.inject(language)
   }
 
   def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node]

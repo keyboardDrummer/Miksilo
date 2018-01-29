@@ -12,7 +12,7 @@ import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.statements.locals.LocalDeclarationDelta.{Name, Type}
 import deltas.javac.statements.{ExpressionAsStatementDelta, StatementSkeleton}
 
-object LocalDeclarationWithInitializerC extends DeltaWithGrammar with DeltaWithPhase {
+object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationDelta)
 

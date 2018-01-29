@@ -11,7 +11,23 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   Seq(SolveConstraintsDelta,
     BlockLanguageDelta,
     ClearPhases) ++
-    JavaCompilerDeltas.javaSimpleStatement)) {
+    JavaCompilerDeltas.methodBlock)) {
+
+  test("int variable") {
+    val program =
+      """int x;
+        |x = 3;
+      """.stripMargin
+    compile(program)
+  }
+
+  test("assign long to int variable") {
+    val program =
+      """int x;
+        |x = 3l;
+      """.stripMargin
+    assertThrows[ConstraintException](compile(program))
+  }
 
   test("int + int") {
     val program = "3 + 2;"

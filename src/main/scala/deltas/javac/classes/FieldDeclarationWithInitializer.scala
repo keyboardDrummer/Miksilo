@@ -12,7 +12,7 @@ import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerC}
+import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
@@ -22,7 +22,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val memberGrammar = find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerC.Shape).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
+    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerDelta.Shape).inner.asInstanceOf[NodeGrammar].inner asNode FieldWithInitializerKey
     memberGrammar.addOption(fieldDeclarationWithInitializer)
   }
 
@@ -34,7 +34,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val _type = LocalDeclarationDelta.getDeclarationType(fieldWithInitialiser)
     val declaration = FieldDeclaration.field(_type, name)
 
-    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), LocalDeclarationWithInitializerC.getInitializer(fieldWithInitialiser))
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), LocalDeclarationWithInitializerDelta.getInitializer(fieldWithInitialiser))
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
     fieldWithInitialiser.replaceWith(declaration)
