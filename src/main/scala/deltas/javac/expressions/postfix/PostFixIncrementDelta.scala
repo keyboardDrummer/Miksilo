@@ -8,7 +8,7 @@ import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.IncrementIntegerDelta
+import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
 import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MethodDelta
@@ -24,9 +24,8 @@ object PostFixIncrementDelta extends ExpressionInstance {
   override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
     val name: Path = plusPlus(VariableKey).asInstanceOf[Path]
-    ???
-//    val variableAddress = methodCompiler.bindingsAndTypes.scopes.resolveLocation(name).asInstanceOf[Path]
-//    Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
+    val variableAddress = methodCompiler.getVariables(plusPlus)(name.current.asInstanceOf[String]).offset //methodCompiler.bindingsAndTypes.scopes.resolveLocation(name).asInstanceOf[Path]
+    Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

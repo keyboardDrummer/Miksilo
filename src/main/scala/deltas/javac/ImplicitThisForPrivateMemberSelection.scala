@@ -25,20 +25,20 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
 //    val scopes = MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes
 //    val reference = scopes.findReference(variable)
-    //scopes.resolve(reference).
-    ???
+//scopes.resolve(reference).
 //    if (!MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes.findReference(variable)variableWithCorrectPath).contains(name)) {
-//      val currentClass = compiler.currentClassInfo
-//      currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
-//        val classMember: ClassMember = currentClass.methods(key)
-//        addThisToVariable(classMember, currentClass, variable)
-//      })
-//
-//      currentClass.fields.keys.find(key => key == name).foreach(key => {
-//        val classMember = currentClass.fields(key)
-//        addThisToVariable(classMember, currentClass, variable)
-//      })
-//    }
+    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
+      val currentClass = compiler.currentClassInfo
+      currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
+        val classMember: ClassMember = currentClass.methods(key)
+        addThisToVariable(classMember, currentClass, variable)
+      })
+
+      currentClass.fields.keys.find(key => key == name).foreach(key => {
+        val classMember = currentClass.fields(key)
+        addThisToVariable(classMember, currentClass, variable)
+      })
+    }
   }
 
   def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: NodePath): Unit = {

@@ -17,8 +17,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
   def getType(compilation: Compilation): NodePath => Node = expression => {
-    ???
-    //getRegistry(compilation).instances(expression.shape).getType(builder, expression, parentScope)
+    getRegistry(compilation).instances(expression.shape).getType(expression, compilation)
   }
 
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
