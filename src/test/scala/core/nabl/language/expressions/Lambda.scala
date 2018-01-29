@@ -10,11 +10,11 @@ import core.nabl.types.objects.{ConstraintClosureType, ConstraintExpression, Typ
 case class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(
-      t => new TypeCheckWrapper(name, body, this /* should be the argument's type definition */, t.constraints(builder, parentScope)))
+      t => new TypeCheckWrapper(name, this /* TODO should be the argument's type definition */, body, t.constraints(builder, parentScope)))
     builder.typesAreEqual(_type, ConstraintClosureType(parentScope, name, this, wrappedBody))
   }
 
-  class TypeCheckWrapper(name: String, location: SourceElement,original: ConstraintExpression, parameterType: Type) extends ConstraintExpression
+  class TypeCheckWrapper(name: String, location: SourceElement,original: ConstraintExpression, parameterType: Type) extends ConstraintExpression with SourceElement
   {
     override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
       val declaration = builder.resolve(name, location, parentScope)

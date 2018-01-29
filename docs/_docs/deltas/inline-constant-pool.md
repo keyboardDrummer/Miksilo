@@ -107,7 +107,7 @@ For task 2.2, which was to replace all constant pool references in the grammar w
 
 ```scala
 private def inlineConstantPoolReferences(language: Language): Unit = {
-  import core.nabl.language.grammars._
+  import language.grammars._
   val constantReferences = ByteCodeSkeleton.getRegistry(language).constantReferences
   val constantPoolIndexGrammar = find(ConstantPoolIndexGrammar)
   for (classWithConstantReferences <- constantReferences) {

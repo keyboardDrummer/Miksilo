@@ -4,6 +4,8 @@ import core.nabl.language.Program
 import core.nabl.language.expressions.Expression
 import core.nabl.language.types.{IntType, LanguageType}
 import core.nabl.modes.ConstraintClosure
+import org.scalatest
+import org.scalatest.run
 
 object Checker {
 

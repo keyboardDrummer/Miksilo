@@ -5,11 +5,7 @@ import core.nabl.ConstraintBuilder
 import core.nabl.language.structs.TypeDefinition
 import core.nabl.scopes.objects.Scope
 
-trait FakeSourceElement extends SourceElement {
-
-//  override def start: Position = ???
-//  override def end: Position = ???
-}
+trait FakeSourceElement extends SourceElement {}
 
 case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,
                   imports: Seq[ModuleImport] = Seq.empty) extends FakeSourceElement

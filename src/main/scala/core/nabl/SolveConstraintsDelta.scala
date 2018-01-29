@@ -4,6 +4,8 @@ import core.deltas.Delta
 import core.deltas.exceptions.BadInputException
 import core.language.{Language, Phase}
 
+import scala.util.{Failure, Success}
+
 object SolveConstraintsDelta extends Delta {
 
   override def inject(language: Language): Unit = {
@@ -14,15 +16,17 @@ object SolveConstraintsDelta extends Delta {
       language.collectConstraints(compilation, builder)
 
       val solver = new ConstraintSolver(builder, builder.getConstraints)
-      val success = solver.run()
-      if (!success)
-        throw ConstraintException(solver)
+      solver.run() match {
+        case Success(_) => compilation.proofs = solver
+        case Failure(e:SolveException) => throw ConstraintException(e)
+        case Failure(e) => throw e
+      }
 
       compilation.proofs = solver
     })
   }
 
-  case class ConstraintException(solver: ConstraintSolver) extends BadInputException {
+  case class ConstraintException(solver: SolveException) extends BadInputException {
     override def toString = "Could not solve constraints"
   }
 

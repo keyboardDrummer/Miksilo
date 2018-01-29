@@ -5,6 +5,7 @@ import core.nabl.language.expressions._
 import core.nabl.language.modules.{Binding, Module}
 import core.nabl.language.structs._
 import core.nabl.language.types.IntType
+import core.nabl.modes.ConstraintClosure
 import org.scalatest.FunSuite
 
 class Structs extends FunSuite with LanguageWriter {
@@ -54,7 +55,7 @@ class Structs extends FunSuite with LanguageWriter {
       Application(Variable("takesStruct"), Variable("newStruct"))), Some(IntType))
     val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    Checker.check(program)
+    ConstraintClosure.succeed(program)
   }
 
   test("intList") {

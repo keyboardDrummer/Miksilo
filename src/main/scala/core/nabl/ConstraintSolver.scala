@@ -7,8 +7,12 @@ import core.nabl.types.objects._
 import core.nabl.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
-object SolveException extends Exception
+trait SolveException extends Exception
+case class CouldNotApplyConstraints(constraints: Seq[Constraint]) extends SolveException {
+  override def toString: String = s"Left with constraints: $constraints"
+}
 
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
@@ -31,7 +35,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
-  def run() : Boolean = {
+  def run() : Try[Unit] = {
     try
     {
       var progress = true
@@ -41,9 +45,9 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
         progress = cycle()
         cycleCount += 1
       }
-      constraints.isEmpty
+      if (constraints.isEmpty) Success(()) else Failure(CouldNotApplyConstraints(constraints))
     } catch {
-      case SolveException => false
+      case e:SolveException => Failure(e)
     }
   }
 
