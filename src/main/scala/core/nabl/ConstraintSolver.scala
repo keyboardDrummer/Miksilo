@@ -8,6 +8,8 @@ import core.nabl.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 
 import scala.collection.mutable
 
+object SolveException extends Exception
+
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of
@@ -18,7 +20,7 @@ The output consists of
 If constraints generate new ones, how do we guarantee termination?
 */
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint],
-                       val maxCycles: Int = 100)
+                       val maxCycles: Int = 100, val allowDuplicateDeclaration: Boolean = false)
   extends Proofs
 {
   val scopeGraph = new ScopeGraph
@@ -30,14 +32,19 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
   def run() : Boolean = {
-    var progress = true
-    var cycleCount = 0
-    while(progress && constraints.nonEmpty && cycleCount < maxCycles)
+    try
     {
-      progress = cycle()
-      cycleCount += 1
+      var progress = true
+      var cycleCount = 0
+      while(progress && constraints.nonEmpty && cycleCount < maxCycles)
+      {
+        progress = cycle()
+        cycleCount += 1
+      }
+      constraints.isEmpty
+    } catch {
+      case SolveException => false
     }
-    constraints.isEmpty
   }
 
   /*

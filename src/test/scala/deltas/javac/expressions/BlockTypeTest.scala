@@ -29,6 +29,22 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
     assertThrows[ConstraintException](compile(program))
   }
 
+  test("define same variable twice") {
+    val program =
+      """int x;
+        |int x;
+      """.stripMargin
+    assertThrows[ConstraintException](compile(program))
+  }
+
+  test("use variable that does not exist") {
+    val program =
+      """int x;
+        |y = 3;
+      """.stripMargin
+    assertThrows[ConstraintException](compile(program))
+  }
+
   test("int + int") {
     val program = "3 + 2;"
     compile(program)

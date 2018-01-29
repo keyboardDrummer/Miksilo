@@ -91,7 +91,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
   def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration): Unit = add(ScopeNode(inside), DeclaresDeclaration(DeclarationNode(declaration)))
   def declareScope(declaration: NamedDeclaration, scope: ConcreteScope): Unit = add(DeclarationNode(declaration), DeclaresScope(ScopeNode(scope)))
 
-  def add(node: GraphNode, edge: GraphEdge): Unit =
+  def add(node: GraphNode, edge: GraphEdge): Boolean =
   {
     val edges = this.getOrElseUpdate(node, mutable.Set.empty)
     edges.add(edge)
