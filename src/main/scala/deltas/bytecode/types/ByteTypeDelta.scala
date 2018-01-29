@@ -2,12 +2,19 @@ package deltas.bytecode.types
 
 import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object ByteTypeC extends TypeInstance
-{
+object ByteTypeDelta extends TypeInstance {
+
+  override def description: String = "Adds the byte type."
+
   object ByteTypeKey extends NodeShape
   override val key = ByteTypeKey
   val me = new Node(ByteTypeKey)
@@ -24,5 +31,6 @@ object ByteTypeC extends TypeInstance
     new Keyword("B",false) ~> value(me)
   }
 
-  override def description: String = "Adds the byte type."
+  val constraintType = PrimitiveType("Byte")
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

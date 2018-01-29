@@ -5,6 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
 import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {
@@ -32,4 +34,9 @@ object JustJavaGoto extends StatementInstance {
   override def getNextLabel(statement: NodePath): (NodePath, String) = super.getNextLabel(statement)
 
   override def description: String = "Adds a goto statement"
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    val target = getTarget(statement)
+    builder.resolve(target, statement, parentScope)
+  }
 }

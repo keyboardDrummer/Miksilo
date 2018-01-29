@@ -4,6 +4,8 @@ import core.deltas._
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 
 trait StatementInstance extends DeltaWithGrammar {
 
@@ -39,4 +41,6 @@ trait StatementInstance extends DeltaWithGrammar {
   def getLabels(obj: NodePath): Map[Any, NodePath] = Map.empty
 
   def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
+
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit
 }

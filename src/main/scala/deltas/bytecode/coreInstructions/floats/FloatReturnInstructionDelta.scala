@@ -8,7 +8,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.FloatTypeC
+import deltas.bytecode.types.FloatTypeDelta
 
 object FloatReturnInstructionDelta extends InstructionDelta {
 
@@ -19,11 +19,11 @@ object FloatReturnInstructionDelta extends InstructionDelta {
   override def getInstructionSize: Int = 1
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(FloatTypeC.floatType), Seq())
+    InstructionSignature(Seq(FloatTypeDelta.floatType), Seq())
 
   override def getInstructionByteCode(instruction: Node): Seq[Byte] = PrintByteCode.hexToBytes("ae")
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(FloatTypeC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(FloatTypeDelta)
 
   override def description: String = "Defines the float return instruction, which returns a float from the current method."
 

@@ -15,7 +15,7 @@ class TestParseTypes extends FunSuite {
   test("ArrayArrayType") {
     val input = "int[][]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(ArrayTypeC.arrayType(ArrayTypeC.arrayType(IntTypeDelta.intType)))(result)
+    assertResult(ArrayTypeDelta.arrayType(ArrayTypeDelta.arrayType(IntTypeDelta.intType)))(result)
   }
 
   test("VoidType") {
@@ -62,7 +62,7 @@ class TestParseTypes extends FunSuite {
   test("ArrayType") {
     val input = "int[]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(ArrayTypeC.arrayType(IntTypeDelta.intType))(result)
+    assertResult(ArrayTypeDelta.arrayType(IntTypeDelta.intType))(result)
   }
 
   test("ObjectType") {
@@ -76,6 +76,6 @@ class TestParseTypes extends FunSuite {
     val input = "java.lang.String[]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
     val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
-    assertResult(ArrayTypeC.arrayType(objectType))(result)
+    assertResult(ArrayTypeDelta.arrayType(objectType))(result)
   }
 }

@@ -5,6 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeLike, NodeWrapper}
 import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.javac.expressions.ExpressionSkeleton
 
 
@@ -15,7 +17,11 @@ object StatementSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
-    statement => getRegistry(compilation).instances(statement.shape).toByteCode(statement, compilation)
+    statement => getInstance(compilation, statement).toByteCode(statement, compilation)
+  }
+
+  def getInstance(compilation: Compilation, statement: NodePath): StatementInstance = {
+    getRegistry(compilation).instances(statement.shape)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
@@ -27,8 +33,12 @@ object StatementSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   override def description: String = "Defines the concept of a statement."
 
   class Registry {
-    val instances = new ShapeRegistry[StatementInstance]
+    val instances = new ShapeRegistry[StatementInstance] //TODO attach these to the shape.
   }
 
   override def createRegistry: Registry = new Registry()
+
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    getInstance(compilation, statement).constraints(compilation, builder, statement, parentScope)
+  }
 }

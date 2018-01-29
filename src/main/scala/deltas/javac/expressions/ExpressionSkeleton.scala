@@ -21,6 +21,10 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     //getRegistry(compilation).instances(expression.shape).getType(builder, expression, parentScope)
   }
 
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    getInstance(compilation)(expression).constraints(compilation, builder, expression, _type, parentScope)
+  }
+
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
     getInstance(compilation)(expression).getType(compilation, builder, expression, parentScope)
   }

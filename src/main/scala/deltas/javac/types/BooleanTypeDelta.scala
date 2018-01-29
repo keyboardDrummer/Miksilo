@@ -2,9 +2,13 @@ package deltas.javac.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.{PrimitiveType, Type}
 import deltas.bytecode.types.{IntTypeDelta, StackType, TypeInstance}
 
@@ -37,4 +41,6 @@ object BooleanTypeDelta extends TypeInstance
   override def description: String = "Defines the boolean type."
 
   override def getStackSize: Int = IntTypeDelta.getStackSize
+
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

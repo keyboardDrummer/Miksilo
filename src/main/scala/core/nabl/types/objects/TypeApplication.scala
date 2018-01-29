@@ -18,7 +18,6 @@ object FuncPrimitive extends PrimitiveType("Func")
  */
 object FunctionType {
 
-
   def apply(argument: Type, result: Type, origin: AnyRef): Type =
     TypeApplication(PrimitiveType("Func"), Seq(argument, result), origin)
 

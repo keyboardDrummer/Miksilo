@@ -10,7 +10,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.Shape
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
@@ -62,7 +62,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   }
 
   def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.shape match {
-    case ArrayTypeC.ArrayTypeKey => fullyQualify(ArrayTypeC.getArrayElementType(_type), classCompiler)
+    case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getArrayElementType(_type), classCompiler)
     case ObjectTypeDelta.ObjectTypeKey =>
         val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
       _type(ObjectTypeDelta.Name) = newName

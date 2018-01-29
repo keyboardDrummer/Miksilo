@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.deltas.node.Node
-import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
+import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.methods.AccessibilityFieldsDelta
@@ -30,7 +30,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType(QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeDelta.arrayType(ObjectTypeDelta.objectType(QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
     method("main", VoidTypeC.voidType, parameters, body, static = true, AccessibilityFieldsDelta.PublicVisibility)
   }

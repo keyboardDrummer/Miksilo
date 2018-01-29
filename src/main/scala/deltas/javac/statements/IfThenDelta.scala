@@ -5,9 +5,12 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends StatementInstance {
 
@@ -68,5 +71,13 @@ object IfThenDelta extends StatementInstance {
     val next = obj.asInstanceOf[NodeSequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next) ++
       super.getLabels(obj)
+  }
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    val bodyScope = builder.newScope(Some(parentScope))
+    val body = getThenStatements(statement)
+    BlockDelta.collectConstraints(compilation, builder, body, bodyScope)
+    val condition = getCondition(statement)
+    ExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
   }
 }

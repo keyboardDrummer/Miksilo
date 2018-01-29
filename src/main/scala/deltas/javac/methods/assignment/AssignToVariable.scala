@@ -8,7 +8,7 @@ import core.language.Language
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
-import deltas.bytecode.types.ArrayTypeC.ArrayTypeKey
+import deltas.bytecode.types.ArrayTypeDelta.ArrayTypeKey
 import deltas.bytecode.types.IntTypeDelta.IntTypeKey
 import deltas.bytecode.types.LongTypeDelta.LongTypeKey
 import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}

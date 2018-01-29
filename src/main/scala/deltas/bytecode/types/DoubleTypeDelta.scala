@@ -2,11 +2,16 @@ package deltas.bytecode.types
 
 import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object DoubleTypeC extends TypeInstance with StackType {
+object DoubleTypeDelta extends TypeInstance with StackType {
 
   override val key = DoubleTypeKey
 
@@ -29,4 +34,7 @@ object DoubleTypeC extends TypeInstance with StackType {
   object DoubleTypeKey extends NodeShape
 
   override def description: String = "Defines the double type."
+
+  val constraintType = PrimitiveType("Double")
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

@@ -6,7 +6,7 @@ import core.nabl.scopes.imports.DeclarationOfScope
 import core.nabl.scopes.objects.{ConcreteScope, _}
 import core.nabl.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
 import core.nabl.types.objects.{Type, TypeVariable}
-import core.nabl.types.{CheckSubType, DeclarationOfType, Specialization, TypesAreEqual}
+import core.nabl.types._
 
 import scala.collection.mutable
 
@@ -71,6 +71,8 @@ class ConstraintBuilder(factory: Factory) {
 
   def add(addition: Constraint): Unit = constraints ::= addition
   def add(addition: List[Constraint]): Unit = constraints = addition ++ constraints
+
+  def assignSubType(superType: Type, subType: Type) = add(AssignSubType(subType, superType))
 
   def declarationVariable(): DeclarationVariable = {
     factory.declarationVariable

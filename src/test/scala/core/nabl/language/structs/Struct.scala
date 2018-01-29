@@ -5,7 +5,7 @@ import core.nabl.language.modules.FakeSourceElement
 import core.nabl.objects.NamedDeclaration
 import core.nabl.scopes.objects.Scope
 import core.nabl.types.{AssignSubType, DeclarationOfType}
-import core.nabl.types.objects.StructConstraintType
+import core.nabl.types.objects.TypeFromDeclaration
 
 trait TypeDefinition
 {
@@ -18,12 +18,12 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
     val structDeclaration: NamedDeclaration = builder.declaration(name, this, parentScope)
-    builder.add(DeclarationOfType(structDeclaration, StructConstraintType(structDeclaration)))
+    builder.add(DeclarationOfType(structDeclaration, TypeFromDeclaration(structDeclaration)))
     val scopeOfParent: Option[Scope] = parent.map(p => {
       val parentDeclaration = builder.declarationVariable()
       val scopeOfParent = builder.declaredScopeVariable(parentDeclaration)
       builder.reference(p, this, parentScope, parentDeclaration)
-      builder.add(List(AssignSubType(StructConstraintType(structDeclaration), StructConstraintType(parentDeclaration))))
+      builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))
       scopeOfParent
     })
     val structScope = builder.declaredNewScope(structDeclaration, scopeOfParent)

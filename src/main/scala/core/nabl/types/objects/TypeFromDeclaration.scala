@@ -1,9 +1,8 @@
 package core.nabl.types.objects
 
-import core.nabl.Factory
 import core.nabl.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 
-case class StructConstraintType(var declaration: Declaration) extends ConcreteType
+case class TypeFromDeclaration(var declaration: Declaration) extends ConcreteType
 {
   override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
     if (declaration == variable)

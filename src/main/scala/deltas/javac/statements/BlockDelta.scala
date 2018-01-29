@@ -3,7 +3,10 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.GrammarKey
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 
 object BlockDelta extends DeltaWithGrammar {
 
@@ -16,6 +19,12 @@ object BlockDelta extends DeltaWithGrammar {
     val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head))
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
+  }
+
+  def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[NodePath], parentScope: Scope): Unit = {
+    for(statement <- statements) {
+      StatementSkeleton.constraints(compilation, builder, statement, parentScope)
+    }
   }
 
   object BlockOrStatementGrammar extends GrammarKey

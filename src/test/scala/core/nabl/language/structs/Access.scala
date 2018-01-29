@@ -3,7 +3,7 @@ package core.nabl.language.structs
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
 import core.nabl.types.CheckSubType
-import core.nabl.types.objects.{StructConstraintType, Type}
+import core.nabl.types.objects.{TypeFromDeclaration, Type}
 import core.nabl.language.expressions.Expression
 
 case class TypeCase(typeName: String, bindingName: String, body: Expression)
@@ -31,6 +31,6 @@ case class Access(target: Expression, field: String) extends Expression
     val fieldDeclaration = builder.declarationVariable(_type)
     val structScope = builder.declaredScopeVariable(structDeclaration)
     builder.reference(field, this, structScope, fieldDeclaration)
-    target.constraints(builder, StructConstraintType(structDeclaration), scope)
+    target.constraints(builder, TypeFromDeclaration(structDeclaration), scope)
   }
 }

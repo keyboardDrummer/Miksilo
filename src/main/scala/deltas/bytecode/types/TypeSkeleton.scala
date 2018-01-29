@@ -6,7 +6,11 @@ import core.deltas.exceptions.BadInputException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Key, Node}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.bytecode.ByteCodeSkeleton
 
 class TypeMismatchException(to: Node, from: Node) extends BadInputException {
@@ -18,9 +22,16 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
+  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = {
+    getInstance(_type, compilation).getType(compilation, builder, _type, parentScope)
+  }
 
   def toStackType(_type: Node, language: Language) : Node = {
-    getRegistry(language).instances(_type.shape).getStackType(_type, language)
+    getInstance(_type, language).getStackType(_type, language)
+  }
+
+  private def getInstance(_type: Node, language: Language) = {
+    getRegistry(language).instances(_type.shape)
   }
 
   def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.shape)
@@ -33,13 +44,13 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def checkAssignableTo(state: Language)(to: Node, from: Node) = {
-    if (!isAssignableTo(state)(to, from))
+  def checkAssignableTo(language: Language)(to: Node, from: Node) = {
+    if (!isAssignableTo(language)(to, from))
       throw new TypeMismatchException(to, from)
   }
 
-  def isAssignableTo(state: Language)(to: Node, from: Node): Boolean = {
-    val fromSuperTypes = getSuperTypes(state)(from)
+  def isAssignableTo(language: Language)(to: Node, from: Node): Boolean = {
+    val fromSuperTypes = getSuperTypes(language)(from)
     if (to.equals(from))
       return true
 

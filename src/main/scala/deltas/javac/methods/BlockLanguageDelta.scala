@@ -3,16 +3,24 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node.{Node, NodeField, NodeShape}
+import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
-import deltas.bytecode.types.{ArrayTypeC, ObjectTypeDelta, VoidTypeC}
-import deltas.javac.ImplicitObjectSuperClass
+import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta, VoidTypeC}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.StatementSkeleton
+import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 
 object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 {
   object ProgramKey extends NodeShape
   object ProgramStatements extends NodeField
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    language.collectConstraints = (compilation, builder) => {
+      val statements = NodePathRoot(compilation.program)(ProgramStatements).asInstanceOf[Seq[NodePath]]
+      BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope())
+    }
+  }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -22,13 +30,13 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
-    val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeC.arrayType(ObjectTypeDelta.objectType("String")))
+    val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeDelta.arrayType(ObjectTypeDelta.objectType("String")))
     val method = MethodDelta.method("main",VoidTypeC.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))
     program.replaceWith(javaClass)
   }
 
-  override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)
+  //TODO bring back. override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)
 
   override def description: String = "Creates a language where the program is simply a Java block."
 }

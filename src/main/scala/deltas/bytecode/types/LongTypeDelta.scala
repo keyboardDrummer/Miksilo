@@ -2,9 +2,13 @@ package deltas.bytecode.types
 
 import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.{PrimitiveType, Type}
 
 object LongTypeDelta extends TypeInstance with StackType {
@@ -32,4 +36,5 @@ object LongTypeDelta extends TypeInstance with StackType {
   override def description: String = "Defines the long type."
 
   val constraintType: Type = PrimitiveType("Long")
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

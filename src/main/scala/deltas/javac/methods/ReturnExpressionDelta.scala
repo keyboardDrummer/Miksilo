@@ -5,6 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
 import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
 import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
@@ -14,6 +16,8 @@ import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
 object ReturnExpressionDelta extends StatementInstance {
+
+  override def description: String = "Allows returning a value using an expression."
 
   override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 
@@ -27,8 +31,8 @@ object ReturnExpressionDelta extends StatementInstance {
     {
       case x if x == IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
       case x if x == LongTypeDelta.longType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if x == FloatTypeC.floatType => Seq(FloatReturnInstructionDelta.create)
-      case x if x == DoubleTypeC.doubleType => Seq(LongReturnInstructionDelta.longReturn)
+      case x if x == FloatTypeDelta.floatType => Seq(FloatReturnInstructionDelta.create)
+      case x if x == DoubleTypeDelta.doubleType => Seq(LongReturnInstructionDelta.longReturn)
       case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
@@ -58,5 +62,7 @@ object ReturnExpressionDelta extends StatementInstance {
     returnToLines(_return, methodCompiler)
   }
 
-  override def description: String = "Allows returning a value using an expression."
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    ExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
+  }
 }

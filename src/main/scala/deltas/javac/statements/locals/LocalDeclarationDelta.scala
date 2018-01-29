@@ -4,8 +4,10 @@ import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.{NodePath, Path}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
@@ -53,4 +55,10 @@ object LocalDeclarationDelta extends StatementInstance {
   }
 
   override def description: String = "Enables declaring a local variable."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    val _languageType = statement(Type).asInstanceOf[NodePath]
+    val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
+    builder.declaration(getDeclarationName(statement), statement(Name).asInstanceOf[Path], parentScope, Some(_type))
+  }
 }

@@ -2,11 +2,16 @@ package deltas.bytecode.types
 
 import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object ShortTypeC extends TypeInstance with StackType {
+object ShortTypeDelta extends TypeInstance with StackType {
 
   override val key = ShortTypeKey
 
@@ -30,4 +35,7 @@ object ShortTypeC extends TypeInstance with StackType {
   object ShortTypeKey extends NodeShape
 
   override def description: String = "Defines the short type."
+
+  val constraintType = PrimitiveType("Short")
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

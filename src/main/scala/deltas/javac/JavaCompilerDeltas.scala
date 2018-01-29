@@ -114,8 +114,8 @@ object JavaCompilerDeltas {
 
   def typeTransformations: Seq[Delta] = Seq(SelectInnerClassC, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
     SuperTypeArgument, TypeApplication, MethodType) ++
-    Seq(ObjectTypeDelta, ArrayTypeC, ByteTypeC, FloatTypeC, CharTypeC, BooleanTypeDelta, DoubleTypeC, LongTypeDelta, VoidTypeC, IntTypeDelta,
-      ShortTypeC, TypeSkeleton)
+    Seq(ObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeC, IntTypeDelta,
+      ShortTypeDelta, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
     Language.spliceBeforeTransformations(javaCompilerDeltas, implicits, splice)

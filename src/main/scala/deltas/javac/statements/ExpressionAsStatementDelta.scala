@@ -1,13 +1,15 @@
 package deltas.javac.statements
 
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.NodePath
-import core.deltas.Compilation
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
-import deltas.javac.expressions.ExpressionSkeleton
 import deltas.bytecode.types.TypeSkeleton
+import deltas.javac.expressions.ExpressionSkeleton
 
 object ExpressionAsStatementDelta extends StatementInstance {
 
@@ -44,4 +46,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def description: String = "Enables using an expression as a statement."
 
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    ExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
+  }
 }

@@ -2,11 +2,16 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
+import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{PrimitiveType, Type}
 
-object FloatTypeC extends TypeInstance
+object FloatTypeDelta extends TypeInstance
 {
   object FloatTypeKey extends NodeShape
   override val key = FloatTypeKey
@@ -25,4 +30,7 @@ object FloatTypeC extends TypeInstance
   }
 
   override def description: String = "Adds the float type."
+
+  val constraintType = PrimitiveType("Float")
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
 }

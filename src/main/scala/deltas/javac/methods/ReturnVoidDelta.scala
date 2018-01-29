@@ -5,6 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.NodePath
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
@@ -37,4 +39,6 @@ object ReturnVoidDelta extends StatementInstance {
   }
 
   override def description: String = "Allows returning void."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {}
 }

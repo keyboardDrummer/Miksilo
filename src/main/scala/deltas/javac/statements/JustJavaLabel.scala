@@ -3,8 +3,10 @@ package deltas.javac.statements
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.{NodePath, Path}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {
@@ -33,5 +35,10 @@ object JustJavaLabel extends StatementInstance {
 
   override def getLabels(obj: NodePath): Map[Any, NodePath] = {
     super.getLabels(obj) + (getName(obj.current) -> obj)
+  }
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    val label = getName(statement)
+    builder.declaration(label, statement(Name).asInstanceOf[Path], parentScope)
   }
 }
