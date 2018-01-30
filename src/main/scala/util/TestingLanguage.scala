@@ -54,10 +54,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     before ++ splice ++ after.drop(1)
   }
 
-  private def runPhases(state: Compilation): Unit = {
+  private def runPhases(compilation: Compilation): Unit = {
     statistics.profile("running phases", {
       for(phase <- language.compilerPhases)
-        statistics.profile("run " + phase.key.description, phase.action(state))
+        statistics.profile("run " + phase.key.description, phase.action(compilation))
     })
   }
 

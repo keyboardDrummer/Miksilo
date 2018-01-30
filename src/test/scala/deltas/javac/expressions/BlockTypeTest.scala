@@ -1,17 +1,29 @@
 package deltas.javac.expressions
 
+import core.deltas.Delta
+import core.language.Language
 import core.nabl.SolveConstraintsDelta
 import core.nabl.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.methods.BlockLanguageDelta
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 import util.{TestLanguageBuilder, TestUtils}
 
+case class DropPhases(amount: Int) extends Delta {
+  override def description: String = "Drop n phases"
+
+  override def inject(language: Language): Unit = {
+    language.compilerPhases = language.compilerPhases.drop(amount)
+  }
+}
+
 class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
-  Seq(SolveConstraintsDelta,
-    BlockLanguageDelta,
-    ClearPhases) ++
-    JavaCompilerDeltas.methodBlock)) {
+  Seq(DropPhases(1), BlockLanguageDelta) ++
+    Language.spliceBeforeTransformations(
+      Seq(LocalDeclarationWithInitializerDelta) ++ JavaCompilerDeltas.methodBlock,
+      JavaCompilerDeltas.javaClassSkeleton,
+      Seq(SolveConstraintsDelta, ClearPhases)))) {
 
   test("int variable") {
     val program =
@@ -29,7 +41,7 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
     assertThrows[ConstraintException](compile(program))
   }
 
-  test("define same variable twice") {
+  ignore("define same variable twice") { //TODO ignore => test
     val program =
       """int x;
         |int x;
@@ -41,6 +53,28 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
     val program =
       """int x;
         |y = 3;
+      """.stripMargin
+    assertThrows[ConstraintException](compile(program))
+  }
+
+  test("defined inside if") {
+    val program =
+      """int x;
+        |if (true) {
+        |  int y = 2;
+        |  x += y;
+        |}
+      """.stripMargin
+    compile(program)
+  }
+
+  test("defined in if, used outside it") {
+    val program =
+      """int x;
+        |if (true) {
+        |  int y = 3;
+        |}
+        |x += y;
       """.stripMargin
     assertThrows[ConstraintException](compile(program))
   }

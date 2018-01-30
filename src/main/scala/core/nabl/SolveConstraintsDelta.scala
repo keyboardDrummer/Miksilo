@@ -15,7 +15,9 @@ object SolveConstraintsDelta extends Delta {
       val builder = new ConstraintBuilder(factory)
       language.collectConstraints(compilation, builder)
 
-      val solver = new ConstraintSolver(builder, builder.getConstraints, allowDuplicateDeclaration = false)
+      val solver = new ConstraintSolver(builder, builder.getConstraints,
+        allowDuplicateDeclaration = true //TODO figure out what to do with this.
+      )
       solver.run() match {
         case Success(_) => compilation.proofs = solver
         case Failure(e:SolveException) => throw ConstraintException(e)
@@ -26,8 +28,8 @@ object SolveConstraintsDelta extends Delta {
     })
   }
 
-  case class ConstraintException(solver: SolveException) extends BadInputException {
-    override def toString = "Could not solve constraints"
+  case class ConstraintException(solveException: SolveException) extends BadInputException {
+    override def toString: String = solveException.toString
   }
 
   override def description: String = "Adds the go to definition capability"

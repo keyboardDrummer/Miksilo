@@ -81,14 +81,14 @@ object Language {
     before ++ splice ++ after.drop(1)
   }
 
-  def spliceBeforeTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
-    val implicitsSet = implicits.toSet
-    deltas.filter(t => !implicitsSet.contains(t)) ++ splice ++ implicits
+  def spliceBeforeTransformations(top: Seq[Delta], bottom: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = bottom.toSet
+    top.filter(t => !implicitsSet.contains(t)) ++ splice ++ bottom
   }
 
-  def spliceAfterTransformations(deltas: Seq[Delta], implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
-    val implicitsSet = implicits.toSet
-    implicits ++ splice ++ deltas.filter(t => !implicitsSet.contains(t))
+  def spliceAfterTransformations(bottom: Seq[Delta], top: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
+    val implicitsSet = top.toSet
+    top ++ splice ++ bottom.filter(t => !implicitsSet.contains(t))
   }
 
 }
