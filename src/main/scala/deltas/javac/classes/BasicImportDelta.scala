@@ -6,7 +6,7 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 
-object BasicImportC extends DeltaWithGrammar {
+object BasicImportDelta extends DeltaWithGrammar {
 
   object ImportKey extends NodeShape
   object ElementsKey extends NodeField

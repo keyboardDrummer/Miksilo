@@ -4,7 +4,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
-import deltas.javac.classes.BasicImportC._
+import deltas.javac.classes.BasicImportDelta._
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
 
 object WildcardImportC extends DeltaWithGrammar {
@@ -35,7 +35,7 @@ object WildcardImportC extends DeltaWithGrammar {
     super.inject(state)
   }
 
-  override def dependencies: Set[Contract] = Set(BasicImportC)
+  override def dependencies: Set[Contract] = Set(BasicImportDelta)
 
   override def description: String = "Enables importing all classes from a package using a wildcard."
 }

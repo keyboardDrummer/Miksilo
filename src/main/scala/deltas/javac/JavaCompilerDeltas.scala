@@ -45,7 +45,7 @@ object JavaCompilerDeltas {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, JavaGotoDelta)
+      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -54,18 +54,19 @@ object JavaCompilerDeltas {
       javaMethod
   }
 
-  def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportC)
+  def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportDelta)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  def javaMethod: Seq[Delta] = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, JavaGotoDelta, LocalDeclarationWithInitializerDelta) ++
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ methodBlock
+  val syntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, LocalDeclarationWithInitializerDelta)
+  def javaMethod: Seq[Delta] = syntaxSugarStatements ++ //Desugar here first because ImplicitThisForPrivateMemberSelection requires variables analysis.
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables
 
-  def methodBlock: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ javaSimpleStatement
+  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ javaSimpleStatement //TODO What is JavaClassSkeleton doing here?
 
-  def javaSimpleStatement: Seq[Delta] = Seq(IfThenElseDelta, IfThenDelta, BlockDelta,
+  def javaSimpleStatement: Seq[Delta] = Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,

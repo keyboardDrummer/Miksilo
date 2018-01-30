@@ -10,18 +10,10 @@ import deltas.javac.methods.BlockLanguageDelta
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 import util.{TestLanguageBuilder, TestUtils}
 
-case class DropPhases(amount: Int) extends Delta {
-  override def description: String = "Drop n phases"
-
-  override def inject(language: Language): Unit = {
-    language.compilerPhases = language.compilerPhases.drop(amount)
-  }
-}
-
 class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   Seq(DropPhases(1), BlockLanguageDelta) ++
     Language.spliceBeforeTransformations(
-      Seq(LocalDeclarationWithInitializerDelta) ++ JavaCompilerDeltas.methodBlock,
+      Seq(LocalDeclarationWithInitializerDelta) ++ JavaCompilerDeltas.blockWithVariables,
       JavaCompilerDeltas.javaClassSkeleton,
       Seq(SolveConstraintsDelta, ClearPhases)))) {
 
@@ -92,5 +84,13 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   test("long + long") {
     val program = "3l + 2l;"
     compile(program)
+  }
+}
+
+case class DropPhases(amount: Int) extends Delta {
+  override def description: String = "Drop n phases"
+
+  override def inject(language: Language): Unit = {
+    language.compilerPhases = language.compilerPhases.drop(amount)
   }
 }
