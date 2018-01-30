@@ -57,16 +57,17 @@ object JavaCompilerDeltas {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportDelta)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
-  val syntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta, LocalDeclarationWithInitializerDelta)
-  def javaMethod: Seq[Delta] = syntaxSugarStatements ++ //Desugar here first because ImplicitThisForPrivateMemberSelection requires variables analysis.
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables
+  val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
+  private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
+  def javaMethod: Seq[Delta] = Language.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables)
 
-  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ javaSimpleStatement //TODO What is JavaClassSkeleton doing here?
+  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
-  def javaSimpleStatement: Seq[Delta] = Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
@@ -121,10 +122,10 @@ object JavaCompilerDeltas {
       ShortTypeDelta, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Language.spliceBeforeTransformations(javaCompilerDeltas, implicits, splice)
+    Language.spliceAndFilterTop(javaCompilerDeltas, implicits, splice)
 
   def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Language.spliceAfterTransformations(javaCompilerDeltas, implicits, splice)
+    Language.spliceAndFilterBottom(implicits, javaCompilerDeltas, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler: Language = {
     new Language(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(new PrettyPrint)))

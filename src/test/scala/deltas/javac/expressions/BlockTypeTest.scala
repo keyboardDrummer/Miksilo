@@ -7,13 +7,12 @@ import core.nabl.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.methods.BlockLanguageDelta
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 import util.{TestLanguageBuilder, TestUtils}
 
 class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   Seq(DropPhases(1), BlockLanguageDelta) ++
-    Language.spliceBeforeTransformations(
-      Seq(LocalDeclarationWithInitializerDelta) ++ JavaCompilerDeltas.blockWithVariables,
+    Language.spliceAndFilterTop(
+      JavaCompilerDeltas.blockWithVariables,
       JavaCompilerDeltas.javaClassSkeleton,
       Seq(SolveConstraintsDelta, ClearPhases)))) {
 
