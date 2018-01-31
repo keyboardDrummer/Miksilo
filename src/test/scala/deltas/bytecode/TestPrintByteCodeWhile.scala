@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompare
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.{IntTypeDelta, VoidTypeC}
+import deltas.bytecode.types.{IntTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.types.MethodType
@@ -27,7 +27,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(13),
       ClassInfoConstant.classRef(14),
       "<init>",
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
+      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",

@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers._
 import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompareGreaterOrEqualDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.{ArrayTypeDelta, IntTypeDelta, ObjectTypeDelta, VoidTypeC}
+import deltas.bytecode.types.{ArrayTypeDelta, IntTypeDelta, ObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.constructor.SuperCallExpression
@@ -80,11 +80,11 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       ClassInfoConstant.classRef(24),
       ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
+      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(
+      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq(
         ArrayTypeDelta.arrayType(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
       TypeConstant.constructor(MethodType.construct(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
@@ -104,7 +104,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
       TypeConstant.constructor(ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq(IntTypeDelta.intType)))
+      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq(IntTypeDelta.intType)))
     )
     new ConstantPool(constantPool)
   }

@@ -10,7 +10,7 @@ object CallStaticOrInstanceDelta extends GenericCall {
 
   override def description: String = "Enables calling static and virtual methods."
 
-  override def dependencies: Set[Contract] = CallStaticC.dependencies ++ CallInstanceC.dependencies
+  override def dependencies: Set[Contract] = CallStaticC.dependencies ++ CallInstanceDelta.dependencies
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
@@ -25,7 +25,7 @@ object CallStaticOrInstanceDelta extends GenericCall {
       CallStaticC.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
     } else
     {
-      CallInstanceC.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
+      CallInstanceDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
     }
   }
 }

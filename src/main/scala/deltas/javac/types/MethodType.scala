@@ -1,11 +1,10 @@
 package deltas.javac.types
 
-import core.bigrammar.grammars.BiFailure
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.BiFailure
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
@@ -53,7 +52,7 @@ object MethodType extends TypeInstance {
     methodGrammar
   }
 
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = {
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val parameters = _type.parameterTypes
     val returnType = _type.returnType
 

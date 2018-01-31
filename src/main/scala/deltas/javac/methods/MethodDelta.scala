@@ -7,12 +7,14 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import deltas.bytecode.types.{TypeSkeleton, VoidTypeC}
+import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
@@ -25,11 +27,13 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   with ClassMemberDelta {
 
   implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
+    def name: String = node.getValue(MethodNameKey)
+
     def returnType: T = node(ReturnTypeKey).asInstanceOf[T]
     def returnType_=(value: T): Unit = node(ReturnTypeKey) = value
 
-    def parameters: Seq[T] = node(MethodParametersKey).asInstanceOf[Seq[T]]
-    def parameters_=(value: Seq[T]): Unit = node(MethodParametersKey) = value
+    def parameters: Seq[MethodParameter[T]] = NodeWrapper.wrapList(node(MethodParametersKey).asInstanceOf[Seq[T]])
+    def parameters_=(value: Seq[MethodParameter[T]]): Unit = node(MethodParametersKey) = NodeWrapper.unwrapList(value)
 
     def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
   }
@@ -56,24 +60,28 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       val methodName: String = MethodDelta.getMethodName(method)
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
-      val _type = MethodType.construct(method.returnType, parameterTypes)
+      val _type = getMethodType(method)
       val key = MethodClassKey(methodName, parameterTypes.toVector)
       classInfo.methods(key) = MethodInfo(_type, method.isStatic)
     }
   }
 
+  private def getMethodType(method: Method[Node]) = {
+    val parameterTypes = method.parameters.map(p => p(ParameterTypeKey).asInstanceOf[Node])
+    MethodType.construct(method.returnType, parameterTypes)
+  }
+
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
     AccessibilityFieldsDelta)
 
-  def getParameterType(metaObject: Node, classCompiler: ClassCompiler) = {
+  def getParameterType(metaObject: Node, classCompiler: ClassCompiler): Node = {
     val result = metaObject(ParameterTypeKey).asInstanceOf[Node]
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
 
   def getMethodDescriptor(method: Method[Node], classCompiler: ClassCompiler): Node = {
-    val methodType = MethodType.construct(method.returnType, method.parameters.map(p => getParameterType(p, classCompiler)))
-    TypeConstant.constructor(methodType)
+    TypeConstant.constructor(getMethodType(method))
   }
 
   def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
@@ -130,7 +138,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val block = find(BlockDelta.Grammar)
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeC.voidType) | parseType)
+    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeDelta.voidType) | parseType)
 
     val parseParameter = parseType.as(ParameterTypeKey) ~~ identifier.as(ParameterNameKey) asNode ParameterKey
     val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
@@ -171,7 +179,19 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     var methodCompiler: MethodCompiler = _
   }
 
-  object Shape extends NodeShape
+  object Shape extends ShapeWithConstraints {
+      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
+        val method: Method[NodePath] = path
+        val bodyScope = builder.newScope(Some(parentScope))
+        method.parameters.foreach(parameter => {
+          val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
+          val name = parameter.current(ParameterNameKey).asInstanceOf[String]
+          builder.declaration(name, parameter, bodyScope, Some(parameterType))
+        })
+        BlockDelta.collectConstraints(compilation, builder, method.body, bodyScope)
+        builder.declaration(method.name, method, parentScope, Some(TypeSkeleton.getType(compilation, builder, getMethodType(method.current), parentScope)))
+      }
+  }
 
   object MethodGrammar extends GrammarKey
 
@@ -188,6 +208,14 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   object TypeParameters extends NodeField
 
   object ParameterTypeKey extends NodeField
+
+  implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def _type: T = node(ParameterTypeKey).asInstanceOf[T]
+    def _type_=(value: T): Unit = node(ParameterTypeKey) = value
+
+    def name: Any = node(ParameterNameKey)
+    def name_=(value: Any): Unit = node(ParameterNameKey) = value
+  }
 
   override def description: String = "Enables Java classes to contain methods."
 }

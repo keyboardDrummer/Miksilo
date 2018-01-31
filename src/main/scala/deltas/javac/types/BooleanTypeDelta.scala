@@ -4,8 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.node.{Node, NodeLike, NodeShape}
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
@@ -42,5 +41,5 @@ object BooleanTypeDelta extends TypeInstance
 
   override def getStackSize: Int = IntTypeDelta.getStackSize
 
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
 }

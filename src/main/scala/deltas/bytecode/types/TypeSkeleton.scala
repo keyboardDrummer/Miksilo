@@ -5,7 +5,7 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.exceptions.BadInputException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Key, Node}
+import core.deltas.node.{GrammarKey, Key, Node, NodeLike}
 import core.deltas.path.NodePath
 import core.language.Language
 import core.nabl.ConstraintBuilder
@@ -22,7 +22,7 @@ class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputExce
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
-  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = {
+  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     getInstance(_type, compilation).getType(compilation, builder, _type, parentScope)
   }
 
@@ -30,7 +30,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     getInstance(_type, language).getStackType(_type, language)
   }
 
-  private def getInstance(_type: Node, language: Language) = {
+  private def getInstance(_type: NodeLike, language: Language) = {
     getRegistry(language).instances(_type.shape)
   }
 

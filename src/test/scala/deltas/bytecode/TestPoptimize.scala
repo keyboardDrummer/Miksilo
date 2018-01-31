@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers.{SmallIntegerConstantDelta, Sto
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.classes.ConstantPool
 import deltas.javac.types.MethodType
@@ -72,7 +72,7 @@ class TestPoptimize extends FunSuite {
     val codeAnnotation = CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.MethodInfoKey.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
-      ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType,Seq.empty)),
+      ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType,Seq.empty)),
       ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)

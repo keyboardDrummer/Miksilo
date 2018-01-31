@@ -1,15 +1,20 @@
 package core.deltas.node
 
+import core.deltas.path.NodePath
+
 import scala.collection.mutable
 
 trait NodeLike {
   type Self <: NodeLike
+  def getValue[T](key: NodeField): T
+  def setValue[T](key: NodeField, value: T): Unit
   def get(key: NodeField): Option[Any]
   def apply(key: NodeField): Any
   def update(key: NodeField, value: Any): Unit
   def shape: NodeShape
   def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
+  def asPath: Option[NodePath]
 
   def children: Seq[Self] = ???
 

@@ -7,7 +7,7 @@ import core.deltas.{Compilation, Contract}
 import core.language.Language
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
@@ -23,7 +23,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.CallArguments -> arguments)
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeC.voidType
+  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)

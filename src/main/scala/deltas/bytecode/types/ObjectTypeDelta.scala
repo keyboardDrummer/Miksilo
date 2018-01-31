@@ -4,12 +4,11 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Labelled}
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.node._
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.{TypeFromDeclaration, Type}
+import core.nabl.types.objects.{Type, TypeFromDeclaration}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName
@@ -85,8 +84,8 @@ object ObjectTypeDelta extends TypeInstance with StackType {
 
   override def description: String = "Defines the object type."
 
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = {
-    val classDeclaration = builder.resolve(name, _type, parentScope)
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
+    val classDeclaration = builder.resolve2(name, _type.asPath, parentScope)
     TypeFromDeclaration(classDeclaration)
   }
 }

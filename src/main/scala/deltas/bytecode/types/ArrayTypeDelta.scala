@@ -3,8 +3,7 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
 import core.deltas.{Compilation, NodeGrammar}
 import core.language.Language
 import core.nabl.ConstraintBuilder
@@ -43,8 +42,8 @@ object ArrayTypeDelta extends TypeInstance with StackType {
   override def description: String = "Defines the array type."
 
   val arrayType = PrimitiveType("Array")
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = {
-    val elementType = TypeSkeleton.getType(compilation, builder, _type(ArrayElementType).asInstanceOf[NodePath], parentScope)
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
+    val elementType = TypeSkeleton.getType(compilation, builder, _type(ArrayElementType).asInstanceOf[NodeLike], parentScope)
     TypeApplication(arrayType, Seq(elementType), _type)
   }
 }

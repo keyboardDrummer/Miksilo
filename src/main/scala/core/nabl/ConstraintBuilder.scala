@@ -34,12 +34,24 @@ class ConstraintBuilder(factory: Factory) {
   }
 
   def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
+    resolve2(name, Some(origin), scope, _type)
+  }
+
+  def resolve2(name: String, origin: Option[SourceElement], scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
     val result = _type.fold(declarationVariable())(t => declarationVariable(t))
     reference(name, origin, scope, result)
     result
   }
 
+  def reference(name: String, scope: Scope, declaration: Declaration) : Reference = {
+    reference(name, None, scope, declaration)
+  }
+
   def reference(name: String, origin: SourceElement, scope: Scope, declaration: Declaration) : Reference = {
+    reference(name, Some(origin), scope, declaration)
+  }
+
+  private def reference(name: String, origin: Option[SourceElement], scope: Scope, declaration: Declaration) : Reference = {
     val result = new Reference(name, origin)
     constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
     constraints ::= ResolvesTo(result, declaration)

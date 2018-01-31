@@ -4,7 +4,7 @@ import core.bigrammar.TestCompilerGrammarUtils
 import core.deltas.grammars.KeyGrammar
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
-import deltas.bytecode.types.VoidTypeC.VoidTypeKey
+import deltas.bytecode.types.VoidTypeDelta.VoidTypeKey
 import util.TestUtils
 
 class TestWhile extends FunSuite {

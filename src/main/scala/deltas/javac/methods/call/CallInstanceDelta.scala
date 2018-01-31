@@ -9,7 +9,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MemberSelector
 
-object CallInstanceC extends GenericCall {
+object CallInstanceDelta extends GenericCall {
 
   override def description: String = "Enables calling instance methods."
 

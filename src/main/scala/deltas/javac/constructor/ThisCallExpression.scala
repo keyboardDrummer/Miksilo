@@ -5,7 +5,7 @@ import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract}
 import core.language.Language
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -19,7 +19,7 @@ object ThisCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeC.voidType
+  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)

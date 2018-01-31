@@ -4,8 +4,12 @@ import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.node.{GrammarKey, Node, NodeField, NodeLike}
+import core.deltas.node._
+import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
+import core.nabl.scopes.ParentScope
+import core.nabl.scopes.objects.Scope
+import core.nabl.{Constraint, ConstraintBuilder}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.Shape
 import deltas.bytecode.constants.ClassInfoConstant
@@ -15,8 +19,14 @@ import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
 
+trait ShapeWithConstraints extends NodeShape {
+  def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit
+}
+
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithLanguageRegistry with WithCompilationState {
+
+  override def description: String = "Defines a skeleton for the Java class."
 
   implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
     def _package = node(ClassPackage).asInstanceOf[Seq[String]]
@@ -25,8 +35,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]) = node(ClassImports) = value
 
-    def name = node(ClassName).asInstanceOf[String]
-    def name_=(value: String) = node(ClassName) = value
+    def name: String = node.getValue(ClassName)
+    def name_=(value: String): Unit = node.setValue(ClassName, value)
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
@@ -69,7 +79,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     case _ =>
   }
 
-  def getClassCompiler(compilation: Compilation) = getState(compilation).classCompiler
+  def getClassCompiler(compilation: Compilation): ClassCompiler = getState(compilation).classCompiler
 
   def getQualifiedClassName(javaClass: JavaClass[Node]): QualifiedClassName = {
     QualifiedClassName(javaClass._package ++ Seq(javaClass.name))
@@ -127,5 +137,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   object ClassName extends NodeField
 
-  override def description: String = "Defines a skeleton for the Java class."
+  override def inject(language: Language): Unit = {
+    language.collectConstraints = (compilation, builder) => {
+      val classScope = builder.newScope()
+      val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
+      val members = clazz.members
+      members.foreach(member =>
+        member.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, member, classScope))
+    }
+    super.inject(language)
+  }
 }

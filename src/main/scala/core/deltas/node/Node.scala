@@ -46,6 +46,12 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     result
   }
 
+
+  override def asPath: Option[NodePath] = None
+
+  override def getValue[T](key: NodeField): T = this(key).asInstanceOf[T]
+  override def setValue[T](key: NodeField, value: T): Unit = this(key) = value
+
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     shape = node.shape
     if (!keepData)

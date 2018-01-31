@@ -7,7 +7,7 @@ import core.deltas.node._
 import core.language.Language
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
@@ -23,7 +23,8 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
   case class BadConstructorNameException(javaClass: Node, constructor: Node) extends BadInputException
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    val className = program.name
+    val clazz: JavaClass[Node] = program
+    val className = clazz.name
     for (constructor <- getConstructors(program)) {
       val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
       if (!constructorClassName.equals(className))
@@ -31,7 +32,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
       constructor.shape = MethodDelta.Shape
       constructor(MethodDelta.MethodNameKey) = SuperCallExpression.constructorName
-      constructor(MethodDelta.ReturnTypeKey) = VoidTypeC.voidType
+      constructor(MethodDelta.ReturnTypeKey) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false
       constructor.data.remove(ConstructorClassNameKey)

@@ -2,8 +2,7 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
-import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.node.{Node, NodeLike, NodeShape}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
 import core.nabl.ConstraintBuilder
@@ -42,5 +41,5 @@ trait TypeInstance extends DeltaWithGrammar {
 
   def getJavaGrammar(grammars: LanguageGrammars): BiGrammar
 
-  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type
+  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type
 }

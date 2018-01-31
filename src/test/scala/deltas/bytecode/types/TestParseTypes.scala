@@ -21,7 +21,7 @@ class TestParseTypes extends FunSuite {
   test("VoidType") {
     val input = "void"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(VoidTypeC.voidType)(result)
+    assertResult(VoidTypeDelta.voidType)(result)
   }
 
   test("appendFrame") {

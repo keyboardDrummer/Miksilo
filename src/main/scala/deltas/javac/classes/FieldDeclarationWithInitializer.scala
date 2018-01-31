@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import deltas.javac.methods.assignment.AssignmentSkeleton
@@ -52,7 +52,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
-    val fieldInitializerMethod = MethodDelta.method(getFieldInitialiserMethodName,VoidTypeC.voidType, Seq.empty, reversedInitialiserStatements)
+    val fieldInitializerMethod = MethodDelta.method(getFieldInitialiserMethodName,VoidTypeDelta.voidType, Seq.empty, reversedInitialiserStatements)
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- ConstructorDelta.getConstructors(program)) {

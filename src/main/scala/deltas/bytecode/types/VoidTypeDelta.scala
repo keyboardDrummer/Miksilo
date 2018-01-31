@@ -1,17 +1,16 @@
 package deltas.bytecode.types
 
-import core.bigrammar.grammars.Keyword
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.node.{Node, NodeLike, NodeShape}
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.{PrimitiveType, Type}
 
-object VoidTypeC extends TypeInstance with StackType {
+object VoidTypeDelta extends TypeInstance with StackType {
 
   override val key = VoidTypeKey
 
@@ -36,5 +35,5 @@ object VoidTypeC extends TypeInstance with StackType {
   override def description: String = "Defines the void type."
 
   val constraintType = PrimitiveType("Void")
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodePath, parentScope: Scope): Type = constraintType
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
 }
