@@ -7,7 +7,7 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val inputType = argument.constraints(builder, scope)
     val outputType = result.constraints(builder, scope)
-    builder.typesAreEqual(_type, FunctionType(inputType, outputType, this))
+    builder.typesAreEqual(_type, FunctionType(inputType, outputType, Some(this)))
   }
 
   override def variables: Set[LanguageTypeVariable] = argument.variables ++ result.variables

@@ -5,6 +5,9 @@ import core.deltas.node.{Node, NodeShape}
 import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{FunctionType, Type}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
@@ -16,6 +19,9 @@ import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements.StatementSkeleton
 
 object SuperCallExpression extends ExpressionInstance {
+
+  override def description: String = "Enables calling a super constructor."
+
   override val key = SuperCall
   val constructorName: String = "<init>"
 
@@ -54,5 +60,10 @@ object SuperCallExpression extends ExpressionInstance {
 
   object SuperCall extends NodeShape
 
-  override def description: String = "Enables calling a super constructor."
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val callArguments = CallDelta.getCallArguments(expression)
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
+    val constructorType = FunctionType.curry(callTypes, VoidTypeDelta.constraintType)
+    builder.resolve(constructorName, expression, parentScope, Some(constructorType))
+  }
 }

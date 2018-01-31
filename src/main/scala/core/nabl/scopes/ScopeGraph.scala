@@ -42,6 +42,12 @@ case class DeclaresScope(target: ScopeNode) extends GraphEdge {
   override def traverse: Boolean = false
 }
 
+/*
+References are inside scopes.
+Scopes can be inside other scopes.
+Declarations are inside scopes.
+A declaration can declare a scope.
+ */
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def findReference(location: SourceElement): Reference = ???

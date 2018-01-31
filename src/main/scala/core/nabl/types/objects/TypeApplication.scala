@@ -18,7 +18,15 @@ object FuncPrimitive extends PrimitiveType("Func")
  */
 object FunctionType {
 
-  def apply(argument: Type, result: Type, origin: AnyRef): Type =
+  def curry(arguments: Seq[Type], initialResult: Type): Type = {
+    var result: Type = initialResult
+    for(parameter <- arguments.reverse) {
+      result = FunctionType(parameter, result, None)
+    }
+    result
+  }
+
+  def apply(argument: Type, result: Type, origin: Option[AnyRef]): Type =
     TypeApplication(PrimitiveType("Func"), Seq(argument, result), origin)
 
   def unapply(_type: Type): Option[(Type, Type, AnyRef)] = _type match {
