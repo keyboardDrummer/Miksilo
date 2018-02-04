@@ -1,13 +1,13 @@
 package deltas.javac
 
 import core.deltas.node.Node
-import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta, VoidTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.javac.methods.MethodDelta._
 import org.scalatest.FunSuite
-import util.{TestLanguageBuilder, SourceUtils}
+import util.{SourceUtils, TestLanguageBuilder}
 
 class EmptyMain extends FunSuite {
   val className = "EmptyMain"
@@ -30,7 +30,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(parameter("args", ArrayTypeDelta.arrayType(ObjectTypeDelta.objectType(QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(parameter("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))
     val body = Seq()
     method("main", VoidTypeDelta.voidType, parameters, body, static = true, AccessibilityFieldsDelta.PublicVisibility)
   }

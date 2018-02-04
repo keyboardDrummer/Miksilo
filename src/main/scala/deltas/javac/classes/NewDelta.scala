@@ -11,7 +11,7 @@ import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.UnqualifiedObjectTypeDelta
 
 object NewDelta extends ExpressionInstance {
 
@@ -20,7 +20,7 @@ object NewDelta extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val objectGrammar = find(ObjectTypeDelta.ObjectTypeJavaGrammar)
+    val objectGrammar = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar.as(NewObject) ~ callArgumentsGrammar.as(CallDelta.CallArguments) asNode NewCallKey
     val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)

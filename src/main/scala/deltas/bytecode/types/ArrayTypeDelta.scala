@@ -13,7 +13,7 @@ import core.nabl.types.objects.{PrimitiveType, Type, TypeApplication}
 object ArrayTypeDelta extends TypeInstance with StackType {
   override val key = ArrayTypeKey
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(ObjectTypeDelta.rootObjectType)
+  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(QualifiedObjectTypeDelta.rootObjectType)
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
@@ -21,7 +21,7 @@ object ArrayTypeDelta extends TypeInstance with StackType {
     "[" ~> typeGrammar.as(ArrayElementType) asNode ArrayTypeKey
   }
 
-  def getArrayElementType(arrayType: Node): Node = arrayType(ArrayElementType).asInstanceOf[Node]
+  def getElementType[T <: NodeLike](arrayType: T): T = arrayType(ArrayElementType).asInstanceOf[T]
 
   override def getJavaGrammar(grammars: LanguageGrammars): NodeGrammar = {
     import grammars._

@@ -5,7 +5,7 @@ import core.deltas.node.Node
 import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.UnqualifiedObjectTypeDelta
 
 case class ProgramTypeState(stackTypes: Seq[Node], variableTypes: Map[Int, Node])
 
@@ -76,7 +76,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
 
   def convertObjectTypesToObjectKey(input: Seq[Node]): Seq[Object] = {
     input.map(_type => _type.shape match {
-      case ObjectTypeDelta.ObjectTypeKey => ObjectTypeDelta.ObjectTypeKey
+      case UnqualifiedObjectTypeDelta.Shape => UnqualifiedObjectTypeDelta.Shape
       case _ => _type
     })
   }

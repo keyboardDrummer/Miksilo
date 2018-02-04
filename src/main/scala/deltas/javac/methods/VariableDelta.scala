@@ -11,7 +11,7 @@ import core.nabl.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.LoadIntegerDelta
 import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
-import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, ObjectTypeDelta}
+import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
@@ -54,7 +54,7 @@ object VariableDelta extends ExpressionInstance {
       case BooleanTypeDelta.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
       case IntTypeDelta.IntTypeKey => LoadIntegerDelta.load(variableAddress)
       case LongTypeDelta.LongTypeKey => LoadLongDelta.load(variableAddress)
-      case ObjectTypeDelta.ObjectTypeKey => LoadAddressDelta.addressLoad(variableAddress)
+      case UnqualifiedObjectTypeDelta.Shape => LoadAddressDelta.addressLoad(variableAddress)
     })
   }
 

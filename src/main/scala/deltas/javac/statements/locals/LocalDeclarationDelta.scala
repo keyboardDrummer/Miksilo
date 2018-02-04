@@ -3,8 +3,8 @@ package deltas.javac.statements.locals
 import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{NodePath, Path}
+import core.deltas.node._
+import core.deltas.path.{NodePath, NodePathRoot, Path}
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
@@ -14,9 +14,10 @@ import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
 object LocalDeclarationDelta extends StatementInstance {
 
-  def getDeclarationType(declaration: Node) = declaration(Type).asInstanceOf[Node]
-
-  def getDeclarationName(declaration: Node) = declaration(Name).asInstanceOf[String]
+  implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def _type: T = node(Type).asInstanceOf[T]
+    def name: String = node.getValue(Name)
+  }
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
@@ -48,9 +49,9 @@ object LocalDeclarationDelta extends StatementInstance {
   }
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
-    val _type = getDeclarationType(declaration)
+    val _type = NodePathRoot(declaration)._type
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
-    val name: String = getDeclarationName(declaration)
+    val name: String = declaration.name
     Map(name -> _type)
   }
 
@@ -59,6 +60,6 @@ object LocalDeclarationDelta extends StatementInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
-    builder.declaration(getDeclarationName(statement), statement(Name).asInstanceOf[Path], parentScope, Some(_type))
+    builder.declaration(statement.name, statement(Name).asInstanceOf[Path], parentScope, Some(_type))
   }
 }

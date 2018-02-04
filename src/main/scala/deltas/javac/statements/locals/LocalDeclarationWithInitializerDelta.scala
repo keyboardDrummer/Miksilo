@@ -2,21 +2,23 @@ package deltas.javac.statements.locals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot, NodeSequenceElement}
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.VariableDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
-import deltas.javac.statements.locals.LocalDeclarationDelta.{Name, Type}
+import deltas.javac.statements.locals.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
 import deltas.javac.statements.{ExpressionAsStatementDelta, StatementSkeleton}
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationDelta)
 
-  def getInitializer(withInitializer: Node) = withInitializer(Initializer).asInstanceOf[Node]
+  implicit class LocalDeclarationWithInitializer[T <: NodeLike](node: T) extends LocalDeclaration[T](node) {
+    def initializer: T = node(Initializer).asInstanceOf[T]
+  }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -38,11 +40,12 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(declarationWithInitializer: NodePath, state: Language): Unit = {
-    val name: String = LocalDeclarationDelta.getDeclarationName(declarationWithInitializer)
-    val _type = LocalDeclarationDelta.getDeclarationType(declarationWithInitializer)
+  def transformDeclarationWithInitializer(node: NodePath, state: Language): Unit = {
+    val declarationWithInitializer: LocalDeclarationWithInitializer[NodePath] = node
+    val name: String = declarationWithInitializer.name
+    val _type = declarationWithInitializer._type
     val declaration = LocalDeclarationDelta.declaration(name, _type)
-    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), getInitializer(declarationWithInitializer))
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), declarationWithInitializer.initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     val originSequence = declarationWithInitializer.asInstanceOf[NodeSequenceElement]

@@ -2,17 +2,16 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
+import core.deltas.Contract
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.deltas.node._
-import core.deltas.Contract
 import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.readJar.ClassFileParser
-import deltas.bytecode.types.ObjectTypeDelta.ObjectStackType
-import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, ObjectTypeDelta}
+import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
 
 object StackMapTableAttribute extends ByteCodeAttribute {
 
@@ -71,7 +70,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     super.inject(state)
     ByteCodeSkeleton.getRegistry(state).getBytes(Shape) = (attribute: Node) => getStackMapTableBytes(attribute, state)
     ByteCodeSkeleton.getRegistry(state).constantReferences.put(Shape, Map(AttributeNameKey -> Utf8ConstantDelta.key))
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ObjectStackType, Map(ObjectTypeDelta.Name -> ClassInfoConstant.key))
+    ByteCodeSkeleton.getRegistry(state).constantReferences.put(QualifiedObjectTypeDelta.StackType,
+      Map(QualifiedObjectTypeDelta.Name -> ClassInfoConstant.key))
   }
 
   def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {
@@ -109,7 +109,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     _type.shape match {
       case IntTypeDelta.key => hexToBytes("01")
       case LongTypeDelta.key => hexToBytes("04")
-      case ObjectTypeDelta.ObjectStackType => hexToBytes("07") ++ shortToBytes(_type(ObjectTypeDelta.Name).asInstanceOf[Int])
+      case QualifiedObjectTypeDelta.StackType => hexToBytes("07") ++ shortToBytes(_type(QualifiedObjectTypeDelta.Name).asInstanceOf[Int])
     }
   }
 
@@ -146,7 +146,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     val index = grammars.find(ConstantPoolIndexGrammar)
     val basic = grammars.find(IntTypeDelta.key) |  grammars.find(LongTypeDelta.key)
     import grammars._
-    val objectReference = "class" ~> index.as(ObjectTypeDelta.Name).asLabelledNode(ObjectStackType)
+    val objectReference = "class" ~> index.as(QualifiedObjectTypeDelta.Name).asLabelledNode(QualifiedObjectTypeDelta.StackType)
 
     basic | objectReference
   }

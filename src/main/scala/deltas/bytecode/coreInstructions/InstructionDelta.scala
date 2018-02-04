@@ -8,7 +8,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvi
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 import deltas.bytecode.coreInstructions.InstructionDelta.InstructionShape
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import deltas.bytecode.types.{UnqualifiedObjectTypeDelta, TypeSkeleton}
 
 case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
@@ -36,7 +36,7 @@ trait InstructionDelta extends InstructionWithGrammar
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
-    if (stackTop.shape != ObjectTypeDelta.ObjectTypeKey)
+    if (stackTop.shape != UnqualifiedObjectTypeDelta.Shape)
       throw new ByteCodeTypeException(s"$name requires an object on top of the stack and not a $stackTop.")
   }
 

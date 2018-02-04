@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node._
-import core.deltas.path.{NodePath, NodePathRoot}
+import core.deltas.path.{ChildPath, NodePath, NodePathRoot}
 import core.document.BlankLine
 import core.language.Language
 import core.nabl.ConstraintBuilder
@@ -15,7 +15,7 @@ import core.nabl.scopes.objects.Scope
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
@@ -69,11 +69,11 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
   }
 
-  def fullyQualify(_type: Node, classCompiler: ClassCompiler): Unit =  _type.shape match {
-    case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getArrayElementType(_type), classCompiler)
-    case ObjectTypeDelta.ObjectTypeKey =>
-        val newName = ObjectTypeDelta.getObjectTypeName(_type).left.flatMap(inner => Right(classCompiler.fullyQualify(inner)))
-      _type(ObjectTypeDelta.Name) = newName
+  def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
+    case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
+    case UnqualifiedObjectTypeDelta.Shape =>
+        val newName = classCompiler.fullyQualify(UnqualifiedObjectTypeDelta.getName(_type))
+      _type.asInstanceOf[ChildPath].replaceWith(QualifiedObjectTypeDelta.neww(newName))
     case _ =>
   }
 

@@ -76,7 +76,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     AccessibilityFieldsDelta)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler): Node = {
-    val result = metaObject(ParameterType).asInstanceOf[Node]
+    val result = NodePathRoot(metaObject)(ParameterType).asInstanceOf[NodePath]
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }

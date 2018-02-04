@@ -68,14 +68,14 @@ class TestParseTypes extends FunSuite {
   test("ObjectType") {
     val input = "java.lang.String"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+    val objectType = QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(objectType)(result)
   }
 
   test("ArrayType2") {
     val input = "java.lang.String[]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+    val objectType = QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(ArrayTypeDelta.arrayType(objectType))(result)
   }
 }

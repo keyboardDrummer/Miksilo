@@ -4,9 +4,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{NodeField, NodeShape}
 import core.deltas.DeltaWithGrammar
 import core.language.Language
-import deltas.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
+import deltas.bytecode.types.QualifiedObjectTypeDelta.ByteCodeGrammarInner
 
-object SelectInnerClassC extends DeltaWithGrammar {
+object SelectInnerClassDelta extends DeltaWithGrammar {
 
   object SelectInnerClass extends NodeShape
   object ParentClass extends NodeField
@@ -15,7 +15,7 @@ object SelectInnerClassC extends DeltaWithGrammar {
 
   def transformByteCodeGrammars(grammars: LanguageGrammars): Unit = {
     import grammars._
-    val objectInner = find(ObjectTypeByteCodeGrammarInner)
+    val objectInner = find(ByteCodeGrammarInner)
     val selectInnerGrammar = (objectInner.as(ParentClass) ~< "." ~~ objectInner.as(ChildClass)).asNode(SelectInnerClass)
 
     objectInner.addOption(selectInnerGrammar)

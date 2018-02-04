@@ -12,7 +12,8 @@ import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
 
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
@@ -29,20 +30,21 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   object FieldWithInitializerKey extends NodeShape
   override def description: String = "Enables fields to have initialisers."
 
-  def transformDeclarationWithInitializer(fieldWithInitialiser: NodePath, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
-    val name: String = LocalDeclarationDelta.getDeclarationName(fieldWithInitialiser)
-    val _type = LocalDeclarationDelta.getDeclarationType(fieldWithInitialiser)
+  def transformDeclarationWithInitializer(node: NodePath, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
+    val fieldWithInitialiser: LocalDeclarationWithInitializer[NodePath] = node
+    val name: String = fieldWithInitialiser.name
+    val _type = fieldWithInitialiser._type
     val declaration = FieldDeclaration.field(_type, name)
 
-    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), LocalDeclarationWithInitializerDelta.getInitializer(fieldWithInitialiser))
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), fieldWithInitialiser.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
-    fieldWithInitialiser.replaceWith(declaration)
+    fieldWithInitialiser.node.replaceWith(declaration)
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
-    new NodePathRoot(program).visit(obj => obj.shape match {
+    NodePathRoot(program).visit(obj => obj.shape match {
       case FieldWithInitializerKey => transformDeclarationWithInitializer(obj, initializerStatements, state)
       case _ =>
     })

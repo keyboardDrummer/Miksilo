@@ -4,7 +4,7 @@ import core.deltas.Compilation
 import core.deltas.exceptions.BadInputException
 import core.deltas.node.Node
 import core.deltas.path.{NodePath, NodePathRoot}
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
@@ -25,7 +25,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   def getInitialVariables: VariablePool = {
     var result = VariablePool(compilation)
     if (!method.isStatic)
-      result = result.add("this", ObjectTypeDelta.objectType(classCompiler.currentClassInfo.name))
+      result = result.add("this", QualifiedObjectTypeDelta.neww(classCompiler.fullyQualify(classCompiler.currentClassInfo.name)))
     for (parameter <- parameters)
       result = result.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
     result

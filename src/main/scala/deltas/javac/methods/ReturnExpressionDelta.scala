@@ -33,7 +33,8 @@ object ReturnExpressionDelta extends StatementInstance {
       case x if x == LongTypeDelta.longType => Seq(LongReturnInstructionDelta.longReturn)
       case x if x == FloatTypeDelta.floatType => Seq(FloatReturnInstructionDelta.create)
       case x if x == DoubleTypeDelta.doubleType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).contains(ObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
+      case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).
+        contains(QualifiedObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
     })
   }

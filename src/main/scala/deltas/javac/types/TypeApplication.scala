@@ -5,12 +5,13 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, NodeField, NodeShape}
 import core.deltas.DeltaWithGrammar
 import core.language.Language
-import deltas.bytecode.types.ObjectTypeDelta.ObjectTypeByteCodeGrammarInner
-import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 
 object TypeApplication extends DeltaWithGrammar {
 
-  object TypeApplicationKey extends NodeShape
+  override def description: String = "Adds application of generic types"
+
+  object Shape extends NodeShape
   object TypeApplicationFunc extends NodeField
   object TypeApplicationArgument extends NodeField
 
@@ -24,10 +25,10 @@ object TypeApplication extends DeltaWithGrammar {
     import grammars._
     val typeArgumentGrammar = create(JavaTypeArgumentGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val objectInner = find(ObjectTypeDelta.ObjectTypeJavaGrammar)
+    val objectInner = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     typeArgumentGrammar.addOption(typeGrammar)
     val typeApplication: BiGrammar = (objectInner.inner.as(TypeApplicationFunc) ~ ("<" ~> typeArgumentGrammar.someSeparated(",").as(TypeApplicationArgument) ~< ">")).
-      asNode(TypeApplicationKey)
+      asNode(Shape)
     typeGrammar.addOption(typeApplication)
   }
 
@@ -35,15 +36,13 @@ object TypeApplication extends DeltaWithGrammar {
   def transformByteCodeGrammars(grammars: LanguageGrammars): Unit = {
     import grammars._
     val typeArgumentGrammar = create(ByteCodeTypeArgumentGrammar)
-    val objectInner = find(ObjectTypeByteCodeGrammarInner)
+    val objectInner = find(QualifiedObjectTypeDelta.ByteCodeGrammarInner)
     objectInner.addOption((objectInner.inner.as(TypeApplicationFunc) ~ ("<" ~> typeArgumentGrammar.some.as(TypeApplicationArgument) ~< ">")).
-      asNode(TypeApplicationKey))
+      asNode(Shape))
 
     val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     val argumentGrammar = find(TypeApplication.ByteCodeTypeArgumentGrammar)
     argumentGrammar.addOption(typeGrammar)
   }
-
-  override def description: String = "Adds application of generic types"
 }
 

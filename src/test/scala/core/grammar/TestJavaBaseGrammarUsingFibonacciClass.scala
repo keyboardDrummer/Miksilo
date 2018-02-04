@@ -2,7 +2,7 @@ package core.grammar
 
 import core.bigrammar.TestCompilerGrammarUtils
 import core.deltas.node.{ComparisonOptions, Node}
-import deltas.bytecode.types.{ArrayTypeDelta, IntTypeDelta, ObjectTypeDelta, VoidTypeDelta}
+import deltas.bytecode.types._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
@@ -117,7 +117,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val fibonacciCall = CallDelta.call(VariableDelta.variable("fibonacci"), Seq(IntLiteralDelta.literal(5)))
     val printCall = CallDelta.call(MemberSelector.selector(MemberSelector.selector(VariableDelta.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
-    MethodDelta.method("main", VoidTypeDelta.voidType, Seq(MethodDelta.parameter("args", ArrayTypeDelta.arrayType(ObjectTypeDelta.stringType))),
+    MethodDelta.method("main", VoidTypeDelta.voidType, Seq(MethodDelta.parameter("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
       Seq(ExpressionAsStatementDelta.create(printCall)), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
