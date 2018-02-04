@@ -26,7 +26,7 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
 
   override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
-  override def pathAsString: String = s"${parent.pathAsString}.$field[$index]"
+  override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
 }
 
 object NodeSequenceElement {

@@ -31,8 +31,8 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
         throw BadConstructorNameException(program, constructor.node)
 
       constructor.shape = MethodDelta.Shape
-      constructor(MethodDelta.MethodNameKey) = SuperCallExpression.constructorName
-      constructor(MethodDelta.ReturnTypeKey) = VoidTypeDelta.voidType
+      constructor(MethodDelta.Name) = SuperCallExpression.constructorName
+      constructor(MethodDelta.ReturnType) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false
       constructor.data.remove(ConstructorClassNameKey)
@@ -45,7 +45,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],
                   visibility: AccessibilityFieldsDelta.Visibility = PublicVisibility) = new Node(ConstructorKey,
-    MethodParametersKey -> _parameters, Body -> _body, AccessibilityFieldsDelta.VisibilityField -> visibility,
+    Parameters -> _parameters, Body -> _body, AccessibilityFieldsDelta.VisibilityField -> visibility,
     ConstructorClassNameKey -> className)
 
 
@@ -57,7 +57,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     import grammars._
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
-    val parseParameters = find(MethodDelta.ParametersGrammar) as MethodParametersKey
+    val parseParameters = find(MethodDelta.ParametersGrammar) as Parameters
     val block = find(BlockDelta.Grammar) as Body
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addOption(constructorGrammar)

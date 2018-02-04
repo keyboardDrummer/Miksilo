@@ -16,7 +16,7 @@ case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
 
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
-  override def pathAsString: String = s"${parent.pathAsString}.$field"
+  override def pathAsString: String = s"${parent.pathAsString}/$field"
 }
 
 object NodeFieldValue {
