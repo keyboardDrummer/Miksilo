@@ -15,6 +15,7 @@ trait NodeLike {
   def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
   def asPath: Option[NodePath]
+  def asNode: Node
 
   def children: Seq[Self] = ???
 

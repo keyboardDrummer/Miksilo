@@ -1,7 +1,7 @@
 package deltas.javac.methods
 
-import core.deltas.grammars.LanguageGrammars
 import core.deltas._
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.NodePath
 import core.language.Language
@@ -28,6 +28,10 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   object SelectGrammar extends GrammarKey
+
+  trait MethodContainerExpressionShape extends NodeShape {
+    def getScope(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Scope
+  }
 
   object Shape extends NodeShape
 

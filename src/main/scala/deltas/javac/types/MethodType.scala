@@ -54,7 +54,12 @@ object MethodType extends TypeInstance {
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val parameters = _type.parameterTypes
-    val returnType = TypeSkeleton.getType(compilation, builder, _type.returnType, parentScope)
+    val returnTypeNode = _type.returnType
+    getType(compilation, builder, parentScope, parameters, returnTypeNode)
+  }
+
+  def getType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope, parameters: Seq[NodeLike], returnTypeNode: NodeLike): Type = {
+    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
     FunctionType.curry(parameterTypes, returnType)
   }

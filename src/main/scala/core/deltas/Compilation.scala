@@ -2,13 +2,13 @@ package core.deltas
 
 import core.deltas.node.Node
 import core.language.Language
-import core.nabl.Proofs
+import core.nabl.ProofsLike
 
 import scala.collection.mutable
 
 class Compilation(val language: Language) {
   var program: Node = _
-  var proofs: Proofs = _
+  var proofs: ProofsLike = _
 
   var output: String = _
   val state: mutable.Map[Any,Any] = mutable.Map.empty

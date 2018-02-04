@@ -68,7 +68,7 @@ object ObjectTypeDelta extends TypeInstance with StackType {
     create(ObjectTypeByteCodeGrammar, grammar)
   }
 
-  def getObjectTypeName(objectType: Node): Either[String, QualifiedClassName] = objectType(Name).asInstanceOf[Either[String, QualifiedClassName]]
+  def getObjectTypeName(objectType: NodeLike): Either[String, QualifiedClassName] = objectType.getValue(Name).asInstanceOf[Either[String, QualifiedClassName]]
 
   override def getStackSize: Int = 1
 
@@ -85,7 +85,8 @@ object ObjectTypeDelta extends TypeInstance with StackType {
   override def description: String = "Defines the object type."
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
-    val classDeclaration = builder.resolve2(name, _type.asPath, parentScope)
+    val name = getObjectTypeName(_type)
+    val classDeclaration = builder.resolve2(name.fold(x => x, x => x.toString), _type.asPath, parentScope)
     TypeFromDeclaration(classDeclaration)
   }
 }

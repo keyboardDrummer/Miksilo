@@ -1,6 +1,13 @@
 package deltas.javac.methods.call
 
+import core.deltas.Compilation
 import core.deltas.node._
+import core.deltas.path.NodePath
+import core.nabl.ConstraintBuilder
+import core.nabl.objects.DeclarationVariable
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.{FunctionType, Type}
+import deltas.javac.expressions.ExpressionSkeleton
 
 object CallDelta
 {
@@ -21,5 +28,13 @@ object CallDelta
 
   def call(callee: Node, arguments: Seq[Node] = Seq()) = {
     new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
+  }
+
+  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, parentScope: Scope,
+                      methodName: String, returnType: Type): DeclarationVariable = {
+    val callArguments = CallDelta.getCallArguments(call)
+    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
+    val constructorType = FunctionType.curry(callTypes, returnType)
+    builder.resolve(methodName, call, parentScope, Some(constructorType))
   }
 }

@@ -1,14 +1,29 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.deltas.node.{GrammarKey, Node, NodeField}
+import core.deltas.path.NodePath
+import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName, ShapeWithConstraints}
 
 object BasicImportDelta extends DeltaWithGrammar {
 
-  object ImportKey extends NodeShape
+  object ImportKey extends ShapeWithConstraints {
+    override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
+
+      val elements = getParts(_import)
+      val fullPackage: String = elements.dropRight(1).fold("")((a, b) => a + "." + b)
+      val packageDeclaration = builder.resolve(fullPackage, _import, parentScope)
+      val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
+      val classDeclaration = builder.resolve(elements.last, null, packageScope)
+      val classExternalScope = builder.resolveScopeDeclaration(classDeclaration)
+      builder.importScope(parentScope, classExternalScope)
+    }
+  }
+
   object ElementsKey extends NodeField
 
   object ImportPathGrammar extends GrammarKey

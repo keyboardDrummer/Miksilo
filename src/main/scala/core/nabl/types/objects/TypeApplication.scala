@@ -13,12 +13,21 @@ case class PrimitiveType(name: String) extends ConcreteType {
 }
 
 object FuncPrimitive extends PrimitiveType("Func")
+object ActionPrimitive extends PrimitiveType("Action")
+
+object ActionType {
+  def apply(result: Type, origin: Option[AnyRef] = None): Type =
+    TypeApplication(ActionPrimitive, Seq(result), origin)
+}
 
 /*
  */
 object FunctionType {
 
   def curry(arguments: Seq[Type], initialResult: Type): Type = {
+    if (arguments.isEmpty)
+      return ActionType(initialResult)
+
     var result: Type = initialResult
     for(parameter <- arguments.reverse) {
       result = FunctionType(parameter, result, None)
@@ -27,7 +36,7 @@ object FunctionType {
   }
 
   def apply(argument: Type, result: Type, origin: Option[AnyRef]): Type =
-    TypeApplication(PrimitiveType("Func"), Seq(argument, result), origin)
+    TypeApplication(FuncPrimitive, Seq(argument, result), origin)
 
   def unapply(_type: Type): Option[(Type, Type, AnyRef)] = _type match {
     case TypeApplication(FuncPrimitive, Seq(input, output), origin) => Some(input, output, origin)

@@ -8,6 +8,7 @@ import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
 import core.nabl.ConstraintBuilder
+import core.nabl.objects.Declaration
 import core.nabl.scopes.objects.Scope
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
@@ -66,9 +67,9 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     }
   }
 
-  private def getMethodType(method: Method[Node]) = {
+  private def getMethodType[T <: NodeLike](method: Method[T]) = {
     val parameterTypes = method.parameters.map(p => p(ParameterTypeKey).asInstanceOf[Node])
-    MethodType.construct(method.returnType, parameterTypes)
+    MethodType.construct(method.returnType.asNode, parameterTypes)
   }
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
@@ -179,7 +180,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     var methodCompiler: MethodCompiler = _
   }
 
-  object Shape extends ShapeWithConstraints {
+  object Shape extends ShapeWithConstraints with ShapeWithDeclaration {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
         val method: Method[NodePath] = path
         val bodyScope = builder.newScope(Some(parentScope))
@@ -189,8 +190,17 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
           builder.declaration(name, parameter, bodyScope, Some(parameterType))
         })
         BlockDelta.collectConstraints(compilation, builder, method.body, bodyScope)
-        builder.declaration(method.name, method, parentScope, Some(TypeSkeleton.getType(compilation, builder, getMethodType(method.current), parentScope)))
       }
+
+    override def collectDeclarationConstraints(compilation: Compilation, builder: ConstraintBuilder,
+                                               path: NodePath, parentScope: Scope): Declaration = {
+      val method: Method[NodePath] = path
+      val parameterTypes = method.parameters.map(p => p(ParameterTypeKey).asInstanceOf[NodePath])
+      val returnType = method.returnType
+      val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
+
+      builder.declaration(method.name, method, parentScope, Some(methodType))
+    }
   }
 
   object MethodGrammar extends GrammarKey

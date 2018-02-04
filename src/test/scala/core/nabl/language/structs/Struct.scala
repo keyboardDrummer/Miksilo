@@ -21,12 +21,12 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
     builder.add(DeclarationOfType(structDeclaration, TypeFromDeclaration(structDeclaration)))
     val scopeOfParent: Option[Scope] = parent.map(p => {
       val parentDeclaration = builder.declarationVariable()
-      val scopeOfParent = builder.declaredScopeVariable(parentDeclaration)
+      val scopeOfParent = builder.resolveScopeDeclaration(parentDeclaration)
       builder.reference(p, this, parentScope, parentDeclaration)
       builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))
       scopeOfParent
     })
-    val structScope = builder.declaredNewScope(structDeclaration, scopeOfParent)
+    val structScope = builder.declareScope(structDeclaration, scopeOfParent)
     fields.foreach(field => {
       val _type = field._type.constraints(builder, parentScope)
       builder.declaration(field.name, field, structScope, Some(_type))

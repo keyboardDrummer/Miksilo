@@ -5,10 +5,14 @@ import core.deltas.node._
 import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MemberSelector
+import deltas.javac.methods.MemberSelector.MethodContainerExpressionShape
 import deltas.javac.methods.call.CallDelta.CallArgumentsGrammar
 import deltas.javac.types.MethodType._
 
@@ -46,7 +50,7 @@ trait GenericCall extends ExpressionInstance {
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
-  def getMethodKey(call: NodePath, compiler: ClassCompiler) = {
+  def getMethodKey(call: NodePath, compiler: ClassCompiler): MethodQuery = {
     val callCallee = CallDelta.getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorTarget(callCallee)
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
@@ -55,6 +59,15 @@ trait GenericCall extends ExpressionInstance {
     val callTypes: Seq[Node] = callArguments.map(argument => ExpressionSkeleton.getType(compiler.compilation)(argument))
 
     val member = MemberSelector.getSelectorMember(callCallee)
-    new MethodQuery(kind.info.getQualifiedName, member, callTypes)
+    MethodQuery(kind.info.getQualifiedName, member, callTypes)
+  }
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val callCallee = CallDelta.getCallCallee(call)
+    val selectorTarget = MemberSelector.getSelectorTarget(callCallee)
+    val methodContainerExpressionShape = selectorTarget.shape.asInstanceOf[MethodContainerExpressionShape]
+    val methodContainerScope = methodContainerExpressionShape.getScope(compilation, builder, selectorTarget, parentScope)
+    val member = MemberSelector.getSelectorMember(callCallee)
+    CallDelta.callConstraints(compilation,builder, call, methodContainerScope, member, _type)
   }
 }

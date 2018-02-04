@@ -1,30 +1,18 @@
 package core.deltas.path
 
 import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
-import core.language.SourceElement
 
 object NodePath {
   implicit def toSimpleObject(withOrigin: NodePath): Node = withOrigin.current
   implicit def castList(list: Seq[NodePath]): Seq[Node] = list.map(x => x.current)
 }
 
-trait Path extends SourceElement {
-  val current: Any
-  def parentOption: Option[NodePath]
-
-
-  def findAncestorShape(shape: NodeShape): NodePath = ancestors.find(p => p.shape == shape).get
-  def ancestors: Stream[NodePath] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
-  def pathAsString: String
-
-  override def toString = s"Path: $pathAsString\nCurrent: $current\nRoot: ${root.current}"
-  def root: NodePath = ancestors.last
-}
-
 trait NodePath extends NodeLike with Path {
   type Self = NodePath
   override val current: Node
 
+
+  override def asNode: Node = current
   override def asPath: Option[NodePath] = Some(this)
   override def getValue[T](key: NodeField): T = this(key).asInstanceOf[Path].current.asInstanceOf[T]
   override def setValue[T](key: NodeField, value: T): Unit = this(key).asInstanceOf[ChildPath].replaceWith(value)

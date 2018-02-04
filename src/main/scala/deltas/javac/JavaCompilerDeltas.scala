@@ -54,7 +54,7 @@ object JavaCompilerDeltas {
       javaMethod
   }
 
-  def imports = Seq(ImplicitJavaLangImport, WildcardImportC, BasicImportDelta)
+  def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
   def fields = Seq(FieldDeclaration, AssignToMember)
 
   val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)

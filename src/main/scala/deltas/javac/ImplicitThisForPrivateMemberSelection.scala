@@ -5,7 +5,6 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
 import core.deltas.path._
 import core.language.Language
-import deltas.bytecode.ByteCodeSkeleton
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
@@ -63,7 +62,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin = NodePathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
-        case ByteCodeSkeleton.Shape =>
+        case JavaClassSkeleton.Shape =>
           JavaLang.loadIntoClassPath(compilation)
 
           val classCompiler = ClassCompiler(obj, compilation)

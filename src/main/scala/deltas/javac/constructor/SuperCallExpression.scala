@@ -2,12 +2,12 @@ package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.{NodePath, Path}
 import core.deltas.{Compilation, Contract}
 import core.language.Language
 import core.nabl.ConstraintBuilder
 import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.{FunctionType, Type}
+import core.nabl.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
@@ -60,10 +60,11 @@ object SuperCallExpression extends ExpressionInstance {
 
   object SuperCall extends NodeShape
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val callArguments = CallDelta.getCallArguments(expression)
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
-    val constructorType = FunctionType.curry(callTypes, VoidTypeDelta.constraintType)
-    builder.resolve(constructorName, expression, parentScope, Some(constructorType))
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
+    val parentName = clazz.parent.get //TODO shouldn't really be an option at this point.
+    val superClass = builder.resolve(parentName, clazz.node(ClassParent).asInstanceOf[Path], parentScope)
+    val superScope = builder.resolveScopeDeclaration(superClass)
+    CallDelta.callConstraints(compilation, builder, call, superScope, constructorName, VoidTypeDelta.constraintType)
   }
 }

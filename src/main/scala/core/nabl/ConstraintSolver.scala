@@ -14,6 +14,8 @@ case class CouldNotApplyConstraints(constraints: Seq[Constraint]) extends SolveE
   override def toString: String = s"Left with constraints: $constraints"
 }
 
+
+
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of
@@ -25,16 +27,20 @@ If constraints generate new ones, how do we guarantee termination?
 */
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint],
                        val maxCycles: Int = 100,
-                       val allowDuplicateDeclaration: Boolean = true //TODO find out why false causes many tests to fail.
+                       val allowDuplicateDeclaration: Boolean = true, //TODO find out why false causes many tests to fail.
+                       val proofs: Proofs = new Proofs()
                       )
-  extends Proofs
+  extends ProofsLike
 {
-  val scopeGraph = new ScopeGraph
-  val typeGraph = new TypeGraph
-  var environment = Map.empty[Declaration, Type]
-  var constraints: Seq[Constraint] = startingConstraints
+  def scopeGraph: ScopeGraph = proofs.scopeGraph
+  def typeGraph: TypeGraph = proofs.typeGraph
+  def environment = Map.empty[Declaration, Type]
+  def environment_=(value: Map[Declaration, Type]): Unit = proofs.environment = value
+
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
+
+  var constraints: Seq[Constraint] = startingConstraints
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
   def run() : Try[Unit] = {
@@ -47,7 +53,10 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
         progress = cycle()
         cycleCount += 1
       }
-      if (constraints.isEmpty) Success(()) else Failure(CouldNotApplyConstraints(constraints))
+      if (constraints.isEmpty)
+        Success(())
+      else
+        Failure(CouldNotApplyConstraints(constraints))
     } catch {
       case e:SolveException => Failure(e)
     }
@@ -79,7 +88,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     environment = currentValue match {
       case Some(existingType) =>
         if (!unifyTypes(existingType, _type)) {
-          result = false
+          result = false //TODO Maybe throw an error?
         }
         environment
       case _ => environment + (declaration -> _type)

@@ -13,6 +13,8 @@ import scala.collection.mutable
 case class Copy(key: AnyRef, counter: Int)
 class ConstraintBuilder(factory: Factory) {
 
+  var proofs: Proofs = null
+
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
 
   def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
@@ -32,6 +34,8 @@ class ConstraintBuilder(factory: Factory) {
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
+
+  def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
   def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
     resolve2(name, Some(origin), scope, _type)
@@ -105,13 +109,13 @@ class ConstraintBuilder(factory: Factory) {
   /*
   Get the scope declared by the given declaration
    */
-  def declaredScopeVariable(declaration: Declaration, parent: Option[Scope] = None): ScopeVariable = {
+  def resolveScopeDeclaration(declaration: Declaration, parent: Option[Scope] = None): ScopeVariable = {
     val result = scopeVariable(parent)
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }
 
-  def declaredNewScope(declaration: Declaration, parent: Option[Scope] = None): ConcreteScope = {
+  def declareScope(declaration: Declaration, parent: Option[Scope] = None): ConcreteScope = {
     val result = newScope(parent)
     constraints ::= DeclarationOfScope(declaration, result)
     result
@@ -125,5 +129,9 @@ class ConstraintBuilder(factory: Factory) {
 
   def checkSubType(superType: Type, subType: Type): Unit = {
     add(CheckSubType(subType, superType))
+  }
+
+  def toSolver: ConstraintSolver = {
+    new ConstraintSolver(this, getConstraints, proofs = if (proofs != null) proofs else new Proofs())
   }
 }

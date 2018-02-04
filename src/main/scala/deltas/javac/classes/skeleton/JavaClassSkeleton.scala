@@ -1,27 +1,24 @@
 package deltas.javac.classes.skeleton
 
 import core.bigrammar.BiGrammar
-import core.document.BlankLine
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot}
+import core.document.BlankLine
 import core.language.Language
-import core.nabl.scopes.ParentScope
+import core.nabl.ConstraintBuilder
+import core.nabl.objects.{Declaration, NamedDeclaration}
+import core.nabl.scopes.DeclarationInsideScope
+import core.nabl.scopes.imports.DeclarationOfScope
 import core.nabl.scopes.objects.Scope
-import core.nabl.{Constraint, ConstraintBuilder}
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.Shape
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{ArrayTypeDelta, ObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
-
-trait ShapeWithConstraints extends NodeShape {
-  def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit
-}
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithLanguageRegistry with WithCompilationState {
@@ -41,8 +38,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
 
-    def parent = node(ClassParent).asInstanceOf[Option[String]]
-    def parent_=(value: Option[String]) = node(ClassParent) = value
+    def parent: Option[String] = node.getValue(ClassParent)
+    def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
@@ -50,6 +47,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
     def transformClass(javaClass: Node) {
       JavaLang.loadIntoClassPath(compilation)
+      javaClass.shape = Shape
       val classCompiler: ClassCompiler = ClassCompiler(javaClass, compilation)
       getState(compilation).classCompiler = classCompiler
       classCompiler.bind()
@@ -104,9 +102,40 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   }
 
   object ImportGrammar extends GrammarKey
+  object Shape extends ShapeWithDeclaration {
+    override def collectDeclarationConstraints(compilation: Compilation, builder: ConstraintBuilder,
+                                               path: NodePath, defaultPackageScope: Scope): Declaration = {
+      val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
+      val fullPackage: String = clazz._package.toList.fold("")((a, b) => a + "." + b)
+      val packageDeclaration = builder.declaration(fullPackage, clazz.node, defaultPackageScope) //TODO because this is declared every time the package is referenced, there might be an issue.
+      val packageScope = builder.declareScope(packageDeclaration)
+
+      val clazzDeclaration = new NamedDeclaration(clazz.name, clazz.node)
+      val classExternalScope = builder.newScope()
+      builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
+      builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
+      builder.importScope(packageScope, classExternalScope)
+
+      val classInternalScope = builder.newScope()
+
+      clazz.imports
+
+      //TODO temp. replace with javaLang.
+//      val objectDeclaration = builder.declaration("Object", clazz.node, classScope)
+//      val objectScope = builder.declaredNewScope(objectDeclaration)
+//      builder.declaration(SuperCallExpression.constructorName, clazz.node, objectScope, Some(ActionType(VoidTypeDelta.constraintType)))
+//      //Exit temp.
+
+      val members = clazz.members
+      members.foreach(member => member.shape.asInstanceOf[ShapeWithDeclaration].
+        collectDeclarationConstraints(compilation, builder, member, classInternalScope))
+
+      clazzDeclaration
+    }
+  }
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
-    new Node(ByteCodeSkeleton.Shape,
+    new Node(Shape,
     Members -> members,
     ClassPackage -> _package,
     ClassName -> name,
@@ -139,8 +168,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   override def inject(language: Language): Unit = {
     language.collectConstraints = (compilation, builder) => {
-      val classScope = builder.newScope()
+      val defaultPackageScope = builder.newScope()
       val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
+      val clazzDeclaration = Shape.collectDeclarationConstraints(compilation, builder, clazz.node, defaultPackageScope)
+      val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
+
+      val proofs = JavaLang.getProofs(compilation)
+      builder.proofs = proofs
+
       val members = clazz.members
       members.foreach(member =>
         member.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, member, classScope))

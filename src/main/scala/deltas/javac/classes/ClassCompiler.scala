@@ -3,7 +3,7 @@ package deltas.javac.classes
 import java.util.NoSuchElementException
 
 import core.deltas.Compilation
-import core.deltas.node.Node
+import core.deltas.node.{Node, NodeShape}
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.ObjectTypeDelta

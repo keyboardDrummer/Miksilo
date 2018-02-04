@@ -17,4 +17,13 @@ class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
       """class Test { }""".stripMargin
     compile(program)
   }
+
+  test("empty main method") {
+    val program =
+      """class Test {
+        |  public static void main(String[] args) {
+        |  }
+        |}""".stripMargin
+    compile(program)
+  }
 }

@@ -47,6 +47,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
 
+  override def asNode: Node = this
   override def asPath: Option[NodePath] = None
 
   override def getValue[T](key: NodeField): T = this(key).asInstanceOf[T]

@@ -1,15 +1,27 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape}
+import core.deltas.node.Node
+import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
 import deltas.javac.classes.BasicImportDelta._
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName}
+import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName, ShapeWithConstraints}
 
-object WildcardImportC extends DeltaWithGrammar {
+object WildcardImportDelta extends DeltaWithGrammar {
 
-  object WildcardImportKey extends NodeShape
+  object WildcardImportKey extends ShapeWithConstraints {
+    override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
+
+      val elements = getParts(_import)
+      val fullPackage: String = elements.fold("")((a, b) => a + "." + b)
+      val packageDeclaration = builder.resolve(fullPackage, _import, parentScope)
+      val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
+      builder.importScope(parentScope, packageScope)
+    }
+  }
 
   def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
 
