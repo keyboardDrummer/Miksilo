@@ -13,7 +13,7 @@ import core.nabl.types.objects.{PrimitiveType, Type}
 object FloatTypeDelta extends TypeInstance
 {
   object FloatTypeKey extends NodeShape
-  override val key = FloatTypeKey
+  override val shape = FloatTypeKey
   val floatType = new Node(FloatTypeKey)
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???

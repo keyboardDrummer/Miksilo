@@ -21,12 +21,12 @@ import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
-  with WithLanguageRegistry with WithCompilationState {
+  with WithLanguageRegistry with WithCompilationState with HasDeclaration {
 
   override def description: String = "Defines a skeleton for the Java class."
 
   implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
-    def _package = node(ClassPackage).asInstanceOf[Seq[String]]
+    def _package: Seq[String] = node.getValue(ClassPackage).asInstanceOf[Seq[String]]
     def _package_=(value: Seq[String]) = node(ClassPackage) = value
 
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
@@ -42,7 +42,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+  override def transformProgram(program: Node, compilation: core.deltas.Compilation): Unit = {
     transformClass(program)
 
     def transformClass(javaClass: Node) {
@@ -101,38 +101,38 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     find(BodyGrammar).inner = classGrammar
   }
 
-  object ImportGrammar extends GrammarKey
-  object Shape extends ShapeWithDeclaration {
-    override def collectDeclarationConstraints(compilation: Compilation, builder: ConstraintBuilder,
-                                               path: NodePath, defaultPackageScope: Scope): Declaration = {
-      val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
-      val fullPackage: String = clazz._package.toList.fold("")((a, b) => a + "." + b)
-      val packageDeclaration = builder.declaration(fullPackage, clazz.node, defaultPackageScope) //TODO because this is declared every time the package is referenced, there might be an issue.
-      val packageScope = builder.declareScope(packageDeclaration)
 
-      val clazzDeclaration = new NamedDeclaration(clazz.name, clazz.node)
-      val classExternalScope = builder.newScope()
-      builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
-      builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
-      builder.importScope(packageScope, classExternalScope)
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
+    val clazz: JavaClass[NodePath] = path
 
-      val classInternalScope = builder.newScope()
-
-      clazz.imports
-
-      //TODO temp. replace with javaLang.
-//      val objectDeclaration = builder.declaration("Object", clazz.node, classScope)
-//      val objectScope = builder.declaredNewScope(objectDeclaration)
-//      builder.declaration(SuperCallExpression.constructorName, clazz.node, objectScope, Some(ActionType(VoidTypeDelta.constraintType)))
-//      //Exit temp.
-
-      val members = clazz.members
-      members.foreach(member => member.shape.asInstanceOf[ShapeWithDeclaration].
-        collectDeclarationConstraints(compilation, builder, member, classInternalScope))
-
-      clazzDeclaration
+    val packageScope = if (clazz._package.isEmpty) {
+      defaultPackageScope
+    } else {
+      val packageParts = clazz.node._package.toList
+      val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
+      val packageDeclaration = builder.declare(fullPackage, clazz.node, defaultPackageScope) //TODO because this is declared every time the package is referenced, there might be an issue.
+      builder.declareScope(packageDeclaration, Some(defaultPackageScope))
     }
+
+    val clazzDeclaration = new NamedDeclaration(clazz.name, clazz.node)
+    val classExternalScope = builder.newScope(Some(defaultPackageScope))
+    builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
+    builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
+    builder.importScope(packageScope, classExternalScope)
+
+    val classInternalScope = builder.newScope(Some(classExternalScope))
+
+    val members = clazz.members
+    members.foreach(member => hasDeclarations.get(compilation, member.shape).
+      getDeclaration(compilation, builder, member, classInternalScope))
+
+    clazzDeclaration
   }
+
+  object ImportGrammar extends GrammarKey
+  object Shape extends NodeShape
+
+  val hasDeclarations: ShapeAspect[HasDeclaration] = new ShapeAspect[HasDeclaration]
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
@@ -167,18 +167,23 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object ClassName extends NodeField
 
   override def inject(language: Language): Unit = {
+    hasDeclarations.add(language, Shape, this)
+
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope()
       val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
-      val clazzDeclaration = Shape.collectDeclarationConstraints(compilation, builder, clazz.node, defaultPackageScope)
+      val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
       val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
 
       val proofs = JavaLang.getProofs(compilation)
       builder.proofs = proofs
 
+      for(_import <- clazz.imports)
+        _import.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, _import, classScope)
+
       val members = clazz.members
       members.foreach(member =>
-        member.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, member, classScope))
+        this.hasDeclarations.get(language, member.shape).getDeclaration(compilation, builder, member, classScope))
     }
     super.inject(language)
   }

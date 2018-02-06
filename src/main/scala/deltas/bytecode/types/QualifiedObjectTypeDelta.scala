@@ -15,7 +15,7 @@ import deltas.javac.classes.skeleton.QualifiedClassName
 
 object QualifiedObjectTypeDelta extends TypeInstance with StackType {
 
-  override val key: Shape.type = Shape
+  override val shape: Shape.type = Shape
 
   override def description: String = "Defines the object type based on a fully qualified class name."
 

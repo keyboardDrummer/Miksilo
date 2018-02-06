@@ -2,21 +2,17 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
-import core.deltas.node.{Node, NodeLike, NodeShape}
-import core.deltas.{Compilation, Contract, DeltaWithGrammar}
+import core.deltas.node.Node
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
 import deltas.bytecode.ByteCodeSkeleton
 
-trait TypeInstance extends DeltaWithGrammar {
-  val key: NodeShape
+trait TypeInstance extends DeltaWithGrammar with HasShape with HasType {
 
-  override def inject(state: Language): Unit = {
-    TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
-    TypeSkeleton.getRegistry(state).instances.put(key, this)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    TypeSkeleton.getSuperTypesRegistry(language).put(shape, _type => getSuperTypes(_type, language))
+    TypeSkeleton.getRegistry(language).instances.put(shape, this)
+    super.inject(language)
   }
 
   def getSuperTypes(_type: Node, state: Language): Seq[Node]
@@ -27,10 +23,10 @@ trait TypeInstance extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
-  def byteCodeGrammarKey = KeyGrammar(key)
+  def byteCodeGrammarKey = KeyGrammar(shape)
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
-    grammars.create(key, javaGrammar)
+    grammars.create(shape, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
     parseType.addOption(javaGrammar)
 
@@ -40,6 +36,4 @@ trait TypeInstance extends DeltaWithGrammar {
   }
 
   def getJavaGrammar(grammars: LanguageGrammars): BiGrammar
-
-  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type
 }

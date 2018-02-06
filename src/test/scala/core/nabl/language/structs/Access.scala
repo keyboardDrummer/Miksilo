@@ -16,7 +16,7 @@ case class MatchType(subject: Expression, cases: Seq[TypeCase]) extends Expressi
       val caseType = builder.getType(caseTypeDeclaration)
       builder.add(CheckSubType(caseType, subjectType))
       val bodyScope = builder.newScope(Some(parentScope))
-      builder.declaration(_case.bindingName, this, bodyScope, Some(caseType))
+      builder.declare(_case.bindingName, this, bodyScope, Some(caseType))
       builder.typesAreEqual(_type, _case.body.getType(builder, bodyScope))
     })
   }

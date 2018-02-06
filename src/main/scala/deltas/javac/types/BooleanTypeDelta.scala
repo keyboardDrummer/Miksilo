@@ -16,7 +16,7 @@ object BooleanTypeDelta extends TypeInstance
 {
   val constraintType: Type = PrimitiveType("Boolean")
 
-  override val key = BooleanTypeKey
+  override val shape = BooleanTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty
 

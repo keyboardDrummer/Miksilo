@@ -12,7 +12,7 @@ import core.nabl.types.objects.{PrimitiveType, Type}
 
 object DoubleTypeDelta extends TypeInstance with StackType {
 
-  override val key = DoubleTypeKey
+  override val shape = DoubleTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
@@ -28,7 +28,7 @@ object DoubleTypeDelta extends TypeInstance with StackType {
     "double" ~> value(doubleType)
   }
 
-  val doubleType = new Node(key)
+  val doubleType = new Node(shape)
 
   object DoubleTypeKey extends NodeShape
 

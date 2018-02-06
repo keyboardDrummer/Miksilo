@@ -1,21 +1,30 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.deltas.node._
+import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
+import core.nabl.ConstraintBuilder
+import core.nabl.objects.Declaration
+import core.nabl.scopes.objects.Scope
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.classes.skeleton.{ClassMemberDelta, ClassSignature, JavaClassSkeleton}
+import deltas.javac.classes.skeleton.{ClassMemberDelta, ClassSignature, HasDeclaration, JavaClassSkeleton}
 import deltas.javac.methods.AccessibilityFieldsDelta
 
-object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
+object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration {
 
   object Shape extends NodeShape
   object Type extends NodeField
   object Name extends NodeField
+
+  implicit class Field[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def name: String = node.getValue(Name)
+    def _type: T = node(Type).asInstanceOf[T]
+  }
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, TypeConstant, AccessibilityFieldsDelta)
 
@@ -28,18 +37,11 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
       bindField(field)
 
     def bindField(field: Node) = {
-      val name: String = getFieldName(field)
-      val _type = getFieldType(field)
+
+      val name: String = Field(field).name
+      val _type = field._type
       signature.newFieldInfo(name, _type)
     }
-  }
-
-  def getFieldType(field: Node): Node = {
-    field(Type).asInstanceOf[Node]
-  }
-
-  def getFieldName(field: Node): String = {
-    field(Name).asInstanceOf[String]
   }
 
   def getFields(javaClass: JavaClass[Node]): Seq[Node] = {
@@ -56,13 +58,14 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
     })
   }
 
-  def convertField(field: Node, classCompiler: ClassCompiler, state: Language) {
-    val nameIndex = classCompiler.getNameIndex(getFieldName(field))
+  def convertField(node: Node, classCompiler: ClassCompiler, state: Language) {
+    val field: Field[Node] = node
+    val nameIndex = classCompiler.getNameIndex(field.name)
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
     field.shape = ByteCodeFieldInfo.FieldKey
 
-    val fieldDescriptor = TypeConstant.constructor(getFieldType(field))
+    val fieldDescriptor = TypeConstant.constructor(field._type)
     field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
     field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
     field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
@@ -82,4 +85,15 @@ object FieldDeclaration extends DeltaWithGrammar with ClassMemberDelta {
   }
 
   override def description: String = "Enables adding a field declaration without an initializer to a Java class."
+
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
+  }
+
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
+    val field: Field[NodePath] = path
+    builder.declare(field.name, path, parentScope, Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
+  }
 }

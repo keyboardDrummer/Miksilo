@@ -25,7 +25,7 @@ import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState
-  with ClassMemberDelta {
+  with ClassMemberDelta with HasDeclaration {
 
   implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
     def name: String = node.getValue(Name)
@@ -180,27 +180,18 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     var methodCompiler: MethodCompiler = _
   }
 
-  object Shape extends ShapeWithConstraints with ShapeWithDeclaration {
+  object Shape extends ShapeWithConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
         val method: Method[NodePath] = path
         val bodyScope = builder.newScope(Some(parentScope))
         method.parameters.foreach(parameter => {
           val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
           val name = parameter.current(ParameterName).asInstanceOf[String]
-          builder.declaration(name, parameter, bodyScope, Some(parameterType))
+          builder.declare(name, parameter, bodyScope, Some(parameterType))
         })
         BlockDelta.collectConstraints(compilation, builder, method.body, bodyScope)
       }
 
-    override def collectDeclarationConstraints(compilation: Compilation, builder: ConstraintBuilder,
-                                               path: NodePath, parentScope: Scope): Declaration = {
-      val method: Method[NodePath] = path
-      val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[NodePath])
-      val returnType = method.returnType
-      val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
-
-      builder.declaration(method.name, method, parentScope, Some(methodType))
-    }
   }
 
   object MethodGrammar extends GrammarKey
@@ -228,4 +219,19 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   override def description: String = "Enables Java classes to contain methods."
+
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
+  }
+
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
+    val method: Method[NodePath] = path
+    val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[NodePath])
+    val returnType = method.returnType
+    val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
+
+    builder.declare(method.name, method, parentScope, Some(methodType))
+  }
 }

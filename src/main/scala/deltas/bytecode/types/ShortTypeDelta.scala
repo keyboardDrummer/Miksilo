@@ -12,7 +12,7 @@ import core.nabl.types.objects.{PrimitiveType, Type}
 
 object ShortTypeDelta extends TypeInstance with StackType {
 
-  override val key = ShortTypeKey
+  override val shape = ShortTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty //TODO extend. long ?
 

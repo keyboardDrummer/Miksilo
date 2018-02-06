@@ -14,7 +14,7 @@ trait NodePath extends NodeLike with Path {
 
   override def asNode: Node = current
   override def asPath: Option[NodePath] = Some(this)
-  override def getValue[T](key: NodeField): T = this(key).asInstanceOf[Path].current.asInstanceOf[T]
+  override def getValue[T](key: NodeField): T = current.data(key).asInstanceOf[T]
   override def setValue[T](key: NodeField, value: T): Unit = this(key).asInstanceOf[ChildPath].replaceWith(value)
 
   def shape: NodeShape = current.shape

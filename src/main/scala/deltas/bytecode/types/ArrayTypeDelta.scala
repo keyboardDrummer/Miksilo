@@ -11,7 +11,7 @@ import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.{PrimitiveType, Type, TypeApplication}
 
 object ArrayTypeDelta extends TypeInstance with StackType {
-  override val key = ArrayTypeKey
+  override val shape = ArrayTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(QualifiedObjectTypeDelta.rootObjectType)
 

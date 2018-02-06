@@ -12,11 +12,11 @@ object SuperTypeArgument extends DeltaWithGrammar {
   object SuperBody extends NodeField
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val byteCodeArgumentGrammar = find(TypeApplication.ByteCodeTypeArgumentGrammar)
+    val byteCodeArgumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
     byteCodeArgumentGrammar.addOption(("-" ~~> byteCodeArgumentGrammar.as(SuperBody)).asNode(SuperKey))
 
     val javaTypeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val javaArgumentGrammar = find(TypeApplication.JavaTypeArgumentGrammar)
+    val javaArgumentGrammar = find(TypeApplicationDelta.JavaTypeArgumentGrammar)
     javaArgumentGrammar.addOption(("?" ~~> "super" ~~> javaTypeGrammar.as(SuperBody)).asNode(SuperKey))
   }
 

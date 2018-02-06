@@ -11,7 +11,7 @@ import core.nabl.scopes.objects.Scope
 import core.nabl.types.objects.{Type, TypeFromDeclaration}
 
 object UnqualifiedObjectTypeDelta extends TypeInstance {
-  override val key: Shape.type = Shape
+  override val shape: Shape.type = Shape
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = {
     Seq.empty //TODO extend

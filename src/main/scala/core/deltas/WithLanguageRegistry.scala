@@ -5,6 +5,24 @@ import core.language.Language
 
 import scala.collection.mutable
 
+trait HasShape {
+  def shape: NodeShape
+}
+
+class ShapeAspect[T] {
+
+  private def map(language: Language): mutable.Map[NodeShape, T] =
+    language.data.getOrElseUpdate(this, mutable.Map.empty[NodeShape, T]).asInstanceOf[mutable.Map[NodeShape, T]]
+
+  def get(language: Language, shape: NodeShape): T = {
+    map(language)(shape)
+  }
+
+  def add[U <: T with HasShape](language: Language, value: U): Unit = add(language, value.shape, value)
+
+  def add(language: Language, shape: NodeShape, value: T): Unit = map(language).put(shape, value)
+}
+
 trait WithLanguageRegistry extends Key {
   type Registry
 

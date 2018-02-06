@@ -16,13 +16,10 @@ trait Key extends AnyRef
   */
 trait NodeField extends GrammarKey
 
-/**
-  * Defines a new Node class
-  */
-trait NodeShape extends GrammarKey {
-  def create(values: (NodeField, Any)*): Node = {
-    new Node(this, values: _*)
-  }
+
+
+trait Aspect {
+
 }
 
 trait GrammarKey extends Key

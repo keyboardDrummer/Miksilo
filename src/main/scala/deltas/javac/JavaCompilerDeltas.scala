@@ -55,7 +55,7 @@ object JavaCompilerDeltas {
   }
 
   def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
-  def fields = Seq(FieldDeclaration, AssignToMember)
+  def fields = Seq(FieldDeclarationDelta, AssignToMember)
 
   val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
@@ -116,8 +116,8 @@ object JavaCompilerDeltas {
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
 
-  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsTypeArgument,
-    SuperTypeArgument, TypeApplication, MethodType) ++
+  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
+    SuperTypeArgument, TypeApplicationDelta, MethodType) ++
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
       ShortTypeDelta, TypeSkeleton)
 

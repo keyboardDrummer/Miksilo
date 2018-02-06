@@ -18,7 +18,7 @@ import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta.Local
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(FieldDeclaration)
+  override def dependencies: Set[Contract] = Set(FieldDeclarationDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -34,7 +34,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val fieldWithInitialiser: LocalDeclarationWithInitializer[NodePath] = node
     val name: String = fieldWithInitialiser.name
     val _type = fieldWithInitialiser._type
-    val declaration = FieldDeclaration.field(_type, name)
+    val declaration = FieldDeclarationDelta.field(_type, name)
 
     val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), fieldWithInitialiser.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)

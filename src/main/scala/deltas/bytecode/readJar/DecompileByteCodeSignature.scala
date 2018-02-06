@@ -10,7 +10,7 @@ import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
-import deltas.javac.classes.{ConstantPool, FieldDeclaration}
+import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.types.{MethodType, TypeAbstraction}
@@ -55,6 +55,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegist
     members ++= getMethods(state, constantPool, program(ByteCodeSkeleton.Methods).asInstanceOf[Seq[Node]])
 
     program.replaceWith(javaClass)
+
   }
 
   val accessFlagsToVisibility: Map[ByteCodeMethodInfo.MethodAccessFlag, Visibility] = AccessibilityFieldsDelta.visibilityAccessFlagLinks.
@@ -121,7 +122,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegist
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)
-      val field = FieldDeclaration.field(_type, name)
+      val field = FieldDeclarationDelta.field(_type, name)
       setVisibility(fieldInfo, field)
       field
     })

@@ -39,6 +39,6 @@ object JustJavaLabel extends StatementInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val label = getName(statement)
-    builder.declaration(label, statement(Name).asInstanceOf[Path], parentScope)
+    builder.declare(label, statement(Name).asInstanceOf[Path], parentScope)
   }
 }

@@ -6,11 +6,11 @@ import core.language.Language
 
 trait StackType extends Delta
 {
-  val key: NodeShape
+  val shape: NodeShape
   def getStackSize: Int
 
-  override def inject(state: Language): Unit = {
-    TypeSkeleton.getRegistry(state).stackSize.put(key, getStackSize)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    TypeSkeleton.getRegistry(language).stackSize.put(shape, getStackSize)
+    super.inject(language)
   }
 }

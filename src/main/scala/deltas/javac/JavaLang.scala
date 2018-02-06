@@ -33,7 +33,7 @@ object JavaLang {
     val builder = new ConstraintBuilder(factory)
     val compilationScope = builder.newScope()
     for(clazz <- Seq(objectClass, stringClass, systemClass, printStreamClass)) {
-      JavaClassSkeleton.Shape.collectDeclarationConstraints(compilation, builder, NodePathRoot(clazz), //TODO hier moet ik eigenlijk even een package tree bouwen met alle classes er in.
+      JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).getDeclaration(compilation, builder, NodePathRoot(clazz), //TODO hier moet ik eigenlijk even een package tree bouwen met alle classes er in.
         compilationScope)
     }
     val solver = new ConstraintSolver(builder, builder.getConstraints)

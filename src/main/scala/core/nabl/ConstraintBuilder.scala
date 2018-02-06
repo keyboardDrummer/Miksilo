@@ -64,11 +64,11 @@ class ConstraintBuilder(factory: Factory) {
 
   def declarationType(name: String, origin: SourceElement, container: Scope) : Type  = {
     val result = typeVariable()
-    declaration(name, origin, container, Some(result))
+    declare(name, origin, container, Some(result))
     result
   }
 
-  def declaration(name: String, origin: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
+  def declare(name: String, origin: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
     val result = new NamedDeclaration(name, origin)
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationOfType(result, t))

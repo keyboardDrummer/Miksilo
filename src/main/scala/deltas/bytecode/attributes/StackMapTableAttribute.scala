@@ -107,8 +107,8 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getVerificationInfoBytes(_type: Node, state: Language): Seq[Byte] = {
     _type.shape match {
-      case IntTypeDelta.key => hexToBytes("01")
-      case LongTypeDelta.key => hexToBytes("04")
+      case IntTypeDelta.`shape` => hexToBytes("01")
+      case LongTypeDelta.`shape` => hexToBytes("04")
       case QualifiedObjectTypeDelta.StackType => hexToBytes("07") ++ shortToBytes(_type(QualifiedObjectTypeDelta.Name).asInstanceOf[Int])
     }
   }
@@ -144,7 +144,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def getVerificationInfoGrammar(grammars: LanguageGrammars): BiGrammar = {
     val index = grammars.find(ConstantPoolIndexGrammar)
-    val basic = grammars.find(IntTypeDelta.key) |  grammars.find(LongTypeDelta.key)
+    val basic = grammars.find(IntTypeDelta.shape) |  grammars.find(LongTypeDelta.shape)
     import grammars._
     val objectReference = "class" ~> index.as(QualifiedObjectTypeDelta.Name).asLabelledNode(QualifiedObjectTypeDelta.StackType)
 

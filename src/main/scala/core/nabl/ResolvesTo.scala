@@ -11,6 +11,8 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
   }
 
   override def apply(solver: ConstraintSolver): Boolean = {
+    if (reference.name == "java.lang")
+      System.out.print("")
     val resolvedDeclaration = solver.scopeGraph.resolve(reference)
     if (resolvedDeclaration != null)
     {

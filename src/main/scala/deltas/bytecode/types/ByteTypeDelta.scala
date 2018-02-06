@@ -15,7 +15,7 @@ object ByteTypeDelta extends TypeInstance {
   override def description: String = "Adds the byte type."
 
   object ByteTypeKey extends NodeShape
-  override val key = ByteTypeKey
+  override val shape = ByteTypeKey
   val me = new Node(ByteTypeKey)
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???

@@ -3,12 +3,17 @@ package deltas.javac.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.DeltaWithGrammar
+import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
+import core.deltas.{Compilation, DeltaWithGrammar}
 import core.language.Language
-import deltas.bytecode.types.TypeSkeleton
+import core.nabl.ConstraintBuilder
+import core.nabl.scopes.objects.Scope
+import core.nabl.types.objects.Type
+import deltas.bytecode.types.{HasType, TypeSkeleton}
 
-object TypeVariable extends DeltaWithGrammar {
+object TypeVariable extends DeltaWithGrammar with HasType {
+
+  override def description: String = "Adds references to type variables."
 
   object Shape extends NodeShape
   object TypeVariableName extends NodeField
@@ -34,5 +39,9 @@ object TypeVariable extends DeltaWithGrammar {
     node(TypeVariable.TypeVariableName).asInstanceOf[String]
   }
 
-  override def description: String = "Adds references to type variables."
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
+    builder.typeVariable() //TODO fix mock implementation
+  }
+
+  override def shape: NodeShape = Shape
 }
