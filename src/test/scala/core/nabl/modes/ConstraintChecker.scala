@@ -33,7 +33,7 @@ trait ConstraintChecker extends Checker
     val factory = new Factory()
     val builder: ConstraintBuilder = new ConstraintBuilder(factory)
     builder.add(Program.libraryConstraints)
-    val scope = factory.newScope
+    val scope = factory.newScope()
     val _type = languageType.constraints(builder, scope)
     expression.constraints(builder, _type, scope)
     val constraints = builder.getConstraints

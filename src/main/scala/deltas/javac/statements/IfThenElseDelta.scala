@@ -68,7 +68,7 @@ object IfThenElseDelta extends StatementInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     IfThenDelta.constraints(compilation, builder, statement, parentScope)
-    val elseBodyScope = builder.newScope(Some(parentScope))
+    val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
     val elseBody = getElseStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, elseBody, elseBodyScope)
   }

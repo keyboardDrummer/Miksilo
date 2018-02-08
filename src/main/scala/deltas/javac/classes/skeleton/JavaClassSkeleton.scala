@@ -20,6 +20,8 @@ import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
 
+import scala.collection.mutable
+
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithLanguageRegistry with WithCompilationState with HasDeclaration {
 
@@ -110,17 +112,19 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     } else {
       val packageParts = clazz.node._package.toList
       val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
-      val packageDeclaration = builder.declare(fullPackage, clazz.node, defaultPackageScope) //TODO because this is declared every time the package is referenced, there might be an issue.
-      builder.declareScope(packageDeclaration, Some(defaultPackageScope))
+      getState(compilation).packageScopes.getOrElseUpdate(fullPackage, {
+        val packageDeclaration = builder.declare(fullPackage, clazz.node, defaultPackageScope)
+        builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
+      })
     }
 
     val clazzDeclaration = new NamedDeclaration(clazz.name, clazz.node)
-    val classExternalScope = builder.newScope(Some(defaultPackageScope))
+    val classExternalScope = builder.newScope(Some(defaultPackageScope), "externalFor" + clazz.name)
     builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
     builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
     builder.importScope(packageScope, classExternalScope)
 
-    val classInternalScope = builder.newScope(Some(classExternalScope))
+    val classInternalScope = builder.newScope(Some(classExternalScope), "internalFor" + clazz.name)
 
     val members = clazz.members
     members.foreach(member => hasDeclarations.get(compilation, member.shape).
@@ -152,6 +156,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   class State {
     var classCompiler: ClassCompiler = _
     val javaCompiler: JavaCompiler = new JavaCompiler()
+    var packageScopes: mutable.Map[String, Scope] = mutable.Map.empty
   }
 
   object ClassGrammar
@@ -170,12 +175,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     hasDeclarations.add(language, Shape, this)
 
     language.collectConstraints = (compilation, builder) => {
-      val defaultPackageScope = builder.newScope()
+      val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
       val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
       val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
       val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
 
-      val proofs = JavaLang.getProofs(compilation)
+      val proofs = JavaLang.getProofs(compilation, defaultPackageScope)
       builder.proofs = proofs
 
       for(_import <- clazz.imports)

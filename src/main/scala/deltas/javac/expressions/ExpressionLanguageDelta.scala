@@ -13,7 +13,7 @@ object ExpressionLanguageDelta extends DeltaWithGrammar {
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation: Compilation, builder: ConstraintBuilder) => {
-      val _type = ExpressionSkeleton.getType(compilation, builder, NodePathRoot(compilation.program), builder.newScope())
+      val _type = ExpressionSkeleton.getType(compilation, builder, NodePathRoot(compilation.program), builder.newScope(debugName = "programScope"))
       //TODO check that the type is printable.
     }
   }

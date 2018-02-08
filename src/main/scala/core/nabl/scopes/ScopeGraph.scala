@@ -77,6 +77,14 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
     null
   }
 
+  case class DebugNode(node: GraphNode, graph: ScopeGraph) {
+    def next: Seq[DebugNode] = {
+      graph(node).map(n => DebugNode(n.target, graph)).toSeq
+    }
+  }
+
+  def debug(node: GraphNode): DebugNode = new DebugNode(node, this)
+
   def depthFirst(root: GraphNode): Seq[GraphNode] = {
     var result = List.empty[GraphNode]
     val visited = mutable.Set.empty[GraphNode]

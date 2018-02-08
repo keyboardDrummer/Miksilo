@@ -34,7 +34,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 {
   def scopeGraph: ScopeGraph = proofs.scopeGraph
   def typeGraph: TypeGraph = proofs.typeGraph
-  def environment = Map.empty[Declaration, Type]
+  def environment = proofs.environment
   def environment_=(value: Map[Declaration, Type]): Unit = proofs.environment = value
 
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
@@ -120,7 +120,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       instantiateScope(variable, right); true
     case (_, variable: ScopeVariable) =>
       instantiateScope(variable, left); true
-    case (ConcreteScope(x), ConcreteScope(y)) => if (x == y) true else false
+    case (ConcreteScope(x, _), ConcreteScope(y, _)) => if (x == y) true else false
     case _ => false
   }
 

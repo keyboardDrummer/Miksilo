@@ -15,9 +15,9 @@ class Factory
   }
 
   private var scopeCounter: Int = 0
-  def newScope: ConcreteScope = {
+  def newScope(debugName: String = ""): ConcreteScope = {
     scopeCounter += 1
-    ConcreteScope(scopeCounter)
+    ConcreteScope(scopeCounter, debugName)
   }
 
   private var typeCounter = 0

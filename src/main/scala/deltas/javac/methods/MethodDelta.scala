@@ -183,7 +183,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   object Shape extends ShapeWithConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
         val method: Method[NodePath] = path
-        val bodyScope = builder.newScope(Some(parentScope))
+        val bodyScope = builder.newScope(Some(parentScope), "methodBody")
         method.parameters.foreach(parameter => {
           val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
           val name = parameter.current(ParameterName).asInstanceOf[String]

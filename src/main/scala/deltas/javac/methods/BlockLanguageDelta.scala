@@ -18,7 +18,7 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
     super.inject(language)
     language.collectConstraints = (compilation, builder) => {
       val statements = NodePathRoot(compilation.program)(ProgramStatements).asInstanceOf[Seq[NodePath]]
-      BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope())
+      BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope(debugName = "programScope"))
     }
   }
 

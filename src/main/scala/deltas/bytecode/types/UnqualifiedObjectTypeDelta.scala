@@ -7,7 +7,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.language.Language
 import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.nabl.scopes.objects.{ConcreteScope, Scope}
 import core.nabl.types.objects.{Type, TypeFromDeclaration}
 
 object UnqualifiedObjectTypeDelta extends TypeInstance {
@@ -37,6 +37,8 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val name = getName(_type)
+    if (name == "String" && parentScope.isInstanceOf[ConcreteScope] && parentScope.asInstanceOf[ConcreteScope].debugName != "classInternalScope")
+      System.out.append("")
     TypeFromDeclaration(builder.resolve2(name, _type.asPath, parentScope))
   }
 
