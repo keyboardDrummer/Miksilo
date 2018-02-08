@@ -4,7 +4,7 @@ import core.language.Language
 import core.nabl.SolveConstraintsDelta
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
-import util.{TestLanguageBuilder, TestUtils}
+import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
     Language.spliceAndFilterTop(
@@ -24,6 +24,11 @@ class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
         |  public static void main(String[] args) {
         |  }
         |}""".stripMargin
+    compile(program)
+  }
+
+  test("fibonacci") {
+    val program = SourceUtils.getJavaTestFileContents("Fibonacci")
     compile(program)
   }
 }

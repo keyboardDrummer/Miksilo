@@ -28,7 +28,9 @@ object QualifiedObjectTypeDelta extends TypeInstance with StackType {
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    identifier.someSeparated(".").as(Name).asLabelledNode(Shape)
+    val parseQualifiedClassName = identifier.someSeparated(".").
+      map[Seq[String], QualifiedClassName](QualifiedClassName, qualifiedClassName => qualifiedClassName.parts)
+    parseQualifiedClassName.as(Name).asLabelledNode(Shape)
   }
 
   def neww(name: QualifiedClassName) = new Node(Shape, Name -> name)
