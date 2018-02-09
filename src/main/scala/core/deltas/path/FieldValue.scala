@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.{Node, NodeField}
+import core.deltas.node.NodeField
 
 case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   val current = parent.current(field)
@@ -19,11 +19,4 @@ case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   override def pathAsString: String = s"${parent.pathAsString}/$field"
 }
 
-object NodeFieldValue {
-  def apply(parent: NodePath, field: NodeField) = new NodeFieldValue(parent, field)
-  def unapply(value: NodeFieldValue): Option[(NodePath, NodeField) ]= Some(value.parent, value.field)
-}
 
-class NodeFieldValue(parent: NodePath, field: NodeField) extends FieldValue(parent, field) with NodePath {
-  override val current: Node = parent.current(field).asInstanceOf[Node]
-}

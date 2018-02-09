@@ -17,8 +17,6 @@ trait NodeLike {
   def asPath: Option[NodePath]
   def asNode: Node
 
-  def children: Seq[Self] = ???
-
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
     visit(node => result = node :: result)

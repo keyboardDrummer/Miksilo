@@ -7,7 +7,6 @@ trait Path extends SourceElement {
   val current: Any
   def parentOption: Option[NodePath]
 
-
   def findAncestorShape(shape: NodeShape): NodePath = ancestors.find(p => p.shape == shape).get
   def ancestors: Stream[NodePath] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
   def pathAsString: String
