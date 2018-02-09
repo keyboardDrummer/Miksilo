@@ -6,8 +6,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot, Path}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
@@ -49,7 +49,8 @@ object LocalDeclarationDelta extends StatementInstance {
   }
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
-    val _type = NodePathRoot(declaration)._type
+    val localDeclaration = LocalDeclaration[NodePath](NodePathRoot(declaration))
+    val _type = localDeclaration._type
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
     Map(name -> _type)

@@ -7,7 +7,7 @@ import core.deltas._
 import core.deltas.exceptions.{BadInputException, DeltaDependencyViolation}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import core.nabl.ConstraintBuilder
+import core.smarts.ConstraintBuilder
 
 import scala.collection.mutable
 import scala.reflect.io.File

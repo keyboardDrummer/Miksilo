@@ -6,9 +6,9 @@ import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.{ConcreteScope, Scope}
-import core.nabl.types.objects.{Type, TypeFromDeclaration}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.{ConcreteScope, Scope}
+import core.smarts.types.objects.{Type, TypeFromDeclaration}
 
 object UnqualifiedObjectTypeDelta extends TypeInstance {
   override val shape: Shape.type = Shape

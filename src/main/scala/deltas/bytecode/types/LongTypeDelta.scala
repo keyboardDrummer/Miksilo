@@ -6,9 +6,9 @@ import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeLike, NodeShape}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.{PrimitiveType, Type}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.{PrimitiveType, Type}
 
 object LongTypeDelta extends TypeInstance with StackType {
 

@@ -33,8 +33,10 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     def fields: Seq[FieldInfoWrapper[T]] = NodeWrapper.wrapList(node(ClassFields).asInstanceOf[Seq[T]])
 
     def attributes: Seq[T] = node(ClassAttributes).asInstanceOf[Seq[T]]
+    def attributes_=(value: Seq[T]) = node(ClassAttributes) = value
 
     def methods: Seq[MethodInfo[T]] = NodeWrapper.wrapList(node(Methods).asInstanceOf[Seq[T]])
+
   }
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]

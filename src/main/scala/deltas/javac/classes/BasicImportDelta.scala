@@ -5,8 +5,8 @@ import core.deltas.node.{GrammarKey, Node, NodeField}
 import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName, ShapeWithConstraints}
 
 object BasicImportDelta extends DeltaWithGrammar {

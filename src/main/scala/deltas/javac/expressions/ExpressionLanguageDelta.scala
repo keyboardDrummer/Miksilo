@@ -4,7 +4,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.NodePathRoot
 import core.deltas.{Compilation, DeltaWithGrammar}
 import core.language.Language
-import core.nabl.ConstraintBuilder
+import core.smarts.ConstraintBuilder
 
 //TODO. This delta is WIP and currently just used for testing.
 object ExpressionLanguageDelta extends DeltaWithGrammar {

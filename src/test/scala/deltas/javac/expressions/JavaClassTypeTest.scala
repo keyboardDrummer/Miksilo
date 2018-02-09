@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
 import core.language.Language
-import core.nabl.SolveConstraintsDelta
+import core.smarts.SolveConstraintsDelta
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}

@@ -2,8 +2,8 @@ package deltas.javac.expressions
 
 import core.deltas.Delta
 import core.language.Language
-import core.nabl.SolveConstraintsDelta
-import core.nabl.SolveConstraintsDelta.ConstraintException
+import core.smarts.SolveConstraintsDelta
+import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.methods.BlockLanguageDelta

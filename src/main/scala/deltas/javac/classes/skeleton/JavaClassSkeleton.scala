@@ -7,12 +7,13 @@ import core.deltas.node._
 import core.deltas.path.{ChildPath, NodePath, NodePathRoot}
 import core.document.BlankLine
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.objects.{Declaration, NamedDeclaration}
-import core.nabl.scopes.DeclarationInsideScope
-import core.nabl.scopes.imports.DeclarationOfScope
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.{Declaration, NamedDeclaration}
+import core.smarts.scopes.DeclarationInsideScope
+import core.smarts.scopes.imports.DeclarationOfScope
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeSkeleton
+import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
@@ -47,27 +48,29 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   override def transformProgram(program: Node, compilation: core.deltas.Compilation): Unit = {
     transformClass(program)
 
-    def transformClass(javaClass: Node) {
+    def transformClass(program: Node) {
+      val javaClass: JavaClass[Node] = program
       JavaLang.loadIntoClassPath(compilation)
-      javaClass.shape = Shape
-      val classCompiler: ClassCompiler = ClassCompiler(javaClass, compilation)
+      javaClass.node.shape = ByteCodeSkeleton.Shape
+      val classFile = new ClassFile(javaClass.node)
+      val classCompiler: ClassCompiler = ClassCompiler(javaClass.node, compilation)
       getState(compilation).classCompiler = classCompiler
       classCompiler.bind()
 
       val classInfo = classCompiler.currentClassInfo
-      javaClass(ByteCodeSkeleton.ClassAttributes) = Seq()
+      classFile.attributes = Seq()
 
       val classRef = classCompiler.getClassRef(classInfo)
-      javaClass(ByteCodeSkeleton.ClassNameIndexKey) = classRef
+      program(ByteCodeSkeleton.ClassNameIndexKey) = classRef
       val parentName = javaClass.parent.get
       val parentRef = ClassInfoConstant.classRef(classCompiler.fullyQualify(parentName))
-      javaClass(ByteCodeSkeleton.ClassParentIndex) = parentRef
-      javaClass(ByteCodeSkeleton.ClassInterfaces) = Seq()
+      program(ByteCodeSkeleton.ClassParentIndex) = parentRef
+      program(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
       for(member <- getRegistry(compilation).members)
-        member.compile(compilation, javaClass)
+        member.compile(compilation, javaClass.node)
 
-      javaClass.data.remove(Members)
+      javaClass.node.data.remove(Members)
     }
   }
 

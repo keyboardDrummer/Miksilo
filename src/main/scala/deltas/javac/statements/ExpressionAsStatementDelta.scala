@@ -5,8 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.NodePath
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton

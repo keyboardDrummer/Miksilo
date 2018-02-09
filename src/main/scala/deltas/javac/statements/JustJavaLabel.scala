@@ -5,8 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.deltas.path.{NodePath, Path}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {

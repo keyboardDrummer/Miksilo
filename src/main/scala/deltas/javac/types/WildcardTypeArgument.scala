@@ -4,9 +4,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeLike, NodeShape}
 import core.deltas.{Compilation, DeltaWithGrammar, HasShape}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.types.HasType
 
 object WildcardTypeArgument extends DeltaWithGrammar with HasType with HasShape {
@@ -24,7 +24,7 @@ object WildcardTypeArgument extends DeltaWithGrammar with HasType with HasShape 
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
-    core.nabl.types.objects.TypeVariable("?") //TODO not sure what to do here.
+    core.smarts.types.objects.TypeVariable("?") //TODO not sure what to do here.
   }
 
   override def shape: NodeShape = Shape

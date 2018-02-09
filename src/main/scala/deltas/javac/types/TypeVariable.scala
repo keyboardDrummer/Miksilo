@@ -6,9 +6,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
 import core.deltas.{Compilation, DeltaWithGrammar}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.types.{HasType, TypeSkeleton}
 
 object TypeVariable extends DeltaWithGrammar with HasType {

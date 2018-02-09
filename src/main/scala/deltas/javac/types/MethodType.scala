@@ -6,9 +6,9 @@ import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.{FunctionType, Type}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.{FunctionType, Type}
 import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
 
 object MethodType extends TypeInstance {

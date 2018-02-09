@@ -5,9 +5,9 @@ import core.deltas.node._
 import core.deltas.path.NodePath
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.objects.Declaration
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.Declaration
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}

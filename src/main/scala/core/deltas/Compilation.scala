@@ -2,7 +2,7 @@ package core.deltas
 
 import core.deltas.node.Node
 import core.language.Language
-import core.nabl.ProofsLike
+import core.smarts.ProofsLike
 
 import scala.collection.mutable
 

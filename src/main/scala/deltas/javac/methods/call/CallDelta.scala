@@ -3,10 +3,10 @@ package deltas.javac.methods.call
 import core.deltas.Compilation
 import core.deltas.node._
 import core.deltas.path.NodePath
-import core.nabl.ConstraintBuilder
-import core.nabl.objects.DeclarationVariable
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.{FunctionType, Type}
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.DeclarationVariable
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.{FunctionType, Type}
 import deltas.javac.expressions.ExpressionSkeleton
 
 object CallDelta

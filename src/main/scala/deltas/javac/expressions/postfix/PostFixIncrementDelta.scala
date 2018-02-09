@@ -5,9 +5,9 @@ import core.deltas.node.{Node, NodeField, NodeShape}
 import core.deltas.path.{NodePath, Path}
 import core.deltas.{Compilation, Contract}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
 import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

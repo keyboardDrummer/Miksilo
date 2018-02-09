@@ -48,7 +48,7 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), declarationWithInitializer.initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = declarationWithInitializer.asInstanceOf[NodeSequenceElement]
+    val originSequence = declarationWithInitializer.node.asInstanceOf[NodeSequenceElement]
     originSequence.replaceWith(Seq(declaration, assignmentStatement))
   }
 

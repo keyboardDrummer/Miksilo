@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
-import core.nabl.SolveConstraintsDelta
-import core.nabl.SolveConstraintsDelta.ConstraintException
+import core.smarts.SolveConstraintsDelta
+import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaCompilerDeltas
 import util.{TestLanguageBuilder, TestUtils}

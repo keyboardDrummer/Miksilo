@@ -5,8 +5,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ExpressionSkeleton

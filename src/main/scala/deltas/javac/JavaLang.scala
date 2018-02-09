@@ -4,8 +4,8 @@ import core.deltas.Compilation
 import core.deltas.node.Node
 import core.deltas.path.NodePathRoot
 import core.language.Language
-import core.nabl._
-import core.nabl.scopes.objects.Scope
+import core.smarts._
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}

@@ -5,9 +5,9 @@ import core.deltas.{Compilation, DeltaWithGrammar, HasShape}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.types._
 
 object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape {
@@ -56,7 +56,7 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val funcType = TypeSkeleton.getType(compilation, builder, _type.func, parentScope)
     val argumentTypes = _type.arguments.map(t => TypeSkeleton.getType(compilation, builder, t, parentScope))
-    core.nabl.types.objects.TypeApplication(funcType, argumentTypes, _type)
+    core.smarts.types.objects.TypeApplication(funcType, argumentTypes, _type)
   }
 
   override def shape: NodeShape = Shape

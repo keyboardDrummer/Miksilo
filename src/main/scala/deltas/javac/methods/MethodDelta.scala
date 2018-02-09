@@ -7,9 +7,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.{NodePath, NodePathRoot}
 import core.language.Language
-import core.nabl.ConstraintBuilder
-import core.nabl.objects.Declaration
-import core.nabl.scopes.objects.Scope
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.Declaration
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
 import deltas.bytecode.constants.Utf8ConstantDelta

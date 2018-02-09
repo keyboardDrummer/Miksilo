@@ -5,9 +5,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.deltas.path.NodePath
 import core.language.Language
-import core.nabl.scopes.objects.Scope
-import core.nabl.types.objects.Type
-import core.nabl.{ConstraintBuilder, ConstraintSolver}
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
+import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
