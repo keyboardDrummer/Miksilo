@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object VoidTypeDelta extends TypeInstance with StackType {
+object VoidTypeDelta extends ByteCodeTypeInstance with StackType {
 
   override val shape = VoidTypeKey
 

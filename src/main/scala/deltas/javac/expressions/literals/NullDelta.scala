@@ -8,9 +8,9 @@ import core.language.Language
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
-object NullC extends ExpressionInstance {
+object NullDelta extends ExpressionInstance {
 
-  val _null = new Node(NullKey)
+  val _null = new Node(Shape)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -21,9 +21,9 @@ object NullC extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullDelta)
 
-  object NullKey extends NodeShape
+  object Shape extends NodeShape
 
-  override val key = NullKey
+  override val key = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = ???
 

@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object DoubleTypeDelta extends TypeInstance with StackType {
+object DoubleTypeDelta extends ByteCodeTypeInstance with StackType {
 
   override val shape = DoubleTypeKey
 

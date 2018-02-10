@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type, TypeApplication}
 
-object ArrayTypeDelta extends TypeInstance with StackType {
+object ArrayTypeDelta extends ByteCodeTypeInstance with StackType {
   override val shape = ArrayTypeKey
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq(QualifiedObjectTypeDelta.rootObjectType)

@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object FloatTypeDelta extends TypeInstance
+object FloatTypeDelta extends ByteCodeTypeInstance
 {
   object FloatTypeKey extends NodeShape
   override val shape = FloatTypeKey

@@ -1,13 +1,12 @@
 package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.BiFailure
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
 import core.language.Language
 import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.{ConcreteScope, Scope}
+import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 
 object UnqualifiedObjectTypeDelta extends TypeInstance {
@@ -37,10 +36,6 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val name = getName(_type)
-    if (name == "String" && parentScope.isInstanceOf[ConcreteScope] && parentScope.asInstanceOf[ConcreteScope].debugName != "classInternalScope")
-      System.out.append("")
     TypeFromDeclaration(builder.resolveOption(name, origin = _type.asPath, parentScope))
   }
-
-  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure("TODO make changes do this implementation can be removed.") //TODO make changes do this implementation can be removed.
 }

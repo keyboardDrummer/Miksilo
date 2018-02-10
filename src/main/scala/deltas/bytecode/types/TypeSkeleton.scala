@@ -11,25 +11,13 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.ByteCodeSkeleton
 
-class TypeMismatchException(to: Node, from: Node) extends BadInputException {
-  override def toString = s"cannot assign: $to = $from"
-}
-
-class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
-
-class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
-
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     hasTypes.get(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
   }
 
   def toStackType(_type: Node, language: Language) : Node = {
-    getInstance(_type, language).getStackType(_type, language)
-  }
-
-  private def getInstance(_type: NodeLike, language: Language) = {
-    getRegistry(language).instances(_type.shape)
+    byteCodeInstances.get(language, _type.shape).getStackType(_type, language)
   }
 
   def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.shape)
@@ -87,7 +75,9 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def createRegistry = new Registry
-  
+
+  val byteCodeInstances = new ShapeProperty[ByteCodeTypeInstance]
+
   class Registry {
     val superTypes = new ShapeRegistry[Node => Seq[Node]]()
     val stackSize = new ShapeRegistry[Int]()
@@ -98,3 +88,11 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   override def description: String = "Defines the concept of a type."
 }
+
+class TypeMismatchException(to: Node, from: Node) extends BadInputException {
+  override def toString = s"cannot assign: $to = $from"
+}
+
+class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
+
+class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException

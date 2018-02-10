@@ -22,10 +22,6 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
     val name = VariableDelta.getVariableName(variable)
     val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
-//    val scopes = MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes
-//    val reference = scopes.findReference(variable)
-//scopes.resolve(reference).
-//    if (!MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes.findReference(variable)variableWithCorrectPath).contains(name)) {
     if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo
       currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {

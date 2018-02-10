@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object ByteTypeDelta extends TypeInstance {
+object ByteTypeDelta extends ByteCodeTypeInstance {
 
   override def description: String = "Adds the byte type."
 

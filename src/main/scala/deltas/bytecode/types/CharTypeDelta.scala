@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object CharTypeDelta extends TypeInstance
+object CharTypeDelta extends ByteCodeTypeInstance
 {
   object CharTypeKey extends NodeShape
   override val shape = CharTypeKey
@@ -25,7 +25,7 @@ object CharTypeDelta extends TypeInstance
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    new Keyword("C",false) ~> value(me)
+    Keyword("C", false) ~> value(me)
   }
 
   override def description: String = "Adds the char type."

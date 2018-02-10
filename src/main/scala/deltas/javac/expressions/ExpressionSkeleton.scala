@@ -33,11 +33,8 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
-    val getInstance2 = getInstance(compilation)
-    expression => getInstance2(expression).toByteCode(expression, compilation)
+    expression => getInstance(compilation)(expression).toByteCode(expression, compilation)
   }
-
-  def getToInstructionsRegistry(state: Language) = getRegistry(state).instances
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     val core = grammars.create(CoreGrammar)

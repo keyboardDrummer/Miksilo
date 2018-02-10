@@ -9,9 +9,9 @@ import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
-import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
+import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
 
-object MethodType extends TypeInstance {
+object MethodType extends ByteCodeTypeInstance {
 
   implicit class MethodTypeWrapper[T <: NodeLike](node: T) {
     def returnType: T = node(ReturnType).asInstanceOf[T]

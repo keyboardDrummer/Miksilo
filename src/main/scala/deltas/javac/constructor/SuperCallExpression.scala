@@ -62,7 +62,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
     val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
-    val parentName = clazz.parent.get //TODO shouldn't really be an option at this point.
+    val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.resolveScopeDeclaration(superClass)
     CallDelta.callConstraints(compilation, builder, call, superScope, call.asInstanceOf[ChildPath], VoidTypeDelta.constraintType)

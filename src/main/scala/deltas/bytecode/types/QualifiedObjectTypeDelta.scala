@@ -13,7 +13,7 @@ import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName
 
-object QualifiedObjectTypeDelta extends TypeInstance with StackType {
+object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
 
   override val shape: Shape.type = Shape
 

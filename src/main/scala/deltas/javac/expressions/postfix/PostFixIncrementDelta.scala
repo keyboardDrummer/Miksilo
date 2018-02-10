@@ -23,27 +23,27 @@ object PostFixIncrementDelta extends ExpressionInstance {
 
   override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-    val name: String = plusPlus(VariableKey).asInstanceOf[String]
-    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset //methodCompiler.bindingsAndTypes.scopes.resolveLocation(name).asInstanceOf[Path]
+    val name: String = plusPlus(Target).asInstanceOf[String]
+    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset
     Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
-    val postFixIncrement = identifier.as(VariableKey) ~< "++" asNode PostfixIncrementKey
+    val postFixIncrement = identifier.as(Target) ~< "++" asNode PostfixIncrementKey
     coreGrammar.addOption(postFixIncrement)
   }
 
   object PostfixIncrementKey extends NodeShape
 
-  object VariableKey extends NodeField //TODO this can also be a member instead of just an identifier.
+  object Target extends NodeField
 
   override def description: String = "Adds the postfix ++ operator."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(IntTypeDelta.constraintType, _type)
-    val name = plusPlus(VariableKey).asInstanceOf[String]
-    builder.resolve(name, plusPlus.getLocation(VariableKey), parentScope, Some(_type))
+    val name = plusPlus(Target).asInstanceOf[String]
+    builder.resolve(name, plusPlus.getLocation(Target), parentScope, Some(_type))
   }
 }
