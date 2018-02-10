@@ -30,11 +30,10 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
                        val allowDuplicateDeclaration: Boolean = true, //TODO find out why false causes many tests to fail.
                        val proofs: Proofs = new Proofs()
                       )
-  extends ProofsLike
 {
   def scopeGraph: ScopeGraph = proofs.scopeGraph
   def typeGraph: TypeGraph = proofs.typeGraph
-  def environment = proofs.environment
+  def environment: Map[Declaration, Type] = proofs.environment
   def environment_=(value: Map[Declaration, Type]): Unit = proofs.environment = value
 
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
