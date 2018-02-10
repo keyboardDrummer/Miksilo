@@ -52,7 +52,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
       rendered
   }
 
-  val hasTypes = new ShapeAspect[HasType]
+  val hasTypes = new ShapeProperty[HasType]
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def checkAssignableTo(language: Language)(to: Node, from: Node): Unit = {

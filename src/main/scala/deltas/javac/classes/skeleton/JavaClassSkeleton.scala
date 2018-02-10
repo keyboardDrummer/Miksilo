@@ -139,7 +139,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object ImportGrammar extends GrammarKey
   object Shape extends NodeShape
 
-  val hasDeclarations: ShapeAspect[HasDeclaration] = new ShapeAspect[HasDeclaration]
+  val hasDeclarations: ShapeProperty[HasDeclaration] = new ShapeProperty[HasDeclaration]
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
