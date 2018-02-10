@@ -18,7 +18,6 @@ class Language(val deltas: Seq[Delta]) {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
-  var capabilities: Seq[Capability] = Seq.empty
   var compilerPhases: List[Phase] = List.empty
   var buildParser: () => (InputStream => Try[Node]) = () => null
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
