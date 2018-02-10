@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 
 object JustJavaLabel extends StatementInstance {
-  override val key = LabelKey
+  override val shape = LabelKey
 
   object LabelKey extends NodeShape
   object Name extends NodeField

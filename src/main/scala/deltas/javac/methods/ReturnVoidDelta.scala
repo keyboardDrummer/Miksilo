@@ -32,7 +32,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   object ReturnVoidKey extends NodeShape
 
-  override val key = ReturnVoidKey
+  override val shape = ReturnVoidKey
 
   override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)

@@ -7,14 +7,14 @@ import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 
-trait StatementInstance extends DeltaWithGrammar {
+trait StatementInstance extends DeltaWithGrammar with HasShape {
 
-  override def inject(state: Language): Unit = {
-    StatementSkeleton.getRegistry(state).instances.put(key, this)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    StatementSkeleton.instances.add(language, this)
+    super.inject(language)
   }
 
-  def key: NodeShape
+  def shape: NodeShape
 
   def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node]
 

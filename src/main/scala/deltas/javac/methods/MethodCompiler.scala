@@ -37,7 +37,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   }
 
   def getVariables(obj: NodePath): VariablePool = {
-    val instances = StatementSkeleton.getRegistry(compilation).instances
+    val instances = StatementSkeleton.instances.get(compilation)
     val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
     val variablesPerStatement: Map[NodePath, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
     try

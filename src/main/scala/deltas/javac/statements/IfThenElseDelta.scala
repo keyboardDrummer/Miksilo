@@ -38,7 +38,7 @@ object IfThenElseDelta extends StatementInstance {
       Seq(endLabel)
   }
 
-  def key = Shape
+  def shape = Shape
   object Shape extends NodeShape
   object ElseKey extends NodeField
 
@@ -46,8 +46,8 @@ object IfThenElseDelta extends StatementInstance {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
-    val ifThenGrammar = find(IfThenDelta.key)
-    val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode key
+    val ifThenGrammar = find(IfThenDelta.shape)
+    val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode shape
     statementGrammar.addOption(ifThenElseGrammar)
   }
 

@@ -73,7 +73,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   }
 
   def statementIsSuperCall(statement: Node): Boolean = {
-    statement.shape == ExpressionAsStatementDelta.key &&
+    statement.shape == ExpressionAsStatementDelta.shape &&
       ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpression.SuperCall
   }
 }

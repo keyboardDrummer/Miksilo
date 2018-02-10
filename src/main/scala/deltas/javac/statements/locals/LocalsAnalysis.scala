@@ -10,7 +10,7 @@ class LocalsAnalysis(compilation: Compilation, method: Node)
   extends StatementFlowAnalysis[VariablePool](compilation, method) {
 
   override def updateState(state: VariablePool, node: NodePath): VariablePool = {
-    val instances = StatementSkeleton.getRegistry(compilation).instances
+    val instances = StatementSkeleton.instances.get(compilation)
     var newState = state
     for(entry <- instances(node.shape).definedVariables(compilation, node.current))
       newState = newState.add(entry._1,entry._2)

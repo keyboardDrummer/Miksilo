@@ -14,7 +14,7 @@ import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends StatementInstance {
 
-  def neww(condition: Node, thenBody: Seq[Node]): Node = key.create(Condition -> condition, Then -> thenBody)
+  def neww(condition: Node, thenBody: Seq[Node]): Node = shape.create(Condition -> condition, Then -> thenBody)
 
   object IfThenKey extends NodeShape
 
@@ -22,7 +22,7 @@ object IfThenDelta extends StatementInstance {
 
   object Then extends NodeField
 
-  override val key = IfThenKey
+  override val shape = IfThenKey
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 

@@ -42,7 +42,7 @@ object LocalDeclarationDelta extends StatementInstance {
   object Name extends NodeField
   object Type extends NodeField
 
-  override val key = DeclarationKey
+  override val shape = DeclarationKey
 
   override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]

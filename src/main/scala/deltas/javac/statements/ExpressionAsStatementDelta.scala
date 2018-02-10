@@ -19,7 +19,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   def create(expression: Node): Node = new Node(Shape, Expression -> expression)
 
-  override val key = Shape
+  override val shape = Shape
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)

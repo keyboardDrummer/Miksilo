@@ -56,7 +56,7 @@ object ReturnExpressionDelta extends StatementInstance {
 
   object ReturnValue extends NodeField
 
-  override val key = ReturnInteger
+  override val shape = ReturnInteger
 
   override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)

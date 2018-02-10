@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 object JustJavaGoto extends StatementInstance {
-  override val key = GotoKey
+  override val shape = GotoKey
 
   object GotoKey extends NodeShape
   object Target extends NodeField

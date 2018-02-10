@@ -13,6 +13,8 @@ class ShapeProperty[T] {
   private def map(language: Language): mutable.Map[NodeShape, T] =
     language.data.getOrElseUpdate(this, mutable.Map.empty[NodeShape, T]).asInstanceOf[mutable.Map[NodeShape, T]]
 
+  def get(language: Language): scala.collection.Map[NodeShape, T] = map(language)
+
   def get(language: Language, shape: NodeShape): T = {
     map(language)(shape)
   }
