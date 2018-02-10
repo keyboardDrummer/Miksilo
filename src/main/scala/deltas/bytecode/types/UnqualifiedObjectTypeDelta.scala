@@ -39,7 +39,7 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
     val name = getName(_type)
     if (name == "String" && parentScope.isInstanceOf[ConcreteScope] && parentScope.asInstanceOf[ConcreteScope].debugName != "classInternalScope")
       System.out.append("")
-    TypeFromDeclaration(builder.resolve2(name, _type.asPath, parentScope))
+    TypeFromDeclaration(builder.resolveOption(name, origin = _type.asPath, parentScope))
   }
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure("TODO make changes do this implementation can be removed.") //TODO make changes do this implementation can be removed.

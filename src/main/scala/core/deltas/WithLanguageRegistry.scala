@@ -5,7 +5,7 @@ import core.language.Language
 
 import scala.collection.mutable
 
-@Deprecated("Use ShapeAspect instead")
+@deprecated("Use ShapeAspect instead", "")
 trait WithLanguageRegistry extends Key {
   type Registry
 

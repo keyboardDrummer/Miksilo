@@ -36,10 +36,10 @@ class ConstraintBuilder(factory: Factory) {
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
   def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
-    resolve2(name, Some(origin), scope, _type)
+    resolveOption(name, Some(origin), scope, _type)
   }
 
-  def resolve2(name: String, origin: Option[SourceElement], scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
+  def resolveOption(name: String, origin: Option[SourceElement], scope: Scope, _type: Option[Type] = None): DeclarationVariable = {
     val result = _type.fold(declarationVariable())(t => declarationVariable(t))
     reference(name, origin, scope, result)
     result

@@ -60,9 +60,9 @@ object QualifiedObjectTypeDelta extends TypeInstance with StackType {
     val packageParts = name.parts.dropRight(1)
     val className = name.parts.last
     val packageFull = packageParts.reduce((a,b) => a + "." + b)
-    val packageDeclaration = builder.resolve2(packageFull, _type.asPath, parentScope)
+    val packageDeclaration = builder.resolveOption(packageFull, origin = _type.asPath, parentScope)
     val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
-    val classDeclaration = builder.resolve2(className, _type.asPath, packageScope)
+    val classDeclaration = builder.resolveOption(className, origin = _type.asPath, packageScope)
     TypeFromDeclaration(classDeclaration)
   }
 }

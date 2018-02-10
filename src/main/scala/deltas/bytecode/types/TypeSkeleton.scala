@@ -1,12 +1,10 @@
 package deltas.bytecode.types
 
-import core.bigrammar.BiGrammarToParser
 import core.bigrammar.printer.BiGrammarToPrinter
-import core.deltas.exceptions.BadInputException
 import core.deltas._
+import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -20,16 +18,6 @@ class TypeMismatchException(to: Node, from: Node) extends BadInputException {
 class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
 
 class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
-
-trait HasType extends Aspect with Delta with HasShape {
-
-  override def inject(language: Language): Unit = {
-    super.inject(language)
-    TypeSkeleton.hasTypes.add(language, this)
-  }
-
-  def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope) : Type
-}
 
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
