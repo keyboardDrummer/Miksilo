@@ -3,7 +3,7 @@ package deltas.javac.expressions
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -51,7 +51,7 @@ object TernaryDelta extends ExpressionInstance {
 
   override val key = TernaryKey
 
-  override def getType(_ternary: Path, compilation: Compilation): Node = {
+  override def getType(_ternary: NodePath, compilation: Compilation): Node = {
     val getExpressionType = ExpressionSkeleton.getType(compilation)
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
@@ -63,7 +63,7 @@ object TernaryDelta extends ExpressionInstance {
     TypeSkeleton.union(compilation)(trueType, falseType)
   }
 
-  override def toByteCode(_ternary: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(_ternary: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
@@ -85,7 +85,7 @@ object TernaryDelta extends ExpressionInstance {
 
   override def description: String = "Adds the ternary operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, _ternary: Path, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, _ternary: NodePath, _type: Type, parentScope: Scope): Unit = {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)

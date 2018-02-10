@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
-import core.deltas.path.{ChildPath, Path}
+import core.deltas.path.{ChildPath, NodePath}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -17,7 +17,7 @@ object JustJavaLabel extends StatementInstance {
 
   def label(name: String) = new Node(LabelKey, Name -> name)
 
-  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(InferredStackFrames.label(getName(statement.current)))
   }
 
@@ -33,7 +33,7 @@ object JustJavaLabel extends StatementInstance {
 
   override def description: String = "Adds a label statement"
 
-  override def getLabels(obj: Path): Map[Any, Path] = {
+  override def getLabels(obj: NodePath): Map[Any, NodePath] = {
     super.getLabels(obj) + (getName(obj.current) -> obj)
   }
 

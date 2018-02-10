@@ -2,8 +2,8 @@ package core.deltas.path
 
 import core.deltas.node.Node
 
-trait ChildPath extends Path with SourceElementWithValue {
+trait ChildPath extends NodePath with SourceElementWithValue {
   val current: Node
-  def parent: Path
+  def parent: NodePath
   def replaceWith(replacement: Any): Unit
 }

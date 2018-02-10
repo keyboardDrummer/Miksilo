@@ -4,7 +4,7 @@ import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{ChildPath, Path, PathRoot}
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -44,12 +44,12 @@ object LocalDeclarationDelta extends StatementInstance {
 
   override val key = DeclarationKey
 
-  override def toByteCode(declaration: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]
   }
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
-    val localDeclaration = LocalDeclaration[Path](PathRoot(declaration))
+    val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
     val _type = localDeclaration._type
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
@@ -59,7 +59,7 @@ object LocalDeclarationDelta extends StatementInstance {
   override def description: String = "Enables declaring a local variable."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
-    val _languageType = statement(Type).asInstanceOf[Path]
+    val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
     builder.declare(statement.name, statement.getLocation(Name), parentScope, Some(_type))
   }

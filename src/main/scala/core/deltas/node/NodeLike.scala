@@ -1,6 +1,6 @@
 package core.deltas.node
 
-import core.deltas.path.{SourceElementWithValue, Path}
+import core.deltas.path.{SourceElementWithValue, NodePath}
 
 import scala.collection.mutable
 
@@ -17,7 +17,7 @@ trait NodeLike {
   def shape: NodeShape
   def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
-  def asPath: Option[Path]
+  def asPath: Option[NodePath]
   def asNode: Node
 
   def getLocation(field: NodeField): FieldLocation = FieldLocation(asNode, field)

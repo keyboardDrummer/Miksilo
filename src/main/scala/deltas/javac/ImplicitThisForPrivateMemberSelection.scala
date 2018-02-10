@@ -17,11 +17,11 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton)
 
-  def addThisToVariable(compilation: Compilation, variable: Path) {
+  def addThisToVariable(compilation: Compilation, variable: NodePath) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val name = VariableDelta.getVariableName(variable)
-    val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
+    val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
 //    val scopes = MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes
 //    val reference = scopes.findReference(variable)
 //scopes.resolve(reference).
@@ -40,14 +40,14 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     }
   }
 
-  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: Path): Unit = {
+  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: NodePath): Unit = {
     val name = VariableDelta.getVariableName(variable)
     val newVariableName = if (classMember._static) currentClass.name else thisName
     val selector = MemberSelector.selector(VariableDelta.variable(newVariableName), name)
     variable.replaceWith(selector)
   }
 
-  def getVariableWithCorrectPath(obj: Path): Path = {
+  def getVariableWithCorrectPath(obj: NodePath): NodePath = {
     if (obj.shape == MethodDelta.Shape)
       return PathRoot(obj.current)
 
@@ -60,7 +60,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val programWithOrigin: Path = PathRoot(program)
+    val programWithOrigin: NodePath = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
         case JavaClassSkeleton.Shape =>
           JavaLang.loadIntoClassPath(compilation)

@@ -2,7 +2,7 @@ package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, Path}
+import core.deltas.path.{ChildPath, NodePath}
 import core.deltas.{Compilation, Contract}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -29,18 +29,18 @@ object SuperCallExpression extends ExpressionInstance {
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.CallArguments -> arguments)
 
-  override def getType(expression: Path, compilation: Compilation): Node = VoidTypeDelta.voidType
+  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
 
-  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
     transformSuperCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformSuperCall(program: Node, call: Path, compilation: Compilation): Seq[Node] = {
+  def transformSuperCall(program: Node, call: NodePath, compilation: Compilation): Seq[Node] = {
     transformToByteCode(call, compilation, program.parent.get)
   }
 
-  def transformToByteCode(call: Path, compilation: Compilation, className: String): Seq[Node] = {
+  def transformToByteCode(call: NodePath, compilation: Compilation, className: String): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val callArguments = CallDelta.getCallArguments(call)
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
@@ -60,8 +60,8 @@ object SuperCallExpression extends ExpressionInstance {
 
   object SuperCall extends NodeShape
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: Path, _type: Type, parentScope: Scope): Unit = {
-    val clazz: JavaClass[Path] = call.findAncestorShape(JavaClassSkeleton.Shape)
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
     val parentName = clazz.parent.get //TODO shouldn't really be an option at this point.
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.resolveScopeDeclaration(superClass)

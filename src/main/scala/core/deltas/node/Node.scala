@@ -1,6 +1,6 @@
 package core.deltas.node
 
-import core.deltas.path.{Path}
+import core.deltas.path.{NodePath}
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
@@ -48,7 +48,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   override def asNode: Node = this
-  override def asPath: Option[Path] = None
+  override def asPath: Option[NodePath] = None
 
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     shape = node.shape
@@ -67,8 +67,8 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   def update(key: NodeField, value: Any): Unit = {
     value match //TODO maybe throw this check away.
     {
-      case _: Path => throwInsertedWithOriginIntoRegularMetaObject()
-      case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[Path]))
+      case _: NodePath => throwInsertedWithOriginIntoRegularMetaObject()
+      case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[NodePath]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }

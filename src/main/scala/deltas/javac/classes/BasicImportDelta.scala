@@ -2,7 +2,7 @@ package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, Node, NodeField}
-import core.deltas.path.{ChildPath, Path}
+import core.deltas.path.{ChildPath, NodePath}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -12,7 +12,7 @@ import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName, Sha
 object BasicImportDelta extends DeltaWithGrammar {
 
   object ImportKey extends ShapeWithConstraints {
-    override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: Path, parentScope: Scope): Unit = {
+    override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
 
       val elements = getParts(_import)
       val fullPackage: String = elements.dropRight(1).fold("")((a, b) => a + "." + b)

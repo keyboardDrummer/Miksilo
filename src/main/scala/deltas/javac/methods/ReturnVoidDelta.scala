@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, Path}
+import core.deltas.path.{ChildPath, NodePath}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -14,7 +14,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 
-  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
+  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
 
   def returnToLines(_return: Node, compiler: MethodCompiler): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
@@ -34,7 +34,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   override val key = ReturnVoidKey
 
-  override def toByteCode(_return: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }
 

@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{ChildPath, Path}
+import core.deltas.path.{ChildPath, NodePath}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -38,15 +38,15 @@ object VariableDelta extends ExpressionInstance {
 
   override val key = VariableKey
 
-  override def getType(variable: Path, compilation: Compilation): Node = {
+  override def getType(variable: NodePath, compilation: Compilation): Node = {
     getVariableInfo(variable, compilation)._type
   }
 
-  def getVariableInfo(variable: Path, compilation: Compilation): VariableInfo = {
+  def getVariableInfo(variable: NodePath, compilation: Compilation): VariableInfo = {
     MethodDelta.getMethodCompiler(compilation).getVariables(variable)(VariableDelta.getVariableName(variable))
   }
 
-  override def toByteCode(variable: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(variable: NodePath, compilation: Compilation): Seq[Node] = {
     val variableInfo: VariableInfo = getVariableInfo(variable, compilation)
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
@@ -60,7 +60,7 @@ object VariableDelta extends ExpressionInstance {
 
   override def description: String = "Enables referencing a variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: Path, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.resolve(getVariableName(variable), variable.asInstanceOf[ChildPath], parentScope, Some(_type))
   }
 }

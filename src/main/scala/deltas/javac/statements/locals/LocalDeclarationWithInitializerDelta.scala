@@ -3,7 +3,7 @@ package deltas.javac.statements.locals
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
@@ -40,8 +40,8 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(node: Path, state: Language): Unit = {
-    val declarationWithInitializer: LocalDeclarationWithInitializer[Path] = node
+  def transformDeclarationWithInitializer(node: NodePath, state: Language): Unit = {
+    val declarationWithInitializer: LocalDeclarationWithInitializer[NodePath] = node
     val name: String = declarationWithInitializer.name
     val _type = declarationWithInitializer._type
     val declaration = LocalDeclarationDelta.declaration(name, _type)

@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas.{Compilation, Contract, NodeGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{ChildPath, Path, SequenceElement}
+import core.deltas.path.{ChildPath, NodePath, SequenceElement}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -18,7 +18,7 @@ object IfThenElseDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, LabelledLocations, InferredStackFrames, BlockDelta)
 
-  override def toByteCode(ifThenElse: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(ifThenElse: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
     val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
     val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
@@ -55,12 +55,12 @@ object IfThenElseDelta extends StatementInstance {
     ifThen(ElseKey).asInstanceOf[Seq[T]]
   }
 
-  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] =
+  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] =
   {
     Set(getThenStatements(obj).head, getElseStatements(obj).head) ++ super.getNextStatements(obj, labels)
   }
 
-  override def getLabels(obj: Path): Map[Any, Path] = {
+  override def getLabels(obj: NodePath): Map[Any, NodePath] = {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
       super.getLabels(obj)

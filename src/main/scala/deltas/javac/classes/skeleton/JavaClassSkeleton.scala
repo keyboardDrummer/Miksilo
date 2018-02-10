@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node._
-import core.deltas.path.{ChildPath, Path, PathRoot}
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.document.BlankLine
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -74,7 +74,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
   }
 
-  def fullyQualify(_type: Path, classCompiler: ClassCompiler): Unit =  _type.shape match {
+  def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
     case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
     case UnqualifiedObjectTypeDelta.Shape =>
         val newName = classCompiler.fullyQualify(UnqualifiedObjectTypeDelta.getName(_type))
@@ -107,8 +107,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   }
 
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: Path, defaultPackageScope: Scope): Declaration = {
-    val clazz: JavaClass[Path] = path
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
+    val clazz: JavaClass[NodePath] = path
 
     val packageScope = if (clazz._package.isEmpty) {
       defaultPackageScope
@@ -179,7 +179,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val clazz: JavaClass[Path] = PathRoot(compilation.program)
+      val clazz: JavaClass[NodePath] = PathRoot(compilation.program)
       val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
       val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
 

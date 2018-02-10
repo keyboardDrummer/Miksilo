@@ -3,7 +3,7 @@ package deltas.javac.methods.assignment
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot}
+import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import deltas.javac.expressions.additive.AdditionDelta
 
@@ -24,7 +24,7 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
-  def transformIncrementAssignment(incrementAssignment: Path, state: Language): Unit = {
+  def transformIncrementAssignment(incrementAssignment: NodePath, state: Language): Unit = {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
     val newValue = AdditionDelta.addition(value, target)

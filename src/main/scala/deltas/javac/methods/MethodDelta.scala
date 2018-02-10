@@ -5,7 +5,7 @@ import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{ChildPath, Path, PathRoot}
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
@@ -76,7 +76,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     AccessibilityFieldsDelta)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler): Node = {
-    val result = PathRoot(metaObject)(ParameterType).asInstanceOf[Path]
+    val result = PathRoot(metaObject)(ParameterType).asInstanceOf[NodePath]
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
@@ -97,7 +97,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method.data.remove(ReturnType)
     method.data.remove(Parameters)
 
-    def addCodeAnnotation(method: Path) {
+    def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
       val statements = method.body
       method.current.data.remove(Body)
@@ -181,8 +181,8 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   object Shape extends ShapeWithConstraints {
-      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: Path, parentScope: Scope) : Unit = {
-        val method: Method[Path] = path
+      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
+        val method: Method[NodePath] = path
         val bodyScope = builder.newScope(Some(parentScope), "methodBody")
         method.parameters.foreach(parameter => {
           val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
@@ -226,9 +226,9 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: Path, parentScope: Scope): Declaration = {
-    val method: Method[Path] = path
-    val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[Path])
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
+    val method: Method[NodePath] = path
+    val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[NodePath])
     val returnType = method.returnType
     val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
 

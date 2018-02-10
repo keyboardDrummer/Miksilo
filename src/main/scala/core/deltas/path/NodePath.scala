@@ -3,25 +3,25 @@ package core.deltas.path
 import core.deltas.node._
 import core.language.SourceElement
 
-object Path {
-  implicit def toSimpleObject(withOrigin: Path): Node = withOrigin.current
-  implicit def castList(list: Seq[Path]): Seq[Node] = list.map(x => x.current)
+object NodePath {
+  implicit def toSimpleObject(withOrigin: NodePath): Node = withOrigin.current
+  implicit def castList(list: Seq[NodePath]): Seq[Node] = list.map(x => x.current)
 }
 
-trait Path extends NodeLike with SourceElement {
-  type Self = Path
+trait NodePath extends NodeLike with SourceElement {
+  type Self = NodePath
   val current: Node
-  def parentOption: Option[Path]
+  def parentOption: Option[NodePath]
 
-  def findAncestorShape(shape: NodeShape): Path = ancestors.find(p => p.shape == shape).get
-  def ancestors: Stream[Path] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
+  def findAncestorShape(shape: NodeShape): NodePath = ancestors.find(p => p.shape == shape).get
+  def ancestors: Stream[NodePath] = parentOption.map(parent => parent #:: parent.ancestors).getOrElse(Stream.empty)
   def pathAsString: String
 
   override def toString = s"Path: $pathAsString\nCurrent: $current\nRoot: ${root.current}"
-  def root: Path = ancestors.last
+  def root: NodePath = ancestors.last
 
   override def asNode: Node = current
-  override def asPath: Option[Path] = Some(this)
+  override def asPath: Option[NodePath] = Some(this)
 
   def shape: NodeShape = current.shape
   def shape_=(value: NodeShape): Unit = current.shape = value

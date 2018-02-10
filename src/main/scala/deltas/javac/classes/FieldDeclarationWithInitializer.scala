@@ -3,7 +3,7 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.{Path, PathRoot}
+import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
@@ -30,8 +30,8 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   object FieldWithInitializerKey extends NodeShape
   override def description: String = "Enables fields to have initialisers."
 
-  def transformDeclarationWithInitializer(node: Path, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
-    val fieldWithInitialiser: LocalDeclarationWithInitializer[Path] = node
+  def transformDeclarationWithInitializer(node: NodePath, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
+    val fieldWithInitialiser: LocalDeclarationWithInitializer[NodePath] = node
     val name: String = fieldWithInitialiser.name
     val _type = fieldWithInitialiser._type
     val declaration = FieldDeclarationDelta.field(_type, name)

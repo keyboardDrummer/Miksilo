@@ -2,20 +2,20 @@ package core.deltas.path
 
 import core.deltas.node.{Node, NodeField}
 
-case class SequenceElement(parent: Path, field: NodeField, index: Int) extends ChildPath
+case class SequenceElement(parent: NodePath, field: NodeField, index: Int) extends ChildPath
 {
   val current: Node = parent.current(field).asInstanceOf[Seq[Node]](index)
-  def sequence: Seq[Path] = parent(field).asInstanceOf[Seq[Path]]
-  def next: Path = sequence(index + 1)
+  def sequence: Seq[NodePath] = parent(field).asInstanceOf[Seq[NodePath]]
+  def next: NodePath = sequence(index + 1)
   def hasNext: Boolean = sequence.length > (index + 1)
 
   def replaceWith(replacements: Seq[Any]): Unit = {
-    val originalSequence = parent.current(field).asInstanceOf[Seq[Path]]
+    val originalSequence = parent.current(field).asInstanceOf[Seq[NodePath]]
     val newSequence = originalSequence.take(index) ++ replacements ++ originalSequence.drop(index + 1)
     parent.current(field) = newSequence
   }
 
-  override def parentOption: Option[Path] = Some(parent)
+  override def parentOption: Option[NodePath] = Some(parent)
 
   override def hashCode(): Int = parent.hashCode() * field.hashCode() * index
 

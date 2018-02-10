@@ -4,7 +4,7 @@ import core.bigrammar.grammars.BiFailure
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -44,17 +44,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   override val key = AssignmentKey
 
-  override def getType(assignment: Path, compilation: Compilation): Node = {
+  override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(compilation)(target)
   }
 
   def createRegistry = new Registry()
   class Registry {
-    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, Path) => Seq[Node]]
+    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, NodePath) => Seq[Node]]
   }
 
-  override def toByteCode(assignment: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
@@ -70,7 +70,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   override def description: String = "Enables assignment to an abstract target using the = operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, assignment: Path, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, assignment: NodePath, _type: Type, parentScope: Scope): Unit = {
     val value = getAssignmentValue(assignment)
     val valueType = ExpressionSkeleton.getType(compilation, builder, value, parentScope)
     val target = getAssignmentTarget(assignment)
