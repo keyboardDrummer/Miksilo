@@ -1,10 +1,10 @@
 package core.deltas.node
 
-import core.deltas.path.{AnyChildPath, Path}
+import core.deltas.path.{SourceElementWithValue, Path}
 
 import scala.collection.mutable
 
-case class FieldLocation(node: Node, field: NodeField) extends AnyChildPath {
+case class FieldLocation(node: Node, field: NodeField) extends SourceElementWithValue {
   def current: Any = node(field)
 }
 
