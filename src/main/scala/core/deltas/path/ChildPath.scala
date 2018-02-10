@@ -1,7 +1,9 @@
 package core.deltas.path
 
-trait ChildPath extends Path {
-  type Self <: Path
-  def parent: NodePath
+import core.deltas.node.Node
+
+trait ChildPath extends Path with AnyChildPath {
+  val current: Node
+  def parent: Path
   def replaceWith(replacement: Any): Unit
 }

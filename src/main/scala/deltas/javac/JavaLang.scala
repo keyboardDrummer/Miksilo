@@ -2,7 +2,7 @@ package deltas.javac
 
 import core.deltas.Compilation
 import core.deltas.node.Node
-import core.deltas.path.NodePathRoot
+import core.deltas.path.PathRoot
 import core.language.Language
 import core.smarts._
 import core.smarts.scopes.objects.Scope
@@ -33,7 +33,7 @@ object JavaLang {
     val factory = new Factory()
     val builder = new ConstraintBuilder(factory)
     for(clazz <- Seq(objectClass, stringClass, systemClass, printStreamClass)) {
-      JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).getDeclaration(compilation, builder, NodePathRoot(clazz), //TODO hier moet ik eigenlijk even een package tree bouwen met alle classes er in.
+      JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).getDeclaration(compilation, builder, PathRoot(clazz), //TODO hier moet ik eigenlijk even een package tree bouwen met alle classes er in.
         scope)
     }
     val solver = new ConstraintSolver(builder, builder.getConstraints)

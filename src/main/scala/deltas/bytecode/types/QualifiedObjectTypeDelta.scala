@@ -43,7 +43,7 @@ object QualifiedObjectTypeDelta extends TypeInstance with StackType {
     Keyword("L", reserved = false) ~> inner ~< ";"
   }
 
-  def getName(objectType: NodeLike): QualifiedClassName = objectType.getValue(Name).asInstanceOf[QualifiedClassName]
+  def getName(objectType: NodeLike): QualifiedClassName = objectType(Name).asInstanceOf[QualifiedClassName]
 
   override def getStackSize: Int = 1
 

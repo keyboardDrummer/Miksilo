@@ -2,7 +2,7 @@ package deltas.javac.methods.call
 
 import core.deltas.Compilation
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.{AnyChildPath, Path}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.DeclarationVariable
 import core.smarts.scopes.objects.Scope
@@ -30,11 +30,11 @@ object CallDelta
     new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
   }
 
-  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, parentScope: Scope,
-                      methodName: String, returnType: Type): DeclarationVariable = {
+  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: Path, parentScope: Scope,
+                      methodName: AnyChildPath, returnType: Type): DeclarationVariable = {
     val callArguments = CallDelta.getCallArguments(call)
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val constructorType = FunctionType.curry(callTypes, returnType)
-    builder.resolve(methodName, call, parentScope, Some(constructorType))
+    builder.resolve(methodName.current.asInstanceOf[String], methodName, parentScope, Some(constructorType))
   }
 }

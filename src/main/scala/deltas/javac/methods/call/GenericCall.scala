@@ -2,7 +2,7 @@ package deltas.javac.methods.call
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.deltas.{Compilation, Contract}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -35,7 +35,7 @@ trait GenericCall extends ExpressionInstance {
 
   override val key = CallDelta.CallKey
 
-  override def getType(call: NodePath, compilation: Compilation): Node = {
+  override def getType(call: Path, compilation: Compilation): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val methodKey = getMethodKey(call, compiler)
     val methodInfo = compiler.javaCompiler.find(methodKey)
@@ -43,14 +43,14 @@ trait GenericCall extends ExpressionInstance {
     returnType
   }
 
-  def getGenericCallInstructions(call: NodePath, compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
+  def getGenericCallInstructions(call: Path, compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
     val callArguments = CallDelta.getCallArguments(call)
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
   }
 
-  def getMethodKey(call: NodePath, compiler: ClassCompiler): MethodQuery = {
+  def getMethodKey(call: Path, compiler: ClassCompiler): MethodQuery = {
     val callCallee = CallDelta.getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorTarget(callCallee)
     val kind = MemberSelector.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
@@ -62,12 +62,12 @@ trait GenericCall extends ExpressionInstance {
     MethodQuery(kind.info.getQualifiedName, member, callTypes)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: Path, _type: Type, parentScope: Scope): Unit = {
     val callCallee = CallDelta.getCallCallee(call)
     val selectorTarget = MemberSelector.getSelectorTarget(callCallee)
     val methodContainerExpressionShape = selectorTarget.shape.asInstanceOf[MethodContainerExpressionShape]
     val methodContainerScope = methodContainerExpressionShape.getScope(compilation, builder, selectorTarget, parentScope)
-    val member = MemberSelector.getSelectorMember(callCallee)
-    CallDelta.callConstraints(compilation,builder, call, methodContainerScope, member, _type)
+    val member = callCallee.getLocation(MemberSelector.Member)
+    CallDelta.callConstraints(compilation, builder, call, methodContainerScope, member, _type)
   }
 }

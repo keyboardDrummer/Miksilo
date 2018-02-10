@@ -3,7 +3,7 @@ package deltas.javac.expressions.relational
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
@@ -17,7 +17,7 @@ object LessThanDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 
-  override def toByteCode(lessThan: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(lessThan: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(lessThan))
     val secondInstructions = toInstructions(getSecond(lessThan))
@@ -28,7 +28,7 @@ object LessThanDelta extends ExpressionInstance {
 
   def getSecond[T <: NodeLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = {
+  override def getType(expression: Path, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))

@@ -3,7 +3,7 @@ package deltas.javac.expressions.literals
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
@@ -25,9 +25,9 @@ object NullC extends ExpressionInstance {
 
   override val key = NullKey
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
+  override def getType(expression: Path, compilation: Compilation): Node = ???
 
-  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = {
     Seq(PushNullDelta.pushNull)
   }
 

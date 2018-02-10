@@ -1,7 +1,7 @@
 package deltas.javac.methods.call
 
 import core.deltas.node.Node
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.deltas.{Compilation, Contract}
 import deltas.bytecode.coreInstructions.InvokeVirtualDelta
 import deltas.javac.classes.MethodQuery
@@ -13,7 +13,7 @@ object CallInstanceDelta extends GenericCall {
 
   override def description: String = "Enables calling instance methods."
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val methodKey: MethodQuery = getMethodKey(call, compiler)
@@ -21,7 +21,7 @@ object CallInstanceDelta extends GenericCall {
     getInstructionsGivenMethodRefIndex(call, compilation, methodRefIndex)
   }
 
-  def getInstructionsGivenMethodRefIndex(call: NodePath, compilation: Compilation, methodRef: Node): Seq[Node] = {
+  def getInstructionsGivenMethodRefIndex(call: Path, compilation: Compilation, methodRef: Node): Seq[Node] = {
     val callCallee = CallDelta.getCallCallee(call)
     val objectExpression = MemberSelector.getSelectorTarget(callCallee)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)

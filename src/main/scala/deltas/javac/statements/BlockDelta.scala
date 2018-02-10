@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.GrammarKey
-import core.deltas.path.NodePath
+import core.deltas.path.ChildPath
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -21,7 +21,7 @@ object BlockDelta extends DeltaWithGrammar {
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
   }
 
-  def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[NodePath], parentScope: Scope): Unit = {
+  def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[ChildPath], parentScope: Scope): Unit = {
     for(statement <- statements) {
       StatementSkeleton.constraints(compilation, builder, statement, parentScope)
     }

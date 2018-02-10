@@ -17,11 +17,11 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton)
 
-  def addThisToVariable(compilation: Compilation, variable: NodePath) {
+  def addThisToVariable(compilation: Compilation, variable: Path) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val name = VariableDelta.getVariableName(variable)
-    val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
+    val variableWithCorrectPath: Path = getVariableWithCorrectPath(variable)
 //    val scopes = MethodDelta.getMethodCompiler(compilation).bindingsAndTypes.scopes
 //    val reference = scopes.findReference(variable)
 //scopes.resolve(reference).
@@ -40,27 +40,27 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     }
   }
 
-  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: NodePath): Unit = {
+  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: Path): Unit = {
     val name = VariableDelta.getVariableName(variable)
     val newVariableName = if (classMember._static) currentClass.name else thisName
     val selector = MemberSelector.selector(VariableDelta.variable(newVariableName), name)
     variable.replaceWith(selector)
   }
 
-  def getVariableWithCorrectPath(obj: NodePath): NodePath = {
+  def getVariableWithCorrectPath(obj: Path): Path = {
     if (obj.shape == MethodDelta.Shape)
-      return NodePathRoot(obj.current)
+      return PathRoot(obj.current)
 
     obj match {
-      case NodeFieldValue(parent, field) => new NodeFieldValue(getVariableWithCorrectPath(parent), field)
-      case NodeSequenceElement(parent, field, index) => new NodeSequenceElement(getVariableWithCorrectPath(parent), field, index)
+      case FieldValue(parent, field) => new FieldValue(getVariableWithCorrectPath(parent), field)
+      case SequenceElement(parent, field, index) => new SequenceElement(getVariableWithCorrectPath(parent), field, index)
     }
   }
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val programWithOrigin = NodePathRoot(program)
+    val programWithOrigin: Path = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
         case JavaClassSkeleton.Shape =>
           JavaLang.loadIntoClassPath(compilation)

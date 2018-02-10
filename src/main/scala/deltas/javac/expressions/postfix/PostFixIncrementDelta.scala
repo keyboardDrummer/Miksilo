@@ -2,7 +2,7 @@ package deltas.javac.expressions.postfix
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{NodePath, Path}
+import core.deltas.path.{Path}
 import core.deltas.{Compilation, Contract}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -19,12 +19,12 @@ object PostFixIncrementDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodDelta, IncrementIntegerDelta)
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = IntTypeDelta.intType
+  override def getType(expression: Path, compilation: Compilation): Node = IntTypeDelta.intType
 
-  override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(plusPlus: Path, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-    val name: Path = plusPlus(VariableKey).asInstanceOf[Path]
-    val variableAddress = methodCompiler.getVariables(plusPlus)(name.current.asInstanceOf[String]).offset //methodCompiler.bindingsAndTypes.scopes.resolveLocation(name).asInstanceOf[Path]
+    val name: String = plusPlus(VariableKey).asInstanceOf[String]
+    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset //methodCompiler.bindingsAndTypes.scopes.resolveLocation(name).asInstanceOf[Path]
     Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
   }
 
@@ -41,9 +41,9 @@ object PostFixIncrementDelta extends ExpressionInstance {
 
   override def description: String = "Adds the postfix ++ operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: NodePath, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: Path, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(IntTypeDelta.constraintType, _type)
-    val namePath: Path = plusPlus(VariableKey).asInstanceOf[Path]
-    builder.resolve(namePath.current.asInstanceOf[String], namePath, parentScope, Some(_type))
+    val name = plusPlus(VariableKey).asInstanceOf[String]
+    builder.resolve(name, plusPlus.getLocation(VariableKey), parentScope, Some(_type))
   }
 }

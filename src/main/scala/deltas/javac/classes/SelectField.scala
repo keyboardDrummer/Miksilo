@@ -3,7 +3,7 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import core.deltas.path.{NodePath, Path}
+import core.deltas.path.{ChildPath, Path}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -21,7 +21,7 @@ object SelectField extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, GetStaticDelta, MemberSelector)
 
-  override def getType(selector: NodePath, compilation: Compilation): Node = {
+  override def getType(selector: Path, compilation: Compilation): Node = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val member = getSelectorMember(selector)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
@@ -29,7 +29,7 @@ object SelectField extends ExpressionInstance {
     fieldInfo._type
   }
 
-  override def toByteCode(selector: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(selector: Path, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val classOrObjectReference = getClassOrObjectReference(selector, compiler)
     val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
@@ -57,10 +57,10 @@ object SelectField extends ExpressionInstance {
 
   override def description: String = "Enables using the . operator to select a member from a class."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: Path, _type: Type, parentScope: Scope): Unit = {
     val target = getSelectorTarget(selector)
     val targetScope = MemberSelector.getScope(compilation, builder, target, parentScope)
     val member = getSelectorMember(selector)
-    builder.resolve(member, selector(Member).asInstanceOf[Path], targetScope, Some(_type))
+    builder.resolve(member, selector(Member).asInstanceOf[ChildPath], targetScope, Some(_type))
   }
 }

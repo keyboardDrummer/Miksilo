@@ -1,21 +1,26 @@
 package core.deltas.node
 
-import core.deltas.path.NodePath
+import core.deltas.path.{AnyChildPath, Path}
 
 import scala.collection.mutable
 
+case class FieldLocation(node: Node, field: NodeField) extends AnyChildPath {
+  def current: Any = node(field)
+}
+
+
 trait NodeLike {
   type Self <: NodeLike
-  def getValue[T](key: NodeField): T
-  def setValue[T](key: NodeField, value: T): Unit
   def get(key: NodeField): Option[Any]
   def apply(key: NodeField): Any
   def update(key: NodeField, value: Any): Unit
   def shape: NodeShape
   def shape_=(value: NodeShape): Unit
   def dataView: Map[NodeField, Any]
-  def asPath: Option[NodePath]
+  def asPath: Option[Path]
   def asNode: Node
+
+  def getLocation(field: NodeField): FieldLocation = FieldLocation(asNode, field)
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
@@ -28,7 +33,10 @@ trait NodeLike {
   }
 
   def visitShape(shape: NodeShape, afterChildren: (Self) => Unit): Unit = {
-    visit(node => if (node.shape == shape) afterChildren(node))
+    visit(node => {
+      if (node.shape == shape)
+        afterChildren(node)
+    })
   }
 
   def visit(afterChildren: (Self) => Unit = _ => {},
@@ -44,14 +52,15 @@ trait NodeLike {
         return
 
       val children = node.dataView.values
+      System.out.append("")
       for(child <- children)
       {
         child match {
-          case metaObject: NodeLike =>
-            transformNode(metaObject.asInstanceOf[Self])
+          case nodeLike: NodeLike =>
+            transformNode(nodeLike.asInstanceOf[Self])
           case sequence: Seq[_] =>
             sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case metaChild: NodeLike => transformNode(metaChild.asInstanceOf[Self])
+              case nodeLikeChild: NodeLike => transformNode(nodeLikeChild.asInstanceOf[Self])
               case _ =>
             })
           case _ =>

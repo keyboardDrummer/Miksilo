@@ -2,14 +2,14 @@ package deltas.javac.statements.locals
 
 import core.deltas.Compilation
 import core.deltas.node.Node
-import core.deltas.path.NodePath
+import core.deltas.path.{Path}
 import deltas.javac.methods.VariablePool
 import deltas.javac.statements.{StatementFlowAnalysis, StatementSkeleton}
 
 class LocalsAnalysis(compilation: Compilation, method: Node)
   extends StatementFlowAnalysis[VariablePool](compilation, method) {
 
-  override def updateState(state: VariablePool, node: NodePath): VariablePool = {
+  override def updateState(state: VariablePool, node: Path): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances
     var newState = state
     for(entry <- instances(node.shape).definedVariables(compilation, node.current))

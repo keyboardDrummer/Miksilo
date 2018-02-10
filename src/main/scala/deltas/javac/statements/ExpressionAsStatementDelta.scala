@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.{ChildPath, Path}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -21,7 +21,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override val key = Shape
 
-  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
     val _type = ExpressionSkeleton.getType(compilation)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
@@ -46,7 +46,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def description: String = "Enables using an expression as a statement."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
     ExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
   }
 }

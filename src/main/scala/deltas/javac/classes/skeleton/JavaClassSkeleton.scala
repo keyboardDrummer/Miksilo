@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node._
-import core.deltas.path.{ChildPath, NodePath, NodePathRoot}
+import core.deltas.path.{ChildPath, Path, PathRoot}
 import core.document.BlankLine
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -29,19 +29,19 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   override def description: String = "Defines a skeleton for the Java class."
 
   implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
-    def _package: Seq[String] = node.getValue(ClassPackage).asInstanceOf[Seq[String]]
+    def _package: Seq[String] = node(ClassPackage).asInstanceOf[Seq[String]]
     def _package_=(value: Seq[String]) = node(ClassPackage) = value
 
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]) = node(ClassImports) = value
 
-    def name: String = node.getValue(ClassName)
-    def name_=(value: String): Unit = node.setValue(ClassName, value)
+    def name: String = node(ClassName).asInstanceOf[String]
+    def name_=(value: String): Unit = node(ClassName) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
 
-    def parent: Option[String] = node.getValue(ClassParent)
+    def parent: Option[String] = node(ClassParent).asInstanceOf[Option[String]]
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
@@ -74,7 +74,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
   }
 
-  def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
+  def fullyQualify(_type: Path, classCompiler: ClassCompiler): Unit =  _type.shape match {
     case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
     case UnqualifiedObjectTypeDelta.Shape =>
         val newName = classCompiler.fullyQualify(UnqualifiedObjectTypeDelta.getName(_type))
@@ -107,8 +107,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   }
 
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
-    val clazz: JavaClass[NodePath] = path
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: Path, defaultPackageScope: Scope): Declaration = {
+    val clazz: JavaClass[Path] = path
 
     val packageScope = if (clazz._package.isEmpty) {
       defaultPackageScope
@@ -116,12 +116,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       val packageParts = clazz.node._package.toList
       val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
       getState(compilation).packageScopes.getOrElseUpdate(fullPackage, {
-        val packageDeclaration = builder.declare(fullPackage, clazz.node, defaultPackageScope)
+        val packageDeclaration = builder.declare(fullPackage, path, defaultPackageScope)
         builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
       })
     }
 
-    val clazzDeclaration = new NamedDeclaration(clazz.name, clazz.node)
+    val clazzDeclaration = new NamedDeclaration(clazz.name, path)
     val classExternalScope = builder.newScope(Some(defaultPackageScope), "externalFor" + clazz.name)
     builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
     builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
@@ -179,7 +179,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val clazz: JavaClass[NodePath] = NodePathRoot(compilation.program)
+      val clazz: JavaClass[Path] = PathRoot(compilation.program)
       val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
       val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
 

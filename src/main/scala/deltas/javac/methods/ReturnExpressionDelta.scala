@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.{ChildPath, Path}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -21,10 +21,10 @@ object ReturnExpressionDelta extends StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 
-  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
+  override def getNextStatements(obj: Path, labels: Map[Any, Path]): Set[Path] = Set.empty
 
-  def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
-    val returnValue: NodePath = getReturnValue(_return)
+  def returnToLines(_return: Path, compiler: MethodCompiler): Seq[Node] = {
+    val returnValue: Path = getReturnValue(_return)
     val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.compilation)(returnValue)
     val getType = ExpressionSkeleton.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
@@ -58,12 +58,12 @@ object ReturnExpressionDelta extends StatementInstance {
 
   override val key = ReturnInteger
 
-  override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(_return: Path, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
     returnToLines(_return, methodCompiler)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
     ExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
   }
 }

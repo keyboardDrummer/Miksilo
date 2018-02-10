@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.path.NodePathRoot
+import core.deltas.path.PathRoot
 import core.deltas.{Compilation, DeltaWithGrammar}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -13,7 +13,7 @@ object ExpressionLanguageDelta extends DeltaWithGrammar {
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation: Compilation, builder: ConstraintBuilder) => {
-      val _type = ExpressionSkeleton.getType(compilation, builder, NodePathRoot(compilation.program), builder.newScope(debugName = "programScope"))
+      val _type = ExpressionSkeleton.getType(compilation, builder, PathRoot(compilation.program), builder.newScope(debugName = "programScope"))
       //TODO check that the type is printable.
     }
   }

@@ -6,7 +6,7 @@ import core.deltas.exceptions.BadInputException
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope

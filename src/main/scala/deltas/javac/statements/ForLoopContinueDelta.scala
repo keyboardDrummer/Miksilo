@@ -1,7 +1,7 @@
 package deltas.javac.statements
 
 import core.deltas.node.Node
-import core.deltas.path.{NodePath, NodePathRoot}
+import core.deltas.path.{Path, PathRoot}
 import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelDelta
@@ -17,12 +17,12 @@ object ForLoopContinueDelta extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ForLoopDelta, WhileContinueDelta)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val beforeIncrementLabels = new mutable.HashMap[NodePath, String]()
-    NodePathRoot(program).visitShape(WhileContinueDelta.ContinueKey).foreach(
+    val beforeIncrementLabels = new mutable.HashMap[Path, String]()
+    PathRoot(program).visitShape(WhileContinueDelta.ContinueKey).foreach(
       path => transformContinue(path, beforeIncrementLabels, compilation))
   }
 
-  def transformContinue(continuePath: NodePath, beforeIncrementLabels: mutable.Map[NodePath, String], language: Language): Unit = {
+  def transformContinue(continuePath: Path, beforeIncrementLabels: mutable.Map[Path, String], language: Language): Unit = {
     val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.shape == ForLoopDelta.Shape || ancestor.shape == WhileLoopDelta.WhileKey)
     containingLoopOption.filter(ancestor => ancestor.shape == ForLoopDelta.Shape).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, addAndReturnBeforeIncrementLabel(containingForLoop))
@@ -30,7 +30,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     })
   }
 
-  def addAndReturnBeforeIncrementLabel(forLoopPath: NodePath): String = {
+  def addAndReturnBeforeIncrementLabel(forLoopPath: Path): String = {
     val forLoop = forLoopPath.current
     val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
     val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)

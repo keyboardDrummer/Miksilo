@@ -2,7 +2,7 @@ package deltas.javac.expressions
 
 import core.deltas._
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -16,17 +16,17 @@ trait ExpressionInstance extends DeltaWithGrammar {
     super.inject(language)
   }
 
-  def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node]
+  def toByteCode(expression: Path, compilation: Compilation): Seq[Node]
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ???
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: Path, _type: Type, parentScope: Scope): Unit = ???
 
-  def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
+  def getType(compilation: Compilation, builder: ConstraintBuilder, expression: Path, parentScope: Scope): Type = {
     val result = builder.typeVariable()
     constraints(compilation, builder, expression, result, parentScope)
     result
   }
 
-  def getType(expression: NodePath, compilation: Compilation): Node //TODO remove
+  def getType(expression: Path, compilation: Compilation): Node //TODO remove
 }

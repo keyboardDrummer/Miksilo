@@ -3,7 +3,7 @@ package deltas.javac.methods.assignment
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
@@ -20,7 +20,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
     AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(VariableDelta.VariableKey,
-      (compilation, targetVariable: NodePath) => {
+      (compilation, targetVariable: Path) => {
       val methodCompiler = MethodDelta.getMethodCompiler(compilation)
       val target = VariableDelta.getVariableName(targetVariable)
       val variableInfo = methodCompiler.getVariables(targetVariable)(target)

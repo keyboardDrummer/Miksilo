@@ -5,7 +5,7 @@ import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{NodePath, NodePathRoot}
+import core.deltas.path.{ChildPath, Path, PathRoot}
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
@@ -28,7 +28,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   with ClassMemberDelta with HasDeclaration {
 
   implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node.getValue(Name)
+    def name: String = node(Name).asInstanceOf[String]
 
     def returnType: T = node(ReturnType).asInstanceOf[T]
     def returnType_=(value: T): Unit = node(ReturnType) = value
@@ -76,7 +76,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     AccessibilityFieldsDelta)
 
   def getParameterType(metaObject: Node, classCompiler: ClassCompiler): Node = {
-    val result = NodePathRoot(metaObject)(ParameterType).asInstanceOf[NodePath]
+    val result = PathRoot(metaObject)(ParameterType).asInstanceOf[Path]
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
@@ -93,11 +93,11 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method.data.remove(Name)
     val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptor) = methodDescriptorIndex
-    addCodeAnnotation(NodePathRoot(method))
+    addCodeAnnotation(PathRoot(method))
     method.data.remove(ReturnType)
     method.data.remove(Parameters)
 
-    def addCodeAnnotation(method: NodePath) {
+    def addCodeAnnotation(method: Path) {
       setMethodCompiler(method, compilation)
       val statements = method.body
       method.current.data.remove(Body)
@@ -181,15 +181,15 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   object Shape extends ShapeWithConstraints {
-      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
-        val method: Method[NodePath] = path
+      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: Path, parentScope: Scope) : Unit = {
+        val method: Method[Path] = path
         val bodyScope = builder.newScope(Some(parentScope), "methodBody")
         method.parameters.foreach(parameter => {
           val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-          val name = parameter.current(ParameterName).asInstanceOf[String]
-          builder.declare(name, parameter, bodyScope, Some(parameterType))
+          val name = parameter(ParameterName).asInstanceOf[String]
+          builder.declare(name, parameter.getLocation(ParameterName), bodyScope, Some(parameterType))
         })
-        BlockDelta.collectConstraints(compilation, builder, method.body, bodyScope)
+        BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
       }
 
   }
@@ -226,12 +226,12 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
-    val method: Method[NodePath] = path
-    val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[NodePath])
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: Path, parentScope: Scope): Declaration = {
+    val method: Method[Path] = path
+    val parameterTypes = method.parameters.map(p => p(ParameterType).asInstanceOf[Path])
     val returnType = method.returnType
     val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
 
-    builder.declare(method.name, method, parentScope, Some(methodType))
+    builder.declare(method.name, path.asInstanceOf[ChildPath], parentScope, Some(methodType))
   }
 }

@@ -1,11 +1,11 @@
 package core.deltas.path
 
-import core.deltas.node.NodeField
+import core.deltas.node.{Node, NodeField}
 
-case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
-  val current = parent.current(field)
+case class FieldValue(parent: Path, field: NodeField) extends ChildPath {
+  val current: Node = parent.current(field).asInstanceOf[Node]
 
-  override def parentOption: Option[NodePath] = Some(parent)
+  override def parentOption: Option[Path] = Some(parent)
 
   override def hashCode(): Int = parent.hashCode() * field.hashCode()
 

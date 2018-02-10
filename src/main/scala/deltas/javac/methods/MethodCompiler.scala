@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas.Compilation
 import core.deltas.exceptions.BadInputException
 import core.deltas.node.Node
-import core.deltas.path.{NodePath, NodePathRoot}
+import core.deltas.path.{Path, PathRoot}
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -18,9 +18,9 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(compilation, method)
-  private val intermediate = new Method(NodePathRoot(method)).body
-  val firstInstruction: NodePath = intermediate.head
-  val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
+  private val intermediate = new Method(PathRoot(method)).body
+  val firstInstruction: Path = intermediate.head
+  val variablesPerStatement: Map[Path, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
 
   def getInitialVariables: VariablePool = {
     var result = VariablePool(compilation)
@@ -31,15 +31,15 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
     result
   }
 
-  case class StatementWasNotFoundDuringLocalsAnalysis(statement: NodePath) extends BadInputException
+  case class StatementWasNotFoundDuringLocalsAnalysis(statement: Path) extends BadInputException
   {
     override def toString = s"the following statement is unreachable:\n$statement"
   }
 
-  def getVariables(obj: NodePath): VariablePool = {
+  def getVariables(obj: Path): VariablePool = {
     val instances = StatementSkeleton.getRegistry(compilation).instances
     val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
-    val variablesPerStatement: Map[NodePath, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
+    val variablesPerStatement: Map[Path, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
     try
     {
       variablesPerStatement(statement)

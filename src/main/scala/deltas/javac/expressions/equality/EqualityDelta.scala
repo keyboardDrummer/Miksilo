@@ -3,7 +3,7 @@ package deltas.javac.expressions.equality
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -38,14 +38,14 @@ object EqualityDelta extends ExpressionInstance {
 
   override val key = EqualityKey
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
+  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
-  def getInputType(equality: NodePath, compilation: Compilation) = {
+  def getInputType(equality: Path, compilation: Compilation) = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(compilation)(first)
   }
 
-  override def toByteCode(equality: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(equality: Path, compilation: Compilation): Seq[Node] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
@@ -59,7 +59,7 @@ object EqualityDelta extends ExpressionInstance {
 
   override def description: String = "Adds the == operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: Path, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType.
 //    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
 //    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)

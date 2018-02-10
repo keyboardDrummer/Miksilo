@@ -2,7 +2,7 @@ package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.{ChildPath, Path}
 import core.deltas.{Compilation, Contract, DeltaWithGrammar}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -22,7 +22,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
   object Name extends NodeField
 
   implicit class Field[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node.getValue(Name)
+    def name: String = node(Name).asInstanceOf[String]
     def _type: T = node(Type).asInstanceOf[T]
   }
 
@@ -92,8 +92,8 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
     JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
-    val field: Field[NodePath] = path
-    builder.declare(field.name, path, parentScope, Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: Path, parentScope: Scope): Declaration = {
+    val field: Field[Path] = path
+    builder.declare(field.name, path.asInstanceOf[ChildPath], parentScope, Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
   }
 }

@@ -2,7 +2,7 @@ package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeShape}
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.deltas.{Compilation, Contract}
 import core.language.Language
 import deltas.bytecode.types.VoidTypeDelta
@@ -19,14 +19,14 @@ object ThisCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
+  override def getType(expression: Path, compilation: Compilation): Node = VoidTypeDelta.voidType
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
     transformThisCall(classCompiler.currentClass, call, compilation)
   }
 
-  def transformThisCall(program: Node, call: NodePath, compilation: Compilation): Seq[Node] = {
+  def transformThisCall(program: Node, call: Path, compilation: Compilation): Seq[Node] = {
     SuperCallExpression.transformToByteCode(call, compilation, program.name)
   }
 

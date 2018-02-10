@@ -2,7 +2,7 @@ package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
@@ -19,7 +19,7 @@ object AssignToMember extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
     AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(MemberSelector.Shape,
-      (compilation: Compilation, selector: NodePath) => {
+      (compilation: Compilation, selector: Path) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelector.getClassOrObjectReference(selector, compiler)
       val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)

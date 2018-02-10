@@ -27,7 +27,7 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
 
   def neww(className: String): Node = Shape.create(Name -> className)
 
-  def getName(objectType: NodeLike): String = objectType.getValue(Name)
+  def getName(objectType: NodeLike): String = objectType(Name).asInstanceOf[String]
 
   object Name extends NodeField
 

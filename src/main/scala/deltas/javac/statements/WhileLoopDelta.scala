@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{NodePath, NodePathRoot, NodeSequenceElement}
+import core.deltas.path.{Path, PathRoot, SequenceElement}
 import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.expressions.ExpressionSkeleton
@@ -14,10 +14,10 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def description: String = "Adds a while loop."
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    NodePathRoot(program).visitShape(WhileKey, path => transformWhileLoop(path, compilation))
+    PathRoot(program).visitShape(WhileKey, path => transformWhileLoop(path, compilation))
   }
 
-  def transformWhileLoop(whileLoopPath: NodePath, compilation: Compilation): Unit = {
+  def transformWhileLoop(whileLoopPath: Path, compilation: Compilation): Unit = {
     val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
@@ -26,7 +26,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)
-    whileLoopPath.asInstanceOf[NodeSequenceElement].replaceWith(newStatements)
+    whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
   override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)

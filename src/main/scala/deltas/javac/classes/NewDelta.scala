@@ -3,7 +3,7 @@ package deltas.javac.classes
 import core.deltas.grammars.LanguageGrammars
 import core.deltas._
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
@@ -31,11 +31,11 @@ object NewDelta extends ExpressionInstance {
 
   override val key = NewCallKey
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = {
-    expression(NewObject).asInstanceOf[NodePath]
+  override def getType(expression: Path, compilation: Compilation): Node = {
+    expression(NewObject).asInstanceOf[Path]
   }
 
-  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+  override def toByteCode(expression: Path, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
     val objectType = getNewObject(expression)

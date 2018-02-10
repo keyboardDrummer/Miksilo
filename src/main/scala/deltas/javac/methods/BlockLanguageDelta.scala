@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{NodePath, NodePathRoot}
+import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Language
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -17,7 +17,7 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation, builder) => {
-      val statements = NodePathRoot(compilation.program)(ProgramStatements).asInstanceOf[Seq[NodePath]]
+      val statements = PathRoot(compilation.program)(ProgramStatements).asInstanceOf[Seq[ChildPath]]
       BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope(debugName = "programScope"))
     }
   }

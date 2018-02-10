@@ -3,7 +3,7 @@ package deltas.javac.expressions.additive
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.NodePath
+import core.deltas.path.Path
 import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -39,7 +39,7 @@ object SubtractionDelta extends ExpressionInstance {
 
   override val key = SubtractionKey
 
-  override def getType(expression: NodePath, compilation: Compilation): Node = {
+  override def getType(expression: Path, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
     val firstType = getType(getFirst(expression))
     val secondType = getType(getSecond(expression))
@@ -48,7 +48,7 @@ object SubtractionDelta extends ExpressionInstance {
     IntTypeDelta.intType
   }
 
-  override def toByteCode(subtraction: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(subtraction: Path, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(getFirst(subtraction))
     val secondInstructions = toInstructions(getSecond(subtraction))
@@ -57,5 +57,5 @@ object SubtractionDelta extends ExpressionInstance {
 
   override def description: String = "Adds the - operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ??? //TODO reuse code from addition
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: Path, _type: Type, parentScope: Scope): Unit = ??? //TODO reuse code from addition
 }
