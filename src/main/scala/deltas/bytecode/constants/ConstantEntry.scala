@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape}
+import core.language.node.{Node, NodeShape}
 import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar

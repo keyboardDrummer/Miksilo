@@ -2,9 +2,9 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.{ChildPath, NodePath}
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.floats.FloatReturnInstructionDelta

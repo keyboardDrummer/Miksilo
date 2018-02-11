@@ -1,9 +1,9 @@
 package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{NodeField, NodeLike, NodeShape}
-import core.deltas.{Compilation, DeltaWithGrammar, HasShape}
-import core.language.Language
+import core.language.node.{NodeField, NodeLike, NodeShape}
+import core.deltas.{DeltaWithGrammar, HasShape}
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

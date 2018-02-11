@@ -2,7 +2,7 @@ package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.language.Language
 import deltas.bytecode.PrintByteCode._
 

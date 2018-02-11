@@ -5,19 +5,19 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
-import core.deltas.Compilation
-import core.deltas.node.{ComparisonOptions, Node}
+import core.language.node.{ComparisonOptions, Node}
+import core.language.Compilation
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
+object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {
 }
 
 class TestUtils(val language: TestingLanguage) extends FunSuite {
@@ -137,7 +137,7 @@ class TestUtils(val language: TestingLanguage) extends FunSuite {
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = TestLanguageBuilder.build(Seq(new PrettyPrint) ++ JavaCompilerDeltas.byteCodeDeltas)
+    val prettyPrintByteCodeCompiler = TestLanguageBuilder.build(Seq(new PrettyPrint) ++ JavaLanguage.byteCodeDeltas)
     val output = prettyPrintByteCodeCompiler.transform(state.program).output
     val prettyPrintActualByteCode = output
 

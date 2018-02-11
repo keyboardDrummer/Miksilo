@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 class TestCallC extends FunSuite {
 
   test("callC") {
-    val language = new Language(Seq.empty)
+    val language = new Language()
     ExpressionSkeleton.inject(language)
     MemberSelector.inject(language)
     CallStaticOrInstanceDelta.inject(language)

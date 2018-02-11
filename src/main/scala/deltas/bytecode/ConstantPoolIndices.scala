@@ -3,7 +3,7 @@ package deltas.bytecode
 import core.bigrammar._
 import core.bigrammar.grammars.ManyVertical
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolGrammar, ConstantPoolItemContentGrammar}

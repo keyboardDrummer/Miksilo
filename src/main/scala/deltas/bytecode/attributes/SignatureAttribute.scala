@@ -2,7 +2,7 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Key, Node, NodeShape, NodeField}
+import core.language.node.{Key, Node, NodeShape, NodeField}
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.readJar.ClassFileParser._
 

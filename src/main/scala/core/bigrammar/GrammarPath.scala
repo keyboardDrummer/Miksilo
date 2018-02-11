@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.deltas.node.{Key, NodeField}
+import core.language.node.{Key, NodeField}
 import util.{ExtendedType, GraphBasics, Property}
 import scala.collection.concurrent._
 

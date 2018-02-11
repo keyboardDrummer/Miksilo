@@ -1,9 +1,9 @@
 package deltas.javac.methods
 
-import core.deltas.Compilation
-import core.deltas.exceptions.BadInputException
-import core.deltas.node.Node
+import core.language.exceptions.BadInputException
+import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
+import core.language.Compilation
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton

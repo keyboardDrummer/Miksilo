@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.{Node, NodeField}
+import core.language.node.{Node, NodeField}
 
 case class SequenceElement(parent: NodePath, field: NodeField, index: Int) extends ChildPath
 {

@@ -3,7 +3,7 @@ package example
 import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, RegexGrammar}
 import core.deltas.NodeGrammarWriter
-import core.deltas.node.{NodeField, NodeShape}
+import core.language.node.{NodeField, NodeShape}
 import org.scalatest.FunSuite
 
 object While {

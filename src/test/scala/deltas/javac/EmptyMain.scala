@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton.QualifiedClassName
@@ -21,7 +21,7 @@ class EmptyMain extends FunSuite {
 
   def getByteCode: Node = {
     val java = getJava
-    val byteCode = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(java).program
+    val byteCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(java).program
     byteCode
   }
 

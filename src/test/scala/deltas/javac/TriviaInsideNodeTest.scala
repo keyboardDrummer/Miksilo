@@ -3,7 +3,7 @@ package deltas.javac
 import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, LeftRight, WithTrivia}
 import core.deltas.grammars.BodyGrammar
-import core.deltas.node.{GrammarKey, NodeField, NodeShape}
+import core.language.node.{GrammarKey, NodeField, NodeShape}
 import core.deltas.NodeGrammarWriter
 import core.language.Language
 import deltas.javac.trivia.TriviaInsideNode
@@ -18,7 +18,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object ChildName extends NodeField
 
   test("Trivia is moved inside Child Node") {
-    val language = new Language(Seq.empty)
+    val language = new Language()
     val grammars = language.grammars
     import grammars._
 
@@ -38,13 +38,13 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   }
 
   test("No doubles") {
-    val language = new Language(Seq.empty)
+    val language = new Language()
     val grammars = language.grammars
     import grammars._
 
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
     language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
-    TriviaInsideNode.transformGrammars(grammars, new Language(Seq.empty))
+    TriviaInsideNode.transformGrammars(grammars, new Language())
     val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
@@ -57,7 +57,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
   object Expression extends GrammarKey
 
   test("Left Recursive") {
-    val language = new Language(Seq.empty)
+    val language = new Language()
     val grammars = language.grammars
     import grammars._
 

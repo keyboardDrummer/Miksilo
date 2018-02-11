@@ -1,7 +1,6 @@
-package core.deltas
+package core.language
 
-import core.deltas.node.Node
-import core.language.Language
+import core.language.node.Node
 import core.smarts.Proofs
 
 import scala.collection.mutable

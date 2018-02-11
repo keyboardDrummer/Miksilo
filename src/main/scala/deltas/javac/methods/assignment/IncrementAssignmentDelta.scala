@@ -2,9 +2,9 @@ package deltas.javac.methods.assignment
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.{NodePath, PathRoot}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.javac.expressions.additive.AdditionDelta
 
 object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {

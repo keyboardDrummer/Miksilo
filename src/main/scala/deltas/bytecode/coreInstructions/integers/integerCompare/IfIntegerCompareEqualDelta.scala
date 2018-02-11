@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.node.{Node, NodeShape}
+import core.language.node.{Node, NodeShape}
 import core.language.Language
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta

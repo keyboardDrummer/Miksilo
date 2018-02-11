@@ -2,9 +2,9 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MethodDelta

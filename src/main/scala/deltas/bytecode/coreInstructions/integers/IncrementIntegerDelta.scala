@@ -1,8 +1,7 @@
 package deltas.bytecode.coreInstructions.integers
 
-import core.deltas.Compilation
-import core.deltas.node.{Node, NodeShape}
-import core.language.Language
+import core.language.node.{Node, NodeShape}
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}

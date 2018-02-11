@@ -1,10 +1,10 @@
 package deltas.javac.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.{Compilation, DeltaWithGrammar, HasShape}
+import core.deltas.{DeltaWithGrammar, HasShape}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
-import core.language.Language
+import core.language.node._
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

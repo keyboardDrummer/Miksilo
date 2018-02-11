@@ -2,7 +2,7 @@ package deltas.bytecode.readJar
 
 import java.nio.ByteBuffer
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.bytecode.constants.Utf8ConstantDelta
 
 trait ByteParsers extends scala.util.parsing.combinator.Parsers {

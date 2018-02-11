@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 
 trait BiGrammarObserver[Result] {
 

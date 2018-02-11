@@ -1,4 +1,4 @@
-package core.deltas.node
+package core.language.node
 
 trait NodeWrapper[T <: NodeLike] {
   def node: T

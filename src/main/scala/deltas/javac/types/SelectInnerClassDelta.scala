@@ -1,7 +1,7 @@
 package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{NodeField, NodeShape}
+import core.language.node.{NodeField, NodeShape}
 import core.deltas.DeltaWithGrammar
 import core.language.Language
 import deltas.bytecode.types.QualifiedObjectTypeDelta.ByteCodeGrammarInner

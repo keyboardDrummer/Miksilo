@@ -4,9 +4,10 @@ import java.io._
 import java.util.stream.Collectors
 
 import core.deltas._
-import core.deltas.node.Node
+import core.language.node.Node
+import core.language.Compilation
 import deltas.bytecode.PrintByteCode
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
@@ -48,7 +49,7 @@ object SourceUtils {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaCompilerDeltas.byteCodeDeltas
+    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaLanguage.byteCodeDeltas
     TestLanguageBuilder.build(particles).transform(byteCode)
     output
   }

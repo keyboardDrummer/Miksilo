@@ -37,9 +37,9 @@ import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWi
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 
-object JavaCompilerDeltas {
+object JavaLanguage {
 
-  def getJava = new Language(javaCompilerDeltas)
+  def getJava: Language = Delta.buildLanguage(javaCompilerDeltas)
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
@@ -59,7 +59,7 @@ object JavaCompilerDeltas {
 
   val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
-  def javaMethod: Seq[Delta] = Language.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
+  def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
@@ -122,13 +122,13 @@ object JavaCompilerDeltas {
       ShortTypeDelta, TypeSkeleton)
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Language.spliceAndFilterTop(javaCompilerDeltas, implicits, splice)
+    Delta.spliceAndFilterTop(javaCompilerDeltas, implicits, splice)
 
   def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Language.spliceAndFilterBottom(implicits, javaCompilerDeltas, splice)
+    Delta.spliceAndFilterBottom(implicits, javaCompilerDeltas, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler: Language = {
-    new Language(spliceBeforeTransformations(JavaCompilerDeltas.byteCodeDeltas, Seq(new PrettyPrint)))
+    Delta.buildLanguage(spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(new PrettyPrint)))
   }
 }
 

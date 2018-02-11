@@ -1,6 +1,6 @@
 package deltas.bytecode.extraBooleanInstructions
 
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.{Contract, Delta}
 import core.language.Language
 import deltas.bytecode.coreInstructions.InstructionWithGrammar

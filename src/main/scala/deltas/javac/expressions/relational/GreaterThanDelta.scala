@@ -1,10 +1,10 @@
 package deltas.javac.expressions.relational
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
+import core.language.node.{Node, NodeField, NodeLike, NodeShape}
 import core.deltas.path.NodePath
-import core.deltas.{Compilation, Contract}
-import core.language.Language
+import core.deltas.Contract
+import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}

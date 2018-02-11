@@ -3,7 +3,7 @@ package core.deltas.grammars
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas.GrammarWithTrivia
-import core.deltas.node.{GrammarKey, Key}
+import core.language.node.{GrammarKey, Key}
 
 case class KeyGrammar(key: Key) extends GrammarKey
 {

@@ -3,7 +3,7 @@ package deltas.bytecode.simpleBytecode
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.language.Language
 import deltas.bytecode.attributes.StackMapTableAttribute.StackMapFrameGrammar
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}

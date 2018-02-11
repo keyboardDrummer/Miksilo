@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.TestCompilerGrammarUtils
-import core.deltas.node.{ComparisonOptions, Node}
+import core.language.node.{ComparisonOptions, Node}
 import deltas.bytecode.types._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
@@ -12,11 +12,11 @@ import deltas.javac.methods._
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import deltas.javac.trivia.JavaStyleCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerDeltas.filter(p => p != JavaStyleCommentsDelta))
+  extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleCommentsDelta))
 {
 
   test("BasicClass") {

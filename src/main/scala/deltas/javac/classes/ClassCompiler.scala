@@ -2,8 +2,8 @@ package deltas.javac.classes
 
 import java.util.NoSuchElementException
 
-import core.deltas.Compilation
-import core.deltas.node.Node
+import core.language.node.Node
+import core.language.Compilation
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}

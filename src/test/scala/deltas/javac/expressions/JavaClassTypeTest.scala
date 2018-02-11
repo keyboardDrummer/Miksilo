@@ -1,15 +1,15 @@
 package deltas.javac.expressions
 
-import core.language.Language
+import core.deltas.Delta
 import core.smarts.SolveConstraintsDelta
 import deltas.ClearPhases
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
-    Language.spliceAndFilterTop(
-        JavaCompilerDeltas.javaCompilerDeltas,
-        JavaCompilerDeltas.javaClassSkeleton,
+    Delta.spliceAndFilterTop(
+        JavaLanguage.javaCompilerDeltas,
+        JavaLanguage.javaClassSkeleton,
         Seq(SolveConstraintsDelta, ClearPhases)))) {
 
   test("empty class") {

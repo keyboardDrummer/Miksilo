@@ -3,10 +3,10 @@ package deltas.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.document.BlankLine
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.{Declaration, NamedDeclaration}
 import core.smarts.scopes.DeclarationInsideScope
@@ -45,7 +45,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
-  override def transformProgram(program: Node, compilation: core.deltas.Compilation): Unit = {
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(program: Node) {

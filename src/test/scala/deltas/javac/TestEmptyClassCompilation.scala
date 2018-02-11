@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.deltas.node.Node
+import core.language.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants._
@@ -22,14 +22,14 @@ class TestEmptyClassCompilation extends FunSuite {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(javaCode).program
+    val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(javaCode).program
     TestUtils.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(javaCode).program
+    val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(javaCode).program
 
     TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

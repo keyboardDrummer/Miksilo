@@ -1,4 +1,4 @@
-package core.deltas.node
+package core.language.node
 
 /**
   * Defines a new Node class

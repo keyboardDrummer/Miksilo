@@ -5,15 +5,15 @@ import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import util.{TestLanguageBuilder, TestUtils}
 
 class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   Seq(DropPhases(1), BlockLanguageDelta) ++
-    Language.spliceAndFilterTop(
-      JavaCompilerDeltas.blockWithVariables,
-      JavaCompilerDeltas.javaClassSkeleton,
+    Delta.spliceAndFilterTop(
+      JavaLanguage.blockWithVariables,
+      JavaLanguage.javaClassSkeleton,
       Seq(SolveConstraintsDelta, ClearPhases)))) {
 
   test("int variable") {

@@ -3,8 +3,8 @@ package application.compilerCockpit
 import java.io.InputStream
 
 import core.deltas._
-import core.deltas.node.Node
-import core.language.Language
+import core.language.Compilation
+import core.language.node.Node
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
@@ -31,7 +31,7 @@ object RunWithJVM extends DeltaWithPhase
 object CompileAndRunOption extends CompileOption {
 
   override def perform(cockpit: LanguageSandbox, inputStream: InputStream): TextWithGrammar = {
-    val compiler = new Language(cockpit.language.deltas ++ Seq(RunWithJVM))
+    val compiler = Delta.buildLanguage(cockpit.deltas ++ Seq(RunWithJVM))
     val state = compiler.parseAndTransform(inputStream)
 
     TextWithGrammar(state.output)

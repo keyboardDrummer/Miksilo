@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.{Key, Node}
+import core.language.node.{Key, Node}
 
 case class PathRoot(current: Node) extends NodePath with Key {
 

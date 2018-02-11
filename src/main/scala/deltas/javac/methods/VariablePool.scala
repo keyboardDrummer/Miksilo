@@ -1,7 +1,7 @@
 package deltas.javac.methods
 
-import core.deltas.exceptions.BadInputException
-import core.deltas.node.Node
+import core.language.exceptions.BadInputException
+import core.language.node.Node
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 

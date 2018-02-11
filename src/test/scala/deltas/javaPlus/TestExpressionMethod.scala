@@ -1,7 +1,7 @@
 package deltas.javaPlus
 
 import org.scalatest.FunSuite
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import util.TestLanguageBuilder
 import util.TestUtils
 
@@ -11,7 +11,7 @@ class TestExpressionMethod extends FunSuite {
 
   test("basic") {
     val inputDirectory = Path("")
-    val compiler = TestLanguageBuilder.build(Seq(ExpressionMethodDelta) ++ JavaCompilerDeltas.javaCompilerDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ExpressionMethodDelta) ++ JavaLanguage.javaCompilerDeltas)
     val result = new TestUtils(compiler).compileAndRun("FibonacciWithExpressionMethod", inputDirectory)
     assertResult(8)(Integer.parseInt(result))
   }

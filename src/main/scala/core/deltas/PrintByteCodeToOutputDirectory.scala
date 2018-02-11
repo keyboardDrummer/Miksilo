@@ -1,5 +1,6 @@
 package core.deltas
 
+import core.language.Compilation
 import deltas.bytecode.PrintByteCode
 
 import scala.reflect.io.File

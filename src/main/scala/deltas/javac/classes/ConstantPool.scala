@@ -1,6 +1,6 @@
 package deltas.javac.classes
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.bytecode.constants.{ClassInfoConstant, DoubleInfoConstant, LongInfoConstant, Utf8ConstantDelta}
 import deltas.javac.classes.skeleton.QualifiedClassName
 

@@ -2,9 +2,9 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 import core.deltas.path.ChildPath
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 

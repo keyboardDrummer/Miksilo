@@ -2,7 +2,7 @@ package core.bigrammar.printer
 
 import core.bigrammar.WithMapG
 import core.bigrammar.printer.Printer.NodePrinter
-import core.deltas.node.NodeField
+import core.language.node.NodeField
 import core.responsiveDocument.ResponsiveDocument
 
 class AsPrinter(inner: NodePrinter, key: NodeField) extends NodePrinter {

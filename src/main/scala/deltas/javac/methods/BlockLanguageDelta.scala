@@ -2,9 +2,9 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.path.{ChildPath, PathRoot}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}

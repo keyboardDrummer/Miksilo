@@ -3,7 +3,7 @@ package core.deltas
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarSequenceMethodsExtension}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.NodeShape
+import core.language.node.NodeShape
 
 class GrammarWithTrivia(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
   with BiGrammarSequenceMethodsExtension

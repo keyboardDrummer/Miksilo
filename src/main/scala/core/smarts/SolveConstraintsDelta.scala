@@ -1,7 +1,7 @@
 package core.smarts
 
 import core.deltas.Delta
-import core.deltas.exceptions.BadInputException
+import core.language.exceptions.BadInputException
 import core.language.{Language, Phase}
 
 import scala.util.{Failure, Success}

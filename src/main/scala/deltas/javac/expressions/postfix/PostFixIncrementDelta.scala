@@ -1,10 +1,10 @@
 package deltas.javac.expressions.postfix
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{NodePath}
-import core.deltas.{Compilation, Contract}
-import core.language.Language
+import core.language.node.{Node, NodeField, NodeShape}
+import core.deltas.path.NodePath
+import core.deltas.Contract
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

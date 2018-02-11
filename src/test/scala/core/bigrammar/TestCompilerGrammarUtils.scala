@@ -4,10 +4,10 @@ import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 import core.language.Language
 import org.scalatest.FunSuite
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import util.{TestLanguageBuilder, TestUtils}
 
 import scala.util.parsing.input.CharArrayReader
@@ -15,7 +15,7 @@ import scala.util.parsing.input.CharArrayReader
 
 case class StringKey(value: String) extends GrammarKey
 
-object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaCompilerDeltas.javaCompilerDeltas)
+object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas)
 
 object TestGrammarUtils extends FunSuite {
 

@@ -5,8 +5,8 @@ import java.nio.charset.StandardCharsets
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.Node
-import core.language.Language
+import core.language.node.Node
+import core.language.{Compilation, Language}
 
 import scala.reflect.io.File
 
@@ -111,7 +111,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   def buildLanguage: Language = {
     statistics.profile("build language", {
-      new Language(Seq(new Delta {
+      Delta.buildLanguage(Seq(new Delta {
         override def description: String = "Instrument buildParser"
 
         override def inject(language: Language): Unit = {

@@ -2,7 +2,7 @@ package core.deltas
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.As
-import core.deltas.node.{NodeShape, NodeField}
+import core.language.node.{NodeField, NodeGrammar, NodeShape}
 
 class GrammarForAst(grammar: BiGrammar) {
   def asNode(key: NodeShape) = new NodeGrammar(grammar, key)

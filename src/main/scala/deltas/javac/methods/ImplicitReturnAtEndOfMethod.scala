@@ -1,7 +1,8 @@
 package deltas.javac.methods
 
-import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase}
+import core.language.node.Node
+import core.deltas.{Contract, DeltaWithPhase}
+import core.language.Compilation
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {

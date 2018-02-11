@@ -1,8 +1,8 @@
 package deltas.javac.methods.call
 
-import core.deltas.Compilation
-import core.deltas.node._
-import core.deltas.path.{SourceElementWithValue, NodePath}
+import core.language.node._
+import core.deltas.path.{NodePath, SourceElementWithValue}
+import core.language.Compilation
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.DeclarationVariable
 import core.smarts.scopes.objects.Scope

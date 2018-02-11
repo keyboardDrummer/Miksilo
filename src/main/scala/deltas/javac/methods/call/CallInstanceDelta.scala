@@ -1,8 +1,9 @@
 package deltas.javac.methods.call
 
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.NodePath
-import core.deltas.{Compilation, Contract}
+import core.deltas.Contract
+import core.language.Compilation
 import deltas.bytecode.coreInstructions.InvokeVirtualDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton

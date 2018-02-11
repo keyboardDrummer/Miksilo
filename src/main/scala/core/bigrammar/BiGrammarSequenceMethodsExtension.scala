@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.deltas.node.Node
+import core.language.node.Node
 import core.document.BlankLine
 
 trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {

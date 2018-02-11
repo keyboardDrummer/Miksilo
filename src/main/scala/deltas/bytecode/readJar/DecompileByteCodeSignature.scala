@@ -2,8 +2,8 @@ package deltas.bytecode.readJar
 
 import core.bigrammar.BiGrammarToParser
 import core.deltas._
-import core.deltas.node.Node
-import core.language.Language
+import core.language.node.Node
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant

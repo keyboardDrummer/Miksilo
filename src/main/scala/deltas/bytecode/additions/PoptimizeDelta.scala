@@ -1,8 +1,8 @@
 package deltas.bytecode.additions
 
-import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase}
-import core.language.Language
+import core.language.node.Node
+import core.deltas.{Contract, DeltaWithPhase}
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions._

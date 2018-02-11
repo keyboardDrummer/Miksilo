@@ -1,6 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 import util.DataFlowAnalysis

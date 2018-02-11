@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 
 import core.bigrammar._
 import core.bigrammar.grammars.{BiFailure, Labelled}
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 
 class GrammarCatalogue {
   var grammars: Map[Any, Labelled] = Map.empty

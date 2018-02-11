@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.PrettyPrint
 import core.language.ParseException
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
@@ -25,7 +25,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     assertThrows[ParseException]({
@@ -54,7 +54,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaCompilerDeltas.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)
@@ -87,7 +87,7 @@ class ReorderMembersTest extends FunSuite {
         |}""".stripMargin
     val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta) ++
-      JavaCompilerDeltas.javaCompilerDeltas)
+      JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)
@@ -120,7 +120,7 @@ class ReorderMembersTest extends FunSuite {
         |}""".stripMargin
     val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
-      JavaCompilerDeltas.javaCompilerDeltas)
+      JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)

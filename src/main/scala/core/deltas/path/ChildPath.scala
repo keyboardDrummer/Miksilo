@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.Node
+import core.language.node.Node
 
 trait ChildPath extends NodePath with SourceElementWithValue {
   val current: Node

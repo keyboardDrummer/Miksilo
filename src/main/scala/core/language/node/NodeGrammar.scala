@@ -1,10 +1,9 @@
-package core.deltas
+package core.language.node
 
 import core.bigrammar.BiGrammarToParser.WithMap
 import core.bigrammar.grammars.MapGrammarWithMap
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMapG}
-import core.deltas.node.{Node, NodeShape, NodeField, NodeLike}
 
 class NodeGrammar(inner: BiGrammar, val key: NodeShape)
   extends MapGrammarWithMap(inner,

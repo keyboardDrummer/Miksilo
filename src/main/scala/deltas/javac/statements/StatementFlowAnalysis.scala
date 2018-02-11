@@ -1,6 +1,6 @@
 package deltas.javac.statements
 
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import util.DataFlowAnalysis

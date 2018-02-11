@@ -1,3 +1,3 @@
-package core.deltas.exceptions
+package core.language.exceptions
 
 class CompileException extends RuntimeException

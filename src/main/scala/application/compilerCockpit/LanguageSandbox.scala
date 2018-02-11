@@ -9,8 +9,9 @@ import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammar
-import core.deltas.exceptions.CompileException
+import core.deltas.Delta
 import core.language.Language
+import core.language.exceptions.CompileException
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import deltas.bytecode.ByteCodeSkeleton
 import org.fife.ui.rsyntaxtextarea._
@@ -20,10 +21,10 @@ import scala.swing.{Component, Frame}
 import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
-class LanguageSandbox(val name: String, val language: Language,
+class LanguageSandbox(val name: String, val deltas: Seq[Delta],
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
-
+  val language: Language = Delta.buildLanguage(deltas)
   this.title = name
 
   private val inputPanel = new EditorFromLanguage(language)

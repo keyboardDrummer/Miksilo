@@ -2,9 +2,9 @@ package deltas.javac.expressions.literals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape}
+import core.language.node.{Node, NodeShape}
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 

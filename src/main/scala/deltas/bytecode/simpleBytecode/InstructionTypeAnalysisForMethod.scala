@@ -1,6 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
-import core.deltas.node.Node
+import core.language.node.Node
 import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile

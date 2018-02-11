@@ -1,7 +1,8 @@
 package deltas.javaPlus
 
-import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase}
+import core.language.node.Node
+import core.deltas.{Contract, DeltaWithPhase}
+import core.language.Compilation
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility

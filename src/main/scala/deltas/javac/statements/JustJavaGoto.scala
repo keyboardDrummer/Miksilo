@@ -1,10 +1,9 @@
 package deltas.javac.statements
 
-import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.path.{ChildPath, NodePath}
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations

@@ -1,7 +1,7 @@
 package core.deltas
 
-import core.deltas.node.Node
-import core.language.{Language, Phase}
+import core.language.node.Node
+import core.language.{Compilation, Language, Phase}
 
 trait DeltaWithPhase extends Delta {
   def transformProgram(program: Node, compilation: Compilation): Unit

@@ -3,7 +3,7 @@ package deltas.javac.types
 import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
-import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
+import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.Language
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.javac.types.MethodType.MethodTypeKey

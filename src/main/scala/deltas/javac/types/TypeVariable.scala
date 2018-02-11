@@ -3,9 +3,9 @@ package deltas.javac.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
-import core.deltas.{Compilation, DeltaWithGrammar}
-import core.language.Language
+import core.language.node.{Node, NodeField, NodeLike, NodeShape}
+import core.deltas.DeltaWithGrammar
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

@@ -1,6 +1,6 @@
 package deltas.bytecode.coreInstructions.doubles
 
-import core.deltas.node.{Node, NodeShape}
+import core.language.node.{Node, NodeShape}
 import core.deltas.Contract
 import core.language.Language
 import deltas.bytecode.PrintByteCode

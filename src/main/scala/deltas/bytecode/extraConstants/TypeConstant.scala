@@ -2,7 +2,7 @@ package deltas.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeLike, NodeShape}
+import core.language.node.{Node, NodeField, NodeLike, NodeShape}
 import core.language.Language
 import deltas.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodInfoKey, MethodNameIndex}

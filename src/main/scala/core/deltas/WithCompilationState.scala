@@ -1,5 +1,7 @@
 package core.deltas
 
+import core.language.Compilation
+
 trait WithCompilationState {
   type State
 

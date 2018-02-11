@@ -1,10 +1,10 @@
 package deltas.javac.statements
 
-import core.deltas.{Compilation, Contract, NodeGrammar}
+import core.deltas.Contract
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, SequenceElement}
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo

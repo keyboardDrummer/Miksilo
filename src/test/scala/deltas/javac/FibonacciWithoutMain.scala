@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions._
@@ -22,7 +22,7 @@ class FibonacciWithoutMain {
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
-    val byteCode = TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas).transform(fibonacci).program
+    val byteCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(fibonacci).program
     TestUtils.printByteCode(byteCode)
   }
 

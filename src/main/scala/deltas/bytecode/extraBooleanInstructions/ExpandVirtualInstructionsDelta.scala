@@ -1,8 +1,9 @@
 package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas._
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
+import core.language.Compilation
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttribute, Instructions}

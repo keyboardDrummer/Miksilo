@@ -3,14 +3,14 @@ package deltas.javac.expressions
 import core.smarts.SolveConstraintsDelta
 import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
-import deltas.javac.JavaCompilerDeltas
+import deltas.javac.JavaLanguage
 import util.{TestLanguageBuilder, TestUtils}
 
 class ExpressionTypeTest extends TestUtils(TestLanguageBuilder.build(
   Seq(SolveConstraintsDelta,
     ExpressionLanguageDelta,
     ClearPhases) ++
-    JavaCompilerDeltas.javaSimpleExpression)) {
+    JavaLanguage.javaSimpleExpression)) {
 
   test("int + int") {
     val program = "3 + 2"

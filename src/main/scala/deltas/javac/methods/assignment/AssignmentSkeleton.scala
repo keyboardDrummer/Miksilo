@@ -3,9 +3,9 @@ package deltas.javac.methods.assignment
 import core.bigrammar.grammars.BiFailure
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

@@ -1,10 +1,10 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.{ChildPath, NodePath}
-import core.deltas.{Compilation, Contract, DeltaWithGrammar}
-import core.language.Language
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.BasicImportDelta._

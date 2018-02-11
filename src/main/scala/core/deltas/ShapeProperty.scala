@@ -1,6 +1,6 @@
 package core.deltas
 
-import core.deltas.node.NodeShape
+import core.language.node.NodeShape
 import core.language.Language
 
 import scala.collection.mutable

@@ -2,8 +2,8 @@ package deltas.javaPlus
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.node.{Node, NodeField, NodeShape}
+import core.language.{Compilation, Language}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.ExpressionSkeleton

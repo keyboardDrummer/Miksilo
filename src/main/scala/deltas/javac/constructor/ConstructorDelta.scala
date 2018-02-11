@@ -1,10 +1,10 @@
 package deltas.javac.constructor
 
 import core.deltas._
-import core.deltas.exceptions.BadInputException
+import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
-import core.language.Language
+import core.language.node._
+import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta

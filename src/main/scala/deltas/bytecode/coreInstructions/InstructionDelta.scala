@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
 import core.deltas._
-import core.deltas.node.{Node, NodeLike, NodeShape, NodeWrapper}
+import core.language.node.{Node, NodeLike, NodeShape, NodeWrapper}
 import core.language.Language
 import deltas.bytecode._
 import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}

@@ -1,6 +1,6 @@
 package deltas.bytecode.types
 
-import core.deltas.node.NodeShape
+import core.language.node.NodeShape
 import core.deltas.Delta
 import core.language.Language
 

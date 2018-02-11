@@ -1,6 +1,6 @@
 package core.deltas
 
-import core.deltas.node.NodeShape
+import core.language.node.NodeShape
 
 trait HasShape {
   def shape: NodeShape

@@ -1,8 +1,8 @@
 package deltas.bytecode.types
 
-import core.deltas.node.NodeLike
-import core.deltas.{Compilation, Delta, HasShape}
-import core.language.Language
+import core.language.node.NodeLike
+import core.deltas.{Delta, HasShape}
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

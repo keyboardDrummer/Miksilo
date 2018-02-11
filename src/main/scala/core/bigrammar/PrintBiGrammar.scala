@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 

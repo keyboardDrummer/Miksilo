@@ -2,10 +2,9 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
-import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeLike, NodeShape}
-import core.language.Language
+import core.language.node.{Node, NodeLike, NodeShape}
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}

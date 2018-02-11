@@ -1,7 +1,7 @@
 package deltas.javac.expressions.additive
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.GrammarKey
+import core.language.node.GrammarKey
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton

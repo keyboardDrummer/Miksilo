@@ -2,7 +2,7 @@ package deltas.javac.methods.assignment
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.NodePath
 import core.language.Language
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta

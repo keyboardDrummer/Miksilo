@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.node._
+import core.language.node._
 import core.language.Language
 import deltas.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo

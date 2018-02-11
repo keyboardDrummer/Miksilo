@@ -3,7 +3,7 @@ package deltas.javac.classes
 import core.deltas.grammars.LanguageGrammars
 import core.deltas._
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.javac.classes.SelectField._

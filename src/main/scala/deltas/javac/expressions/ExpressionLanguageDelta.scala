@@ -2,8 +2,8 @@ package deltas.javac.expressions
 
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.PathRoot
-import core.deltas.{Compilation, DeltaWithGrammar}
-import core.language.Language
+import core.deltas.DeltaWithGrammar
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 
 //TODO. This delta is WIP and currently just used for testing.

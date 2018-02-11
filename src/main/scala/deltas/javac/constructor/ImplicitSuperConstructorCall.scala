@@ -1,7 +1,8 @@
 package deltas.javac.constructor
 
-import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase}
+import core.language.node.Node
+import core.deltas.{Contract, DeltaWithPhase}
+import core.language.Compilation
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 

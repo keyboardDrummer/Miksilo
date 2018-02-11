@@ -2,9 +2,9 @@ package deltas.javac
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}

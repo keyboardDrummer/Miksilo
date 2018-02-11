@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node.{Node, NodeField}
+import core.language.node.{Node, NodeField}
 
 case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   val current: Node = parent.current(field).asInstanceOf[Node]

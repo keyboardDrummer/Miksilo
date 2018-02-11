@@ -2,7 +2,7 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
-import core.deltas.node.Node
+import core.language.node.Node
 import core.language.Language
 
 trait ByteCodeTypeInstance extends TypeInstance {

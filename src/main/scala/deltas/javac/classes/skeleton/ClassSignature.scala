@@ -1,6 +1,6 @@
 package deltas.javac.classes.skeleton
 
-import core.deltas.node.Node
+import core.language.node.Node
 import deltas.javac.classes.{MethodQuery, FieldInfo, MethodInfo}
 import deltas.javac.types.MethodType._
 

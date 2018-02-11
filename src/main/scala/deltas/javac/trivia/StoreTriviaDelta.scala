@@ -6,8 +6,8 @@ import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
 import core.bigrammar.{BiGrammar, StateFull, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
-import core.deltas.node.{Key, NodeField}
-import core.deltas.{DeltaWithGrammar, NodeGrammar}
+import core.language.node.{Key, NodeField, NodeGrammar}
+import core.deltas.DeltaWithGrammar
 import core.language.Language
 import core.responsiveDocument.ResponsiveDocument
 

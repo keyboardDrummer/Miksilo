@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.deltas.node._
+import core.language.node._
 import core.language.SourceElement
 
 object NodePath {

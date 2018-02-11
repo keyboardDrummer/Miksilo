@@ -1,8 +1,9 @@
 package deltas.javac.methods.call
 
 import core.deltas._
-import core.deltas.node.Node
+import core.language.node.Node
 import core.deltas.path.NodePath
+import core.language.Compilation
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 

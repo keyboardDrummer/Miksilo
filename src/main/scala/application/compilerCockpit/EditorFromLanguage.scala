@@ -6,7 +6,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.swing.JPanel
 
-import core.deltas.node.Node
+import core.language.node.Node
 import core.language.{Language, NoSourceException, ParseException}
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea, SyntaxConstants}
 import org.fife.ui.rsyntaxtextarea.parser._

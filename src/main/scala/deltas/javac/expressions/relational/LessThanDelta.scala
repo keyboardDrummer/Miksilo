@@ -2,9 +2,9 @@ package deltas.javac.expressions.relational
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node._
+import core.language.node._
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}

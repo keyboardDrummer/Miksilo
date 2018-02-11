@@ -2,8 +2,8 @@ package deltas.bytecode.simpleBytecode
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.Node
-import core.language.Language
+import core.language.node.Node
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
