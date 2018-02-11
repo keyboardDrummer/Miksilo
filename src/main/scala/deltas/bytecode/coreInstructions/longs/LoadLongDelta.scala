@@ -1,12 +1,12 @@
 package deltas.bytecode.coreInstructions.longs
 
-import core.deltas.Language
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.LongTypeC
+import deltas.bytecode.types.LongTypeDelta
 
 object LoadLongDelta extends InstructionDelta {
 
@@ -22,7 +22,7 @@ object LoadLongDelta extends InstructionDelta {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(), Seq(LongTypeC.longType))
+    InstructionSignature(Seq(), Seq(LongTypeDelta.longType))
 
   override def grammarName = "lload" //TODO lload_0 etc..
 }

@@ -2,7 +2,8 @@ package deltas.javac.expressions.additive
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.GrammarKey
-import core.deltas.{Contract, DeltaWithGrammar, Language}
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 
 object AddAdditivePrecedence extends DeltaWithGrammar {

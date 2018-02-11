@@ -1,12 +1,12 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
-import core.deltas.Language
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object IfIntegerCompareNotEqualDelta extends JumpInstruction {
 
@@ -18,7 +18,7 @@ object IfIntegerCompareNotEqualDelta extends JumpInstruction {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(IntTypeC.intType, IntTypeC.intType), Seq())
+    InstructionSignature(Seq(IntTypeDelta.intType, IntTypeDelta.intType), Seq())
 
   override def grammarName = "if_icmpne"
 }

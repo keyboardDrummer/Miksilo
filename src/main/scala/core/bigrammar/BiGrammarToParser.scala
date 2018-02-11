@@ -1,11 +1,10 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
-import scala.util.parsing.input.CharArrayReader
+import scala.util.parsing.input.{CharArrayReader, Position, Positional}
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
@@ -128,4 +127,8 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   }
 
   override val whiteSpace: Regex = "".r
+
+  def position[T <: Positional](p: => Parser[T]): Parser[Position] = Parser { in =>
+    Success(in.pos, in)
+  }
 }

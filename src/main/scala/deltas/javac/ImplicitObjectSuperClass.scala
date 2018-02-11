@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.deltas.node.Node
-import core.deltas.{Compilation, Contract, DeltaWithPhase, Language}
+import core.deltas.{Compilation, Contract, DeltaWithPhase}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 

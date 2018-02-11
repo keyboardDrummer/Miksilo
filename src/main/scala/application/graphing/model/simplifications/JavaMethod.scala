@@ -2,15 +2,15 @@ package application.graphing.model.simplifications
 
 import core.deltas.Contract
 import deltas.javac.ImplicitObjectSuperClass
-import deltas.javac.classes.{BasicImportC, FieldDeclaration}
-import deltas.javac.expressions.postfix.PostFixIncrementC
+import deltas.javac.classes.{BasicImportDelta, FieldDeclarationDelta}
+import deltas.javac.expressions.postfix.PostFixIncrementDelta
 import deltas.javac.methods.assignment.{AssignToVariable, IncrementAssignmentDelta}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelector}
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 
 object JavaMethod extends DeltaGroup {
 
-  override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, LocalDeclarationWithInitializerC, IncrementAssignmentDelta, PostFixIncrementC, AssignToVariable)
+  override def dependencies: Set[Contract] = Set(ImplicitReturnAtEndOfMethod, LocalDeclarationWithInitializerDelta, IncrementAssignmentDelta, PostFixIncrementDelta, AssignToVariable)
 
-  override def dependants: Set[Contract] = Set(ImplicitObjectSuperClass, MemberSelector, BasicImportC, FieldDeclaration)
+  override def dependants: Set[Contract] = Set(ImplicitObjectSuperClass, MemberSelector, BasicImportDelta, FieldDeclarationDelta)
 }

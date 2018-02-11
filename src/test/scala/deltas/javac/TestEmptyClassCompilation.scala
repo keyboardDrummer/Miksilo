@@ -7,7 +7,7 @@ import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.coreInstructions.{InvokeSpecialDelta, VoidReturnInstructionDelta}
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
-import deltas.bytecode.types.VoidTypeC
+import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
@@ -39,7 +39,7 @@ class TestEmptyClassCompilation extends FunSuite {
       ClassInfoConstant.classRef(11),
       ClassInfoConstant.classRef(12),
       Utf8ConstantDelta.create(SuperCallExpression.constructorName),
-      TypeConstant.constructor(MethodType.construct(VoidTypeC.voidType, Seq())),
+      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
       QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),

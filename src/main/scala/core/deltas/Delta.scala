@@ -1,6 +1,7 @@
 package core.deltas
 
 import core.deltas.node.Key
+import core.language.Language
 
 trait Delta extends Contract with Key {
 

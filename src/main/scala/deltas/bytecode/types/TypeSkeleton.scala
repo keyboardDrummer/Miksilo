@@ -1,25 +1,23 @@
 package deltas.bytecode.types
 
-import core.bigrammar.BiGrammarToParser
 import core.bigrammar.printer.BiGrammarToPrinter
-import core.deltas.exceptions.BadInputException
 import core.deltas._
+import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{GrammarKey, Key, Node}
+import core.deltas.node._
+import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.ByteCodeSkeleton
 
-class TypeMismatchException(to: Node, from: Node) extends BadInputException {
-  override def toString = s"cannot assign: $to = $from"
-}
-
-class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
-
-class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException
-
 object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
+  def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
+    hasTypes.get(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
+  }
 
   def toStackType(_type: Node, language: Language) : Node = {
-    getRegistry(language).instances(_type.shape).getStackType(_type, language)
+    byteCodeInstances.get(language, _type.shape).getStackType(_type, language)
   }
 
   def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.shape)
@@ -30,15 +28,16 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
       rendered
   }
 
+  val hasTypes = new ShapeProperty[HasType]
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  def checkAssignableTo(state: Language)(to: Node, from: Node) = {
-    if (!isAssignableTo(state)(to, from))
+  def checkAssignableTo(language: Language)(to: Node, from: Node): Unit = {
+    if (!isAssignableTo(language)(to, from))
       throw new TypeMismatchException(to, from)
   }
 
-  def isAssignableTo(state: Language)(to: Node, from: Node): Boolean = {
-    val fromSuperTypes = getSuperTypes(state)(from)
+  def isAssignableTo(language: Language)(to: Node, from: Node): Boolean = {
+    val fromSuperTypes = getSuperTypes(language)(from)
     if (to.equals(from))
       return true
 
@@ -76,7 +75,9 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def createRegistry = new Registry
-  
+
+  val byteCodeInstances = new ShapeProperty[ByteCodeTypeInstance]
+
   class Registry {
     val superTypes = new ShapeRegistry[Node => Seq[Node]]()
     val stackSize = new ShapeRegistry[Int]()
@@ -87,3 +88,11 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   override def description: String = "Defines the concept of a type."
 }
+
+class TypeMismatchException(to: Node, from: Node) extends BadInputException {
+  override def toString = s"cannot assign: $to = $from"
+}
+
+class NoCommonSuperTypeException(first: Node, second: Node) extends BadInputException
+
+class AmbiguousCommonSuperTypeException(first: Node, second: Node) extends BadInputException

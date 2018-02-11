@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
-import core.deltas.Language
 import core.deltas.node.Node
+import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.QualifiedClassName
 
@@ -44,7 +44,7 @@ class InstructionTypeAnalysisForMethod(program: Node, language: Language, method
       val classFile: ClassFile[Node] = program
       val classRef = classFile(ByteCodeSkeleton.ClassNameIndexKey).asInstanceOf[Node]
       val className = classRef(ClassInfoConstant.Name).asInstanceOf[Node]
-      Seq(ObjectTypeDelta.objectType(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
+      Seq(QualifiedObjectTypeDelta.neww(className(QualifiedClassNameConstantDelta.Value).asInstanceOf[QualifiedClassName])) ++ methodParameters
     }
   }
 }

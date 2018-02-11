@@ -8,21 +8,22 @@ import javax.swing.text.AbstractDocument
 
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.deltas.{Delta, Language}
+import core.deltas.Delta
+import core.language.Language
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
-import deltas.javac.methods.{BlockCompilerDelta, ImplicitReturnAtEndOfMethod}
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerC
+import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
+import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset: Preset = {
-    val deltas = Language.spliceBeforeTransformations(JavaCompilerDeltas.simpleByteCodeTransformations, JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))
+    val deltas = Language.spliceAndFilterTop(JavaCompilerDeltas.simpleByteCodeTransformations, JavaCompilerDeltas.byteCodeDeltas, Seq(MarkOutputGrammar))
     Preset("Simplified bytecode", deltas, "Simplified JVM bytecode.")
   }
 
@@ -57,7 +58,7 @@ object PresetsPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockCompilerDelta) ++ getJavaCompilerParticles,
+    new Preset("Java statement block", Seq(BlockLanguageDelta) ++ getJavaCompilerParticles,
       "The program consists only of a single statement block.")
   }
 
@@ -75,7 +76,7 @@ object PresetsPanel
 
   def getRevealSyntaxSugar: Preset = {
     val implicits = Seq[Delta](DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
-      ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerC,
+      ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerDelta,
       ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
     Preset("Reveal Syntax Sugar", JavaCompilerDeltas.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),

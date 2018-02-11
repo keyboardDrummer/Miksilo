@@ -1,38 +1,29 @@
 package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
-import core.deltas.node.{Node, NodeShape}
-import core.deltas.{Contract, DeltaWithGrammar, Language}
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.node.Node
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 
-trait TypeInstance extends DeltaWithGrammar {
-  val key: NodeShape
+trait TypeInstance extends DeltaWithGrammar with HasShape with HasType {
 
-  override def inject(state: Language): Unit = {
-    TypeSkeleton.getSuperTypesRegistry(state).put(key, _type => getSuperTypes(_type, state))
-    TypeSkeleton.getRegistry(state).instances.put(key, this)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    TypeSkeleton.getSuperTypesRegistry(language).put(shape, _type => getSuperTypes(_type, language))
+    TypeSkeleton.getRegistry(language).instances.put(shape, this)
+    super.inject(language)
   }
 
   def getSuperTypes(_type: Node, state: Language): Seq[Node]
 
-  def getStackType(_type: Node, state: Language): Node = _type
-
-  def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar
-
   override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
 
-  def byteCodeGrammarKey = KeyGrammar(key)
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
-    grammars.create(key, javaGrammar)
+    grammars.create(shape, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
     parseType.addOption(javaGrammar)
-
-    val byteCodeGrammar = grammars.create(byteCodeGrammarKey, getByteCodeGrammar(grammars))
-    val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    byteCodeType.addOption(byteCodeGrammar)
   }
 
   def getJavaGrammar(grammars: LanguageGrammars): BiGrammar

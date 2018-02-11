@@ -6,7 +6,7 @@ import core.deltas.Compilation
 import core.deltas.node.Node
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 
@@ -77,9 +77,9 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
   }
 
   def findClass(objectType: Node): ClassSignature = {
-    val qualifiedName = ObjectTypeDelta.getObjectTypeName(objectType) match {
-      case Right(qualified) => qualified
-      case Left(name) => fullyQualify(className)
+    val qualifiedName = objectType.shape match {
+      case QualifiedObjectTypeDelta.Shape => QualifiedObjectTypeDelta.getName(objectType)
+      case UnqualifiedObjectTypeDelta.Shape => fullyQualify(UnqualifiedObjectTypeDelta.getName(objectType))
     }
     javaCompiler.find(qualifiedName.parts).asInstanceOf[ClassSignature]
   }

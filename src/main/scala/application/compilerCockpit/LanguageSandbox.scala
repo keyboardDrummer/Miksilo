@@ -9,8 +9,8 @@ import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammar
-import core.deltas.Language
 import core.deltas.exceptions.CompileException
+import core.language.Language
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import deltas.bytecode.ByteCodeSkeleton
 import org.fife.ui.rsyntaxtextarea._

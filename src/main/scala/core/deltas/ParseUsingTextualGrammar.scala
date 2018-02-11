@@ -4,6 +4,7 @@ import java.io.InputStream
 
 import core.bigrammar.BiGrammarToParser
 import core.deltas.node.Node
+import core.language.{Language, NoSourceException, ParseException}
 
 import scala.util.{Failure, Success, Try}
 import scala.util.parsing.input.CharArrayReader

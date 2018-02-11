@@ -1,12 +1,15 @@
 package deltas.javac.statements
 
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
-import core.deltas.{Compilation, Language}
+import core.deltas.path.{ChildPath, NodePath}
+import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
-import deltas.javac.expressions.ExpressionSkeleton
 import deltas.bytecode.types.TypeSkeleton
+import deltas.javac.expressions.ExpressionSkeleton
 
 object ExpressionAsStatementDelta extends StatementInstance {
 
@@ -16,9 +19,9 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   def create(expression: Node): Node = new Node(Shape, Expression -> expression)
 
-  override val key = Shape
+  override val shape = Shape
 
-  override def toByteCode(statement: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
     val _type = ExpressionSkeleton.getType(compilation)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
@@ -43,4 +46,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def description: String = "Enables using an expression as a statement."
 
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+    ExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
+  }
 }

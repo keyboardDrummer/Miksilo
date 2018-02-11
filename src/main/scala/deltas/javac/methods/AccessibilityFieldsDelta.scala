@@ -2,7 +2,8 @@ package deltas.javac.methods
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.DeltaWithGrammar
+import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo
 
 object AccessibilityFieldsDelta extends DeltaWithGrammar {

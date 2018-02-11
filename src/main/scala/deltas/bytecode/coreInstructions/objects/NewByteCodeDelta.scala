@@ -1,13 +1,13 @@
 package deltas.bytecode.coreInstructions.objects
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
-import core.deltas.{Compilation, Language}
+import core.deltas.node.{Node, NodeField}
+import core.language.Language
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.ObjectTypeDelta
+import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
 object NewByteCodeDelta extends InstructionDelta {
@@ -22,7 +22,7 @@ object NewByteCodeDelta extends InstructionDelta {
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val classRef = instruction(ClassRef).asInstanceOf[Node]
     val className = QualifiedClassNameConstantDelta.get(classRef(ClassInfoConstant.Name).asInstanceOf[Node])
-    val classType = ObjectTypeDelta.objectType(className)
+    val classType = QualifiedObjectTypeDelta.neww(className)
     InstructionSignature(Seq.empty, Seq(classType))
   }
 

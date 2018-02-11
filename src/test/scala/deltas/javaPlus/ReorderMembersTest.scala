@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 import application.compilerCockpit.PrettyPrint
-import core.deltas.ParseException
+import core.language.ParseException
 import deltas.javac.JavaCompilerDeltas
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite

@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
+import core.language.Language
 
 import scala.reflect.io.File
 
@@ -15,9 +16,12 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
+  def parseAndTransform(input: String): Compilation = {
+    parseAndTransform(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
+  }
+
   def parseAndTransform(input: File): Compilation = {
-    val state: Compilation = parseAndTransform(input.inputStream())
-    state
+    parseAndTransform(input.inputStream())
   }
 
   def compile(inputStream: InputStream, outputFile: File): Compilation = {
@@ -50,10 +54,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     before ++ splice ++ after.drop(1)
   }
 
-  private def runPhases(state: Compilation): Unit = {
+  private def runPhases(compilation: Compilation): Unit = {
     statistics.profile("running phases", {
       for(phase <- language.compilerPhases)
-        statistics.profile("run " + phase.key.description, phase.action(state))
+        statistics.profile("run " + phase.key.description, phase.action(compilation))
     })
   }
 

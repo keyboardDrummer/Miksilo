@@ -4,7 +4,8 @@ import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, LeftRight, WithTrivia}
 import core.deltas.grammars.BodyGrammar
 import core.deltas.node.{GrammarKey, NodeField, NodeShape}
-import core.deltas.{Language, NodeGrammarWriter}
+import core.deltas.NodeGrammarWriter
+import core.language.Language
 import deltas.javac.trivia.TriviaInsideNode
 import org.scalatest.FunSuite
 

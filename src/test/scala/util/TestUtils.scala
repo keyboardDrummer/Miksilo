@@ -20,7 +20,7 @@ import scala.sys.process.Process
 object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaCompilerDeltas.javaCompilerDeltas)) {
 }
 
-class TestUtils(val compiler: TestingLanguage) extends FunSuite {
+class TestUtils(val language: TestingLanguage) extends FunSuite {
 
   def toFile(fileName: String, program: String): Path = {
     val directory = Directory.makeTemp()
@@ -58,19 +58,23 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    compiler.parseAndTransform(stringToInputStream(input)).program
+    language.parseAndTransform(stringToInputStream(input)).program
   }
 
-  def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
+    def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
     val outputDirectory = actualOutputDirectory / inputDirectory
     outputDirectory.createDirectory(force = true)
     val outputFile = outputDirectory / className addExtension "class"
-    compiler.compile(input, outputFile.toFile)
+    language.compile(input, outputFile.toFile)
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
     SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
+  }
+
+  def compile(input: String): Unit = {
+    language.parseAndTransform(input)
   }
 
   def compileAndPrettyPrint(input: String): String = {
@@ -80,7 +84,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
   def compileAndPrettyPrint(input: InputStream): String = {
 
     val prettyPrint = PrettyPrint(recover = true)
-    val splicedDeltas = compiler.replace(MarkOutputGrammar,Seq(prettyPrint))
+    val splicedDeltas = language.replace(MarkOutputGrammar,Seq(prettyPrint))
     val newCompiler = TestLanguageBuilder.build(splicedDeltas)
 
     val state = newCompiler.parseAndTransform(input)
@@ -111,7 +115,7 @@ class TestUtils(val compiler: TestingLanguage) extends FunSuite {
     assertResult("")(javaCompilerOutput)
 
     val outputFile = File((actualOutputDirectory / className).addExtension("class"))
-    val state = profile("Miksilo compile", compiler.compile(input, outputFile))
+    val state = profile("Miksilo compile", language.compile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = profile("Java run expected", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))

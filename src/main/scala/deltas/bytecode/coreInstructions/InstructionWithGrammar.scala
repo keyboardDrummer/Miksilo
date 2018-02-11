@@ -3,7 +3,8 @@ package deltas.bytecode.coreInstructions
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{GrammarKey, NodeShape}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.DeltaWithGrammar
+import core.language.Language
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 
 object ConstantPoolIndexGrammar extends GrammarKey

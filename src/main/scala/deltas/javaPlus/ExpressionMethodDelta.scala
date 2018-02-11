@@ -2,7 +2,8 @@ package deltas.javaPlus
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
+import core.deltas.node.{Node, NodeField, NodeShape}
+import core.language.Language
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.ExpressionSkeleton
@@ -20,11 +21,11 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     import grammars._
     val visibilityGrammar = find(AccessibilityFieldsDelta.VisibilityField)
     val parseStatic = find(AccessibilityFieldsDelta.Static)
-    val parseReturnType = find(MethodDelta.ReturnTypeGrammar).as(ReturnTypeKey)
-    val parseParameters = find(MethodDelta.ParametersGrammar).as(MethodParametersKey)
+    val parseReturnType = find(MethodDelta.ReturnTypeGrammar).as(ReturnType)
+    val parseParameters = find(MethodDelta.ParametersGrammar).as(Parameters)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar).as(Expression)
     val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
-      identifier.as(MethodNameKey) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
+      identifier.as(Name) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
       asNode(Shape)
     val methodGrammar = find(MethodDelta.MethodGrammar)
     methodGrammar.addOption(expressionMethodGrammar)

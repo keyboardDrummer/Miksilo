@@ -1,15 +1,16 @@
 package deltas.bytecode.types
 
 import core.deltas.node.NodeShape
-import core.deltas.{Delta, Language}
+import core.deltas.Delta
+import core.language.Language
 
-trait StackType extends Delta
+trait StackType extends Delta //TODO should this be merged with ByteCodeTypeInstance?
 {
-  val key: NodeShape
+  val shape: NodeShape
   def getStackSize: Int
 
-  override def inject(state: Language): Unit = {
-    TypeSkeleton.getRegistry(state).stackSize.put(key, getStackSize)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    TypeSkeleton.getRegistry(language).stackSize.put(shape, getStackSize)
+    super.inject(language)
   }
 }

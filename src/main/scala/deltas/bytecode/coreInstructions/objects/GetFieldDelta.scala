@@ -1,9 +1,9 @@
 package deltas.bytecode.coreInstructions.objects
 
 import core.bigrammar.BiGrammar
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.{Node, NodeField}
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.FieldRefConstant

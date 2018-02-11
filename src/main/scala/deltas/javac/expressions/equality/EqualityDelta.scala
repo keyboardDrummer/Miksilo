@@ -3,19 +3,23 @@ package deltas.javac.expressions.equality
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.Path
+import core.deltas.path.NodePath
+import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.bytecode.types.{IntTypeC, LongTypeC, TypeSkeleton}
-import deltas.javac.types.BooleanTypeC
+import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
+import deltas.javac.types.BooleanTypeDelta
 
 object EqualityDelta extends ExpressionInstance {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
-  def getFirst[T <: NodeLike](equality: T) = equality(FirstKey).asInstanceOf[T]
+  def getFirst[T <: NodeLike](equality: T): T = equality(FirstKey).asInstanceOf[T]
 
-  def getSecond[T <: NodeLike](equality: T) = equality(SecondKey).asInstanceOf[T]
+  def getSecond[T <: NodeLike](equality: T): T = equality(SecondKey).asInstanceOf[T]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -34,24 +38,31 @@ object EqualityDelta extends ExpressionInstance {
 
   override val key = EqualityKey
 
-  override def getType(expression: Path, compilation: Compilation): Node = BooleanTypeC.booleanType
+  override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
-  def getInputType(equality: Path, compilation: Compilation) = {
+  def getInputType(equality: NodePath, compilation: Compilation) = {
     val first = getFirst(equality)
     ExpressionSkeleton.getType(compilation)(first)
   }
 
-  override def toByteCode(equality: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(equality: NodePath, compilation: Compilation): Seq[Node] = {
     val first = getFirst(equality)
     val second = getSecond(equality)
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
     val equalityInstructions: Seq[Node] = inputType.shape match {
-      case LongTypeC.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
-      case IntTypeC.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
+      case LongTypeDelta.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
+      case IntTypeDelta.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions
   }
 
   override def description: String = "Adds the == operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    //TODO add a check for first and secondType.
+//    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
+//    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
+  }
 }

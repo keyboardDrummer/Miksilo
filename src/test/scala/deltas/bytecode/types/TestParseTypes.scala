@@ -15,13 +15,13 @@ class TestParseTypes extends FunSuite {
   test("ArrayArrayType") {
     val input = "int[][]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(ArrayTypeC.arrayType(ArrayTypeC.arrayType(IntTypeC.intType)))(result)
+    assertResult(ArrayTypeDelta.arrayType(ArrayTypeDelta.arrayType(IntTypeDelta.intType)))(result)
   }
 
   test("VoidType") {
     val input = "void"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(VoidTypeC.voidType)(result)
+    assertResult(VoidTypeDelta.voidType)(result)
   }
 
   test("appendFrame") {
@@ -56,26 +56,26 @@ class TestParseTypes extends FunSuite {
   test("intType") {
     val input = "int"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(IntTypeC.intType)(result)
+    assertResult(IntTypeDelta.intType)(result)
   }
 
   test("ArrayType") {
     val input = "int[]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    assertResult(ArrayTypeC.arrayType(IntTypeC.intType))(result)
+    assertResult(ArrayTypeDelta.arrayType(IntTypeDelta.intType))(result)
   }
 
   test("ObjectType") {
     val input = "java.lang.String"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
+    val objectType = QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String")))
     assertResult(objectType)(result)
   }
 
   test("ArrayType2") {
     val input = "java.lang.String[]"
     val result = TestCompilerGrammarUtils.getGrammarResult(input, TypeSkeleton.JavaTypeGrammar)
-    val objectType = ObjectTypeDelta.objectType(new QualifiedClassName(Seq("java", "lang", "String")))
-    assertResult(ArrayTypeC.arrayType(objectType))(result)
+    val objectType = QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String")))
+    assertResult(ArrayTypeDelta.arrayType(objectType))(result)
   }
 }

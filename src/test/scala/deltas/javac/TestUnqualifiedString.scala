@@ -2,7 +2,7 @@ package deltas.javac
 
 import core.deltas.node.Node
 import org.scalatest.FunSuite
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.classes.skeleton.MethodClassKey
 import util.TestUtils
 

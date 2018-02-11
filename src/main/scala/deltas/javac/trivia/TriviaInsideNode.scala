@@ -3,7 +3,8 @@ package deltas.javac.trivia
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.{DeltaWithGrammar, Language, NodeGrammar}
+import core.deltas.{DeltaWithGrammar, NodeGrammar}
+import core.language.Language
 
 //noinspection ZeroIndexToHead
 object TriviaInsideNode extends DeltaWithGrammar {

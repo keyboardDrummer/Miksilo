@@ -3,17 +3,21 @@ package deltas.javac.statements.locals
 import core.deltas._
 import core.deltas.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.node.{Node, NodeShape, NodeField}
-import core.deltas.path.Path
+import core.deltas.node._
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
 object LocalDeclarationDelta extends StatementInstance {
 
-  def getDeclarationType(declaration: Node) = declaration(Type).asInstanceOf[Node]
-
-  def getDeclarationName(declaration: Node) = declaration(Name).asInstanceOf[String]
+  implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def _type: T = node(Type).asInstanceOf[T]
+    def name: String = node(Name).asInstanceOf[String]
+  }
 
   override def dependencies: Set[Contract] = Set(StatementSkeleton)
 
@@ -38,18 +42,25 @@ object LocalDeclarationDelta extends StatementInstance {
   object Name extends NodeField
   object Type extends NodeField
 
-  override val key = DeclarationKey
+  override val shape = DeclarationKey
 
-  override def toByteCode(declaration: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]
   }
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
-    val _type = getDeclarationType(declaration)
+    val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
+    val _type = localDeclaration._type
     JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
-    val name: String = getDeclarationName(declaration)
+    val name: String = declaration.name
     Map(name -> _type)
   }
 
   override def description: String = "Enables declaring a local variable."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+    val _languageType = statement(Type).asInstanceOf[NodePath]
+    val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
+    builder.declare(statement.name, statement.getLocation(Name), parentScope, Some(_type))
+  }
 }

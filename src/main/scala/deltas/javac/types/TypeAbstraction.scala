@@ -1,10 +1,11 @@
 package deltas.javac.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.grammars.{LanguageGrammars, KeyGrammar}
-import core.deltas.node.{GrammarKey, Node, NodeShape, NodeField}
-import core.deltas.{DeltaWithGrammar, Language}
-import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import core.deltas.DeltaWithGrammar
+import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
+import core.deltas.node.{GrammarKey, Node, NodeField, NodeShape}
+import core.language.Language
+import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.javac.types.MethodType.MethodTypeKey
 
 object TypeAbstraction extends DeltaWithGrammar {
@@ -43,7 +44,7 @@ object TypeAbstraction extends DeltaWithGrammar {
     import grammars._
     val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
     val methodTypeGrammar = find(KeyGrammar(MethodTypeKey))
-    val objectTypeGrammar = find(ObjectTypeDelta.ObjectTypeByteCodeGrammar)
+    val objectTypeGrammar = find(QualifiedObjectTypeDelta.byteCodeGrammarKey)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier.as(ParameterName) ~
       (":" ~> classBound.option).as(ParameterClassBound) ~~

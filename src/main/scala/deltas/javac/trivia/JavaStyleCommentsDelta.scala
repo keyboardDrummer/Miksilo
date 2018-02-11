@@ -3,7 +3,8 @@ package deltas.javac.trivia
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
-import core.deltas.{DeltaWithGrammar, Language}
+import core.deltas.DeltaWithGrammar
+import core.language.Language
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 
 object JavaStyleCommentsDelta extends DeltaWithGrammar {

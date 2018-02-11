@@ -2,7 +2,8 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import core.deltas.path.{Path, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.ExpressionSkeleton.Expression
 import deltas.javac.statements.StatementSkeleton.Statement
@@ -29,7 +30,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     PathRoot(program).visitShape(Shape, path => transformForLoop(path))
   }
 
-  def transformForLoop(forLoopPath: Path): Unit = {
+  def transformForLoop(forLoopPath: NodePath): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementDelta.create(forLoop.increment))

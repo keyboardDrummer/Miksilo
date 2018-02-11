@@ -2,7 +2,8 @@ package application.compilerCockpit
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import core.deltas.{Contract, Delta, Language, Phase}
+import core.deltas.{Contract, Delta}
+import core.language.{Language, Phase}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try

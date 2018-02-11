@@ -1,10 +1,14 @@
 package deltas.javac
 
+import core.deltas.Compilation
 import core.deltas.node.Node
-import core.deltas.{Compilation, Language}
+import core.deltas.path.PathRoot
+import core.language.Language
+import core.smarts._
+import core.smarts.scopes.objects.Scope
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
-import deltas.javac.classes.skeleton.PackageSignature
+import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import util.SourceUtils
 
 object JavaLang {
@@ -24,4 +28,20 @@ object JavaLang {
   }
 
   val classPath = new PackageSignature(None, "")
+
+  def getProofs(compilation: Compilation, scope: Scope): Proofs = {
+    val factory = new Factory()
+    val builder = new ConstraintBuilder(factory)
+    for(clazz <- Seq(objectClass, stringClass, systemClass, printStreamClass)) {
+      JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).
+        getDeclaration(compilation, builder, PathRoot(clazz), scope)
+    }
+    val solver = new ConstraintSolver(builder, builder.getConstraints)
+    try {
+      solver.run()
+    } catch {
+      case CouldNotApplyConstraints(e) =>
+    }
+    solver.proofs
+  }
 }

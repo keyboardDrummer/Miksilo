@@ -1,6 +1,6 @@
 package core.deltas.node
 
-import core.deltas.path.Path
+import core.deltas.path.{NodePath}
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
@@ -37,7 +37,8 @@ object Node {
   }
 }
 
-class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
+class Node(var shape: NodeShape, entries: (NodeField, Any)*)
+  extends NodeLike {
   type Self = Node
 
   def shallowClone: Node = {
@@ -45,6 +46,9 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
     result.data ++= data
     result
   }
+
+  override def asNode: Node = this
+  override def asPath: Option[NodePath] = None
 
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     shape = node.shape
@@ -56,15 +60,15 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
-  def dataView = data.toMap
+  def dataView: Map[NodeField, Any] = data.toMap
 
   def apply(key: NodeField) = data(key)
 
   def update(key: NodeField, value: Any): Unit = {
     value match //TODO maybe throw this check away.
     {
-      case _: Path => throwInsertedWithOriginIntoRegularMetaObject()
-      case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[Path]))
+      case _: NodePath => throwInsertedWithOriginIntoRegularMetaObject()
+      case sequence: Seq[_] => if (sequence.exists(item => item.isInstanceOf[NodePath]))
         throwInsertedWithOriginIntoRegularMetaObject()
       case _ =>
     }
@@ -99,6 +103,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*) extends NodeLike {
   }
 
   override def get(key: NodeField): Option[Any] = data.get(key)
+
 }
 
 

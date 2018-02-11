@@ -2,7 +2,7 @@ package deltas.javac.methods.call
 
 import core.deltas._
 import core.deltas.node.Node
-import core.deltas.path.Path
+import core.deltas.path.NodePath
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 
@@ -10,9 +10,9 @@ object CallStaticOrInstanceDelta extends GenericCall {
 
   override def description: String = "Enables calling static and virtual methods."
 
-  override def dependencies: Set[Contract] = CallStaticC.dependencies ++ CallInstanceC.dependencies
+  override def dependencies: Set[Contract] = CallStaticDelta.dependencies ++ CallInstanceDelta.dependencies
 
-  override def toByteCode(call: Path, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val methodKey: MethodQuery = getMethodKey(call, compiler)
@@ -22,10 +22,10 @@ object CallStaticOrInstanceDelta extends GenericCall {
     val staticCall = methodInfo._static
     if (staticCall)
     {
-      CallStaticC.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
+      CallStaticDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
     } else
     {
-      CallInstanceC.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
+      CallInstanceDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
     }
   }
 }

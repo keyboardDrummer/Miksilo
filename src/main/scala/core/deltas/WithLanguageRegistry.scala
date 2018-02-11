@@ -1,9 +1,11 @@
 package core.deltas
 
 import core.deltas.node.{Key, NodeShape}
+import core.language.Language
 
 import scala.collection.mutable
 
+@deprecated("Use ShapeAspect instead", "")
 trait WithLanguageRegistry extends Key {
   type Registry
 
@@ -12,9 +14,3 @@ trait WithLanguageRegistry extends Key {
   def getRegistry(language: Language): Registry = language.data.getOrElseUpdate(this, createRegistry).asInstanceOf[Registry]
 }
 
-trait WithCompilationState {
-  type State
-
-  def createState: State
-  def getState(compilation: Compilation): State = compilation.state.getOrElseUpdate(this, createState).asInstanceOf[State]
-}

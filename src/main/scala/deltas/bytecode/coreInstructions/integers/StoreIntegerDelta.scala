@@ -1,12 +1,13 @@
 package deltas.bytecode.coreInstructions.integers
 
 import core.deltas.node.Node
-import core.deltas.{Contract, Language}
+import core.deltas.Contract
+import core.language.Language
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
-import deltas.bytecode.types.IntTypeC
+import deltas.bytecode.types.IntTypeDelta
 
 object StoreIntegerDelta extends InstructionDelta {
 
@@ -22,12 +23,12 @@ object StoreIntegerDelta extends InstructionDelta {
   }
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature =
-    InstructionSignature(Seq(IntTypeC.intType), Seq())
+    InstructionSignature(Seq(IntTypeDelta.intType), Seq())
 
   override def getVariableUpdates(instruction: Node, typeState: ProgramTypeState ): Map[Int, Node] =
-    Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> IntTypeC.intType)
+    Map(CodeAttributeDelta.getInstructionArguments(instruction)(0) -> IntTypeDelta.intType)
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeC)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IntTypeDelta)
 
   override def description: String = "Defines the integer store instruction, which stores the top stack integer in a variable."
 

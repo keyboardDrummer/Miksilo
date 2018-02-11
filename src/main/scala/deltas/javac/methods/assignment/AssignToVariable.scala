@@ -3,14 +3,15 @@ package deltas.javac.methods.assignment
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node.Node
-import core.deltas.path.Path
+import core.deltas.path.NodePath
+import core.language.Language
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
-import deltas.bytecode.types.ArrayTypeC.ArrayTypeKey
-import deltas.bytecode.types.IntTypeC.IntTypeKey
-import deltas.bytecode.types.LongTypeC.LongTypeKey
-import deltas.bytecode.types.{ObjectTypeDelta, TypeSkeleton}
+import deltas.bytecode.types.ArrayTypeDelta.ArrayTypeKey
+import deltas.bytecode.types.IntTypeDelta.IntTypeKey
+import deltas.bytecode.types.LongTypeDelta.LongTypeKey
+import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.javac.methods.{MethodDelta, VariableDelta, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
@@ -19,7 +20,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def inject(state: Language): Unit = {
     AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(VariableDelta.VariableKey,
-      (compilation, targetVariable: Path) => {
+      (compilation, targetVariable: NodePath) => {
       val methodCompiler = MethodDelta.getMethodCompiler(compilation)
       val target = VariableDelta.getVariableName(targetVariable)
       val variableInfo = methodCompiler.getVariables(targetVariable)(target)
@@ -32,7 +33,7 @@ object AssignToVariable extends DeltaWithGrammar {
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.shape match {
       case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
-      case ObjectTypeDelta.ObjectStackType => StoreAddressDelta.addressStore(variableInfo.offset)
+      case QualifiedObjectTypeDelta.StackType => StoreAddressDelta.addressStore(variableInfo.offset)
       case ArrayTypeKey => StoreAddressDelta.addressStore(variableInfo.offset)
       case LongTypeKey => StoreLongDelta.longStore(variableInfo.offset)
     }

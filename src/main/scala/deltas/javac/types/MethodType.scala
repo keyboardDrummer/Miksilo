@@ -1,14 +1,17 @@
 package deltas.javac.types
 
-import core.bigrammar.grammars.BiFailure
 import core.bigrammar.BiGrammar
-import core.deltas.Language
+import core.bigrammar.grammars.BiFailure
+import core.deltas.Compilation
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
-import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
+import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.{FunctionType, Type}
+import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
 
-
-object MethodType extends TypeInstance {
+object MethodType extends ByteCodeTypeInstance {
 
   implicit class MethodTypeWrapper[T <: NodeLike](node: T) {
     def returnType: T = node(ReturnType).asInstanceOf[T]
@@ -33,7 +36,7 @@ object MethodType extends TypeInstance {
 
   object ThrowsSignature extends NodeField
 
-  val key = MethodTypeKey
+  val shape = MethodTypeKey
 
   override def description: String = "Defines the method type."
 
@@ -47,5 +50,17 @@ object MethodType extends TypeInstance {
     val throwsGrammar = ("^" ~> typeGrammar)*
     val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) ~< ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(MethodTypeKey)
     methodGrammar
+  }
+
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
+    val parameters = _type.parameterTypes
+    val returnTypeNode = _type.returnType
+    getType(compilation, builder, parentScope, parameters, returnTypeNode)
+  }
+
+  def getType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope, parameters: Seq[NodeLike], returnTypeNode: NodeLike): Type = {
+    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
+    val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
+    FunctionType.curry(parameterTypes, returnType)
   }
 }

@@ -1,9 +1,9 @@
 package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
-import core.deltas.Language
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.node._
+import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
