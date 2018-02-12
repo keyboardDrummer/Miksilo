@@ -1,8 +1,8 @@
 package deltas.javac.methods.call
 
 import core.language.node._
-import core.deltas.path.{NodePath, SourceElementWithValue}
-import core.language.Compilation
+import core.deltas.path.NodePath
+import core.language.{Compilation, SourceElement}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.DeclarationVariable
 import core.smarts.scopes.objects.Scope
@@ -31,7 +31,7 @@ object CallDelta
   }
 
   def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, parentScope: Scope,
-                      methodName: SourceElementWithValue, returnType: Type): DeclarationVariable = {
+                      methodName: SourceElement, returnType: Type): DeclarationVariable = {
     val callArguments = CallDelta.getCallArguments(call)
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val constructorType = FunctionType.curry(callTypes, returnType)

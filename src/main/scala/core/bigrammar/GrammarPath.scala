@@ -30,7 +30,7 @@ trait GrammarPath {
   def findGrammar(grammar: BiGrammar): Option[GrammarReference] = find(p => p.value == grammar)
 
   def findAs(field: NodeField): GrammarReference = {
-    find(p => p.value match { case as:As => as.key == field; case _ => false}).get
+    find(p => p.value match { case as:As => as.field == field; case _ => false}).get
   }
 
   def findLabelled(label: Key): GrammarReference = {

@@ -54,11 +54,9 @@ class TestUtils(val language: TestingLanguage) extends FunSuite {
     assertResult(expectedResult)(Integer.parseInt(line))
   }
 
-  def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.parseAndTransform(stringToInputStream(input)).program
+    language.parseAndTransform(SourceUtils.stringToStream(input)).program
   }
 
     def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {

@@ -1,13 +1,9 @@
 package core.language.node
 
-import core.deltas.path.{SourceElementWithValue, NodePath}
+import core.deltas.path.NodePath
+import core.language.SourceElement
 
 import scala.collection.mutable
-
-case class FieldLocation(node: Node, field: NodeField) extends SourceElementWithValue {
-  def current: Any = node(field)
-}
-
 
 trait NodeLike {
   type Self <: NodeLike
@@ -20,7 +16,7 @@ trait NodeLike {
   def asPath: Option[NodePath]
   def asNode: Node
 
-  def getLocation(field: NodeField): FieldLocation = FieldLocation(asNode, field)
+  def getLocation(field: NodeField): SourceElement
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]

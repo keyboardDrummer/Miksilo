@@ -43,7 +43,6 @@ class BiGrammarToPrinter {
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
         case Print(document) => _ => TryState.value(document)
-        case As(inner, key) => new AsPrinter(toPrinterCached(inner), key)
       }
       result
     })

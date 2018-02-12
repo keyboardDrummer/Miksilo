@@ -4,11 +4,11 @@ import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
-import core.language.node.GrammarKey
 import core.language.Language
-import org.scalatest.FunSuite
+import core.language.node.GrammarKey
 import deltas.javac.JavaLanguage
-import util.{TestLanguageBuilder, TestUtils}
+import org.scalatest.FunSuite
+import util.{SourceUtils, TestLanguageBuilder}
 
 import scala.util.parsing.input.CharArrayReader
 
@@ -64,7 +64,7 @@ case class TestCompilerGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def getGrammarResult(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.build(getTransformations(grammarTransformer))
-    compiler.parse(TestUtils.stringToInputStream(input))
+    compiler.parse(SourceUtils.stringToStream(input))
   }
 
   def getTransformations(key: GrammarKey): Seq[Delta] = {
