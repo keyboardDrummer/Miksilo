@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.language.node.{Node, NodeField}
+import core.language.node.{Node, NodeField, SourceRange}
 
 case class SequenceElement(parent: NodePath, field: NodeField, index: Int) extends ChildPath
 {
@@ -27,4 +27,6 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
   override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
   override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
+
+  override def position: SourceRange = current.asNode.position
 }

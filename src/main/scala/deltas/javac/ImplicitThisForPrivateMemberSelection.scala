@@ -66,7 +66,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
           classCompiler.bind()
 
         case MethodDelta.Shape => MethodDelta.setMethodCompiler(obj, compilation)
-        case VariableDelta.VariableKey => addThisToVariable(compilation, obj)
+        case VariableDelta.Shape => addThisToVariable(compilation, obj)
         case _ =>
       }
       true

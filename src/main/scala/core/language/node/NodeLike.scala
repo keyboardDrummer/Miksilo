@@ -39,8 +39,8 @@ trait NodeLike {
             beforeChildren: (Self) => Boolean = _ => true,
             visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
 
-    transformNode(this.asInstanceOf[Self])
-    def transformNode(node: Self): Unit = {
+    visitNode(this.asInstanceOf[Self])
+    def visitNode(node: Self): Unit = {
       if (!visited.add(node))
         return
 
@@ -48,22 +48,23 @@ trait NodeLike {
         return
 
       val children = node.dataView.values
-      System.out.append("")
       for(child <- children)
-      {
-        child match {
-          case nodeLike: NodeLike =>
-            transformNode(nodeLike.asInstanceOf[Self])
-          case sequence: Seq[_] =>
-            sequence.reverse.foreach({ //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-              case nodeLikeChild: NodeLike => transformNode(nodeLikeChild.asInstanceOf[Self])
-              case _ =>
-            })
-          case _ =>
-        }
-      }
+        NodeLike.getChildNodeLikes[Self](child).foreach(visitNode)
 
       afterChildren(node)
     }
   }
+}
+
+object NodeLike {
+
+  def getChildNodeLikes[Self](value: Any): Seq[Self] = value match {
+    case nodeLike: NodeLike =>
+      Seq(nodeLike.asInstanceOf[Self])
+    case sequence: Seq[_] =>
+      sequence.reverse. //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
+        collect({ case nodeLikeChild: Self => nodeLikeChild })
+    case _ => Seq.empty
+  }
+
 }

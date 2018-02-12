@@ -14,13 +14,14 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AdditionDelta, AssignmentSkeleton)
 
   def incrementAssignment(target: Node, value: Node) =
-    new Node(IncrementAssignmentKey, TargetKey -> target, ValueKey -> value)
+    new Node(IncrementAssignmentKey, AssignmentSkeleton.Target -> target, AssignmentSkeleton.Value -> value)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
-    val incrementAssignmentGrammar = assignmentTarget.as(TargetKey) ~~ ("+=" ~~> assignmentGrammar.as(ValueKey)) asNode IncrementAssignmentKey
+    val incrementAssignmentGrammar = assignmentTarget.as(AssignmentSkeleton.Target) ~~
+      ("+=" ~~> assignmentGrammar.as(AssignmentSkeleton.Value)) asNode IncrementAssignmentKey
     assignmentGrammar.addOption(incrementAssignmentGrammar)
   }
 
@@ -28,28 +29,23 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
     val newValue = AdditionDelta.addition(value, target)
+    newValue.sources.put(AdditionDelta.Left, incrementAssignment.sources(AssignmentSkeleton.Value))
+    incrementAssignment.sources.remove(AssignmentSkeleton.Value)
     val assignment = AssignmentSkeleton.assignment(target, newValue)
     incrementAssignment.replaceWith(assignment)
   }
 
-  override def transformProgram(program: Node, state: Compilation): Unit = {
-    PathRoot(program).visit(obj => obj.shape match {
-      case IncrementAssignmentKey => transformIncrementAssignment(obj, state)
-      case _ =>
-    })
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    PathRoot(program).visitShape(IncrementAssignmentKey, obj => transformIncrementAssignment(obj, compilation))
   }
 
   object IncrementAssignmentKey extends NodeShape
 
-  object TargetKey extends NodeField
-
-  object ValueKey extends NodeField
-
   def getValue[T <: NodeLike](incrementAssignment: T): T = {
-    incrementAssignment(ValueKey).asInstanceOf[T]
+    incrementAssignment(AssignmentSkeleton.Value).asInstanceOf[T]
   }
 
   def getTarget[T <: NodeLike](incrementAssignment: T): T = {
-    incrementAssignment(TargetKey).asInstanceOf[T]
+    incrementAssignment(AssignmentSkeleton.Target).asInstanceOf[T]
   }
 }

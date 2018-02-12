@@ -18,9 +18,9 @@ import deltas.bytecode.types.TypeSkeleton
 
 object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
-  def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(AssignmentTarget).asInstanceOf[T]
+  def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
-  def getAssignmentValue[T <: NodeLike](assignment: T): T = assignment(AssignmentValue).asInstanceOf[T]
+  def getAssignmentValue[T <: NodeLike](assignment: T): T = assignment(Value).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(MethodDelta, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
@@ -28,21 +28,21 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     import grammars._
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar) //TODO shouldn't this use AssignmentPrecedence?
-    val assignmentGrammar = targetGrammar.as(AssignmentTarget) ~~< "=" ~~ expressionGrammar.as(AssignmentValue) asNode AssignmentKey
+    val assignmentGrammar = targetGrammar.as(Target) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
     expressionGrammar.addOption(assignmentGrammar)
   }
 
   object AssignmentTargetGrammar extends GrammarKey
 
-  def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
+  def assignment(target: Node, value: Node) = new Node(Shape, Target -> target, Value -> value)
 
-  object AssignmentKey extends NodeShape
+  object Shape extends NodeShape
 
-  object AssignmentTarget extends NodeField
+  object Target extends NodeField
 
-  object AssignmentValue extends NodeField
+  object Value extends NodeField
 
-  override val key = AssignmentKey
+  override val key = Shape
 
   override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)

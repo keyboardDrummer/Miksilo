@@ -1,7 +1,7 @@
 package core.language
 
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
-import core.language.node.{Position, SourceRange}
+import core.deltas.path.{NodePath, PathRoot}
+import core.language.node.{NodeLike, Position, SourceRange}
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import util.SourceUtils
 
@@ -39,14 +39,17 @@ class LanguageServer(getInput: () => InputStream, language: Language) {
 
   def getSourceElement(position: Position): SourceElement = {
     def getForNode(node: NodePath): SourceElement = {
-      val inner = node.sources.find(kv => kv._2.contains(position)) //TODO Ik heb een SequencePath nodig met een sources veld, right? De elementen v.d. sequence krijgen echter geen SourceRange tijdens het parsen nu. Hoe te fixen? Volgens mij Nodes gewoon ook start en end position geven. Sequences van primitives hebben pech. Ander idee is dat sources een Seq[Range] wordt.
-      inner.fold[SourceElement](node)(kv => {
-        val location = node.getLocation(kv._1)
-        location match {
-          case childPath: ChildPath => getForNode(childPath)
-          case _ => location
+      val childPositions = node.dataView.flatMap(kv => {
+        val value = kv._2
+        val childPaths = NodeLike.getChildNodeLikes[NodePath](value)
+        if (childPaths.isEmpty) {
+          Seq(node.getLocation(kv._1))
+        } else {
+          childPaths.map(child => getForNode(child))
         }
       })
+      val childPosition = childPositions.find(kv => kv.position.contains(position))
+      childPosition.fold[SourceElement](node)(x => x)
     }
     getForNode(PathRoot(getCompilation.program))
   }

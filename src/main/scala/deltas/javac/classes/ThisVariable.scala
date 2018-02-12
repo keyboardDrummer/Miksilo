@@ -5,7 +5,7 @@ import core.language.node.GrammarKey
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.javac.methods.VariableDelta
-import deltas.javac.methods.VariableDelta.{VariableKey, VariableNameKey}
+import deltas.javac.methods.VariableDelta.{Shape, Name}
 
 object ThisVariable extends DeltaWithGrammar
 {
@@ -13,7 +13,7 @@ object ThisVariable extends DeltaWithGrammar
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val variable = find(VariableDelta.VariableGrammar)
-    val thisGrammar = create(Grammar, ("this" ~> value("this").as(VariableNameKey)).asNode(VariableKey))
+    val thisGrammar = create(Grammar, ("this" ~> value("this").as(Name)).asNode(Shape))
     variable.addOption(thisGrammar)
   }
 

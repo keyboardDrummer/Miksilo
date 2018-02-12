@@ -75,6 +75,8 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   override def get(key: NodeField): Option[Any] = data.get(key)
 
   override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
+
+  def position: SourceRange = SourceRange(sources.values.map(p => p.start).min, sources.values.map(p => p.end).max)
 }
 
 

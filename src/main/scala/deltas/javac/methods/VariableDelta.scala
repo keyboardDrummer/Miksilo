@@ -19,24 +19,24 @@ object VariableDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
 
-  def getVariableName(variable: Node) = variable(VariableNameKey).asInstanceOf[String]
+  def getVariableName(variable: Node) = variable(Name).asInstanceOf[String]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val core = find(ExpressionSkeleton.CoreGrammar)
-    val variableGrammar = create(VariableGrammar, identifier.as(VariableNameKey) asNode VariableKey)
+    val variableGrammar = create(VariableGrammar, identifier.as(Name) asNode Shape)
     core.addOption(variableGrammar)
   }
 
   object VariableGrammar extends GrammarKey
 
-  def variable(name: String) = new Node(VariableKey, VariableNameKey -> name)
+  def variable(name: String) = new Node(Shape, Name -> name)
 
-  object VariableNameKey extends NodeField
+  object Name extends NodeField
 
-  object VariableKey extends NodeShape
+  object Shape extends NodeShape
 
-  override val key = VariableKey
+  override val key = Shape
 
   override def getType(variable: NodePath, compilation: Compilation): Node = {
     getVariableInfo(variable, compilation)._type
