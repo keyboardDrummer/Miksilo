@@ -40,22 +40,19 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
 
   override def description: String = "Enables declaring a local and initializing it in one statement."
 
-  def transformDeclarationWithInitializer(node: NodePath, state: Language): Unit = {
-    val declarationWithInitializer: LocalDeclarationWithInitializer[NodePath] = node
-    val name: String = declarationWithInitializer.name
-    val _type = declarationWithInitializer._type
-    val declaration = LocalDeclarationDelta.declaration(name, _type)
-    declaration.sources.put(LocalDeclarationDelta.Type, declarationWithInitializer.node.sources(Type))
-    declaration.sources.put(LocalDeclarationDelta.Name, declarationWithInitializer.node.sources(Name))
+  def transformDeclarationWithInitializer(path: NodePath, state: Language): Unit = {
+    val withInitializer: LocalDeclarationWithInitializer[NodePath] = path
+    val name: String = withInitializer.name
+    path.shape = LocalDeclarationDelta.Shape
     val target = VariableDelta.variable(name)
-    val assignment = AssignmentSkeleton.assignment(target, declarationWithInitializer.initializer)
-    assignment.sources.put(AssignmentSkeleton.Target, declarationWithInitializer.node.sources(Name))
-    assignment.sources.put(AssignmentSkeleton.Value, declarationWithInitializer.node.sources(Initializer))
-    target.sources.put(VariableDelta.Name, declarationWithInitializer.node.sources(Name))
+    val assignment = AssignmentSkeleton.Shape.createWithSource(
+      AssignmentSkeleton.Target -> target,
+      AssignmentSkeleton.Value -> path.getWithSource(Initializer))
+    path.removeField(Initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = declarationWithInitializer.node.asInstanceOf[SequenceElement]
-    originSequence.replaceWith(Seq(declaration, assignmentStatement))
+    val originSequence = withInitializer.node.asInstanceOf[SequenceElement]
+    originSequence.replaceWith(Seq(path.current, assignmentStatement))
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

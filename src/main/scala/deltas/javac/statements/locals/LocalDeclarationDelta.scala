@@ -25,12 +25,12 @@ object LocalDeclarationDelta extends StatementInstance {
     import grammars._
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode DeclarationKey
+    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     statement.addOption(parseDeclaration)
   }
 
   def declaration(name: String, _type: Node): Node = {
-    new Node(DeclarationKey, Name -> name, Type -> _type)
+    new Node(Shape, Name -> name, Type -> _type)
   }
 
   case class VariableAlreadyDefined(variable: String) extends BadInputException
@@ -38,11 +38,11 @@ object LocalDeclarationDelta extends StatementInstance {
     override def toString = s"variable '$variable' was defined more than once."
   }
 
-  object DeclarationKey extends NodeShape
+  object Shape extends NodeShape
   object Name extends NodeField
   object Type extends NodeField
 
-  override val shape = DeclarationKey
+  override val shape = Shape
 
   override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]

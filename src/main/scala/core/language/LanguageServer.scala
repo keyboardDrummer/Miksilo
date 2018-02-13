@@ -17,7 +17,7 @@ class LanguageServer(getInput: () => InputStream, language: Language) {
     val proofs = getProofs
     val element = getSourceElement(position)
     val declaration = proofs.scopeGraph.resolveLocation(element)
-    declaration.position
+    declaration.position.get
   }
 
   def compile(): Unit = {
@@ -48,7 +48,7 @@ class LanguageServer(getInput: () => InputStream, language: Language) {
           childPaths.map(child => getForNode(child))
         }
       })
-      val childPosition = childPositions.find(kv => kv.position.contains(position))
+      val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
     getForNode(PathRoot(getCompilation.program))

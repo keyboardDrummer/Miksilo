@@ -9,7 +9,7 @@ import core.smarts.scopes.objects.Scope
 trait FakeSourceElement extends SourceElement {
   override def current: Any = ???
 
-  override def position: SourceRange = ???
+  override def position: Option[SourceRange] = ???
 }
 
 case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,

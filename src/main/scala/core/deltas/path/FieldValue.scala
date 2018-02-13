@@ -18,7 +18,7 @@ case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
 
   override def pathAsString: String = s"${parent.pathAsString}/$field"
 
-  override def position: SourceRange = parent.current.sources.getOrElse(field, current.position)
+  override def position: Option[SourceRange] = parent.current.sources.get(field).orElse(current.position)
 }
 
 

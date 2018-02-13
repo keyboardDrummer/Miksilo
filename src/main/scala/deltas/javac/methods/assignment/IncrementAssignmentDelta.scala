@@ -28,9 +28,9 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   def transformIncrementAssignment(incrementAssignment: NodePath, state: Language): Unit = {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
-    val newValue = AdditionDelta.addition(value, target)
-    newValue.sources.put(AdditionDelta.Left, incrementAssignment.sources(AssignmentSkeleton.Value))
-    incrementAssignment.sources.remove(AssignmentSkeleton.Value)
+    val newValue = AdditionDelta.Shape.createWithSource(
+      AdditionDelta.Left -> incrementAssignment.current(AssignmentSkeleton.Target),
+      AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentSkeleton.Value))
     val assignment = AssignmentSkeleton.assignment(target, newValue)
     incrementAssignment.replaceWith(assignment)
   }
