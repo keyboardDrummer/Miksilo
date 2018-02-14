@@ -2,14 +2,19 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.{Compilation, Language}
+import core.language.node.NodeShape
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.Declaration
+import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, ResolvesToDeclaration, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
-object VariableReferenceKind extends Delta {
-  override def inject(state: Language): Unit = {
-    MemberSelectorDelta.getReferenceKindRegistry(state).put(Shape, (compilation, variable) => {
+object VariableReferenceKind extends Delta with ResolvesToDeclaration {
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    MemberSelectorDelta.getReferenceKindRegistry(language).put(Shape, (compilation, variable) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(variable, compiler)
     })
@@ -34,4 +39,10 @@ object VariableReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(VariableDelta, JavaClassSkeleton)
 
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
+
+  override def getResolvedDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
+    builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
+  }
+
+  override def shape: NodeShape = Shape
 }

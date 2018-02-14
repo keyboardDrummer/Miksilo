@@ -10,20 +10,18 @@ import util.SourceUtils
 
 class GotoDefinitionTest extends FunSuite {
 
-    private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
+  private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
 
-    test("int variable") {
-
-      val program =
-        """int x;
-          |x = 3;
-        """.stripMargin
-      val getProgram = () => SourceUtils.stringToStream(program)
-      val server = new LanguageServer(getProgram, blockLanguage)
-      val result = server.go(server.toPosition(2, 1))
-      assertResult(SourceRange(server.toPosition(1,5), server.toPosition(1,6)))(result)
-    }
-
+  test("int variable") {
+    val program =
+      """int x;
+        |x = 3;
+      """.stripMargin
+    val getProgram = () => SourceUtils.stringToStream(program)
+    val server = new LanguageServer(getProgram, blockLanguage)
+    val result = server.go(server.toPosition(2, 1))
+    assertResult(SourceRange(server.toPosition(1,5), server.toPosition(1,6)))(result)
+  }
 
   test("defined inside if") {
     val program =

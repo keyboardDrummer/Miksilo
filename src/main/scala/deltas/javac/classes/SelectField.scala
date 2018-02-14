@@ -2,8 +2,8 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node.Node
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -16,6 +16,8 @@ import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta._
 
 object SelectField extends ExpressionInstance {
+
+  override def description: String = "Enables using the . operator to select a member from a class."
 
   override val shape = Shape
 
@@ -56,12 +58,10 @@ object SelectField extends ExpressionInstance {
     core.addOption(grammars.find(SelectGrammar))
   }
 
-  override def description: String = "Enables using the . operator to select a member from a class."
-
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val target = selector.target
-    val targetScope = MemberSelectorDelta.getScope(compilation, builder, target, parentScope)
-    val member = selector.member
-    builder.resolve(member, selector(Member).asInstanceOf[ChildPath], targetScope, Some(_type))
+//    val target = selector.target
+//    val targetScope = MemberSelectorDelta.resolvedToDeclaration.get(compilation, target.shape).getResolvedDeclaration(compilation, builder, target, parentScope)
+//    val member = selector.member
+//    builder.resolve(member, selector(Member).asInstanceOf[ChildPath], targetScope, Some(_type))
   }
 }

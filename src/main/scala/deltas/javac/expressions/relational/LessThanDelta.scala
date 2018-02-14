@@ -2,13 +2,16 @@ package deltas.javac.expressions.relational
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
-import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.bytecode.extraBooleanInstructions.LessThanInstructionDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
+import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object LessThanDelta extends ExpressionInstance {
@@ -53,4 +56,11 @@ object LessThanDelta extends ExpressionInstance {
   object LessThanSecond extends NodeField
 
   override def description: String = "Adds the < operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    //TODO add a check for first and secondType. Share code with other comparisons.
+    //    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
+    //    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
+  }
 }

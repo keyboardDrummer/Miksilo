@@ -12,7 +12,6 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.MemberSelectorDelta.MethodContainerExpressionShape
 import deltas.javac.methods.call.CallDelta.{Call, CallArgumentsGrammar}
 import deltas.javac.types.MethodType._
 
@@ -61,13 +60,10 @@ trait GenericCall extends ExpressionInstance {
     MethodQuery(kind.info.getQualifiedName, member, callTypes)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, _type: Type, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
     val callCallee = call.callee
-    val selectorTarget = callCallee.target
-    val methodContainerExpressionShape = selectorTarget.shape.asInstanceOf[MethodContainerExpressionShape]
-    val methodContainerScope = methodContainerExpressionShape.getScope(compilation, builder, selectorTarget, parentScope)
-    val member = callCallee.getLocation(MemberSelectorDelta.Member)
-    CallDelta.callConstraints(compilation, builder, call, methodContainerScope, callCallee.member, member, _type)
+    val calleeDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, callCallee, parentScope)
+    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeDeclaration, returnType)
   }
 }

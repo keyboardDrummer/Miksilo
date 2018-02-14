@@ -1,9 +1,9 @@
 package deltas.javac.constructor
 
-import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, NodePath}
 import core.deltas.Contract
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -67,6 +67,7 @@ object SuperCallExpression extends ExpressionInstance {
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.resolveScopeDeclaration(superClass)
-    CallDelta.callConstraints(compilation, builder, call, superScope, constructorName, call.asInstanceOf[ChildPath], VoidTypeDelta.constraintType)
+    val superDeclaration = builder.resolve(constructorName, call, superScope)
+    CallDelta.callConstraints(compilation, builder, call, parentScope, superDeclaration, VoidTypeDelta.constraintType)
   }
 }
