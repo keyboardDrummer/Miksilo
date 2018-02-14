@@ -36,7 +36,7 @@ object VariableDelta extends ExpressionInstance {
 
   object Shape extends NodeShape
 
-  override val key = Shape
+  override val shape = Shape
 
   override def getType(variable: NodePath, compilation: Compilation): Node = {
     getVariableInfo(variable, compilation)._type

@@ -35,7 +35,7 @@ object NewDelta extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
 
-  override val key = Shape
+  override val shape = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     expression(Type).asInstanceOf[NodePath]
@@ -45,8 +45,7 @@ object NewDelta extends ExpressionInstance {
     val call: NewCall[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
-    val objectType = call._type
-    val classInfo: ClassSignature = compiler.findClass(objectType)
+    val classInfo: ClassSignature = compiler.findClass(call._type)
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
@@ -55,10 +54,6 @@ object NewDelta extends ExpressionInstance {
     val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
-  }
-
-  def getNewObject[T <: NodeLike](expression: T): T = {
-    expression(Type).asInstanceOf[T]
   }
 
   override def description: String = "Enables using the new keyword to create a new object."

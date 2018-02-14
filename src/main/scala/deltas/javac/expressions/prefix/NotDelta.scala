@@ -17,7 +17,7 @@ object NotDelta extends ExpressionInstance {
 
   object NotExpression extends NodeField
 
-  override val key = NotKey
+  override val shape = NotKey
 
   override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 

@@ -13,7 +13,7 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object BooleanLiteralDelta extends ExpressionInstance {
-  val key = Shape
+  val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 

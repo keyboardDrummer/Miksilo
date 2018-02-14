@@ -12,7 +12,7 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta
 
 object ThisCallExpression extends ExpressionInstance {
-  override val key = ThisCall
+  override val shape = ThisCall
   object ThisCall extends NodeShape
 
   def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallDelta.CallArguments -> arguments)

@@ -49,7 +49,7 @@ object TernaryDelta extends ExpressionInstance {
 
   object TernaryExpressionGrammar extends GrammarKey
 
-  override val key = TernaryKey
+  override val shape = TernaryKey
 
   override def getType(_ternary: NodePath, compilation: Compilation): Node = {
     val getExpressionType = ExpressionSkeleton.getType(compilation)

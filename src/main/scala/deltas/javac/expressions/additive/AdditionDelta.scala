@@ -17,7 +17,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the + operator."
 
-  val key = Shape
+  val shape = Shape
 
   override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)

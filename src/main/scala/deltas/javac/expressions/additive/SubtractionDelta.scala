@@ -37,7 +37,7 @@ object SubtractionDelta extends ExpressionInstance {
     FirstKey -> first,
     SecondKey -> second)
 
-  override val key = SubtractionKey
+  override val shape = SubtractionKey
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)

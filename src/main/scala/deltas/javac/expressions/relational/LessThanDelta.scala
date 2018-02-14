@@ -13,7 +13,7 @@ import deltas.javac.types.BooleanTypeDelta
 
 object LessThanDelta extends ExpressionInstance {
 
-  val key = LessThanKey
+  val shape = LessThanKey
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 

@@ -31,7 +31,7 @@ trait GenericCall extends ExpressionInstance {
     core.addOption(parseCall)
   }
 
-  override val key = CallDelta.CallKey
+  override val shape = CallDelta.CallKey
 
   override def getType(path: NodePath, compilation: Compilation): Node = {
     val call: Call[NodePath] = path

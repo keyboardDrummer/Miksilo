@@ -23,7 +23,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def description: String = "Enables calling a super constructor."
 
-  override val key = SuperCall
+  override val shape = SuperCall
   val constructorName: String = "<init>"
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta) ++ super.dependencies

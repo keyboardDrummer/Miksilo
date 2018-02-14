@@ -42,7 +42,7 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
 
   object Value extends NodeField
 
-  override val key = Shape
+  override val shape = Shape
 
   override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)
