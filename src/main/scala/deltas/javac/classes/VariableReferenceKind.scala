@@ -4,12 +4,12 @@ import core.deltas._
 import core.deltas.path.NodePath
 import core.language.Language
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{MemberSelector, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
 object VariableReferenceKind extends Delta {
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(Shape, (compilation, variable) => {
+    MemberSelectorDelta.getReferenceKindRegistry(state).put(Shape, (compilation, variable) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(variable, compiler)
     })
@@ -26,7 +26,7 @@ object VariableReferenceKind extends Delta {
       if (mbPackage.isDefined)
         new PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
       else {
-        MemberSelector.getReferenceKindFromExpressionType(classCompiler, variable)
+        MemberSelectorDelta.getReferenceKindFromExpressionType(classCompiler, variable)
       }
     }
   }

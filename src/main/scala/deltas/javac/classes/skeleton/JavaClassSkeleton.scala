@@ -140,6 +140,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object Shape extends NodeShape
 
   val hasDeclarations: ShapeProperty[HasDeclaration] = new ShapeProperty[HasDeclaration]
+  val hasConstraints: ShapeProperty[HasConstraints] = new ShapeProperty[HasConstraints]
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
@@ -187,11 +188,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       builder.proofs = proofs
 
       for(_import <- clazz.imports)
-        _import.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, _import, classScope)
+        this.hasConstraints.get(language, _import.shape).collectConstraints(compilation, builder, _import, classScope)
 
       val members = clazz.members
       members.foreach(member =>
         this.hasDeclarations.get(language, member.shape).getDeclaration(compilation, builder, member, classScope))
+
+      members.foreach(member =>
+        this.hasConstraints.get(language, member.shape).collectConstraints(compilation, builder, member, classScope))
     }
     super.inject(language)
   }

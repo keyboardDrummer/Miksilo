@@ -15,6 +15,7 @@ import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements.StatementSkeleton
 
@@ -40,9 +41,10 @@ object SuperCallExpression extends ExpressionInstance {
     transformToByteCode(call, compilation, program.parent.get)
   }
 
-  def transformToByteCode(call: NodePath, compilation: Compilation, className: String): Seq[Node] = {
+  def transformToByteCode(path: NodePath, compilation: Compilation, className: String): Seq[Node] = {
+    val call: Call[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-    val callArguments = CallDelta.getCallArguments(call)
+    val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
@@ -65,6 +67,6 @@ object SuperCallExpression extends ExpressionInstance {
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.resolveScopeDeclaration(superClass)
-    CallDelta.callConstraints(compilation, builder, call, superScope, call.asInstanceOf[ChildPath], VoidTypeDelta.constraintType)
+    CallDelta.callConstraints(compilation, builder, call, superScope, constructorName, call.asInstanceOf[ChildPath], VoidTypeDelta.constraintType)
   }
 }

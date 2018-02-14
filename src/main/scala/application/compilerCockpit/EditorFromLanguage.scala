@@ -1,21 +1,45 @@
 package application.compilerCockpit
 
-import java.awt.CardLayout
+import java.awt.{CardLayout, event}
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import javax.swing.JPanel
+import javax.swing._
 
-import core.language.node.Node
-import core.language.{Language, NoSourceException, ParseException}
-import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea, SyntaxConstants}
+import core.language.node.{Node, Position}
+import core.language.{LanguageServer, NoSourceException, ParseException}
 import org.fife.ui.rsyntaxtextarea.parser._
+import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane
 
 import scala.util.{Failure, Try}
 
-class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
+class MiksiloTextEditor(server: LanguageServer, document: RSyntaxDocument) extends RSyntaxTextArea(document) {
 
+  def currentPosition: Position = {
+    val offset = this.getCaret.getDot
+    Position(offset)
+  }
+
+  override def configurePopupMenu(popupMenu: JPopupMenu): Unit = {
+    super.configurePopupMenu(popupMenu)
+
+    if (server.isReference(currentPosition)) {
+      popupMenu.addSeparator()
+      val newChoice = new JMenuItem("Go to definition")
+      newChoice.addActionListener((e: event.ActionEvent) => {
+        val position = server.go(currentPosition)
+        MiksiloTextEditor.this.getCaret.setDot(position.end.offset)
+        MiksiloTextEditor.this.getCaret.moveDot(position.start.offset)
+      })
+    }
+  }
+}
+
+
+class EditorFromLanguage(server: LanguageServer) extends JPanel(new CardLayout()) {
+
+  private def language = server.language
   val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
 
   val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
@@ -23,7 +47,7 @@ class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
 
   private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
 
-  val inputTextArea = new RSyntaxTextArea(inputDocument)
+  val inputTextArea = new MiksiloTextEditor(server, inputDocument)
   inputTextArea.addParser(new Parser() {
     override def parse(doc: RSyntaxDocument, style: String): ParseResult = {
       val text = doc.getText(0, doc.getLength)

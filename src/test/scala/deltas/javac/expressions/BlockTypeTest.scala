@@ -1,7 +1,6 @@
 package deltas.javac.expressions
 
 import core.deltas.Delta
-import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
@@ -86,10 +85,4 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
   }
 }
 
-case class DropPhases(amount: Int) extends Delta {
-  override def description: String = "Drop n phases"
 
-  override def inject(language: Language): Unit = {
-    language.compilerPhases = language.compilerPhases.drop(amount)
-  }
-}

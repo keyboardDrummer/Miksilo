@@ -7,11 +7,26 @@ import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream
 
-class LanguageServer(getInput: () => InputStream, language: Language) {
+class LanguageServer(getInput: () => InputStream, val language: Language) {
+
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
 
   var compilation: Compilation = _
+
+  def documentChanged(): Unit = {
+    compilation = null
+  }
+
+  def isReference(position: Position): Boolean = {
+    val element = getSourceElement(position)
+    getProofs.scopeGraph.findReference(element).nonEmpty
+  }
+
+  def toPosition(row: Int, column: Int): Position = {
+    val offsetOfLineStart = getLines.take(row - 1).map(l => l.length + 1).sum
+    Position(offsetOfLineStart + column - 1)
+  }
 
   def go(position: Position): SourceRange = {
     val proofs = getProofs

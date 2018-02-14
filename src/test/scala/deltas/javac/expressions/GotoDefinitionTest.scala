@@ -2,9 +2,7 @@ package deltas.javac.expressions
 
 import core.deltas.Delta
 import core.language.LanguageServer
-import core.language.node.{Position, SourceRange}
-import core.smarts.SolveConstraintsDelta
-import deltas.ClearPhases
+import core.language.node.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import org.scalatest.FunSuite
@@ -12,12 +10,7 @@ import util.SourceUtils
 
 class GotoDefinitionTest extends FunSuite {
 
-  private val deltas = Seq(DropPhases(1), BlockLanguageDelta) ++
-    Delta.spliceAndFilterTop(
-      JavaLanguage.blockWithVariables,
-      JavaLanguage.javaClassSkeleton,
-      Seq(SolveConstraintsDelta, ClearPhases))
-  private val language = Delta.buildLanguage(deltas)
+    private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
 
     test("int variable") {
 
@@ -26,9 +19,9 @@ class GotoDefinitionTest extends FunSuite {
           |x = 3;
         """.stripMargin
       val getProgram = () => SourceUtils.stringToStream(program)
-      val server = new LanguageServer(getProgram, language)
-      val result = server.go(Position(2, 1))
-      assertResult(SourceRange(Position(1,5), Position(1,6)))(result)
+      val server = new LanguageServer(getProgram, blockLanguage)
+      val result = server.go(server.toPosition(2, 1))
+      assertResult(SourceRange(server.toPosition(1,5), server.toPosition(1,6)))(result)
     }
 
 
@@ -41,11 +34,22 @@ class GotoDefinitionTest extends FunSuite {
         |}
       """.stripMargin
     val getProgram = () => SourceUtils.stringToStream(program)
-    val server = new LanguageServer(getProgram, language)
-    val xDefinition = server.go(Position(4, 3))
-    assertResult(SourceRange(Position(1,5), Position(1,6)))(xDefinition)
+    val server = new LanguageServer(getProgram, blockLanguage)
+    val xDefinition = server.go(server.toPosition(4, 3))
+    assertResult(SourceRange(server.toPosition(1,5), server.toPosition(1,6)))(xDefinition)
 
-    val yDefinition = server.go(Position(4, 8))
-    assertResult(SourceRange(Position(3,7), Position(3,8)))(yDefinition)
+    val yDefinition = server.go(server.toPosition(4, 8))
+    assertResult(SourceRange(server.toPosition(3,7), server.toPosition(3,8)))(yDefinition)
+  }
+
+  test("fibonacci") {
+    val program = SourceUtils.getJavaTestFileContents("Fibonacci")
+    val getProgram = () => SourceUtils.stringToStream(program)
+    val server = new LanguageServer(getProgram, JavaLanguage.getJava)
+    val indexDefinition = server.go(server.toPosition(10, 16))
+    assertResult(SourceRange(server.toPosition(8,37), server.toPosition(8,42)))(indexDefinition)
+
+    val yDefinition = server.go(server.toPosition(5, 36))
+    assertResult(SourceRange(server.toPosition(8,23), server.toPosition(8,32)))(yDefinition)
   }
 }

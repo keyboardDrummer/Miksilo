@@ -29,7 +29,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("MainExpression") {
     val input = "System.out.print(fibonacci(5))"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation = CallDelta.call(MemberSelector.selector(MemberSelector.selector(VariableDelta.variable("System"), "out"), "print"),
+    val expectation = CallDelta.call(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.variable("System"), "out"), "print"),
       Seq(CallDelta.call(VariableDelta.variable("fibonacci"), Seq(IntLiteralDelta.literal(5)))))
     assertResult(expectation)(result)
   }
@@ -115,7 +115,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
 
   def getMainMethod: Node = {
     val fibonacciCall = CallDelta.call(VariableDelta.variable("fibonacci"), Seq(IntLiteralDelta.literal(5)))
-    val printCall = CallDelta.call(MemberSelector.selector(MemberSelector.selector(VariableDelta.variable("System"), "out"), "print"),
+    val printCall = CallDelta.call(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.variable("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodDelta.method("main", VoidTypeDelta.voidType, Seq(MethodDelta.parameter("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
       Seq(ExpressionAsStatementDelta.create(printCall)), static = true, AccessibilityFieldsDelta.PublicVisibility)

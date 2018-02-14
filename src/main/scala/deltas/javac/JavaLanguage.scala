@@ -3,6 +3,7 @@ package deltas.javac
 import application.compilerCockpit.PrettyPrint
 import core.deltas._
 import core.language.Language
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode._
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes._
@@ -60,10 +61,10 @@ object JavaLanguage {
   val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
   def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables)
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ javaClassSkeleton
+    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
 
   def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 

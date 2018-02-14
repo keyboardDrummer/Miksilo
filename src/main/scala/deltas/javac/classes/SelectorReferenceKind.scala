@@ -4,23 +4,24 @@ import core.deltas._
 import core.deltas.path.NodePath
 import core.language.Language
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.MemberSelector
-import deltas.javac.methods.MemberSelector.Shape
+import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.MemberSelectorDelta.{MemberSelector, Shape}
 
 object SelectorReferenceKind extends Delta {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: Language): Unit = {
-    MemberSelector.getReferenceKindRegistry(state).put(Shape, (compilation, selector) => {
+    MemberSelectorDelta.getReferenceKindRegistry(state).put(Shape, (compilation, selector) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(selector, compiler)
     })
   }
 
-  def getReferenceKind(selector: NodePath, compiler: ClassCompiler): ReferenceKind = {
-    val obj = MemberSelector.getSelectorTarget(selector)
-    val member = MemberSelector.getSelectorMember(selector)
-    MemberSelector.getReferenceKind(compiler, obj) match {
+  def getReferenceKind(path: NodePath, compiler: ClassCompiler): ReferenceKind = {
+    val selector: MemberSelector[NodePath] = path
+    val obj = selector.target
+    val member = selector.member
+    MemberSelectorDelta.getReferenceKind(compiler, obj) match {
       case PackageReference(info) => info.content(member) match {
         case result: PackageSignature => PackageReference(result)
         case result: ClassSignature => ClassOrObjectReference(result, wasClass = true)

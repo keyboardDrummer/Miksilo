@@ -1,13 +1,14 @@
 package deltas.javac.methods.call
 
-import core.language.node._
 import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, SourceElement}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.DeclarationVariable
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector}
 
 object CallDelta
 {
@@ -19,9 +20,10 @@ object CallDelta
 
   object CallArgumentsGrammar extends GrammarKey
 
-  def getCallCallee[T <: NodeLike](call: T) = call(CallDelta.CallCallee).asInstanceOf[T]
-
-  def getCallArguments[T <: NodeLike](call: T) = call(CallDelta.CallArguments).asInstanceOf[Seq[T]]
+  implicit class Call[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def callee: MemberSelector[T] = node(Member).asInstanceOf[T]
+    def arguments: Seq[T] = NodeWrapper.wrapList(node(CallArguments).asInstanceOf[Seq[T]])
+  }
 
   def call(callee: Any, arguments: Any): Node =
     call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
@@ -30,11 +32,11 @@ object CallDelta
     new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
   }
 
-  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, parentScope: Scope,
-                      methodName: SourceElement, returnType: Type): DeclarationVariable = {
-    val callArguments = CallDelta.getCallArguments(call)
+  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: Call[NodePath], parentScope: Scope,
+                      methodName: String, nameOrigin: SourceElement, returnType: Type): DeclarationVariable = {
+    val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val constructorType = FunctionType.curry(callTypes, returnType)
-    builder.resolve(methodName.current.asInstanceOf[String], methodName, parentScope, Some(constructorType))
+    builder.resolve(methodName, nameOrigin, parentScope, Some(constructorType))
   }
 }

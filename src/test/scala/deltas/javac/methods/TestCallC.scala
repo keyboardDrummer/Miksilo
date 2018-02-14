@@ -10,7 +10,7 @@ class TestCallC extends FunSuite {
   test("callC") {
     val language = new Language()
     ExpressionSkeleton.inject(language)
-    MemberSelector.inject(language)
+    MemberSelectorDelta.inject(language)
     CallStaticOrInstanceDelta.inject(language)
     assert(ExpressionSkeleton.getRegistry(language).instances.get(CallDelta.CallKey).nonEmpty)
   }

@@ -58,7 +58,7 @@ trait NodeLike {
 
 object NodeLike {
 
-  def getChildNodeLikes[Self](value: Any): Seq[Self] = value match {
+  def getChildNodeLikes[Self <: NodeLike](value: Any): Seq[Self] = value match {
     case nodeLike: NodeLike =>
       Seq(nodeLike.asInstanceOf[Self])
     case sequence: Seq[_] =>

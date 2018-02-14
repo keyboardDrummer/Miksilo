@@ -1,38 +1,39 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.Node
+import core.language.node.{Node, NodeShape}
 import core.deltas.path.{ChildPath, NodePath}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.BasicImportDelta._
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature, QualifiedClassName, ShapeWithConstraints}
+import deltas.javac.classes.skeleton._
 
-object WildcardImportDelta extends DeltaWithGrammar {
+object WildcardImportDelta extends DeltaWithGrammar with HasConstraints {
 
-  object WildcardImportKey extends ShapeWithConstraints {
-    override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
+  object Shape extends NodeShape
 
-      val elements = getParts(_import)
-      val fullPackage: String = elements.reduce((a, b) => a + "." + b)
-      val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[ChildPath], parentScope)
-      val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
-      builder.importScope(parentScope, packageScope)
-    }
+  def wildCardImport(elements: Seq[String]) = new Node(Shape, Elements -> elements)
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
+    val elements = getParts(_import)
+    val fullPackage: String = elements.reduce((a, b) => a + "." + b)
+    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[ChildPath], parentScope)
+    val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
+    builder.importScope(parentScope, packageScope)
   }
 
-  def wildCardImport(elements: Seq[String]) = new Node(WildcardImportKey, ElementsKey -> elements)
+  override def shape: NodeShape = Shape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val importPath = find(ImportPathGrammar)
-    importPath.addOption(identifier.someSeparated(".").as(ElementsKey) ~< ".*" asNode WildcardImportKey)
+    val importPath = find(BasicImportDelta.Shape)
+    importPath.addOption(identifier.someSeparated(".").as(Elements) ~< ".*" asNode Shape)
   }
 
   override def inject(state: Language): Unit = {
-    JavaClassSkeleton.getRegistry(state).importToClassMap.put(WildcardImportKey, (compilation: Compilation, wildcardImport) => {
+    JavaClassSkeleton.getRegistry(state).importToClassMap.put(Shape, (compilation: Compilation, wildcardImport) => {
       val packageParts = getParts(wildcardImport)
       val classCompiler = JavaClassSkeleton.getState(compilation).classCompiler
       val compiler = classCompiler.javaCompiler

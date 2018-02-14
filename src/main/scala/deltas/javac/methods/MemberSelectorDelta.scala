@@ -11,14 +11,15 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
+object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry {
   def getScope(compilation: Compilation, builder: ConstraintBuilder, target: NodePath, parentScope: Scope): Scope = {
     getRegistry(compilation).getScope(target.shape)(compilation,builder,target, parentScope)
   }
 
-  def getSelectorTarget[T <: NodeLike](selector: T): T = selector(Target).asInstanceOf[T]
-
-  def getSelectorMember(selector: Node): String = selector(Member).asInstanceOf[String]
+  implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def member: String = node(Member).asInstanceOf[String]
+    def target: T = node(Target).asInstanceOf[T]
+  }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -47,13 +48,13 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
       Member -> member)
   }
 
-  def getClassOrObjectReference(selector: NodePath, compiler: ClassCompiler): ClassOrObjectReference = {
-    val obj = getSelectorTarget(selector)
+  def getClassOrObjectReference(selector: MemberSelector[NodePath], compiler: ClassCompiler): ClassOrObjectReference = {
+    val obj = selector.target
     getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
   }
 
   def getReferenceKind(classCompiler: ClassCompiler, expression: NodePath): ReferenceKind = {
-    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.compilation).get(expression.shape)
+    val getReferenceKindOption = MemberSelectorDelta.getReferenceKindRegistry(classCompiler.compilation).get(expression.shape)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(classCompiler.compilation, expression))

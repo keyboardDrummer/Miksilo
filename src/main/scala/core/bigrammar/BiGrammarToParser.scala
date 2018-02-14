@@ -6,7 +6,7 @@ import core.language.node.Position
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
-import scala.util.parsing.input.{CharArrayReader, Positional}
+import scala.util.parsing.input.{CharArrayReader, OffsetPosition, Positional}
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
@@ -128,6 +128,6 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   override val whiteSpace: Regex = "".r
 
   def position[T <: Positional]: Parser[Position] = Parser { in =>
-    Success(Position(in.pos.line, in.pos.column), in)
+    Success(Position(in.pos.asInstanceOf[OffsetPosition].offset), in)
   }
 }
