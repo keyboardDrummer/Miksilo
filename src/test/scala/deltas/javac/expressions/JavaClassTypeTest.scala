@@ -27,6 +27,11 @@ class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
     compile(program)
   }
 
+  test("System.out.print reference") {
+    val program = SourceUtils.getJavaTestFileContents("Fibonacci")
+    compile(program)
+  }
+
   test("fibonacci") {
     val program = SourceUtils.getJavaTestFileContents("Fibonacci")
     compile(program)

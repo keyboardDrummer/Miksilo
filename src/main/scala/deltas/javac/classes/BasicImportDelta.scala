@@ -1,7 +1,7 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
@@ -18,13 +18,14 @@ object BasicImportDelta extends DeltaWithGrammar with HasConstraints {
   def _import(elements: Seq[String]) = new Node(Shape, Elements -> elements)
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
-    val elements = getParts(_import)
-    val fullPackage: String = elements.dropRight(1).fold("")((a, b) => a + "." + b)
-    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[ChildPath], parentScope)
-    val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
-    val classDeclaration = builder.resolve(elements.last, null, packageScope)
-    val classExternalScope = builder.resolveScopeDeclaration(classDeclaration)
-    builder.importScope(parentScope, classExternalScope)
+//    val elements = getParts(_import)
+//    val fullPackage: String = elements.dropRight(1).fold("")((a, b) => a + "." + b)
+//    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[ChildPath], parentScope)
+//    val packageScope = builder.resolveScopeDeclaration(packageDeclaration)
+//    val classDeclaration = builder.resolve(elements.last, null, packageScope)
+//    val classExternalScope = builder.resolveScopeDeclaration(classDeclaration)
+//    builder.importScope(parentScope, classExternalScope) Eigenlijk een rename iets hier voor nodig.
+    throw new Exception("woeps")
   }
 
   override def shape: NodeShape = Shape

@@ -122,12 +122,10 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
 
     val clazzDeclaration = new NamedDeclaration(clazz.name, path)
-    val classExternalScope = builder.newScope(Some(defaultPackageScope), "externalFor" + clazz.name)
-    builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
-    builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
-    builder.importScope(packageScope, classExternalScope)
+    builder.add(DeclarationInsideScope(clazzDeclaration, packageScope))
 
-    val classInternalScope = builder.newScope(Some(classExternalScope), "internalFor" + clazz.name)
+    val classInternalScope = builder.newScope(Some(packageScope), "internalFor" + clazz.name)
+    builder.add(DeclarationOfScope(clazzDeclaration, classInternalScope))
 
     val members = clazz.members
     members.foreach(member => hasDeclarations.get(compilation, member.shape).
@@ -182,7 +180,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
       val clazz: JavaClass[NodePath] = PathRoot(compilation.program)
       val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
-      val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
+      val classScope  = builder.getDeclaredScope(clazzDeclaration)
 
       val proofs = JavaLang.getProofs(compilation, defaultPackageScope)
       builder.proofs = proofs

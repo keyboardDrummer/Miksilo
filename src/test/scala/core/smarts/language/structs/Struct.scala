@@ -4,7 +4,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.language.modules.FakeSourceElement
 import core.smarts.objects.NamedDeclaration
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.{AssignSubType, DeclarationOfType}
+import core.smarts.types.{AssignSubType, DeclarationHasType}
 import core.smarts.types.objects.TypeFromDeclaration
 
 trait TypeDefinition
@@ -18,10 +18,10 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
     val structDeclaration: NamedDeclaration = builder.declare(name, this, parentScope)
-    builder.add(DeclarationOfType(structDeclaration, TypeFromDeclaration(structDeclaration)))
+    builder.add(DeclarationHasType(structDeclaration, TypeFromDeclaration(structDeclaration)))
     val scopeOfParent: Option[Scope] = parent.map(p => {
       val parentDeclaration = builder.declarationVariable()
-      val scopeOfParent = builder.resolveScopeDeclaration(parentDeclaration)
+      val scopeOfParent = builder.getDeclaredScope(parentDeclaration)
       builder.reference(p, this, parentScope, parentDeclaration)
       builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))
       scopeOfParent

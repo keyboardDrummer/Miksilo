@@ -18,7 +18,6 @@ object SubtractionDelta extends ExpressionInstance {
   object FirstKey extends NodeField
   object SecondKey extends NodeField
 
-
   implicit class Subtraction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(FirstKey).asInstanceOf[T]
     def left_=(value: T): Unit = node(Left) = value

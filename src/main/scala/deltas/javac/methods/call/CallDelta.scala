@@ -6,7 +6,7 @@ import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.DeclarationOfType
+import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{FunctionType, Type}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
@@ -38,6 +38,6 @@ object CallDelta
     val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val functionType = FunctionType.curry(callTypes, returnType)
-    builder.add(DeclarationOfType(methodDeclaration, functionType))
+    builder.add(DeclarationHasType(methodDeclaration, functionType))
   }
 }
