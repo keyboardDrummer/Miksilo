@@ -86,7 +86,7 @@ class ConstraintBuilder(factory: Factory) {
     factory.declarationVariable
   }
 
-  def getTypeDeclaration(_type: Type): Declaration = {
+  def getDeclarationOfType(_type: Type): Declaration = {
     val result = declarationVariable()
     add(TypesAreEqual(TypeFromDeclaration(result), _type))
     result

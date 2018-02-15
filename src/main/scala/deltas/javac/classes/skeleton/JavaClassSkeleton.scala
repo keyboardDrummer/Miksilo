@@ -121,15 +121,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       })
     }
 
-    val clazzDeclaration = new NamedDeclaration(clazz.name, path)
-    builder.add(DeclarationInsideScope(clazzDeclaration, packageScope))
-
-    val classInternalScope = builder.newScope(Some(packageScope), "internalFor" + clazz.name)
-    builder.add(DeclarationOfScope(clazzDeclaration, classInternalScope))
+    val clazzDeclaration = builder.declare(clazz.name, path, packageScope)
+    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), "internalFor" + clazz.name)
 
     val members = clazz.members
     members.foreach(member => hasDeclarations.get(compilation, member.shape).
-      getDeclaration(compilation, builder, member, classInternalScope))
+      getDeclaration(compilation, builder, member, classScope))
 
     clazzDeclaration
   }

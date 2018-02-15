@@ -50,7 +50,7 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
               solver.builder.getDeclaredScope(targetDeclaration)
             case _ =>
               val objectType = solver.builder.getType(targetDeclaration)
-              val objectDeclaration = solver.builder.getTypeDeclaration(objectType)
+              val objectDeclaration = solver.builder.getDeclarationOfType(objectType)
               solver.builder.getDeclaredScope(objectDeclaration)
           }
           solver.builder.reference(member, memberSource, targetScope, resolvesTo)
