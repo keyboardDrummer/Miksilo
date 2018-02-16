@@ -11,22 +11,13 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
 
   override def apply(solver: ConstraintSolver): Boolean = {
     val resolvedDeclaration = solver.scopeGraph.resolve(reference)
-    if (resolvedDeclaration != null)
+    if (resolvedDeclaration == null)
+      return false
+
+    if (!solver.unifyDeclarations(declaration, resolvedDeclaration))
     {
-      if (!solver.unifyDeclarations(declaration, resolvedDeclaration))
-      {
-        throw new IllegalStateException("what?!")
-      }
-      true
+      throw new IllegalStateException("what?!")
     }
-    else if (reference.name == "Class") //. De java.util import faalt nog. Maar ook de class references lijken niet te resolven.
-    {
-      val resolvedDeclaration2 = solver.scopeGraph.resolve(reference)
-      false
-    }
-    else
-    {
-      false
-    }
+    true
   }
 }

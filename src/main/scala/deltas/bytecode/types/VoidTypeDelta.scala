@@ -11,7 +11,7 @@ import core.smarts.types.objects.{PrimitiveType, Type}
 
 object VoidTypeDelta extends ByteCodeTypeInstance with StackType {
 
-  override val shape = VoidTypeKey
+  override val shape = Shape
 
   override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
 
@@ -27,9 +27,9 @@ object VoidTypeDelta extends ByteCodeTypeInstance with StackType {
     "void" ~> value(voidType)
   }
 
-  def voidType = new Node(VoidTypeKey)
+  def voidType = new Node(Shape)
 
-  object VoidTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   override def description: String = "Defines the void type."
 

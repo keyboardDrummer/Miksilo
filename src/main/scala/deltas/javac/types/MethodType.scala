@@ -7,8 +7,8 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.{FunctionType, Type}
-import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
+import core.smarts.types.objects.{ActionType, FunctionType, Type}
+import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton, VoidTypeDelta}
 
 object MethodType extends ByteCodeTypeInstance {
 
@@ -58,8 +58,8 @@ object MethodType extends ByteCodeTypeInstance {
   }
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope, parameters: Seq[NodeLike], returnTypeNode: NodeLike): Type = {
-    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
+    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     FunctionType.curry(parameterTypes, returnType)
   }
 }
