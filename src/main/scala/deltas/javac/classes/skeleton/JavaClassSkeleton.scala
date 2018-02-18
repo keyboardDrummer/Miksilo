@@ -122,7 +122,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
 
     val clazzDeclaration = builder.declare(clazz.name, path, packageScope)
-    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), "internalFor" + clazz.name)
+    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members
     members.foreach(member => hasDeclarations.get(compilation, member.shape).
@@ -186,8 +186,6 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
         this.hasConstraints.get(language, _import.shape).collectConstraints(compilation, builder, _import, classScope)
 
       val members = clazz.members
-      members.foreach(member =>
-        this.hasDeclarations.get(language, member.shape).getDeclaration(compilation, builder, member, classScope))
 
       members.foreach(member =>
         this.hasConstraints.get(language, member.shape).collectConstraints(compilation, builder, member, classScope))

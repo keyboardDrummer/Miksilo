@@ -6,6 +6,7 @@ import core.deltas.path.NodePath
 import core.deltas.Contract
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
+import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -65,9 +66,8 @@ trait GenericCall extends ExpressionInstance {
     val callCallee = call.callee
     val calleeTarget = callCallee.target
     val calleeMember = callCallee.member
-    val calleeTargetDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, calleeTarget, parentScope)
-    val calleeDeclaration = builder.declarationVariable()
-    val calleeReference = builder.reference(calleeMember, callCallee.getLocation(MemberSelectorDelta.Member), parentScope, calleeDeclaration)
-    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeReference, calleeTargetDeclaration, returnType)
+    val calleeDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, callCallee, parentScope)
+    val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
+    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeReference, calleeDeclaration, returnType)
   }
 }

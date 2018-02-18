@@ -146,6 +146,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
+    case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
+      couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
