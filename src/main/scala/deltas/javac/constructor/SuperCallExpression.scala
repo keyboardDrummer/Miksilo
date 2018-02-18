@@ -6,6 +6,8 @@ import core.deltas.path.NodePath
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
+import core.smarts.objects.Reference
+import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
@@ -67,8 +69,9 @@ object SuperCallExpression extends ExpressionInstance {
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.getDeclaredScope(superClass)
-    val superDeclaration = builder.declarationVariable()
-    val superReference = builder.reference(constructorName, call, superScope, superDeclaration)
-    CallDelta.callConstraints(compilation, builder, call, parentScope, superReference, superDeclaration, VoidTypeDelta.constraintType)
+
+    val superReference = Reference(constructorName, Some(call))
+    builder.add(ReferenceInScope(superReference, superScope))
+    CallDelta.callConstraints(compilation, builder, call, parentScope, superReference, VoidTypeDelta.constraintType)
   }
 }

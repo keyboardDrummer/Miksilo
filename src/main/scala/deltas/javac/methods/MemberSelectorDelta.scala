@@ -2,13 +2,12 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath}
-import core.language.{Compilation, Language, SourceElement}
-import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
+import core.language.{Compilation, Language}
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
-import core.smarts.scopes.objects.Scope
-import core.smarts.types.DeclarationHasType
+import core.smarts.scopes.objects.{Scope, ScopeVariable}
+import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
@@ -32,40 +31,11 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
     val target = memberSelector.target
     val targetDeclaration = resolvedToDeclaration.get(compilation, target.shape).getResolvedDeclaration(compilation, builder, target, scope)
     val result = builder.declarationVariable()
-    builder.add(ResolveSelectorConstraint(targetDeclaration, memberSelector.member, expression.getLocation(Member), result) )
+
+    val targetScope = builder.scopeVariable()
+    builder.add(SelectorTargetScopeConstraint(targetDeclaration, targetScope))
+    builder.reference(memberSelector.member, expression.getLocation(Member), targetScope, result)
     result
-    //De out reference blijkt in de externalSystemClass scope te leven, en kan daarom out niet vinden, want die zit in de internalSystemClass scope.
-    //Waarom resolved System in System.out naar de package en niet de class?
-  }
-
-  case class ResolveSelectorConstraint(var targetDeclaration: Declaration, member: String, memberSource: SourceElement,
-                                       var resolvesTo: Declaration) extends Constraint {
-    override def apply(solver: ConstraintSolver): Boolean = {
-      targetDeclaration match {
-        case e:NamedDeclaration =>
-          val path = e.origin.asInstanceOf[NodePath]
-          val node = path.current
-          val targetScope = node.shape match {
-            case JavaClassSkeleton.Shape => //TODO allow referencing packages.
-              solver.builder.getDeclaredScope(targetDeclaration)
-            case _ =>
-              val objectType = solver.builder.getType(targetDeclaration)
-              val objectDeclaration = solver.builder.getDeclarationOfType(objectType)
-              solver.builder.getDeclaredScope(objectDeclaration)
-          }
-          solver.builder.reference(member, memberSource, targetScope, resolvesTo)
-          true
-        case _ => false
-      }
-    }
-
-    override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
-      if (targetDeclaration == variable)
-        targetDeclaration = instance
-      if (resolvesTo == variable)
-        resolvesTo = instance
-      super.instantiateDeclaration(variable, instance)
-    }
   }
 
   override def shape: NodeShape = Shape

@@ -1,19 +1,20 @@
 package deltas.javac.methods.call
 
-import core.deltas.grammars.LanguageGrammars
-import core.language.node._
-import core.deltas.path.NodePath
 import core.deltas.Contract
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
+import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.CallDelta.{Call, CallArgumentsGrammar}
+import deltas.javac.methods.{MemberSelectorDelta, SelectorTargetScopeConstraint}
 import deltas.javac.types.MethodType._
 
 trait GenericCall extends ExpressionInstance {
@@ -66,8 +67,12 @@ trait GenericCall extends ExpressionInstance {
     val callCallee = call.callee
     val calleeTarget = callCallee.target
     val calleeMember = callCallee.member
-    val calleeDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, callCallee, parentScope)
-    val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
-    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeReference, calleeDeclaration, returnType)
+    val calleeTargetDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, calleeTarget, parentScope)
+
+    val calleeReference = Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
+    val targetScope = builder.scopeVariable()
+    builder.add(ReferenceInScope(calleeReference, targetScope))
+    builder.add(SelectorTargetScopeConstraint(calleeTargetDeclaration, targetScope))
+    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeReference, returnType)
   }
 }

@@ -17,6 +17,7 @@ case class DeclarationOfScope(var declaration: Declaration, var scope: Scope) ex
   override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
     if (scope == variable)
       scope = instance
+    super.instantiateScope(variable, instance)
   }
 
   override def apply(solver: ConstraintSolver): Boolean = declaration match {
