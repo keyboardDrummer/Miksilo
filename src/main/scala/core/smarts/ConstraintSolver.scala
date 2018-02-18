@@ -108,7 +108,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     allConstraints.foreach(c => c.instantiateType(variable, _type)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(variable, _type))
     true
-  }
+  }//Types and references toevoegen? Of Misschien een nieuwe environment van reference naar type? Of een nieuwe map van reference naar declaration? ja en ResolveTo werkt alleen als er een enkele declaration is. Voor overloading moet je een nieuwe constraint hebben.
 
   def instantiateScope(variable: ScopeVariable, scope: Scope): Unit = {
     allConstraints.foreach(c => c.instantiateScope(variable, scope))
@@ -132,7 +132,24 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
+      generatedConstraints ++= builder.getConstraints //TODO shouldn't this be running in a subSolver?
+      true
+    case (FunctionType(input, output, _), closure: ConstraintClosureType) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(closureOutput, output))
       generatedConstraints ++= builder.getConstraints
+      true
+    case (l, r) =>
+      typeGraph.isSuperType(TypeNode(l), TypeNode(r))
+  }
+
+  def couldBeSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
+    case (_: TypeVariable,_) => true
+    case (_,_: TypeVariable) => true
+    case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(output, closureOutput))
+      generatedConstraints ++= builder.getConstraints //TODO shouldn't this be running in a subSolver?
       true
     case (FunctionType(input, output, _), closure: ConstraintClosureType) =>
       val closureOutput = closure.instantiate(builder, input)

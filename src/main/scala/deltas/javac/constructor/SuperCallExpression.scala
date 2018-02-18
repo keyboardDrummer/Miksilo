@@ -67,7 +67,8 @@ object SuperCallExpression extends ExpressionInstance {
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
     val superScope = builder.getDeclaredScope(superClass)
-    val superDeclaration = builder.resolve(constructorName, call, superScope)
-    CallDelta.callConstraints(compilation, builder, call, parentScope, superDeclaration, VoidTypeDelta.constraintType)
+    val superDeclaration = builder.declarationVariable()
+    val superReference = builder.reference(constructorName, call, superScope, superDeclaration)
+    CallDelta.callConstraints(compilation, builder, call, parentScope, superReference, superDeclaration, VoidTypeDelta.constraintType)
   }
 }

@@ -3,11 +3,10 @@ package deltas.javac.methods.call
 import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node._
-import core.smarts.ConstraintBuilder
-import core.smarts.objects.Declaration
+import core.smarts.objects.{Declaration, Reference}
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{FunctionType, Type}
+import core.smarts.{ConstraintBuilder, ResolvesToType}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 
@@ -29,15 +28,15 @@ object CallDelta
   def call(callee: Any, arguments: Any): Node =
     call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
-  def call(callee: Node, arguments: Seq[Node] = Seq()) = {
+  def call(callee: Node, arguments: Seq[Node] = Seq()): Node = {
     new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
   }
 
   def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: Call[NodePath], parentScope: Scope,
-                      methodDeclaration: Declaration, returnType: Type): Unit = {
+                      methodReference: Reference, methodDeclaration: Declaration, returnType: Type): Unit = {
     val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val functionType = FunctionType.curry(callTypes, returnType)
-    builder.add(DeclarationHasType(methodDeclaration, functionType))
+    builder.add(new ResolvesToType(methodReference, methodDeclaration, functionType))
   }
 }

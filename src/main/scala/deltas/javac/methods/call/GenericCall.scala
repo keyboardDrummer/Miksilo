@@ -63,7 +63,11 @@ trait GenericCall extends ExpressionInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
     val callCallee = call.callee
-    val calleeDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, callCallee, parentScope)
-    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeDeclaration, returnType)
+    val calleeTarget = callCallee.target
+    val calleeMember = callCallee.member
+    val calleeTargetDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, calleeTarget, parentScope)
+    val calleeDeclaration = builder.declarationVariable()
+    val calleeReference = builder.reference(calleeMember, callCallee.getLocation(MemberSelectorDelta.Member), parentScope, calleeDeclaration)
+    CallDelta.callConstraints(compilation, builder, call, parentScope, calleeReference, calleeTargetDeclaration, returnType)
   }
 }

@@ -7,8 +7,8 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.{ActionType, FunctionType, Type}
-import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton, VoidTypeDelta}
+import core.smarts.types.objects.{FunctionType, Type}
+import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
 
 object MethodType extends ByteCodeTypeInstance {
 

@@ -53,11 +53,8 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
   def declarations: Seq[DeclarationNode] = this.keys.collect({case x: DeclarationNode => x}).toSeq
   def findReference(location: SourceElement): Option[Reference] = {
     val references = this.keys.collect({ case n: ReferenceNode => n.reference })
-    val positions = references.map(n => n.origin.map(x => x.position))
     references.find(n => n.origin.map(x => x.position).contains(location.position))
   }
-
-  def resolveLocation(location: SourceElement): SourceElement = resolve(findReference(location).get).origin
 
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
 
@@ -72,14 +69,14 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 
   def addReference(reference: Reference, currentScope: ConcreteScope): Unit = add(ReferenceNode(reference), ReferenceEdge(ScopeNode(currentScope)))
 
-  def resolve(reference: Reference): NamedDeclaration = {
+  def resolve(reference: Reference): Seq[NamedDeclaration]= {
     val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
       filter(d => d.declaration.name == reference.name)
-    if (reachableNodes.nonEmpty)
-    {
-      return reachableNodes.head.declaration
-    }
-    null
+
+    if (reachableNodes.isEmpty)
+      return Seq.empty
+
+    reachableNodes.map(n => n.declaration)
   }
 
   case class DebugNode(node: GraphNode, graph: ScopeGraph) {
@@ -88,7 +85,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
     }
   }
 
-  def debug(node: GraphNode): DebugNode = new DebugNode(node, this)
+  def debug(node: GraphNode): DebugNode = DebugNode(node, this)
 
   def depthFirst(root: GraphNode): Seq[GraphNode] = {
     var result = List.empty[GraphNode]

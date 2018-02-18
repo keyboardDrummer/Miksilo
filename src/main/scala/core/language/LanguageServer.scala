@@ -31,7 +31,7 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
   def go(position: Position): SourceRange = {
     val proofs = getProofs
     val element = getSourceElement(position)
-    val declaration = proofs.scopeGraph.resolveLocation(element)
+    val declaration = proofs.resolveLocation(element)
     declaration.position.get
   }
 

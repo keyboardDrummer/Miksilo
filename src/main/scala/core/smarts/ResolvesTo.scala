@@ -1,7 +1,8 @@
 package core.smarts
 
-import core.smarts.objects.{Declaration, DeclarationVariable, Reference}
+import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
+
 case class ResolvesTo(reference: Reference, var declaration: Declaration) extends ResolutionConstraint
 {
   override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
@@ -10,14 +11,21 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
   }
 
   override def apply(solver: ConstraintSolver): Boolean = {
-    val resolvedDeclaration = solver.scopeGraph.resolve(reference)
-    if (resolvedDeclaration == null)
-      return false
+    val declarations = solver.scopeGraph.resolve(reference)
+    applyDeclarations(solver, declarations)
+  }
 
-    if (!solver.unifyDeclarations(declaration, resolvedDeclaration))
-    {
-      throw new IllegalStateException("what?!")
+  def applyDeclarations(solver: ConstraintSolver, declarations: Seq[NamedDeclaration]): Boolean = {
+    if (declarations.length == 1) {
+      val resolvedDeclaration = declarations.head
+      if (!solver.unifyDeclarations(declaration, resolvedDeclaration))
+        throw new IllegalStateException("what?!")
+
+      solver.proofs.resolutions += reference -> resolvedDeclaration
+      true
     }
-    true
+    else
+      false
   }
 }
+
