@@ -69,7 +69,7 @@ trait GenericCall extends ExpressionInstance {
     val calleeMember = callCallee.member
     val calleeTargetDeclaration = MemberSelectorDelta.getResolvedToDeclaration(compilation, builder, calleeTarget, parentScope)
 
-    val calleeReference = Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
+    val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
     val targetScope = builder.scopeVariable()
     builder.add(ReferenceInScope(calleeReference, targetScope))
     builder.add(SelectorTargetScopeConstraint(calleeTargetDeclaration, targetScope))
