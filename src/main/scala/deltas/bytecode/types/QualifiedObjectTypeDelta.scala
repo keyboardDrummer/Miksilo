@@ -27,8 +27,10 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    val parseQualifiedClassName = identifier.someSeparated(".").
-      map[Seq[String], QualifiedClassName](QualifiedClassName, qualifiedClassName => qualifiedClassName.parts)
+    val parseQualifiedClassName = identifier ~< "." ~ identifier.someSeparated(".").
+      map[(String, Seq[String]), QualifiedClassName](
+        p => QualifiedClassName(Seq(p._1) ++ p._2),
+        qualifiedClassName => (qualifiedClassName.parts.head, qualifiedClassName.parts.tail))
     parseQualifiedClassName.as(Name).asLabelledNode(Shape)
   }
 
@@ -58,10 +60,13 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
     val name = getName(_type)
     val packageParts = name.parts.dropRight(1)
     val className = name.parts.last
-    val packageFull = packageParts.reduce((a,b) => a + "." + b)
-    val packageDeclaration = builder.resolveOption(packageFull, origin = _type.asPath, parentScope)
-    val packageScope = builder.getDeclaredScope(packageDeclaration)
-    val classDeclaration = builder.resolveOption(className, origin = _type.asPath, packageScope)
+    val scope = if (packageParts.nonEmpty) {
+      val packageFull = packageParts.reduce((a,b) => a + "." + b)
+      val packageDeclaration = builder.resolveOption(packageFull, origin = _type.asPath, parentScope)
+      builder.getDeclaredScope(packageDeclaration)
+    } else
+      parentScope
+    val classDeclaration = builder.resolveOption(className, origin = _type.asPath, scope)
     TypeFromDeclaration(classDeclaration)
   }
 }

@@ -59,9 +59,10 @@ object SelectField extends ExpressionInstance {
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {
-//    val target = selector.target
-//    val targetScope = MemberSelectorDelta.resolvedToDeclaration.get(compilation, target.shape).getResolvedDeclaration(compilation, builder, target, parentScope)
-//    val member = selector.member
-//    builder.resolve(member, selector(Member).asInstanceOf[ChildPath], targetScope, Some(_type))
+    val target = selector.target
+    val scopeDeclaration = MemberSelectorDelta.getScopeDeclaration(compilation, builder, target, parentScope)
+    val scope = builder.getDeclaredScope(scopeDeclaration)
+    val member = selector.member
+    builder.resolve(member, selector.getLocation(Member), scope, Some(_type))
   }
 }

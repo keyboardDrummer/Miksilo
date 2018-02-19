@@ -72,6 +72,6 @@ object SuperCallExpression extends ExpressionInstance {
 
     val superReference = new Reference(constructorName, Some(call))
     builder.add(ReferenceInScope(superReference, superScope))
-    CallDelta.callConstraints(compilation, builder, call, parentScope, superReference, VoidTypeDelta.constraintType)
+    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, superReference, VoidTypeDelta.constraintType)
   }
 }

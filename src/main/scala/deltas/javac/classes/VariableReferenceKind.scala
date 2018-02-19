@@ -40,8 +40,9 @@ object VariableReferenceKind extends Delta with ResolvesToDeclaration {
 
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 
-  override def getResolvedDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
+  override def getScopeDeclarationForShape(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
+    //TODO this is incomplete. Does not compare to the getReferenceKind.
   }
 
   override def shape: NodeShape = Shape

@@ -1,10 +1,9 @@
 package deltas.javac.types
 
-import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeLike, NodeShape}
-import core.deltas.DeltaWithGrammar
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -23,10 +22,11 @@ object TypeVariable extends DeltaWithGrammar with HasType {
   }
 
   def transformJavaGrammar(grammars: LanguageGrammars): Unit = {
-    import grammars._
-    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val variableGrammar: BiGrammar = identifier.as(TypeVariableName).asNode(Shape)
-    typeGrammar.addOption(variableGrammar)
+    //TODO FIX?!
+//    import grammars._
+//    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
+//    val variableGrammar: BiGrammar = identifier.as(TypeVariableName).asNode(Shape)
+//    typeGrammar.addOption(variableGrammar)
   }
 
   def transformByteCodeGrammar(grammars: LanguageGrammars): Unit = {

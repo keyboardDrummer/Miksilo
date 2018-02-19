@@ -26,10 +26,10 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
     create(SelectGrammar, selection)
   }
 
-  override def getResolvedDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
+  override def getScopeDeclarationForShape(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
     val memberSelector: MemberSelector[NodePath] = expression
     val target = memberSelector.target
-    val targetDeclaration = resolvedToDeclaration.get(compilation, target.shape).getResolvedDeclaration(compilation, builder, target, scope)
+    val targetDeclaration = getScopeDeclaration(compilation, builder, target, scope)
     val result = builder.declarationVariable()
 
     val targetScope = builder.scopeVariable()
@@ -42,11 +42,14 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
 
   object SelectGrammar extends GrammarKey
 
-  def getResolvedToDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope) : Declaration = {
-    resolvedToDeclaration.get(compilation, expression.shape).getResolvedDeclaration(compilation,builder,expression,scope)
+  def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
+    namespaceReferences.get(compilation).get(expression.shape).fold({
+      val _type = ExpressionSkeleton.getType(compilation, builder, expression, scope)
+      builder.getDeclarationOfType(_type)
+    })(hasResolvedToDeclaration => hasResolvedToDeclaration.getScopeDeclarationForShape(compilation,builder,expression,scope))
   }
 
-  val resolvedToDeclaration: ShapeProperty[ResolvesToDeclaration] = new ShapeProperty[ResolvesToDeclaration]
+  val namespaceReferences: ShapeProperty[ResolvesToDeclaration] = new ShapeProperty[ResolvesToDeclaration]
 
   object Shape extends NodeShape
 

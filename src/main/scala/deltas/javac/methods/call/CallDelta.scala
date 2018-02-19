@@ -32,9 +32,8 @@ object CallDelta
     new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
   }
 
-  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: Call[NodePath], parentScope: Scope,
+  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, callArguments: Seq[NodePath], parentScope: Scope,
                       methodReference: Reference, returnType: Type): Unit = {
-    val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
     val functionType = FunctionType.curry(callTypes, returnType)
     builder.add(new ResolvesToType(methodReference, builder.declarationVariable(), functionType))

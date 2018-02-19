@@ -5,16 +5,24 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.Reference
+import core.smarts.scopes.ReferenceInScope
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
-import deltas.bytecode.types.UnqualifiedObjectTypeDelta
+import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.constructor.SuperCallExpression.constructorName
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta.CallArguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
 object NewDelta extends ExpressionInstance {
+
+  override def description: String = "Enables using the new keyword to create a new object."
 
   object Shape extends NodeShape
   object Type extends NodeField
@@ -56,5 +64,14 @@ object NewDelta extends ExpressionInstance {
       Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }
 
-  override def description: String = "Enables using the new keyword to create a new object."
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val call: NewCall[NodePath] = expression
+    val constraintType = TypeSkeleton.getType(compilation, builder, call._type, parentScope)
+    val classDeclaration = builder.getDeclarationOfType(constraintType)
+    val classScope = builder.getDeclaredScope(classDeclaration)
+
+    val constructorReference = new Reference(constructorName, Some(call))
+    builder.add(ReferenceInScope(constructorReference, classScope))
+    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, constructorReference, VoidTypeDelta.constraintType)
+  }
 }

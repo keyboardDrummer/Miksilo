@@ -51,9 +51,9 @@ object LocalDeclarationDelta extends StatementInstance {
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
     val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
     val _type = localDeclaration._type
-    JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
+    JavaClassSkeleton.fullyQualify(localDeclaration._type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
-    Map(name -> _type)
+    Map(name -> localDeclaration._type)
   }
 
   override def description: String = "Enables declaring a local variable."

@@ -12,10 +12,10 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.classes.skeleton.{ClassMemberDelta, ClassSignature, HasDeclaration, JavaClassSkeleton}
+import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 
-object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration {
+object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraints {
 
   object Shape extends NodeShape
   object Type extends NodeField
@@ -96,4 +96,9 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
     val field: Field[NodePath] = path
     builder.declare(field.name, path.asInstanceOf[ChildPath], parentScope, Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
   }
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+  }
+
+  override def shape: NodeShape = Shape
 }
