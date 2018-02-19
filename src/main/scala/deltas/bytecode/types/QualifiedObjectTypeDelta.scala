@@ -27,7 +27,7 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    val parseQualifiedClassName = identifier ~< "." ~ identifier.someSeparated(".").
+    val parseQualifiedClassName = (identifier ~< "." ~ identifier.someSeparated(".")).
       map[(String, Seq[String]), QualifiedClassName](
         p => QualifiedClassName(Seq(p._1) ++ p._2),
         qualifiedClassName => (qualifiedClassName.parts.head, qualifiedClassName.parts.tail))
