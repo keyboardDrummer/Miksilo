@@ -26,4 +26,6 @@ class ResolvesToType(reference: Reference, declaration: Declaration, var _type: 
     _type = _type.instantiateType(variable, instance)
     super.instantiateType(variable, instance)
   }
+
+  override def boundTypes: Set[Type] = Set(_type)
 }

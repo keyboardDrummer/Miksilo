@@ -6,11 +6,11 @@ import core.smarts.types.objects.{Type, TypeVariable}
 
 case class CheckSubType(var subType: Type, var superType: Type) extends TypeConstraint {
   override def apply(solver: ConstraintSolver): Boolean = subType match {
-//    case v:TypeVariable =>
-//      if (!solver.boundVariables.contains(v))
-//        solver.unifyTypes(subType, superType)
-//      else
-//        false
+    case v:TypeVariable =>
+      if (!solver.boundVariables.contains(v))
+        solver.unifyTypes(subType, superType)
+      else
+        false
     case _ => solver.isSuperType(superType, subType)
   }
 
@@ -24,6 +24,6 @@ case class CheckSubType(var subType: Type, var superType: Type) extends TypeCons
     superType = superType.instantiateType(variable, instance)
   }
 
-  override def boundTypes: Set[Type] = Set(subType, superType)
+  override def boundTypes: Set[Type] = Set.empty
 }
 
