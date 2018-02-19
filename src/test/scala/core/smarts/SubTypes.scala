@@ -170,13 +170,13 @@ class SubTypes extends FunSuite with LanguageWriter {
     Checker.check(program)
   }
 
-  test("succeed function subtyping") {
-    val structParent = Struct("parent", Seq("x" of IntType))
-    val structChild = Struct("child", Seq("y" of IntType), Some("parent"))
-    val newChild = New("child", Seq("x" is 3, "y" is 2))
-    val takesChild = Lambda("child", Variable("child"), Some(new StructType("child")))
-    val takesParent = Lambda("parent", Variable("parent"), Some(new StructType("parent")))
-    val takesFunction = Lambda("x", Variable("x").apply(newChild).access("x"), Some(FunctionLanguageType(new StructType("child"), new StructType("parent"))))
+  test("succeed function subtyping") { //TODO The struct names must currently be different from the variable, otherwise the resolves get multiple hits. We need some type/kind checking in the resolve to allow name overloading.
+    val structParent = Struct("parentStruct", Seq("x" of IntType))
+    val structChild = Struct("childStruct", Seq("y" of IntType), Some("parentStruct"))
+    val newChild = New("childStruct", Seq("x" is 3, "y" is 2))
+    val takesChild = Lambda("child", Variable("child"), Some(new StructType("childStruct")))
+    val takesParent = Lambda("parent", Variable("parent"), Some(new StructType("parentStruct")))
+    val takesFunction = Lambda("x", Variable("x").apply(newChild).access("x"), Some(FunctionLanguageType(new StructType("childStruct"), new StructType("parentStruct"))))
     val structUse = Binding("structUse", Let("takesFunction", takesFunction,
       Add(Variable("takesFunction") $ takesChild,
         Variable("takesFunction") $ takesParent)), Some(IntType))

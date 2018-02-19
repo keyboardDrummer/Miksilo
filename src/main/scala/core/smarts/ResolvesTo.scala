@@ -24,6 +24,8 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       solver.proofs.resolutions += reference -> resolvedDeclaration
       true
     }
+    else if (declarations.length > 1)
+      false
     else
       false
   }
