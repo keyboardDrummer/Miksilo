@@ -4,13 +4,13 @@ import core.deltas.DeltaWithPhase
 import core.language.node.Node
 import core.language.Compilation
 import deltas.bytecode.types.UnqualifiedObjectTypeDelta
-import deltas.javac.types.TypeVariable
+import deltas.javac.types.TypeVariableDelta
 
 object ClassifyTypeIdentifiers extends DeltaWithPhase {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     program.visit(node => node.shape match {
-      case TypeVariable.Shape =>
-        val objectType = UnqualifiedObjectTypeDelta.neww(TypeVariable.getTypeVariableName(node))
+      case TypeVariableDelta.Shape =>
+        val objectType = UnqualifiedObjectTypeDelta.neww(TypeVariableDelta.getTypeVariableName(node))
         node.replaceWith(objectType)
       case _ =>
     })

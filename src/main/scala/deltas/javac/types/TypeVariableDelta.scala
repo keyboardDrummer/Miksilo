@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{HasType, TypeSkeleton}
 
-object TypeVariable extends DeltaWithGrammar with HasType {
+object TypeVariableDelta extends DeltaWithGrammar with HasType {
 
   override def description: String = "Adds references to type variables."
 
@@ -36,7 +36,7 @@ object TypeVariable extends DeltaWithGrammar with HasType {
   }
 
   def getTypeVariableName(node: Node): String = {
-    node(TypeVariable.TypeVariableName).asInstanceOf[String]
+    node(TypeVariableDelta.TypeVariableName).asInstanceOf[String]
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
