@@ -21,18 +21,26 @@ class MiksiloTextEditor(server: LanguageServer, document: RSyntaxDocument) exten
     Position(offset)
   }
 
+
+  var gotoDefinitionItem: JMenuItem = _
+  override def createPopupMenu(): JPopupMenu = {
+    val popupMenu = super.createPopupMenu()
+
+    popupMenu.addSeparator()
+    gotoDefinitionItem = new JMenuItem("Go to definition")
+    gotoDefinitionItem.addActionListener((e: event.ActionEvent) => {
+      val position = server.go(currentPosition)
+      MiksiloTextEditor.this.getCaret.setDot(position.end.offset)
+      MiksiloTextEditor.this.getCaret.moveDot(position.start.offset)
+    })
+    popupMenu.add(gotoDefinitionItem)
+    popupMenu
+  }
+
   override def configurePopupMenu(popupMenu: JPopupMenu): Unit = {
     super.configurePopupMenu(popupMenu)
 
-    if (server.isReference(currentPosition)) {
-      popupMenu.addSeparator()
-      val newChoice = new JMenuItem("Go to definition")
-      newChoice.addActionListener((e: event.ActionEvent) => {
-        val position = server.go(currentPosition)
-        MiksiloTextEditor.this.getCaret.setDot(position.end.offset)
-        MiksiloTextEditor.this.getCaret.moveDot(position.start.offset)
-      })
-    }
+    gotoDefinitionItem.setEnabled(server.isReference(currentPosition))
   }
 }
 

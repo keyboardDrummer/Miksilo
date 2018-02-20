@@ -4,20 +4,14 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import core.deltas._
-import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, SourceRange}
+import core.language.exceptions.BadInputException
+import core.language.node.Node
 import core.smarts.ConstraintBuilder
 
 import scala.collection.mutable
 import scala.reflect.io.File
 import scala.util.Try
-import scala.util.parsing.input.Position
-
-trait GotoDefinition {
-}
-
-trait GetProofs
 
 class Language {
 
