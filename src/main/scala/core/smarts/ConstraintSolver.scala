@@ -14,7 +14,9 @@ case class CouldNotApplyConstraints(constraints: Seq[Constraint]) extends SolveE
   override def toString: String = s"Left with constraints: $constraints"
 }
 
-
+case class MaxCycleCountReached(max: Int) extends SolveException {
+  override def toString: String = "Max cycle count reached"
+}
 
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
@@ -54,6 +56,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       }
       if (constraints.isEmpty)
         Success(())
+      else if (cycleCount == maxCycles)
+        Failure(MaxCycleCountReached(maxCycles))
       else
         Failure(CouldNotApplyConstraints(constraints))
     } catch {
@@ -67,9 +71,9 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def cycle() : Boolean = {
     var progress = false
     val remainingConstraints = constraints.filter(constraint => {
-      val result = !constraint.apply(this)
-      progress |= result
-      result
+      val applied = constraint.apply(this)
+      progress |= applied
+      !applied
     })
     generatedConstraints ++= builder.getConstraints //TODO add a test for this line.
     progress |= generatedConstraints.nonEmpty

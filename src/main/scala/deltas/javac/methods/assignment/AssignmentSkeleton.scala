@@ -76,6 +76,6 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     val target = getAssignmentTarget(assignment)
     val targetType = ExpressionSkeleton.getType(compilation, builder, target, parentScope)
     builder.typesAreEqual(targetType, _type)
-    builder.checkSubType(targetType, valueType)
+    builder.isFirstSubsetOfSecond(valueType, targetType)
   }
 }

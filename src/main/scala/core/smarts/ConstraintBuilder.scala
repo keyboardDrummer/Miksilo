@@ -67,10 +67,10 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def getCommonSuperType(first: Type, second: Type): Type = {
+  def getCommonSuperType(first: Type, second: Type): Type = { //TODO this doesn't actually work, because it won't find the superType. We need a separate constraint.
     val superType = typeVariable()
-    checkSubType(superType, first)
-    checkSubType(superType, second)
+    isFirstSubsetOfSecond(first, superType)
+    isFirstSubsetOfSecond(second, superType)
     superType
   }
 
@@ -125,7 +125,7 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def checkSubType(superType: Type, subType: Type): Unit = {
+  def isFirstSubsetOfSecond(subType: Type, superType: Type): Unit = {
     add(CheckSubType(subType, superType))
   }
 

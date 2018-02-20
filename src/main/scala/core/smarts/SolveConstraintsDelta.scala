@@ -29,5 +29,5 @@ object SolveConstraintsDelta extends Delta {
     override def toString: String = solveException.toString
   }
 
-  override def description: String = "Adds the go to definition capability"
+  override def description: String = "Solves the semantic constraints"
 }

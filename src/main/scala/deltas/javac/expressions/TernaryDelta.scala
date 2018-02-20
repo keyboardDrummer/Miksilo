@@ -95,7 +95,7 @@ object TernaryDelta extends ExpressionInstance {
     val trueType = ExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
     val falseType = ExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
 
-    builder.checkSubType(_type, trueType)
-    builder.checkSubType(_type, falseType)
+    builder.typesAreEqual(trueType, _type) //TODO should also be isFirstSubsetOfSecond but then there has to be a mechanism to determine the superSet type. I guess we need a constraint for that. Use builder.getCommonSuperType
+    builder.isFirstSubsetOfSecond(falseType, _type)
   }
 }
