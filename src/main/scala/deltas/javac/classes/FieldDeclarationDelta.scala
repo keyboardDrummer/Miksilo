@@ -15,7 +15,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 
-object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraints {
+object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraintsDelta {
 
   object Shape extends NodeShape
   object Type extends NodeField

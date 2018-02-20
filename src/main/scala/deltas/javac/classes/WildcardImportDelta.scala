@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.BasicImportDelta._
 import deltas.javac.classes.skeleton._
 
-object WildcardImportDelta extends DeltaWithGrammar with HasConstraints {
+object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
 

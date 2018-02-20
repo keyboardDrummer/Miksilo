@@ -7,9 +7,9 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.javac.classes.skeleton.{HasConstraints, JavaClassSkeleton, QualifiedClassName}
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassSkeleton, QualifiedClassName}
 
-object BasicImportDelta extends DeltaWithGrammar with HasConstraints {
+object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
 

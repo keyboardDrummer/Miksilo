@@ -12,7 +12,7 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry with ResolvesToDeclaration {
+object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry with IsNamespaceOrObjectExpression {
 
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def member: String = node(Member).asInstanceOf[String]
@@ -26,14 +26,11 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
     create(SelectGrammar, selection)
   }
 
-  override def getScopeDeclarationForShape(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
+  override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
     val memberSelector: MemberSelector[NodePath] = expression
     val target = memberSelector.target
-    val targetDeclaration = getScopeDeclaration(compilation, builder, target, scope)
     val result = builder.declarationVariable()
-
-    val targetScope = builder.scopeVariable()
-    builder.add(SelectorTargetScopeConstraint(targetDeclaration, targetScope))
+    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
     builder.reference(memberSelector.member, expression.getLocation(Member), targetScope, result)
     result
   }
@@ -41,15 +38,6 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
   override def shape: NodeShape = Shape
 
   object SelectGrammar extends GrammarKey
-
-  def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
-    namespaceReferences.get(compilation).get(expression.shape).fold({
-      val _type = ExpressionSkeleton.getType(compilation, builder, expression, scope)
-      builder.getDeclarationOfType(_type)
-    })(hasResolvedToDeclaration => hasResolvedToDeclaration.getScopeDeclarationForShape(compilation,builder,expression,scope))
-  }
-
-  val namespaceReferences: ShapeProperty[ResolvesToDeclaration] = new ShapeProperty[ResolvesToDeclaration]
 
   object Shape extends NodeShape
 

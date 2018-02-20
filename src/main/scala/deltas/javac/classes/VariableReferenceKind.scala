@@ -8,10 +8,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{MemberSelectorDelta, ResolvesToDeclaration, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, IsNamespaceOrObjectExpression, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
-object VariableReferenceKind extends Delta with ResolvesToDeclaration {
+object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
   override def inject(language: Language): Unit = {
     super.inject(language)
     MemberSelectorDelta.getReferenceKindRegistry(language).put(Shape, (compilation, variable) => {
@@ -40,7 +40,7 @@ object VariableReferenceKind extends Delta with ResolvesToDeclaration {
 
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 
-  override def getScopeDeclarationForShape(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
+  override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
     //TODO this is incomplete. Does not compare to the getReferenceKind.
   }

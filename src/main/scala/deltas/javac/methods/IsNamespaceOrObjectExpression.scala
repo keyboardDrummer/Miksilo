@@ -7,11 +7,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 
-trait ResolvesToDeclaration extends Delta with HasShape {
-  def getScopeDeclarationForShape(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration
+trait IsNamespaceOrObjectExpression extends Delta with HasShape {
+  def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    MemberSelectorDelta.namespaceReferences.add(language, this)
+    NamespaceOrObjectExpression.namespaceOrObjectExpression.add(language, this)
   }
 }

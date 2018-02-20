@@ -51,7 +51,7 @@ A declaration can declare a scope.
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def declarations: Seq[DeclarationNode] = this.keys.collect({case x: DeclarationNode => x}).toSeq
-  def findReference(location: SourceElement): Option[Reference] = {
+  def findReference(location:  SourceElement): Option[Reference] = {
     val references = this.keys.collect({ case n: ReferenceNode => n.reference })
     references.find(n => n.origin.map(x => x.position).contains(location.position))
   }

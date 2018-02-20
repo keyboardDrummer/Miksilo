@@ -14,7 +14,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta.{Call, CallArgumentsGrammar}
-import deltas.javac.methods.{MemberSelectorDelta, SelectorTargetScopeConstraint}
+import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
 
 trait GenericCall extends ExpressionInstance {
@@ -67,12 +67,10 @@ trait GenericCall extends ExpressionInstance {
     val callCallee = call.callee
     val calleeTarget = callCallee.target
     val calleeMember = callCallee.member
-    val calleeTargetDeclaration = MemberSelectorDelta.getScopeDeclaration(compilation, builder, calleeTarget, parentScope)
 
     val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
-    val targetScope = builder.scopeVariable()
+    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, calleeTarget, parentScope)
     builder.add(ReferenceInScope(calleeReference, targetScope))
-    builder.add(SelectorTargetScopeConstraint(calleeTargetDeclaration, targetScope))
     CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
   }
 }

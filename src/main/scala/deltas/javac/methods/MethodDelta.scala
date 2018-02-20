@@ -4,8 +4,8 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
@@ -224,6 +224,10 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    getBodyScope(compilation, builder, path, parentScope)
+  }
+
+  def getBodyScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) = {
     val method: Method[NodePath] = path
     val bodyScope = builder.newScope(Some(parentScope), "methodBody")
     method.parameters.foreach(parameter => {
@@ -232,6 +236,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       builder.declare(name, parameter.getLocation(ParameterName), bodyScope, Some(parameterType))
     })
     BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
+    bodyScope
   }
 
   override def shape: NodeShape = Shape

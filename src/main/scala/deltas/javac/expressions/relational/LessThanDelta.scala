@@ -16,7 +16,7 @@ import deltas.javac.types.BooleanTypeDelta
 
 object LessThanDelta extends ExpressionInstance {
 
-  val shape = LessThanKey
+  val shape = Shape
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 
@@ -27,9 +27,9 @@ object LessThanDelta extends ExpressionInstance {
     firstInstructions ++ secondInstructions ++ Seq(LessThanInstructionDelta.lessThanInstruction)
   }
 
-  def getFirst[T <: NodeLike](lessThan: T) = lessThan(LessThanFirst).asInstanceOf[T]
+  def getFirst[T <: NodeLike](lessThan: T) = lessThan(First).asInstanceOf[T]
 
-  def getSecond[T <: NodeLike](lessThan: T) = lessThan(LessThanSecond).asInstanceOf[T]
+  def getSecond[T <: NodeLike](lessThan: T) = lessThan(Second).asInstanceOf[T]
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     val getType = ExpressionSkeleton.getType(compilation)
@@ -43,24 +43,25 @@ object LessThanDelta extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
-    val parseLessThan = ((relationalGrammar.as(LessThanFirst) ~~< "<") ~~ relationalGrammar.as(LessThanSecond)).asNode(LessThanKey)
+    val parseLessThan = ((relationalGrammar.as(First) ~~< "<") ~~ relationalGrammar.as(Second)).asNode(Shape)
     relationalGrammar.addOption(parseLessThan)
   }
 
-  def lessThan(first: Node, second: Node) = new Node(LessThanKey, LessThanFirst -> first, LessThanSecond -> second)
+  def lessThan(first: Node, second: Node) = new Node(Shape, First -> first, Second -> second)
 
-  object LessThanKey extends NodeShape
+  object Shape extends NodeShape
 
-  object LessThanFirst extends NodeField
+  object First extends NodeField
 
-  object LessThanSecond extends NodeField
+  object Second extends NodeField
 
   override def description: String = "Adds the < operator."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType. Share code with other comparisons.
-    //    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
-    //    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
+    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    builder.typesAreEqual(firstType, secondType)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
   }
 }

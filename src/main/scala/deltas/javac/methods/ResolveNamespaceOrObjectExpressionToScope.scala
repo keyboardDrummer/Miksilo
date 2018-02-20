@@ -7,7 +7,7 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintSolver}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 
-case class SelectorTargetScopeConstraint(var targetDeclaration: Declaration, var scope: Scope) extends Constraint {
+case class ResolveNamespaceOrObjectExpressionToScope(var targetDeclaration: Declaration, var scope: Scope) extends Constraint {
   override def apply(solver: ConstraintSolver): Boolean = {
     targetDeclaration match {
       case e:NamedDeclaration =>

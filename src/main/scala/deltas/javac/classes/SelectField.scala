@@ -12,7 +12,7 @@ import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.methods.MemberSelectorDelta._
 
 object SelectField extends ExpressionInstance {
@@ -60,8 +60,7 @@ object SelectField extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {
     val target = selector.target
-    val scopeDeclaration = MemberSelectorDelta.getScopeDeclaration(compilation, builder, target, parentScope)
-    val scope = builder.getDeclaredScope(scopeDeclaration)
+    val scope = NamespaceOrObjectExpression.getScope(compilation, builder, target, parentScope)
     val member = selector.member
     builder.resolve(member, selector.getLocation(Member), scope, Some(_type))
   }
