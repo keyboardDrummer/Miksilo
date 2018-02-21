@@ -12,7 +12,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Enables using the non-iterator for loop."
 
-  override def dependencies: Set[Contract] = Set(WhileLoopDelta)
+  override def dependencies: Set[Contract] = Set(WhileLoopDelta, BlockAsStatementDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -30,14 +30,15 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     PathRoot(program).visitShape(Shape, path => transformForLoop(path))
   }
 
-  def transformForLoop(forLoopPath: NodePath): Unit = {
+  def transformForLoop(forLoopPath: NodePath): Unit = { //TODO binding resolution breaks down because of this, because the scope of the increment expression has changed from being just the body scope to being the method scope. We need to nest the new statements into a new block.
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementDelta.create(forLoop.increment))
     val _while = WhileLoopDelta.create(forLoop.condition, whileBody)
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
-    forLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
+    val block = BlockAsStatementDelta.Shape.create(BlockAsStatementDelta.Statements -> newStatements)
+    forLoopPath.asInstanceOf[SequenceElement].replaceWith(block)
   }
 
   implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {

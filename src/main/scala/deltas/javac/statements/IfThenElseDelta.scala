@@ -66,7 +66,7 @@ object IfThenElseDelta extends StatementInstance {
       super.getLabels(obj)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     IfThenDelta.constraints(compilation, builder, statement, parentScope)
     val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
     val elseBody = getElseStatements(statement)

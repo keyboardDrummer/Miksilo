@@ -34,7 +34,7 @@ object JustJavaGoto extends StatementInstance {
 
   override def description: String = "Adds a goto statement"
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val target = getTarget(statement)
     builder.resolve(target, statement, parentScope)
   }

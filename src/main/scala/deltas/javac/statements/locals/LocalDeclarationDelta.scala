@@ -58,7 +58,7 @@ object LocalDeclarationDelta extends StatementInstance {
 
   override def description: String = "Enables declaring a local variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
     builder.declare(statement.name, statement.getLocation(Name), parentScope, Some(_type))

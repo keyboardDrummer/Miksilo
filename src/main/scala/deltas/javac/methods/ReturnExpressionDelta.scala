@@ -47,7 +47,7 @@ object ReturnExpressionDelta extends StatementInstance {
     val statement = find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
-    statement.inner = statement.inner | returnExpression
+    statement.addOption(returnExpression)
   }
 
   def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
@@ -63,7 +63,7 @@ object ReturnExpressionDelta extends StatementInstance {
     returnToLines(_return, methodCompiler)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     ExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
   }
 }

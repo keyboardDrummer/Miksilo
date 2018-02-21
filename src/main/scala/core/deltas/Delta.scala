@@ -4,12 +4,11 @@ import core.language.node.Key
 import core.language.Language
 
 trait Delta extends Contract with Key {
+  def description: String
 
   def suffix = "Delta"
 
   def inject(language: Language): Unit = {  }
-
-  def description: String
 }
 
 object Delta {

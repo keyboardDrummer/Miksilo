@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
 import core.deltas._
+import core.deltas.path.{NodePath, SequenceElement}
 import core.language.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, NodePath, SequenceElement}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -25,7 +25,7 @@ trait StatementInstance extends DeltaWithGrammar with HasShape {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
 
-  def getNextLabel(statement: NodePath) = (statement, "next") //TODO volgens mij kan dit weg.
+  final def getNextLabel(statement: NodePath) = (statement, "next")
   def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = {
     val selection = obj.asInstanceOf[SequenceElement]
     if (selection.hasNext)
@@ -42,5 +42,5 @@ trait StatementInstance extends DeltaWithGrammar with HasShape {
 
   def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
 
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit
 }
