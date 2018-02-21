@@ -8,7 +8,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{MemberSelectorDelta, IsNamespaceOrObjectExpression, VariableDelta}
+import deltas.javac.methods.{GetScopeDeclarationForNamespaceOrObjectVariableDeclaration, IsNamespaceOrObjectExpression, MemberSelectorDelta, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
 object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
@@ -41,8 +41,11 @@ object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
-    builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
-    //TODO this is incomplete. Does not compare to the getReferenceKind.
+    val namespaceOrObjectVariableDeclaration =
+      builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
+    val result = builder.declarationVariable()
+    builder.add(GetScopeDeclarationForNamespaceOrObjectVariableDeclaration(namespaceOrObjectVariableDeclaration, result))
+    result
   }
 
   override def shape: NodeShape = Shape

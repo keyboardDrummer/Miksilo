@@ -29,9 +29,11 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
     val memberSelector: MemberSelector[NodePath] = expression
     val target = memberSelector.target
-    val result = builder.declarationVariable()
     val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
-    builder.reference(memberSelector.member, expression.getLocation(Member), targetScope, result)
+    val namespaceOrObjectVariableDeclaration =
+      builder.resolve(memberSelector.member, expression.getLocation(Member), targetScope)
+    val result = builder.declarationVariable()
+    builder.add(GetScopeDeclarationForNamespaceOrObjectVariableDeclaration(namespaceOrObjectVariableDeclaration, result))
     result
   }
 

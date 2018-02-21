@@ -11,7 +11,7 @@ import core.smarts.types._
 import scala.collection.mutable
 
 case class Copy(key: AnyRef, counter: Int)
-class ConstraintBuilder(factory: Factory) {
+class ConstraintBuilder(val factory: Factory) {
 
   var proofs: Proofs = null
 

@@ -11,10 +11,7 @@ import deltas.javac.expressions.ExpressionSkeleton
 object NamespaceOrObjectExpression {
 
   def getScope(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Scope = {
-    val scopeDeclaration = getScopeDeclaration(compilation, builder, expression, scope)
-    val targetScope = builder.scopeVariable()
-    builder.add(ResolveNamespaceOrObjectExpressionToScope(scopeDeclaration, targetScope))
-    targetScope
+    builder.getDeclaredScope(getScopeDeclaration(compilation, builder, expression, scope))
   }
 
   def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {

@@ -7,9 +7,10 @@ import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.TypeFromDeclaration
 import deltas.javac.classes.skeleton.{HasConstraints, JavaClassSkeleton}
+import deltas.javac.methods.VariableDelta
 import deltas.javac.methods.VariableDelta.{Name, Shape}
-import deltas.javac.methods.{MethodDelta, VariableDelta}
 
 object ThisVariableDelta extends DeltaWithGrammar
 {
@@ -22,13 +23,15 @@ object ThisVariableDelta extends DeltaWithGrammar
   }
 
   override def inject(language: Language): Unit = {
-    JavaClassSkeleton.hasConstraints.add(language, MethodDelta.Shape, new HasConstraints {
+    JavaClassSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-        val bodyScope = MethodDelta.getBodyScope(compilation, builder, path, parentScope)
-        val clazz: JavaClassSkeleton.JavaClass[NodePath] = path.findAncestorShape(JavaClassSkeleton.Shape)
+        val classScope = JavaClassSkeleton.getClassScope(compilation, builder, path, parentScope)
+        val clazz: JavaClassSkeleton.JavaClass[NodePath] = path
         val clazzName = clazz.name
-        val classDeclaration = builder.resolve(clazzName, path, parentScope)
-        builder.declare("this", path, bodyScope, Some(builder.getType(classDeclaration)))
+        val classDeclaration = builder.resolve(clazzName, path, classScope)
+        builder.declare("this",
+          path.getLocation(JavaClassSkeleton.ClassName), //This was first path and that failed.
+          classScope, Some(TypeFromDeclaration(classDeclaration)))
       }
     })
     super.inject(language)

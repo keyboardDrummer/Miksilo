@@ -18,7 +18,8 @@ case class DeclarationHasType(var declaration: Declaration, var _type: Type) ext
   override def boundTypes: Set[Type] = Set(_type)
 
   override def apply(solver: ConstraintSolver): Boolean = declaration match {
-    case named: NamedDeclaration => solver.declare(named, _type)
+    case named: NamedDeclaration =>
+      solver.declare(named, _type)
     case _ => false
   }
 }

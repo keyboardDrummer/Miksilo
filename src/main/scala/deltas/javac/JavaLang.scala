@@ -29,8 +29,7 @@ object JavaLang {
 
   val classPath = new PackageSignature(None, "")
 
-  def getProofs(compilation: Compilation, scope: Scope): Proofs = {
-    val factory = new Factory()
+  def getProofs(compilation: Compilation, factory: Factory, scope: Scope): Proofs = {
     val builder = new ConstraintBuilder(factory)
     for(clazz <- Seq(objectClass, stringClass, systemClass, printStreamClass)) {
       JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).

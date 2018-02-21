@@ -176,7 +176,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def unifyTypes(left: Type, right: Type): Boolean = (resolveType(left), resolveType(right)) match {
-    case (TypeVariable(nl), TypeVariable(nr)) if nl == nr => true
+    case (TypeVariable(nl, _), TypeVariable(nr, _)) if nl == nr => true
     case (v: TypeVariable,_) => instantiateType(v,right)
     case (_,v: TypeVariable) => instantiateType(v,left)
     case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)

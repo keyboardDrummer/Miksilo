@@ -24,7 +24,7 @@ import deltas.javac.statements.BlockDelta
 import scala.collection.mutable
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
-  with WithLanguageRegistry with WithCompilationState with HasDeclaration {
+  with WithLanguageRegistry with WithCompilationState with HasDeclaration with HasConstraints {
 
   override def description: String = "Defines a skeleton for the Java class."
 
@@ -175,21 +175,31 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val clazz: JavaClass[NodePath] = PathRoot(compilation.program)
-      val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
-      val classScope  = builder.getDeclaredScope(clazzDeclaration)
-
-      val proofs = JavaLang.getProofs(compilation, defaultPackageScope)
+      val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
-      for(_import <- clazz.imports)
-        this.hasConstraints.get(language, _import.shape).collectConstraints(compilation, builder, _import, classScope)
-
-      val members = clazz.members
-
-      members.foreach(member =>
-        this.hasConstraints.get(language, member.shape).collectConstraints(compilation, builder, member, classScope))
+      hasConstraints.get(compilation, Shape).collectConstraints(
+        compilation, builder, PathRoot(compilation.program), defaultPackageScope)
     }
     super.inject(language)
+  }
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Unit = {
+    getClassScope(compilation, builder, path, defaultPackageScope)
+  }
+
+  def getClassScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope) = {
+    val clazz: JavaClass[NodePath] = path
+    val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
+    val classScope = builder.getDeclaredScope(clazzDeclaration)
+    for (_import <- clazz.imports)
+      hasConstraints.get(compilation, _import.shape).collectConstraints(compilation, builder, _import, classScope)
+
+    val members = clazz.members
+
+    members.foreach(member =>
+      hasConstraints.get(compilation, member.shape).collectConstraints(compilation, builder, member, classScope))
+
+    classScope
   }
 }
