@@ -21,7 +21,7 @@ import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, In
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
 import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
@@ -66,7 +66,7 @@ object JavaLanguage {
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
     AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
+  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
   def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression

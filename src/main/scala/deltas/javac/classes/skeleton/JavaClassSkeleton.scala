@@ -23,6 +23,7 @@ import deltas.javac.statements.BlockDelta
 
 import scala.collection.mutable
 
+
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithLanguageRegistry with WithCompilationState with HasDeclaration with HasConstraints {
 

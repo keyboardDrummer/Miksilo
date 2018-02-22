@@ -8,7 +8,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{GetScopeDeclarationForNamespaceOrObjectVariableDeclaration, IsNamespaceOrObjectExpression, MemberSelectorDelta, VariableDelta}
+import deltas.javac.methods.{ResolveNamespaceOrObjectVariableAmbiguity, IsNamespaceOrObjectExpression, MemberSelectorDelta, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
 object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
@@ -44,7 +44,7 @@ object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
     val namespaceOrObjectVariableDeclaration =
       builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
     val result = builder.declarationVariable()
-    builder.add(GetScopeDeclarationForNamespaceOrObjectVariableDeclaration(namespaceOrObjectVariableDeclaration, result))
+    builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result
   }
 

@@ -8,8 +8,8 @@ import core.smarts.types.objects.TypeFromDeclaration
 import core.smarts.{Constraint, ConstraintSolver}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 
-case class GetScopeDeclarationForNamespaceOrObjectVariableDeclaration(var namespaceOrObjectVariableDeclaration: Declaration,
-                                                                      var scopeDeclaration: Declaration) extends Constraint {
+case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariableDeclaration: Declaration,
+                                                     var scopeDeclaration: Declaration) extends Constraint {
   override def apply(solver: ConstraintSolver): Boolean = {
     namespaceOrObjectVariableDeclaration match {
       case e:NamedDeclaration =>

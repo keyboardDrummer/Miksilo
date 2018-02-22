@@ -33,7 +33,7 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
     val namespaceOrObjectVariableDeclaration =
       builder.resolve(memberSelector.member, expression.getLocation(Member), targetScope)
     val result = builder.declarationVariable()
-    builder.add(GetScopeDeclarationForNamespaceOrObjectVariableDeclaration(namespaceOrObjectVariableDeclaration, result))
+    builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result
   }
 

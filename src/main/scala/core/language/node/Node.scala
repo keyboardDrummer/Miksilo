@@ -21,8 +21,10 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     shape = node.shape
-    if (!keepData)
+    if (!keepData) {
       data.clear()
+      sources.clear()
+    }
     data ++= node.data
   }
 
