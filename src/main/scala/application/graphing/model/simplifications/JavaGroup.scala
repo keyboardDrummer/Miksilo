@@ -2,12 +2,12 @@ package application.graphing.model.simplifications
 
 import core.deltas.Contract
 import deltas.javac._
-import deltas.javac.classes.{SelectorReferenceKind, VariableReferenceKind}
+import deltas.javac.classes.{MemberSelectorAsNamespaceReference, VariableAsNamespaceReference}
 import deltas.javac.constructor.{DefaultConstructorDelta, ImplicitSuperConstructorCall}
 
 object JavaGroup extends DeltaGroup {
   override def dependencies: Set[Contract] =
-    Set(ImplicitSuperConstructorCall, DefaultConstructorDelta, ImplicitObjectSuperClass, VariableReferenceKind, SelectorReferenceKind,
+    Set(ImplicitSuperConstructorCall, DefaultConstructorDelta, ImplicitObjectSuperClass, VariableAsNamespaceReference, MemberSelectorAsNamespaceReference,
     ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
 
   override def dependants: Set[Contract] = Set.empty

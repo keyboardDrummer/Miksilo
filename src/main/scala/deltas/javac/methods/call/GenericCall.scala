@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.call.CallDelta.{Call, CallArgumentsGrammar}
+import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
 
@@ -26,13 +26,13 @@ trait GenericCall extends ExpressionInstance {
     val core = find(ExpressionSkeleton.CoreGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
     val selectorGrammar = find(MemberSelectorDelta.SelectGrammar)
-    val calleeGrammar = create(CallDelta.CallCallee, selectorGrammar)
-    val callArguments = create(CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
-    val parseCall = calleeGrammar.as(CallDelta.CallCallee) ~ callArguments.as(CallDelta.CallArguments) asNode CallDelta.CallKey
+    val calleeGrammar = create(CallDelta.Callee, selectorGrammar)
+    val callArguments = create(CallDelta.CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
+    val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asNode CallDelta.Shape
     core.addOption(parseCall)
   }
 
-  override val shape = CallDelta.CallKey
+  override val shape = CallDelta.Shape
 
   override def getType(path: NodePath, compilation: Compilation): Node = {
     val call: Call[NodePath] = path

@@ -44,7 +44,7 @@ object BlockAsStatementDelta extends StatementInstance {
   override def getLabels(statement: NodePath): Map[Any, NodePath] = {
     val block: BlockStatement[NodePath] = statement
     val childStatements = block.statements
-    val nextMap: Map[Any, NodePath] = statement.asInstanceOf[SequenceElement].maybeNext.fold[Map[Any, NodePath]](
+    val nextMap: Map[Any, NodePath] = statement.asInstanceOf[SequenceElement].getNext.fold[Map[Any, NodePath]](
       Map.empty)(
       (next: NodePath) => Map(getNextLabel(childStatements.last) -> next))
     nextMap ++ super.getLabels(statement)

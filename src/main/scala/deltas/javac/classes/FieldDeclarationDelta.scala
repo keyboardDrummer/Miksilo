@@ -17,6 +17,8 @@ import deltas.javac.methods.AccessibilityFieldsDelta
 
 object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraintsDelta {
 
+  override def description: String = "Enables adding a field declaration without an initializer to a Java class."
+
   object Shape extends NodeShape
   object Type extends NodeField
   object Name extends NodeField
@@ -83,9 +85,6 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
       typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     memberGrammar.addOption(fieldGrammar)
   }
-
-  override def description: String = "Enables adding a field declaration without an initializer to a Java class."
-
 
   override def inject(language: Language): Unit = {
     super.inject(language)

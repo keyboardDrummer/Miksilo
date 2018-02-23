@@ -30,7 +30,7 @@ object ThisVariableDelta extends DeltaWithGrammar
         val clazzName = clazz.name
         val classDeclaration = builder.resolve(clazzName, path, classScope)
         builder.declare("this",
-          path.getLocation(JavaClassSkeleton.ClassName), //This was first path and that failed.
+          path.getLocation(JavaClassSkeleton.ClassName), //Initially this was just 'path', but that fails because then `this` is seen as a Class declaration.
           classScope, Some(TypeFromDeclaration(classDeclaration)))
       }
     })

@@ -8,7 +8,7 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
   def sequence: Seq[NodePath] = parent(field).asInstanceOf[Seq[NodePath]]
   def next: NodePath = sequence(index + 1)
   def hasNext: Boolean = sequence.length > (index + 1)
-  def maybeNext: Option[NodePath] = if (hasNext) Some(next) else None
+  def getNext: Option[NodePath] = if (hasNext) Some(next) else None
 
   def replaceWith(replacements: Seq[Any]): Unit = {
     val originalSequence = parent.current(field).asInstanceOf[Seq[NodePath]]

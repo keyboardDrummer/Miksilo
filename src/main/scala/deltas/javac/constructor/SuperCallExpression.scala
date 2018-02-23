@@ -30,7 +30,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta) ++ super.dependencies
 
-  def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.CallArguments -> arguments)
+  def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.Arguments -> arguments)
 
   override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
 
@@ -56,8 +56,8 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val callArguments = find(CallDelta.CallArgumentsGrammar)
-    val superCallGrammar = "super" ~> callArguments.as(CallDelta.CallArguments) asNode SuperCall
+    val callArguments = find(GenericCall.CallArgumentsGrammar)
+    val superCallGrammar = "super" ~> callArguments.as(CallDelta.Arguments) asNode SuperCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(superCallGrammar)
   }

@@ -68,7 +68,7 @@ object IfThenDelta extends StatementInstance {
   }
 
   override def getLabels(obj: NodePath): Map[Any, NodePath] = {
-    val nextMap = obj.asInstanceOf[SequenceElement].maybeNext.fold[Map[Any, NodePath]](Map.empty)(
+    val nextMap = obj.asInstanceOf[SequenceElement].getNext.fold[Map[Any, NodePath]](Map.empty)(
       next => Map(getNextLabel(getThenStatements(obj).last) -> next)
     ) //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     nextMap ++ super.getLabels(obj)

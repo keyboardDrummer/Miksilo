@@ -12,6 +12,6 @@ class TestCallC extends FunSuite {
     ExpressionSkeleton.inject(language)
     MemberSelectorDelta.inject(language)
     CallStaticOrInstanceDelta.inject(language)
-    assert(ExpressionSkeleton.getRegistry(language).instances.get(CallDelta.CallKey).nonEmpty)
+    assert(ExpressionSkeleton.getRegistry(language).instances.get(CallDelta.Shape).nonEmpty)
   }
 }

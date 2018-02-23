@@ -1,49 +1,18 @@
 package application.compilerCockpit
 
-import java.awt.{CardLayout, event}
+import java.awt.CardLayout
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.swing._
 
-import core.language.node.{Node, Position}
+import core.language.node.Node
 import core.language.{LanguageServer, NoSourceException, ParseException}
 import org.fife.ui.rsyntaxtextarea.parser._
-import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea, SyntaxConstants}
+import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane
 
 import scala.util.{Failure, Try}
-
-class MiksiloTextEditor(server: LanguageServer, document: RSyntaxDocument) extends RSyntaxTextArea(document) {
-
-  def currentPosition: Position = {
-    val offset = this.getCaret.getDot
-    Position(offset)
-  }
-
-
-  var gotoDefinitionItem: JMenuItem = _
-  override def createPopupMenu(): JPopupMenu = {
-    val popupMenu = super.createPopupMenu()
-
-    popupMenu.addSeparator()
-    gotoDefinitionItem = new JMenuItem("Go to definition")
-    gotoDefinitionItem.addActionListener((e: event.ActionEvent) => {
-      val position = server.go(currentPosition)
-      MiksiloTextEditor.this.getCaret.setDot(position.end.offset)
-      MiksiloTextEditor.this.getCaret.moveDot(position.start.offset)
-    })
-    popupMenu.add(gotoDefinitionItem)
-    popupMenu
-  }
-
-  override def configurePopupMenu(popupMenu: JPopupMenu): Unit = {
-    super.configurePopupMenu(popupMenu)
-
-    gotoDefinitionItem.setEnabled(server.isReference(currentPosition))
-  }
-}
-
 
 class EditorFromLanguage(server: LanguageServer) extends JPanel(new CardLayout()) {
 

@@ -7,8 +7,6 @@ import core.bigrammar.printer.Printer.NodePrinter
 import core.language.node.{NodeField, SourceRange}
 import core.responsiveDocument.ResponsiveDocument
 
-case class FieldPosition(field: NodeField)
-
 case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)

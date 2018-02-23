@@ -1,7 +1,5 @@
 package core.smarts.types.objects
 
-/*
- */
 object FunctionType {
 
   def curry(arguments: Seq[Type], initialResult: Type = null): Type = {

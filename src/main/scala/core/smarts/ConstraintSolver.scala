@@ -9,15 +9,6 @@ import core.smarts.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
-trait SolveException extends Exception
-case class CouldNotApplyConstraints(constraints: Seq[Constraint]) extends SolveException {
-  override def toString: String = s"Left with constraints: $constraints"
-}
-
-case class MaxCycleCountReached(max: Int) extends SolveException {
-  override def toString: String = "Max cycle count reached"
-}
-
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of
@@ -112,7 +103,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     allConstraints.foreach(c => c.instantiateType(variable, _type)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(variable, _type))
     true
-  }//Types and references toevoegen? Of Misschien een nieuwe environment van reference naar type? Of een nieuwe map van reference naar declaration? ja en ResolveTo werkt alleen als er een enkele declaration is. Voor overloading moet je een nieuwe constraint hebben.
+  }
 
   def instantiateScope(variable: ScopeVariable, scope: Scope): Unit = {
     allConstraints.foreach(c => c.instantiateScope(variable, scope))

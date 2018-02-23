@@ -11,7 +11,7 @@ import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{ResolveNamespaceOrObjectVariableAmbiguity, IsNamespaceOrObjectExpression, MemberSelectorDelta, VariableDelta}
 import deltas.javac.methods.VariableDelta.Shape
 
-object VariableReferenceKind extends Delta with IsNamespaceOrObjectExpression {
+object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
   override def inject(language: Language): Unit = {
     super.inject(language)
     MemberSelectorDelta.getReferenceKindRegistry(language).put(Shape, (compilation, variable) => {

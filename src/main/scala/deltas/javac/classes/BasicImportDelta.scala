@@ -25,7 +25,7 @@ object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 //    val classDeclaration = builder.resolve(elements.last, null, packageScope)
 //    val classExternalScope = builder.resolveScopeDeclaration(classDeclaration)
 //    builder.importScope(parentScope, classExternalScope) Eigenlijk een rename iets hier voor nodig.
-    throw new Exception("woeps")
+    ???
   }
 
   override def shape: NodeShape = Shape

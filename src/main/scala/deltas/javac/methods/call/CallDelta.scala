@@ -12,24 +12,24 @@ import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 
 object CallDelta
 {
-  object CallKey extends NodeShape
+  object Shape extends NodeShape
 
-  object CallCallee extends NodeField
+  object Callee extends NodeField
 
-  object CallArguments extends NodeField
+  object Arguments extends NodeField
 
   object CallArgumentsGrammar extends GrammarKey
 
   implicit class Call[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def callee: MemberSelector[T] = node(CallCallee).asInstanceOf[T]
-    def arguments: Seq[T] = NodeWrapper.wrapList(node(CallArguments).asInstanceOf[Seq[T]])
+    def callee: MemberSelector[T] = node(Callee).asInstanceOf[T]
+    def arguments: Seq[T] = NodeWrapper.wrapList(node(Arguments).asInstanceOf[Seq[T]])
   }
 
   def call(callee: Any, arguments: Any): Node =
     call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
   def call(callee: Node, arguments: Seq[Node] = Seq()): Node = {
-    new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
+    new Node(CallDelta.Shape, CallDelta.Callee -> callee, CallDelta.Arguments -> arguments)
   }
 
   def callConstraints(compilation: Compilation, builder: ConstraintBuilder, callArguments: Seq[NodePath], parentScope: Scope,

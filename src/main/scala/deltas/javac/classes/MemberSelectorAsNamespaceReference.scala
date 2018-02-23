@@ -2,12 +2,16 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.path.NodePath
-import core.language.Language
+import core.language.node.NodeShape
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.objects.Declaration
+import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.MemberSelectorDelta.{MemberSelector, Shape}
+import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, NamespaceOrObjectExpression, ResolveNamespaceOrObjectVariableAmbiguity}
+import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape}
 
-object SelectorReferenceKind extends Delta {
+object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
   override def inject(state: Language): Unit = {
@@ -32,6 +36,19 @@ object SelectorReferenceKind extends Delta {
         ClassOrObjectReference(fieldClassType, wasClass = false)
     }
   }
+
+  override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
+    val memberSelector: MemberSelector[NodePath] = expression
+    val target = memberSelector.target
+    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
+    val namespaceOrObjectVariableDeclaration =
+      builder.resolve(memberSelector.member, expression.getLocation(Member), targetScope)
+    val result = builder.declarationVariable()
+    builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
+    result
+  }
+
+  override def shape: NodeShape = Shape
 
   override def description: String = "Enables recognizing the kind of a selection, whether is a class, package or object."
 }

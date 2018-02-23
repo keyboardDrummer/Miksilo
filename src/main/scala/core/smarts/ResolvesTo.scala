@@ -18,7 +18,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
   def applyDeclarations(solver: ConstraintSolver, declarations: Seq[NamedDeclaration]): Boolean = {
     if (declarations.length == 1) {
       val resolvedDeclaration = declarations.head
-      if (!solver.unifyDeclarations(declaration, resolvedDeclaration)) //TODO maybe I don't need ResolvesToType, if I can store variableDeclaration's types.
+      if (!solver.unifyDeclarations(declaration, resolvedDeclaration)) //TODO maybe we don't need ResolvesToType. If we can store the type of a variable declaration, then we can replace ResolvesToType with ResolvesTo and DeclarationHasType.
         throw new IllegalStateException("what?!")
 
       solver.proofs.resolutions += reference -> resolvedDeclaration

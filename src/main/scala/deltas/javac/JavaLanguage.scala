@@ -50,7 +50,7 @@ object JavaLanguage {
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, SelectorReferenceKind, VariableReferenceKind) ++
+      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReference) ++
       Seq(ThisCallExpression, SuperCallExpression, ThisVariableDelta) ++ fields ++ imports ++
       javaMethod
   }

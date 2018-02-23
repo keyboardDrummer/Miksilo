@@ -10,7 +10,7 @@ class Proofs {
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
-  var resolutions = Map.empty[Reference, NamedDeclaration] //Hoe laat ik de method call completion case werken, zodat die al filtert op basis van de types?
+  var resolutions = Map.empty[Reference, NamedDeclaration]
 
   def resolveLocation(location: SourceElement): SourceElement = {
     val reference = scopeGraph.findReference(location).get

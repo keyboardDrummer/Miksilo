@@ -17,7 +17,7 @@ import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
-import deltas.javac.methods.call.CallDelta.CallArguments
+import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
 object NewDelta extends ExpressionInstance {
@@ -29,14 +29,14 @@ object NewDelta extends ExpressionInstance {
 
   implicit class NewCall[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
-    def arguments: Seq[T] = NodeWrapper.wrapList(node(CallArguments).asInstanceOf[Seq[T]])
+    def arguments: Seq[T] = NodeWrapper.wrapList(node(Arguments).asInstanceOf[Seq[T]])
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val objectGrammar = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
-    val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.CallArguments) asNode Shape
+    val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape
     val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)
     expressionGrammar.addOption(newGrammar)
   }
@@ -66,8 +66,9 @@ object NewDelta extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     val call: NewCall[NodePath] = expression
-    val constraintType = TypeSkeleton.getType(compilation, builder, call._type, parentScope)
-    val classDeclaration = builder.getDeclarationOfType(constraintType)
+    val classType = TypeSkeleton.getType(compilation, builder, call._type, parentScope)
+    val classDeclaration = builder.getDeclarationOfType(classType)
+    builder.typesAreEqual(classType, _type)
     val classScope = builder.getDeclaredScope(classDeclaration)
 
     val constructorReference = new Reference(constructorName, Some(call))

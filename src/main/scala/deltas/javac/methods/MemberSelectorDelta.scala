@@ -12,7 +12,7 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry with IsNamespaceOrObjectExpression {
+object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry {
 
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def member: String = node(Member).asInstanceOf[String]
@@ -25,19 +25,6 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry wi
     val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Shape
     create(SelectGrammar, selection)
   }
-
-  override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
-    val memberSelector: MemberSelector[NodePath] = expression
-    val target = memberSelector.target
-    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
-    val namespaceOrObjectVariableDeclaration =
-      builder.resolve(memberSelector.member, expression.getLocation(Member), targetScope)
-    val result = builder.declarationVariable()
-    builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
-    result
-  }
-
-  override def shape: NodeShape = Shape
 
   object SelectGrammar extends GrammarKey
 
