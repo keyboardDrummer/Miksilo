@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
@@ -15,9 +15,9 @@ object StringConstant extends ConstantEntry {
 
   def construct(index: Int) = new Node(StringKey, StringIndex -> index)
 
-  override def key = StringKey
+  override def shape = StringKey
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = PrintByteCode.byteToBytes(8) ++
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = PrintByteCode.byteToBytes(8) ++
     PrintByteCode.shortToBytes(constant(StringIndex).asInstanceOf[Int])
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {

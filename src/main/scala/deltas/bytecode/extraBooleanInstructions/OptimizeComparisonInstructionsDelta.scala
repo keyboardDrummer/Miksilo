@@ -67,10 +67,10 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   def findIntegerEqualsReplacement(second: Node): Option[Node] = {
     second.shape match {
-      case IfZeroDelta.key =>
+      case IfZeroDelta.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareNotEquals(target))
-      case IfNotZero.key =>
+      case IfNotZero.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareEquals(target))
       case _ => None
@@ -79,10 +79,10 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   def findNotReplacement(second: Node): Option[Node] = {
     second.shape match {
-      case IfZeroDelta.key =>
+      case IfZeroDelta.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifNotZero(target))
-      case IfNotZero.key =>
+      case IfNotZero.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifZero(target))
       case _ => None
@@ -91,10 +91,10 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   def findGreaterThanReplacement(second: Node): Option[Node] = {
     second.shape match {
-      case IfZeroDelta.key =>
+      case IfZeroDelta.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareLessEquals(target))
-      case IfNotZero.key =>
+      case IfNotZero.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareGreater(target))
       case _ => None
@@ -103,10 +103,10 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
   def findLessThanReplacement(second: Node): Option[Node] = {
     second.shape match {
-      case IfZeroDelta.key =>
+      case IfZeroDelta.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareGreaterEquals(target))
-      case IfNotZero.key =>
+      case IfNotZero.`shape` =>
         val target = LabelledLocations.getJumpInstructionLabel(second)
         Some(LabelledLocations.ifIntegerCompareLess(target))
       case _ => None

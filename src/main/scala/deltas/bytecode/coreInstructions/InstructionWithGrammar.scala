@@ -3,18 +3,18 @@ package deltas.bytecode.coreInstructions
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{GrammarKey, NodeShape}
-import core.deltas.DeltaWithGrammar
+import core.deltas.{DeltaWithGrammar, HasShape}
 import core.language.Language
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
 
 object ConstantPoolIndexGrammar extends GrammarKey
-trait InstructionWithGrammar extends DeltaWithGrammar
+trait InstructionWithGrammar extends DeltaWithGrammar with HasShape
 {
-  val key: NodeShape
+  val shape: NodeShape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val instructionGrammar = grammars.find(CodeAttributeDelta.InstructionGrammar)
-    instructionGrammar.addOption(grammars.create(key, getGrammarForThisInstruction(grammars)))
+    instructionGrammar.addOption(grammars.create(shape, getGrammarForThisInstruction(grammars)))
   }
 
   def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
@@ -28,6 +28,6 @@ trait InstructionWithGrammar extends DeltaWithGrammar
   def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
     val arguments = argumentsGrammar(grammars)
     import grammars._
-    (grammarName ~~> arguments).asNode(key)
+    (grammarName ~~> arguments).asNode(shape)
   }
 }

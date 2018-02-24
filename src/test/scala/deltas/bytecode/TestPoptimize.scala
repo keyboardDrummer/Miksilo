@@ -70,7 +70,7 @@ class TestPoptimize extends FunSuite {
 
   def transformInstructions(instructions: Seq[Node]): Seq[Node] = {
     val codeAnnotation = CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
-    val method = ByteCodeMethodInfo.MethodInfoKey.create(
+    val method = ByteCodeMethodInfo.Shape.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
       ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType,Seq.empty)),
       ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))

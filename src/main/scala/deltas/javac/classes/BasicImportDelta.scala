@@ -39,8 +39,8 @@ object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   def getParts(_import: Node) = _import(Elements).asInstanceOf[Seq[String]]
 
-  override def inject(state: Language): Unit = {
-    JavaClassSkeleton.getRegistry(state).importToClassMap.put(Shape, (compilation, _import) => {
+  override def inject(language: Language): Unit = {
+    JavaClassSkeleton.importToClassMap.add(language, Shape, (compilation, _import) => {
       val elements = getParts(_import)
       val packageParts = elements.dropRight(1)
       val importedClassName = elements.last
@@ -49,7 +49,7 @@ object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
       val result = Seq((importedClassName, qualifiedClassName)).toMap
       result
     })
-    super.inject(state)
+    super.inject(language)
   }
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton)

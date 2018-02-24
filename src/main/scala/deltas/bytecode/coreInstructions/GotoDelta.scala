@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions
 
 import core.language.node.Node
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta.JumpBehavior
@@ -10,9 +10,9 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object GotoDelta extends JumpInstruction {
 
-  def goTo(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
+  def goTo(target: Int): Node = CodeAttributeDelta.instruction(shape, Seq(target))
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     PrintByteCode.hexToBytes("a7") ++ PrintByteCode.shortToBytes(arguments(0))
   }

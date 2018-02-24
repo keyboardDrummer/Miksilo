@@ -4,15 +4,15 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.attributes.StackMapTableAttribute.StackMapFrameGrammar
-import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{InstructionInstance, InstructionSignature}
 
 import scala.collection.mutable
 
-object LabelDelta extends InstructionDelta {
+object LabelDelta extends InstructionInstance {
 
-  def LabelKey = key //TODO inline
+  def Shape = shape //TODO inline
 
   object Name extends NodeField
 
@@ -23,24 +23,24 @@ object LabelDelta extends InstructionDelta {
     def name: String = node(Name).asInstanceOf[String]
   }
 
-  def label(name: String, stackFrame: Node): Node = LabelKey.create(
+  def label(name: String, stackFrame: Node): Node = Shape.create(
     Name -> name,
     StackFrame -> stackFrame)
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = throw new UnsupportedOperationException()
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     InstructionSignature(Seq.empty, Seq.empty)
   }
 
-  override def getInstructionSize: Int = 0
+  override def getInstructionSize(compilation: Compilation): Int = 0
 
   def getNameGrammar: BiGrammar = RegexGrammar("""[\w<>\-]+""".r)
   override def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val stackMapFrameGrammar = find(StackMapFrameGrammar)
     grammarName ~~> getNameGrammar.as(Name) %
-      stackMapFrameGrammar.indent().as(StackFrame) asNode LabelKey
+      stackMapFrameGrammar.indent().as(StackFrame) asNode Shape
   }
 
   override def description: String = "Used to mark a specific point in an instruction list."

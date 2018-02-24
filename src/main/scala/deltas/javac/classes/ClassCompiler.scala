@@ -28,7 +28,7 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
     getState(compilation).classCompiler = this
     myPackage.content(className) = currentClassInfo
 
-    for (member <- getRegistry(compilation.language).members)
+    for (member <- members.get(compilation).values)
       member.bind(compilation, currentClassInfo, currentClass)
     getState(compilation).classCompiler = previous
   }
@@ -86,7 +86,7 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
 
   private def getClassMapFromImports(imports: Seq[Node]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
-      JavaClassSkeleton.getRegistry(compilation.language).importToClassMap(_import.shape)(compilation, _import)
+      JavaClassSkeleton.importToClassMap.get(compilation, _import.shape)(compilation, _import)
     }).toMap ++ Map(className -> JavaClassSkeleton.getQualifiedClassName(currentClass))
   }
 }

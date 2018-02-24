@@ -20,7 +20,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val constantPool = new ConstantPool()
     program.constantPool = constantPool
-    val fieldConstantTypesPerClass = ByteCodeSkeleton.getRegistry(compilation).constantReferences
+    val fieldConstantTypesPerClass = ByteCodeSkeleton.constantReferences.get(compilation)
 
     program.visit(afterChildren = extractReferencesInNode)
 
@@ -44,7 +44,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
   private def inlineConstantPoolReferences(language: Language): Unit = {
     import language.grammars._
-    val constantReferences = ByteCodeSkeleton.getRegistry(language).constantReferences
+    val constantReferences = ByteCodeSkeleton.constantReferences.get(language)
     val constantPoolIndexGrammar = find(ConstantPoolIndexGrammar)
     for (classWithConstantReferences <- constantReferences) {
       val shape: NodeShape = classWithConstantReferences._1
@@ -63,8 +63,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
-    for (entry <- ByteCodeSkeleton.getRegistry(language).constantEntries) {
-      val ignoreLeft = grammars.find(entry.key).find(p => p.value.isInstanceOf[IgnoreLeft]).get
+    for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
+      val ignoreLeft = grammars.find(entry.shape).find(p => p.value.isInstanceOf[IgnoreLeft]).get
       ignoreLeft.set(ignoreLeft.value.asInstanceOf[IgnoreLeft].sequence.second)
     }
   }

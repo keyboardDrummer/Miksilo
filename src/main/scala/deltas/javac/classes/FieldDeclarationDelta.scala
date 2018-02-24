@@ -65,7 +65,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
     val nameIndex = classCompiler.getNameIndex(field.name)
 
     field(ByteCodeFieldInfo.NameIndex) = nameIndex
-    field.shape = ByteCodeFieldInfo.FieldKey
+    field.shape = ByteCodeFieldInfo.Shape
 
     val fieldDescriptor = TypeConstant.constructor(field._type)
     field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor

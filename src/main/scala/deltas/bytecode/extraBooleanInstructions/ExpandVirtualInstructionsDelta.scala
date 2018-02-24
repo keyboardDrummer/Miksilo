@@ -1,21 +1,19 @@
 package deltas.bytecode.extraBooleanInstructions
 
 import core.deltas._
-import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Compilation
+import core.language.node.Node
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.attributes.CodeAttributeDelta
-import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttribute, Instructions}
+import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 
-object ExpandVirtualInstructionsDelta extends DeltaWithPhase with WithLanguageRegistry {
+object ExpandVirtualInstructionsDelta extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
-  class Registry {
-    val expandInstruction = new ShapeRegistry[ExpandInstruction]()
-  }
+  val expandInstruction = new ShapeProperty[ExpandInstruction]
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
 
@@ -27,14 +25,14 @@ object ExpandVirtualInstructionsDelta extends DeltaWithPhase with WithLanguageRe
     }
 
     def processCodeAnnotation(codeAnnotation: CodeAttribute[NodePath]): Unit = {
-      val methodInfo = codeAnnotation.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
+      val methodInfo = codeAnnotation.findAncestorShape(ByteCodeMethodInfo.Shape)
       val instructions = codeAnnotation.current.instructions
       val newInstructions: Seq[Node] = getNewInstructions(instructions, methodInfo)
       codeAnnotation(CodeAttributeDelta.Instructions) = newInstructions
     }
 
     def getNewInstructions(instructions: Seq[Node], methodInfo: Node): Seq[Node] = {
-      val expandInstructions = getRegistry(compilation.language).expandInstruction
+      val expandInstructions = expandInstruction.get(compilation)
       instructions.flatMap(instruction => {
         expandInstructions.get(instruction.shape).fold(
           Seq(instruction))(
@@ -44,6 +42,4 @@ object ExpandVirtualInstructionsDelta extends DeltaWithPhase with WithLanguageRe
   }
 
   override def description: String = "Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions."
-
-  override def createRegistry: Registry = new Registry()
 }

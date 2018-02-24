@@ -10,9 +10,9 @@ import deltas.bytecode.types.IntTypeDelta
 
 object IfIntegerCompareGreaterOrEqualDelta extends JumpInstruction {
 
-  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
+  def ifIntegerCompareGreater(target: Int): Node = CodeAttributeDelta.instruction(shape, Seq(target))
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     hexToBytes("a2") ++ shortToBytes(arguments.head)
   }

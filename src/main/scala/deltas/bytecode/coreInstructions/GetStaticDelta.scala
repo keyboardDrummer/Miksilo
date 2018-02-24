@@ -2,21 +2,21 @@ package deltas.bytecode.coreInstructions
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
+import core.language.node.{Node, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.constants.FieldRefConstant.FieldRefWrapper
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
-object GetStaticDelta extends InstructionDelta {
+object GetStaticDelta extends InstructionInstance {
 
   object FieldRef extends NodeField
 
-  def getStatic(fieldRefIndex: Any): Node = key.create(FieldRef -> fieldRefIndex)
+  def getStatic(fieldRefIndex: Any): Node = shape.create(FieldRef -> fieldRefIndex)
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = instruction(FieldRef).asInstanceOf[Int]
     hexToBytes("b2") ++ shortToBytes(arguments)
   }
@@ -29,9 +29,9 @@ object GetStaticDelta extends InstructionDelta {
     fieldRef.nameAndType._type.value
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(FieldRef -> FieldRefConstant.shape))
   }
 
   override def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
@@ -39,7 +39,7 @@ object GetStaticDelta extends InstructionDelta {
     find(ConstantPoolIndexGrammar).as(FieldRef)
   }
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(compilation: Compilation): Int = 3
 
   override def description: String = "Defines the getStatic instruction, which retrieves a value from a static field."
 

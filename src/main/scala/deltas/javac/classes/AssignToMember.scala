@@ -18,7 +18,7 @@ object AssignToMember extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, SelectField)
 
   override def inject(language: Language): Unit = {
-    AssignmentSkeleton.getRegistry(language).assignFromStackByteCodeRegistry.put(MemberSelectorDelta.Shape,
+    AssignmentSkeleton.hasAssignFromStackByteCode.add(language, MemberSelectorDelta.Shape,
       (compilation: Compilation, selector: NodePath) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelectorDelta.getClassOrObjectReference(selector, compiler)

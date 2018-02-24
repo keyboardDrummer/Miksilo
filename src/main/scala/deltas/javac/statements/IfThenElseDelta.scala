@@ -20,7 +20,7 @@ object IfThenElseDelta extends StatementInstance {
 
   override def toByteCode(ifThenElse: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
-    val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
+    val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.Shape)
     val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
     val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo)
     val endLabel = InferredStackFrames.label(endLabelName)

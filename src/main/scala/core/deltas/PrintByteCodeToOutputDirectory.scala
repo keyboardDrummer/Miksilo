@@ -7,8 +7,8 @@ import scala.reflect.io.File
 
 object PrintByteCodeToOutputDirectory {
 
-  def perform(outputFile: File, state: Compilation): Unit = {
-    val bytes = PrintByteCode.getBytes(state.program, state.language).toArray
+  def perform(outputFile: File, compilation: Compilation): Unit = {
+    val bytes = PrintByteCode.getBytes(compilation, compilation.program).toArray
     outputFile.createFile()
     val writer = outputFile.outputStream(append = false)
     writer.write(bytes)

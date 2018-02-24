@@ -9,11 +9,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object LongTypeDelta extends ByteCodeTypeInstance with StackType {
+object LongTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override val shape = LongTypeKey
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty
+  override def getSuperTypes(_type: Node): Seq[Node] = Seq.empty
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._

@@ -3,10 +3,10 @@ package deltas.bytecode
 import java.math.BigInteger
 
 import com.google.common.primitives.{Ints, Longs}
+import core.language.Compilation
 import core.language.node.Node
-import core.language.Language
-import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.bytecode.ByteCodeSkeleton._
+import deltas.javac.classes.skeleton.QualifiedClassName
 
 object PrintByteCode {
   def longToBytes(long: Long): scala.Seq[Byte] = Longs.toByteArray(long)
@@ -19,7 +19,7 @@ object PrintByteCode {
 
   val versionNumber: Seq[Byte] = intToBytes(0x00000033)
 
-  def getBytes(byteCode: Node, language: Language): Seq[Byte] = {
+  def getBytes(compilation: Compilation, byteCode: Node): Seq[Byte] = {
 
     val classFile = new ClassFile(byteCode)
     def getBytes(byteCode: Node): Seq[Byte] = {
@@ -39,28 +39,28 @@ object PrintByteCode {
       result ++= getInterfacesByteCode(classFile)
       result ++= getFieldsByteCode(classFile)
       result ++= getMethodsByteCode(classFile)
-      result ++= getAttributesByteCode(language, classFile.attributes)
+      result ++= getAttributesByteCode(compilation, classFile.attributes)
       result
     }
 
     def getMethodsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
       val methods = classFile.methods
       shortToBytes(methods.length) ++ methods.flatMap(method => {
-        ByteCodeSkeleton.getRegistry(language).getBytes(method.shape)(method)
+        ByteCodeSkeleton.getBytes(compilation, method)
       })
     }
 
     def getFieldsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
       val fields = classFile.fields
       PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
-        ByteCodeSkeleton.getRegistry(language).getBytes(field.shape)(field)
+        ByteCodeSkeleton.getBytes(compilation, field)
       })
     }
 
     def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
       entry match {
-        case metaEntry: Node => ByteCodeSkeleton.getRegistry(language).getBytes(metaEntry.shape)(metaEntry)
-        case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/"))
+        case metaEntry: Node => ByteCodeSkeleton.getBytes(compilation, metaEntry)
+        case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/")) //TODO is this still used?
         case utf8: String => toUTF8ConstantEntry(utf8)
       }
     }
@@ -95,11 +95,11 @@ object PrintByteCode {
 
   def getExceptionByteCode(exception: Node): Seq[Byte] = ???
 
-  def getAttributesByteCode(state: Language, attributes: Seq[Node]): Seq[Byte] = {
+  def getAttributesByteCode(compilation: Compilation, attributes: Seq[Node]): Seq[Byte] = {
 
     def getAttributeByteCode(attribute: Node): Seq[Byte] = {
       shortToBytes(ByteCodeSkeleton.getAttributeNameIndex(attribute)) ++
-        prefixWithIntLength(() => ByteCodeSkeleton.getRegistry(state).getBytes(attribute.shape)(attribute))
+        prefixWithIntLength(() => ByteCodeSkeleton.getBytes(compilation, attribute))
     }
 
     shortToBytes(attributes.length) ++ attributes.flatMap(attribute => getAttributeByteCode(attribute))

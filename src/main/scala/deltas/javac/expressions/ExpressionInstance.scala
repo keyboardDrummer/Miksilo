@@ -11,8 +11,8 @@ import core.smarts.types.objects.Type
 trait ExpressionInstance extends DeltaWithGrammar with HasShape {
 
   override def inject(language: Language): Unit = {
-    ExpressionSkeleton.getRegistry(language).instances.put(shape, this)
     super.inject(language)
+    ExpressionSkeleton.expressionInstances.add(language, this)
   }
 
   def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node]

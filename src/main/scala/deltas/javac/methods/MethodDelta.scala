@@ -89,7 +89,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
 
-    method.shape = ByteCodeMethodInfo.MethodInfoKey
+    method.shape = ByteCodeMethodInfo.Shape
     AccessibilityFieldsDelta.addAccessFlags(method)
     method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(Name)

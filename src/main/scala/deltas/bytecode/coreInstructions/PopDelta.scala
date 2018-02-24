@@ -1,16 +1,16 @@
 package deltas.bytecode.coreInstructions
 
 import core.language.node.{Node, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
-object PopDelta extends InstructionDelta {
+object PopDelta extends InstructionInstance {
 
-  def pop = CodeAttributeDelta.instruction(key)
+  def pop = CodeAttributeDelta.instruction(shape)
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("57")
   }
 

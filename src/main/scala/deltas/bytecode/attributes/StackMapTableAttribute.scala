@@ -5,7 +5,7 @@ import core.bigrammar.grammars.Keyword
 import core.deltas.Contract
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
@@ -66,15 +66,14 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   def sameFrame(offset: Int) = new Node(SameFrameKey, FrameOffset -> offset)
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).getBytes(Shape) = (attribute: Node) => getStackMapTableBytes(attribute, state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Shape, Map(AttributeNameKey -> Utf8ConstantDelta.key))
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(QualifiedObjectTypeDelta.StackType,
-      Map(QualifiedObjectTypeDelta.Name -> ClassInfoConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, Shape, Map(AttributeNameKey -> Utf8ConstantDelta.shape))
+    ByteCodeSkeleton.constantReferences.add(language, QualifiedObjectTypeDelta.StackType,
+      Map(QualifiedObjectTypeDelta.Name -> ClassInfoConstant.shape))
   }
 
-  def getStackMapTableBytes(attribute: Node, state: Language): Seq[Byte] = {
+  def getBytes(compilation: Compilation, attribute: Node): Seq[Byte] = {
 
     def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttribute.getFrameOffset(frame)
@@ -89,14 +88,14 @@ object StackMapTableAttribute extends ByteCodeAttribute {
         case StackMapTableAttribute.AppendFrame =>
           val localVerificationTypes = StackMapTableAttribute.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
-            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info, state))
+            shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info, compilation))
         case StackMapTableAttribute.SameLocals1StackItem =>
           val _type = StackMapTableAttribute.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
-            byteToBytes(code) ++ getVerificationInfoBytes(_type, state)
+            byteToBytes(code) ++ getVerificationInfoBytes(_type, compilation)
           } else {
-            byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type, state)
+            byteToBytes(247) ++ shortToBytes(offset) ++ getVerificationInfoBytes(_type, compilation)
           }
       }
     }
@@ -118,7 +117,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
     "Each stack from provides information on the current types on the stack and in the local registers." +
     "Given a frame at and the frames before it, all stack and local types are fully defined at the location of that frame."
 
-  override def key: Key = Shape
+  override def shape = Shape
 
   val offsetGrammarKey = KeyGrammar(FrameOffset)
   object StackMapFrameGrammar extends GrammarKey

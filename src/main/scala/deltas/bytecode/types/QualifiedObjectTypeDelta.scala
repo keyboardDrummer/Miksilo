@@ -12,7 +12,7 @@ import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.QualifiedClassName
 
-object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
+object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override val shape: Shape.type = Shape
 
@@ -21,7 +21,7 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with StackType {
   val stringType: Node = neww(QualifiedClassName(Seq("java", "lang", "String")))
   val rootObjectType: Node = neww(QualifiedClassName(Seq("java", "lang", "Object")))
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = {
+  override def getSuperTypes(_type: Node): Seq[Node] = {
     Seq.empty //TODO extend
   }
 

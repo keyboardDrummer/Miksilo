@@ -5,7 +5,7 @@ import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
+import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects

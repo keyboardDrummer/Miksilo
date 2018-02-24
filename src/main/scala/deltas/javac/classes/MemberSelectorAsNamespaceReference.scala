@@ -14,8 +14,8 @@ import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape}
 object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
   override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
 
-  override def inject(state: Language): Unit = {
-    MemberSelectorDelta.getReferenceKindRegistry(state).put(Shape, (compilation, selector) => {
+  override def inject(language: Language): Unit = {
+    MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, selector) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(selector, compiler)
     })

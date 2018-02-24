@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
@@ -36,21 +36,21 @@ object FieldRefConstant extends ConstantEntry {
     ClassInfo -> classIndex,
     NameAndType -> nameAndTypeIndex)
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     val fieldRef: FieldRefWrapper[Node] = constant
     byteToBytes(9) ++
       shortToBytes(fieldRef.classIndex) ++
       shortToBytes(fieldRef.nameAndTypeIndex)
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(
-      ClassInfo -> ClassInfoConstant.key,
-      NameAndType -> NameAndTypeConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(
+      ClassInfo -> ClassInfoConstant.shape,
+      NameAndType -> NameAndTypeConstant.shape))
   }
 
-  override def key = FieldRef
+  override def shape = FieldRef
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._

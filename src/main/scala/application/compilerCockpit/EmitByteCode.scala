@@ -7,8 +7,8 @@ import deltas.bytecode.PrintByteCode
 object EmitByteCode extends CompileOption {
 
   override def perform(cockpit: LanguageSandbox, input: InputStream): TextWithGrammar = {
-    val state = cockpit.language.parseAndTransform(input)
-    val bytes = PrintByteCode.getBytes(state.program, state.language).toArray
+    val compilation = cockpit.language.parseAndTransform(input)
+    val bytes = PrintByteCode.getBytes(compilation, compilation.program).toArray
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }
 

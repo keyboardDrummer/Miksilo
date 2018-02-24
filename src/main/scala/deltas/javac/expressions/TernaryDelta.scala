@@ -64,7 +64,7 @@ object TernaryDelta extends ExpressionInstance {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
-    val methodInfo = _ternary.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
+    val methodInfo = _ternary.findAncestorShape(ByteCodeMethodInfo.Shape)
     val falseLabelName = LabelDelta.getUniqueLabel("false", methodInfo)
     val falseTarget = InferredStackFrames.label(falseLabelName)
     val conditionalBranch = LabelledLocations.ifZero(falseLabelName)

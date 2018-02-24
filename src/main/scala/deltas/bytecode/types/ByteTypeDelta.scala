@@ -17,7 +17,7 @@ object ByteTypeDelta extends ByteCodeTypeInstance {
   override val shape = ByteTypeKey
   val me = new Node(ByteTypeKey)
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
+  override def getSuperTypes(_type: Node): Seq[Node] = ???
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._

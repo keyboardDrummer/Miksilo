@@ -1,16 +1,16 @@
 package deltas.bytecode.coreInstructions
 
 import core.language.node.Node
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object InvokeVirtualDelta extends InvokeDelta {
 
-  def invokeVirtual(methodRefIndex: Any) = key.create(MethodRef -> methodRefIndex)
+  def invokeVirtual(methodRefIndex: Any) = shape.create(MethodRef -> methodRefIndex)
 
-  override def getInstructionSize: Int = 3
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getInstructionSize(compilation: Compilation): Int = 3
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     hexToBytes("b6") ++ shortToBytes(instruction(MethodRef).asInstanceOf[Int])
   }
 

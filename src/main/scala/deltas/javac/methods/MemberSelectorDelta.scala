@@ -5,14 +5,11 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
-import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
-import core.smarts.scopes.objects.{Scope, ScopeVariable}
-import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry {
+object MemberSelectorDelta extends DeltaWithGrammar {
 
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def member: String = node(Member).asInstanceOf[String]
@@ -48,7 +45,7 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def getReferenceKind(classCompiler: ClassCompiler, expression: NodePath): ReferenceKind = {
-    val getReferenceKindOption = MemberSelectorDelta.getReferenceKindRegistry(classCompiler.compilation).get(expression.shape)
+    val getReferenceKindOption = MemberSelectorDelta.referenceKindRegistry.get(classCompiler.compilation).get(expression.shape)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(classCompiler.compilation, expression))
@@ -59,13 +56,7 @@ object MemberSelectorDelta extends DeltaWithGrammar with WithLanguageRegistry {
     ClassOrObjectReference(classInfo, wasClass = false)
   }
 
-  def getReferenceKindRegistry(language: Language) = getRegistry(language).referenceKindRegistry
-  class Registry {
-    val referenceKindRegistry = new ShapeRegistry[(Compilation, NodePath) => ReferenceKind]()
-    val getScope = new ShapeRegistry[(Compilation, ConstraintBuilder, NodePath, Scope) => Scope]()
-  }
-
-  override def createRegistry = new Registry()
+  val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
 
   override def description: String = "Defines the selector grammar <expression>.<identifier>"
 

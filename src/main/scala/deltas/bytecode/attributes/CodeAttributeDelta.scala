@@ -5,19 +5,19 @@ import core.bigrammar.grammars.Keyword
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.ClassFile
+import deltas.bytecode.ByteCodeSkeleton.{ClassFile, HasBytes}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta
-import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
-import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
+import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionInstance, InstructionSignature}
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
 object InstructionArgumentsKey extends NodeField
 
-object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
+object CodeAttributeDelta extends ByteCodeAttribute with HasBytes with HasShape {
 
   implicit class CodeAttribute[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def maxStack: Int = node(MaxStack).asInstanceOf[Int]
@@ -68,24 +68,22 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   case class JumpBehavior(movesToNext: Boolean, hasJumpInFirstArgument: Boolean)
 
-  def createRegistry = new Registry()
-  class Registry {
-    val instructions = new ShapeRegistry[InstructionDelta] //TODO make this registry obsolete by storing all the data in the NodeShape of the instruction.
-  }
+  val instructions = new ShapeProperty[InstructionInstance]
 
   val constantEntry: Node = Utf8ConstantDelta.create("Code")
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).getBytes(CodeKey) = attribute => getCodeAttributeBytes(attribute, state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(
-      AttributeNameKey -> Utf8ConstantDelta.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.hasBytes.add(language, CodeKey, this)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(
+      AttributeNameKey -> Utf8ConstantDelta.shape))
   }
 
-  def getCodeAttributeBytes(code: CodeAttribute[Node], state: Language): Seq[Byte] = {
+  def getBytes(compilation: Compilation, node: Node): Seq[Byte] = {
+    val code: CodeAttribute[Node] = node
 
     def getInstructionByteCode(instruction: Instruction[Node]): Seq[Byte] = {
-      ByteCodeSkeleton.getRegistry(state).getBytes(instruction.shape)(instruction)
+      ByteCodeSkeleton.getBytes(compilation, instruction)
     }
 
     val exceptionTable = code.exceptionTable
@@ -94,9 +92,8 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
       prefixWithIntLength(() => code.instructions.flatMap(getInstructionByteCode)) ++
       shortToBytes(exceptionTable.length) ++
       exceptionTable.flatMap(exception => getExceptionByteCode(exception)) ++
-      getAttributesByteCode(state, code.attributes)
+      getAttributesByteCode(compilation, code.attributes)
   }
-
 
   def getCodeAnnotations[T <: NodeLike](shape: ClassFile[T]): Seq[CodeAttribute[T]] = {
     shape.methods
@@ -118,7 +115,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with WithLanguageRegistry {
 
   object InstructionGrammar extends GrammarKey
 
-  override def key: NodeShape = CodeKey
+  override def shape: NodeShape = CodeKey
 
   object MaxStackGrammar extends GrammarKey
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {

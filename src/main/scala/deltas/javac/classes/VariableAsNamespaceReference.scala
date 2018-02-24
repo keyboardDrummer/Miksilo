@@ -12,9 +12,12 @@ import deltas.javac.methods.{ResolveNamespaceOrObjectVariableAmbiguity, IsNamesp
 import deltas.javac.methods.VariableDelta.Shape
 
 object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
+
+  override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
+
   override def inject(language: Language): Unit = {
     super.inject(language)
-    MemberSelectorDelta.getReferenceKindRegistry(language).put(Shape, (compilation, variable) => {
+    MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, variable) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       getReferenceKind(variable, compiler)
     })
@@ -37,8 +40,6 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
   }
 
   override def dependencies: Set[Contract] = Set(VariableDelta, JavaClassSkeleton)
-
-  override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     val namespaceOrObjectVariableDeclaration =

@@ -39,7 +39,7 @@ object MethodType extends ByteCodeTypeInstance {
 
   override def description: String = "Defines the method type."
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
+  override def getSuperTypes(_type: Node): Seq[Node] = ???
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure()
 

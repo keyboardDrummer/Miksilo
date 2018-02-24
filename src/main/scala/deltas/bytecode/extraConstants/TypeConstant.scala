@@ -3,9 +3,9 @@ package deltas.bytecode.extraConstants
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeLike, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
-import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodInfoKey, MethodNameIndex}
+import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, Shape, MethodNameIndex}
 import deltas.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
 import deltas.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import deltas.bytecode.types.TypeSkeleton
@@ -22,28 +22,28 @@ object TypeConstant extends ConstantEntry {
     def value_=(value: T): Unit = node(Type) = value
   }
 
-  override def key = Key
+  override def shape = Key
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     val _type: Node = constant(Type).asInstanceOf[Node]
-    val typeString = TypeSkeleton.getByteCodeString(state)(_type)
+    val typeString = TypeSkeleton.getByteCodeString(compilation)(_type)
     PrintByteCode.toUTF8ConstantEntry(typeString)
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    super.inject(language)
 
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(ByteCodeFieldInfo.FieldKey, Map(
-      NameIndex -> Utf8ConstantDelta.key,
-      DescriptorIndex -> TypeConstant.key))
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodInfoKey, Map(
-      MethodNameIndex -> Utf8ConstantDelta.key,
-      MethodDescriptor -> TypeConstant.key))
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodTypeConstant.key, Map(
-      MethodTypeDescriptorIndex -> TypeConstant.key))
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(NameAndTypeConstant.key, Map(
-      NameAndTypeConstant.Name -> Utf8ConstantDelta.key,
-      NameAndTypeConstant.Type -> TypeConstant.key))
+    ByteCodeSkeleton.constantReferences.add(language, ByteCodeFieldInfo.Shape, Map(
+      NameIndex -> Utf8ConstantDelta.shape,
+      DescriptorIndex -> TypeConstant.shape))
+    ByteCodeSkeleton.constantReferences.add(language, Shape, Map(
+      MethodNameIndex -> Utf8ConstantDelta.shape,
+      MethodDescriptor -> TypeConstant.shape))
+    ByteCodeSkeleton.constantReferences.add(language, MethodTypeConstant.shape, Map(
+      MethodTypeDescriptorIndex -> TypeConstant.shape))
+    ByteCodeSkeleton.constantReferences.add(language, NameAndTypeConstant.shape, Map(
+      NameAndTypeConstant.Name -> Utf8ConstantDelta.shape,
+      NameAndTypeConstant.Type -> TypeConstant.shape))
   }
 
   override def dependencies = Set(MethodTypeConstant, NameAndTypeConstant, ByteCodeMethodInfo, ByteCodeFieldInfo)

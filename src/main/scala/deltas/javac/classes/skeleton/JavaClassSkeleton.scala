@@ -3,14 +3,12 @@ package deltas.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.document.BlankLine
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
-import core.smarts.objects.{Declaration, NamedDeclaration}
-import core.smarts.scopes.DeclarationInsideScope
-import core.smarts.scopes.imports.DeclarationOfScope
+import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
@@ -25,7 +23,7 @@ import scala.collection.mutable
 
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
-  with WithLanguageRegistry with WithCompilationState with HasDeclaration with HasConstraints {
+  with WithCompilationState with HasDeclaration with HasConstraints {
 
   override def description: String = "Defines a skeleton for the Java class."
 
@@ -68,7 +66,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       program(ByteCodeSkeleton.ClassParentIndex) = parentRef
       program(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      for(member <- getRegistry(compilation).members)
+      for(member <- members.get(compilation).values)
         member.compile(compilation, javaClass.node)
 
       javaClass.node.data.remove(Members)
@@ -146,11 +144,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     ClassImports -> imports,
     ClassParent -> mbParent)
 
-  def createRegistry = new Registry()
-  class Registry {
-    var members = List.empty[ClassMemberDelta]
-    val importToClassMap = new ShapeRegistry[(Compilation, Node) => Map[String, QualifiedClassName]]()
-  }
+  val members = new ShapeProperty[ClassMemberDelta]
+  val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
   def createState = new State()
   class State {

@@ -16,7 +16,7 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MethodDelta
 import deltas.bytecode.types.TypeSkeleton
 
-object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
+object AssignmentSkeleton extends ExpressionInstance {
 
   def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
@@ -49,16 +49,17 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     ExpressionSkeleton.getType(compilation)(target)
   }
 
-  def createRegistry = new Registry()
-  class Registry {
-    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, NodePath) => Seq[Node]]
+  trait HasAssignFromStackByteCode {
+    def getAssignFromStackByteCode(compilation: Compilation, path: NodePath): Seq[Node]
   }
+
+  val hasAssignFromStackByteCode = new ShapeProperty[HasAssignFromStackByteCode]
 
   override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
-    val assignInstructions = getRegistry(compilation).assignFromStackByteCodeRegistry(target.shape)(compilation, target)
+    val assignInstructions = hasAssignFromStackByteCode.get(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
     val valueType = ExpressionSkeleton.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {
