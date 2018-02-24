@@ -47,8 +47,8 @@ class GotoDefinitionTest extends FunSuite {
     val indexDefinition = server.go(server.toPosition(10, 16))
     assertResult(SourceRange(server.toPosition(8,37), server.toPosition(8,42)))(indexDefinition)
 
-    val yDefinition = server.go(server.toPosition(5, 36))
-    val methodRange = SourceRange(server.toPosition(8, 5), server.toPosition(11, 6))
-    assertResult(methodRange)(yDefinition)
+    val fibonacciDefinition = server.go(server.toPosition(5, 36))
+    val methodRange = SourceRange(server.toPosition(8, 23), server.toPosition(8, 32))
+    assertResult(methodRange)(fibonacciDefinition)
   }
 }

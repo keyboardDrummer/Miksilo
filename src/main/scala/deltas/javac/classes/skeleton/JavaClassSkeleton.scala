@@ -34,8 +34,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]) = node(ClassImports) = value
 
-    def name: String = node(ClassName).asInstanceOf[String]
-    def name_=(value: String): Unit = node(ClassName) = value
+    def name: String = node(Name).asInstanceOf[String]
+    def name_=(value: String): Unit = node(Name) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
@@ -98,13 +98,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
-    val nameGrammar: BiGrammar = "class" ~~> identifier
+    val nameGrammar: BiGrammar = "class" ~~> identifier.as(Name)
     val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"
-    val nameAndParent: BiGrammar = nameGrammar.as(ClassName) ~~ classParentGrammar.as(ClassParent)
+    val nameAndParent: BiGrammar = nameGrammar ~~ classParentGrammar.as(ClassParent)
     val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Shape
     find(BodyGrammar).inner = classGrammar
   }
-
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
     val clazz: JavaClass[NodePath] = path
@@ -120,7 +119,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       })
     }
 
-    val clazzDeclaration = builder.declare(clazz.name, path, packageScope)
+    val clazzDeclaration = builder.declare(clazz.name, path.getLocation(Name), packageScope)
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members
@@ -140,7 +139,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     new Node(Shape,
     Members -> members,
     ClassPackage -> _package,
-    ClassName -> name,
+    Name -> name,
     ClassImports -> imports,
     ClassParent -> mbParent)
 
@@ -164,7 +163,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   object Members extends NodeField
 
-  object ClassName extends NodeField
+  object Name extends NodeField
 
   override def inject(language: Language): Unit = {
     hasDeclarations.add(language, Shape, this)

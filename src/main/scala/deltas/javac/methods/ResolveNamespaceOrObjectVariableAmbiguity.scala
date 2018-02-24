@@ -1,7 +1,7 @@
 package deltas.javac.methods
 
 import core.language.SourceElement
-import core.language.node.Node
+import core.language.node.FieldLocation
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import core.smarts.types.TypesAreEqual
 import core.smarts.types.objects.TypeFromDeclaration
@@ -13,11 +13,10 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
   override def apply(solver: ConstraintSolver): Boolean = {
     namespaceOrObjectVariableDeclaration match {
       case e:NamedDeclaration =>
-        val path = e.origin.asInstanceOf[SourceElement]
-        val value = path.current
+        val value = e.origin.asInstanceOf[SourceElement]
         value match {
-          case node: Node => node.shape match {
-            case JavaClassSkeleton.Shape => //TODO allow referencing packages.
+          case fieldLocation: FieldLocation => fieldLocation.field match {
+            case JavaClassSkeleton.Name => //TODO allow referencing packages.
               solver.unifyDeclarations(scopeDeclaration, namespaceOrObjectVariableDeclaration)
             case _ =>
               unifyObjectVariableDeclaration(solver)
