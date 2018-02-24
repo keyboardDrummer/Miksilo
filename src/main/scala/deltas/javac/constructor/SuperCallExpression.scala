@@ -56,7 +56,7 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val callArguments = find(GenericCall.CallArgumentsGrammar)
+    val callArguments = find(CallDelta.CallArgumentsGrammar)
     val superCallGrammar = "super" ~> callArguments.as(CallDelta.Arguments) asNode SuperCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(superCallGrammar)

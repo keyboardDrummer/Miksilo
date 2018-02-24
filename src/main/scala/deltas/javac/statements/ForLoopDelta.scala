@@ -30,7 +30,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     PathRoot(program).visitShape(Shape, path => transformForLoop(path))
   }
 
-  def transformForLoop(forLoopPath: NodePath): Unit = { //TODO binding resolution breaks down because of this, because the scope of the increment expression has changed from being just the body scope to being the method scope. We need to nest the new statements into a new block.
+  def transformForLoop(forLoopPath: NodePath): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
     val whileBody = forLoop.body ++
       Seq(ExpressionAsStatementDelta.create(forLoop.increment))

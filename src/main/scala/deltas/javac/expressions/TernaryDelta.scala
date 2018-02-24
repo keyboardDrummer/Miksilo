@@ -14,12 +14,12 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeDelta
 
 object TernaryDelta extends ExpressionInstance {
-  def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseKey).asInstanceOf[T]
+  def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseBranch).asInstanceOf[T]
 
-  def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueKey).asInstanceOf[T]
+  def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueBranch).asInstanceOf[T]
 
   def getCondition[T <: NodeLike](metaObject: T) = {
-    metaObject(ConditionKey).asInstanceOf[T]
+    metaObject(Condition).asInstanceOf[T]
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
@@ -27,29 +27,26 @@ object TernaryDelta extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    val parseTernary = (expressionGrammar.as(ConditionKey) ~~< "?") ~~
-      (expressionGrammar.as(TrueKey) ~~< ":") ~~
-      expressionGrammar.as(FalseKey) asNode TernaryKey
-    val ternaryGrammar = create(TernaryExpressionGrammar, parseTernary | expressionGrammar.inner)
-    expressionGrammar.inner = ternaryGrammar
+    val parseTernary = (expressionGrammar.as(Condition) ~~< "?") ~~
+      (expressionGrammar.as(TrueBranch) ~~< ":") ~~
+      expressionGrammar.as(FalseBranch) asNode Shape
+    expressionGrammar.addOption(parseTernary)
   }
 
-  def ternary(condition: Node, trueBranch: Node, falseBranch: Node) = new Node(TernaryKey,
-    FalseKey -> falseBranch,
-    TrueKey -> trueBranch,
-    ConditionKey -> condition)
+  def ternary(condition: Node, trueBranch: Node, falseBranch: Node) = new Node(Shape,
+    FalseBranch -> falseBranch,
+    TrueBranch -> trueBranch,
+    Condition -> condition)
 
-  object FalseKey extends NodeField
+  object FalseBranch extends NodeField
 
-  object TrueKey extends NodeField
+  object TrueBranch extends NodeField
 
-  object ConditionKey extends NodeField
+  object Condition extends NodeField
 
-  object TernaryKey extends NodeShape
+  object Shape extends NodeShape
 
-  object TernaryExpressionGrammar extends GrammarKey
-
-  override val shape = TernaryKey
+  override val shape = Shape
 
   override def getType(_ternary: NodePath, compilation: Compilation): Node = {
     val getExpressionType = ExpressionSkeleton.getType(compilation)
@@ -95,7 +92,6 @@ object TernaryDelta extends ExpressionInstance {
     val trueType = ExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
     val falseType = ExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
 
-    builder.typesAreEqual(trueType, _type) //TODO should also be isFirstSubsetOfSecond but then there has to be a mechanism to determine the superSet type. I guess we need a constraint for that. Use builder.getCommonSuperType
-    builder.isFirstSubsetOfSecond(falseType, _type)
+    builder.typesAreEqual(_type, builder.getCommonSuperType(trueType, falseType))
   }
 }

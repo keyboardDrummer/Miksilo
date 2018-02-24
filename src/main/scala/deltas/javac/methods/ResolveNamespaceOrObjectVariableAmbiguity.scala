@@ -23,7 +23,7 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
               unifyObjectVariableDeclaration(solver)
           }
           case _ => unifyObjectVariableDeclaration(solver)
-        } //TODO de order of the scopes matters here because the builder hasn't moved the new constraints into solver.constraints yet. Fix
+        }
         true
       case _ => false
     }

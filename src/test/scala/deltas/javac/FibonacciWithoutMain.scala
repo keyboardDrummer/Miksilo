@@ -34,7 +34,7 @@ class FibonacciWithoutMain {
     val parameters = Seq(parameter("i", IntTypeDelta.intType))
     val recursiveCall1 = call(variable("fibonacci"), Seq(SubtractionDelta.subtraction(variable("i"), IntLiteralDelta.literal(1))))
     val recursiveCall2 = call(variable("fibonacci"), Seq(SubtractionDelta.subtraction(variable("i"), IntLiteralDelta.literal(2))))
-    val condition = LessThanDelta.lessThan(variable("i"), IntLiteralDelta.literal(2))
+    val condition = LessThanDelta.neww(variable("i"), IntLiteralDelta.literal(2))
     val returnValue = TernaryDelta.ternary(condition, IntLiteralDelta.literal(1), AdditionDelta.addition(recursiveCall1, recursiveCall2))
     val body = Seq(ReturnExpressionDelta._return(returnValue))
     method("fibonacci", IntTypeDelta.intType, parameters, body, static = true)
