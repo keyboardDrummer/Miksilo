@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 
 object MethodHandleConstant extends ConstantEntry {
@@ -14,9 +14,9 @@ object MethodHandleConstant extends ConstantEntry {
 
   def construct(kind: Int, index: Int) = new Node(MethodHandleKey, MethodHandleReference -> kind, MethodHandleIndex -> index)
 
-  override def key = MethodHandleKey
+  override def shape = MethodHandleKey
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     byteToBytes(15) ++ byteToBytes(constant(MethodHandleReference).asInstanceOf[Int]) ++ shortToBytes(constant(MethodHandleIndex).asInstanceOf[Int])
   }
 

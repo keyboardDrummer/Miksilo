@@ -8,7 +8,7 @@ class ModuleImport(name: String) extends FakeSourceElement {
 
   def constraints(builder: ConstraintBuilder, scope: Scope): Unit = {
     val importedDeclaration = builder.declarationVariable()
-    val importedScope = builder.resolveScopeDeclaration(importedDeclaration)
+    val importedScope = builder.getDeclaredScope(importedDeclaration)
     builder.reference(name, this, scope, importedDeclaration)
     builder.add(ScopeImport(scope, importedScope))
   }

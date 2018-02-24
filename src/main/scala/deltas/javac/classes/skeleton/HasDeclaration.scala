@@ -9,3 +9,4 @@ import core.smarts.scopes.objects.Scope
 trait HasDeclaration {
   def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Declaration
 }
+

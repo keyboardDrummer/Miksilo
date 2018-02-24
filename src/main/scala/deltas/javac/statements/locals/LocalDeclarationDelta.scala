@@ -25,12 +25,12 @@ object LocalDeclarationDelta extends StatementInstance {
     import grammars._
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode DeclarationKey
+    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     statement.addOption(parseDeclaration)
   }
 
   def declaration(name: String, _type: Node): Node = {
-    new Node(DeclarationKey, Name -> name, Type -> _type)
+    new Node(Shape, Name -> name, Type -> _type)
   }
 
   case class VariableAlreadyDefined(variable: String) extends BadInputException
@@ -38,11 +38,11 @@ object LocalDeclarationDelta extends StatementInstance {
     override def toString = s"variable '$variable' was defined more than once."
   }
 
-  object DeclarationKey extends NodeShape
+  object Shape extends NodeShape
   object Name extends NodeField
   object Type extends NodeField
 
-  override val shape = DeclarationKey
+  override val shape = Shape
 
   override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
     Seq.empty[Node]
@@ -51,14 +51,14 @@ object LocalDeclarationDelta extends StatementInstance {
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
     val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
     val _type = localDeclaration._type
-    JavaClassSkeleton.fullyQualify(_type, JavaClassSkeleton.getClassCompiler(compilation))
+    JavaClassSkeleton.fullyQualify(localDeclaration._type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
-    Map(name -> _type)
+    Map(name -> localDeclaration._type)
   }
 
   override def description: String = "Enables declaring a local variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
     builder.declare(statement.name, statement.getLocation(Name), parentScope, Some(_type))

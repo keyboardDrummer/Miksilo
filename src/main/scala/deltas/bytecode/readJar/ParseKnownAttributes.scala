@@ -16,14 +16,14 @@ object ParseKnownAttributes extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set[Contract](UnParsedAttribute, Utf8ConstantDelta)
 
-  override def transformProgram(program: Node, state: Compilation): Unit = {
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val constantPool = program.constantPool
     program.visit(node => node.shape match {
           case UnParsedAttribute.Shape =>
             val typedNode = new UnParsedAttribute.UnParsedAttribute(node)
             val index = typedNode.nameIndex
             val name = constantPool.getValue(index).asInstanceOf[Node]
-            val attributeTypeOption = ByteCodeSkeleton.getRegistry(state).attributes.get(Utf8ConstantDelta.get(name))
+            val attributeTypeOption = ByteCodeSkeleton.attributesByName.get(compilation).get(Utf8ConstantDelta.get(name))
             for(attributeType <- attributeTypeOption)
             {
               parseAttribute(typedNode, attributeType)

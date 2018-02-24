@@ -11,7 +11,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.ByteCodeSkeleton
 
-object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
+object TypeSkeleton extends DeltaWithGrammar {
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     hasTypes.get(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
   }
@@ -20,7 +20,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     byteCodeInstances.get(language, _type.shape).getStackType(_type, language)
   }
 
-  def getTypeSize(_type: Node, language: Language): Int = getRegistry(language).stackSize(_type.shape)
+  def getTypeSize(_type: Node, language: Language): Int = hasStackSize.get(language, _type.shape)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
@@ -44,11 +44,7 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     fromSuperTypes.exists(_type => _type.equals(to))
   }
 
-  def getSuperTypes(state: Language)(_type: Node) = getSuperTypesRegistry(state)(_type.shape)(_type)
-
-  def getSuperTypesRegistry(state: Language) = {
-    getRegistry(state).superTypes
-  }
+  def getSuperTypes(language: Language)(_type: Node): Seq[Node] = hasSuperTypes.get(language, _type.shape).getSuperTypes(_type)
 
   def union(state: Language)(first: Node, second: Node): Node = {
     val filteredDepths = getAllSuperTypes(state)(first).map(depthTypes => depthTypes.filter(_type => isAssignableTo(state)(_type, second)))
@@ -74,15 +70,15 @@ object TypeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     grammars.create(ByteCodeTypeGrammar)
   }
 
-  def createRegistry = new Registry
-
   val byteCodeInstances = new ShapeProperty[ByteCodeTypeInstance]
 
-  class Registry {
-    val superTypes = new ShapeRegistry[Node => Seq[Node]]()
-    val stackSize = new ShapeRegistry[Int]()
-    val instances = new ShapeRegistry[TypeInstance]
+  trait HasSuperTypes {
+    def getSuperTypes(node: Node): Seq[Node]
   }
+
+  val hasSuperTypes = new ShapeProperty[HasSuperTypes]
+  val hasStackSize = new ShapeProperty[Int]
+  val typeInstances = new ShapeProperty[TypeInstance]
 
   object JavaTypeGrammar extends GrammarKey
 

@@ -29,7 +29,7 @@ trait ConstraintChecker extends Checker
     result
   }
 
-  override def checkExpression(expression: Expression, languageType: LanguageType): Boolean = {
+  override def checkExpression(expression: Expression, languageType: LanguageType): Try[Unit] = {
     val factory = new Factory()
     val builder: ConstraintBuilder = new ConstraintBuilder(factory)
     builder.add(Program.libraryConstraints)
@@ -37,6 +37,6 @@ trait ConstraintChecker extends Checker
     val _type = languageType.constraints(builder, scope)
     expression.constraints(builder, _type, scope)
     val constraints = builder.getConstraints
-    new ConstraintSolver(builder, constraints).run().isSuccess
+    new ConstraintSolver(builder, constraints).run()
   }
 }

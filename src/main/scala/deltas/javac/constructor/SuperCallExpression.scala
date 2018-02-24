@@ -1,11 +1,13 @@
 package deltas.javac.constructor
 
-import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, NodePath}
 import core.deltas.Contract
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
+import core.smarts.objects.Reference
+import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
@@ -15,6 +17,7 @@ import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements.StatementSkeleton
 
@@ -22,12 +25,12 @@ object SuperCallExpression extends ExpressionInstance {
 
   override def description: String = "Enables calling a super constructor."
 
-  override val key = SuperCall
+  override val shape = SuperCall
   val constructorName: String = "<init>"
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta) ++ super.dependencies
 
-  def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.CallArguments -> arguments)
+  def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.Arguments -> arguments)
 
   override def getType(expression: NodePath, compilation: Compilation): Node = VoidTypeDelta.voidType
 
@@ -40,9 +43,10 @@ object SuperCallExpression extends ExpressionInstance {
     transformToByteCode(call, compilation, program.parent.get)
   }
 
-  def transformToByteCode(call: NodePath, compilation: Compilation, className: String): Seq[Node] = {
+  def transformToByteCode(path: NodePath, compilation: Compilation, className: String): Seq[Node] = {
+    val call: Call[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-    val callArguments = CallDelta.getCallArguments(call)
+    val callArguments = call.arguments
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
@@ -53,7 +57,7 @@ object SuperCallExpression extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val callArguments = find(CallDelta.CallArgumentsGrammar)
-    val superCallGrammar = "super" ~> callArguments.as(CallDelta.CallArguments) asNode SuperCall
+    val superCallGrammar = "super" ~> callArguments.as(CallDelta.Arguments) asNode SuperCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(superCallGrammar)
   }
@@ -64,7 +68,10 @@ object SuperCallExpression extends ExpressionInstance {
     val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getLocation(ClassParent), parentScope)
-    val superScope = builder.resolveScopeDeclaration(superClass)
-    CallDelta.callConstraints(compilation, builder, call, superScope, call.asInstanceOf[ChildPath], VoidTypeDelta.constraintType)
+    val superScope = builder.getDeclaredScope(superClass)
+
+    val superReference = new Reference(constructorName, Some(call))
+    builder.add(ReferenceInScope(superReference, superScope))
+    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, superReference, VoidTypeDelta.constraintType)
   }
 }

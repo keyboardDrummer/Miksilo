@@ -5,7 +5,7 @@ import core.document.Empty
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
@@ -15,7 +15,7 @@ import deltas.javac.classes.ConstantPool
 
 import scala.collection.mutable
 
-object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
+object ByteCodeSkeleton extends DeltaWithGrammar {
 
   implicit class ClassFile[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def constantPool: ConstantPool = node(ClassConstantPool).asInstanceOf[ConstantPool]
@@ -40,8 +40,6 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   def getAttributeNameIndex(attribute: Node) = attribute(AttributeNameKey).asInstanceOf[Int]
 
-  def createRegistry = new Registry()
-
   def neww(name: Int, parent: Int, constantPool: ConstantPool, methods: Seq[Node], interfaces: Seq[Int] = Seq(),
            classFields: Seq[Node] = Seq(), attributes: Seq[Node] = Seq()) = new Node(Shape,
     Methods ->  methods,
@@ -55,19 +53,23 @@ object ByteCodeSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
 
   override def dependencies: Set[Contract] = Set.empty
 
-  class Registry {
-    val getBytes = new ShapeRegistry[Node => Seq[Byte]]
-    val attributes = new mutable.HashMap[String, ByteCodeAttribute]
-    val constantReferences = new ShapeRegistry[Map[NodeField, NodeShape]]
-    val constantEntries = mutable.Set.empty[ConstantEntry]
+  trait HasBytes {
+    def getBytes(compilation: Compilation, node: Node): Seq[Byte]
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(Shape, Map(
+  def getBytes(compilation: Compilation, node: Node): Seq[Byte] = hasBytes.get(compilation, node.shape).getBytes(compilation, node)
+
+  val hasBytes = new ShapeProperty[HasBytes]
+  val constantEntries = new ShapeProperty[ConstantEntry]
+  val attributesByName = new Property[mutable.HashMap[String, ByteCodeAttribute]](mutable.HashMap.empty)
+  val constantReferences = new ShapeProperty[Map[NodeField, NodeShape]]
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    constantReferences.add(language, Shape, Map(
       //TODO add with seq support //ClassInterfaces -> ClassRefConstant.key,
-      ClassParentIndex -> ClassInfoConstant.key,
-      ClassNameIndexKey -> ClassInfoConstant.key))
+      ClassParentIndex -> ClassInfoConstant.shape,
+      ClassNameIndexKey -> ClassInfoConstant.shape))
   }
 
   object Shape extends NodeShape

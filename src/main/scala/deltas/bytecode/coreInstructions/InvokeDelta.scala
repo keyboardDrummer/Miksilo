@@ -2,7 +2,7 @@ package deltas.bytecode.coreInstructions
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.MethodRefConstant.MethodRefWrapper
 import deltas.bytecode.constants._
@@ -11,7 +11,7 @@ import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.javac.types.MethodType._
 
-abstract class InvokeDelta extends InstructionDelta {
+abstract class InvokeDelta extends InstructionInstance {
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val methodRef = getInvokeTargetMethodRef(instruction)
@@ -32,9 +32,9 @@ abstract class InvokeDelta extends InstructionDelta {
   }
 
   object MethodRef extends NodeField
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodRef -> MethodRefConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(MethodRef -> MethodRefConstant.shape))
   }
 
   override def argumentsGrammar(grammars: LanguageGrammars) = {
@@ -52,5 +52,5 @@ abstract class InvokeDelta extends InstructionDelta {
     instruction(MethodRef).asInstanceOf[Node]
   }
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(compilation: Compilation): Int = 3
 }

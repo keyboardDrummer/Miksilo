@@ -2,23 +2,24 @@ package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Key, Node, NodeField}
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language
+import core.language.node.{Node, NodeField, NodeShape}
 import deltas.bytecode.ByteCodeSkeleton
+import deltas.bytecode.ByteCodeSkeleton.HasBytes
 import deltas.bytecode.readJar.ClassFileParser
 
 object AttributeNameKey extends NodeField //TODO give this a proper place
-trait ByteCodeAttribute extends DeltaWithGrammar {
+trait ByteCodeAttribute extends DeltaWithGrammar with HasShape with HasBytes {
 
   override def dependencies: Set[Contract] = Set[Contract](ByteCodeSkeleton)
 
-  override def inject(state: Language): Unit = {
-    ByteCodeSkeleton.getRegistry(state).attributes.put(constantPoolKey, this)
-    super.inject(state)
+  override def inject(language: Language): Unit = {
+    ByteCodeSkeleton.attributesByName.get(language).put(constantPoolKey, this)
+    ByteCodeSkeleton.hasBytes.add(language, this)
+    super.inject(language)
   }
 
-  def key: Key
   def getGrammar(grammars: LanguageGrammars): BiGrammar
   def constantPoolKey: String
 

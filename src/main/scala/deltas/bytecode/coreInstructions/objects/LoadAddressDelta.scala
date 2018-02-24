@@ -1,17 +1,17 @@
 package deltas.bytecode.coreInstructions.objects
 
 import core.language.node.{Node, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.attributes.CodeAttributeDelta
-import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{InstructionInstance, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
-object LoadAddressDelta extends InstructionDelta {
+object LoadAddressDelta extends InstructionInstance {
 
-  def addressLoad(location: Int): Node = CodeAttributeDelta.instruction(key, Seq(location))
+  def addressLoad(location: Int): Node = CodeAttributeDelta.instruction(shape, Seq(location))
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)

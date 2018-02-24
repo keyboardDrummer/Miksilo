@@ -1,7 +1,7 @@
 package deltas.bytecode.coreInstructions.integers.integerCompare
 
 import core.language.node.Node
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.coreInstructions.InstructionSignature
@@ -10,9 +10,9 @@ import deltas.bytecode.types.IntTypeDelta
 
 object IfIntegerCompareLessOrEqualDelta extends JumpInstruction { //TODO superclasse maken om wat van deze jump instructies onder te schuiven
 
-  def create(target: Int): Node = CodeAttributeDelta.instruction(key, Seq(target))
+  def create(target: Int): Node = CodeAttributeDelta.instruction(shape, Seq(target))
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     hexToBytes("a4") ++ shortToBytes(arguments.head)
   }

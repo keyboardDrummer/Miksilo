@@ -2,20 +2,20 @@ package deltas.bytecode.coreInstructions.objects
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.constants.FieldRefConstant
-import deltas.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{ByteCodeTypeException, ConstantPoolIndexGrammar, InstructionInstance, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
-object PutField extends InstructionDelta {
+object PutField extends InstructionInstance {
 
   object FieldRef extends NodeField
 
-  def putField(index: Any) = key.create(FieldRef -> index)
+  def putField(index: Any) = shape.create(FieldRef -> index)
 
-  override def getInstructionSize: Int = 3
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getInstructionSize(compilation: Compilation): Int = 3
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("b5") ++ PrintByteCode.shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
@@ -33,9 +33,9 @@ object PutField extends InstructionDelta {
     new InstructionSignature(Seq.empty, Seq(valueType, objectType))
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(FieldRef -> FieldRefConstant.shape))
   }
 
   override def argumentsGrammar(grammars: LanguageGrammars) = {

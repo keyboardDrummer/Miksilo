@@ -9,7 +9,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta._
 import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta, StackMapTableAttribute}
 import deltas.bytecode.coreInstructions.GotoDelta
-import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
+import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 
@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
-  def jump(delta: JumpInstruction, target: String): Node = delta.key.create(JumpName -> target)
+  def jump(delta: JumpInstruction, target: String): Node = delta.shape.create(JumpName -> target)
   def ifZero(target: String): Node = jump(IfZeroDelta, target)
   def ifNotZero(target: String): Node = jump(IfNotZero, target)
   def goTo(target: String): Node = jump(GotoDelta, target)
@@ -29,15 +29,15 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   def ifIntegerCompareNotEquals(target: String): Node = jump(IfIntegerCompareNotEqualDelta, target)
   def ifIntegerCompareLessEquals(target: String): Node = jump(IfIntegerCompareLessOrEqualDelta, target)
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    LabelDelta.inject(state)
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    LabelDelta.inject(language)
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
 
-    val instructionDeltas = CodeAttributeDelta.getRegistry(compilation.language).instructions
-    def instructionSize(instruction: Node) = instructionDeltas(instruction.shape).getInstructionSize
+    val instructionDeltas = CodeAttributeDelta.instructions.get(compilation)
+    def instructionSize(instruction: Node) = instructionDeltas(instruction.shape).getInstructionSize(compilation)
 
     val classFile = program
     val codeAnnotations = CodeAttributeDelta.getCodeAnnotations(classFile)
@@ -57,7 +57,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       val targetLocations = mutable.Map[String, Int]()
       var location = 0
       for (instruction <- instructions) {
-        if (instruction.shape == LabelDelta.key) {
+        if (instruction.shape == LabelDelta.shape) {
           targetLocations(new Label(instruction).name) = location
         }
 
@@ -78,7 +78,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
           instruction.data.remove(JumpName)
         }
 
-        if (instruction.shape != LabelDelta.key)
+        if (instruction.shape != LabelDelta.shape)
           newInstructions += instruction
 
         location += instructionSize(instruction)
@@ -93,7 +93,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def getStackMapTable(labelLocations: Map[String, Int], instructions: Seq[Node]): Seq[Node] = {
-    val locationsWithFrame = instructions.filter(i => i.shape == LabelDelta.LabelKey).map(i => new Label(i)).
+    val locationsWithFrame = instructions.filter(i => i.shape == LabelDelta.Shape).map(i => new Label(i)).
       map(i => (labelLocations(i.name), i.stackFrame))
     var locationAfterPreviousFrame = 0
     var stackFrames = ArrayBuffer[Node]()
@@ -135,12 +135,12 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   object JumpName extends NodeField
   def replaceJumpIndicesWithLabels(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val instructionDeltas = CodeAttributeDelta.getRegistry(language).instructions.values
+    val instructionDeltas = CodeAttributeDelta.instructions.get(language).values
     val jumpInstructionDeltas = instructionDeltas.filter(v => v.jumpBehavior.hasJumpInFirstArgument)
     for(jump <- jumpInstructionDeltas)
     {
-      val grammar = find(jump.key)
-      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammar.as(JumpName) asNode jump.key
+      val grammar = find(jump.shape)
+      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammar.as(JumpName) asNode jump.shape
     }
   }
 }

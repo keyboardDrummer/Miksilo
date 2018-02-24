@@ -9,11 +9,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object VoidTypeDelta extends ByteCodeTypeInstance with StackType {
+object VoidTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
-  override val shape = VoidTypeKey
+  override val shape = Shape
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
+  override def getSuperTypes(_type: Node): Seq[Node] = ???
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
@@ -27,9 +27,9 @@ object VoidTypeDelta extends ByteCodeTypeInstance with StackType {
     "void" ~> value(voidType)
   }
 
-  def voidType = new Node(VoidTypeKey)
+  def voidType = new Node(Shape)
 
-  object VoidTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   override def description: String = "Defines the void type."
 

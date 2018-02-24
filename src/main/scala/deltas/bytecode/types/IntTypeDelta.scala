@@ -3,17 +3,17 @@ package deltas.bytecode.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeLike, NodeShape}
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object IntTypeDelta extends ByteCodeTypeInstance with StackType {
+object IntTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override val shape = IntTypeKey
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = Seq.empty //TODO extend. long ?
+  override def getSuperTypes(_type: Node): Seq[Node] = Seq.empty //TODO extend. long ?
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._

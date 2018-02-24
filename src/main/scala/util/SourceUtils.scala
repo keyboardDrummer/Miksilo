@@ -1,6 +1,7 @@
 package util
 
 import java.io._
+import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
 import core.deltas._
@@ -13,6 +14,9 @@ import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
 object SourceUtils {
+
+  def streamToString(stream: InputStream): String = scala.io.Source.fromInputStream(stream).mkString
+  def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
     val className = SourceUtils.fileNameToClassName(fileName)
@@ -55,8 +59,8 @@ object SourceUtils {
   }
 
   class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
-    override def transformProgram(program: Node, state: Compilation): Unit = {
-      write(PrintByteCode.getBytes(program, state))
+    override def transformProgram(program: Node, compilation: Compilation): Unit = {
+      write(PrintByteCode.getBytes(compilation, program))
     }
 
     override def description: String = "Writes the current program as JVM class file bytes to a function."

@@ -1,10 +1,12 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
+import core.language.node.Position
+
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
-import scala.util.parsing.input.{CharArrayReader, Position, Positional}
+import scala.util.parsing.input.{CharArrayReader, OffsetPosition, Positional}
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
@@ -95,9 +97,6 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
       case BiFailure(message) => failure(message)
       case Print(_) => success(Unit).map(valueToResult)
       case ValueGrammar(value) => success(value).map(valueToResult)
-      case As(inner, key) =>
-        val innerParser = recursive(inner)
-        innerParser.map(result => result.map { case WithMapG(v, state) => WithMapG(inner, state + (key -> v)) })
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
@@ -128,7 +127,7 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
   override val whiteSpace: Regex = "".r
 
-  def position[T <: Positional](p: => Parser[T]): Parser[Position] = Parser { in =>
-    Success(in.pos, in)
+  def position[T <: Positional]: Parser[Position] = Parser { in =>
+    Success(Position(in.pos.asInstanceOf[OffsetPosition].offset), in)
   }
 }

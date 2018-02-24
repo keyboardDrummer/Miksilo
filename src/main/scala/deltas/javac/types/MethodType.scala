@@ -39,7 +39,7 @@ object MethodType extends ByteCodeTypeInstance {
 
   override def description: String = "Defines the method type."
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = ???
+  override def getSuperTypes(_type: Node): Seq[Node] = ???
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = BiFailure()
 
@@ -58,8 +58,8 @@ object MethodType extends ByteCodeTypeInstance {
   }
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope, parameters: Seq[NodeLike], returnTypeNode: NodeLike): Type = {
-    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
+    val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     FunctionType.curry(parameterTypes, returnType)
   }
 }

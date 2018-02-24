@@ -3,21 +3,21 @@ package deltas.bytecode.coreInstructions.objects
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.constants.FieldRefConstant.FieldRefWrapper
-import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionInstance, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 
-object GetFieldDelta extends InstructionDelta {
+object GetFieldDelta extends InstructionInstance {
 
   object FieldRef extends NodeField
 
-  def construct(fieldRefIndex: Any): Node = key.create(FieldRef -> fieldRefIndex)
+  def construct(fieldRefIndex: Any): Node = shape.create(FieldRef -> fieldRefIndex)
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     hexToBytes("b4") ++ shortToBytes(instruction(FieldRef).asInstanceOf[Int])
   }
 
@@ -32,9 +32,9 @@ object GetFieldDelta extends InstructionDelta {
     fieldRef.nameAndType._type.value
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(FieldRef -> FieldRefConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(FieldRef -> FieldRefConstant.shape))
   }
 
   override def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
@@ -42,7 +42,7 @@ object GetFieldDelta extends InstructionDelta {
     find(ConstantPoolIndexGrammar).as(FieldRef)
   }
 
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(compilation: Compilation): Int = 3
 
   override def grammarName = "getfield"
 }

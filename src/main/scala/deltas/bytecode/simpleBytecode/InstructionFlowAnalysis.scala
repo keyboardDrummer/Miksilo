@@ -1,7 +1,7 @@
 package deltas.bytecode.simpleBytecode
 
 import core.language.node.Node
-import deltas.bytecode.coreInstructions.InstructionDelta.Instruction
+import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 import util.DataFlowAnalysis
 
@@ -9,7 +9,7 @@ abstract class InstructionFlowAnalysis[State](instructions: Seq[Instruction[Node
   extends DataFlowAnalysis[Int, State] {
   
   val labelIndices = instructions.zipWithIndex.
-    filter(indexedInstruction => indexedInstruction._1.shape == LabelDelta.LabelKey).
+    filter(indexedInstruction => indexedInstruction._1.shape == LabelDelta.Shape).
     map(indexedInstruction => (new Label(indexedInstruction._1.node).name, indexedInstruction._2)).toMap
 
   override def getOutgoingNodes(instructionIndex: Int): Set[Int] = {

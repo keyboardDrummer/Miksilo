@@ -23,3 +23,13 @@ class ShapeProperty[T] {
 
   def add(language: Language, shape: NodeShape, value: T): Unit = map(language).put(shape, value)
 }
+
+class Property[T](default: => T) {
+
+  private def map(language: Language): T =
+    language.data.getOrElseUpdate(this, default).asInstanceOf[T]
+
+  def get(language: Language): T = map(language)
+
+  def add(language: Language, value: T): Unit = language.data.put(this, value)
+}

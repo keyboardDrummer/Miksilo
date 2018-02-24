@@ -1,7 +1,7 @@
 package core.language.node
 
 import core.bigrammar.BiGrammarToParser.WithMap
-import core.bigrammar.grammars.MapGrammarWithMap
+import core.bigrammar.grammars.{FieldPosition, MapGrammarWithMap}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMapG}
 
@@ -36,6 +36,7 @@ object NodeGrammar {
   def construct(withMap: WithMap, key: NodeShape): WithMap = {
     val result = new Node(key)
     result.data ++= withMap.map.collect { case (k: NodeField,v) => (k,v) }
+    result.sources ++= withMap.map.collect { case (k: FieldPosition,v) => (k.field,v.asInstanceOf[SourceRange]) }
     WithMapG(result, Map.empty)
   }
 }

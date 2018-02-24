@@ -5,13 +5,13 @@ import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, 
 import core.smarts.scopes.imports.DeclarationOfScope
 import core.smarts.scopes.objects.{ConcreteScope, _}
 import core.smarts.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
-import core.smarts.types.objects.{Type, TypeVariable}
+import core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
 import core.smarts.types._
 
 import scala.collection.mutable
 
 case class Copy(key: AnyRef, counter: Int)
-class ConstraintBuilder(factory: Factory) {
+class ConstraintBuilder(val factory: Factory) {
 
   var proofs: Proofs = null
 
@@ -60,23 +60,17 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def declarationType(name: String, origin: SourceElement, container: Scope) : Type  = {
-    val result = typeVariable()
-    declare(name, origin, container, Some(result))
-    result
-  }
-
   def declare(name: String, origin: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
     val result = new NamedDeclaration(name, origin)
     constraints ::= DeclarationInsideScope(result, container)
-    _type.foreach(t => constraints ::= DeclarationOfType(result, t))
+    _type.foreach(t => constraints ::= DeclarationHasType(result, t))
     result
   }
 
-  def getCommonSuperType(first: Type, second: Type): Type = {
+  def getCommonSuperType(first: Type, second: Type): Type = { //TODO this doesn't actually work, because it won't find the superType. We need a separate constraint.
     val superType = typeVariable()
-    checkSubType(superType, first)
-    checkSubType(superType, second)
+    typesAreEqual(first, superType)
+    isFirstSubsetOfSecond(second, superType)
     superType
   }
 
@@ -92,23 +86,29 @@ class ConstraintBuilder(factory: Factory) {
     factory.declarationVariable
   }
 
+  def getDeclarationOfType(_type: Type): Declaration = {
+    val result = declarationVariable()
+    add(TypesAreEqual(TypeFromDeclaration(result), _type))
+    result
+  }
+
   def getType(declaration: Declaration) : Type = {
     val result = typeVariable()
-    add(DeclarationOfType(declaration, result))
+    add(DeclarationHasType(declaration, result))
     result
   }
 
   def declarationVariable(_type: Type): DeclarationVariable = {
     val result = factory.declarationVariable
-    constraints ::= DeclarationOfType(result, _type)
+    constraints ::= DeclarationHasType(result, _type)
     result
   }
 
   /*
   Get the scope declared by the given declaration
    */
-  def resolveScopeDeclaration(declaration: Declaration, parent: Option[Scope] = None): ScopeVariable = {
-    val result = scopeVariable(parent)
+  def getDeclaredScope(declaration: Declaration): ScopeVariable = {
+    val result = scopeVariable()
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }
@@ -125,7 +125,7 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def checkSubType(superType: Type, subType: Type): Unit = {
+  def isFirstSubsetOfSecond(subType: Type, superType: Type): Unit = {
     add(CheckSubType(subType, superType))
   }
 

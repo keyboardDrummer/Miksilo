@@ -37,12 +37,12 @@ object PoptimizeDelta extends DeltaWithPhase {
 
       def processInstruction(instructionIndex: Int) {
         val instruction = instructions(instructionIndex)
-        if (instruction.shape == PopDelta.key) {
+        if (instruction.shape == PopDelta.shape) {
           consumptions ::= true
           return
         }
 
-        if (instruction.shape == Pop2Delta.key) {
+        if (instruction.shape == Pop2Delta.shape) {
           consumptions = List(true,true) ++ consumptions
           return
         }

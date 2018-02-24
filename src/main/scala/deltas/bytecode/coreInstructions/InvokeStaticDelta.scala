@@ -1,14 +1,15 @@
 package deltas.bytecode.coreInstructions
 
+import core.language.Compilation
 import core.language.node.{Node, NodeShape}
 import deltas.bytecode.PrintByteCode._
 
 object InvokeStaticDelta extends InvokeDelta {
 
-  def invokeStatic(constantIndex: Any): Node = key.create(MethodRef -> constantIndex)
+  def invokeStatic(constantIndex: Any): Node = shape.create(MethodRef -> constantIndex)
 
-  override def getInstructionSize: Int = 3
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getInstructionSize(compilation: Compilation): Int = 3
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     hexToBytes("b8") ++ shortToBytes(instruction(MethodRef).asInstanceOf[Int])
   }
 

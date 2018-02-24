@@ -1,7 +1,6 @@
 package deltas.javac.expressions
 
 import core.deltas.Delta
-import core.smarts.SolveConstraintsDelta
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}
@@ -10,7 +9,7 @@ class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
     Delta.spliceAndFilterTop(
         JavaLanguage.javaCompilerDeltas,
         JavaLanguage.javaClassSkeleton,
-        Seq(SolveConstraintsDelta, ClearPhases)))) {
+        Seq(ClearPhases)))) {
 
   test("empty class") {
     val program =

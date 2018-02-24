@@ -13,30 +13,30 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object BooleanLiteralDelta extends ExpressionInstance {
-  val key = LiteralBooleanKey
+  val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val parseNumber = "true" ~> value(literal(true)) | "false" ~> value(literal(false))
+    val parseNumber = ("true" ~> value(true) | "false" ~> value(false)).as(Value).asNode(Shape)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
 
-  def literal(value: Boolean) = new Node(LiteralBooleanKey, ValueKey -> value)
+  def literal(value: Boolean) = new Node(Shape, Value -> value)
 
   override def toByteCode(literal: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(SmallIntegerConstantDelta.integerConstant(if (getValue(literal)) 1 else 0))
   }
 
-  def getValue(literal: Node) = literal(ValueKey).asInstanceOf[Boolean]
+  def getValue(literal: Node) = literal(Value).asInstanceOf[Boolean]
 
   override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
-  object LiteralBooleanKey extends NodeShape
+  object Shape extends NodeShape
 
-  object ValueKey extends NodeField
+  object Value extends NodeField
 
   override def description: String = "Adds the boolean literals 'true' and 'false'"
 

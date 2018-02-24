@@ -2,14 +2,13 @@ package core.bigrammar
 
 import application.compilerCockpit._
 import core.deltas.Delta
-import org.scalatest.FunSuite
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.javac.statements.BlockDelta
 import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaLanguage}
-import util.{TestLanguageBuilder, SourceUtils}
-import util.TestUtils
+import org.scalatest.FunSuite
+import util.{SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -96,21 +95,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(byteCode)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(SourceUtils.stringToStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ JavaLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(SourceUtils.stringToStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(RunWithJVM) ++ JavaLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(TestUtils.stringToInputStream(input)).output
+    val output = TestLanguageBuilder.build(parseTransformations).parseAndTransform(SourceUtils.stringToStream(input)).output
     assertResult("8")(output)
   }
 }

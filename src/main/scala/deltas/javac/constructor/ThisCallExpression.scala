@@ -12,10 +12,10 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta
 
 object ThisCallExpression extends ExpressionInstance {
-  override val key = ThisCall
+  override val shape = ThisCall
   object ThisCall extends NodeShape
 
-  def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallDelta.CallArguments -> arguments)
+  def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallDelta.Arguments -> arguments)
 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
@@ -33,7 +33,7 @@ object ThisCallExpression extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val callArguments = find(CallDelta.CallArgumentsGrammar)
-    val thisCallGrammar = "this" ~> callArguments.as(CallDelta.CallArguments) asNode ThisCall
+    val thisCallGrammar = "this" ~> callArguments.as(CallDelta.Arguments) asNode ThisCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addOption(thisCallGrammar)
   }

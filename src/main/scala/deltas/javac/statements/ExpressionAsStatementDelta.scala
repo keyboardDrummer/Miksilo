@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -45,7 +45,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def description: String = "Enables using an expression as a statement."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     ExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
   }
 }

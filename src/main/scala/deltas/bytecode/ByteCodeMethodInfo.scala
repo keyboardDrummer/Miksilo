@@ -4,8 +4,8 @@ import core.bigrammar.BiGrammar
 import core.document.BlankLine
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.deltas.{Contract, DeltaWithGrammar}
-import core.language.Language
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
@@ -15,9 +15,9 @@ import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 import deltas.javac.types.MethodType.MethodTypeWrapper
 
-object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
+object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasBytes with HasShape {
 
-  object MethodInfoKey extends NodeShape
+  object Shape extends NodeShape
 
   object MethodNameIndex extends NodeField
 
@@ -26,7 +26,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
   object MethodAttributes extends NodeField
 
   def methodInfo(nameIndex: Int, descriptorIndex: Int, attributes: Seq[Node], flags: Set[MethodAccessFlag] = Set()) =
-    new Node(MethodInfoKey,
+    new Node(Shape,
       MethodAttributes -> attributes,
       MethodNameIndex -> nameIndex,
       MethodDescriptor -> descriptorIndex,
@@ -50,21 +50,22 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
 
     def attributes: Seq[T] = node(MethodAttributes).asInstanceOf[Seq[T]]
 
-    def codeAttribute: CodeAttribute[T] = attributes.find(r => r.shape == CodeAttributeDelta.key).get
+    def codeAttribute: CodeAttribute[T] = attributes.find(r => r.shape == CodeAttributeDelta.shape).get
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).getBytes(MethodInfoKey) = methodInfo => getMethodByteCode(methodInfo, state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(MethodInfoKey, Map(MethodNameIndex -> Utf8ConstantDelta.key,
-      MethodDescriptor -> Utf8ConstantDelta.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.hasBytes.add(language, this)
+    ByteCodeSkeleton.constantReferences.add(language, Shape, Map(MethodNameIndex -> Utf8ConstantDelta.shape,
+      MethodDescriptor -> Utf8ConstantDelta.shape))
   }
 
-  def getMethodByteCode(methodInfo: MethodInfo[Node], state: Language): Seq[Byte] = {
+  def getBytes(compilation: Compilation, node: Node): Seq[Byte] = {
+    val methodInfo: MethodInfo[Node] = node
     getAccessFlagsByteCode(methodInfo) ++
         shortToBytes(methodInfo.nameIndex) ++
         shortToBytes(methodInfo.typeIndex) ++
-      getAttributesByteCode(state, methodInfo.attributes)
+      getAttributesByteCode(compilation, methodInfo.attributes)
     }
 
   object MethodsGrammar extends GrammarKey
@@ -89,12 +90,14 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags {
       ("name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
       "descriptor" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
       "flags" ~ ":" ~~> parseAccessFlag.manySeparated("," ~ space).seqToSet.as(AccessFlagsKey) %
-      attributesGrammar.as(MethodAttributes)).indent().asNode(MethodInfoKey)
+      attributesGrammar.as(MethodAttributes)).indent().asNode(Shape)
 
-    create(MethodInfoKey, methodInfoGrammar)
+    create(Shape, methodInfoGrammar)
   }
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   override def description: String = "Adds method members to bytecode."
+
+  override def shape: NodeShape = Shape
 }

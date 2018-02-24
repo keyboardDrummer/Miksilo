@@ -16,7 +16,7 @@ import deltas.bytecode.types.LongTypeDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object LongLiteralDelta extends ExpressionInstance {
-  val key = LongLiteralKey
+  val shape = LongLiteralKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 

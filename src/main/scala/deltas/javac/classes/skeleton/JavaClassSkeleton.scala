@@ -3,14 +3,12 @@ package deltas.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.document.BlankLine
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
-import core.smarts.objects.{Declaration, NamedDeclaration}
-import core.smarts.scopes.DeclarationInsideScope
-import core.smarts.scopes.imports.DeclarationOfScope
+import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
@@ -23,8 +21,9 @@ import deltas.javac.statements.BlockDelta
 
 import scala.collection.mutable
 
+
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
-  with WithLanguageRegistry with WithCompilationState with HasDeclaration {
+  with WithCompilationState with HasDeclaration with HasConstraints {
 
   override def description: String = "Defines a skeleton for the Java class."
 
@@ -67,7 +66,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       program(ByteCodeSkeleton.ClassParentIndex) = parentRef
       program(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      for(member <- getRegistry(compilation).members)
+      for(member <- members.get(compilation).values)
         member.compile(compilation, javaClass.node)
 
       javaClass.node.data.remove(Members)
@@ -121,17 +120,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       })
     }
 
-    val clazzDeclaration = new NamedDeclaration(clazz.name, path)
-    val classExternalScope = builder.newScope(Some(defaultPackageScope), "externalFor" + clazz.name)
-    builder.add(DeclarationInsideScope(clazzDeclaration, classExternalScope))
-    builder.add(DeclarationOfScope(clazzDeclaration, classExternalScope))
-    builder.importScope(packageScope, classExternalScope)
-
-    val classInternalScope = builder.newScope(Some(classExternalScope), "internalFor" + clazz.name)
+    val clazzDeclaration = builder.declare(clazz.name, path, packageScope)
+    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members
     members.foreach(member => hasDeclarations.get(compilation, member.shape).
-      getDeclaration(compilation, builder, member, classInternalScope))
+      getDeclaration(compilation, builder, member, classScope))
 
     clazzDeclaration
   }
@@ -140,6 +134,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object Shape extends NodeShape
 
   val hasDeclarations: ShapeProperty[HasDeclaration] = new ShapeProperty[HasDeclaration]
+  val hasConstraints: ShapeProperty[HasConstraints] = new ShapeProperty[HasConstraints]
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
@@ -149,11 +144,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     ClassImports -> imports,
     ClassParent -> mbParent)
 
-  def createRegistry = new Registry()
-  class Registry {
-    var members = List.empty[ClassMemberDelta]
-    val importToClassMap = new ShapeRegistry[(Compilation, Node) => Map[String, QualifiedClassName]]()
-  }
+  val members = new ShapeProperty[ClassMemberDelta]
+  val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
   def createState = new State()
   class State {
@@ -179,20 +171,31 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val clazz: JavaClass[NodePath] = PathRoot(compilation.program)
-      val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
-      val classScope  = builder.resolveScopeDeclaration(clazzDeclaration)
-
-      val proofs = JavaLang.getProofs(compilation, defaultPackageScope)
+      val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
-      for(_import <- clazz.imports)
-        _import.shape.asInstanceOf[ShapeWithConstraints].collectConstraints(compilation, builder, _import, classScope)
-
-      val members = clazz.members
-      members.foreach(member =>
-        this.hasDeclarations.get(language, member.shape).getDeclaration(compilation, builder, member, classScope))
+      hasConstraints.get(compilation, Shape).collectConstraints(
+        compilation, builder, PathRoot(compilation.program), defaultPackageScope)
     }
     super.inject(language)
+  }
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Unit = {
+    getClassScope(compilation, builder, path, defaultPackageScope)
+  }
+
+  def getClassScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope) = {
+    val clazz: JavaClass[NodePath] = path
+    val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
+    val classScope = builder.getDeclaredScope(clazzDeclaration)
+    for (_import <- clazz.imports)
+      hasConstraints.get(compilation, _import.shape).collectConstraints(compilation, builder, _import, classScope)
+
+    val members = clazz.members
+
+    members.foreach(member =>
+      hasConstraints.get(compilation, member.shape).collectConstraints(compilation, builder, member, classScope))
+
+    classScope
   }
 }

@@ -2,7 +2,7 @@ package deltas.bytecode.constants
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 
 object InterfaceMethodRefConstant extends ConstantEntry {
@@ -13,13 +13,13 @@ object InterfaceMethodRefConstant extends ConstantEntry {
 
   object MethodRefMethodName extends NodeField
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     byteToBytes(11) ++
       shortToBytes(getClassRefIndex(constant)) ++
       shortToBytes(getNameIndex(constant))
   }
 
-  override def key = InterfaceMethodRefConstantKey
+  override def shape = InterfaceMethodRefConstantKey
 
   def methodRef(classNameIndex: Int, methodNameAndTypeIndex: Int) = new Node(InterfaceMethodRefConstantKey,
     MethodRefClassName -> classNameIndex,

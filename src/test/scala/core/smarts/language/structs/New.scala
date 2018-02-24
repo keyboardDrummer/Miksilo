@@ -20,7 +20,7 @@ case class New(structName: String, fieldInitializers: Seq[StructFieldInit], gene
       TypeFromDeclaration(instantiatedStruct) //TypeApplication(StructType(instantiatedStruct), Seq(typeArgument))
     })
     val instantiatedStructDeclaration: Declaration = structType.function.asInstanceOf[TypeFromDeclaration].declaration
-    val structScope = builder.resolveScopeDeclaration(instantiatedStructDeclaration)
+    val structScope = builder.getDeclaredScope(instantiatedStructDeclaration)
     builder.typesAreEqual(_type, structType)
     fieldInitializers.foreach(value => value.constraints(builder, structScope, parentScope))
   }

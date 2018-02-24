@@ -11,7 +11,7 @@ import core.smarts.types.objects.{Type, TypeFromDeclaration}
 object UnqualifiedObjectTypeDelta extends TypeInstance {
   override val shape: Shape.type = Shape
 
-  override def getSuperTypes(_type: Node, state: Language): Seq[Node] = {
+  override def getSuperTypes(_type: Node): Seq[Node] = {
     Seq.empty //TODO extend
   }
 

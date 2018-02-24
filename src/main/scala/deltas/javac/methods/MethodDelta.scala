@@ -4,8 +4,8 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
@@ -25,7 +25,9 @@ import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState
-  with ClassMemberDelta with HasDeclaration {
+  with ClassMemberDelta with HasDeclaration with HasConstraints with HasShape {
+
+  override def description: String = "Enables Java classes to contain methods."
 
   implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
     def name: String = node(Name).asInstanceOf[String]
@@ -87,7 +89,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
 
-    method.shape = ByteCodeMethodInfo.MethodInfoKey
+    method.shape = ByteCodeMethodInfo.Shape
     AccessibilityFieldsDelta.addAccessFlags(method)
     method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
     method.data.remove(Name)
@@ -180,19 +182,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     var methodCompiler: MethodCompiler = _
   }
 
-  object Shape extends ShapeWithConstraints {
-      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) : Unit = {
-        val method: Method[NodePath] = path
-        val bodyScope = builder.newScope(Some(parentScope), "methodBody")
-        method.parameters.foreach(parameter => {
-          val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-          val name = parameter(ParameterName).asInstanceOf[String]
-          builder.declare(name, parameter.getLocation(ParameterName), bodyScope, Some(parameterType))
-        })
-        BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
-      }
-
-  }
+  object Shape extends NodeShape
 
   object MethodGrammar extends GrammarKey
 
@@ -218,12 +208,10 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     def name_=(value: Any): Unit = node(ParameterName) = value
   }
 
-  override def description: String = "Enables Java classes to contain methods."
-
-
   override def inject(language: Language): Unit = {
     super.inject(language)
     JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
+    JavaClassSkeleton.hasConstraints.add(language, this)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
@@ -234,4 +222,22 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     builder.declare(method.name, path.asInstanceOf[ChildPath], parentScope, Some(methodType))
   }
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    getBodyScope(compilation, builder, path, parentScope)
+  }
+
+  def getBodyScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope) = {
+    val method: Method[NodePath] = path
+    val bodyScope = builder.newScope(Some(parentScope), "methodBody")
+    method.parameters.foreach(parameter => {
+      val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
+      val name = parameter(ParameterName).asInstanceOf[String]
+      builder.declare(name, parameter.getLocation(ParameterName), bodyScope, Some(parameterType))
+    })
+    BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
+    bodyScope
+  }
+
+  override def shape: NodeShape = Shape
 }

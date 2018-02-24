@@ -1,17 +1,17 @@
 package deltas.bytecode.coreInstructions.longs
 
 import core.language.node.Node
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{InstructionInstance, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta}
 
-object CompareLongDelta extends InstructionDelta {
+object CompareLongDelta extends InstructionInstance {
 
-  val compareLong = new Node(key)
+  val compareLong = new Node(shape)
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     PrintByteCode.hexToBytes("94")
   }
 

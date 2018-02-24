@@ -20,7 +20,7 @@ object IfThenElseDelta extends StatementInstance {
 
   override def toByteCode(ifThenElse: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
-    val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
+    val methodInfo = ifThenElse.findAncestorShape(ByteCodeMethodInfo.Shape)
     val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
     val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo)
     val endLabel = InferredStackFrames.label(endLabelName)
@@ -66,7 +66,7 @@ object IfThenElseDelta extends StatementInstance {
       super.getLabels(obj)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     IfThenDelta.constraints(compilation, builder, statement, parentScope)
     val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
     val elseBody = getElseStatements(statement)

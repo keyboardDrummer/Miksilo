@@ -1,41 +1,10 @@
 package core.language.node
 
-import core.deltas.path.{NodePath}
+import core.deltas.path.NodePath
+import core.language.SourceElement
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
-
-object Node {
-
-  def shapeDebugRepresentation(_shape: Any): String = _shape match {
-    case string: String => string
-    case anyRef: AnyRef =>
-      try
-      {
-        val shape = anyRef.getClass
-        getClassName(shape)
-      }
-      catch
-      {
-        case e: java.lang.InternalError => e.toString
-      }
-    case _ => _shape.toString
-  }
-
-  private def getClassName(shape: Class[_]): String = {
-    val enclosing = shape.getEnclosingClass
-    val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
-    addition + getDirectClassName(shape)
-  }
-
-  private def getDirectClassName(shape: Class[_]): String = {
-    val simpleName: String = shape.getSimpleName
-    if (simpleName.last == '$')
-      simpleName.dropRight(1)
-    else
-      simpleName
-  }
-}
 
 class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   extends NodeLike {
@@ -52,15 +21,29 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   def replaceWith(node: Node, keepData: Boolean = false): Unit = {
     shape = node.shape
-    if (!keepData)
+    if (!keepData) {
       data.clear()
+      sources.clear()
+    }
     data ++= node.data
   }
 
+  def removeField(field: NodeField): Unit = {
+    sources.remove(field)
+    data.remove(field)
+  }
+
+  val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
   def dataView: Map[NodeField, Any] = data.toMap
+
+  def getWithSource(field: NodeField): WithSource = WithSource(this(field), sources(field))
+  def setWithSource(field: NodeField, withSource: WithSource): Unit = {
+    this(field) = withSource.value
+    this.sources(field) = withSource.range
+  }
 
   def apply(key: NodeField) = data(key)
 
@@ -83,7 +66,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     val className = shape.toString
     if (data.isEmpty)
       return className
-    s"$className: ${data.map(kv => (Node.shapeDebugRepresentation(kv._1), kv._2))}"
+    s"$className: ${data.map(kv => (kv._1.debugRepresentation, kv._2))}"
   }
 
   override def equals(other: Any): Boolean = other match {
@@ -104,6 +87,13 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   override def get(key: NodeField): Option[Any] = data.get(key)
 
+  override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
+
+  def position: Option[SourceRange] =
+    if (sources.values.isEmpty) None
+    else Some(SourceRange(sources.values.map(p => p.start).min, sources.values.map(p => p.end).max))
 }
+
+case class WithSource(value: Any, range: SourceRange)
 
 

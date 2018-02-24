@@ -16,7 +16,7 @@ object NotInstructionDelta extends ExpandInstruction {
 
   object NotInstructionKey extends NodeShape
 
-  override val key = NotInstructionKey
+  override val shape = NotInstructionKey
 
   override def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node] = {
     val falseStartLabel = LabelDelta.getUniqueLabel("falseStart", methodInfo)

@@ -1,40 +1,41 @@
 package deltas.javac.methods.call
 
-import core.language.node._
-import core.deltas.path.{NodePath, SourceElementWithValue}
+import core.deltas.path.NodePath
 import core.language.Compilation
-import core.smarts.ConstraintBuilder
-import core.smarts.objects.DeclarationVariable
+import core.language.node._
+import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
+import core.smarts.{ConstraintBuilder, ResolvesToType}
 import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 
 object CallDelta
 {
-  object CallKey extends NodeShape
+  object Shape extends NodeShape
 
-  object CallCallee extends NodeField
+  object Callee extends NodeField
 
-  object CallArguments extends NodeField
+  object Arguments extends NodeField
 
   object CallArgumentsGrammar extends GrammarKey
 
-  def getCallCallee[T <: NodeLike](call: T) = call(CallDelta.CallCallee).asInstanceOf[T]
-
-  def getCallArguments[T <: NodeLike](call: T) = call(CallDelta.CallArguments).asInstanceOf[Seq[T]]
+  implicit class Call[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def callee: MemberSelector[T] = node(Callee).asInstanceOf[T]
+    def arguments: Seq[T] = NodeWrapper.wrapList(node(Arguments).asInstanceOf[Seq[T]])
+  }
 
   def call(callee: Any, arguments: Any): Node =
     call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
-  def call(callee: Node, arguments: Seq[Node] = Seq()) = {
-    new Node(CallDelta.CallKey, CallDelta.CallCallee -> callee, CallDelta.CallArguments -> arguments)
+  def call(callee: Node, arguments: Seq[Node] = Seq()): Node = {
+    new Node(CallDelta.Shape, CallDelta.Callee -> callee, CallDelta.Arguments -> arguments)
   }
 
-  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, parentScope: Scope,
-                      methodName: SourceElementWithValue, returnType: Type): DeclarationVariable = {
-    val callArguments = CallDelta.getCallArguments(call)
+  def callConstraints(compilation: Compilation, builder: ConstraintBuilder, callArguments: Seq[NodePath], parentScope: Scope,
+                      methodReference: Reference, returnType: Type): Unit = {
     val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
-    val constructorType = FunctionType.curry(callTypes, returnType)
-    builder.resolve(methodName.current.asInstanceOf[String], methodName, parentScope, Some(constructorType))
+    val functionType = FunctionType.curry(callTypes, returnType)
+    builder.add(new ResolvesToType(methodReference, builder.declarationVariable(), functionType))
   }
 }

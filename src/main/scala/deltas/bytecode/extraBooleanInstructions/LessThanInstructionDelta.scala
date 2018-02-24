@@ -14,7 +14,7 @@ object LessThanInstructionDelta extends ExpandInstruction {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(LabelledLocations, IfIntegerCompareLessDelta)
 
-  override val key = LessThanInstructionKey
+  override val shape = LessThanInstructionKey
 
   override def expand(instruction: Node, methodInfo: Node, state: Language): Seq[Node] = {
     val trueLabel = LabelDelta.getUniqueLabel("true", methodInfo)

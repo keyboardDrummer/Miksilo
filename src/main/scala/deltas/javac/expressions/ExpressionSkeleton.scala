@@ -10,14 +10,14 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.TypeSkeleton
 
-object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
+object ExpressionSkeleton extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
   def getType(compilation: Compilation): NodePath => Node = expression => {
-    getRegistry(compilation).instances(expression.shape).getType(expression, compilation)
+    getInstance(compilation)(expression).getType(expression, compilation)
   }
 
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
@@ -29,7 +29,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   def getInstance(language: Language): NodeLike => ExpressionInstance = {
-    expression => getRegistry(language).instances(expression.shape)
+    expression => expressionInstances.get(language, expression.shape)
   }
 
   def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
@@ -41,10 +41,7 @@ object ExpressionSkeleton extends DeltaWithGrammar with WithLanguageRegistry {
     grammars.create(ExpressionGrammar, core)
   }
 
-  def createRegistry = new Registry()
-  class Registry {
-    val instances = new ShapeRegistry[ExpressionInstance]
-  }
+  val expressionInstances = new ShapeProperty[ExpressionInstance]
 
   object CoreGrammar extends GrammarKey
   object ExpressionGrammar extends GrammarKey

@@ -18,7 +18,8 @@ object SolveConstraintsDelta extends Delta {
       val solver = builder.toSolver
       solver.run() match {
         case Success(_) => compilation.proofs = solver.proofs
-        case Failure(e:SolveException) => throw ConstraintException(e)
+        case Failure(e:SolveException) =>
+          throw ConstraintException(e)
         case Failure(e) => throw e
       }
     })
@@ -28,5 +29,5 @@ object SolveConstraintsDelta extends Delta {
     override def toString: String = solveException.toString
   }
 
-  override def description: String = "Adds the go to definition capability"
+  override def description: String = "Solves the semantic constraints"
 }

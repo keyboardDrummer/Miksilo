@@ -5,7 +5,7 @@ import core.bigrammar.BiGrammarToParser.WithMap
 
 case class MapGrammarWithMap(var inner: BiGrammar,
                         construct: WithMap => WithMap,
-                        deconstruct: WithMap => Option[WithMap])  extends BiGrammar {
+                        deconstruct: WithMap => Option[WithMap]) extends BiGrammar {
 
   override def children = Seq(inner)
 

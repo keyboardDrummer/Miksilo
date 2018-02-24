@@ -1,11 +1,12 @@
 package deltas.bytecode.attributes
 
 import core.bigrammar.BiGrammar
+import core.deltas.Contract
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
-import core.deltas.Contract
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
+import deltas.bytecode.ByteCodeSkeleton.HasBytes
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.readJar.ClassFileParser
 
@@ -18,12 +19,7 @@ object LineNumberTable extends ByteCodeAttribute {
     AttributeNameKey -> nameIndex,
     LineNumberTableLines -> lines)
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).getBytes(LineNumberTableKey) = getLineNumberTableBytes
-  }
-
-  def getLineNumberTableBytes(attribute: Node): Seq[Byte] = {
+  def getBytes(compilation: Compilation, attribute: Node): Seq[Byte] = {
     val entries = LineNumberTable.getLineNumberTableEntries(attribute)
     shortToBytes(entries.length) ++
       entries.flatMap(getLineNumberTableEntryByteCode)
@@ -41,10 +37,10 @@ object LineNumberTable extends ByteCodeAttribute {
   override def description: String = "Defines the line number table attribute. " +
     "This table explains which source code line a particular instruction came from, and can be used to aid in debugging."
 
-  override def key = LineNumberTableKey
+  override def shape = LineNumberTableKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
-    ("NotImplemented" : BiGrammar).asNode(key)
+    ("NotImplemented" : BiGrammar).asNode(shape)
   } // TODO implement. Also figure out why I can't use failure here.
 
   override def constantPoolKey: String = "LineNumberTable"

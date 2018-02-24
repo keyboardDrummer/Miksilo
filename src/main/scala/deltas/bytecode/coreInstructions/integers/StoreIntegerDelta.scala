@@ -2,18 +2,18 @@ package deltas.bytecode.coreInstructions.integers
 
 import core.language.node.Node
 import core.deltas.Contract
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.attributes.CodeAttributeDelta
-import deltas.bytecode.coreInstructions.{InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{InstructionInstance, InstructionSignature}
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.IntTypeDelta
 
-object StoreIntegerDelta extends InstructionDelta {
+object StoreIntegerDelta extends InstructionInstance {
 
-  def integerStore(location: Int) = CodeAttributeDelta.instruction(key, Seq(location))
+  def integerStore(location: Int) = CodeAttributeDelta.instruction(shape, Seq(location))
 
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val arguments = CodeAttributeDelta.getInstructionArguments(instruction)
     val location = arguments(0)
     if (location > 3)

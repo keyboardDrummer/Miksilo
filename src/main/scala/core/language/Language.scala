@@ -4,8 +4,8 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import core.deltas._
-import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
+import core.language.exceptions.BadInputException
 import core.language.node.Node
 import core.smarts.ConstraintBuilder
 
@@ -20,8 +20,7 @@ class Language {
   var compilerPhases: List[Phase] = List.empty
   var buildParser: () => (InputStream => Try[Node]) = () => null
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
-
-  lazy val parser = buildParser()
+  lazy val parser: InputStream => Try[Node] = buildParser()
 
   def parse(input: InputStream): Try[Node] = parser(input)
 
@@ -60,4 +59,3 @@ case class ParseException(message: String) extends BadInputException {
 }
 
 object NoSourceException extends BadInputException
-

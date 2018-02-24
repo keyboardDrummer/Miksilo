@@ -14,7 +14,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(LabelledLocations)
 
-  def label(name: String): Node = LabelDelta.key.create(LabelDelta.Name -> name)
+  def label(name: String): Node = LabelDelta.shape.create(LabelDelta.Name -> name)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val classFile: ClassFile[Node] = program
@@ -24,7 +24,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
       val stackLayouts = new InstructionTypeAnalysisForMethod(program, compilation, method)
       var previousStack = stackLayouts.initialStack
       var previousLocals = stackLayouts.parameters
-      for ((label, index) <- instructions.zipWithIndex.filter(i => i._1.shape == LabelDelta.key)) {
+      for ((label, index) <- instructions.zipWithIndex.filter(i => i._1.shape == LabelDelta.shape)) {
         val typeState = stackLayouts.typeStatePerInstruction(index)
         val currentStack = typeState.stackTypes
         val locals = getLocalTypesSequenceFromMap(typeState.variableTypes)
@@ -74,7 +74,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    grammars.find(LabelDelta.LabelKey).
+    grammars.find(LabelDelta.Shape).
       findAs(LabelDelta.StackFrame).
       asInstanceOf[GrammarReference].removeMe()
   }

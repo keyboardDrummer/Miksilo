@@ -2,8 +2,8 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node.{GrammarKey, Node, NodeLike, NodeWrapper}
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -33,7 +33,7 @@ object StatementSkeleton extends DeltaWithGrammar {
 
   val instances = new ShapeProperty[StatementInstance]
 
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     getInstance(compilation, statement).constraints(compilation, builder, statement, parentScope)
   }
 }

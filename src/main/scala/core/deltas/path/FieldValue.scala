@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.language.node.{Node, NodeField}
+import core.language.node.{Node, NodeField, SourceRange}
 
 case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   val current: Node = parent.current(field).asInstanceOf[Node]
@@ -17,6 +17,8 @@ case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
   override def pathAsString: String = s"${parent.pathAsString}/$field"
+
+  override def position: Option[SourceRange] = parent.current.sources.get(field).orElse(current.position)
 }
 
 

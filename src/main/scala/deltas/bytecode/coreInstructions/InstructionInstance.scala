@@ -2,11 +2,12 @@ package deltas.bytecode.coreInstructions
 
 import core.deltas._
 import core.language.node.{Node, NodeLike, NodeShape, NodeWrapper}
-import core.language.Language
+import core.language.{Compilation, Language}
+import deltas.bytecode.ByteCodeSkeleton.HasBytes
 import deltas.bytecode._
 import deltas.bytecode.attributes.CodeAttributeDelta.{InstructionSideEffectProvider, InstructionSignatureProvider, JumpBehavior}
 import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
-import deltas.bytecode.coreInstructions.InstructionDelta.InstructionShape
+import deltas.bytecode.coreInstructions.InstructionInstance.InstructionShape
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 
@@ -14,25 +15,25 @@ case class InstructionSignature(inputs: Seq[Node], outputs: Seq[Node])
 
 class ByteCodeTypeException(message: String) extends Exception(message)
 
-object InstructionDelta {
+object InstructionInstance {
   implicit class Instruction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def delta: InstructionDelta = node.shape.asInstanceOf[InstructionShape].delta
+    def delta: InstructionInstance = node.shape.asInstanceOf[InstructionShape].delta
     def jumpBehavior: JumpBehavior = delta.jumpBehavior
   }
-  case class InstructionShape(delta: InstructionDelta) extends NodeShape {
+  case class InstructionShape(delta: InstructionInstance) extends NodeShape {
     override lazy val toString: String = delta.name
   }
 }
 
-trait InstructionDelta extends InstructionWithGrammar
-  with InstructionSignatureProvider with InstructionSideEffectProvider with NodeShape {
+trait InstructionInstance extends InstructionWithGrammar
+  with InstructionSignatureProvider with InstructionSideEffectProvider with NodeShape with HasShape with HasBytes {
 
-  final override val key = InstructionShape(this)
+  final override val shape = InstructionShape(this)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    ByteCodeSkeleton.getRegistry(language).getBytes.put(key, getInstructionByteCode)
-    CodeAttributeDelta.getRegistry(language).instructions.put(key, this)
+    ByteCodeSkeleton.hasBytes.add(language, this)
+    CodeAttributeDelta.instructions.add(language, this)
   }
 
   def assertObjectTypeStackTop(stackTop: Node, name: String): Unit = {
@@ -59,8 +60,7 @@ trait InstructionDelta extends InstructionWithGrammar
 
   def jumpBehavior: JumpBehavior = JumpBehavior(movesToNext = true, hasJumpInFirstArgument = false)
 
-  def getInstructionSize: Int = getInstructionByteCode(new Node(key, InstructionArgumentsKey -> List.range(0,10))).size
-  def getInstructionByteCode(instruction: Node): Seq[Byte]
+  def getInstructionSize(compilation: Compilation): Int = getBytes(compilation, new Node(shape, InstructionArgumentsKey -> List.range(0,10))).size
 
   protected def binary(_type: Node) = InstructionSignature(Seq(_type, _type), Seq(_type))
 

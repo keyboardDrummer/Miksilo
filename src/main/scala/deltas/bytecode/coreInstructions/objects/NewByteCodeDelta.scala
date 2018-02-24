@@ -2,22 +2,22 @@ package deltas.bytecode.coreInstructions.objects
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionDelta, InstructionSignature}
+import deltas.bytecode.coreInstructions.{ConstantPoolIndexGrammar, InstructionInstance, InstructionSignature}
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.bytecode.{ByteCodeSkeleton, PrintByteCode}
 
-object NewByteCodeDelta extends InstructionDelta {
+object NewByteCodeDelta extends InstructionInstance {
   
-  def newInstruction(classRef: Any) = key.create(ClassRef -> classRef)
-  override def getInstructionByteCode(instruction: Node): Seq[Byte] = {
+  def newInstruction(classRef: Any) = shape.create(ClassRef -> classRef)
+  override def getBytes(compilation: Compilation, instruction: Node): Seq[Byte] = {
     val location = instruction(ClassRef).asInstanceOf[Int]
     PrintByteCode.hexToBytes("bb") ++ PrintByteCode.shortToBytes(location)
   }
-  override def getInstructionSize: Int = 3
+  override def getInstructionSize(compilation: Compilation): Int = 3
 
   override def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature = {
     val classRef = instruction(ClassRef).asInstanceOf[Node]
@@ -27,9 +27,9 @@ object NewByteCodeDelta extends InstructionDelta {
   }
 
   object ClassRef extends NodeField
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(ClassRef -> ClassInfoConstant.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(ClassRef -> ClassInfoConstant.shape))
   }
 
   override def argumentsGrammar(grammars: LanguageGrammars) = {

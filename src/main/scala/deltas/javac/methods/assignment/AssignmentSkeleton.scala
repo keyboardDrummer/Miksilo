@@ -16,11 +16,11 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MethodDelta
 import deltas.bytecode.types.TypeSkeleton
 
-object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
+object AssignmentSkeleton extends ExpressionInstance {
 
-  def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(AssignmentTarget).asInstanceOf[T]
+  def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
-  def getAssignmentValue[T <: NodeLike](assignment: T): T = assignment(AssignmentValue).asInstanceOf[T]
+  def getAssignmentValue[T <: NodeLike](assignment: T): T = assignment(Value).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(MethodDelta, StoreAddressDelta, StoreIntegerDelta, AssignmentPrecedence)
 
@@ -28,37 +28,38 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     import grammars._
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar) //TODO shouldn't this use AssignmentPrecedence?
-    val assignmentGrammar = targetGrammar.as(AssignmentTarget) ~~< "=" ~~ expressionGrammar.as(AssignmentValue) asNode AssignmentKey
+    val assignmentGrammar = targetGrammar.as(Target) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
     expressionGrammar.addOption(assignmentGrammar)
   }
 
   object AssignmentTargetGrammar extends GrammarKey
 
-  def assignment(target: Node, value: Node) = new Node(AssignmentKey, AssignmentTarget -> target, AssignmentValue -> value)
+  def assignment(target: Node, value: Node) = new Node(Shape, Target -> target, Value -> value)
 
-  object AssignmentKey extends NodeShape
+  object Shape extends NodeShape
 
-  object AssignmentTarget extends NodeField
+  object Target extends NodeField
 
-  object AssignmentValue extends NodeField
+  object Value extends NodeField
 
-  override val key = AssignmentKey
+  override val shape = Shape
 
   override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)
     ExpressionSkeleton.getType(compilation)(target)
   }
 
-  def createRegistry = new Registry()
-  class Registry {
-    val assignFromStackByteCodeRegistry = new ShapeRegistry[(Compilation, NodePath) => Seq[Node]]
+  trait HasAssignFromStackByteCode {
+    def getAssignFromStackByteCode(compilation: Compilation, path: NodePath): Seq[Node]
   }
+
+  val hasAssignFromStackByteCode = new ShapeProperty[HasAssignFromStackByteCode]
 
   override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
     val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
-    val assignInstructions = getRegistry(compilation).assignFromStackByteCodeRegistry(target.shape)(compilation, target)
+    val assignInstructions = hasAssignFromStackByteCode.get(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
     val valueType = ExpressionSkeleton.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {
@@ -76,6 +77,6 @@ object AssignmentSkeleton extends ExpressionInstance with WithLanguageRegistry {
     val target = getAssignmentTarget(assignment)
     val targetType = ExpressionSkeleton.getType(compilation, builder, target, parentScope)
     builder.typesAreEqual(targetType, _type)
-    builder.checkSubType(targetType, valueType)
+    builder.isFirstSubsetOfSecond(valueType, targetType)
   }
 }

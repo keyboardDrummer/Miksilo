@@ -18,16 +18,16 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableDelta)
 
-  override def inject(state: Language): Unit = {
-    AssignmentSkeleton.getRegistry(state).assignFromStackByteCodeRegistry.put(VariableDelta.VariableKey,
+  override def inject(language: Language): Unit = {
+    AssignmentSkeleton.hasAssignFromStackByteCode.add(language, VariableDelta.Shape,
       (compilation, targetVariable: NodePath) => {
       val methodCompiler = MethodDelta.getMethodCompiler(compilation)
       val target = VariableDelta.getVariableName(targetVariable)
       val variableInfo = methodCompiler.getVariables(targetVariable)(target)
-      val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, state)
+      val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, language)
       Seq(getStoreInstruction(variableInfo, byteCodeType))
     })
-    super.inject(state)
+    super.inject(language)
   }
 
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {

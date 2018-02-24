@@ -42,7 +42,6 @@ object PrintBiGrammar {
     case labelled: Labelled => grammarKeyToName(labelled.name)
     case NumberGrammar => "number"
     case StringLiteral => "string"
-    case As(inner, key) => withParenthesis(inner) ~ s".As($key)"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
     case ignore: IgnoreLeft =>
       val sequenceLike = ignore.inner.asInstanceOf[Sequence]
@@ -61,7 +60,7 @@ object PrintBiGrammar {
     case _ => toDocumentInner(grammar)
   }
 
-  private def withParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
+  def withParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
     case labelled:Labelled => toDocumentInner(labelled)
     case x => toDocumentInner(x).inParenthesis
   }

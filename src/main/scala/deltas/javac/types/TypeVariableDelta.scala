@@ -2,16 +2,16 @@ package deltas.javac.types
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeLike, NodeShape}
-import core.deltas.DeltaWithGrammar
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{HasType, TypeSkeleton}
 
-object TypeVariable extends DeltaWithGrammar with HasType {
+object TypeVariableDelta extends DeltaWithGrammar with HasType {
 
   override def description: String = "Adds references to type variables."
 
@@ -22,7 +22,7 @@ object TypeVariable extends DeltaWithGrammar with HasType {
     transformJavaGrammar(grammars)
   }
 
-  def transformJavaGrammar(grammars: LanguageGrammars): Unit = {
+  def transformJavaGrammar(grammars: LanguageGrammars): Unit = { //TODO this should not have a grammar that overlaps with UnqualifiedObjectTypeDelta. This and UnqualifiedObjectTypeDelta should depend on a TypeIdentifierDelta.
     import grammars._
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val variableGrammar: BiGrammar = identifier.as(TypeVariableName).asNode(Shape)
@@ -36,7 +36,7 @@ object TypeVariable extends DeltaWithGrammar with HasType {
   }
 
   def getTypeVariableName(node: Node): String = {
-    node(TypeVariable.TypeVariableName).asInstanceOf[String]
+    node(TypeVariableDelta.TypeVariableName).asInstanceOf[String]
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {

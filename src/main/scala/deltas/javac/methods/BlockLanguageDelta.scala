@@ -11,25 +11,25 @@ import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 
 object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 {
-  object ProgramKey extends NodeShape
-  object ProgramStatements extends NodeField
+  object Shape extends NodeShape
+  object Statements extends NodeField
 
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation, builder) => {
-      val statements = PathRoot(compilation.program)(ProgramStatements).asInstanceOf[Seq[ChildPath]]
+      val statements = PathRoot(compilation.program)(Statements).asInstanceOf[Seq[ChildPath]]
       BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope(debugName = "programScope"))
     }
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statements = find(StatementSkeleton.StatementGrammar).manyVertical.as(ProgramStatements).asNode(ProgramKey)
+    val statements = find(StatementSkeleton.StatementGrammar).manyVertical.as(Statements).asNode(Shape)
     find(BodyGrammar).inner = statements
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    val statements = program(ProgramStatements).asInstanceOf[Seq[Node]]
+    val statements = program(Statements).asInstanceOf[Seq[Node]]
     val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
     val method = MethodDelta.method("main",VoidTypeDelta.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))

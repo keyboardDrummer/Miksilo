@@ -2,23 +2,19 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 
-object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
-  def getScope(compilation: Compilation, builder: ConstraintBuilder, target: NodePath, parentScope: Scope): Scope = {
-    getRegistry(compilation).getScope(target.shape)(compilation,builder,target, parentScope)
+object MemberSelectorDelta extends DeltaWithGrammar {
+
+  implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def member: String = node(Member).asInstanceOf[String]
+    def target: T = node(Target).asInstanceOf[T]
   }
-
-  def getSelectorTarget[T <: NodeLike](selector: T): T = selector(Target).asInstanceOf[T]
-
-  def getSelectorMember(selector: Node): String = selector(Member).asInstanceOf[String]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -28,10 +24,6 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
   }
 
   object SelectGrammar extends GrammarKey
-
-  trait MethodContainerExpressionShape extends NodeShape {
-    def getScope(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Scope
-  }
 
   object Shape extends NodeShape
 
@@ -47,13 +39,13 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
       Member -> member)
   }
 
-  def getClassOrObjectReference(selector: NodePath, compiler: ClassCompiler): ClassOrObjectReference = {
-    val obj = getSelectorTarget(selector)
+  def getClassOrObjectReference(selector: MemberSelector[NodePath], compiler: ClassCompiler): ClassOrObjectReference = {
+    val obj = selector.target
     getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
   }
 
   def getReferenceKind(classCompiler: ClassCompiler, expression: NodePath): ReferenceKind = {
-    val getReferenceKindOption = MemberSelector.getReferenceKindRegistry(classCompiler.compilation).get(expression.shape)
+    val getReferenceKindOption = MemberSelectorDelta.referenceKindRegistry.get(classCompiler.compilation).get(expression.shape)
     getReferenceKindOption.fold[ReferenceKind]({
       getReferenceKindFromExpressionType(classCompiler, expression)
     })(implementation => implementation(classCompiler.compilation, expression))
@@ -64,13 +56,7 @@ object MemberSelector extends DeltaWithGrammar with WithLanguageRegistry {
     ClassOrObjectReference(classInfo, wasClass = false)
   }
 
-  def getReferenceKindRegistry(language: Language) = getRegistry(language).referenceKindRegistry
-  class Registry {
-    val referenceKindRegistry = new ShapeRegistry[(Compilation, NodePath) => ReferenceKind]()
-    val getScope = new ShapeRegistry[(Compilation, ConstraintBuilder, NodePath, Scope) => Scope]()
-  }
-
-  override def createRegistry = new Registry()
+  val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
 
   override def description: String = "Defines the selector grammar <expression>.<identifier>"
 

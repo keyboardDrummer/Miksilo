@@ -9,13 +9,6 @@ import core.smarts.types.{CheckSubType, TypeGraph, TypeNode, TypesAreEqual}
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
-trait SolveException extends Exception
-case class CouldNotApplyConstraints(constraints: Seq[Constraint]) extends SolveException {
-  override def toString: String = s"Left with constraints: $constraints"
-}
-
-
-
 /*
 Solves an ordered sequence of constraints. Takes a constraint builder because some constraints can create new ones.
 The output consists of
@@ -54,6 +47,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       }
       if (constraints.isEmpty)
         Success(())
+      else if (cycleCount == maxCycles)
+        Failure(MaxCycleCountReached(maxCycles))
       else
         Failure(CouldNotApplyConstraints(constraints))
     } catch {
@@ -67,9 +62,9 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def cycle() : Boolean = {
     var progress = false
     val remainingConstraints = constraints.filter(constraint => {
-      val result = !constraint.apply(this)
-      progress |= result
-      result
+      val applied = constraint.apply(this)
+      progress |= applied
+      !applied
     })
     generatedConstraints ++= builder.getConstraints //TODO add a test for this line.
     progress |= generatedConstraints.nonEmpty
@@ -132,7 +127,26 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
+      generatedConstraints ++= builder.getConstraints //TODO shouldn't this be running in a subSolver?
+      true
+    case (FunctionType(input, output, _), closure: ConstraintClosureType) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(closureOutput, output))
       generatedConstraints ++= builder.getConstraints
+      true
+    case (l, r) =>
+      typeGraph.isSuperType(TypeNode(l), TypeNode(r))
+  }
+
+  def couldBeSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
+    case (_: TypeVariable,_) => true
+    case (_,_: TypeVariable) => true
+    case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
+      couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
+    case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
+      val closureOutput = closure.instantiate(builder, input)
+      builder.add(CheckSubType(output, closureOutput))
+      generatedConstraints ++= builder.getConstraints //TODO shouldn't this be running in a subSolver?
       true
     case (FunctionType(input, output, _), closure: ConstraintClosureType) =>
       val closureOutput = closure.instantiate(builder, input)
@@ -153,7 +167,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def unifyTypes(left: Type, right: Type): Boolean = (resolveType(left), resolveType(right)) match {
-    case (TypeVariable(nl), TypeVariable(nr)) if nl == nr => true
+    case (TypeVariable(nl, _), TypeVariable(nr, _)) if nl == nr => true
     case (v: TypeVariable,_) => instantiateType(v,right)
     case (_,v: TypeVariable) => instantiateType(v,left)
     case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)

@@ -15,7 +15,7 @@ import deltas.javac.methods.MethodDelta
 
 object PostFixIncrementDelta extends ExpressionInstance {
 
-  override val key = PostfixIncrementKey
+  override val shape = PostfixIncrementKey
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, MethodDelta, IncrementIntegerDelta)
 

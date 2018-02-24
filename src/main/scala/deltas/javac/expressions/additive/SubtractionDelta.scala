@@ -10,6 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
+import deltas.javac.expressions.additive.AdditionDelta.{Left, Right, additionOrSubtractionConstraints}
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object SubtractionDelta extends ExpressionInstance {
@@ -17,9 +18,13 @@ object SubtractionDelta extends ExpressionInstance {
   object FirstKey extends NodeField
   object SecondKey extends NodeField
 
-  def getFirst[T <: NodeLike](subtraction: T) = subtraction(FirstKey).asInstanceOf[T]
+  implicit class Subtraction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def left: T = node(FirstKey).asInstanceOf[T]
+    def left_=(value: T): Unit = node(Left) = value
 
-  def getSecond[T <: NodeLike](subtraction: T) = subtraction(SecondKey).asInstanceOf[T]
+    def right: T = node(SecondKey).asInstanceOf[T]
+    def right_=(value: T): Unit = node(Right) = value
+  }
 
   override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerDelta)
 
@@ -37,25 +42,31 @@ object SubtractionDelta extends ExpressionInstance {
     FirstKey -> first,
     SecondKey -> second)
 
-  override val key = SubtractionKey
+  override val shape = SubtractionKey
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
+    val subtraction: Subtraction[NodePath] = expression
     val getType = ExpressionSkeleton.getType(compilation)
-    val firstType = getType(getFirst(expression))
-    val secondType = getType(getSecond(expression))
+    val firstType = getType(subtraction.left)
+    val secondType = getType(subtraction.right)
     TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)
     TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, secondType)
     IntTypeDelta.intType
   }
 
-  override def toByteCode(subtraction: NodePath, compilation: Compilation): Seq[Node] = {
+  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
+    val subtraction: Subtraction[NodePath] = expression
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
-    val firstInstructions = toInstructions(getFirst(subtraction))
-    val secondInstructions = toInstructions(getSecond(subtraction))
+    val firstInstructions = toInstructions(subtraction.left)
+    val secondInstructions = toInstructions(subtraction.right)
     firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)
   }
 
   override def description: String = "Adds the - operator."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ??? //TODO reuse code from addition
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val left = expression.left
+    val right = expression.right
+    additionOrSubtractionConstraints(compilation, builder, _type, parentScope, left, right)
+  }
 }

@@ -23,7 +23,7 @@ object NullDelta extends ExpressionInstance {
 
   object Shape extends NodeShape
 
-  override val key = Shape
+  override val shape = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = ???
 

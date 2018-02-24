@@ -2,8 +2,8 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.{NodePath, SequenceElement}
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath, SequenceElement}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -28,7 +28,7 @@ object IfThenDelta extends StatementInstance {
 
   override def toByteCode(ifThen: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThen)
-    val method = ifThen.findAncestorShape(ByteCodeMethodInfo.MethodInfoKey)
+    val method = ifThen.findAncestorShape(ByteCodeMethodInfo.Shape)
     val endLabelName = LabelDelta.getUniqueLabel("ifEnd", method)
     val end = InferredStackFrames.label(endLabelName)
     val body = getThenStatements(ifThen)
@@ -68,12 +68,13 @@ object IfThenDelta extends StatementInstance {
   }
 
   override def getLabels(obj: NodePath): Map[Any, NodePath] = {
-    val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
-    Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next) ++
-      super.getLabels(obj)
+    val nextMap = obj.asInstanceOf[SequenceElement].getNext.fold[Map[Any, NodePath]](Map.empty)(
+      next => Map(getNextLabel(getThenStatements(obj).last) -> next)
+    ) //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
+    nextMap ++ super.getLabels(obj)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val bodyScope = builder.newScope(Some(parentScope), "thenScope")
     val body = getThenStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, body, bodyScope)

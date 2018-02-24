@@ -3,28 +3,23 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeShape}
 import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.ConstantPoolItemContentGrammar
+import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolItemContentGrammar, HasBytes}
 
-trait ConstantEntry extends DeltaWithGrammar {
-
-  def key: NodeShape
-
-  def getByteCode(constant: Node, state: Language): Seq[Byte]
+trait ConstantEntry extends DeltaWithGrammar with HasShape with HasBytes {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    ByteCodeSkeleton.getRegistry(language).constantEntries.add(this)
-    ByteCodeSkeleton.getRegistry(language).getBytes.put(key, (constant: Node) => getByteCode(constant, language))
+    ByteCodeSkeleton.constantEntries.add(language, this)
+    ByteCodeSkeleton.hasBytes.add(language, this)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val constantEntryGrammar = getConstantEntryGrammar(grammars)
     import grammars._
     val itemContent = find(ConstantPoolItemContentGrammar)
-    itemContent.addOption(create(key, (getName ~~> constantEntryGrammar).asNode(key)))
+    itemContent.addOption(create(shape, (getName ~~> constantEntryGrammar).asNode(shape)))
   }
 
   def getName: BiGrammar

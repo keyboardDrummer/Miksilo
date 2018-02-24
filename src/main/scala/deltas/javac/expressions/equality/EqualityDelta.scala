@@ -36,7 +36,7 @@ object EqualityDelta extends ExpressionInstance {
 
   object SecondKey extends NodeField
 
-  override val key = EqualityKey
+  override val shape = EqualityKey
 
   override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 

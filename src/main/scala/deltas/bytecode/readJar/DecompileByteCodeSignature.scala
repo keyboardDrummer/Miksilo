@@ -17,24 +17,20 @@ import deltas.javac.types.{MethodType, TypeAbstraction}
 
 import scala.collection.mutable.ArrayBuffer
 
-object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegistry {
+object DecompileByteCodeSignature extends DeltaWithPhase {
 
   override def description: String = "Decompiles the field and method signatures in a classfile."
 
   override def dependencies: Set[Contract] = Set[Contract](SignatureAttribute, ClassInfoConstant)
 
-  class Registry {
-    var parseType: String => Node = _
-  }
+  val parseTypeProperty = new Property[String => Node](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
     val parser = BiGrammarToParser.toStringParser(typeGrammar)
-    getRegistry(language).parseType = input => parser(input).get.asInstanceOf[Node]
+    parseTypeProperty.add(language, input => parser(input).get.asInstanceOf[Node])
   }
-
-  override def createRegistry = new Registry()
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val constantPool = program.constantPool
@@ -48,7 +44,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegist
 
     val members = new ArrayBuffer[Node]()
     val javaClass = JavaClassSkeleton.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
-    
+
     val fieldInfos = program(ByteCodeSkeleton.ClassFields).asInstanceOf[Seq[Node]]
 
     members ++= getFields(state, constantPool, fieldInfos)
@@ -62,11 +58,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegist
     flatMap(p => p._2.map(flag => (flag, p._1))).toMap
 
   def getMethods(language: Language, constantPool: ConstantPool, methodInfos: Seq[Node]): Seq[Node] = {
-    val parseType = getRegistry(language).parseType
+    val parseType = parseTypeProperty.get(language)
     methodInfos.map(methodInfo => {
       val nameIndex: Int = methodInfo(ByteCodeMethodInfo.MethodNameIndex).asInstanceOf[Int]
       val attributes = methodInfo(ByteCodeMethodInfo.MethodAttributes).asInstanceOf[Seq[Node]]
-      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.key)
+      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.shape)
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]
@@ -105,11 +101,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase with WithLanguageRegist
   }
 
   def getFields(language: Language, constantPool: ConstantPool, fieldInfos: Seq[Node]): Seq[Node] = {
-    val parseType = getRegistry(language).parseType
+    val parseType = parseTypeProperty.get(language)
     fieldInfos.map(fieldInfo => {
       val nameIndex: Int = fieldInfo(ByteCodeFieldInfo.NameIndex).asInstanceOf[Int]
       val attributes = fieldInfo(ByteCodeFieldInfo.FieldAttributes).asInstanceOf[Seq[Node]]
-      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.key)
+      val signatureAttribute = attributes.find(node => node.shape == SignatureAttribute.shape)
       val _type: Node = signatureAttribute match {
         case Some(signature) =>
           val signatureIndex = signature(SignatureAttribute.SignatureIndex).asInstanceOf[Int]

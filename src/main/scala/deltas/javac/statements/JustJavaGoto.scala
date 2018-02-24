@@ -1,8 +1,8 @@
 package deltas.javac.statements
 
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -30,11 +30,9 @@ object JustJavaGoto extends StatementInstance {
 
   override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set(labels(getTarget(obj.current)))
 
-  override def getNextLabel(statement: NodePath): (NodePath, String) = super.getNextLabel(statement)
-
   override def description: String = "Adds a goto statement"
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: ChildPath, parentScope: Scope): Unit = {
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val target = getTarget(statement)
     builder.resolve(target, statement, parentScope)
   }

@@ -3,6 +3,7 @@ package deltas.javac
 import application.compilerCockpit.PrettyPrint
 import core.deltas._
 import core.language.Language
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode._
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes._
@@ -20,7 +21,7 @@ import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, In
 import deltas.bytecode.types._
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.classes._
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
 import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
@@ -49,23 +50,23 @@ object JavaLanguage {
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, SelectorReferenceKind, VariableReferenceKind) ++
-      Seq(ThisCallExpression, SuperCallExpression, ThisVariable) ++ fields ++ imports ++
+      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReference) ++
+      Seq(ThisCallExpression, SuperCallExpression, ThisVariableDelta) ++ fields ++ imports ++
       javaMethod
   }
 
   def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
   def fields = Seq(FieldDeclarationDelta, AssignToMember)
 
-  val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
+  val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
   def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelector) ++ blockWithVariables)
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ javaClassSkeleton
+    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
+  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
   def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
@@ -83,7 +84,7 @@ object JavaLanguage {
 
   def byteCodeDeltas: Seq[Delta] = byteCodeInstructions ++ byteCodeWithoutInstructions
 
-  def byteCodeInstructions: Seq[InstructionDelta] = {
+  def byteCodeInstructions: Seq[InstructionInstance] = {
     Seq(Pop2Delta, PopDelta, GetStaticDelta, GotoDelta, IfIntegerCompareLessDelta, IfIntegerCompareLessOrEqualDelta,
       IfZeroDelta, IfNotZero, InvokeSpecialDelta, InvokeVirtualDelta, InvokeStaticDelta, NewByteCodeDelta, Duplicate2InstructionDelta, DuplicateInstructionDelta) ++
       objectInstructions ++ Seq(PushNullDelta, StoreIntegerDelta, SubtractIntegerDelta, VoidReturnInstructionDelta,
@@ -116,7 +117,7 @@ object JavaLanguage {
     ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
     InvokeDynamicConstant)
 
-  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariable, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
+  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
     SuperTypeArgument, TypeApplicationDelta, MethodType) ++
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
       ShortTypeDelta, TypeSkeleton)

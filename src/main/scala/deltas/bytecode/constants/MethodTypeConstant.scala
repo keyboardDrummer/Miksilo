@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
@@ -12,17 +12,17 @@ object MethodTypeConstant extends ConstantEntry {
 
   object MethodTypeConstantKey extends NodeShape
   object MethodTypeDescriptorIndex extends NodeField
-  override def key = MethodTypeConstantKey
+  override def shape = MethodTypeConstantKey
 
   def construct(descriptorIndex: Int) = new Node(MethodTypeConstantKey, MethodTypeDescriptorIndex -> descriptorIndex)
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     byteToBytes(16) ++ shortToBytes(constant(MethodTypeDescriptorIndex).asInstanceOf[Int])
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(MethodTypeDescriptorIndex -> Utf8ConstantDelta.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(MethodTypeDescriptorIndex -> Utf8ConstantDelta.shape))
   }
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {

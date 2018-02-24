@@ -10,7 +10,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MemberSelector, MethodDelta, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
   val thisName: String = "this"
@@ -39,7 +39,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: NodePath): Unit = {
     val name = VariableDelta.getVariableName(variable)
     val newVariableName = if (classMember._static) currentClass.name else thisName
-    val selector = MemberSelector.selector(VariableDelta.variable(newVariableName), name)
+    val selector = MemberSelectorDelta.selector(VariableDelta.variable(newVariableName), name)
     variable.replaceWith(selector)
   }
 
@@ -66,7 +66,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
           classCompiler.bind()
 
         case MethodDelta.Shape => MethodDelta.setMethodCompiler(obj, compilation)
-        case VariableDelta.VariableKey => addThisToVariable(compilation, obj)
+        case VariableDelta.Shape => addThisToVariable(compilation, obj)
         case _ =>
       }
       true
@@ -74,7 +74,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val callee = grammars.find(CallDelta.CallCallee)
+    val callee = grammars.find(CallDelta.Callee)
     val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
     callee.inner = expression
   }

@@ -1,6 +1,6 @@
 package core.deltas.path
 
-import core.language.node.{Node, NodeField}
+import core.language.node.{Node, NodeField, SourceRange}
 
 case class SequenceElement(parent: NodePath, field: NodeField, index: Int) extends ChildPath
 {
@@ -8,6 +8,7 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
   def sequence: Seq[NodePath] = parent(field).asInstanceOf[Seq[NodePath]]
   def next: NodePath = sequence(index + 1)
   def hasNext: Boolean = sequence.length > (index + 1)
+  def getNext: Option[NodePath] = if (hasNext) Some(next) else None
 
   def replaceWith(replacements: Seq[Any]): Unit = {
     val originalSequence = parent.current(field).asInstanceOf[Seq[NodePath]]
@@ -27,4 +28,6 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
   override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
   override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
+
+  override def position: Option[SourceRange] = current.asNode.position
 }

@@ -17,7 +17,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the + operator."
 
-  val key = Shape
+  val shape = Shape
 
   override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
@@ -73,8 +73,14 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
   object Right extends NodeField
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val firstType = ExpressionSkeleton.getType(compilation, builder, expression.left, parentScope)
-    val secondType = ExpressionSkeleton.getType(compilation, builder, expression.right, parentScope)
+    val left = expression.left
+    val right = expression.right
+    additionOrSubtractionConstraints(compilation, builder, _type, parentScope, left, right)
+  }
+
+  def additionOrSubtractionConstraints(compilation: Compilation, builder: ConstraintBuilder, _type: Type, parentScope: Scope, left: NodePath, right: NodePath): Unit = {
+    val firstType = ExpressionSkeleton.getType(compilation, builder, left, parentScope)
+    val secondType = ExpressionSkeleton.getType(compilation, builder, right, parentScope)
     builder.add((solver: ConstraintSolver) => {
       val resolved = solver.resolveType(firstType)
       val additionTypeOption: Option[Type] = resolved match {

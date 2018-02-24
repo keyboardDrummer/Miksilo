@@ -14,7 +14,7 @@ import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 object IntLiteralDelta extends ExpressionInstance {
-  val key = Shape
+  val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
 

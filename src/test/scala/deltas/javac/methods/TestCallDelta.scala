@@ -5,13 +5,13 @@ import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import org.scalatest.FunSuite
 
-class TestCallC extends FunSuite {
+class TestCallDelta extends FunSuite {
 
-  test("callC") {
+  test("basic") {
     val language = new Language()
     ExpressionSkeleton.inject(language)
-    MemberSelector.inject(language)
+    MemberSelectorDelta.inject(language)
     CallStaticOrInstanceDelta.inject(language)
-    assert(ExpressionSkeleton.getRegistry(language).instances.get(CallDelta.CallKey).nonEmpty)
+    assert(ExpressionSkeleton.expressionInstances.get(language).get(CallDelta.Shape).nonEmpty)
   }
 }

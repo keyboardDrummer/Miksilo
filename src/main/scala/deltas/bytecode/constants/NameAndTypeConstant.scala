@@ -3,7 +3,7 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.language.Language
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
@@ -30,7 +30,7 @@ object NameAndTypeConstant extends ConstantEntry {
 
   def getTypeIndex(nameAndType: Node): Int = nameAndType(Type).asInstanceOf[Int]
 
-  override def key = Shape
+  override def shape = Shape
 
   implicit class NameAndTypeConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: TypeConstantWrapper[T] = node(Type).asInstanceOf[T]
@@ -40,16 +40,16 @@ object NameAndTypeConstant extends ConstantEntry {
     def name_=(value: Utf8Constant[T]): Unit = node(Name) = value
   }
 
-  override def getByteCode(constant: Node, state: Language): Seq[Byte] = {
+  override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = {
     byteToBytes(12) ++ shortToBytes(getName(constant)) ++
       shortToBytes(getTypeIndex(constant))
   }
 
-  override def inject(state: Language): Unit = {
-    super.inject(state)
-    ByteCodeSkeleton.getRegistry(state).constantReferences.put(key, Map(
-      Name -> Utf8ConstantDelta.key,
-      Type -> Utf8ConstantDelta.key))
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(
+      Name -> Utf8ConstantDelta.shape,
+      Type -> Utf8ConstantDelta.shape))
   }
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
