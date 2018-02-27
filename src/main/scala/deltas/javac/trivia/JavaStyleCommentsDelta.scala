@@ -15,7 +15,7 @@ object JavaStyleCommentsDelta extends DeltaWithGrammar {
 
   def getCommentGrammar: BiGrammar = {
     val comment = TokenColor(RegexGrammar("""(?s)/\*[^(\*/)]*\*/""".r), TokenTypes.COMMENT_MULTILINE)
-    new LeftRight(comment, space).ignoreRight
+    new LeftRight(comment, printSpace).ignoreRight
   }
 
   override def description: String = "Adds Java-style comments to the language"

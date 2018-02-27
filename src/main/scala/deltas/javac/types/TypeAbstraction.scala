@@ -36,7 +36,7 @@ object TypeAbstraction extends DeltaWithGrammar {
     import grammars._
     val variableGrammar: BiGrammar = identifier.as(ParameterName) asNode ParameterKey
     val parametersGrammar: BiGrammar = variableGrammar.some
-    create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< space).option.optionToSeq)
+    create(TypeParametersGrammar, ("<" ~> parametersGrammar ~< ">" ~< printSpace).option.optionToSeq)
   }
 
   object AbstractMethodTypeGrammar extends GrammarKey

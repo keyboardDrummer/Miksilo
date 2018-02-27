@@ -122,7 +122,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with HasBytes with HasShape 
     import grammars._
     val attributesGrammar = find(ByteCodeSkeleton.AttributesGrammar).as(CodeAttributesKey)
     val instructionGrammar: BiGrammar = create(InstructionGrammar)
-    val maxStackGrammar = create(MaxStackGrammar, "stack" ~ ":" ~> integer.as(MaxStack) ~< "," ~ space)
+    val maxStackGrammar = create(MaxStackGrammar, "stack" ~ ":" ~> integer.as(MaxStack) ~< "," ~ printSpace)
     val maxLocalGrammar = "locals" ~ ":" ~> integer.as(CodeMaxLocalsKey)
     val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = instructionGrammar.manyVertical.indent().as(Instructions)

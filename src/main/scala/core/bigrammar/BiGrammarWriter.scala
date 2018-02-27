@@ -24,7 +24,7 @@ trait BiGrammarWriter {
 
   def keywordClass(value: String) = Keyword(value, reserved = false, verifyWhenPrinting = true)
 
-  def space: BiGrammar = print(WhiteSpace(1, 1))
+  def printSpace: BiGrammar = print(WhiteSpace(1, 1))
 
   def keyword(word: String): BiGrammar = Keyword(word)
 

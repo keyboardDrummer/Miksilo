@@ -89,7 +89,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasByte
     val methodInfoGrammar: BiGrammar = "Method" ~ ";"  %>
       ("name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %
       "descriptor" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodDescriptor) %
-      "flags" ~ ":" ~~> parseAccessFlag.manySeparated("," ~ space).seqToSet.as(AccessFlagsKey) %
+      "flags" ~ ":" ~~> parseAccessFlag.manySeparated("," ~ printSpace).seqToSet.as(AccessFlagsKey) %
       attributesGrammar.as(MethodAttributes)).indent().asNode(Shape)
 
     create(Shape, methodInfoGrammar)
