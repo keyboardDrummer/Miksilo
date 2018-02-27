@@ -4,11 +4,11 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
-case class TokenColor(var inner: BiGrammar, _type: Int) extends CustomGrammar {
+case class Colorize(var inner: BiGrammar, _type: Int) extends CustomGrammar {
 
   override def children = Seq(inner)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = TokenColor(newChildren.head, _type)
+  override def withChildren(newChildren: Seq[BiGrammar]) = Colorize(newChildren.head, _type)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = inner.containsParser(recursive)
 

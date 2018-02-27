@@ -9,15 +9,15 @@ import org.fife.ui.rsyntaxtextarea.TokenTypes
 
 object JavaStyleCommentsDelta extends DeltaWithGrammar {
 
+  override def description: String = "Adds Java-style comments to the language"
+
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(TriviaGrammar).addOption(getCommentGrammar)
   }
 
   def getCommentGrammar: BiGrammar = {
-    val comment = TokenColor(RegexGrammar("""(?s)/\*[^(\*/)]*\*/""".r), TokenTypes.COMMENT_MULTILINE)
+    val comment = Colorize(RegexGrammar("""(?s)/\*[^(\*/)]*\*/""".r), TokenTypes.COMMENT_MULTILINE)
     new LeftRight(comment, printSpace).ignoreRight
   }
-
-  override def description: String = "Adds Java-style comments to the language"
 
 }
