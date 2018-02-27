@@ -220,7 +220,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val returnType = method.returnType
     val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
 
-    builder.declare(method.name, path.getLocation(Name), parentScope, Some(methodType))
+    builder.declare(method.name, parentScope, path.getLocation(Name), Some(methodType))
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
@@ -233,7 +233,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method.parameters.foreach(parameter => {
       val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
       val name = parameter(ParameterName).asInstanceOf[String]
-      builder.declare(name, parameter.getLocation(ParameterName), bodyScope, Some(parameterType))
+      builder.declare(name, bodyScope, parameter.getLocation(ParameterName), Some(parameterType))
     })
     BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
     bodyScope

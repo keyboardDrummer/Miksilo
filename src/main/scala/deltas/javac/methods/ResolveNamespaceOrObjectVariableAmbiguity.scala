@@ -1,6 +1,5 @@
 package deltas.javac.methods
 
-import core.language.SourceElement
 import core.language.node.FieldLocation
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import core.smarts.types.TypesAreEqual
@@ -12,8 +11,8 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
                                                      var scopeDeclaration: Declaration) extends Constraint {
   override def apply(solver: ConstraintSolver): Boolean = {
     namespaceOrObjectVariableDeclaration match {
-      case e:NamedDeclaration =>
-        val value = e.origin.asInstanceOf[SourceElement]
+      case e:NamedDeclaration if e.origin.nonEmpty =>
+        val value = e.origin.get
         value match {
           case fieldLocation: FieldLocation => fieldLocation.field match {
             case JavaClassSkeleton.Name => //TODO allow referencing packages.

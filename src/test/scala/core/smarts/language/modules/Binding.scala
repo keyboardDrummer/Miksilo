@@ -10,7 +10,7 @@ case class Binding(name: String, body: Expression, bindingType: Option[LanguageT
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit = {
     val typeVariable = bindingType.fold[Type](builder.typeVariable())(t => t.constraints(builder, parentScope))
-    builder.declare(name, this, parentScope, Some(typeVariable))
+    builder.declare(name, parentScope, this, Some(typeVariable))
     body.constraints(builder, typeVariable, parentScope)
   }
 }

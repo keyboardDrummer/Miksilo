@@ -17,7 +17,7 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
-    val structDeclaration: NamedDeclaration = builder.declare(name, this, parentScope)
+    val structDeclaration: NamedDeclaration = builder.declare(name, parentScope, this)
     builder.add(DeclarationHasType(structDeclaration, TypeFromDeclaration(structDeclaration)))
     val scopeOfParent: Option[Scope] = parent.map(p => {
       val parentDeclaration = builder.declarationVariable()
@@ -29,7 +29,7 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
     val structScope = builder.declareScope(structDeclaration, scopeOfParent)
     fields.foreach(field => {
       val _type = field._type.constraints(builder, parentScope)
-      builder.declare(field.name, field, structScope, Some(_type))
+      builder.declare(field.name, structScope, field, Some(_type))
     })
   }
 

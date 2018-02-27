@@ -19,8 +19,7 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
   }
 
   def isReference(position: Position): Boolean = {
-    val element = getSourceElement(position)
-    getProofs.scopeGraph.findReference(element).nonEmpty
+    goOption(position).nonEmpty
   }
 
   def toPosition(row: Int, column: Int): Position = {
@@ -29,10 +28,15 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
   }
 
   def go(position: Position): SourceRange = {
+    val declaration: Option[SourceElement] = goOption(position)
+    declaration.get.position.get
+  }
+
+  private def goOption(position: Position) = {
     val proofs = getProofs
     val element = getSourceElement(position)
     val declaration = proofs.resolveLocation(element)
-    declaration.position.get
+    declaration
   }
 
   def compile(): Unit = {

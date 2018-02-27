@@ -16,7 +16,7 @@ case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinit
                   imports: Seq[ModuleImport] = Seq.empty) extends FakeSourceElement
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit = {
-    val moduleDeclaration = builder.declare(name, this, parentScope)
+    val moduleDeclaration = builder.declare(name, parentScope, this)
     val scope = builder.declareScope(moduleDeclaration, Some(parentScope))
     structs.foreach(struct => struct.constraints(builder, scope))
     bindings.foreach(binding => binding.constraints(builder, scope))

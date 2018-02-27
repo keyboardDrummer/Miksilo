@@ -1,5 +1,6 @@
 package deltas.javac.classes
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -15,10 +16,13 @@ import deltas.javac.methods.VariableDelta.{Name, Shape}
 object ThisVariableDelta extends DeltaWithGrammar
 {
   object Grammar extends GrammarKey
+
+  val thisName = "this"
+
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val variable = find(VariableDelta.VariableGrammar)
-    val thisGrammar = create(Grammar, ("this" ~> value("this").as(Name)).asNode(Shape))
+    val thisGrammar = create(Grammar, (thisName: BiGrammar).as(Name)).asNode(Shape)
     variable.addOption(thisGrammar)
   }
 
@@ -29,9 +33,7 @@ object ThisVariableDelta extends DeltaWithGrammar
         val clazz: JavaClassSkeleton.JavaClass[NodePath] = path
         val clazzName = clazz.name
         val classDeclaration = builder.resolve(clazzName, path, classScope)
-        builder.declare("this",
-          path,
-          classScope, Some(TypeFromDeclaration(classDeclaration)))
+        builder.declare(thisName, classScope, _type = Some(TypeFromDeclaration(classDeclaration)))
       }
     })
     super.inject(language)
@@ -39,5 +41,5 @@ object ThisVariableDelta extends DeltaWithGrammar
 
   override def dependencies: Set[Contract] = Set(VariableDelta)
 
-  override def description: String = "Enables using the 'this' qualifier to refer to the current instance."
+  override def description: String = "Enables using the '" + thisName + "' qualifier to refer to the current instance."
 }

@@ -51,4 +51,12 @@ class GotoDefinitionTest extends FunSuite {
     val methodRange = SourceRange(server.toPosition(8, 23), server.toPosition(8, 32))
     assertResult(methodRange)(fibonacciDefinition)
   }
+
+  test("assignment") {
+    val program = SourceUtils.getJavaTestFileContents("FieldAssignment")
+    val getProgram = () => SourceUtils.stringToStream(program)
+    val server = new LanguageServer(getProgram, JavaLanguage.getJava)
+    val myFieldDefinition = server.go(server.toPosition(11, 9))
+    assertResult(SourceRange(server.toPosition(2,9), server.toPosition(2,16)))(myFieldDefinition)
+  }
 }

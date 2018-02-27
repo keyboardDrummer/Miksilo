@@ -1,9 +1,9 @@
 package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
@@ -93,7 +93,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
     val field: Field[NodePath] = path
-    builder.declare(field.name, path.asInstanceOf[ChildPath], parentScope, Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
+    builder.declare(field.name, parentScope, path.getLocation(Name), Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {

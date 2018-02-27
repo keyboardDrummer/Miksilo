@@ -12,7 +12,7 @@ class Proofs {
   var environment = Map.empty[Declaration, Type]
   var resolutions = Map.empty[Reference, NamedDeclaration]
 
-  def resolveLocation(location: SourceElement): SourceElement = {
+  def resolveLocation(location: SourceElement): Option[SourceElement] = {
     val reference = scopeGraph.findReference(location).get
     resolutions(reference).origin
   }

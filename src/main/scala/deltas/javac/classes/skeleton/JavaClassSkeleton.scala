@@ -114,12 +114,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       val packageParts = clazz.node._package.toList
       val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
       getState(compilation).packageScopes.getOrElseUpdate(fullPackage, {
-        val packageDeclaration = builder.declare(fullPackage, path, defaultPackageScope)
+        val packageDeclaration = builder.declare(fullPackage, defaultPackageScope, path)
         builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
       })
     }
 
-    val clazzDeclaration = builder.declare(clazz.name, path.getLocation(Name), packageScope)
+    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getLocation(Name))
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members

@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.node.Node
 import core.deltas.path._
 import core.language.{Compilation, Language}
-import deltas.javac.classes.ClassCompiler
+import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.ExpressionSkeleton
@@ -13,11 +13,12 @@ import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
-  val thisName: String = "this"
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton)
+  override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  def addThisToVariable(compilation: Compilation, variable: NodePath) {
+  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, ThisVariableDelta)
+
+  def addThisToVariable(compilation: Compilation, variable: ChildPath) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
     val name = VariableDelta.getVariableName(variable)
@@ -36,10 +37,11 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     }
   }
 
-  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: NodePath): Unit = {
-    val name = VariableDelta.getVariableName(variable)
-    val newVariableName = if (classMember._static) currentClass.name else thisName
-    val selector = MemberSelectorDelta.selector(VariableDelta.variable(newVariableName), name)
+  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: ChildPath): Unit = {
+    val newVariableName = if (classMember._static) currentClass.name else ThisVariableDelta.thisName
+    val selector = MemberSelectorDelta.Shape.createWithSource(
+      MemberSelectorDelta.Target -> VariableDelta.variable(newVariableName),
+      MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
     variable.replaceWith(selector)
   }
 
@@ -48,12 +50,10 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
       return PathRoot(obj.current)
 
     obj match {
-      case FieldValue(parent, field) => new FieldValue(getVariableWithCorrectPath(parent), field)
-      case SequenceElement(parent, field, index) => new SequenceElement(getVariableWithCorrectPath(parent), field, index)
+      case FieldValue(parent, field) => FieldValue(getVariableWithCorrectPath(parent), field)
+      case SequenceElement(parent, field, index) => SequenceElement(getVariableWithCorrectPath(parent), field, index)
     }
   }
-
-  override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin: NodePath = PathRoot(program)
@@ -66,7 +66,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
           classCompiler.bind()
 
         case MethodDelta.Shape => MethodDelta.setMethodCompiler(obj, compilation)
-        case VariableDelta.Shape => addThisToVariable(compilation, obj)
+        case VariableDelta.Shape => addThisToVariable(compilation, obj.asInstanceOf[ChildPath])
         case _ =>
       }
       true

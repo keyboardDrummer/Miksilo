@@ -39,7 +39,11 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   def dataView: Map[NodeField, Any] = data.toMap
 
-  def getWithSource(field: NodeField): WithSource = WithSource(this(field), sources(field))
+  def getWithSource(field: NodeField): Any = {
+    val value = this(field)
+    sources.get(field).fold(value)(source => WithSource(value, source))
+  }
+
   def setWithSource(field: NodeField, withSource: WithSource): Unit = {
     this(field) = withSource.value
     this.sources(field) = withSource.range

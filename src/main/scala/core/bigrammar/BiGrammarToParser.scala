@@ -107,21 +107,24 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
   /**
     * Improves the error message slightly over the original
     */
-  override implicit def literal(s: String): Parser[String] = (in: Input) => {
-    val source = in.source
-    val offset = in.offset
-    val start = offset
-    var i = 0
-    var j = start
-    while (i < s.length && j < source.length && s.charAt(i) == source.charAt(j)) {
-      i += 1
-      j += 1
-    }
-    if (i == s.length)
-      Success(source.subSequence(start, j).toString, in.drop(j - offset))
-    else {
-      val found = if (start == source.length()) "end of source" else "`" + source.subSequence(start, start + i + 1) + "'"
-      Failure("`" + s + "' expected but " + found + " found", in.drop(i + start - offset))
+  override implicit def literal(value: String): Parser[String] = new Parser[String] {
+    override def apply(in: BiGrammarToParser.Input): BiGrammarToParser.ParseResult[String] = {
+      val source = in.source
+      val offset = in.offset
+      val start = offset
+      var matchLength = 0
+      var currentPosition = start
+      while (matchLength < value.length && currentPosition < source.length && value.charAt(matchLength) == source.charAt(currentPosition)) {
+        matchLength += 1
+        currentPosition += 1
+      }
+      if (matchLength == value.length)
+        Success(source.subSequence(start, currentPosition).toString, in.drop(currentPosition - offset))
+      else {
+        val nextPosition = currentPosition + 1
+        val found = if (nextPosition >= source.length()) "end of source" else "`" + source.subSequence(start, nextPosition) + "'"
+        Failure("`" + value + "' expected but " + found + " found", in.drop(matchLength))
+      }
     }
   }
 

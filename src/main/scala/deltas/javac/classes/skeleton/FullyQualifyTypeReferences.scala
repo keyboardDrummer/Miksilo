@@ -11,7 +11,7 @@ object FullyQualifyTypeReferences extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     PathRoot(program).visitShape(UnqualifiedObjectTypeDelta.Shape, _type => {
-      val declaration = compilation.proofs.resolveLocation(_type).asInstanceOf[FieldLocation].node
+      val declaration = compilation.proofs.resolveLocation(_type).get.asInstanceOf[FieldLocation].node
       val clazz: JavaClassSkeleton.JavaClass[Node] = declaration
       val parts = clazz._package ++ Seq(clazz.name)
       _type.replaceWith(QualifiedObjectTypeDelta.neww(QualifiedClassName(parts)))
