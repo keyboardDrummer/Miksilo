@@ -7,7 +7,7 @@ import core.language.{Compilation, Language}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.methods.MethodDelta._
+import deltas.javac.methods.MethodDelta.{Name, _}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
