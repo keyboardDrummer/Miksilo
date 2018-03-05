@@ -4,7 +4,7 @@ import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.PrintError
 import org.scalatest.FunSuite
 
-class TestSimpleExpressionLanguage extends FunSuite with BiGrammarSequenceWriter {
+class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenceCombinators {
 
   test("SimpleAddition") {
     val example = "3 + 4"
@@ -101,23 +101,23 @@ Partial:
       t => Multiply(t._1, t._2)
     , multiply => (multiply.first, multiply.second))
 
-    multipleLabel.addOption(multiply)
-    multipleLabel.addOption(numberValue)
-    multipleLabel.addOption(parenthesis)
+    multipleLabel.addAlternative(multiply)
+    multipleLabel.addAlternative(numberValue)
+    multipleLabel.addAlternative(parenthesis)
 
     val addLabel = new Labelled(StringKey("add"))
     val add: BiGrammar = (addLabel ~~< "+" ~~ addLabel).map[(TestExpression, TestExpression), Add](
       t => Add(t._1, t._2)
       , add => (add.first, add.second))
-    addLabel.addOption(add)
-    addLabel.addOption(multipleLabel)
+    addLabel.addAlternative(add)
+    addLabel.addAlternative(multipleLabel)
 
     val _if: BiGrammar = (expression % ("?" ~~> expression) % (":" ~~> expression)).map[((TestExpression, TestExpression), TestExpression), IfNotZero](
       t => IfNotZero(t._1._1, t._1._2, t._2),
       ifNotZero => ((ifNotZero.condition, ifNotZero._then), ifNotZero._else))
 
-    expression.addOption(_if)
-    expression.addOption(addLabel)
+    expression.addAlternative(_if)
+    expression.addAlternative(addLabel)
     expression
   }
 }

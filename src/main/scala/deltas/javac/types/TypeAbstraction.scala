@@ -52,7 +52,7 @@ object TypeAbstraction extends DeltaWithGrammar {
     val parametersGrammar: BiGrammar = variableGrammar.some
     val abstractMethodType = create(AbstractMethodTypeGrammar, (("<" ~> parametersGrammar.as(Parameters) ~< ">") ~ methodTypeGrammar.as(Body)).
       asNode(TypeAbstractionKey))
-    byteCodeType.addOption(abstractMethodType)
+    byteCodeType.addAlternative(abstractMethodType)
   }
 
   override def description: String = "Adds type abstraction or 'generics'."

@@ -18,7 +18,7 @@ object SelectInnerClassDelta extends DeltaWithGrammar {
     val objectInner = find(ByteCodeGrammarInner)
     val selectInnerGrammar = (objectInner.as(ParentClass) ~< "." ~~ objectInner.as(ChildClass)).asNode(SelectInnerClass)
 
-    objectInner.addOption(selectInnerGrammar)
+    objectInner.addAlternative(selectInnerGrammar)
   }
 
   override def description: String = "Enables a type referring to an inner class."

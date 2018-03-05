@@ -17,7 +17,7 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val statementGrammar = language.grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(new NodeGrammar("break" ~ ";", BreakShape))
+    statementGrammar.addAlternative(new NodeGrammar("break" ~ ";", BreakShape))
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {

@@ -28,7 +28,7 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val parseDeclarationWithInitializer = create(Shape,
       (typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(Initializer)) ~< ";").
       asNode(Shape))
-    statement.addOption(parseDeclarationWithInitializer)
+    statement.addAlternative(parseDeclarationWithInitializer)
   }
 
   def declarationWithInitializer(name: String, _type: Node, initializer: Node) = new Node(Shape,

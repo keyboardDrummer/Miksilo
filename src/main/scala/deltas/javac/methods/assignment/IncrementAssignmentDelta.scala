@@ -22,7 +22,7 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     val assignmentTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
     val incrementAssignmentGrammar = assignmentTarget.as(AssignmentSkeleton.Target) ~~
       ("+=" ~~> assignmentGrammar.as(AssignmentSkeleton.Value)) asNode IncrementAssignmentKey
-    assignmentGrammar.addOption(incrementAssignmentGrammar)
+    assignmentGrammar.addAlternative(incrementAssignmentGrammar)
   }
 
   def transformIncrementAssignment(incrementAssignment: NodePath, state: Language): Unit = {

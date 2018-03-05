@@ -39,7 +39,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val whileGrammar =
       "while" ~> expression.inParenthesis.as(Condition) %
       blockGrammar.as(Body) asLabelledNode WhileKey
-    statementGrammar.addOption(whileGrammar)
+    statementGrammar.addAlternative(whileGrammar)
   }
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {

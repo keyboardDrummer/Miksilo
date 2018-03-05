@@ -26,7 +26,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     import grammars._
     val memberGrammar = find(ClassMemberGrammar)
     val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerDelta.Shape).inner.asInstanceOf[NodeGrammar].inner asNode Shape
-    memberGrammar.addOption(fieldDeclarationWithInitializer)
+    memberGrammar.addAlternative(fieldDeclarationWithInitializer)
   }
 
   object Shape extends NodeShape

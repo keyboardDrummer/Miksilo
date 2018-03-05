@@ -24,7 +24,7 @@ trait TypeInstance extends DeltaWithGrammar with HasShape with HasType with HasS
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)
     grammars.create(shape, javaGrammar)
     val parseType = grammars.find(TypeSkeleton.JavaTypeGrammar)
-    parseType.addOption(javaGrammar)
+    parseType.addAlternative(javaGrammar)
   }
 
   def getJavaGrammar(grammars: LanguageGrammars): BiGrammar

@@ -64,8 +64,8 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     val numberGrammar = (number : BiGrammar).as(Value).asLabelledNode(IntegerClass)
     val expressionGrammar = new Labelled(Expression)
     val additionGrammar = expressionGrammar.as(Left) ~ "+" ~ expressionGrammar.as(Right) asLabelledNode Add
-    expressionGrammar.addOption(numberGrammar)
-    expressionGrammar.addOption(additionGrammar)
+    expressionGrammar.addAlternative(numberGrammar)
+    expressionGrammar.addAlternative(additionGrammar)
 
     grammars.find(BodyGrammar).inner = expressionGrammar
     val expectedBeforeAdditionGrammar = new LeftRight(expressionGrammar.as(Left), new WithTrivia(new LeftRight("+",

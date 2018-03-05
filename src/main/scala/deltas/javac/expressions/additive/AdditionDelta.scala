@@ -19,6 +19,16 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val shape = Shape
 
+  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta, AddIntegersDelta)
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+
+    val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
+    val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Shape
+    additiveGrammar.addAlternative(parseAddition)
+  }
+
   override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(addition.left)
@@ -46,15 +56,6 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
         LongTypeDelta.longType
       case _ => throw new NotImplementedError()
     }
-  }
-
-  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, AddIntegersDelta)
-
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
-    import grammars._
-    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
-    val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Shape
-    additiveGrammar.addOption(parseAddition)
   }
 
   implicit class Addition[T <: NodeLike](val node: T) extends NodeWrapper[T] {

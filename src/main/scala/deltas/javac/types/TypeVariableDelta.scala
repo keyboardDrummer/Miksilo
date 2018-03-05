@@ -26,13 +26,13 @@ object TypeVariableDelta extends DeltaWithGrammar with HasType {
     import grammars._
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val variableGrammar: BiGrammar = identifier.as(TypeVariableName).asNode(Shape)
-    typeGrammar.addOption(variableGrammar)
+    typeGrammar.addAlternative(variableGrammar)
   }
 
   def transformByteCodeGrammar(grammars: LanguageGrammars): Unit = {
     import grammars._
     val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
-    byteCodeType.addOption(Keyword("T", false) ~> identifier.as(TypeVariableName) ~< ";" asNode Shape)
+    byteCodeType.addAlternative(Keyword("T", false) ~> identifier.as(TypeVariableName) ~< ";" asNode Shape)
   }
 
   def getTypeVariableName(node: Node): String = {

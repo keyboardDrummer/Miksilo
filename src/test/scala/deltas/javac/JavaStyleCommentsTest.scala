@@ -8,7 +8,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
+import deltas.javac.expressions.additive.{AdditivePrecedenceDelta, AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
@@ -57,7 +57,7 @@ class JavaStyleCommentsTest
 
   test("BasicClass") {
     val input = "/* jooo */"
-    TestGrammarUtils.parseAndPrintSame(input, None, JavaStyleCommentsDelta.getCommentGrammar)
+    TestGrammarUtils.parseAndPrintSame(input, None, JavaStyleCommentsDelta.commentGrammar)
   }
 
   object ExpressionAsRoot extends DeltaWithGrammar
@@ -79,7 +79,7 @@ class JavaStyleCommentsTest
 //Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
   test("addition") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
 
@@ -90,7 +90,7 @@ class JavaStyleCommentsTest
 
   test("addition2") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, SubtractionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
 
@@ -101,7 +101,7 @@ class JavaStyleCommentsTest
 
   test("addition3") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleCommentsDelta, ExpressionAsRoot) ++
-      Seq(SubtractionDelta, AdditionDelta, AddAdditivePrecedence, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
     JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
 

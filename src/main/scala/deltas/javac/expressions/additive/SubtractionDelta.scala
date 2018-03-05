@@ -26,14 +26,14 @@ object SubtractionDelta extends ExpressionInstance {
     def right_=(value: T): Unit = node(Right) = value
   }
 
-  override def dependencies: Set[Contract] = Set(AddAdditivePrecedence, SubtractIntegerDelta)
+  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta, SubtractIntegerDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
-    val additiveGrammar = find(AddAdditivePrecedence.Grammar)
+    val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
     val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
     val parseSubtraction = (additiveGrammar.as(FirstKey) ~~< "-") ~~ withoutSubtraction.as(SecondKey) asNode SubtractionKey
-    additiveGrammar.addOption(parseSubtraction)
+    additiveGrammar.addAlternative(parseSubtraction)
   }
 
   def subtraction(first: Any, second: Any): Node = subtraction(first.asInstanceOf[Node], second.asInstanceOf[Node])

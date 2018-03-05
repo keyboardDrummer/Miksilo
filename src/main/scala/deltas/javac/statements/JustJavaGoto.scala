@@ -25,7 +25,7 @@ object JustJavaGoto extends StatementInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
+    statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 
   override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set(labels(getTarget(obj.current)))

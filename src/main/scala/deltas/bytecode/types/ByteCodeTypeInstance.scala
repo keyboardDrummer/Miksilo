@@ -16,7 +16,7 @@ trait ByteCodeTypeInstance extends TypeInstance {
     super.transformGrammars(grammars, language)
     val byteCodeGrammar = grammars.create(byteCodeGrammarKey, getByteCodeGrammar(grammars))
     val byteCodeType = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-    byteCodeType.addOption(byteCodeGrammar)
+    byteCodeType.addAlternative(byteCodeGrammar)
   }
 
   override def inject(language: Language): Unit = {

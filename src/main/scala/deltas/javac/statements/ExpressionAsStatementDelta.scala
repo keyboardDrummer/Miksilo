@@ -40,7 +40,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Shape
-    statementGrammar.addOption(expressionAsStatement)
+    statementGrammar.addAlternative(expressionAsStatement)
   }
 
   override def description: String = "Enables using an expression as a statement."

@@ -4,7 +4,7 @@ import core.bigrammar.printer.{BiGrammarToPrinter, BiGrammarToPrinter$, PrintErr
 import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 
-class TestFailureFeedback extends FunSuite with BiGrammarSequenceWriter {
+class TestFailureFeedback extends FunSuite with WhitespaceTriviaSequenceCombinators {
 
   test("FailureFeedback") {
     val input = ("1", "2")

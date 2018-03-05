@@ -26,7 +26,7 @@ object LocalDeclarationDelta extends StatementInstance {
     val statement = find(StatementSkeleton.StatementGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
-    statement.addOption(parseDeclaration)
+    statement.addAlternative(parseDeclaration)
   }
 
   def declaration(name: String, _type: Node): Node = {

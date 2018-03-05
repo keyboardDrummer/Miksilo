@@ -48,7 +48,7 @@ object IfThenElseDelta extends StatementInstance {
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val ifThenGrammar = find(IfThenDelta.shape)
     val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode shape
-    statementGrammar.addOption(ifThenElseGrammar)
+    statementGrammar.addAlternative(ifThenElseGrammar)
   }
 
   def getElseStatements[T <: NodeLike](ifThen: T): Seq[T] = {

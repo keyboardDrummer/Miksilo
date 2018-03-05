@@ -29,7 +29,7 @@ object AssignmentSkeleton extends ExpressionInstance {
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar) //TODO shouldn't this use AssignmentPrecedence?
     val assignmentGrammar = targetGrammar.as(Target) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
-    expressionGrammar.addOption(assignmentGrammar)
+    expressionGrammar.addAlternative(assignmentGrammar)
   }
 
   object AssignmentTargetGrammar extends GrammarKey

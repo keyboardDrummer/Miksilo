@@ -57,7 +57,7 @@ object IfThenDelta extends StatementInstance {
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val ifThenGrammar = create(IfThenKey, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") % bodyGrammar.as(Then)).
       asNode(IfThenKey))
-    statementGrammar.addOption(ifThenGrammar)
+    statementGrammar.addAlternative(ifThenGrammar)
   }
 
   override def description: String = "Enables using the if-then (no else) construct."

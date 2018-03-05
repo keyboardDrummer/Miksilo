@@ -155,7 +155,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))
 
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
-    memberGrammar.addOption(methodGrammar)
+    memberGrammar.addAlternative(methodGrammar)
   }
 
   def method(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],

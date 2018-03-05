@@ -26,7 +26,7 @@ object VariableDelta extends ExpressionInstance {
     import grammars._
     val core = find(ExpressionSkeleton.CoreGrammar)
     val variableGrammar = create(VariableGrammar, identifier.as(Name) asNode Shape)
-    core.addOption(variableGrammar)
+    core.addAlternative(variableGrammar)
   }
 
   object VariableGrammar extends GrammarKey

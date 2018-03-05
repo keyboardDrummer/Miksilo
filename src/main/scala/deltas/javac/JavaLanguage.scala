@@ -19,12 +19,12 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
-import deltas.javaPlus.ExpressionMethodDelta
+import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembers}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
 import deltas.javac.constructor._
 import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AddAdditivePrecedence, AdditionDelta, SubtractionDelta}
+import deltas.javac.expressions.additive.{AdditivePrecedenceDelta, AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, IntLiteralDelta, LongLiteralDelta, NullDelta}
 import deltas.javac.expressions.postfix.PostFixIncrementDelta
@@ -46,7 +46,7 @@ object JavaLanguage {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta)
+      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembers)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -72,7 +72,7 @@ object JavaLanguage {
     ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
-    AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AddAdditivePrecedence,
+    AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisDelta, ExpressionSkeleton) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++

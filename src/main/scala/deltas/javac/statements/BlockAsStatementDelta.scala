@@ -17,7 +17,7 @@ object BlockAsStatementDelta extends StatementInstance {
     import grammars._
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val blockGrammar = "block" ~> find(BlockDelta.Grammar).as(Statements) asLabelledNode Shape
-    statementGrammar.addOption(blockGrammar)
+    statementGrammar.addAlternative(blockGrammar)
   }
 
   implicit class BlockStatement[T <: NodeLike](val node: T) extends NodeWrapper[T] {

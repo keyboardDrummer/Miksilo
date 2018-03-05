@@ -12,12 +12,14 @@ object JavaStyleCommentsDelta extends DeltaWithGrammar {
   override def description: String = "Adds Java-style comments to the language"
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    grammars.find(TriviaGrammar).addOption(getCommentGrammar)
+    grammars.find(TriviaGrammar).addAlternative(commentGrammar)
   }
 
-  def getCommentGrammar: BiGrammar = {
-    val comment = Colorize(RegexGrammar("""(?s)/\*[^(\*/)]*\*/""".r), TokenTypes.COMMENT_MULTILINE)
-    new LeftRight(comment, printSpace).ignoreRight
-  }
+  val commentGrammar: BiGrammar = {
+    import BasicSequenceCombinators._
 
+    val comment = RegexGrammar("""(?s)/\*[^(\*/)]*\*/""".r)
+    val coloredComment = Colorize(comment, TokenTypes.COMMENT_MULTILINE)
+    (coloredComment ~ printSpace).ignoreRight
+  }
 }

@@ -6,7 +6,9 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.javac.expressions.ExpressionSkeleton
 
-object AddAdditivePrecedence extends DeltaWithGrammar {
+object AdditivePrecedenceDelta extends DeltaWithGrammar {
+
+  override def description: String = "Creates a named grammar with the correct precedence for addition-like operators."
 
   override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
@@ -17,6 +19,4 @@ object AddAdditivePrecedence extends DeltaWithGrammar {
   }
 
   object Grammar extends GrammarKey
-
-  override def description: String = "Creates a named grammar with the correct precedence for addition-like operators."
 }

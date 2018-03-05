@@ -14,8 +14,9 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(WhileLoopDelta, BlockAsStatementDelta)
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
+
     val statementGrammar = find(StatementSkeleton.StatementGrammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
@@ -23,7 +24,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
       expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %
       blockGrammar.as(Body) asNode Shape
-    statementGrammar.addOption(forLoopGrammar)
+    statementGrammar.addAlternative(forLoopGrammar)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

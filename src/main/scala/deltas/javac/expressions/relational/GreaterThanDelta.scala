@@ -27,6 +27,6 @@ object GreaterThanDelta extends ComparisonOperatorDelta { //TODO move more code 
     import grammars._
     val relationalGrammar = find(AddRelationalPrecedence.RelationalExpressionGrammar)
     val parseLessThan = ((relationalGrammar.as(Left) ~~< ">") ~~ relationalGrammar.as(Right)).asNode(Shape)
-    relationalGrammar.addOption(parseLessThan)
+    relationalGrammar.addAlternative(parseLessThan)
   }
 }

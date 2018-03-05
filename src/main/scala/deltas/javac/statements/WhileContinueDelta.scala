@@ -40,7 +40,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val statementGrammar = language.grammars.find(StatementSkeleton.StatementGrammar)
-    statementGrammar.addOption(new NodeGrammar("continue" ~ ";", ContinueKey))
+    statementGrammar.addAlternative(new NodeGrammar("continue" ~ ";", ContinueKey))
   }
 
   object ContinueKey extends NodeShape

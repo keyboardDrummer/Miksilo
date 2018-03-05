@@ -22,7 +22,7 @@ object IntLiteralDelta extends ExpressionInstance {
     import grammars._
     val inner = integer
     val parseNumber = inner.as(Value).asLabelledNode(Shape)
-    find(ExpressionSkeleton.ExpressionGrammar).addOption(parseNumber)
+    find(ExpressionSkeleton.ExpressionGrammar).addAlternative(parseNumber)
   }
 
   def literal(value: Int) = new Node(Shape, Value -> value)

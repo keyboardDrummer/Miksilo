@@ -18,11 +18,11 @@ object ExtendsDelta extends DeltaWithGrammar with HasShape with HasType {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val byteCodeArgumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
-    byteCodeArgumentGrammar.addOption(("+" ~~> byteCodeArgumentGrammar.as(ExtendsBody)).asNode(Shape))
+    byteCodeArgumentGrammar.addAlternative(("+" ~~> byteCodeArgumentGrammar.as(ExtendsBody)).asNode(Shape))
 
     val javaTypeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val javaArgumentGrammar = find(TypeApplicationDelta.JavaTypeArgumentGrammar)
-    javaArgumentGrammar.addOption(("?" ~~> "extends" ~~> javaTypeGrammar.as(ExtendsBody)).asNode(Shape))
+    javaArgumentGrammar.addAlternative(("?" ~~> "extends" ~~> javaTypeGrammar.as(ExtendsBody)).asNode(Shape))
   }
 
   val shape: NodeShape = Shape

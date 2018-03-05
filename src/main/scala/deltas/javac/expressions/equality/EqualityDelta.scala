@@ -25,7 +25,7 @@ object EqualityDelta extends ExpressionInstance {
     import grammars._
     val equalityGrammar = find(AddEqualityPrecedence.EqualityExpressionGrammar)
     val parseEquality = ((equalityGrammar.as(FirstKey) ~< "==") ~ equalityGrammar.as(SecondKey)).asNode(EqualityKey)
-    equalityGrammar.addOption(parseEquality)
+    equalityGrammar.addAlternative(parseEquality)
   }
 
   def equality(first: Node, second: Node) = new Node(EqualityKey, FirstKey -> first, SecondKey -> second)
