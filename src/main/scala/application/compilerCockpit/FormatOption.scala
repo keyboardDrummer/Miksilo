@@ -5,14 +5,14 @@ import java.io.InputStream
 import core.deltas.Delta
 import core.language.Language
 
-object PrettyPrintOption extends CompileOption {
+object FormatOption extends CompileOption {
 
   val prettyPrint = PrettyPrint(recover = true)
   var language: Language = _
 
   override def initialize(sandbox: LanguageSandbox): Unit = {
-    val splicedParticles = Delta.replace(sandbox.deltas, MarkOutputGrammar, Seq(prettyPrint))
-    language = Delta.buildLanguage(splicedParticles)
+    val startWithPrettyPrint = Seq(PrettyPrint(recover = true)) ++ sandbox.deltas
+    language = Delta.buildLanguage(startWithPrettyPrint)
   }
 
   override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
@@ -21,5 +21,5 @@ object PrettyPrintOption extends CompileOption {
     TextWithGrammar(state.output, outputGrammar)
   }
 
-  override def toString = "Pretty Print"
+  override def toString = "Reformat code"
 }
