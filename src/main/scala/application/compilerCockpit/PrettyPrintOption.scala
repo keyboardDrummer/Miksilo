@@ -8,7 +8,7 @@ object PrettyPrintOption extends CompileOption {
 
   override def perform(cockpit: LanguageSandbox, input: InputStream): TextWithGrammar = {
     val prettyPrint = PrettyPrint(recover = true)
-    val splicedParticles = Delta.replace(cockpit.deltas, MarkOutputGrammar,Seq(prettyPrint))
+    val splicedParticles = Delta.replace(cockpit.deltas, MarkOutputGrammar, Seq(prettyPrint))
     val language = Delta.buildLanguage(splicedParticles)
 
     val state = language.parseAndTransform(input)

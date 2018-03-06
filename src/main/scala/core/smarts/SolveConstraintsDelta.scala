@@ -26,7 +26,7 @@ object SolveConstraintsDelta extends Delta {
   }
 
   case class ConstraintException(solveException: SolveException) extends BadInputException {
-    override def toString: String = solveException.toString
+    override def toString: String = "Could not solve semantic constriants:" + solveException.toString
   }
 
   override def description: String = "Solves the semantic constraints"

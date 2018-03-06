@@ -1,6 +1,7 @@
 package core.language
 
 import core.deltas.path.{NodePath, PathRoot}
+import core.language.exceptions.BadInputException
 import core.language.node.{NodeLike, Position, SourceRange}
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import util.SourceUtils
@@ -12,10 +13,10 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
 
-  var compilation: Compilation = _
+  var compilation: Option[Compilation] = None
 
   def documentChanged(): Unit = {
-    compilation = null
+    compilation = None
   }
 
   def isReference(position: Position): Boolean = {
@@ -32,28 +33,34 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
     declaration.get.position.get
   }
 
-  private def goOption(position: Position) = {
-    val proofs = getProofs
-    val element = getSourceElement(position)
-    val declaration = proofs.resolveLocation(element)
-    declaration
+  private def goOption(position: Position): Option[SourceElement] = {
+    for {
+      proofs <- getProofs
+      element = getSourceElement(position)
+      declaration <- proofs.resolveLocation(element)
+    } yield declaration
   }
 
   def compile(): Unit = {
-    compilation = new Compilation(language)
-    compilation.program = language.parse(getSource).get
-    for(phase <- proofPhases)
-      phase.action(compilation)
+    val compilation = new Compilation(language)
+    try {
+      compilation.program = language.parse(getSource).get
+      for(phase <- proofPhases)
+        phase.action(compilation)
+      this.compilation = Some(compilation)
+    } catch {
+      case e: BadInputException =>
+    }
   }
 
-  def getCompilation: Compilation = {
-    if (compilation == null)
+  def getCompilation: Option[Compilation] = {
+    if (compilation.isEmpty)
       compile()
     compilation
   }
 
-  def getProofs: Proofs = {
-    getCompilation.proofs
+  def getProofs: Option[Proofs] = {
+    getCompilation.map(c => c.proofs)
   }
 
   def getSourceElement(position: Position): SourceElement = {
@@ -70,7 +77,7 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
       val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
-    getForNode(PathRoot(getCompilation.program))
+    getForNode(PathRoot(getCompilation.get.program))
   }
 
   def getSource: InputStream = {
