@@ -50,7 +50,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
 
   def getCompileOptions: Seq[CompileOption] = {
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode)
-    val result = Seq(PrettyPrintOption) ++ byteCodeActions ++ Seq(FormatOption)
+    val result = Seq(PrettyPrintOption) ++ byteCodeActions ++ Seq(FormatOption) ++ language.extraCompileOptions
     result.foreach(option => option.initialize(this))
     result
   }

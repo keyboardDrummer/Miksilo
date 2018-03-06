@@ -25,7 +25,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     assertThrows[ParseException]({
@@ -54,7 +54,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)
@@ -85,7 +85,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta) ++
       JavaLanguage.javaCompilerDeltas)
 
@@ -118,7 +118,7 @@ class ReorderMembersTest extends FunSuite {
         |    /* third comes last */
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta, PrettyPrint(),
       JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
       JavaLanguage.javaCompilerDeltas)
 

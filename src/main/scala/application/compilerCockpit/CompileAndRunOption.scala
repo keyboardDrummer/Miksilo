@@ -19,5 +19,5 @@ object CompileAndRunOption extends CompileOption {
     TextWithGrammar(state.output)
   }
 
-  override def toString = "Compile and run"
+  override def name = "Compile and run"
 }

@@ -3,6 +3,7 @@ package core.language
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
+import application.compilerCockpit.CompileOption
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
@@ -21,6 +22,7 @@ class Language {
   var buildParser: () => (InputStream => Try[Node]) = () => null
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
   lazy val parser: InputStream => Try[Node] = buildParser()
+  var extraCompileOptions: List[CompileOption] = List.empty
 
   def parse(input: InputStream): Try[Node] = parser(input)
 

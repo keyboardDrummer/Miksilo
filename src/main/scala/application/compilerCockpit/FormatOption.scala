@@ -21,5 +21,5 @@ object FormatOption extends CompileOption {
     TextWithGrammar(state.output, outputGrammar)
   }
 
-  override def toString = "Reformat code"
+  override def name = "Reformat code"
 }

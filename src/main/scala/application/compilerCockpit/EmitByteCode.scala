@@ -14,5 +14,5 @@ object EmitByteCode extends CompileOption {
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }
 
-  override def toString = "Emit ByteCode"
+  override def name = "Emit ByteCode"
 }

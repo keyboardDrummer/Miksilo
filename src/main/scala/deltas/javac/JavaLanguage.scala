@@ -19,7 +19,7 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
-import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembers}
+import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
 import deltas.javac.constructor._
@@ -46,7 +46,7 @@ object JavaLanguage {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembers)
+      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
