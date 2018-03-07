@@ -35,7 +35,7 @@ import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, 
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
-import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 
 object JavaLanguage {
@@ -45,7 +45,7 @@ object JavaLanguage {
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
-    Set(ConstantPoolIndices, JavaStyleCommentsDelta, StoreTriviaDelta,
+    Set(ConstantPoolIndices, JavaStyleBlockCommentsDelta, StoreTriviaDelta,
       TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {

@@ -7,9 +7,9 @@ import core.deltas.DeltaWithGrammar
 import core.language.Language
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 
-object JavaStyleCommentsDelta extends DeltaWithGrammar {
+object JavaStyleBlockCommentsDelta extends DeltaWithGrammar {
 
-  override def description: String = "Adds Java-style comments to the language"
+  override def description: String = "Adds Java-style block comments to the language"
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(TriviaGrammar).addAlternative(commentGrammar)

@@ -25,7 +25,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def transformContinue(continuePath: NodePath, startLabels: mutable.Map[NodePath, String], language: Language): Unit = {
-    val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.WhileKey)
+    val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.Shape)
     val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(containingWhile))
     continuePath.replaceWith(JustJavaGoto.goto(label))
   }

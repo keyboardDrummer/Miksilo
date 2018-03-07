@@ -13,10 +13,10 @@ import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.JavaLanguage
-import deltas.javac.trivia.JavaStyleCommentsDelta
+import deltas.javac.trivia.JavaStyleBlockCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleCommentsDelta))
+  extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
 {
 
   test("BasicClass") {
