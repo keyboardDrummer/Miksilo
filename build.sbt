@@ -45,6 +45,4 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9"
 // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 
-resolvers += Resolver.bintrayRepo("dhpcs", "maven")
-
-libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1"
+libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1"
