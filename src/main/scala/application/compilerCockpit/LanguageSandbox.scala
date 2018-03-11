@@ -12,6 +12,7 @@ import core.bigrammar.BiGrammar
 import core.deltas.Delta
 import core.language.Language
 import core.language.exceptions.CompileException
+import core.language.{Language, LanguageServer}
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
