@@ -7,16 +7,16 @@ import java.nio.charset.StandardCharsets
 import javax.swing._
 
 import core.language.node.Node
-import core.language.{LanguageServer, NoSourceException, ParseException}
+import core.language.{Language, NoSourceException, ParseException}
+import lsp.MiksiloLanguageServer
 import org.fife.ui.rsyntaxtextarea.parser._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane
 
 import scala.util.{Failure, Try}
 
-class EditorFromLanguage(server: LanguageServer) extends JPanel(new CardLayout()) {
+class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
 
-  private def language = server.language
   val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
 
   val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
@@ -24,7 +24,9 @@ class EditorFromLanguage(server: LanguageServer) extends JPanel(new CardLayout()
 
   private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
 
-  val inputTextArea = new MiksiloTextEditor(server, inputDocument)
+  val inputTextArea = new MiksiloTextEditor(inputDocument)
+  val server = new MiksiloLanguageServer(language, inputTextArea)
+
   inputTextArea.addParser(new Parser() {
     override def parse(doc: RSyntaxDocument, style: String): ParseResult = {
       val text = doc.getText(0, doc.getLength)

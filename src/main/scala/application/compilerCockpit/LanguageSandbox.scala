@@ -4,14 +4,14 @@ import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 import javax.swing._
-import javax.swing.event.{DocumentEvent, DocumentListener, ListDataEvent, ListDataListener}
+import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammar
 import core.deltas.Delta
+import core.language.Language
 import core.language.exceptions.CompileException
-import core.language.{Language, LanguageServer}
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
@@ -26,8 +26,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
   this.title = name
   val language: Language = Delta.buildLanguage(deltas)
 
-  private val server: LanguageServer = new LanguageServer(getInputStream, language)
-  private val inputPanel = new EditorFromLanguage(server)
+  private val inputPanel = new EditorFromLanguage(language)
   private def getInputStream = () => {
     new ByteArrayInputStream(inputPanel.inputDocument.getText(0, inputPanel.inputDocument.getLength).getBytes(StandardCharsets.UTF_8))
   }
@@ -35,14 +34,6 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
 
   private val outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   private val textAreaInput: InputOption = new ParseFromFunction(getInputStream)
-
-  inputPanel.inputDocument.addDocumentListener(new DocumentListener {
-    override def removeUpdate(e: DocumentEvent): Unit = server.documentChanged()
-
-    override def changedUpdate(e: DocumentEvent): Unit = server.documentChanged()
-
-    override def insertUpdate(e: DocumentEvent): Unit = server.documentChanged()
-  })
 
   val textAreaOutput: TextAreaOutput =
     new TextAreaOutput(textWithGrammar => setOutputText(textWithGrammar.text, textWithGrammar.grammar))

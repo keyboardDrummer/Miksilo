@@ -1,56 +1,47 @@
-package core.language
+package lsp
+
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
-import core.language.node.{NodeLike, Position, SourceRange}
+import core.language.node.{NodeLike, Position}
+import core.language.{Compilation, Language, SourceElement}
 import core.smarts.{Proofs, SolveConstraintsDelta}
-import util.SourceUtils
+import langserver.messages.DefinitionResult
+import langserver.types.{Location, TextDocumentContentChangeEvent, TextDocumentIdentifier, VersionedTextDocumentIdentifier}
 
-import scala.tools.nsc.interpreter.InputStream
-
-class LanguageServer(getInput: () => InputStream, val language: Language) {
+class MiksiloLanguageServer(val language: Language, connection: Connection)
+  extends LanguageServer(connection) {
 
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
-
   var compilation: Option[Compilation] = None
 
-  def documentChanged(): Unit = {
+  override def onChangeTextDocument(td: VersionedTextDocumentIdentifier, changes: Seq[TextDocumentContentChangeEvent]): Unit = {
     compilation = None
-  }
-
-  def isReference(position: Position): Boolean = {
-    goOption(position).nonEmpty
-  }
-
-  def toPosition(row: Int, column: Int): Position = {
-    val offsetOfLineStart = getLines.take(row - 1).map(l => l.length + 1).sum
-    Position(offsetOfLineStart + column - 1)
-  }
-
-  def go(position: Position): SourceRange = {
-    val declaration: Option[SourceElement] = goOption(position)
-    declaration.get.position.get
-  }
-
-  private def goOption(position: Position): Option[SourceElement] = {
-    for {
-      proofs <- getProofs
-      element = getSourceElement(position)
-      declaration <- proofs.resolveLocation(element)
-    } yield declaration
+    super.onChangeTextDocument(td, changes)
   }
 
   def compile(): Unit = {
     val compilation = new Compilation(language)
     try {
-      compilation.program = language.parse(getSource).get
+      val input = getInputStreamFromDocument(currentDocument)
+      compilation.program = language.parse(input).get
       for(phase <- proofPhases)
         phase.action(compilation)
       this.compilation = Some(compilation)
     } catch {
       case e: BadInputException =>
     }
+  }
+
+  private def getInputStreamFromDocument(document: langserver.core.TextDocument) = {
+    new ByteArrayInputStream(new String(document.contents).getBytes(StandardCharsets.UTF_8))
+  }
+
+  private def currentDocument = {
+    documentManager.allOpenDocuments.head
   }
 
   def getCompilation: Option[Compilation] = {
@@ -80,9 +71,13 @@ class LanguageServer(getInput: () => InputStream, val language: Language) {
     getForNode(PathRoot(getCompilation.get.program))
   }
 
-  def getSource: InputStream = {
-    getInput()
+  override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: langserver.types.Position): DefinitionResult = {
+    val location = for {
+      proofs <- getProofs
+      element = getSourceElement(position.asInstanceOf[Position])
+      declaration <- proofs.resolveLocation(element)
+      range <- declaration.position
+    } yield Location(textDocument.uri, new langserver.types.Range(range.start, range.end))
+    DefinitionResult(location.toSeq)
   }
-
-  def getLines: Seq[String] = SourceUtils.streamToString(getSource).split("\n")
 }

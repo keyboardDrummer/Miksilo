@@ -11,7 +11,7 @@ case class PathRoot(current: Node) extends NodePath with Key {
   override def equals(obj: Any): Boolean = obj.isInstanceOf[PathRoot] //TODO && obj.equals..
   override def pathAsString: String = "Root"
 
-  override def position: Option[SourceRange] = Some(SourceRange(Position(0), Position(Int.MaxValue)))
+  override def position: Option[SourceRange] = Some(SourceRange(new Position(0, 0), new Position(Int.MaxValue, Int.MaxValue)))
 }
 
 
