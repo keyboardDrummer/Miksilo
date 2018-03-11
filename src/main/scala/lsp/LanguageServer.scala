@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
   * A language server implementation. Users should subclass this class and implement specific behavior.
   */
 abstract class LanguageServer(connection: Connection) {
-  connection.setServer(this)
 
   lazy val logger: Logger = Logger(LoggerFactory.getLogger(getClass.getName))
 
@@ -23,6 +22,7 @@ abstract class LanguageServer(connection: Connection) {
     case DidChangeWatchedFiles(changes) => onChangeWatchedFiles(changes)
     case e => logger.error(s"Unknown notification $e")
   }
+  connection.setServer(this)
 
   def start(): Unit = {
     connection.start()

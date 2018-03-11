@@ -4,7 +4,8 @@ import core.deltas.Delta
 import core.language.node.{Position, SourceRange}
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
-import langserver.types.{TextDocumentContentChangeEvent, TextDocumentIdentifier, VersionedTextDocumentIdentifier}
+import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
+import langserver.types.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 import lsp.{Connection, LanguageServer, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
@@ -14,11 +15,13 @@ class GotoDefinitionTest extends FunSuite {
   private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
 
   val document = new TextDocumentIdentifier("jo")
+  val documentItem = new TextDocumentItem("jo","x",1,"")
   class ConnectionFromString(program: String) extends Connection {
     override def setServer(languageServer: LanguageServer): Unit = {
-      languageServer.onChangeTextDocument(new VersionedTextDocumentIdentifier(document.uri, 1), Seq(
+      notifySubscribers(DidOpenTextDocumentParams(documentItem))
+      notifySubscribers(DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(document.uri, 1), Seq(
         TextDocumentContentChangeEvent(None, None, program)
-      ))
+      )))
     }
   }
 

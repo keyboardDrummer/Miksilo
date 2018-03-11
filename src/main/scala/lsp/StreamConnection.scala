@@ -25,7 +25,7 @@ import scala.util.{Failure, Success, Try}
   *       and that can't subclass anything other than Any
   */
 class StreamConnection(inStream: InputStream, outStream: OutputStream)
-  extends Connection with LazyLogging {
+  extends Connection {
 
   var handler: CommandHandler = _
   override def setServer(languageServer: LanguageServer): Unit = {
@@ -39,11 +39,6 @@ class StreamConnection(inStream: InputStream, outStream: OutputStream)
   implicit private val commandExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
 
   override val notificationHandlers: ListBuffer[Notification => Unit] = ListBuffer.empty
-
-  def notifySubscribers(n: Notification): Unit = {
-    notificationHandlers.foreach(f =>
-      Try(f(n)).recover { case e => logger.error("failed notification handler", e) })
-  }
 
   def sendNotification(params: Notification): Unit = {
     val json = Notification.write(params)
