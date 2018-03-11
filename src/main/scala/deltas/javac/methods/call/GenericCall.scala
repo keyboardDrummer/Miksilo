@@ -29,7 +29,7 @@ trait GenericCall extends ExpressionInstance {
     val calleeGrammar = create(CallDelta.Callee, selectorGrammar)
     val callArguments = create(CallDelta.CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
     val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asNode CallDelta.Shape
-    core.addOption(parseCall)
+    core.addAlternative(parseCall)
   }
 
   override val shape = CallDelta.Shape

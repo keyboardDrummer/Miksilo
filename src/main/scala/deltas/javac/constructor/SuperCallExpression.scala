@@ -59,7 +59,7 @@ object SuperCallExpression extends ExpressionInstance {
     val callArguments = find(CallDelta.CallArgumentsGrammar)
     val superCallGrammar = "super" ~> callArguments.as(CallDelta.Arguments) asNode SuperCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    expressionGrammar.addOption(superCallGrammar)
+    expressionGrammar.addAlternative(superCallGrammar)
   }
 
   object SuperCall extends NodeShape

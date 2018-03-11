@@ -29,7 +29,7 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val importPath = find(BasicImportDelta.Shape)
-    importPath.addOption(identifier.someSeparated(".").as(Elements) ~< ".*" asNode Shape)
+    importPath.addAlternative(identifier.someSeparated(".").as(Elements) ~< ".*" asNode Shape)
   }
 
   override def inject(language: Language): Unit = {

@@ -6,11 +6,13 @@ import deltas.bytecode.PrintByteCode
 
 object EmitByteCode extends CompileOption {
 
-  override def perform(cockpit: LanguageSandbox, input: InputStream): TextWithGrammar = {
-    val compilation = cockpit.language.parseAndTransform(input)
+  override def initialize(sandbox: LanguageSandbox): Unit = {}
+
+  override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
+    val compilation = sandbox.language.parseAndTransform(input)
     val bytes = PrintByteCode.getBytes(compilation, compilation.program).toArray
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }
 
-  override def toString = "Emit ByteCode"
+  override def name = "Emit ByteCode"
 }

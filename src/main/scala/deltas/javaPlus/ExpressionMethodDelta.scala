@@ -28,7 +28,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
       identifier.as(Name) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
       asNode(Shape)
     val methodGrammar = find(MethodDelta.MethodGrammar)
-    methodGrammar.addOption(expressionMethodGrammar)
+    methodGrammar.addAlternative(expressionMethodGrammar)
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {

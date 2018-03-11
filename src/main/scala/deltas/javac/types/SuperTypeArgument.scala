@@ -13,11 +13,11 @@ object SuperTypeArgument extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val byteCodeArgumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
-    byteCodeArgumentGrammar.addOption(("-" ~~> byteCodeArgumentGrammar.as(SuperBody)).asNode(SuperKey))
+    byteCodeArgumentGrammar.addAlternative(("-" ~~> byteCodeArgumentGrammar.as(SuperBody)).asNode(SuperKey))
 
     val javaTypeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val javaArgumentGrammar = find(TypeApplicationDelta.JavaTypeArgumentGrammar)
-    javaArgumentGrammar.addOption(("?" ~~> "super" ~~> javaTypeGrammar.as(SuperBody)).asNode(SuperKey))
+    javaArgumentGrammar.addAlternative(("?" ~~> "super" ~~> javaTypeGrammar.as(SuperBody)).asNode(SuperKey))
   }
 
   override def description: String = "Adds the 'extends' type function. Example: 'T extends U'."

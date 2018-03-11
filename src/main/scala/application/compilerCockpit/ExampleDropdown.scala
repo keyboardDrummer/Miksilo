@@ -105,12 +105,38 @@ class ExampleDropdown(val compilerCockpit: LanguageSandbox) extends JPanel {
     new Example("Fibonacci with labelled locations", content)
   }
 
+  private def reorderMembers = {
+    val content =
+      """class Example
+        |{
+        |    int first;
+        |
+        |    public static int second;
+        |}
+      """.stripMargin
+    Example("Reorder members", content)
+  }
+
+  private def reorderMembersWithComments = {
+    val content =
+      """class Example
+        |{
+        |    int first;
+        |
+        |    /* second is used for foo */
+        |    public static /* bar */ int second;
+        |}
+      """.stripMargin
+    Example("Reorder members with comments", content)
+  }
+
   def initialise() {
     try
     {
       val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,
         getVariableAlreadyDefined, getFibonacciExpressionMethod, getFibonacciSimplifiedByteCode, getFibonacciByteCode, getRevealSyntaxSugar,
-        getComparisonOptimization, getFibonacciWithComments, getMethodOverloading, getFibonacciWithLabelledLocations))
+        getComparisonOptimization, getFibonacciWithComments, getMethodOverloading, getFibonacciWithLabelledLocations,
+        reorderMembers, reorderMembersWithComments))
       add(new JLabel("code examples:"))
       val comboBox: JComboBox[Example] = new JComboBox(exampleModel)
 

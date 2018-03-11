@@ -4,7 +4,7 @@ import core.bigrammar.grammars._
 import core.language.node.Node
 import core.document.BlankLine
 
-trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
+trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def grammar: BiGrammar
   def %(bottom: BiGrammar): Sequence
@@ -12,7 +12,7 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
   def many: ManyHorizontal
   def manyVertical: ManyVertical
 
-  implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension
+  implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension
 
   def ~<(right: BiGrammar): BiGrammar = (this ~ right).ignoreRight
 
@@ -54,3 +54,4 @@ trait BiGrammarSequenceMethodsExtension extends BiGrammarWriter {
 
   def %<(bottom: BiGrammar): BiGrammar = (this % bottom).ignoreRight
 }
+

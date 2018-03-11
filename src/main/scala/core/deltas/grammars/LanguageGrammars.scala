@@ -2,8 +2,8 @@ package core.deltas.grammars
 
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.deltas.GrammarWithTrivia
-import core.language.node.{GrammarKey, Key}
+import core.deltas.{GrammarForAst, NodeGrammarWriter}
+import core.language.node.{GrammarKey, Key, NodeShape}
 
 case class KeyGrammar(key: Key) extends GrammarKey
 {
@@ -18,11 +18,32 @@ class LanguageGrammars extends GrammarCatalogue {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new LeftRight(bodyGrammar, trivia)), trivia))
+  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new LeftRight(bodyGrammar, trivia)), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
   def root: Labelled = find(ProgramGrammar)
 
-  implicit def stringToAstGrammar(value: String): GrammarWithTrivia =
-    new GrammarWithTrivia(BiGrammarWriter.stringToGrammar(value), this)
-  implicit def grammarToAstGrammar(value: BiGrammar): GrammarWithTrivia = new GrammarWithTrivia(value, this)
+  implicit def stringToAstGrammar(value: String): BiGrammarExtension =
+    new BiGrammarExtension(BiGrammarWriter.stringToGrammar(value), this)
+  implicit def grammarToAstGrammar(value: BiGrammar): BiGrammarExtension = new BiGrammarExtension(value, this)
+
+  class BiGrammarExtension(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
+    with BiGrammarSequenceCombinatorsExtension
+  {
+    def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
+      if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
+
+    def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
+
+    def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
+
+    def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
+
+    def many = new ManyHorizontal(addTriviaIfUseful(grammar))
+
+    def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, false))
+
+    override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
+  }
 }
+
+

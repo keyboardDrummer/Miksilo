@@ -36,7 +36,7 @@ object Constant {
 /**
   * Contains some examples for the wiki.
   */
-class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSequenceWriter {
+class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTriviaSequenceCombinators {
 
   test("mapAndRegexExample") {
     new RegexGrammar("""-?\d+""".r).map[String, Int](
@@ -47,21 +47,21 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with BiGrammarSeq
 
   test("whileWithAsNode") {
     val expression = new Labelled(StringKey("expression"))
-    expression.addOption(identifier.as(Variable.Name).asNode(Variable.Shape))
-    expression.addOption(number.as(Constant.Value).asNode(Constant.Shape))
+    expression.addAlternative(identifier.as(Variable.Name).asNode(Variable.Shape))
+    expression.addAlternative(number.as(Constant.Value).asNode(Constant.Shape))
     val assignment = identifier ~~ keywordClass("=") ~~ expression |
       (identifier.as(PlusEquals.Target) ~~ "+=" ~~ expression.as(PlusEquals.Value)).asNode(PlusEquals.Shape)
-    expression.addOption(assignment)
-    expression.addOption(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Shape)
-    expression.addOption(expression ~~ "-" ~~ expression)
+    expression.addAlternative(assignment)
+    expression.addAlternative(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Shape)
+    expression.addAlternative(expression ~~ "-" ~~ expression)
     val statement = new Labelled(StringKey("statement"))
     val _while =
       "while" ~ expression.inParenthesis.as(While.Condition) ~~ "{" %
         statement.manyVertical.indent(2).as(While.Body) %<
         "}" asNode While.Shape
 
-    statement.addOption(_while)
-    statement.addOption(expression ~< ";")
+    statement.addAlternative(_while)
+    statement.addAlternative(expression ~< ";")
 
     val example =
       """while (i){

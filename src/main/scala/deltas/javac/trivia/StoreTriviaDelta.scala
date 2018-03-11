@@ -12,15 +12,18 @@ import core.language.Language
 import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {
+
+  override def description: String = "Causes trivia to be captured in the AST during parsing"
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     resetCounterWhenEnteringNode(grammars)
 
     val triviasGrammar = grammars.find(TriviasGrammar)
-    if (!triviasGrammar.inner.isInstanceOf[StoreTrivia])
+    if (!triviasGrammar.inner.isInstanceOf[StoreTrivia]) //This check enables us to apply this delta multiple times.
       triviasGrammar.inner = new StoreTrivia(triviasGrammar.inner)
   }
 
-  private def resetCounterWhenEnteringNode(grammars: LanguageGrammars) = {
+  private def resetCounterWhenEnteringNode(grammars: LanguageGrammars): Unit = {
     var visited = Set.empty[BiGrammar]
     for (path <- grammars.root.descendants) {
       if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
@@ -41,21 +44,22 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
   class StoreTrivia(var triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammar {
 
-    def getKeyAndIncrementCounter: StateFull[NodeField] = (state: State) => {
+    def getFieldAndIncrementCounter: StateFull[NodeField] = (state: State) => {
       val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
-      val key = Trivia(counter)
+      val field = Trivia(counter)
       val newState = state + (TriviaCounter -> (counter + 1))
-      (newState, key)
+      (newState, field)
     }
 
     override def toParser(recursive: BiGrammar => Parser): Parser = {
-      recursive(triviaGrammar).map(result =>
+      val triviaParser = recursive(triviaGrammar)
+      triviaParser.map(statefulTrivias =>
         for {
-          key <- getKeyAndIncrementCounter
-          inner <- result
+          field <- getFieldAndIncrementCounter
+          triviasWithMap <- statefulTrivias
         } yield {
-          val innerValue = inner.value.asInstanceOf[Seq[_]]
-          WithMapG[Any](Unit, if (innerValue.nonEmpty) Map(key -> innerValue) else Map.empty)
+          val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
+          WithMapG[Any](Unit, if (trivias.nonEmpty) Map(field -> trivias) else Map.empty)
         }
       )
     }
@@ -64,7 +68,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       val triviaPrinter: NodePrinter = recursive(triviaGrammar)
 
       override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = for {
-        key <- TryState.fromStateM(getKeyAndIncrementCounter)
+        key <- TryState.fromStateM(getFieldAndIncrementCounter)
         value = from.map.getOrElse(key, Seq.empty)
         result <- triviaPrinter.write(WithMapG[Any](value, from.map))
       } yield result
@@ -113,6 +117,4 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
   }
-
-  override def description: String = "Causes trivia to be captured in the AST during parsing"
 }

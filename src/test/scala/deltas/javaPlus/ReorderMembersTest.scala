@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 import application.compilerCockpit.PrettyPrint
 import core.language.ParseException
 import deltas.javac.JavaLanguage
-import deltas.javac.trivia.{JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
@@ -25,7 +25,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     assertThrows[ParseException]({
@@ -54,7 +54,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.parseAndTransform(inputStream)
@@ -85,8 +85,8 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
-      JavaStyleCommentsDelta, StoreTriviaDelta) ++
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
+      JavaStyleBlockCommentsDelta, StoreTriviaDelta) ++
       JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
@@ -118,8 +118,8 @@ class ReorderMembersTest extends FunSuite {
         |    /* third comes last */
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembers, PrettyPrint(),
-      JavaStyleCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
+    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
+      JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
       JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))

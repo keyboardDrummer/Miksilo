@@ -10,10 +10,9 @@ import javax.swing.text.DefaultCaret
 import application.StyleSheet
 import core.bigrammar.BiGrammar
 import core.deltas.Delta
-import core.language.{Language, LanguageServer}
 import core.language.exceptions.CompileException
+import core.language.{Language, LanguageServer}
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
-import deltas.bytecode.ByteCodeSkeleton
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 
@@ -50,9 +49,10 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
   private val compileOptions = getCompileOptions.toArray
 
   def getCompileOptions: Seq[CompileOption] = {
-    val selection = Set(MarkOutputGrammar, ByteCodeSkeleton)
-    val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode) //if (orderedSelection.take(1) == Seq(ByteCodeSkeleton)) Seq(CompileAndRun, EmitByteCode) else Seq.empty
-    Seq(PrettyPrintOption) ++ byteCodeActions
+    val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode)
+    val result = Seq(PrettyPrintOption) ++ byteCodeActions ++ Seq(FormatOption) ++ language.extraCompileOptions
+    result.foreach(option => option.initialize(this))
+    result
   }
 
   private val outputOptions = Array[OutputOption](textAreaOutput)

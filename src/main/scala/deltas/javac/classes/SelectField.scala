@@ -55,7 +55,7 @@ object SelectField extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val core = grammars.find(ExpressionSkeleton.CoreGrammar)
-    core.addOption(grammars.find(SelectGrammar))
+    core.addAlternative(grammars.find(SelectGrammar))
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, _type: Type, parentScope: Scope): Unit = {

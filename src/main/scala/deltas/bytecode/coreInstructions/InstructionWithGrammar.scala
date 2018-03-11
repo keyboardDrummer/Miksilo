@@ -14,7 +14,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar with HasShape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val instructionGrammar = grammars.find(CodeAttributeDelta.InstructionGrammar)
-    instructionGrammar.addOption(grammars.create(shape, getGrammarForThisInstruction(grammars)))
+    instructionGrammar.addAlternative(grammars.create(shape, getGrammarForThisInstruction(grammars)))
   }
 
   def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {

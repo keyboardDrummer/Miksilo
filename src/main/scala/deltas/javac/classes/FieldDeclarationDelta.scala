@@ -83,7 +83,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
-    memberGrammar.addOption(fieldGrammar)
+    memberGrammar.addAlternative(fieldGrammar)
   }
 
   override def inject(language: Language): Unit = {

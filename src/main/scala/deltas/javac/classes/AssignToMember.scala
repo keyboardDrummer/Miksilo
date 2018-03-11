@@ -38,7 +38,7 @@ object AssignToMember extends DeltaWithGrammar {
     val variableGrammar = find(VariableDelta.VariableGrammar)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Shape)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
-    assignTarget.addOption(selectGrammar)
+    assignTarget.addAlternative(selectGrammar)
   }
 
   override def description: String = "Enables assignment to a field."

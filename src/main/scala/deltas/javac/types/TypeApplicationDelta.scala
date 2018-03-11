@@ -34,10 +34,10 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape 
     val typeArgumentGrammar = create(JavaTypeArgumentGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val objectInner = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
-    typeArgumentGrammar.addOption(typeGrammar)
+    typeArgumentGrammar.addAlternative(typeGrammar)
     val typeApplication: BiGrammar = (objectInner.inner.as(Func) ~ ("<" ~> typeArgumentGrammar.someSeparated(",").as(Arguments) ~< ">")).
       asNode(Shape)
-    typeGrammar.addOption(typeApplication)
+    typeGrammar.addAlternative(typeApplication)
   }
 
   object ByteCodeTypeArgumentGrammar extends GrammarKey
@@ -45,12 +45,12 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape 
     import grammars._
     val typeArgumentGrammar = create(ByteCodeTypeArgumentGrammar)
     val objectInner = find(QualifiedObjectTypeDelta.ByteCodeGrammarInner)
-    objectInner.addOption((objectInner.inner.as(Func) ~ ("<" ~> typeArgumentGrammar.some.as(Arguments) ~< ">")).
+    objectInner.addAlternative((objectInner.inner.as(Func) ~ ("<" ~> typeArgumentGrammar.some.as(Arguments) ~< ">")).
       asNode(Shape))
 
     val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     val argumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
-    argumentGrammar.addOption(typeGrammar)
+    argumentGrammar.addAlternative(typeGrammar)
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {

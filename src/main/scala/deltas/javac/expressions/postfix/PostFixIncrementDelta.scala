@@ -32,7 +32,7 @@ object PostFixIncrementDelta extends ExpressionInstance {
     import grammars._
     val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
     val postFixIncrement = identifier.as(Target) ~< "++" asNode PostfixIncrementKey
-    coreGrammar.addOption(postFixIncrement)
+    coreGrammar.addAlternative(postFixIncrement)
   }
 
   object PostfixIncrementKey extends NodeShape

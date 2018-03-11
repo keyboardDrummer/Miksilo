@@ -29,6 +29,6 @@ object UnParsedAttribute extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val grammar = "UnParsedAttribute" ~ "," ~~ "nameIndex" ~ ":" ~~> integer.as(Name) asNode Shape
-    find(ByteCodeSkeleton.AttributeGrammar).addOption(grammar)
+    find(ByteCodeSkeleton.AttributeGrammar).addAlternative(grammar)
   }
 }

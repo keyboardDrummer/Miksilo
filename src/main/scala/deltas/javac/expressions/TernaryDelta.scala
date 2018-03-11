@@ -30,7 +30,7 @@ object TernaryDelta extends ExpressionInstance {
     val parseTernary = (expressionGrammar.as(Condition) ~~< "?") ~~
       (expressionGrammar.as(TrueBranch) ~~< ":") ~~
       expressionGrammar.as(FalseBranch) asNode Shape
-    expressionGrammar.addOption(parseTernary)
+    expressionGrammar.addAlternative(parseTernary)
   }
 
   def ternary(condition: Node, trueBranch: Node, falseBranch: Node) = new Node(Shape,

@@ -38,7 +38,7 @@ object NewDelta extends ExpressionInstance {
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape
     val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)
-    expressionGrammar.addOption(newGrammar)
+    expressionGrammar.addAlternative(newGrammar)
   }
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.

@@ -28,7 +28,7 @@ object NotDelta extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val coreGrammar = find(ExpressionSkeleton.CoreGrammar)
-    coreGrammar.addOption("!" ~> coreGrammar.as(NotExpression) asNode NotKey)
+    coreGrammar.addAlternative("!" ~> coreGrammar.as(NotExpression) asNode NotKey)
   }
 
   override def description: String = "Adds the ! (not) operator."

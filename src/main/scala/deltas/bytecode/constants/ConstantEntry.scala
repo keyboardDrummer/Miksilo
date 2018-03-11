@@ -19,7 +19,7 @@ trait ConstantEntry extends DeltaWithGrammar with HasShape with HasBytes {
     val constantEntryGrammar = getConstantEntryGrammar(grammars)
     import grammars._
     val itemContent = find(ConstantPoolItemContentGrammar)
-    itemContent.addOption(create(shape, (getName ~~> constantEntryGrammar).asNode(shape)))
+    itemContent.addAlternative(create(shape, (getName ~~> constantEntryGrammar).asNode(shape)))
   }
 
   def getName: BiGrammar

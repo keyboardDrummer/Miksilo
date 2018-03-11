@@ -26,7 +26,7 @@ trait ByteCodeAttribute extends DeltaWithGrammar with HasShape with HasBytes {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val grammar = getGrammar(grammars)
     val attributeGrammar = grammars.find(ByteCodeSkeleton.AttributeGrammar)
-    attributeGrammar.addOption(grammar)
+    attributeGrammar.addAlternative(grammar)
   }
 
   def getParser(unParsed: Node) : ClassFileParser.Parser[Node]

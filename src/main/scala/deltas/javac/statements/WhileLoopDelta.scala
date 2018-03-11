@@ -13,8 +13,19 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Adds a while loop."
 
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+
+    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val blockGrammar = find(BlockDelta.Grammar)
+    val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
+        blockGrammar.as(Body) asLabelledNode Shape
+    statementGrammar.addAlternative(whileGrammar)
+  }
+
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(WhileKey, path => transformWhileLoop(path, compilation))
+    PathRoot(program).visitShape(Shape, path => transformWhileLoop(path, compilation))
   }
 
   def transformWhileLoop(whileLoopPath: NodePath, compilation: Compilation): Unit = {
@@ -31,25 +42,14 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
-    val blockGrammar = find(BlockDelta.Grammar)
-    val whileGrammar =
-      "while" ~> expression.inParenthesis.as(Condition) %
-      blockGrammar.as(Body) asLabelledNode WhileKey
-    statementGrammar.addOption(whileGrammar)
-  }
-
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]
     def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
   }
 
-  def create(condition: Node, body: Seq[Node]) = new Node(WhileKey, Condition -> condition, Body -> body)
+  def create(condition: Node, body: Seq[Node]) = new Node(Shape, Condition -> condition, Body -> body)
 
-  object WhileKey extends NodeShape
+  object Shape extends NodeShape
 
   object Condition extends NodeField
 

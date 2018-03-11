@@ -2,13 +2,13 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 
-trait BiGrammarSequenceWriter extends BiGrammarWriter {
+trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {
 
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
     if (grammar.containsParser()) new WithTrivia(grammar, new ManyHorizontal(ParseWhiteSpace), horizontal) else grammar
 
-  implicit def stringAsGrammar(value: String): GrammarWithSequence = new GrammarWithSequence(value)
-  implicit class GrammarWithSequence(val grammar: BiGrammar) extends BiGrammarSequenceMethodsExtension {
+  implicit def stringAsGrammar(value: String): BiGrammarExtension = new BiGrammarExtension(value)
+  implicit class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, horizontal = false))
 
     def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
@@ -17,6 +17,6 @@ trait BiGrammarSequenceWriter extends BiGrammarWriter {
 
     def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, horizontal = false))
 
-    override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceMethodsExtension = new GrammarWithSequence(grammar)
+    override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension = new BiGrammarExtension(grammar)
   }
 }

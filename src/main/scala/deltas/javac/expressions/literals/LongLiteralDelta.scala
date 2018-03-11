@@ -27,7 +27,7 @@ object LongLiteralDelta extends ExpressionInstance {
     val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r).map[String, Long](
       number => parseLong(number), l => s"${l}l") as ValueKey asNode LongLiteralKey
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    expressionGrammar.addOption(longGrammar)
+    expressionGrammar.addAlternative(longGrammar)
   }
 
   def literal(value: Long) = new Node(LongLiteralKey, ValueKey -> value)

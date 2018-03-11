@@ -60,7 +60,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     val parseParameters = find(MethodDelta.ParametersGrammar) as Parameters
     val block = find(BlockDelta.Grammar) as Body
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
-    memberGrammar.addOption(constructorGrammar)
+    memberGrammar.addAlternative(constructorGrammar)
   }
 
   override def description: String = "Introduces constructors."

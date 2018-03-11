@@ -34,7 +34,7 @@ object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
     import grammars._
     val importPath = identifier.someSeparated(".").as(Elements).asLabelledNode(Shape)
     val basicImport = "import" ~~> importPath ~< ";"
-    find(JavaClassSkeleton.ImportGrammar).addOption(basicImport)
+    find(JavaClassSkeleton.ImportGrammar).addAlternative(basicImport)
   }
 
   def getParts(_import: Node) = _import(Elements).asInstanceOf[Seq[String]]

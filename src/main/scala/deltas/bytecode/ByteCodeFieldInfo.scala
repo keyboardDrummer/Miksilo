@@ -1,9 +1,9 @@
 package deltas.bytecode
 
-import core.document.BlankLine
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
+import core.document.BlankLine
+import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton.{AttributesGrammar, ClassFields, HasBytes}
 import deltas.bytecode.constants.Utf8ConstantDelta
@@ -45,10 +45,11 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags with HasBytes
 
     val attributesGrammar = find(AttributesGrammar)
     val constantIndex = find(ConstantPoolIndexGrammar)
-    val fieldGrammar = "Field" ~> ("name" ~ ":" ~> constantIndex.as(NameIndex) %
-      ("descriptor" ~> constantIndex.as(DescriptorIndex)) %
-      attributesGrammar.as(FieldAttributes)).asLabelledNode(Shape)
-    val parseFields = (fieldGrammar ~< BlankLine).manyVertical.as(ClassFields)
+    val fieldGrammar = "Field" ~ ";" %>
+      ("name" ~ ":" ~~> constantIndex.as(NameIndex) %
+        ("descriptor" ~ ":" ~~> constantIndex.as(DescriptorIndex)) %
+        attributesGrammar.as(FieldAttributes)).asLabelledNode(Shape).indent()
+    val parseFields = (fieldGrammar %< BlankLine).manyVertical.as(ClassFields)
 
     val membersGrammar = find(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~ membersGrammar.inner

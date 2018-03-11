@@ -47,7 +47,7 @@ object ReturnExpressionDelta extends StatementInstance {
     val statement = find(StatementSkeleton.StatementGrammar)
 
     val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
-    statement.addOption(returnExpression)
+    statement.addAlternative(returnExpression)
   }
 
   def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)

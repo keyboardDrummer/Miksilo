@@ -35,7 +35,7 @@ object ThisCallExpression extends ExpressionInstance {
     val callArguments = find(CallDelta.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments.as(CallDelta.Arguments) asNode ThisCall
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    expressionGrammar.addOption(thisCallGrammar)
+    expressionGrammar.addAlternative(thisCallGrammar)
   }
 
   override def description: String = "Enables calling a different constructor using 'this'"
