@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.language.node.Position
+import langserver.types.Position
 
 import scala.collection.mutable
 import scala.util.matching.Regex

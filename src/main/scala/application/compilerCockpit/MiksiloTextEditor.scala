@@ -4,6 +4,7 @@ import java.awt.event
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
 
+import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
 import langserver.types
 import langserver.types.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 import lsp.{Connection, LanguageServer}
@@ -13,7 +14,7 @@ class MiksiloTextEditor(document: RSyntaxDocument)
   extends RSyntaxTextArea(document) with Connection {
 
   def currentPosition: Position = {
-    Position(this.getCaretLineNumber, this.getCaretOffsetFromLineStart)
+    Position(this.getCaretLineNumber + 1, this.getCaretOffsetFromLineStart + 1)
   }
 
   var server: LanguageServer = _
@@ -28,8 +29,8 @@ class MiksiloTextEditor(document: RSyntaxDocument)
     gotoDefinitionItem = new JMenuItem("Go to definition")
     gotoDefinitionItem.addActionListener((e: event.ActionEvent) => {
       val range = server.gotoDefinitionRequest(freshTextDocumentReference, currentPosition).params.head.range
-      def positionToOffset(position: Position) = MiksiloTextEditor.this.getLineStartOffset(position.line) + position.character
-      MiksiloTextEditor.this.getCaret.setDot(positionToOffset(range.end))
+      def positionToOffset(position: Position) = MiksiloTextEditor.this.getLineStartOffset(position.line - 1) + position.character - 1
+      MiksiloTextEditor.this.getCaret.setDot(positionToOffset(range.start))
       MiksiloTextEditor.this.getCaret.moveDot(positionToOffset(range.end))
     })
     popupMenu.add(gotoDefinitionItem)
@@ -45,14 +46,17 @@ class MiksiloTextEditor(document: RSyntaxDocument)
   override def setServer(languageServer: LanguageServer): Unit = {
     server = languageServer
 
+    val freshTextDocument = new TextDocumentItem("space", "language", 1, "")
+    val documentId = new VersionedTextDocumentIdentifier("space", 1)
+    notifySubscribers(DidOpenTextDocumentParams(freshTextDocument))
+
     document.addDocumentListener(new DocumentListener {
 
-      val freshTextDocument = new TextDocumentItem("space", "language", 1, "")
-      val documentId = new VersionedTextDocumentIdentifier("space", 1)
 
       def changeAll(e: DocumentEvent): Unit = {
         val text = e.getDocument.getText(0, e.getDocument.getLength)
-        server.onChangeTextDocument(documentId, Seq(types.TextDocumentContentChangeEvent(None, None, text)))
+        notifySubscribers(DidChangeTextDocumentParams(documentId,
+          Seq(types.TextDocumentContentChangeEvent(None, None, text))))
       }
       override def removeUpdate(e: DocumentEvent): Unit = changeAll(e)
 

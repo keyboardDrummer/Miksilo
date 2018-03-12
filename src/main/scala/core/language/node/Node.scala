@@ -2,9 +2,11 @@ package core.language.node
 
 import core.deltas.path.NodePath
 import core.language.SourceElement
+import langserver.types.Position
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
+import core.language.node.Node._
 
 class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   extends NodeLike {
@@ -95,7 +97,17 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   def position: Option[SourceRange] =
     if (sources.values.isEmpty) None
-    else Some(SourceRange(sources.values.map(p => p.start).min, sources.values.map(p => p.end).max))
+    else Some(SourceRange(sources.values.map(p => p.start).min(PositionOrdering), sources.values.map(p => p.end).max))
+}
+
+object Node {
+  implicit object PositionOrdering extends Ordering[Position] {
+
+    private val ordering = Ordering.by[Position, (Int, Int)](x => (x.line, x.character))
+    override def compare(x: Position, y: Position): Int = {
+      ordering.compare(x, y)
+    }
+  }
 }
 
 case class WithSource(value: Any, range: SourceRange)

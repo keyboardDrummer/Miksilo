@@ -5,11 +5,11 @@ import java.nio.charset.StandardCharsets
 
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
-import core.language.node.{NodeLike, Position}
+import core.language.node.NodeLike
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.messages.DefinitionResult
-import langserver.types.{Location, TextDocumentContentChangeEvent, TextDocumentIdentifier, VersionedTextDocumentIdentifier}
+import langserver.types._
 
 class MiksiloLanguageServer(val language: Language, connection: Connection)
   extends LanguageServer(connection) {
@@ -73,10 +73,10 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     getForNode(PathRoot(getCompilation.get.program))
   }
 
-  override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: langserver.types.Position): DefinitionResult = {
+  override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult = {
     val location = for {
       proofs <- getProofs
-      element = getSourceElement(position.asInstanceOf[Position])
+      element = getSourceElement(position)
       declaration <- proofs.resolveLocation(element)
       range <- declaration.position
     } yield Location(textDocument.uri, new langserver.types.Range(range.start, range.end))

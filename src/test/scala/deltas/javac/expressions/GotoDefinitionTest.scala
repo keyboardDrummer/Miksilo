@@ -2,11 +2,11 @@ package deltas.javac.expressions
 
 import core.deltas.Delta
 import core.language.Language
-import core.language.node.{Position, SourceRange}
+import core.language.node.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
-import langserver.types.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import langserver.types._
 import lsp.{Connection, LanguageServer, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
