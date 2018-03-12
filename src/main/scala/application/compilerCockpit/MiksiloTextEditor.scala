@@ -7,17 +7,16 @@ import javax.swing.{JMenuItem, JPopupMenu}
 import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
 import langserver.types
 import langserver.types.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
-import lsp.{Connection, LanguageServer}
+import lsp.{Connection, LanguageServer, MiksiloLanguageServer}
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}
 
-class MiksiloTextEditor(document: RSyntaxDocument)
-  extends RSyntaxTextArea(document) with Connection {
+class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(document) with Connection {
 
   def currentPosition: Position = {
     Position(this.getCaretLineNumber + 1, this.getCaretOffsetFromLineStart + 1)
   }
 
-  var server: LanguageServer = _
+  var server: MiksiloLanguageServer = _
 
   val freshTextDocumentReference = new TextDocumentIdentifier("space")
 
@@ -44,7 +43,7 @@ class MiksiloTextEditor(document: RSyntaxDocument)
   }
 
   override def setServer(languageServer: LanguageServer): Unit = {
-    server = languageServer
+    server = languageServer.asInstanceOf[MiksiloLanguageServer]
 
     val freshTextDocument = new TextDocumentItem("space", "language", 1, "")
     val documentId = new VersionedTextDocumentIdentifier("space", 1)

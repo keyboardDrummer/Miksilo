@@ -24,10 +24,6 @@ abstract class LanguageServer(connection: Connection) {
   }
   connection.setServer(this)
 
-  def start(): Unit = {
-    connection.start()
-  }
-
   def onOpenTextDocument(td: TextDocumentItem) = {
     logger.debug(s"openTextDocuemnt $td")
   }
@@ -46,29 +42,37 @@ abstract class LanguageServer(connection: Connection) {
   }
 
   def onChangeWatchedFiles(changes: Seq[FileEvent]) = {
-    //    ???
   }
 
   def initialize(pid: Long, rootPath: String, capabilities: ClientCapabilities): ServerCapabilities = {
-    logger.info(s"Initialized with $pid, $rootPath, $capabilities")
-    ServerCapabilities(completionProvider = Some(CompletionOptions(false, Seq("."))))
-  }
-
-  def completionRequest(textDocument: TextDocumentIdentifier, position: Position): ResultResponse = {
-    CompletionList(isIncomplete = false, Nil)
+    ServerCapabilities(
+      documentSymbolProvider = this.isInstanceOf[DocumentSymbolProvider],
+      hoverProvider = this.isInstanceOf[HoverProvider],
+      definitionProvider = this.isInstanceOf[GotoProvider],
+      completionProvider = this match {
+        case provider: CompletionProvider => Some(provider.getOptions)
+        case _ => None
+      })
   }
 
   def shutdown(): Unit = {
 
   }
+}
 
+trait DocumentSymbolProvider {
+  def documentSymbols(tdi: TextDocumentIdentifier): Seq[SymbolInformation]
+}
+
+trait HoverProvider {
+  def hoverRequest(textDocument: TextDocumentIdentifier, position: Position): Hover
+}
+
+trait CompletionProvider {
+  def getOptions: CompletionOptions
+  def completionRequest(textDocument: TextDocumentIdentifier, position: Position): ResultResponse
+}
+
+trait GotoProvider {
   def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult
-
-  def hoverRequest(textDocument: TextDocumentIdentifier, position: Position): Hover = {
-    Hover(Nil, None)
-  }
-
-  def documentSymbols(tdi: TextDocumentIdentifier): Seq[SymbolInformation] = {
-    Seq.empty
-  }
 }

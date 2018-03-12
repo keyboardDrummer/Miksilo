@@ -77,7 +77,7 @@ class StreamConnection(inStream: InputStream, outStream: OutputStream)
     sendNotification(PublishDiagnostics(uri, diagnostics))
   }
 
-  override def start() {
+  def start() {
     var streamClosed = false
     do {
       msgReader.nextPayload() match {

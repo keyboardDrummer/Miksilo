@@ -8,13 +8,13 @@ class HandlerFromLPSServer(server: LanguageServer) extends CommandHandler {
         case (_, InitializeParams(pid, rootPath, capabilities)) =>
           InitializeResult(server.initialize(pid, rootPath, capabilities))
         case ("textDocument/completion", TextDocumentCompletionRequest(TextDocumentPositionParams(textDocument, position))) =>
-          server.completionRequest(textDocument, position)
+          server.asInstanceOf[CompletionProvider].completionRequest(textDocument, position)
         case ("textDocument/definition", TextDocumentDefinitionRequest(TextDocumentPositionParams(textDocument, position))) =>
-          server.gotoDefinitionRequest(textDocument, position)
+          server.asInstanceOf[GotoProvider].gotoDefinitionRequest(textDocument, position)
         case ("textDocument/hover", TextDocumentHoverRequest(TextDocumentPositionParams(textDocument, position))) =>
-          server.hoverRequest(textDocument, position)
+          server.asInstanceOf[HoverProvider].hoverRequest(textDocument, position)
         case ("textDocument/documentSymbol", DocumentSymbolParams(tdi)) =>
-          DocumentSymbolResult(server.documentSymbols(tdi))
+          DocumentSymbolResult(server.asInstanceOf[DocumentSymbolProvider].documentSymbols(tdi))
 
         case (_, Shutdown()) =>
           server.shutdown()

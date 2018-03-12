@@ -12,7 +12,7 @@ import langserver.messages.DefinitionResult
 import langserver.types._
 
 class MiksiloLanguageServer(val language: Language, connection: Connection)
-  extends LanguageServer(connection) {
+  extends LanguageServer(connection) with GotoProvider {
 
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)

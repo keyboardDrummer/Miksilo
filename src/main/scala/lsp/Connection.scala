@@ -9,7 +9,6 @@ import scala.util.Try
 trait Connection extends LazyLogging {
   def showMessage(messageType: Int, message: String): Unit = {}
   def setServer(languageServer: LanguageServer)
-  def start(): Unit = {}
   val notificationHandlers: ListBuffer[Notification => Unit] = ListBuffer.empty
 
   def notifySubscribers(n: Notification): Unit = {
