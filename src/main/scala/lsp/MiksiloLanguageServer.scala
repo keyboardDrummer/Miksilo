@@ -32,7 +32,9 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
         phase.action(compilation)
       this.compilation = Some(compilation)
     } catch {
-      case e: BadInputException =>
+      case e: BadInputException => {
+        logger.debug(e.toString)
+      }
     }
   }
 
