@@ -9,7 +9,7 @@ import langserver.core.{MessageReader, MessageWriter}
 import langserver.types.Diagnostic
 import play.api.libs.json._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future}
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -24,16 +24,16 @@ import scala.util.{Failure, Success, Try}
 class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
   extends Connection {
 
-  var handler: CommandHandler = _
+  var server: LanguageServer = _
   override def setServer(languageServer: LanguageServer): Unit = {
-    handler = new HandlerFromLPSServer(languageServer)
+    server = languageServer
   }
 
   private val msgReader = new MessageReader(inStream)
   private val msgWriter = new MessageWriter(outStream)
 
   // 4 threads should be enough for everyone
-  implicit private val commandExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
+  implicit private val commandExecutionContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
 
   def sendNotification(params: Notification): Unit = {
     val json = Notification.write(params)
@@ -149,10 +149,32 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
   }
 
   private def handleCommand(method: String, id: CorrelationId, command: ServerCommand) = {
-    Future(handler.handle(method, command)).map { result =>
+    Future(handle(method, command)).map { result =>
       val t = Try{ResultResponse.write(result, id)}
       t.recover{case e => logger.error("ResultResponse.write:"+result); e.printStackTrace }
       t.foreach{rJson => msgWriter.write(rJson)}
+    }
+  }
+
+  private def handle(method: String, command: ServerCommand): Any = {
+    (method, command) match {
+      case (_, InitializeParams(pid, rootPath, capabilities)) =>
+        InitializeResult(server.initialize(pid, rootPath, capabilities))
+      case ("textDocument/completion", TextDocumentCompletionRequest(TextDocumentPositionParams(textDocument, position))) =>
+        server.asInstanceOf[CompletionProvider].completionRequest(textDocument, position)
+      case ("textDocument/definition", TextDocumentDefinitionRequest(TextDocumentPositionParams(textDocument, position))) =>
+        server.asInstanceOf[GotoProvider].gotoDefinitionRequest(textDocument, position)
+      case ("textDocument/hover", TextDocumentHoverRequest(TextDocumentPositionParams(textDocument, position))) =>
+        server.asInstanceOf[HoverProvider].hoverRequest(textDocument, position)
+      case ("textDocument/documentSymbol", DocumentSymbolParams(tdi)) =>
+        DocumentSymbolResult(server.asInstanceOf[DocumentSymbolProvider].documentSymbols(tdi))
+
+      case (_, Shutdown()) =>
+        server.shutdown()
+        ShutdownResult(0) // the value is a dummy, because Play Json needs to serialize something
+      case c =>
+        server.logger.error(s"Unknown command $c")
+        sys.error("Unknown command")
     }
   }
 }
