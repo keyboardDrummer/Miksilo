@@ -10,7 +10,7 @@ object Program extends LazyLogging {
     logger.info(s"Starting server in ${System.getenv("PWD")}")
 
     val server = Try {
-      new MiksiloLanguageServer(JavaLanguage.getJava, new StreamConnection(System.in, System.out))
+      new MiksiloLanguageServer(JavaLanguage.getJava, new JsonRpcConnection(System.in, System.out))
     }
     server.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
   }

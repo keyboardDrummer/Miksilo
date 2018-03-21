@@ -5,13 +5,10 @@ import java.util.concurrent.Executors
 
 import com.dhpcs.jsonrpc.JsonRpcMessage._
 import com.dhpcs.jsonrpc._
-import com.typesafe.scalalogging.LazyLogging
 import langserver.core.{MessageReader, MessageWriter}
-import langserver.messages.{ServerCommand, _}
-import langserver.types._
+import langserver.types.Diagnostic
 import play.api.libs.json._
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -24,7 +21,7 @@ import scala.util.{Failure, Success, Try}
   *       of a sealed hierarchy. For instance, goto definition returns a {{{Seq[Location]}}}
   *       and that can't subclass anything other than Any
   */
-class StreamConnection(inStream: InputStream, outStream: OutputStream)
+class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
   extends Connection {
 
   var handler: CommandHandler = _
@@ -37,8 +34,6 @@ class StreamConnection(inStream: InputStream, outStream: OutputStream)
 
   // 4 threads should be enough for everyone
   implicit private val commandExecutionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
-
-  override val notificationHandlers: ListBuffer[Notification => Unit] = ListBuffer.empty
 
   def sendNotification(params: Notification): Unit = {
     val json = Notification.write(params)
@@ -53,10 +48,6 @@ class StreamConnection(inStream: InputStream, outStream: OutputStream)
     */
   override def showMessage(tpe: Int, message: String): Unit = {
     sendNotification(ShowMessageParams(tpe, message))
-  }
-
-  def showMessage(tpe: Int, message: String, actions: String*): Unit = {
-    ???
   }
 
   /**

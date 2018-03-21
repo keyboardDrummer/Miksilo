@@ -5,9 +5,8 @@ import core.language.Language
 import core.language.node.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
-import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
 import langserver.types._
-import lsp.{Connection, LanguageServer, MiksiloLanguageServer}
+import lsp._
 import org.scalatest.FunSuite
 import util.SourceUtils
 

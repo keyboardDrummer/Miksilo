@@ -1,7 +1,6 @@
 package lsp
 
 import com.typesafe.scalalogging.LazyLogging
-import langserver.messages.Notification
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Try

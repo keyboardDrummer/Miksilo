@@ -1,14 +1,14 @@
 package lsp
 
 import com.typesafe.scalalogging.Logger
-import langserver.messages._
+import langserver.messages.MessageType
 import langserver.types._
 import org.slf4j.LoggerFactory
 
 /**
   * A language server implementation. Users should subclass this class and implement specific behavior.
   */
-abstract class LanguageServer(connection: Connection) {
+class LanguageServer(connection: Connection) {
 
   lazy val logger: Logger = Logger(LoggerFactory.getLogger(getClass.getName))
 
@@ -44,7 +44,7 @@ abstract class LanguageServer(connection: Connection) {
   def onChangeWatchedFiles(changes: Seq[FileEvent]) = {
   }
 
-  def initialize(pid: Long, rootPath: String, capabilities: ClientCapabilities): ServerCapabilities = {
+  def initialize(pid: Option[Long], rootPath: String, capabilities: ClientCapabilities): ServerCapabilities = {
     ServerCapabilities(
       documentSymbolProvider = this.isInstanceOf[DocumentSymbolProvider],
       hoverProvider = this.isInstanceOf[HoverProvider],

@@ -4,10 +4,9 @@ import java.awt.event
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
 
-import langserver.messages.{DidChangeTextDocumentParams, DidOpenTextDocumentParams}
 import langserver.types
 import langserver.types.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
-import lsp.{Connection, LanguageServer, MiksiloLanguageServer}
+import lsp._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}
 
 class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(document) with Connection {
