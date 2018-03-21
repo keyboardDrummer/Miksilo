@@ -52,8 +52,9 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 {
   def declarations: Seq[DeclarationNode] = this.keys.collect({case x: DeclarationNode => x}).toSeq
   def findReference(location:  SourceElement): Option[Reference] = {
+    val position = location.position
     val references = this.keys.collect({ case n: ReferenceNode => n.reference }) //TODO change O(N) to O(1).
-    references.find(n => n.origin.map(x => x.position).contains(location.position))
+    references.find(n => n.origin.map(x => x.position).contains(position))
   }
 
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
