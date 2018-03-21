@@ -8,7 +8,6 @@ import core.language.exceptions.BadInputException
 import core.language.node.NodeLike
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.{Proofs, SolveConstraintsDelta}
-import langserver.messages.DefinitionResult
 import langserver.types._
 
 class MiksiloLanguageServer(val language: Language, connection: Connection)
