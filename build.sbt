@@ -44,3 +44,5 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9"
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 
 libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1"
+
+dependencyOverrides += "com.dhpcs" %% "scala-json-rpc" % "0.9.3"
