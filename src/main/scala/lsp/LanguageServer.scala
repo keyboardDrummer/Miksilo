@@ -20,6 +20,7 @@ class LanguageServer(connection: Connection) {
     case DidSaveTextDocumentParams(td) => onSaveTextDocument(td)
     case DidCloseTextDocumentParams(td) => onCloseTextDocument(td)
     case DidChangeWatchedFiles(changes) => onChangeWatchedFiles(changes)
+    case _:Initialized =>
     case e => logger.error(s"Unknown notification $e")
   }
   connection.setServer(this)

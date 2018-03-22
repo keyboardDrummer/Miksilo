@@ -8,6 +8,7 @@ import core.language.exceptions.BadInputException
 import core.language.node.NodeLike
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.{Proofs, SolveConstraintsDelta}
+import langserver.core.TextDocument
 import langserver.types._
 
 class MiksiloLanguageServer(val language: Language, connection: Connection)
@@ -15,6 +16,7 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
 
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
+  var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
   override def onChangeTextDocument(td: VersionedTextDocumentIdentifier, changes: Seq[TextDocumentContentChangeEvent]): Unit = {
@@ -31,9 +33,8 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
         phase.action(compilation)
       this.compilation = Some(compilation)
     } catch {
-      case e: BadInputException => {
+      case e: BadInputException =>
         logger.debug(e.toString)
-      }
     }
   }
 
@@ -41,8 +42,11 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     new ByteArrayInputStream(new String(document.contents).getBytes(StandardCharsets.UTF_8))
   }
 
-  private def currentDocument = {
-    documentManager.allOpenDocuments.head
+  private def currentDocument: TextDocument = {
+    documentManager.documentForUri(currentDocumentId.uri).getOrElse({
+      val contents = scala.io.Source.fromFile(currentDocumentId.uri.drop(7)).mkString
+      TextDocument(currentDocumentId.uri, contents.toCharArray)
+    })
   }
 
   def getCompilation: Option[Compilation] = {
@@ -73,6 +77,8 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
   }
 
   override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult = {
+    currentDocumentId = textDocument
+    logger.debug("Went into gotoDefinitionRequest")
     val location = for {
       proofs <- getProofs
       element = getSourceElement(position)

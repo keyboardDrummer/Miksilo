@@ -3,6 +3,7 @@ package lsp
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
+import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
 
 
@@ -17,7 +18,19 @@ class LanguageServerTest extends FunSuite {
     inStream.add(input.getBytes(StandardCharsets.UTF_8))
     val outStream = new ByteArrayOutputStream()
     val connection = new JsonRpcConnection(inStream, outStream)
-    val languageServer = new LanguageServer(connection)
+    new MiksiloLanguageServer(JavaLanguage.getJava, connection)
+
+    def add(value: String) = inStream.add(value.getBytes(StandardCharsets.UTF_8))
+
+    def pop(): String = {
+      while(outStream.toString.isEmpty) {
+        Thread.sleep(5)
+      }
+
+      val result = outStream.toString
+      outStream.reset()
+      result
+    }
 
     val runConnection = new Thread(new Runnable {
       override def run(): Unit = {
@@ -26,15 +39,22 @@ class LanguageServerTest extends FunSuite {
     })
     runConnection.start()
 
-    while(outStream.toString.isEmpty) {
-      Thread.sleep(5)
-    }
-
-    val result = outStream.toString
-    val expectation = """Content-Length: 371
+    val result = pop()
+    val expectation = """Content-Length: 370
                         |
-                        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"definitionProvider":false,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
+                        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"definitionProvider":true,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
       stripMargin.replace("\n","\r\n")
     assertResult(expectation)(result)
+
+    add("Content-Length: 65\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\",\"params\":{\"something\":3}}")
+    //inStream.add("Content-Length: 40\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\"}".getBytes(StandardCharsets.UTF_8))
+
+    add("Content-Length: 231\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java\"},\"position\":{\"line\":5,\"character\":27}}}")
+    val secondResult = pop()
+    val secondExpectation =
+      """Content-Length: 219
+        |
+        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java","range":{"start":{"line":1,"character":7},"end":{"line":1,"character":16}}}],"id":1}""".stripMargin.replace("\n","\r\n")
+    assertResult(secondExpectation)(secondResult)
   }
 }
