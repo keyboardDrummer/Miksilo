@@ -18,6 +18,13 @@ class CloudFormationTest extends FunSuite with LspServerTest {
     assertResult(SourceRange(new Position(5,5), new Position(5,25)))(indexDefinition)
   }
 
+  test("Code completion") {
+    val program = SourceUtils.getTestFileContents("CloudFormationParameterReference.stpl")
+    val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(17, 18))
+    val item = CompletionItem("AvailabilityZones", kind = Some(CompletionItemKind.Text))
+    assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
+  }
+
   test("can it initialize") {
     var input = """Content-Length: 304
                   |

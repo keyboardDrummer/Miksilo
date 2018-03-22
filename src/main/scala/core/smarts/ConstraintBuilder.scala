@@ -60,7 +60,7 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
-  def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = {
+  def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.
     val result = new NamedDeclaration(name, Some(origin))
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationHasType(result, t))

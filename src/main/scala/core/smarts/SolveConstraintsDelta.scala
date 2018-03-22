@@ -1,12 +1,13 @@
 package core.smarts
 
+import com.typesafe.scalalogging.LazyLogging
 import core.deltas.Delta
 import core.language.exceptions.BadInputException
 import core.language.{Language, Phase}
 
 import scala.util.{Failure, Success}
 
-object SolveConstraintsDelta extends Delta {
+object SolveConstraintsDelta extends Delta with LazyLogging {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -19,7 +20,7 @@ object SolveConstraintsDelta extends Delta {
       solver.run() match {
         case Success(_) =>
         case Failure(e:SolveException) =>
-          //throw ConstraintException(e)
+          logger.debug("Failed to solve constraints")
         case Failure(e) => throw e
       }
       compilation.proofs = solver.proofs

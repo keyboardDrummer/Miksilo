@@ -114,7 +114,7 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     } yield nameFilteredDeclarations
     val declarations = maybeDeclarations.getOrElse(Seq.empty[NamedDeclaration])
 
-    val items: Seq[CompletionItem] = declarations.map(declaration => CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(declaration.name)))
+    val items: Seq[CompletionItem] = declarations.map(declaration => CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text)))
     CompletionList(isIncomplete = false, items)
   }
 }
