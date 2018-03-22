@@ -3,6 +3,7 @@ import sbt.Keys.scalacOptions
 lazy val commonSettings = Seq(
 
   version := "1.0",
+  resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
 
   scalaVersion := "2.12.3",
   scalacOptions += "-deprecation",

@@ -78,9 +78,9 @@ object JavaLanguage {
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++
-    simpleByteCodeTransformations
+    simpleByteCodeDeltas
 
-  def simpleByteCodeTransformations: Seq[Delta] = Seq(PoptimizeDelta) ++
+  def simpleByteCodeDeltas: Seq[Delta] = Seq(PoptimizeDelta) ++
     Seq(InferredStackFrames, InferredMaxStack, LabelledLocations, InlineConstantPool) ++ byteCodeDeltas
 
   def byteCodeDeltas: Seq[Delta] = byteCodeInstructions ++ byteCodeWithoutInstructions
