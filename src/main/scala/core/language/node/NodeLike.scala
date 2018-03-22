@@ -63,7 +63,7 @@ object NodeLike {
       Seq(nodeLike.asInstanceOf[Self])
     case sequence: Seq[_] =>
       sequence.reverse. //TODO: the reverse is a nasty hack to decrease the chance of mutations conflicting with this iteration. Problem would occur when transforming two consecutive declarationWithInitializer's
-        collect({ case nodeLikeChild: Self => nodeLikeChild })
+        collect({ case nodeLikeChild: NodeLike => nodeLikeChild.asInstanceOf[Self] })
     case _ => Seq.empty
   }
 

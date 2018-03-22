@@ -3,6 +3,7 @@ package cloudformation
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
+import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.SourceRange
 import deltas.cloudformation.CloudFormationLanguage
 import langserver.types._
@@ -71,5 +72,11 @@ class CloudFormationTest extends FunSuite with LspServerTest {
         |
         |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/CloudFormationParameterReference.stpl","range":{"start":{"line":4,"character":4},"end":{"line":4,"character":24}}}],"id":3}""".stripMargin.replace("\n","\r\n")
     assertResult(secondExpectation)(secondResult)
+  }
+
+  test("parse vfsServiceTemplate") {
+    val utils = new TestLanguageGrammarUtils(CloudFormationLanguage.deltas)
+    val source = SourceUtils.getTestFileContents("CloudFormationParameterReference.stpl")
+    utils.parse(source)
   }
 }

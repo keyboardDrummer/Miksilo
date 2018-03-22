@@ -2,7 +2,6 @@ package deltas.json
 
 import core.bigrammar.TestLanguageGrammarUtils
 import org.scalatest.FunSuite
-import util.SourceUtils
 
 class JsonGrammarTest extends FunSuite {
 
@@ -31,10 +30,5 @@ class JsonGrammarTest extends FunSuite {
     val ast = utils.parse(example)
     val printResult = utils.getPrintResult(ast)
     assertResult(expected)(printResult)
-  }
-
-  test("parse vfsServiceTemplate") {
-    val source = SourceUtils.getTestFileContents("vfsServiceTemplate.stpl")
-    utils.parse(source)
   }
 }

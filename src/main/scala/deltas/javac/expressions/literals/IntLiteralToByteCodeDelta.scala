@@ -28,7 +28,6 @@ object IntLiteralToByteCodeDelta extends ConvertsToByteCode {
     }
   }
 
-
   override def dependencies: Set[Contract] = Set(IntLiteralDelta, SmallIntegerConstantDelta, LoadConstantDelta)
 
   override def shape: NodeShape = IntLiteralDelta.Shape
