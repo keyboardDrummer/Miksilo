@@ -13,6 +13,13 @@ class Proofs {
   var resolutions = Map.empty[Reference, NamedDeclaration]
 
   def resolveLocation(location: SourceElement): Option[SourceElement] = {
-    scopeGraph.findReference(location).flatMap(reference => resolutions(reference).origin)
+    val maybeReference = scopeGraph.findReference(location)
+    maybeReference.flatMap(reference => resolutions(reference).origin)
+  }
+
+  def getDeclarationsInScope(location: SourceElement): Seq[NamedDeclaration] = {
+    val maybeReference = scopeGraph.findReference(location)
+    val declarations = maybeReference.map(reference => scopeGraph.resolveWithoutNameCheck(reference)).getOrElse(Seq.empty)
+    declarations.filter(declaration => declaration.origin.nonEmpty)
   }
 }

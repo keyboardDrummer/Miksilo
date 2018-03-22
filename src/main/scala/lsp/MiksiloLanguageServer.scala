@@ -7,12 +7,20 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
 import core.language.node.NodeLike
 import core.language.{Compilation, Language, SourceElement}
+import core.smarts.objects.NamedDeclaration
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.core.TextDocument
 import langserver.types._
 
+object HumanPosition {
+  implicit def toPosition(position: HumanPosition): Position = new Position(position.line, position.character)
+  implicit def fromPosition(position: Position): HumanPosition = new HumanPosition(position.line + 1, position.character + 1)
+}
+
+case class HumanPosition(line: Int, character: Int) {}
+
 class MiksiloLanguageServer(val language: Language, connection: Connection)
-  extends LanguageServer(connection) with GotoProvider {
+  extends LanguageServer(connection) with GotoProvider with CompletionProvider {
 
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
@@ -76,6 +84,9 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     getForNode(PathRoot(getCompilation.get.program))
   }
 
+  def fromLspPosition(position: Position) = Position(position.line + 1, position.character + 1)
+  def toLspPosition(position: Position) = Position(position.line - 1, position.character - 1)
+
   override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult = {
     currentDocumentId = textDocument
     logger.debug("Went into gotoDefinitionRequest")
@@ -84,7 +95,26 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
       element = getSourceElement(position)
       declaration <- proofs.resolveLocation(element)
       range <- declaration.position
-    } yield Location(textDocument.uri, new langserver.types.Range(range.start, range.end))
+    } yield Location(textDocument.uri, new langserver.types.Range(toLspPosition(range.start), toLspPosition(range.end)))
     DefinitionResult(location.toSeq)
+  }
+
+  override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
+
+  override def completionRequest(textDocument: TextDocumentIdentifier, position: Position): CompletionList = {
+    currentDocumentId = textDocument
+    logger.debug("Went into completionRequest")
+    val maybeDeclarations: Option[Seq[NamedDeclaration]] = for {
+      proofs <- getProofs
+      scopeGraph = proofs.scopeGraph
+      element = getSourceElement(position)
+      reference <- scopeGraph.findReference(element)
+      declarations = scopeGraph.resolveWithoutNameCheck(reference).filter(declaration => declaration.origin.nonEmpty)
+      nameFilteredDeclarations = declarations.filter(declaration => declaration.name.startsWith(reference.name))
+    } yield nameFilteredDeclarations
+    val declarations = maybeDeclarations.getOrElse(Seq.empty[NamedDeclaration])
+
+    val items: Seq[CompletionItem] = declarations.map(declaration => CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(declaration.name)))
+    CompletionList(isIncomplete = false, items)
   }
 }

@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import langserver.types.Position
+import lsp.HumanPosition
 
 import scala.collection.mutable
 import scala.util.matching.Regex
@@ -132,6 +133,6 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
   def position[T <: Positional]: Parser[Position] = Parser { in =>
     val offsetPosition = in.pos.asInstanceOf[OffsetPosition]
-    Success(new Position(offsetPosition.line, offsetPosition.column), in)
+    Success(new HumanPosition(offsetPosition.line, offsetPosition.column), in)
   }
 }

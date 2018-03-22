@@ -1,7 +1,6 @@
 package deltas.javac.expressions
 
 import core.deltas.Delta
-import core.language.Language
 import core.language.node.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
@@ -10,27 +9,9 @@ import lsp._
 import org.scalatest.FunSuite
 import util.SourceUtils
 
-class GotoDefinitionTest extends FunSuite {
+class GotoDefinitionTest extends FunSuite with LspServerTest {
 
   private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
-
-  val document = new TextDocumentIdentifier("jo")
-  val documentItem = new TextDocumentItem("jo","x",1,"")
-  class ConnectionFromString(program: String) extends Connection {
-    override def setServer(languageServer: LanguageServer): Unit = {
-      notifySubscribers(DidOpenTextDocumentParams(documentItem))
-      notifySubscribers(DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(document.uri, 1), Seq(
-        TextDocumentContentChangeEvent(None, None, program)
-      )))
-    }
-  }
-
-  def getDefinitionResultForProgram(language: Language, program: String, position: Position): SourceRange = {
-    val server = new MiksiloLanguageServer(language, new ConnectionFromString(program))
-    val result = server.gotoDefinitionRequest(document, position)
-    val range = result.params.head.range
-    SourceRange(range.start.asInstanceOf[Position], range.end.asInstanceOf[Position])
-  }
 
   test("int variable") {
     val program =

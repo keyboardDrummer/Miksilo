@@ -71,7 +71,7 @@ trait HoverProvider {
 
 trait CompletionProvider {
   def getOptions: CompletionOptions
-  def completionRequest(textDocument: TextDocumentIdentifier, position: Position): ResultResponse
+  def completionRequest(textDocument: TextDocumentIdentifier, position: Position): CompletionList
 }
 
 trait GotoProvider {

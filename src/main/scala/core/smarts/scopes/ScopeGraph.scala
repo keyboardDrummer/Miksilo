@@ -70,14 +70,17 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 
   def addReference(reference: Reference, currentScope: ConcreteScope): Unit = add(ReferenceNode(reference), ReferenceEdge(ScopeNode(currentScope)))
 
-  def resolve(reference: Reference): Seq[NamedDeclaration]= {
-    val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
-      filter(d => d.declaration.name == reference.name)
+  def resolveWithoutNameCheck(reference: Reference): Seq[NamedDeclaration] = {
+    val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d})
 
     if (reachableNodes.isEmpty)
       return Seq.empty
 
     reachableNodes.map(n => n.declaration)
+  }
+
+  def resolve(reference: Reference): Seq[NamedDeclaration] = {
+    resolveWithoutNameCheck(reference).filter(d => d.name == reference.name)
   }
 
   case class DebugNode(node: GraphNode, graph: ScopeGraph) {
