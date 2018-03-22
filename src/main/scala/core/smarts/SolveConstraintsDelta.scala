@@ -17,11 +17,12 @@ object SolveConstraintsDelta extends Delta {
 
       val solver = builder.toSolver
       solver.run() match {
-        case Success(_) => compilation.proofs = solver.proofs
+        case Success(_) =>
         case Failure(e:SolveException) =>
-          throw ConstraintException(e)
+          //throw ConstraintException(e)
         case Failure(e) => throw e
       }
+      compilation.proofs = solver.proofs
     })
   }
 

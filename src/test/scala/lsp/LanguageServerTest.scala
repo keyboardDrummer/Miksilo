@@ -47,7 +47,6 @@ class LanguageServerTest extends FunSuite {
     assertResult(expectation)(result)
 
     add("Content-Length: 65\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\",\"params\":{\"something\":3}}")
-    //inStream.add("Content-Length: 40\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\"}".getBytes(StandardCharsets.UTF_8))
 
     add("Content-Length: 231\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java\"},\"position\":{\"line\":5,\"character\":27}}}")
     val secondResult = pop()

@@ -1,0 +1,140 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Service Specific Stack",
+  "Parameters": {
+    "ProdASGMaxCapacity": {
+      "Default": "30",
+      "Type": "Number"
+    },
+  },
+  "Resources": {
+    "AutoScalingGroup1": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Metadata": {
+        "Comment": "AutoScalingGroup configured with the template-defined launch config and ELB. Scaling policies will be set a later date."
+      },
+      "Properties": {
+        "AvailabilityZones": [
+          {
+            "Fn::GetAtt": [
+              "AvailableZones",
+              "0"
+            ]
+          }
+        ],
+        "HealthCheckGracePeriod": 90,
+        "HealthCheckType": {
+          "Ref": "ASGHealthCheckType"
+        },
+        "MetricsCollection": [
+          {
+            "Granularity": "1Minute"
+          }
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "LaunchConfiguration"
+        },
+        "TargetGroupARNs": [
+          {
+            "Ref": "ELBTargetGroup"
+          }
+        ],
+        "MaxSize": {
+          "Fn::If": [
+            "Prod",
+            {
+              "Ref": "ProdASGMaxCapacity"
+            },
+            {
+              "Ref": "PreProdASGMaxCapacity"
+            }
+          ]
+        },
+        "MinSize": {
+          "Fn::If": [
+            "Prod",
+            {
+              "Ref": "ProdASGMinCapacity"
+            },
+            {
+              "Ref": "PreProdASGMinCapacity"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "PropagateAtLaunch": "true",
+            "Value": {
+              "Fn::Join": [
+                " ",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "AS Group 1"
+                ]
+              ]
+            }
+          },
+          {
+            "Key": "singlepass-ec2-client-hostclass",
+            "PropagateAtLaunch": "true",
+            "Value": {
+              "Ref": "Hostclass"
+            }
+          },
+          {
+            "Key": "onebox",
+            "PropagateAtLaunch": "true",
+            "Value": "false"
+          }
+        ],
+        "VPCZoneIdentifier": [
+          {
+            "Fn::If": [
+              "UsePublicSubnet",
+              {
+                "Ref": "PublicSubnet1"
+              },
+              {
+                "Ref": "PrivateSubnet1"
+              }
+            ]
+          }
+        ]
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MaxBatchSize": {
+            "Fn::If": [
+              "Prod",
+              {
+                "Fn::FindInMap": [
+                  "RegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "AutoScalingRollingUpdateMaxBatchSizePerAsg"
+                ]
+              },
+              {
+                "Ref": "PreProdAutoScalingRollingUpdateMaxBatchSizePerAsg"
+              }
+            ]
+          },
+          "MinSuccessfulInstancesPercent": 100,
+          "PauseTime": "PT30M",
+          "SuspendProcesses": [
+            "HealthCheck",
+            "ReplaceUnhealthy",
+            "AZRebalance",
+            "AlarmNotification",
+            "ScheduledActions"
+          ],
+          "WaitOnResourceSignals": "true"
+        }
+      }
+    },
+  }
+}
