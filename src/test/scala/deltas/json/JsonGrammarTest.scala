@@ -4,7 +4,7 @@ import core.bigrammar.TestLanguageGrammarUtils
 import org.scalatest.FunSuite
 import util.SourceUtils
 
-class JsonGrammar extends FunSuite {
+class JsonGrammarTest extends FunSuite {
 
   val utils = new TestLanguageGrammarUtils(JsonLanguage.deltas)
 
@@ -12,6 +12,15 @@ class JsonGrammar extends FunSuite {
     val example =
       """{
         |  "x": 3
+        |}""".stripMargin
+
+    utils.compareInputWithPrint(example)
+  }
+
+  test("optionalComma") {
+    val example =
+      """{
+        |  "x": 3,
         |}""".stripMargin
 
     utils.compareInputWithPrint(example)
