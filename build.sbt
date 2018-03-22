@@ -45,4 +45,4 @@ libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"
 
 libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1"
 
-dependencyOverrides += "com.dhpcs" %% "scala-json-rpc" % "0.9.3"
+dependencyOverrides += "io.github.shogowada" %% "scala-json-rpc" % "0.9.3"
