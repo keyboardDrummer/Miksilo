@@ -23,7 +23,14 @@ class JsonGrammarTest extends FunSuite {
         |  "x": 3,
         |}""".stripMargin
 
-    utils.compareInputWithPrint(example)
+    val expected =
+      """{
+        |  "x": 3
+        |}""".stripMargin
+
+    val ast = utils.parse(example)
+    val printResult = utils.getPrintResult(ast)
+    assertResult(expected)(printResult)
   }
 
   test("parse vfsServiceTemplate") {
