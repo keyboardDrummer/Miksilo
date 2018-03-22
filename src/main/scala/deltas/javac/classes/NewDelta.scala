@@ -16,11 +16,11 @@ import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidType
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
-object NewDelta extends ExpressionInstance {
+object NewDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def description: String = "Enables using the new keyword to create a new object."
 
@@ -52,7 +52,7 @@ object NewDelta extends ExpressionInstance {
   override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
     val call: NewCall[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-    val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
+    val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
     val classInfo: ClassSignature = compiler.findClass(call._type)
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = call.arguments

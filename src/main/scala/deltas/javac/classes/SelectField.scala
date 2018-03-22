@@ -11,11 +11,11 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.methods.MemberSelectorDelta._
 
-object SelectField extends ExpressionInstance {
+object SelectField extends ExpressionInstance with ConvertsToByteCode {
 
   override def description: String = "Enables using the . operator to select a member from a class."
 
@@ -41,7 +41,7 @@ object SelectField extends ExpressionInstance {
     else
     {
       val obj = selector.target
-      val objInstructions = ExpressionSkeleton.getToInstructions(compilation)(obj)
+      val objInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(obj)
       objInstructions ++ Seq(GetFieldDelta.construct(fieldRefIndex))
     }
   }

@@ -11,9 +11,9 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.javac.expressions.additive.AdditionDelta.{Left, Right, additionOrSubtractionConstraints}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 
-object SubtractionDelta extends ExpressionInstance {
+object SubtractionDelta extends ExpressionInstance with ConvertsToByteCode {
   object SubtractionKey extends NodeShape
   object FirstKey extends NodeField
   object SecondKey extends NodeField
@@ -56,7 +56,7 @@ object SubtractionDelta extends ExpressionInstance {
 
   override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
     val subtraction: Subtraction[NodePath] = expression
-    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(subtraction.left)
     val secondInstructions = toInstructions(subtraction.right)
     firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)

@@ -13,10 +13,10 @@ import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
-object VariableDelta extends ExpressionInstance {
+object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
 

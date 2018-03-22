@@ -13,7 +13,7 @@ import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, Labelled
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeDelta
 
-object TernaryDelta extends ExpressionInstance {
+object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseBranch).asInstanceOf[T]
 
   def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueBranch).asInstanceOf[T]
@@ -71,7 +71,7 @@ object TernaryDelta extends ExpressionInstance {
     val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
     val end = InferredStackFrames.label(endLabelName)
     val goToEnd = LabelledLocations.goTo(endLabelName)
-    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     toInstructions(condition) ++
       Seq(conditionalBranch) ++
       toInstructions(truePath) ++

@@ -2,14 +2,14 @@ package deltas.javac.statements
 
 import core.deltas.Contract
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.{NodePath, SequenceElement}
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath, SequenceElement}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.statements.IfThenDelta._
 
 object IfThenElseDelta extends StatementInstance {
@@ -28,7 +28,7 @@ object IfThenElseDelta extends StatementInstance {
     val thenBody = getThenStatements(ifThenElse)
 
     val jumpToElseIfFalse = LabelledLocations.ifZero(elseLabelName)
-    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
     val toInstructionsStatement = StatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToElseIfFalse) ++

@@ -7,16 +7,16 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionSkeleton, ToByteCodeSkeleton}
 
-object GreaterThanDelta extends ComparisonOperatorDelta { //TODO move more code into comparisonOperatorDelta.
+object GreaterThanDelta extends ComparisonOperatorDelta with ConvertsToByteCode { //TODO move more code into comparisonOperatorDelta.
 
   override def description: String = "Adds the > operator."
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedence, SmallIntegerConstantDelta, LessThanInstructionDelta)
 
   override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val greaterThan: ComparisonOperator[NodePath] = expression
     val firstInstructions = toInstructions(greaterThan.left)
     val secondInstructions = toInstructions(greaterThan.right)

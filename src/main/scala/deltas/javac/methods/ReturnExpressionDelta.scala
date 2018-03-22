@@ -12,7 +12,7 @@ import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
 import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.statements.{StatementInstance, StatementSkeleton}
 
 object ReturnExpressionDelta extends StatementInstance {
@@ -25,7 +25,7 @@ object ReturnExpressionDelta extends StatementInstance {
 
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: NodePath = getReturnValue(_return)
-    val returnValueInstructions = ExpressionSkeleton.getToInstructions(compiler.compilation)(returnValue)
+    val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
     val getType = ExpressionSkeleton.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
     {

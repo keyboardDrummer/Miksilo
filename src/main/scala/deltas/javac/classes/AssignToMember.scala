@@ -1,17 +1,17 @@
 package deltas.javac.classes
 
-import core.deltas.grammars.LanguageGrammars
 import core.deltas._
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
-import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
+import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 
 object AssignToMember extends DeltaWithGrammar {
 
@@ -25,7 +25,7 @@ object AssignToMember extends DeltaWithGrammar {
       val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
 
       val _object = (selector: MemberSelector[NodePath]).target
-      val objectInstructions = ExpressionSkeleton.getToInstructions(compilation)(_object)
+      val objectInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(_object)
       objectInstructions ++ Seq(SwapInstruction.swap, PutField.putField(fieldRefIndex))
     })
     super.inject(language)

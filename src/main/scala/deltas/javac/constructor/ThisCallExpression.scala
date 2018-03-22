@@ -5,13 +5,16 @@ import core.language.node.{Node, NodeShape}
 import core.deltas.path.NodePath
 import core.deltas.Contract
 import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta
 
-object ThisCallExpression extends ExpressionInstance {
+object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
   override val shape = ThisCall
   object ThisCall extends NodeShape
 
@@ -39,4 +42,6 @@ object ThisCallExpression extends ExpressionInstance {
   }
 
   override def description: String = "Enables calling a different constructor using 'this'"
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ???
 }

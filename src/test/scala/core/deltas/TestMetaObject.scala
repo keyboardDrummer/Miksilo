@@ -1,8 +1,8 @@
 package core.deltas
 
-import core.language.node.{Node, NodeShape, NodeField}
+import core.language.node.{Node, NodeField, NodeShape}
+import deltas.expression.IntLiteralDelta
 import org.scalatest.FunSuite
-import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 

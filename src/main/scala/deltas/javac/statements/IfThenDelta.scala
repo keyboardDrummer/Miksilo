@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends StatementInstance {
@@ -34,7 +34,7 @@ object IfThenDelta extends StatementInstance {
     val body = getThenStatements(ifThen)
 
     val jumpToEndIfFalse = LabelledLocations.ifZero(endLabelName)
-    val toInstructionsExpr = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
     val toInstructionsStatement = StatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToEndIfFalse) ++

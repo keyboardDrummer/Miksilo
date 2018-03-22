@@ -6,8 +6,9 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.expressions.ConvertsToByteCode
 
-object CallStaticOrInstanceDelta extends GenericCall {
+object CallStaticOrInstanceDelta extends GenericCall with ConvertsToByteCode {
 
   override def description: String = "Enables calling static and virtual methods."
 

@@ -11,9 +11,9 @@ import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 
-object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
+object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCode {
 
   override def description: String = "Adds the + operator."
 
@@ -30,7 +30,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
-    val toInstructions = ExpressionSkeleton.getToInstructions(compilation)
+    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(addition.left)
     val secondInstructions = toInstructions(addition.right)
     firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {

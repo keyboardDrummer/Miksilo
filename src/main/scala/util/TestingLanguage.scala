@@ -62,9 +62,9 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def parse(input: InputStream): Node = {
-    val state = new Compilation(language)
-    justParse(input, state)
-    state.program
+    val compilation = new Compilation(language)
+    justParse(input, compilation)
+    compilation.program
   }
 
   private def justParse(input: InputStream, state: Compilation): Unit = {

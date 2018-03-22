@@ -12,7 +12,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
@@ -44,7 +44,7 @@ trait GenericCall extends ExpressionInstance {
   }
 
   def getGenericCallInstructions(call: Call[NodePath], compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
-    val expressionToInstruction = ExpressionSkeleton.getToInstructions(compilation)
+    val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions

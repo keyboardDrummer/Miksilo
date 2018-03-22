@@ -5,10 +5,13 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeShape}
 import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
 
-object NullDelta extends ExpressionInstance {
+object NullDelta extends ExpressionInstance with ConvertsToByteCode {
 
   val _null = new Node(Shape)
 
@@ -32,4 +35,6 @@ object NullDelta extends ExpressionInstance {
   }
 
   override def description: String = "Adds the usage of 'null'"
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ???
 }

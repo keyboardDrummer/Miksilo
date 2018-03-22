@@ -37,6 +37,8 @@ libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5"
 
 libraryDependencies += "com.google.guava" % "guava" % "18.0"
 
+libraryDependencies += "io.github.shogowada" %% "scala-json-rpc" % "0.9.3"
+
 // https://mvnrepository.com/artifact/com.typesafe.play/play-json
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9"
 

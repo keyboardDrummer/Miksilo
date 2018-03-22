@@ -17,27 +17,27 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("SimpleForLoop") {
     val testFileContent = SourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
-    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestLanguageGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("While") {
     val testFileContent = SourceUtils.getJavaTestFileContents("Whilee", Path(""))
-    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestLanguageGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Fibonacci") {
     val testFileContent = SourceUtils.getJavaTestFileContents("Fibonacci", Path(""))
-    TestCompilerGrammarUtils.compareInputWithPrint(testFileContent, None)
+    TestLanguageGrammarUtils.compareInputWithPrint(testFileContent, None)
   }
 
   test("Ternary") {
     val input = "1 ? 2 : 3"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
   test("SystemPrintX") {
     val input = s"System.print(x)"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
   /*
@@ -48,17 +48,17 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
    */
   test("SystemOutPrintX") {
     val input = s"System.out.print(x)"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
   }
 
   test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, MethodDelta.MethodGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, MethodDelta.MethodGrammar)
   }
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestCompilerGrammarUtils.compareInputWithPrint(input, None, BlockDelta.Grammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, BlockDelta.Grammar)
   }
 
   test("PrintAfterImplicitAddition") {

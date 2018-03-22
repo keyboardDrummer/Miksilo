@@ -16,12 +16,12 @@ import deltas.bytecode.types.VoidTypeDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements.StatementSkeleton
 
-object SuperCallExpression extends ExpressionInstance {
+object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
 
   override def description: String = "Enables calling a super constructor."
 

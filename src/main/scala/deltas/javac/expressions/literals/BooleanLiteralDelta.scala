@@ -2,20 +2,19 @@ package deltas.javac.expressions.literals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.path.NodePath
+import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object BooleanLiteralDelta extends ExpressionInstance {
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -25,10 +24,6 @@ object BooleanLiteralDelta extends ExpressionInstance {
   }
 
   def literal(value: Boolean) = new Node(Shape, Value -> value)
-
-  override def toByteCode(literal: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(SmallIntegerConstantDelta.integerConstant(if (getValue(literal)) 1 else 0))
-  }
 
   def getValue(literal: Node) = literal(Value).asInstanceOf[Boolean]
 

@@ -8,7 +8,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
 
 object ExpressionAsStatementDelta extends StatementInstance {
 
@@ -28,7 +28,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
       case 1 => Seq(PopDelta.pop)
       case 2 => Seq(Pop2Delta.pop2)
     }
-    ExpressionSkeleton.getToInstructions(compilation)(expression) ++ extra
+    ToByteCodeSkeleton.getToInstructions(compilation)(expression) ++ extra
   }
 
   def getExpression[T <: NodeLike](statement: T): T = {

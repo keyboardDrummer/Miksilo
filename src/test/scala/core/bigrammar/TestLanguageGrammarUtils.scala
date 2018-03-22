@@ -15,7 +15,7 @@ import scala.util.parsing.input.CharArrayReader
 
 case class StringKey(value: String) extends GrammarKey
 
-object TestCompilerGrammarUtils extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas)
+object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas)
 
 object TestGrammarUtils extends FunSuite {
 
@@ -46,7 +46,7 @@ object TestGrammarUtils extends FunSuite {
   }
 }
 
-case class TestCompilerGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
+case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null): Unit = {
     val grammar = getGrammarUsingTransformer(grammarTransformer)
@@ -62,7 +62,7 @@ case class TestCompilerGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
     TestLanguageBuilder.build(getTransformations(grammarTransformer)).language.grammars.root
   }
 
-  def getGrammarResult(input: String, grammarTransformer: GrammarKey = null): Any = {
+  def parse(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.build(getTransformations(grammarTransformer))
     compiler.parse(SourceUtils.stringToStream(input))
   }

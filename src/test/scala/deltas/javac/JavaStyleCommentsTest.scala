@@ -7,9 +7,9 @@ import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import core.language.Language
+import deltas.expression.IntLiteralDelta
 import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.expressions.additive.{AdditivePrecedenceDelta, AdditionDelta, SubtractionDelta}
-import deltas.javac.expressions.literals.IntLiteralDelta
+import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}
@@ -53,7 +53,7 @@ class JavaStyleCommentsTest
     assertResult(slaveExpectation)(slavePrinted)
   }
 
-  val testGrammar = TestCompilerGrammarUtils(this.language.deltas)
+  val testGrammar = TestLanguageGrammarUtils(this.language.deltas)
 
   test("BasicClass") {
     val input = "/* jooo */"
@@ -72,7 +72,7 @@ class JavaStyleCommentsTest
   test("relational") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.javaCompilerDeltas))
-    val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
   }
@@ -81,7 +81,7 @@ class JavaStyleCommentsTest
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
       JavaLanguage.allByteCodeDeltas))
-    val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -92,7 +92,7 @@ class JavaStyleCommentsTest
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
       JavaLanguage.allByteCodeDeltas))
-    val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -103,7 +103,7 @@ class JavaStyleCommentsTest
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
     JavaLanguage.allByteCodeDeltas))
-    val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -113,7 +113,7 @@ class JavaStyleCommentsTest
   test("addition4") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.javaCompilerDeltas))
-    val grammarUtils = TestCompilerGrammarUtils(utils.language.deltas)
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -139,7 +139,7 @@ class JavaStyleCommentsTest
 
   test("comparePrintResultWithoutComment") {
     val input = SourceUtils.getJavaTestFileContents("Whilee")
-    val result = TestGrammarUtils.parseAndPrint(input, None, TestCompilerGrammarUtils.getGrammarUsingTransformer())
+    val result = TestGrammarUtils.parseAndPrint(input, None, TestLanguageGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)(result)
   }
 

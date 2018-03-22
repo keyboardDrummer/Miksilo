@@ -1,12 +1,12 @@
 package core.grammar
 
-import core.bigrammar.TestCompilerGrammarUtils
+import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{ComparisonOptions, Node}
 import deltas.bytecode.types._
+import deltas.expression.IntLiteralDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
-import deltas.javac.expressions.literals.IntLiteralDelta
 import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
@@ -16,12 +16,12 @@ import deltas.javac.JavaLanguage
 import deltas.javac.trivia.JavaStyleBlockCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestCompilerGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
+  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
 {
 
   test("BasicClass") {
     val input = "package bla; class Help {}"
-    val result = TestCompilerGrammarUtils.getGrammarResult(input)
+    val result = TestLanguageGrammarUtils.parse(input)
     val expectation = JavaClassSkeleton.neww(Seq("bla"), "Help")
     assertResult(expectation)(result)
   }
@@ -66,7 +66,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = getGrammarResult(input, ExpressionSkeleton.ExpressionGrammar)
+    val result: Any = parse(input, ExpressionSkeleton.ExpressionGrammar)
     result
   }
 
@@ -101,7 +101,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = TestCompilerGrammarUtils.getGrammarResult(input, MethodDelta.MethodGrammar)
+    val result = TestLanguageGrammarUtils.parse(input, MethodDelta.MethodGrammar)
     result
   }
 

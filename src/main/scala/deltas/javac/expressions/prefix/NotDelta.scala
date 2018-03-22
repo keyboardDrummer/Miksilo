@@ -8,10 +8,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
-object NotDelta extends ExpressionInstance {
+object NotDelta extends ExpressionInstance with ConvertsToByteCode {
 
   object NotKey extends NodeShape
 
@@ -22,7 +22,7 @@ object NotDelta extends ExpressionInstance {
   override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
   override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    ExpressionSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionDelta.not)
+    ToByteCodeSkeleton.getToInstructions(compilation)(expression) ++ Seq(NotInstructionDelta.not)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

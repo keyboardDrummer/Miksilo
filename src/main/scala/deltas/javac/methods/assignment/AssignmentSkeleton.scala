@@ -12,11 +12,11 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
 import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateInstructionDelta}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.methods.MethodDelta
 import deltas.bytecode.types.TypeSkeleton
 
-object AssignmentSkeleton extends ExpressionInstance {
+object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
 
   def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
@@ -57,7 +57,7 @@ object AssignmentSkeleton extends ExpressionInstance {
 
   override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
     val value = getAssignmentValue(assignment)
-    val valueInstructions = ExpressionSkeleton.getToInstructions(compilation)(value)
+    val valueInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
     val assignInstructions = hasAssignFromStackByteCode.get(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
     val valueType = ExpressionSkeleton.getType(compilation)(value)

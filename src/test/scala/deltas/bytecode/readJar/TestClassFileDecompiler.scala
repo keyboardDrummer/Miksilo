@@ -3,7 +3,7 @@ package deltas.bytecode.readJar
 import java.io
 
 import application.compilerCockpit.PrettyPrint
-import core.bigrammar.{BiGrammarToParser, TestCompilerGrammarUtils}
+import core.bigrammar.{BiGrammarToParser, TestLanguageGrammarUtils}
 import core.language.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton
@@ -124,23 +124,23 @@ class TestClassFileDecompiler extends FunSuite {
   }
 
   test("ParseByteCodeType3") {
-    val grammarUtils = TestCompilerGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    val grammarUtils = TestLanguageGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
     grammarUtils.compareInputWithPrint("([BII)V", None, ByteCodeTypeGrammar)
   }
 
 
   test("ParseByteCodeType2") {
-    val grammarUtils = TestCompilerGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    val grammarUtils = TestLanguageGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
     grammarUtils.compareInputWithPrint("[B", None, ByteCodeTypeGrammar)
   }
 
   test("ParseByteCodeType1") {
-    val grammarUtils = TestCompilerGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    val grammarUtils = TestLanguageGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
     grammarUtils.compareInputWithPrint("B", None, ByteCodeTypeGrammar)
   }
 
   test("ParseByteCodeType0") {
-    val grammarUtils = TestCompilerGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
+    val grammarUtils = TestLanguageGrammarUtils(ClassFileSignatureDecompiler.getDecompiler)
     grammarUtils.compareInputWithPrint("I", None, ByteCodeTypeGrammar)
   }
 }

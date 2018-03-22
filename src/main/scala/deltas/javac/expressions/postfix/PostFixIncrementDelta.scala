@@ -10,10 +10,10 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
 import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
 import deltas.javac.methods.MethodDelta
 
-object PostFixIncrementDelta extends ExpressionInstance {
+object PostFixIncrementDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override val shape = PostfixIncrementKey
 

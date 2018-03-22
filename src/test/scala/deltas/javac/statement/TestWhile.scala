@@ -1,6 +1,6 @@
 package deltas.javac.statement
 
-import core.bigrammar.TestCompilerGrammarUtils
+import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.grammars.KeyGrammar
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
