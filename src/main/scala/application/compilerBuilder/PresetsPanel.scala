@@ -22,13 +22,13 @@ import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset: Preset = {
-    val deltas = Delta.spliceAndFilterTop(JavaLanguage.simpleByteCodeTransformations, JavaLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
+    val deltas = Delta.spliceAndFilterTop(JavaLanguage.simpleByteCodeDeltas, JavaLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
     Preset("Simplified bytecode", deltas, "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
     Preset("Java to simplified bytecode",
-      JavaLanguage.spliceBeforeTransformations(JavaLanguage.simpleByteCodeTransformations, Seq(MarkOutputGrammar)),
+      JavaLanguage.spliceBeforeTransformations(JavaLanguage.simpleByteCodeDeltas, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
 

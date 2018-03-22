@@ -4,6 +4,8 @@ version := "1.0"
 
 scalaVersion := "2.12.3"
 
+resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven"
+
 scalacOptions += "-deprecation"
 scalacOptions += "-feature"
 scalacOptions += "-language:implicitConversions"
