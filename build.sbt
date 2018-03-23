@@ -1,4 +1,10 @@
-import sbt.Keys.scalacOptions
+
+lazy val global = project
+  .in(file("."))
+  .aggregate(
+    languageServer,
+    playground,
+  )
 
 lazy val commonSettings = Seq(
 
@@ -10,18 +16,6 @@ lazy val commonSettings = Seq(
   scalacOptions += "-feature",
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
-
-  libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8",
-
-  libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
-
-  libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1",
-
-  libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0",
-
-  libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
-
-  libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
 
   libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
 
@@ -50,16 +44,22 @@ lazy val commonSettings = Seq(
   libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1",
 )
 
-lazy val lspServer = (project in file(".")).
+lazy val languageServer = (project in file("languageServer")).
   settings(commonSettings: _*).
   settings(
     name := "MiksiloLspServer",
     mainClass in assembly := Some("lsp.Program"),
   )
 
-//lazy val playground = (project in file(".")).
-//  settings(commonSettings: _*).
-//  settings(
-//    name := "MiksiloPlayground",
-//    mainClass in assembly := Some("application.Program"),
-//  )
+lazy val playground = (project in file("playground")).
+  settings(commonSettings: _*).
+  settings(
+    name := "MiksiloPlayground",
+    mainClass in assembly := Some("application.Program"),
+    libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8",
+    libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
+    libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1",
+    libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0",
+    libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
+    libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
+  ).dependsOn(languageServer)
