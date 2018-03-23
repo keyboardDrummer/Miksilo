@@ -40,7 +40,7 @@ class LanguageServerTest extends FunSuite {
     runConnection.start()
 
     val result = pop()
-    val expectation = """Content-Length: [440
+    val expectation = """Content-Length: 440
                         |
                         |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"completionProvider":{"resolveProvider":false,"triggerCharacters":[]},"definitionProvider":true,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
       stripMargin.replace("\n","\r\n")
@@ -53,7 +53,7 @@ class LanguageServerTest extends FunSuite {
     val secondExpectation =
       """Content-Length: 219
         |
-        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java","range":{"start":{"line":1,"character":7},"end":{"line":1,"character":16}}}],"id":1}""".stripMargin.replace("\n","\r\n")
+        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java","range":{"start":{"line":0,"character":6},"end":{"line":0,"character":15}}}],"id":1}""".stripMargin.replace("\n","\r\n")
     assertResult(secondExpectation)(secondResult)
   }
 }

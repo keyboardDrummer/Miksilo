@@ -52,12 +52,9 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 {
   def declarations: Seq[DeclarationNode] = this.keys.collect({case x: DeclarationNode => x}).toSeq
   def findReference(location: SourceElement): Option[Reference] = {
-    val allReferences = this.keys.collect({ case n: ReferenceNode => n.reference }) //TODO change O(N) to O(1).
-    val referenceLocations = allReferences.map(reference => reference.origin.flatMap(s => s.position).get).filter(r => r.start.line == 424 || r.start.line == 425 || r.start.line == 423)
-    System.out.append("")
     val references = for {
       elementRange <- location.position.toSeq
-      reference <- allReferences
+      reference <- this.keys.collect({ case n: ReferenceNode => n.reference })  //TODO change O(N) to O(1).
       referenceRange <- reference.origin.flatMap(s => s.position).toSeq
       valid = elementRange == referenceRange
       result <- if (valid) Seq(reference) else Seq.empty
