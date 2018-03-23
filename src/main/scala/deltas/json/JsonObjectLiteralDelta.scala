@@ -56,6 +56,7 @@ object JsonObjectLiteralDelta extends ExpressionInstance with DeltaWithPhase {
 
   implicit class ObjectLiteralMember(val node: Node) extends NodeWrapper[Node] {
     def key: String = node(MemberKey).asInstanceOf[String]
+    def keyWithQuotes: String = "\"" + key + "\""
     def value: Node = node(MemberValue).asInstanceOf[Node]
   }
 

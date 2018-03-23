@@ -15,18 +15,18 @@ class CloudFormationTest extends FunSuite with LspServerTest {
 
   test("Goto definition") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(425, 31))
-    assertResult(SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))(result)
+    val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(437, 36))
+    assertResult(SourceRange(new HumanPosition(42,5), new HumanPosition(42,18)))(result)
   }
 
   test("Code completion") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(214, 14))
-    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("cription"))
+    val item = CompletionItem("\"Subscription\"", kind = Some(CompletionItemKind.Text), insertText = Some("cription\""))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 
-  test("can it initialize") {
+  test("Goto definition through LSP") {
     var input = """Content-Length: 304
                   |
                   |{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"rootUri":"file:///local/home/rwillems/workspaces/cloud9-dev/ide-assets/src/AWSCloud9Core/plugins/c9.ide.language.lsp/worker/test_files/project","capabilities":{"workspace":{"applyEdit":false},"textDocument":{"definition":true}},"trace":"verbose"}}""".stripMargin
@@ -56,27 +56,22 @@ class CloudFormationTest extends FunSuite with LspServerTest {
     })
     runConnection.start()
 
-    val result = pop()
-    val expectation = """Content-Length: 370
-                        |
-                        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"definitionProvider":true,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
-      stripMargin.replace("\n","\r\n")
-    assertResult(expectation)(result)
+    pop()
 
     add("Content-Length: 65\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\",\"params\":{\"something\":3}}")
 
-    add("Content-Length: 255\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/CloudFormationParameterReference.stpl\"},\"position\":{\"line\":45,\"character\":34}}}")
+    add("Content-Length: 259\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/AutoScalingMultiAZWithNotifications.json\"},\"position\":{\"line\":436,\"character\":35}}}")
     val secondResult = pop()
     val secondExpectation =
-      """Content-Length: 242
+      """Content-Length: 247
         |
-        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/CloudFormationParameterReference.stpl","range":{"start":{"line":4,"character":4},"end":{"line":4,"character":24}}}],"id":3}""".stripMargin.replace("\n","\r\n")
+        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/AutoScalingMultiAZWithNotifications.json","range":{"start":{"line":41,"character":4},"end":{"line":41,"character":17}}}],"id":3}""".stripMargin.replace("\n","\r\n")
     assertResult(secondExpectation)(secondResult)
   }
 
   test("parse vfsServiceTemplate") {
     val utils = new TestLanguageGrammarUtils(CloudFormationLanguage.deltas)
-    val source = SourceUtils.getTestFileContents("CloudFormationParameterReference.stpl")
+    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     utils.parse(source)
   }
 }

@@ -422,7 +422,7 @@
         "Port" : 80,
         "Protocol" : "HTTP",
         "UnhealthyThresholdCount" : 5,
-        "VpcId" : {"Ref" : "VpcId"}
+        "VpcId" : { "Ref" : "VpcId" }
       }
     },
 

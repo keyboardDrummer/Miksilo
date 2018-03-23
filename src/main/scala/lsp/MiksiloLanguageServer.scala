@@ -83,9 +83,6 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     getForNode(PathRoot(getCompilation.get.program))
   }
 
-  def fromLspPosition(position: Position) = Position(position.line + 1, position.character + 1)
-  def toLspPosition(position: Position) = Position(position.line - 1, position.character - 1)
-
   override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult = {
     currentDocumentId = textDocument
     logger.debug("Went into gotoDefinitionRequest")
@@ -94,7 +91,7 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
       element = getSourceElement(position)
       declaration <- proofs.resolveLocation(element)
       range <- declaration.position
-    } yield Location(textDocument.uri, new langserver.types.Range(toLspPosition(range.start), toLspPosition(range.end)))
+    } yield Location(textDocument.uri, new langserver.types.Range(range.start, range.end))
     DefinitionResult(location.toSeq)
   }
 

@@ -29,7 +29,7 @@ object CloudFormationTemplate extends Delta {
         val typeObject = resourceType._2.as[JsObject]
         val properties = typeObject.value("Properties").as[JsObject]
         for(property <- properties.value) {
-          builder.declare(property._1, typeScope)
+          builder.declare("\"" + property._1 + "\"", typeScope)
         }
       }
 
@@ -52,7 +52,8 @@ object CloudFormationTemplate extends Delta {
 
         val properties: ObjectLiteral = resourceMembers.getValue("Properties")
         for(property <- properties.members) {
-          builder.resolve(property.key, KeyLocation(property.node.getLocation(MemberKey)), typeScope)
+          builder.resolve(property.keyWithQuotes, property.node.getLocation(MemberKey), typeScope)
+          //builder.resolve(property.key, KeyLocation(property.node.getLocation(MemberKey)), typeScope)
         }
       }
 
@@ -66,11 +67,5 @@ object CloudFormationTemplate extends Delta {
 
     }
     super.inject(language)
-  }
-
-  case class KeyLocation(original: SourceElement) extends SourceElement {
-    override def current: Any = original.current
-
-    override def position: Option[SourceRange] = original.position.map(range => SourceRange(Position(range.start.line, range.start.character + 1), Position(range.end.line, range.end.character - 1)))
   }
 }
