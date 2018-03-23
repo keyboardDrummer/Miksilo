@@ -14,15 +14,15 @@ import util.SourceUtils
 class CloudFormationTest extends FunSuite with LspServerTest {
 
   test("Goto definition") {
-    val program = SourceUtils.getTestFileContents("CloudFormationParameterReference.stpl")
-    val indexDefinition = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new Position(46, 24))
-    assertResult(SourceRange(new Position(5,5), new Position(5,25)))(indexDefinition)
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(425, 31))
+    assertResult(SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))(result)
   }
 
   test("Code completion") {
-    val program = SourceUtils.getTestFileContents("CloudFormationParameterReference.stpl")
-    val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(17, 18))
-    val item = CompletionItem("AvailabilityZones", kind = Some(CompletionItemKind.Text))
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(214, 14))
+    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("cription"))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 

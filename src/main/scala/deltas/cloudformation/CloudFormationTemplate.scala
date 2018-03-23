@@ -1,10 +1,12 @@
 package deltas.cloudformation
 
 import core.deltas.Delta
-import core.language.Language
+import core.language.node.SourceRange
+import core.language.{Language, SourceElement}
 import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, MemberValue, ObjectLiteral}
+import langserver.types.Position
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
 
@@ -50,7 +52,7 @@ object CloudFormationTemplate extends Delta {
 
         val properties: ObjectLiteral = resourceMembers.getValue("Properties")
         for(property <- properties.members) {
-          builder.resolve(property.key, property.node.getLocation(MemberKey), typeScope)
+          builder.resolve(property.key, KeyLocation(property.node.getLocation(MemberKey)), typeScope)
         }
       }
 
@@ -64,5 +66,11 @@ object CloudFormationTemplate extends Delta {
 
     }
     super.inject(language)
+  }
+
+  case class KeyLocation(original: SourceElement) extends SourceElement {
+    override def current: Any = original.current
+
+    override def position: Option[SourceRange] = original.position.map(range => SourceRange(Position(range.start.line, range.start.character + 1), Position(range.end.line, range.end.character - 1)))
   }
 }

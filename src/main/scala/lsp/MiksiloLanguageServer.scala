@@ -7,13 +7,12 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
 import core.language.node.NodeLike
 import core.language.{Compilation, Language, SourceElement}
-import core.smarts.objects.NamedDeclaration
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.core.TextDocument
 import langserver.types._
 
 object HumanPosition {
-  implicit def toPosition(position: HumanPosition): Position = new Position(position.line, position.character)
+  implicit def toPosition(position: HumanPosition): Position = new Position(position.line - 1, position.character - 1)
   implicit def fromPosition(position: Position): HumanPosition = new HumanPosition(position.line + 1, position.character + 1)
 }
 
@@ -104,17 +103,20 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
   override def completionRequest(textDocument: TextDocumentIdentifier, position: Position): CompletionList = {
     currentDocumentId = textDocument
     logger.debug("Went into completionRequest")
-    val maybeDeclarations: Option[Seq[NamedDeclaration]] = for {
-      proofs <- getProofs
+    val completions: Seq[CompletionItem] = for {
+      proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
       element = getSourceElement(position)
-      reference <- scopeGraph.findReference(element)
-      declarations = scopeGraph.resolveWithoutNameCheck(reference).filter(declaration => declaration.origin.nonEmpty)
-      nameFilteredDeclarations = declarations.filter(declaration => declaration.name.startsWith(reference.name))
-    } yield nameFilteredDeclarations
-    val declarations = maybeDeclarations.getOrElse(Seq.empty[NamedDeclaration])
+      reference <- scopeGraph.findReference(element).toSeq
+      prefixLength = position.character - reference.origin.get.position.get.start.character
+      prefix = reference.name.take(prefixLength)
+      declaration <- scopeGraph.resolveWithoutNameCheck(reference).
+        filter(declaration => declaration.origin.nonEmpty).
+        filter(declaration => declaration.name.startsWith(prefix))
+      missingText = declaration.name.drop(prefixLength)
+      completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(missingText))
+    } yield completion
 
-    val items: Seq[CompletionItem] = declarations.map(declaration => CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text)))
-    CompletionList(isIncomplete = false, items)
+    CompletionList(isIncomplete = false, completions)
   }
 }
