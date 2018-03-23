@@ -35,6 +35,14 @@ class ConstraintBuilder(val factory: Factory) {
 
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
+  def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
+    val declaration = declarationVariable()
+    val reference = new Reference(name, Some(origin))
+    add(ReferenceInScope(reference, scope))
+    add(new ResolvesToType(reference, declaration, _type))
+    declaration
+  }
+
   def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
     resolveOption(name, Some(origin), scope, _type)
   }
@@ -61,7 +69,7 @@ class ConstraintBuilder(val factory: Factory) {
   }
 
   def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.
-    val result = new NamedDeclaration(name, Some(origin))
+    val result = new NamedDeclaration(name, Option(origin))
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationHasType(result, t))
     result

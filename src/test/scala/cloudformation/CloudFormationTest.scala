@@ -19,10 +19,36 @@ class CloudFormationTest extends FunSuite with LspServerTest {
     assertResult(SourceRange(new HumanPosition(42,5), new HumanPosition(42,18)))(result)
   }
 
-  test("Code completion") {
+  test("Goto definition overloaded parameter") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(445, 32))
+    assertResult(SourceRange(new HumanPosition(8,5), new HumanPosition(8,12)))(result)
+  }
+
+  test("Goto definition overloaded parameter") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(425, 32))
+    assertResult(SourceRange(new HumanPosition(8,5), new HumanPosition(8,12)))(result)
+  }
+
+  test("Code completion parameter") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(437, 38))
+    val item = CompletionItem("\"SSHLocation\"", kind = Some(CompletionItemKind.Text), insertText = Some("cation\""))
+    assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
+  }
+
+  test("Code completion property") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(214, 14))
     val item = CompletionItem("\"Subscription\"", kind = Some(CompletionItemKind.Text), insertText = Some("cription\""))
+    assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
+  }
+
+  test("Code completion overloaded parameter") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(425, 32))
+    val item = CompletionItem("\"VpcId\"", kind = Some(CompletionItemKind.Text), insertText = Some("cId\""))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 
