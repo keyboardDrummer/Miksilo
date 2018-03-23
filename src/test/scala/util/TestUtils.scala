@@ -71,7 +71,7 @@ class TestUtils(val language: TestingLanguage) extends FunSuite {
     SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
   }
 
-  def compile(input: String): Unit = {
+  def compile(input: String): Compilation = {
     language.parseAndTransform(input)
   }
 

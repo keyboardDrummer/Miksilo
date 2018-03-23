@@ -74,10 +74,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(input: InputStream): Compilation = {
-    val state = new Compilation(language)
-    justParse(input, state)
-    runPhases(state)
-    state
+    val compilation = new Compilation(language)
+    justParse(input, compilation)
+    runPhases(compilation)
+    compilation
   }
 
   class WrappedContract(contract: Contract) extends Contract {

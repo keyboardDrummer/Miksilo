@@ -2,7 +2,6 @@ package deltas.javac.expressions
 
 import core.deltas.Delta
 import core.smarts.SolveConstraintsDelta
-import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
@@ -20,7 +19,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
       """int x;
         |x = 3;
       """.stripMargin
-    compile(program)
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.isEmpty)
   }
 
   test("assign long to int variable") {
@@ -28,7 +28,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
       """int x;
         |x = 3l;
       """.stripMargin
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   ignore("define same variable twice") { //TODO ignore => test
@@ -36,7 +37,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
       """int x;
         |int x;
       """.stripMargin
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("use variable that does not exist") {
@@ -44,7 +46,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
       """int x;
         |y = 3;
       """.stripMargin
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("defined inside if") {
@@ -55,7 +58,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
         |  x += y;
         |}
       """.stripMargin
-    compile(program)
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.isEmpty)
   }
 
   test("defined in if, used outside it") {
@@ -66,7 +70,8 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
         |}
         |x += y;
       """.stripMargin
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("int + int") {
@@ -76,12 +81,14 @@ class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
 
   test("int + long") {
     val program = "3 + 2l;"
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("long + long") {
     val program = "3l + 2l;"
-    compile(program)
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.isEmpty)
   }
 }
 

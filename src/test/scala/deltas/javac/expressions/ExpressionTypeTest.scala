@@ -1,7 +1,6 @@
 package deltas.javac.expressions
 
 import core.smarts.SolveConstraintsDelta
-import core.smarts.SolveConstraintsDelta.ConstraintException
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import util.{TestLanguageBuilder, TestUtils}
@@ -14,16 +13,19 @@ class ExpressionTypeTest extends TestUtils(TestLanguageBuilder.build(
 
   test("int + int") {
     val program = "3 + 2"
-    compile(program)
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.isEmpty)
   }
 
   test("int + long") {
     val program = "3 + 2l"
-    assertThrows[ConstraintException](compile(program))
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("long + long") {
     val program = "3l + 2l"
-    compile(program)
+    val compilation = compile(program)
+    assert(compilation.remainingConstraints.isEmpty)
   }
 }

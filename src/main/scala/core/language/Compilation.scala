@@ -1,13 +1,14 @@
 package core.language
 
 import core.language.node.Node
-import core.smarts.Proofs
+import core.smarts.{Constraint, Proofs}
 
 import scala.collection.mutable
 
 class Compilation(val language: Language) {
   var program: Node = _
   var proofs: Proofs = _
+  var remainingConstraints: Seq[Constraint] = _
 
   var output: String = _
   val state: mutable.Map[Any,Any] = mutable.Map.empty

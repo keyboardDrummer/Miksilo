@@ -19,8 +19,11 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
       val solver = builder.toSolver
       solver.run() match {
         case Success(_) =>
+          compilation.remainingConstraints = Seq.empty
+        case Failure(e:CouldNotApplyConstraints) =>
+          compilation.remainingConstraints = e.constraints
         case Failure(e:SolveException) =>
-          logger.debug("Failed to solve constraints")
+          throw ConstraintException(e)
         case Failure(e) => throw e
       }
       compilation.proofs = solver.proofs
