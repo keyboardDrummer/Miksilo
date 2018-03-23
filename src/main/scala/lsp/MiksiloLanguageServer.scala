@@ -108,7 +108,6 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
       prefixLength = position.character - reference.origin.get.position.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
-        filter(declaration => declaration.origin.nonEmpty).
         filter(declaration => declaration.name.startsWith(prefix))
       missingText = declaration.name.drop(prefixLength)
       completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(missingText))

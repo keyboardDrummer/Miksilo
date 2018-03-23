@@ -25,7 +25,7 @@ class CloudFormationTest extends FunSuite with LspServerTest {
     assertResult(SourceRange(new HumanPosition(8,5), new HumanPosition(8,12)))(result)
   }
 
-  test("Goto definition overloaded parameter") {
+  test("Goto definition overloaded parameter second") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = getDefinitionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(425, 32))
     assertResult(SourceRange(new HumanPosition(8,5), new HumanPosition(8,12)))(result)
@@ -42,7 +42,7 @@ class CloudFormationTest extends FunSuite with LspServerTest {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = getCompletionResultForProgram(CloudFormationLanguage.language, program, new HumanPosition(214, 14))
     val item = CompletionItem("\"Subscription\"", kind = Some(CompletionItemKind.Text), insertText = Some("cription\""))
-    assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
+    assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
   }
 
   test("Code completion overloaded parameter") {
