@@ -1,7 +1,9 @@
 package languageServer.lsp
 
-import deltas.javac.JavaLanguage
-import languageServer.MiksiloLanguageServer
+import java.io.ByteArrayOutputStream
+
+import langserver.types._
+import languageServer.{CompletionProvider, DefinitionProvider, LanguageServer}
 import org.scalatest.AsyncFunSpec
 
 class LSPServerTest extends AsyncFunSpec {
@@ -15,76 +17,123 @@ class LSPServerTest extends AsyncFunSpec {
                                            |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"completionProvider":{"resolveProvider":false,"triggerCharacters":[]},"definitionProvider":true,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
     stripMargin.replace("\n","\r\n")
 
+  case class ServerAndClient(client: LSPClient, server: LSPServer,
+                             clientOut: ByteArrayOutputStream,
+                             serverOut: ByteArrayOutputStream)
+
   it("can initialize") {
+
+    val languageServer = new DefaultLanguageServer {}
+    val serverAndClient = setupServerAndClient(languageServer)
+
+    val serverOutExpectation =
+      """Content-Length: 371
+        |
+        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"definitionProvider":false,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 99
+        |
+        |{"jsonrpc":"2.0","method":"initialize","params":{"rootUri":"someRootUri","capabilities":{}},"id":0}""".stripMargin
+    val initializePromise = serverAndClient.client.initialize(InitializeParams(None, "someRootUri", ClientCapabilities()))
+    initializePromise.future.map(result => {
+      assert(result.capabilities == serverAndClient.server.getCapabilities)
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+  }
+
+  it("can use goto definition") {
+    val document = TextDocumentItem("a","",0,"content")
+    val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
+    val definitionRange = Range(Position(0, 1), Position(1, 2))
+
+    val languageServer: LanguageServer = new DefaultLanguageServer with DefinitionProvider {
+      override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
+        if (parameters == request)
+          return Seq(Location(parameters.textDocument.uri, definitionRange))
+        Seq.empty
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val gotoPromise = client.gotoDefinition(request)
+
+    val serverOutExpectation =
+      """Content-Length: 121
+        |
+        |{"jsonrpc":"2.0","result":[{"uri":"a","range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}}}],"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 133
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/definition","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
+    gotoPromise.future.map(result => {
+      assert(result == Seq(Location(document.uri, definitionRange)))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+  }
+
+  it("can use completion") {
+    val document = TextDocumentItem("a","",0, "content")
+    val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
+
+    val languageServer: LanguageServer = new DefaultLanguageServer with CompletionProvider {
+      override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
+
+      override def complete(request: DocumentPosition): CompletionList =
+        CompletionList(isIncomplete = false, Seq(CompletionItem("hello")))
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val completePromise = client.complete(request)
+
+    val serverOutExpectation =
+      """Content-Length: 84
+        |
+        |{"jsonrpc":"2.0","result":{"isIncomplete":false,"items":[{"label":"hello"}]},"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 133
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/completion","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
+    completePromise.future.map(result => {
+      assert(result.items == Seq(CompletionItem("hello")))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+
+  }
+
+  def fixNewlines(text: String): String = text.replace("\n","\r\n")
+
+  private def setupServerAndClient(languageServer: LanguageServer): ServerAndClient = {
     val clientToServer = new InOutStream()
     val serverToClient = new InOutStream()
 
-    val serverConnection = new JsonRpcConnection(clientToServer.in, serverToClient.out)
-    val server = new LSPServer(new MiksiloLanguageServer(JavaLanguage.getJava), serverConnection)
-    val client = new LSPClient(new JsonRpcConnection(serverToClient.in, clientToServer.out))
+    val serverOutCopy = new ByteArrayOutputStream()
+    val clientOutCopy = new ByteArrayOutputStream()
+    val clientOut = new StreamMultiplexer(Seq(clientToServer.out, clientOutCopy))
+    val serverOut = new StreamMultiplexer(Seq(serverToClient.out, serverOutCopy))
+    val serverConnection = new JsonRpcConnection(clientToServer.in, serverOut)
+    val server = new LSPServer(languageServer, serverConnection)
+    val client = new LSPClient(new JsonRpcConnection(serverToClient.in, clientOut))
     new Thread(() => server.listen()).start()
     new Thread(() => client.listen()).start()
-
-    val initializePromise = client.initialize(InitializeParams(None, "someRootUri", ClientCapabilities()))
-    initializePromise.future.map(result =>
-      assert(result.capabilities == server.getCapabilities)
-    )
+    ServerAndClient(client, server, clientOutCopy, serverOutCopy)
   }
 
-//  val document = new TextDocumentIdentifier("jo")
-//  val documentItem = new TextDocumentItem("jo","x",1,"")
-//
-//
-//  test("Goto definition through LSP") {
-//    val initialize = """Content-Length: 304
-//                       |
-//                       |{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"rootUri":"file:///local/home/rwillems/workspaces/cloud9-dev/ide-assets/src/AWSCloud9Core/plugins/c9.ide.language.languageServer.lsp/worker/test_files/project","capabilities":{"workspace":{"applyEdit":false},"textDocument":{"definition":true}},"trace":"verbose"}}""".
-//      stripMargin.replace("\n", "\r\n")
-//
-//    val inStream = new MemoryStream()
-//    inStream.add(initialize)
-//    val outStream = new LspOutStream()
-//    val connection = new JsonRpcConnection(inStream, outStream)
-//    new MiksiloLanguageServer(CloudFormationLanguage.language, connection)
-//
-//    val runConnection = new Thread(new Runnable {
-//      override def run(): Unit = {
-//        connection.listen()
-//      }
-//    })
-//    runConnection.start()
-//
-//    val result1 = outStream.pop()
-//
-//    inStream.add("Content-Length: 65\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\",\"params\":{\"something\":3}}")
-//
-//    inStream.add("Content-Length: 259\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/AutoScalingMultiAZWithNotifications.json\"},\"position\":{\"line\":436,\"character\":35}}}")
-//    val secondResult = outStream.pop()
-//    val secondExpectation =
-//      """Content-Length: 247
-//        |
-//        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/AutoScalingMultiAZWithNotifications.json","range":{"start":{"line":41,"character":4},"end":{"line":41,"character":17}}}],"id":3}""".stripMargin.replace("\n","\r\n")
-//    assertResult(secondExpectation)(secondResult)
-//  }
-//
-//  test("goto definition") {
-//    val inStream = new MemoryStream()
-//    inStream.add(initialize)
-//    val outStream = new LspOutStream()
-//
-//    setupServer(inStream, outStream)
-//
-//    val initializeResult = outStream.pop()
-//    assertResult(expectedInitializeResult)(initializeResult)
-//
-//    inStream.add("Content-Length: 65\r\n\r\n{\"jsonrpc\":\"2.0\",\"method\":\"initialized\",\"params\":{\"something\":3}}")
-//
-//    inStream.add("Content-Length: 231\r\n\r\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"textDocument/definition\",\"params\":{\"textDocument\":{\"uri\":\"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java\"},\"position\":{\"line\":5,\"character\":27}}}")
-//    val secondResult = outStream.pop()
-//    val secondExpectation =
-//      """Content-Length: 219
-//        |
-//        |{"jsonrpc":"2.0","result":[{"uri":"file:///Users/rwillems/Dropbox/Projects/Code/ParticleCompilerSbt/src/test/resources/Fibonacci.java","range":{"start":{"line":0,"character":6},"end":{"line":0,"character":15}}}],"id":1}""".stripMargin.replace("\n","\r\n")
-//    assertResult(secondExpectation)(secondResult)
-//  }
+  class DefaultLanguageServer extends LanguageServer {
+    override def didOpen(parameters: TextDocumentItem): Unit = {}
+
+    override def didChange(parameters: DidChangeTextDocumentParams): Unit = {}
+
+    override def didClose(parameters: TextDocumentIdentifier): Unit = {}
+
+    override def didSave(parameters: TextDocumentIdentifier): Unit = {}
+
+    override def initialized(): Unit = {}
+
+    override def initialize(parameters: InitializeParams): Unit = {}
+  }
 }

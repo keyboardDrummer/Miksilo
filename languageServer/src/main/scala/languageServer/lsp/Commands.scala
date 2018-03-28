@@ -1,7 +1,7 @@
 package languageServer.lsp
 
 import com.dhpcs.jsonrpc._
-import langserver.messages.TextDocumentSyncKind
+import langserver.messages.{DefinitionResult, TextDocumentSyncKind}
 import langserver.types._
 import langserver.utils.JsonRpcUtils
 import play.api.libs.json._
@@ -225,7 +225,6 @@ object FileChangeType {
 }
 
 case class DocumentSymbolResult(params: Seq[SymbolInformation]) extends ResultResponse
-case class DefinitionResult(params: Seq[Location]) extends ResultResponse
 
 object ResultResponse extends ResponseCompanion[Any] {
   import JsonRpcUtils._

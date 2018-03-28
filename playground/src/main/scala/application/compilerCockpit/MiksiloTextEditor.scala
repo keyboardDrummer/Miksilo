@@ -27,7 +27,7 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
     popupMenu.addSeparator()
     gotoDefinitionItem = new JMenuItem("Go to definition")
     gotoDefinitionItem.addActionListener((e: event.ActionEvent) => {
-      val range = server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).params.head.range
+      val range = server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).head.range
       def positionToOffset(position: Position) = MiksiloTextEditor.this.getLineStartOffset(position.line - 1) + position.character - 1
       MiksiloTextEditor.this.getCaret.setDot(positionToOffset(range.start))
       MiksiloTextEditor.this.getCaret.moveDot(positionToOffset(range.end))
@@ -39,7 +39,7 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
   override def configurePopupMenu(popupMenu: JPopupMenu): Unit = {
     super.configurePopupMenu(popupMenu)
 
-    gotoDefinitionItem.setEnabled(server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).params.nonEmpty)
+    gotoDefinitionItem.setEnabled(server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).nonEmpty)
   }
 
   def setServer(languageServer: LanguageServer): Unit = {
@@ -47,7 +47,7 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
 
     val freshTextDocument = new TextDocumentItem("space", "language", 1, "")
     val documentId = new VersionedTextDocumentIdentifier("space", 1)
-    server.didOpen(DidOpenTextDocumentParams(freshTextDocument))
+    server.didOpen(freshTextDocument)
 
     document.addDocumentListener(new DocumentListener {
 

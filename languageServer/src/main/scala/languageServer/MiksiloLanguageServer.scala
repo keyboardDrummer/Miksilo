@@ -24,7 +24,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
-  override def didOpen(parameters: DidOpenTextDocumentParams): Unit = documentManager.onOpenTextDocument(parameters.textDocument)
+  override def didOpen(parameters: TextDocumentItem): Unit = documentManager.onOpenTextDocument(parameters)
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
 
@@ -91,7 +91,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def initialized(): Unit = {}
 
-  override def gotoDefinition(parameters: DocumentPosition): DefinitionResult = {
+  override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinitionRequest")
     val location = for {
@@ -100,7 +100,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       declaration <- proofs.resolveLocation(element)
       range <- declaration.position
     } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
-    DefinitionResult(location.toSeq)
+    location.toSeq
   }
 
   override def complete(params: DocumentPosition): CompletionList = {

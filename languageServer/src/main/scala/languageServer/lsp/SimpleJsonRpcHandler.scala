@@ -21,7 +21,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
   }
 
   def sendRequest[Request, Response](method: String, correlationId: CorrelationId, request: Request)
-                                    (implicit requestFormat: OFormat[Request], responseFormat: OFormat[Response]):
+                                    (implicit requestFormat: OWrites[Request], responseFormat: Reads[Response]):
     Promise[Response] = {
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
@@ -84,7 +84,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
   }
 
   def addRequestHandler[Request, Response](method: String, handler: Request => Response)
-                                          (requestFormat: OFormat[Request], responseFormat: OFormat[Response]): Unit = {
+                                          (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
     val handle = (request: JsonRpcRequestMessage) => {
       val requestJson = toJson(request.params)
       requestFormat.reads(requestJson) match {

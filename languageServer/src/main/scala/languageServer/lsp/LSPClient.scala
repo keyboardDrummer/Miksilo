@@ -1,8 +1,8 @@
 package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import langserver.types.TextDocumentIdentifier
-import play.api.libs.json.Json
+import langserver.types.{Location, TextDocumentIdentifier, TextDocumentItem}
+import play.api.libs.json.{Json, Reads}
 
 import scala.concurrent.Promise
 
@@ -21,9 +21,14 @@ class LSPClient(connection: JsonRpcConnection) {
     NumericCorrelationId(result)
   }
 
-  def gotoDefinition(parameters: DocumentPosition): Promise[DefinitionResult] = {
-    simpleConnection.sendRequest[DocumentPosition, DefinitionResult](
-      LSPProtocol.definition, getCorrelationId, parameters)(Json.format, Json.format)
+  def gotoDefinition(parameters: DocumentPosition): Promise[Seq[Location]] = {
+    simpleConnection.sendRequest[DocumentPosition, Seq[Location]](
+      LSPProtocol.definition, getCorrelationId, parameters)(Json.format, Reads.of[Seq[Location]])
+  }
+
+  def complete(parameters: DocumentPosition): Promise[CompletionList] = {
+    simpleConnection.sendRequest[DocumentPosition, CompletionList](
+      LSPProtocol.completion, getCorrelationId, parameters)(Json.format, Json.format)
   }
 
   def initialize(parameters: InitializeParams): Promise[InitializeResult] = {
@@ -31,8 +36,8 @@ class LSPClient(connection: JsonRpcConnection) {
       LSPProtocol.initialize, getCorrelationId, parameters)(Json.format, Json.format)
   }
 
-  def didOpen(parameters: DidOpenTextDocumentParams): Unit = {
-    simpleConnection.sendNotification[DidOpenTextDocumentParams](LSPProtocol.didOpen, parameters)(Json.format)
+  def didOpen(parameters: TextDocumentItem): Unit = {
+    simpleConnection.sendNotification[TextDocumentItem](LSPProtocol.didOpen, parameters)(Json.format)
   }
 
   def didClose(identifier: TextDocumentIdentifier): Unit = {

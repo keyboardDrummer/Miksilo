@@ -9,12 +9,12 @@ import scala.util.Random
 
 trait LanguageServerTest extends FunSuite {
 
-  def gotoDefinition(language: Language, program: String, position: HumanPosition): DefinitionResult = {
+  def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)
   }
 
-  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): DefinitionResult = {
+  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[Location] = {
     val document = openDocument(server, program)
     server.asInstanceOf[DefinitionProvider].gotoDefinition(DocumentPosition(document, position))
   }
@@ -27,7 +27,7 @@ trait LanguageServerTest extends FunSuite {
   val random = new Random()
   def openDocument(server: LanguageServer, content: String): TextDocumentIdentifier = {
     val item = new TextDocumentItem(random.nextString(10), "", 1, content)
-    server.didOpen(DidOpenTextDocumentParams(item))
+    server.didOpen(item)
     TextDocumentIdentifier(item.uri)
   }
 }

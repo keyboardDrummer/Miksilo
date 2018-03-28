@@ -15,7 +15,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
 
   test("Goto definition") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val result: DefinitionResult = gotoDefinition(server, program, new HumanPosition(437, 36))
+    val result: Seq[Location] = gotoDefinition(server, program, new HumanPosition(437, 36))
     assertResult(SourceRange(new HumanPosition(42,5), new HumanPosition(42,18)))(result)
   }
 

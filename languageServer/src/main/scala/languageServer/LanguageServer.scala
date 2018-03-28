@@ -17,12 +17,12 @@ trait CompletionProvider {
 }
 
 trait DefinitionProvider {
-  def gotoDefinition(parameters: DocumentPosition): DefinitionResult
+  def gotoDefinition(parameters: DocumentPosition): Seq[Location]
 }
 
 trait LanguageServer {
   def initialize(parameters: InitializeParams): Unit
-  def didOpen(parameters: DidOpenTextDocumentParams): Unit
+  def didOpen(parameters: TextDocumentItem): Unit
   def didClose(parameters: TextDocumentIdentifier): Unit
   def didSave(parameters: TextDocumentIdentifier): Unit
   def didChange(parameters: DidChangeTextDocumentParams): Unit
