@@ -1,6 +1,6 @@
 package core.bigrammar
 
-object TokenTypes {
+object TokenTypes { //TODO this should be replaced by something more disciplined.
   /**
     * Tokens of type <code>NULL</code> mark the end of lines with no
     * multi-line token at the end (such as a block comment in C++).

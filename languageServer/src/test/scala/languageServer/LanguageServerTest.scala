@@ -9,6 +9,7 @@ import scala.util.Random
 
 trait LanguageServerTest extends FunSuite {
 
+  val itemUri = "helloWorld"
   def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)
@@ -26,7 +27,7 @@ trait LanguageServerTest extends FunSuite {
 
   val random = new Random()
   def openDocument(server: LanguageServer, content: String): TextDocumentIdentifier = {
-    val item = new TextDocumentItem(random.nextString(10), "", 1, content)
+    val item = new TextDocumentItem(itemUri, "", 1, content)
     server.didOpen(item)
     TextDocumentIdentifier(item.uri)
   }

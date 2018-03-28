@@ -1,7 +1,7 @@
 package deltas.json
 
 import core.bigrammar.grammars.{Keyword, Parse, StringLiteral}
-import core.deltas.DeltaWithPhase
+import core.deltas.Delta
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
@@ -14,7 +14,7 @@ import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
-object JsonObjectLiteralDelta extends ExpressionInstance with DeltaWithPhase {
+object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
 
   override def description: String = "Adds the JSON object literal to expressions"
 
@@ -42,18 +42,6 @@ object JsonObjectLiteralDelta extends ExpressionInstance with DeltaWithPhase {
 
   override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
-//    program.visitShape(Shape, objectLiteral => {
-//      val membersList = objectLiteral(Member).asInstanceOf[Seq[Node]]
-//      val keys = membersList.map(member => member(MemberKey).asInstanceOf[String])
-//      val duplicateKeys: Seq[String] = keys.groupBy(identity).collect { case (x, List(_,_,_*)) => x }.toSeq
-//      if (duplicateKeys.nonEmpty)
-//        throw DuplicateObjectLiteralKeys(duplicateKeys)
-//
-//      objectLiteral(Members) = membersList.map(member => (member(MemberKey).asInstanceOf[String], member(MemberValue))).toMap
-//    })
-  }
-
   implicit class ObjectLiteralMember(val node: Node) extends NodeWrapper[Node] {
     def key: String = node(MemberKey).asInstanceOf[String]
     def keyWithQuotes: String = "\"" + key + "\""
@@ -64,9 +52,4 @@ object JsonObjectLiteralDelta extends ExpressionInstance with DeltaWithPhase {
     def getValue(key: String): Node = members.find(member => member.key == key).get.value
     def members: Seq[ObjectLiteralMember] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[Node]])
   }
-
-//  implicit class ObjectLiteral(val node: Node) extends NodeWrapper[Node] {
-//    def entries: Seq[(String, Node)] = node(Members).asInstanceOf[Map[String,Node]].toSeq
-//    def getValue(key: String): Any = node(Members).asInstanceOf[Map[String,Node]](key)
-//  }
 }

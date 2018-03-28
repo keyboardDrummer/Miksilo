@@ -1,6 +1,6 @@
 package util
 
-import java.util.TimerTask
+import java.util.{Timer, TimerTask}
 
 import core.deltas._
 
@@ -16,8 +16,8 @@ object TestLanguageBuilder {
 
   def profile[T](description: String, action: => T): T = statistics.profile(description, action)
 
-//  val timer = new Timer()
-//  timer.scheduleAtFixedRate(new MyThread(), 5000, 5000)
+  val timer = new Timer()
+  timer.scheduleAtFixedRate(new MyThread(), 5000, 5000)
 
   class MyThread extends TimerTask {
     override def run(): Unit = {
