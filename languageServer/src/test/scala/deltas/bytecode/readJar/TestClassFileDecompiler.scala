@@ -2,15 +2,15 @@ package deltas.bytecode.readJar
 
 import java.io
 
-import application.compilerCockpit.PrettyPrint
 import core.bigrammar.{BiGrammarToParser, TestLanguageGrammarUtils}
 import core.language.node.Node
+import deltas.PrettyPrint
 import org.scalatest.FunSuite
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.javac.JavaLanguage
 import deltas.javac.types.TypeAbstraction
-import util.{TestLanguageBuilder, SourceUtils}
+import util.{SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.{File, Path}
 

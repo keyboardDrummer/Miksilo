@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import langserver.types.Position
-import lsp.HumanPosition
+import languageServer.HumanPosition
 
 import scala.collection.mutable
 import scala.util.matching.Regex

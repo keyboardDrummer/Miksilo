@@ -9,7 +9,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
-import core.smarts.scopes.objects.Scope
+import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
@@ -18,9 +18,7 @@ import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, Unqualif
 import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.statements.BlockDelta
-
 import scala.collection.mutable
-
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   with WithCompilationState with HasDeclaration with HasConstraints {
@@ -183,7 +181,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     getClassScope(compilation, builder, path, defaultPackageScope)
   }
 
-  def getClassScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope) = {
+  def getClassScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): ScopeVariable = {
     val clazz: JavaClass[NodePath] = path
     val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
     val classScope = builder.getDeclaredScope(clazzDeclaration)

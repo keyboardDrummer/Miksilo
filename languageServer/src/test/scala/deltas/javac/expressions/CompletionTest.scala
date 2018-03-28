@@ -2,15 +2,18 @@ package deltas.javac.expressions
 
 import deltas.javac.JavaLanguage
 import langserver.types.{CompletionItem, CompletionItemKind}
-import lsp.{CompletionList, HumanPosition, LspServerTest}
+import languageServer.lsp.CompletionList
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
 
-class CompletionTest extends FunSuite with LspServerTest {
+class CompletionTest extends FunSuite with LanguageServerTest {
+
+  val server = new MiksiloLanguageServer(JavaLanguage.getJava)
 
   test("fibonacci") {
     val program = SourceUtils.getJavaTestFileContents("Fibonacci")
-    val indexDefinition = getCompletionResultForProgram(JavaLanguage.getJava, program, new HumanPosition(5, 40))
+    val indexDefinition = complete(server, program, new HumanPosition(5, 40))
     val item = CompletionItem("fibonacci", kind = Some(CompletionItemKind.Text), insertText = Some("nacci"))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(indexDefinition)
   }

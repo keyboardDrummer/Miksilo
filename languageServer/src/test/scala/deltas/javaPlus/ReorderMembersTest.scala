@@ -3,8 +3,8 @@ package deltas.javaPlus
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import application.compilerCockpit.PrettyPrint
 import core.language.ParseException
+import deltas.PrettyPrint
 import deltas.javac.JavaLanguage
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite

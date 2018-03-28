@@ -1,7 +1,7 @@
 package core.bigrammar
 
-import application.compilerCockpit._
 import core.deltas.Delta
+import deltas.{PrettyPrint, RunWithJVM}
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}

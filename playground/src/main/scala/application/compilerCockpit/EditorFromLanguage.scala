@@ -4,11 +4,11 @@ import java.awt.CardLayout
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import javax.swing._
 
+import javax.swing._
 import core.language.node.Node
 import core.language.{Language, NoSourceException, ParseException}
-import lsp.MiksiloLanguageServer
+import languageServer.MiksiloLanguageServer
 import org.fife.ui.rsyntaxtextarea.parser._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane
@@ -25,7 +25,8 @@ class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
   private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
 
   val inputTextArea = new MiksiloTextEditor(inputDocument)
-  val server = new MiksiloLanguageServer(language, inputTextArea)
+  val server = new MiksiloLanguageServer(language)
+  inputTextArea.setServer(server)
 
   inputTextArea.addParser(new Parser() {
     override def parse(doc: RSyntaxDocument, style: String): ParseResult = {

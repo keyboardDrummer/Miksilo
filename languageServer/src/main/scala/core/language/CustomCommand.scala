@@ -1,7 +1,7 @@
 package core.language
 
 import core.deltas.Delta
-import lsp.LanguageServer
+import languageServer.LanguageServer
 
 trait CustomCommand {
   def name: String

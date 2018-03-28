@@ -1,11 +1,14 @@
-package lsp
+package languageServer.lsp
 
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
 
 class MemoryStream extends InputStream {
-  var data: List[Array[Byte]] = List(Array.emptyByteArray)
+  var data: List[Array[Byte]] = List.empty
   var index: Int = 0
   val lock = new Object()
+
+  def add(value: String): Unit = add(value.getBytes(StandardCharsets.UTF_8))
 
   override def read(buffer: Array[Byte]): Int = {
     val result = super.read(buffer)

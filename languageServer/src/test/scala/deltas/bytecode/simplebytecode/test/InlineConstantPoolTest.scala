@@ -1,7 +1,7 @@
 package deltas.bytecode.simplebytecode.test
 
-import application.compilerCockpit.MarkOutputGrammar
 import core.bigrammar.TestLanguageGrammarUtils
+import deltas.PrettyPrint
 import deltas.bytecode.ConstantPoolIndices
 import deltas.bytecode.simpleBytecode.InlineConstantPool
 import deltas.javac.JavaLanguage
@@ -217,19 +217,19 @@ class InlineConstantPoolTest extends FunSuite {
       |}""".stripMargin
 
   test("inlined bytecode parse & print") {
-    val deltas = Seq(InlineConstantPool, MarkOutputGrammar) ++ JavaLanguage.byteCodeDeltas
+    val deltas = Seq(InlineConstantPool, PrettyPrint()) ++ JavaLanguage.byteCodeDeltas
     new TestLanguageGrammarUtils(deltas).compareInputWithPrint(emptyInlined)
   }
 
   test("inline to numbered bytecode") {
-    val deltas = Seq(InlineConstantPool, MarkOutputGrammar, ConstantPoolIndices) ++ JavaLanguage.byteCodeDeltas
+    val deltas = Seq(InlineConstantPool, PrettyPrint(), ConstantPoolIndices) ++ JavaLanguage.byteCodeDeltas
     val compiler = TestLanguageBuilder.build(deltas)
     val result = new TestUtils(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCodeWithLineNumbers)(result)
   }
 
   test("inline to bytecode") {
-    val deltas = Seq(InlineConstantPool, MarkOutputGrammar) ++ JavaLanguage.byteCodeDeltas
+    val deltas = Seq(InlineConstantPool, PrettyPrint()) ++ JavaLanguage.byteCodeDeltas
     val compiler = TestLanguageBuilder.build(deltas)
     val result = new TestUtils(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCode)(result)

@@ -4,9 +4,9 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-import application.compilerCockpit.{MarkOutputGrammar, PrettyPrint}
 import core.language.node.{ComparisonOptions, Node}
 import core.language.Compilation
+import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
@@ -80,13 +80,9 @@ class TestUtils(val language: TestingLanguage) extends FunSuite {
   }
 
   def compileAndPrettyPrint(input: InputStream): String = {
-
-    val prettyPrint = PrettyPrint(recover = true)
-    val splicedDeltas = language.replace(MarkOutputGrammar,Seq(prettyPrint))
-    val newCompiler = TestLanguageBuilder.build(splicedDeltas)
-
-    val state = newCompiler.parseAndTransform(input)
-    state.output
+    val newCompiler = TestLanguageBuilder.build(language.deltas)
+    val compilation = newCompiler.parseAndTransform(input)
+    compilation.output
   }
 
   def compareWithJavacAfterRunning(className: String, input: String): Unit = {

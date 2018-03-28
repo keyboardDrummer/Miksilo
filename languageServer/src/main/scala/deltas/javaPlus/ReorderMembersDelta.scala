@@ -8,7 +8,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
-import lsp.LanguageServer
+import languageServer.LanguageServer
 
 object ReorderMembersDelta extends Delta {
 

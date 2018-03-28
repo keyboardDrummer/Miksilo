@@ -1,20 +1,24 @@
 package deltas.bytecode.simplebytecode
 
-import application.compilerBuilder.PresetsPanel
+import core.deltas.Delta
+import deltas.PrettyPrint
+import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
-import util.{TestLanguageBuilder, SourceUtils, TestUtils}
+import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 class SimplifiedByteCodeTest extends FunSuite {
 
-    test("javaToSimplified") {
-    val utils = new TestUtils(TestLanguageBuilder.build(PresetsPanel.getJavaToSimplifiedByteCodePreset.deltas))
+  test("javaToSimplified") {
+    val deltas = JavaLanguage.spliceBeforeTransformations(JavaLanguage.simpleByteCodeDeltas, Seq(PrettyPrint()))
+    val utils = new TestUtils(TestLanguageBuilder.build(deltas))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("Fibonacci.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
     assertResult(expectedResult)(result)
   }
 
   test("simplifiedToByteCode") {
-    val utils = new TestUtils(TestLanguageBuilder.build(PresetsPanel.getSimplifiedByteCodePreset.deltas))
+    val deltas = Delta.spliceAndFilterTop(JavaLanguage.simpleByteCodeDeltas, JavaLanguage.byteCodeDeltas, Seq(PrettyPrint()))
+    val utils = new TestUtils(TestLanguageBuilder.build(deltas))
     val result = utils.compileAndPrettyPrint(SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     assertResult(expectedResult)(result)

@@ -1,4 +1,4 @@
-package application.compilerCockpit
+package deltas
 
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation

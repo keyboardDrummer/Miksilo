@@ -1,8 +1,9 @@
-package lsp
+package languageServer.lsp
 
 import ch.qos.logback.classic.Level
 import com.typesafe.scalalogging.LazyLogging
 import deltas.cloudformation.CloudFormationLanguage
+import languageServer.MiksiloLanguageServer
 import org.slf4j.LoggerFactory
 
 import scala.util.Try
@@ -13,11 +14,12 @@ object Program extends LazyLogging {
     logger.debug(s"Starting server in ${System.getenv("PWD")}")
 
     val connection = new JsonRpcConnection(System.in, System.out)
-    val server = Try {
-      new MiksiloLanguageServer(CloudFormationLanguage.language, connection)
+    val lspServer = Try {
+      val languageServer = new MiksiloLanguageServer(CloudFormationLanguage.language)
+      new LSPServer(languageServer, connection)
     }
-    server.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
-    connection.start()
+    lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
+    connection.listen()
   }
 }
 

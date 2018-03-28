@@ -48,7 +48,7 @@ lazy val languageServer = (project in file("languageServer")).
   settings(commonSettings: _*).
   settings(
     name := "MiksiloLspServer",
-    mainClass in assembly := Some("lsp.Program"),
+    mainClass in assembly := Some("languageServer.lsp.Program"),
   )
 
 lazy val playground = (project in file("playground")).

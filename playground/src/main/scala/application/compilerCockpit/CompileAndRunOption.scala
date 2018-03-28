@@ -4,6 +4,7 @@ import java.io.InputStream
 
 import core.deltas._
 import core.language.Language
+import deltas.RunWithJVM
 import deltas.javac.JavaLanguage
 
 object CompileAndRunOption extends CompileOption {

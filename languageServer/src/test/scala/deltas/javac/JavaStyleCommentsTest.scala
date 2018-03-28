@@ -1,12 +1,12 @@
 package deltas.javac
 
-import application.compilerBuilder.PresetsPanel
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import core.language.Language
+import deltas.PrettyPrint
 import deltas.expression.IntLiteralDelta
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -156,7 +156,7 @@ class JavaStyleCommentsTest
   }
 
   test("comments are maintained in bytecode") {
-    val initialCompiler = TestLanguageBuilder.build(PresetsPanel.getJavaCompilerParticles)
+    val initialCompiler = TestLanguageBuilder.build(JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(PrettyPrint())))
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++
       initialCompiler.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))

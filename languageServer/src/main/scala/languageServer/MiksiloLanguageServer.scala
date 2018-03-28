@@ -1,8 +1,9 @@
-package lsp
+package languageServer
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
+import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
 import core.language.node.NodeLike
@@ -10,25 +11,28 @@ import core.language.{Compilation, Language, SourceElement}
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.core.TextDocument
 import langserver.types._
+import languageServer.lsp._
 
-object HumanPosition {
-  implicit def toPosition(position: HumanPosition): Position = new Position(position.line - 1, position.character - 1)
-  implicit def fromPosition(position: Position): HumanPosition = new HumanPosition(position.line + 1, position.character + 1)
-}
-
-case class HumanPosition(line: Int, character: Int) {}
-
-class MiksiloLanguageServer(val language: Language, connection: Connection)
-  extends LanguageServer(connection) with GotoProvider with CompletionProvider {
+class MiksiloLanguageServer(val language: Language) extends LanguageServer
+  with DefinitionProvider
+  with CompletionProvider
+  with LazyLogging {
 
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
+  private val documentManager = new TextDocumentManager()
   var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
-  override def onChangeTextDocument(td: VersionedTextDocumentIdentifier, changes: Seq[TextDocumentContentChangeEvent]): Unit = {
+  override def didOpen(parameters: DidOpenTextDocumentParams): Unit = documentManager.onOpenTextDocument(parameters.textDocument)
+
+  override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
+
+  override def didSave(parameters: TextDocumentIdentifier): Unit = {}
+
+  override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = None
-    super.onChangeTextDocument(td, changes)
+    documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
   }
 
   def compile(): Unit = {
@@ -83,22 +87,25 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
     getForNode(PathRoot(getCompilation.get.program))
   }
 
-  override def gotoDefinitionRequest(textDocument: TextDocumentIdentifier, position: Position): DefinitionResult = {
-    currentDocumentId = textDocument
+  override def initialize(parameters: InitializeParams): Unit = {}
+
+  override def initialized(): Unit = {}
+
+  override def gotoDefinition(parameters: DocumentPosition): DefinitionResult = {
+    currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinitionRequest")
     val location = for {
       proofs <- getProofs
-      element = getSourceElement(position)
+      element = getSourceElement(parameters.position)
       declaration <- proofs.resolveLocation(element)
       range <- declaration.position
-    } yield Location(textDocument.uri, new langserver.types.Range(range.start, range.end))
+    } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
     DefinitionResult(location.toSeq)
   }
 
-  override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
-
-  override def completionRequest(textDocument: TextDocumentIdentifier, position: Position): CompletionList = {
-    currentDocumentId = textDocument
+  override def complete(params: DocumentPosition): CompletionList = {
+    currentDocumentId = params.textDocument
+    val position = params.position
     logger.debug("Went into completionRequest")
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
@@ -115,4 +122,7 @@ class MiksiloLanguageServer(val language: Language, connection: Connection)
 
     CompletionList(isIncomplete = false, completions)
   }
+
+  override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
+
 }

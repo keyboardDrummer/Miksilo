@@ -1,15 +1,16 @@
 package application.compilerCockpit
 
 import java.awt.event
+
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
-
 import langserver.types
 import langserver.types.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
-import lsp._
+import languageServer.{LanguageServer, MiksiloLanguageServer}
+import languageServer.lsp._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}
 
-class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(document) with Connection {
+class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(document) {
 
   def currentPosition: Position = {
     Position(this.getCaretLineNumber + 1, this.getCaretOffsetFromLineStart + 1)
@@ -26,7 +27,7 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
     popupMenu.addSeparator()
     gotoDefinitionItem = new JMenuItem("Go to definition")
     gotoDefinitionItem.addActionListener((e: event.ActionEvent) => {
-      val range = server.gotoDefinitionRequest(freshTextDocumentReference, currentPosition).params.head.range
+      val range = server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).params.head.range
       def positionToOffset(position: Position) = MiksiloTextEditor.this.getLineStartOffset(position.line - 1) + position.character - 1
       MiksiloTextEditor.this.getCaret.setDot(positionToOffset(range.start))
       MiksiloTextEditor.this.getCaret.moveDot(positionToOffset(range.end))
@@ -38,22 +39,21 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
   override def configurePopupMenu(popupMenu: JPopupMenu): Unit = {
     super.configurePopupMenu(popupMenu)
 
-    gotoDefinitionItem.setEnabled(server.gotoDefinitionRequest(freshTextDocumentReference, currentPosition).params.nonEmpty)
+    gotoDefinitionItem.setEnabled(server.gotoDefinition(DocumentPosition(freshTextDocumentReference, currentPosition)).params.nonEmpty)
   }
 
-  override def setServer(languageServer: LanguageServer): Unit = {
+  def setServer(languageServer: LanguageServer): Unit = {
     server = languageServer.asInstanceOf[MiksiloLanguageServer]
 
     val freshTextDocument = new TextDocumentItem("space", "language", 1, "")
     val documentId = new VersionedTextDocumentIdentifier("space", 1)
-    notifySubscribers(DidOpenTextDocumentParams(freshTextDocument))
+    server.didOpen(DidOpenTextDocumentParams(freshTextDocument))
 
     document.addDocumentListener(new DocumentListener {
 
-
       def changeAll(e: DocumentEvent): Unit = {
         val text = e.getDocument.getText(0, e.getDocument.getLength)
-        notifySubscribers(DidChangeTextDocumentParams(documentId,
+        server.didChange(DidChangeTextDocumentParams(documentId,
           Seq(types.TextDocumentContentChangeEvent(None, None, text))))
       }
       override def removeUpdate(e: DocumentEvent): Unit = changeAll(e)

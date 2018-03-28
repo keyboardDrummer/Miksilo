@@ -1,4 +1,4 @@
-package lsp
+package languageServer.lsp
 
 import com.dhpcs.jsonrpc._
 import langserver.messages.TextDocumentSyncKind
@@ -172,32 +172,16 @@ object MessageActionItem {
   implicit val format = Json.format[MessageActionItem]
 }
 
-case class TextDocumentPositionParams(textDocument: TextDocumentIdentifier, position: Position)
+case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
 case class DocumentSymbolParams(textDocument: TextDocumentIdentifier) extends ServerCommand
 
-case class TextDocumentCompletionRequest(params: TextDocumentPositionParams) extends ServerCommand
-case class TextDocumentDefinitionRequest(params: TextDocumentPositionParams) extends ServerCommand
-case class TextDocumentHoverRequest(params: TextDocumentPositionParams) extends ServerCommand
+case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
 
 case class Hover(contents: Seq[MarkedString], range: Option[Range]) extends ResultResponse
 object Hover {
   implicit val format = Json.format[Hover]
 }
 
-object ServerCommand extends CommandCompanion[ServerCommand] {
-  import JsonRpcUtils._
-
-  implicit val positionParamsFormat = Json.format[TextDocumentPositionParams]
-
-  override val CommandFormats = Message.MessageFormats(
-    "initialize" -> Json.format[InitializeParams],
-    "shutdown" -> Shutdown.format,
-    "textDocument/completion" -> valueFormat(TextDocumentCompletionRequest)(_.params),
-    "textDocument/definition" -> valueFormat(TextDocumentDefinitionRequest)(_.params),
-    "textDocument/hover" -> valueFormat(TextDocumentHoverRequest)(_.params),
-    "textDocument/documentSymbol" -> Json.format[DocumentSymbolParams]
-  )
-}
 
 object ClientCommand extends CommandCompanion[ClientCommand] {
   override val CommandFormats = Message.MessageFormats(
@@ -220,8 +204,6 @@ case class DidChangeTextDocumentParams(
                                         textDocument: VersionedTextDocumentIdentifier,
                                         contentChanges: Seq[TextDocumentContentChangeEvent]) extends Notification
 
-case class DidCloseTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
-case class DidSaveTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
 case class DidChangeWatchedFiles(changes: Seq[FileEvent]) extends Notification
 
 case class Initialized() extends Notification
@@ -230,7 +212,6 @@ object Initialized {
     Reads(jsValue => JsSuccess(Initialized())),
     OWrites[Initialized](s => Json.obj()))
 }
-
 
 case class CancelRequest(id: Int) extends Notification
 
@@ -241,21 +222,6 @@ object FileChangeType {
   final val Created = 1
   final val Changed = 2
   final val Deleted = 3
-}
-
-object Notification extends NotificationCompanion[Notification] {
-  override val NotificationFormats = Message.MessageFormats(
-    "window/showMessage" -> Json.format[ShowMessageParams],
-    "window/logMessage" -> Json.format[LogMessageParams],
-    "textDocument/publishDiagnostics" -> Json.format[PublishDiagnostics],
-    "textDocument/didOpen" -> Json.format[DidOpenTextDocumentParams],
-    "textDocument/didChange" -> Json.format[DidChangeTextDocumentParams],
-    "textDocument/didClose" -> Json.format[DidCloseTextDocumentParams],
-    "textDocument/didSave" -> Json.format[DidSaveTextDocumentParams],
-    "workspace/didChangeWatchedFiles" -> Json.format[DidChangeWatchedFiles],
-    "initialized" -> Initialized.format,
-    "$/cancelRequest" -> Json.format[CancelRequest]
-  )
 }
 
 case class DocumentSymbolResult(params: Seq[SymbolInformation]) extends ResultResponse
