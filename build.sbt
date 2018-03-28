@@ -1,5 +1,5 @@
 
-lazy val global = project
+lazy val miksilo = project
   .in(file("."))
   .aggregate(
     languageServer,
