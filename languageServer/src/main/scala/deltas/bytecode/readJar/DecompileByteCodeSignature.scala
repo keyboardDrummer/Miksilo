@@ -29,7 +29,14 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     super.inject(language)
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
     val parser = BiGrammarToParser.toStringParser(typeGrammar)
-    parseTypeProperty.add(language, input => parser(input).get.asInstanceOf[Node])
+    val sourceLessParser = (input: String) => {
+      val result = parser(input)
+      result.map(r => r.asInstanceOf[Node].visit(node => {
+        node.sources.clear()
+      }))
+      result
+    }
+    parseTypeProperty.add(language, input => sourceLessParser(input).get.asInstanceOf[Node])
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {

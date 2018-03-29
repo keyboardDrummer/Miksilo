@@ -15,6 +15,9 @@ import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, Express
 import deltas.javac.methods.call.CallDelta
 
 object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
+
+  override def description: String = "Enables calling a different constructor using 'this'"
+
   override val shape = ThisCall
   object ThisCall extends NodeShape
 
@@ -40,8 +43,6 @@ object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     expressionGrammar.addAlternative(thisCallGrammar)
   }
-
-  override def description: String = "Enables calling a different constructor using 'this'"
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = ???
 }

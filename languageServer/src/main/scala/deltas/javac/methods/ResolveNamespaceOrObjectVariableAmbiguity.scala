@@ -11,10 +11,9 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
                                                      var scopeDeclaration: Declaration) extends Constraint {
   override def apply(solver: ConstraintSolver): Boolean = {
     namespaceOrObjectVariableDeclaration match {
-      case e:NamedDeclaration if e.origin.nonEmpty =>
-        val value = e.origin.get
-        value match {
-          case fieldLocation: FieldLocation => fieldLocation.field match {
+      case e:NamedDeclaration =>
+        e.origin match {
+          case Some(fieldLocation: FieldLocation) => fieldLocation.field match {
             case JavaClassSkeleton.Name => //TODO allow referencing packages.
               solver.unifyDeclarations(scopeDeclaration, namespaceOrObjectVariableDeclaration)
             case _ =>
@@ -27,7 +26,7 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
     }
   }
 
-  private def unifyObjectVariableDeclaration(solver: ConstraintSolver) = {
+  private def unifyObjectVariableDeclaration(solver: ConstraintSolver): Unit = {
     val objectType = solver.builder.getType(namespaceOrObjectVariableDeclaration)
     solver.builder.add(TypesAreEqual(TypeFromDeclaration(scopeDeclaration), objectType))
   }
