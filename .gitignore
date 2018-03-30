@@ -55,13 +55,11 @@ pip-log.txt
 .idea/workspace*
 out/
 
-
 nonEssentialFiles/*
-target/*
+**target*
 
 resources/*
 .idea/*
-project/*
 
 #############
 ## GhPages
