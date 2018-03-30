@@ -13,7 +13,7 @@ import util.{SourceUtils, TestLanguageBuilder}
 import scala.reflect.io.Path
 
 class TestDocumentGrammarWithJavaExamples extends FunSuite {
-  val lineSeparator = System.lineSeparator()
+  val lineSeparator: String = System.lineSeparator()
 
   test("SimpleForLoop") {
     val testFileContent = SourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))

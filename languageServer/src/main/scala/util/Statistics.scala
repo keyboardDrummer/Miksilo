@@ -1,8 +1,10 @@
 package util
 
+import com.typesafe.scalalogging.LazyLogging
+
 import scala.collection.mutable
 
-class Statistics(parent: Statistics = null) {
+class Statistics(parent: Statistics = null) extends LazyLogging {
 
   def profile[T](description: String, action: => T): T = {
     val start = System.nanoTime()
@@ -32,7 +34,7 @@ class Statistics(parent: Statistics = null) {
       val total = timings.sum
       val totalString = "%06.0f".format(total)
       if (total > 10)
-        System.out.println(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
+        logger.debug(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
     }
   }
 }

@@ -72,6 +72,7 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
         responseHandlers.get(response.id).fold({
           logger.info(s"Received a response for which there was no handler: $response")
         })(handler => handler(response))
+      case _ => ???
     }
   }
 

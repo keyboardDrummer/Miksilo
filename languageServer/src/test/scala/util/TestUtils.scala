@@ -4,14 +4,16 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-import core.language.node.{ComparisonOptions, Node}
+import ch.qos.logback.classic.{Level, Logger}
 import core.language.Compilation
+import core.language.node.{ComparisonOptions, Node}
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaLanguage
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
+import org.slf4j.LoggerFactory
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
@@ -20,7 +22,21 @@ import scala.sys.process.Process
 object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {
 }
 
-class TestUtils(val language: TestingLanguage) extends FunSuite {
+class TestUtils(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
+
+  override protected def beforeAll(configMap: ConfigMap): Unit = {
+    val level = configMap.get("level") match {
+      case Some("debug") => Level.DEBUG
+      case Some("info") => Level.INFO
+      case _ => Level.INFO
+    }
+    val logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
+    logger.setLevel(level)
+  }
+
+  override protected def afterAll(configMap: ConfigMap): Unit = {
+    TestLanguageBuilder.statistics.printAll()
+  }
 
   def toFile(fileName: String, program: String): Path = {
     val directory = Directory.makeTemp()

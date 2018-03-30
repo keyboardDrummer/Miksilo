@@ -1,4 +1,5 @@
 
+
 lazy val miksilo = project
   .in(file("."))
   .aggregate(
@@ -10,7 +11,8 @@ lazy val commonSettings = Seq(
 
   version := "1.0",
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
-
+  logLevel := Level.Info,
+  logBuffered in Test := false,
   scalaVersion := "2.12.3",
   scalacOptions += "-deprecation",
   scalacOptions += "-feature",
@@ -39,7 +41,7 @@ lazy val commonSettings = Seq(
   libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
 
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
-  libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0",
+  libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
 
   libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1",
 )

@@ -76,7 +76,7 @@ class JavaStyleCommentsTest
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
   }
-//Deze doet het nu opeens wel. Komt dat door de wijzigingen in JSCommentsC? Of door de missende substraction? Reproduceer het probleem opnieuw
+
   test("addition") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++

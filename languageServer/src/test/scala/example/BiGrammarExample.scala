@@ -76,7 +76,6 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTr
     val grammar = statement.manyVertical
     val parseResult = TestGrammarUtils.parse(example, grammar)
     val result = parseResult.get
-    System.out.print(result)
     assertResult(expectation)(TestGrammarUtils.print(result, grammar))
   }
 
