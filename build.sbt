@@ -1,11 +1,11 @@
 
-
 lazy val miksilo = project
   .in(file("."))
   .aggregate(
     languageServer,
     playground,
   )
+
 
 lazy val commonSettings = Seq(
 
@@ -46,18 +46,28 @@ lazy val commonSettings = Seq(
   libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1",
 )
 
+lazy val assemblySettings = Seq(
+  assemblyJarName in assembly := name.value + ".jar",
+  assemblyMergeStrategy in assembly := {
+    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+    case _                             => MergeStrategy.first
+  }
+)
+
 lazy val languageServer = (project in file("languageServer")).
   settings(commonSettings: _*).
   settings(
     name := "MiksiloLspServer",
-    mainClass in assembly := Some("languageServer.lsp.Program"),
+    assemblySettings,
+    mainClass in Compile := Some("languageServer.lsp.Program"),
   )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
   settings(
     name := "MiksiloPlayground",
-    mainClass in assembly := Some("application.Program"),
+    assemblySettings,
+    mainClass in Compile := Some("application.Program"),
     libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8",
     libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
     libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1",
