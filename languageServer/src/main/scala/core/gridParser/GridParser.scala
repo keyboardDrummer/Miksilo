@@ -30,7 +30,7 @@ class EmptyGrid[T] extends Grid[T] {
 case class Location(row: Int, column: Int) {
   def +(size: Size): Location = Location(row + size.height, column + size.width)
 }
-object Zero extends Location(0,0)
+object Zero extends Size(0,0)
 
 trait ParseResult[R] {
   def flatMap[R2](f: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] = {
@@ -38,7 +38,7 @@ trait ParseResult[R] {
   }
 }
 
-case class ParseSuccess[R](newLocation: Location, result: R) extends ParseResult[R]
+case class ParseSuccess[R](size: Size, result: R) extends ParseResult[R]
 class ParseFailure[R] extends ParseResult[R]
 
 case class Succeed[T, R](value: R) extends GridParser[T, R] {
@@ -80,7 +80,7 @@ case class Row[R](parser: CharParsers.Parser[R]) extends GridParser[Char, R] {
       case success: CharParsers.Success[R] =>
         val position = success.next.pos
         val column = position.column
-        ParseSuccess(Location(0, column), success.result)
+        ParseSuccess(Size(0, column), success.result)
       case f => new ParseFailure
     }
   }
@@ -107,9 +107,10 @@ case class Wrapped[R](parser: CharParsers.Parser[R]) extends GridParser[Char, R]
       case success: CharParsers.Success[R] =>
         val position = success.next.pos
         val column = position.column
-        ParseSuccess(Location(position.line, position.column), success.result)
+        ParseSuccess(Size(position.line, position.column), success.result)
       case f => new ParseFailure
     }
+  }
 }
 
 case class ParseWhitespaceOrEmpty[T](size: Size) extends GridParser[T, Unit] {
@@ -120,7 +121,7 @@ case class ParseWhitespaceOrEmpty[T](size: Size) extends GridParser[T, Unit] {
       if (!canParseRow)
         new ParseFailure[Unit]()
     }
-    ParseSuccess(new Location(size.height, size.width), Unit)
+    ParseSuccess(size, Unit)
   }
 }
 
@@ -143,7 +144,7 @@ case class Indent[T](minimumWidth: Int, canBeWider: Boolean) extends GridParser[
       }
     }
 
-    ParseSuccess(Location(row, column), Unit)
+    ParseSuccess(Size(row, column), Unit)
   }
 }
 
@@ -151,11 +152,11 @@ case class LeftRight[T, R, R2](left: GridParser[T, R], right: GridParser[T, R2])
   override def parse(leftGrid: Grid[T]): ParseResult[(R, R2)] = {
     for {
       leftSuccess: ParseSuccess[R] <- left.parse(leftGrid)
-      rightGrid = leftGrid.zoomColumn(leftSuccess.newLocation.column)
+      rightGrid = leftGrid.zoomColumn(leftSuccess.size.width)
       rightSuccess: ParseSuccess[R2] <- right.parse(rightGrid)
-      difference = leftSuccess.newLocation.row - rightSuccess.newLocation.row
+      difference = leftSuccess.size.height - rightSuccess.size.height
     } yield if (difference != 0) new ParseFailure() else ParseSuccess(
-      rightSuccess.newLocation,
+      rightSuccess.size,
       (leftSuccess.result, rightSuccess.result))
   }
 }
@@ -164,17 +165,17 @@ case class TopBottom[T, R, R2](top: GridParser[T, R], bottom: GridParser[T, R2])
   override def parse(topGrid: Grid[T]): ParseResult[R] = {
     for {
       topSuccess: ParseSuccess[R] <- top.parse(topGrid)
-      bottomGrid = topGrid.zoomRow(topSuccess.newLocation.row)
+      bottomGrid = topGrid.zoomRow(topSuccess.size.height)
       bottomSuccess: ParseSuccess[R2] <- bottom.parse(bottomGrid)
-      difference = topSuccess.newLocation.column - bottomSuccess.newLocation.column
+      difference = topSuccess.size.width - bottomSuccess.size.width
       remainderGrid = difference.compareTo(0) match {
-        case 1 => bottomGrid.zoomColumn(bottomSuccess.newLocation.column).clipWidth(difference)
+        case 1 => bottomGrid.zoomColumn(bottomSuccess.size.width).clipWidth(difference)
         case 0 => new EmptyGrid[T]
-        case -1 => topGrid.zoomColumn(topSuccess.newLocation.column).clipWidth(-1 * difference)
+        case -1 => topGrid.zoomColumn(topSuccess.size.width).clipWidth(-1 * difference)
       }
-      whitespaceSuccess: ParseSuccess[Unit] <- ParseWhitespaceOrEmpty(remainderGrid.size).parse(remainderGrid)
+      ParseWhitespaceOrEmpty(remainderGrid.size).parse(remainderGrid)
     } yield ParseSuccess(
-        Location(bottomSuccess.newLocation.row, whitespaceSuccess.newLocation.column),
+        if (difference > 0) topSuccess.size else bottomSuccess.size,
         (topSuccess.result, bottomSuccess.result))
   }
 }
