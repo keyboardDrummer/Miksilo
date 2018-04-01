@@ -1,159 +1,93 @@
 package core.gridParser
 
-import scala.util.parsing.combinator.{Parsers, RegexParsers}
-import scala.util.parsing.input.CharSequenceReader
+import core.gridParser.grids.Grid
 
-
-
-case class Location(row: Int, column: Int) {
-  def +(size: Size): Location = Location(row + size.height, column + size.width)
-}
-object Zero extends Size(0,0)
+import scala.util.parsing.combinator.JavaTokenParsers
 
 trait ParseResult[R] {
-  def flatMap[R2](f: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] = {
-    ???
-  }
+  def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2]
+  def map[R2](mapping: R => R2): ParseResult[R2]
 }
 
-case class ParseSuccess[R](size: Size, result: R) extends ParseResult[R]
-class ParseFailure[R] extends ParseResult[R]
+case class ParseSuccess[R](size: Size, result: R) extends ParseResult[R] {
+  override def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] = {
+    next(this)
+  }
+
+  override def map[R2](mapping: R => R2): ParseResult[R2] = ParseSuccess(size, mapping(result))
+}
+
+case class ParseFailure[R](message: String, location: Location) extends ParseResult[R] {
+  override def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] = new ParseFailure[R2](message, location)
+
+  override def map[R2](mapping: R => R2): ParseResult[R2] = ParseFailure(message, location)
+}
 
 case class Succeed[T, R](value: R) extends GridParser[T, R] {
-  override def parse(grid: Grid[T]): ParseResult[R] = ParseSuccess(Zero, value)
+  override def parseInner(grid: Grid[T]): ParseResult[R] = ParseSuccess(Size.zero, value)
 }
-class Fail[T, R] extends GridParser[T, R] {
-  override def parse(grid: Grid[T]): ParseResult[R] = {
-    new ParseFailure()
+
+class Fail[T, R](message: String) extends GridParser[T, R] {
+  override def parseInner(grid: Grid[T]): ParseResult[R] = {
+    ParseFailure(message, Location.zero)
   }
+}
+
+case class Named[T, R](name: String, inner: GridParser[T, R]) extends GridParser[T, R] {
+  override def parseInner(grid: Grid[T]): ParseResult[R] = inner.parseInner(grid)
+
+  override def toString: String = name
 }
 
 trait GridParser[T, R] {
+  def parseInner(grid: Grid[T]): ParseResult[R]
 
-  object MyParsers extends Parsers {
-    type Elem = T
-  }
-
-  def parse(grid: Grid[T]): ParseResult[R]
-}
-
-case class Size(width: Int, height: Int)
-
-object CharParsers extends RegexParsers {
-}
-
-case class Row[R](parser: CharParsers.Parser[R]) extends GridParser[Char, R] {
-
-  override def parse(grid: Grid[Char]): ParseResult[R] = {
-    val reader = new CharSequenceReader(new CharSequence {
-      override def length(): Int = grid.getRowWidth(0)
-
-      override def subSequence(start: Int, end: Int): CharSequence = ???
-
-      override def charAt(index: Int): Char =
-        grid.get(0, index).getOrElse(throw new IndexOutOfBoundsException())
-    })
-    val result: CharParsers.ParseResult[R] = parser(reader)
-    result match {
-      case success: CharParsers.Success[R] =>
-        val position = success.next.pos
-        val column = position.column
-        ParseSuccess(Size(0, column), success.result)
-      case f => new ParseFailure
+  def parse(grid: Grid[T]): ParseResult[R] = {
+    parseInner(grid) match {
+      case success: ParseSuccess[R] => success
+      case failure: ParseFailure[T] => ParseFailure(failure.message, failure.location + grid.origin)
     }
   }
-}
 
-case class Wrapped[R](parser: CharParsers.Parser[R]) extends GridParser[Char, R] {
+  def name(name: String) = Named(name, this)
+  def map[R2](f: R => R2): GridParser[T, R2] = MapParser(this, f)
 
-  private val parserWithWhitespace = parser <~ """\s+""".r
-  override def parse(grid: Grid[Char]): ParseResult[R] = {
+  def ~[R2](right: => GridParser[T, R2]) = new LeftRight(this, right)
+  def ~>[R2](right: => GridParser[T, R2]): GridParser[T, R2] = new LeftRight(this, right).map(r => r._2)
+  def ~<[R2](right: => GridParser[T, R2]): GridParser[T, R] = new LeftRight(this, right).map(r => r._1)
 
-    val reader = new CharSequenceReader(new CharSequence {
-      override def length(): Int = {
-        0.until(grid.height).map(row => grid.getRowWidth(row)).sum
-      }
+  def %[R2](right: GridParser[T, R2]) = TopBottom(this, right)
+  def |[R2](right: => GridParser[T, R]) = new OrParser(this, right)
+  def indent(amount: Int = 2, canBeWider: Boolean = true): GridParser[T, R] = Indent(amount, canBeWider) ~> this
 
-      override def subSequence(start: Int, end: Int): CharSequence = ???
-
-      override def charAt(index: Int): Char =
-        grid.get(index)
-    })
-
-    val result: CharParsers.ParseResult[R] = parserWithWhitespace(reader)
-    result match {
-      case success: CharParsers.Success[R] =>
-        val position = success.next.pos
-        val column = position.column
-        ParseSuccess(Size(position.line, position.column), success.result)
-      case f => new ParseFailure
-    }
+  def someVertical: GridParser[T, List[R]] = {
+    (this % new ManyVertical[T, R](this)).map(t => t._1 :: t._2)
   }
 }
 
-case class ParseWhitespaceOrEmpty[T](size: Size) extends GridParser[T, Unit] {
+case class MapParser[T, R, R2](parser: GridParser[T, R], mapping: R => R2) extends GridParser[T, R2] {
+  override def parseInner(grid: Grid[T]): ParseResult[R2] = parser.parseInner(grid).map(mapping)
+}
 
-  override def parse(grid: Grid[T]): ParseResult[Unit] = {
-    for(row <- 0.until(size.height)) {
-      def canParseRow: Boolean = 0.until(size.width).forall(column => grid.isEmpty(row, column))
-      if (!canParseRow)
-        new ParseFailure[Unit]()
-    }
-    ParseSuccess(size, Unit)
+case class ManyVertical[T, R](parser: GridParser[T, R]) extends GridParser[T, List[R]] {
+  private val topBottom = new TopBottom[T, R, List[R]](parser, this).map(t => t._1 :: t._2)
+  private val result = new OrParser[T, List[R]](topBottom, Succeed[T, List[R]](List.empty))
+
+  override def parseInner(grid: Grid[T]): ParseResult[List[R]] = {
+    result.parseInner(grid)
   }
 }
 
-case class Indent[T](minimumWidth: Int, canBeWider: Boolean) extends GridParser[T, Unit] {
+object CharParsers extends JavaTokenParsers {}
 
-  override def parse(grid: Grid[T]): ParseResult[Unit] = {
-    val whitespace = Some(grid.whitespace)
-    var row = 0
 
-    def canParseRow: Boolean = 0.until(minimumWidth).forall(column => grid.get(row, column) == whitespace)
-    while(canParseRow) {
-      row += 1
-    }
 
-    var column = minimumWidth
-    if (canBeWider) {
-      def canParseColumn: Boolean = 0.until(row).forall(columnRow => grid.get(columnRow, column) == whitespace)
-      while(canParseColumn) {
-        column += 1
-      }
-    }
 
-    ParseSuccess(Size(row, column), Unit)
-  }
-}
 
-case class LeftRight[T, R, R2](left: GridParser[T, R], right: GridParser[T, R2]) extends GridParser[T, (R, R2)] {
-  override def parse(leftGrid: Grid[T]): ParseResult[(R, R2)] = {
-    for {
-      leftSuccess: ParseSuccess[R] <- left.parse(leftGrid)
-      rightGrid = leftGrid.zoomColumn(leftSuccess.size.width)
-      rightSuccess: ParseSuccess[R2] <- right.parse(rightGrid)
-      difference = leftSuccess.size.height - rightSuccess.size.height
-    } yield if (difference != 0) new ParseFailure() else ParseSuccess(
-      rightSuccess.size,
-      (leftSuccess.result, rightSuccess.result))
-  }
-}
 
-case class TopBottom[T, R, R2](top: GridParser[T, R], bottom: GridParser[T, R2]) extends GridParser[T, (R, R2)] {
-  override def parse(topGrid: Grid[T]): ParseResult[R] = {
-    for {
-      topSuccess: ParseSuccess[R] <- top.parse(topGrid)
-      bottomGrid = topGrid.zoomRow(topSuccess.size.height)
-      bottomSuccess: ParseSuccess[R2] <- bottom.parse(bottomGrid)
-      difference = topSuccess.size.width - bottomSuccess.size.width
-      remainderGrid = difference.compareTo(0) match {
-        case 1 => bottomGrid.zoomColumn(bottomSuccess.size.width).clipWidth(difference)
-        case 0 => new EmptyGrid[T]
-        case -1 => topGrid.zoomColumn(topSuccess.size.width).clipWidth(-1 * difference)
-      }
-      ParseWhitespaceOrEmpty(remainderGrid.size).parse(remainderGrid)
-    } yield ParseSuccess(
-        if (difference > 0) topSuccess.size else bottomSuccess.size,
-        (topSuccess.result, bottomSuccess.result))
-  }
-}
+
+
+
+
+
+
