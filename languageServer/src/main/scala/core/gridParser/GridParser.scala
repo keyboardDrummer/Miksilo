@@ -3,29 +3,7 @@ package core.gridParser
 import scala.util.parsing.combinator.{Parsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
-trait Grid[T] {
-  def isEmpty(row: Int, column: Int): Boolean = get(row, column).fold(true)(_ == whitespace)
 
-  def whitespace: T
-  def get(location: Location): Option[T]
-  def get(row: Int, column: Int): Option[T]
-  def get(offset: Int): T = get(getLocation(offset)).get
-  def getLocation(offset: Int): Location
-  def getOffset(location: Location): Int
-  def getRowWidth(row: Int): Int
-  def height: Int = size.height
-  def width: Int = size.width
-  def size: Size
-
-  def zoom(start: Location): Grid[T]
-  def zoomColumn(column: Int): Grid[T] = zoom(Location(0, column))
-  def zoomRow(row: Int): Grid[T] = zoom(Location(row, 0))
-  def clip(size: Size): Grid[T]
-  def clipWidth(width: Int): Grid[T] = clip(Size(width, height))
-  def clipHeight(height: Int): Grid[T] = clip(Size(width, height))
-}
-class EmptyGrid[T] extends Grid[T] {
-}
 
 case class Location(row: Int, column: Int) {
   def +(size: Size): Location = Location(row + size.height, column + size.width)
