@@ -14,7 +14,7 @@ case class TopBottom[T, R, R2](top: GridParser[T, R], bottom: GridParser[T, R2])
         }
         ParseWhitespaceOrEmpty(remainderGrid.size).parseInner(remainderGrid).flatMap(_ => {
           ParseSuccess(
-            Size(bottomSuccess.size.width + difference, topSuccess.size.height + bottomSuccess.size.height),
+            Size(Math.max(bottomSuccess.size.width, topSuccess.size.width), topSuccess.size.height + bottomSuccess.size.height),
             (topSuccess.result, bottomSuccess.result))
           })
         })
