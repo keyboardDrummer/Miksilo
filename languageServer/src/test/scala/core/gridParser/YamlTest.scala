@@ -96,4 +96,32 @@ class YamlTest extends FunSuite {
     val expectation = ParseSuccess(Size(6, 3), Array(Seq(Number(2), Object(Map("x" -> Number(3), "y" -> Number(4))))))
     assertResult(expectation)(result)
   }
+
+  test("complex composite") {
+    val program =
+      """- 2
+        |- x: 3
+        |  y: a: 4
+        |     b: 5
+        |  z: - 2
+        |     - 4
+        |- 6
+        |- q: - 7
+        |     - 8
+        |  r: 9""".stripMargin
+
+    val result = parseValue.parse(program)
+    val expectation = ParseSuccess(Size(9, 10),
+      Array(Seq(
+        Number(2),
+          Object(Map("x" -> Number(3),
+            "y" -> Object(Map("a" -> Number(4), "b" -> Number(5))),
+            "z" -> Array(Seq(Number(2), Number(4))))),
+        Number(6),
+        Object(Map(
+          "q" ->
+            Array(Seq(Number(7), Number(8))),
+          "r" -> Number(9))))))
+    assertResult(expectation)(result)
+  }
 }
