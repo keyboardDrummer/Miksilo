@@ -12,8 +12,6 @@ case class Indent[T](minimumWidth: Int, canBeWider: Boolean) extends GridParser[
     while(canParseRow) {
       row += 1
     }
-    if (row == 0)
-      return ParseFailure("No indentation found", Location.zero)
 
     var column = minimumWidth
     if (canBeWider) {
@@ -23,6 +21,6 @@ case class Indent[T](minimumWidth: Int, canBeWider: Boolean) extends GridParser[
       }
     }
 
-    ParseSuccess(Size(row, column), Unit)
+    ParseSuccess(Size(column, row), Unit)
   }
 }

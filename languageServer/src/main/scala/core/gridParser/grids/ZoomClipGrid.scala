@@ -14,7 +14,7 @@ class ZoomClipGrid[T](zoom: Location, size: Size, original: DefaultGrid[T]) exte
 
   override def origin: Size = original.origin + Size(zoom.row, zoom.column)
 
-  override def zoom(extraZoom: Location): Grid[T] = new ZoomClipGrid[T](this.zoom + extraZoom, size, original)
+  override def zoom(extraZoom: Location): Grid[T] = new ZoomClipGrid[T](this.zoom + extraZoom, size - extraZoom, original)
 
   override def clip(newSize: Size): Grid[T] = new ZoomClipGrid[T](zoom, newSize, original)
 }

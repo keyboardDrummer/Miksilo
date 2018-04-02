@@ -10,7 +10,7 @@ class YamlTest extends FunSuite {
   case class Array(elements: Seq[YamlExpression]) extends YamlExpression
   case class Number(value: Int) extends YamlExpression
 
-  lazy val parseValue: GridParser[Char, YamlExpression] = parseObject | parseArray | parseNumber
+  lazy val parseValue: GridParser[Char, YamlExpression] = parseObject.name("object") | parseArray | parseNumber
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
     val key = Row(CharParsers.ident <~ CharParsers.literal(":"))
@@ -19,7 +19,7 @@ class YamlTest extends FunSuite {
   }
 
   lazy val parseArray: GridParser[Char, YamlExpression] = {
-    val element = Row(CharParsers.literal("- ")) ~> parseValue
+    val element = (Row(CharParsers.literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
     element.someVertical.map(elements => Array(elements))
   }
 
@@ -32,7 +32,7 @@ class YamlTest extends FunSuite {
     val program = "3"
 
     val result = parseNumber.parse(program)
-    val expectation = ParseSuccess(Size(0, 1), Number(3))
+    val expectation = ParseSuccess(Size(1, 1), Number(3))
     assertResult(expectation)(result)
   }
 
@@ -41,7 +41,7 @@ class YamlTest extends FunSuite {
     val member: GridParser[Char, (String, YamlExpression)] = key ~ parseNumber
     val program = "hallo: 3"
     val result = member.parse(program)
-    assertResult(ParseSuccess(Size(8, 0), ("hallo", Number(3))))(result)
+    assertResult(ParseSuccess(Size(8, 1), ("hallo", Number(3))))(result)
   }
 
   test("inline members") {
@@ -62,6 +62,38 @@ class YamlTest extends FunSuite {
 
     val result = parseValue.parse(program)
     val expectation = ParseSuccess(Size(12, 2), Object(Map("minecraft" -> Number(2), "cancelled" -> Number(3))))
+    assertResult(expectation)(result)
+  }
+
+  test("array") {
+    val program =
+      """- 2
+        |- 3""".stripMargin
+
+    val result = parseValue.parse(program)
+    val expectation = ParseSuccess(Size(3, 2), Array(Seq(Number(2), Number(3))))
+    assertResult(expectation)(result)
+  }
+
+  test("array object composite 2") {
+    val program =
+      """- x: 3
+        |  y: 4
+        |- 2""".stripMargin
+
+    val result = parseValue.parse(program)
+    val expectation = ParseSuccess(Size(6, 3), Array(Seq(Object(Map("x" -> Number(3), "y" -> Number(4))), Number(2))))
+    assertResult(expectation)(result)
+  }
+
+  test("array object composite") {
+    val program =
+      """- 2
+        |- x: 3
+        |  y: 4""".stripMargin
+
+    val result = parseValue.parse(program)
+    val expectation = ParseSuccess(Size(6, 3), Array(Seq(Number(2), Object(Map("x" -> Number(3), "y" -> Number(4))))))
     assertResult(expectation)(result)
   }
 }

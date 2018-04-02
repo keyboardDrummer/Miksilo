@@ -36,7 +36,7 @@ trait DefaultGrid[T] extends Grid[T] {
 
   override def height: Int = rows.length
 
-  override def zoom(zoom: Location): Grid[T] = new ZoomClipGrid[T](zoom, size, this)
+  override def zoom(zoom: Location): Grid[T] = new ZoomClipGrid[T](zoom, size - zoom, this)
 
   override def clip(zoomSize: Size): Grid[T] = new ZoomClipGrid[T](Location.zero, zoomSize, this)
 }
