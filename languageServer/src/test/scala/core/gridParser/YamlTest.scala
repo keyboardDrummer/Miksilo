@@ -3,7 +3,9 @@ package core.gridParser
 import core.gridParser.grids.GridFromString
 import org.scalatest.FunSuite
 
-class YamlTest extends FunSuite {
+import scala.util.parsing.combinator.JavaTokenParsers
+
+class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
 
   trait YamlExpression
   case class Object(members: Map[String, YamlExpression]) extends YamlExpression
@@ -13,18 +15,18 @@ class YamlTest extends FunSuite {
   lazy val parseValue: GridParser[Char, YamlExpression] = parseObject.name("object") | parseArray | parseNumber
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
-    val key = Row(CharParsers.ident <~ CharParsers.literal(":"))
+    val key = FromLinearParser(ident <~ literal(":"))
     val member: GridParser[Char, (String, YamlExpression)] = key ~ parseValue | key % parseValue.indent(1)
     member.someVertical.map(values => Object(values.toMap))
   }
 
   lazy val parseArray: GridParser[Char, YamlExpression] = {
-    val element = (Row(CharParsers.literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
+    val element = (FromLinearParser(literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
     element.someVertical.map(elements => Array(elements))
   }
 
   lazy val parseNumber: GridParser[Char, YamlExpression] =
-    Row(CharParsers.wholeNumber).map(n => Number(Integer.parseInt(n)))
+    FromLinearParser(wholeNumber).map(n => Number(Integer.parseInt(n)))
 
   implicit def toGrid(value: String): GridFromString = GridFromString(value)
 
@@ -37,7 +39,7 @@ class YamlTest extends FunSuite {
   }
 
   test("inline member") {
-    val key = Row(CharParsers.ident <~ CharParsers.literal(":"))
+    val key = FromLinearParser(ident <~ literal(":"))
     val member: GridParser[Char, (String, YamlExpression)] = key ~ parseNumber
     val program = "hallo: 3"
     val result = member.parse(program)
@@ -45,7 +47,7 @@ class YamlTest extends FunSuite {
   }
 
   test("inline members") {
-    val key = Row(CharParsers.ident <~ CharParsers.literal(":"))
+    val key = FromLinearParser(ident <~ literal(":"))
     val member: GridParser[Char, (String, YamlExpression)] = (key ~ parseNumber).name("member")
 
     val program =

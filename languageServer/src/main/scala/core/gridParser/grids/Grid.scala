@@ -9,7 +9,6 @@ trait Grid[T] {
   def get(row: Int, column: Int): Option[T]
 
   def get(location: Location): Option[T] = get(location.row, location.column)
-  def get(offset: Int): T
   def getRowWidth(row: Int): Int
   def height: Int
   def width: Int
