@@ -20,6 +20,12 @@ trait DefinitionProvider {
   def gotoDefinition(parameters: DocumentPosition): Seq[Location]
 }
 
+case class ReferencesParams(textDocument: TextDocumentIdentifier, position: Position, context: ReferenceContext)
+
+trait ReferencesProvider {
+  def references(location: ReferencesParams): Seq[Location]
+}
+
 trait LanguageServer {
   def initialize(parameters: InitializeParams): Unit
   def didOpen(parameters: TextDocumentItem): Unit

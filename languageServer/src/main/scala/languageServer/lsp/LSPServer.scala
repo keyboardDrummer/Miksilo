@@ -1,6 +1,6 @@
 package languageServer.lsp
 
-import langserver.types.Location
+import langserver.types.{Location, ReferenceContext}
 import languageServer._
 import play.api.libs.json._
 
@@ -30,7 +30,9 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     }
 
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
+    implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
+    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
   }
@@ -52,6 +54,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
   def getCapabilities: ServerCapabilities = {
     ServerCapabilities(
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
+      referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
       completionProvider = languageServer match {

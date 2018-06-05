@@ -3,7 +3,7 @@ package languageServer.lsp
 import java.io.ByteArrayOutputStream
 
 import langserver.types._
-import languageServer.{CompletionProvider, DefinitionProvider, LanguageServer}
+import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
 
 import scala.concurrent.Promise
@@ -131,6 +131,38 @@ class LSPServerTest extends AsyncFunSpec {
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
     })
 
+  }
+
+  it("can use references") {
+    val document = TextDocumentItem("a","",0,"content")
+    val request = ReferencesParams(TextDocumentIdentifier(document.uri), Position(0, 0), ReferenceContext(false))
+    val referenceRange = Range(Position(0, 1), Position(1, 2))
+
+    val languageServer: LanguageServer = new TestLanguageServer with ReferencesProvider {
+      override def references(parameters: ReferencesParams): Seq[Location] = {
+        if (parameters == request)
+          return Seq(Location(parameters.textDocument.uri, referenceRange))
+        Seq.empty
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val gotoPromise = client.references(request)
+
+    val serverOutExpectation =
+      """Content-Length: 121
+        |
+        |{"jsonrpc":"2.0","result":[{"uri":"a","range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}}}],"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 172
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/references","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0},"context":{"includeDeclaration":false}},"id":0}""".stripMargin
+    gotoPromise.future.map(result => {
+      assert(result == Seq(Location(document.uri, referenceRange)))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
   }
 
   def fixNewlines(text: String): String = text.replace("\n","\r\n")

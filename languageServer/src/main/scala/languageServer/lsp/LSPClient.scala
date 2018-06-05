@@ -1,8 +1,9 @@
 package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import langserver.types.{Location, TextDocumentIdentifier, TextDocumentItem}
-import play.api.libs.json.{Json, Reads}
+import langserver.types.{Location, ReferenceContext, TextDocumentIdentifier, TextDocumentItem}
+import languageServer.ReferencesParams
+import play.api.libs.json.{Json, OFormat, Reads}
 
 import scala.concurrent.Promise
 
@@ -19,6 +20,12 @@ class LSPClient(connection: JsonRpcConnection) {
     val result = correlationId
     correlationId += 1
     NumericCorrelationId(result)
+  }
+
+  def references(parameters: ReferencesParams): Promise[Seq[Location]] = {
+    implicit val referenceContext: OFormat[ReferenceContext] = Json.format
+    simpleConnection.sendRequest[ReferencesParams, Seq[Location]](
+      LSPProtocol.references, getCorrelationId, parameters)(Json.format, Reads.of[Seq[Location]])
   }
 
   def gotoDefinition(parameters: DocumentPosition): Promise[Seq[Location]] = {
