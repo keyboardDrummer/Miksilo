@@ -36,9 +36,9 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
   }
 
   def addNotificationHandlers(): Unit = {
-    handler.addNotificationHandler(LSPProtocol.didOpen, languageServer.didOpen)(Json.format)
+    handler.addNotificationHandler(LSPProtocol.didOpen, (params: DidOpenTextDocumentParams) => languageServer.didOpen(params.textDocument))(Json.format)
     handler.addNotificationHandler(LSPProtocol.didChange, languageServer.didChange)(Json.format)
-    handler.addNotificationHandler(LSPProtocol.didClose, languageServer.didClose)(Json.format)
+    handler.addNotificationHandler(LSPProtocol.didClose, (params: DidCloseTextDocumentParams) => languageServer.didClose(params.identifier))(Json.format)
     handler.addNotificationHandler(LSPProtocol.didSave, languageServer.didSave)(Json.format)
 
     handler.getNotificationHandlersForMethod(LSPProtocol.initialized).append(_ => languageServer.initialized())

@@ -48,9 +48,9 @@ class LSPServerTest extends AsyncFunSpec {
     val document = TextDocumentItem("a","",0,"content")
 
     val clientOutExpectation =
-      """Content-Length: 115
+      """Content-Length: 132
         |
-        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"uri":"a","languageId":"","version":0,"text":"content"}}""".stripMargin
+        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
 
     val p = Promise[Assertion]()
     lazy val serverAndClient = setupServerAndClient(languageServer)
@@ -158,7 +158,7 @@ class LSPServerTest extends AsyncFunSpec {
 
     override def didClose(parameters: TextDocumentIdentifier): Unit = {}
 
-    override def didSave(parameters: TextDocumentIdentifier): Unit = {}
+    override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
     override def initialized(): Unit = {}
 

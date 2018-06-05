@@ -37,15 +37,15 @@ class LSPClient(connection: JsonRpcConnection) {
   }
 
   def didOpen(parameters: TextDocumentItem): Unit = {
-    simpleConnection.sendNotification[TextDocumentItem](LSPProtocol.didOpen, parameters)(Json.format)
+    simpleConnection.sendNotification[DidOpenTextDocumentParams](LSPProtocol.didOpen, DidOpenTextDocumentParams(parameters))(Json.format)
   }
 
   def didClose(identifier: TextDocumentIdentifier): Unit = {
-    simpleConnection.sendNotification[TextDocumentIdentifier](LSPProtocol.didOpen, identifier)(Json.format)
+    simpleConnection.sendNotification[DidCloseTextDocumentParams](LSPProtocol.didOpen, DidCloseTextDocumentParams(identifier))(Json.format)
   }
 
-  def didSave(identifier: TextDocumentIdentifier): Unit = {
-    simpleConnection.sendNotification[TextDocumentIdentifier](LSPProtocol.didSave, identifier)(Json.format)
+  def didSave(params: DidSaveTextDocumentParams): Unit = {
+    simpleConnection.sendNotification[DidSaveTextDocumentParams](LSPProtocol.didSave, params)(Json.format)
   }
 
   def didChange(parameters: DidChangeTextDocumentParams): Unit = {

@@ -28,7 +28,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
 
-  override def didSave(parameters: TextDocumentIdentifier): Unit = {}
+  override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = None
