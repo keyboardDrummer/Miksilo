@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 
 import langserver.types._
 import languageServer.{CompletionProvider, DefinitionProvider, LanguageServer}
-import org.scalatest.AsyncFunSpec
+import org.scalatest.{Assertion, AsyncFunSpec}
 
 import scala.concurrent.Promise
 
@@ -47,18 +47,27 @@ class LSPServerTest extends AsyncFunSpec {
   it("can open document") {
     val document = TextDocumentItem("a","",0,"content")
 
-    val p = Promise[Unit]()
-    val languageServer: LanguageServer = new TestLanguageServer {
+    val clientOutExpectation =
+      """Content-Length: 115
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"uri":"a","languageId":"","version":0,"text":"content"}}""".stripMargin
+
+    val p = Promise[Assertion]()
+    lazy val serverAndClient = setupServerAndClient(languageServer)
+    lazy val languageServer: LanguageServer = new TestLanguageServer {
       override def didOpen(parameters: TextDocumentItem): Unit = {
-        p.success(())
+        try {
+          p.success(assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString))
+        } catch {
+          case e: Throwable => p.failure(e)
+        }
       }
     }
 
-    val serverAndClient = setupServerAndClient(languageServer)
     val client = serverAndClient.client
     client.didOpen(document)
 
-    p.future.map(_ => assert(true))
+    p.future
   }
 
   it("can use goto definition") {
