@@ -6,6 +6,8 @@ import langserver.types._
 import languageServer.{CompletionProvider, DefinitionProvider, LanguageServer}
 import org.scalatest.AsyncFunSpec
 
+import scala.concurrent.Promise
+
 class LSPServerTest extends AsyncFunSpec {
 
   val initialize: String = """Content-Length: 304
@@ -23,7 +25,7 @@ class LSPServerTest extends AsyncFunSpec {
 
   it("can initialize") {
 
-    val languageServer = new DefaultLanguageServer {}
+    val languageServer = new TestLanguageServer {}
     val serverAndClient = setupServerAndClient(languageServer)
 
     val serverOutExpectation =
@@ -42,12 +44,29 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
+  it("can open document") {
+    val document = TextDocumentItem("a","",0,"content")
+
+    val p = Promise[Unit]()
+    val languageServer: LanguageServer = new TestLanguageServer {
+      override def didOpen(parameters: TextDocumentItem): Unit = {
+        p.success(())
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    client.didOpen(document)
+
+    p.future.map(_ => assert(true))
+  }
+
   it("can use goto definition") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
     val definitionRange = Range(Position(0, 1), Position(1, 2))
 
-    val languageServer: LanguageServer = new DefaultLanguageServer with DefinitionProvider {
+    val languageServer: LanguageServer = new TestLanguageServer with DefinitionProvider {
       override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
         if (parameters == request)
           return Seq(Location(parameters.textDocument.uri, definitionRange))
@@ -78,7 +97,7 @@ class LSPServerTest extends AsyncFunSpec {
     val document = TextDocumentItem("a","",0, "content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
 
-    val languageServer: LanguageServer = new DefaultLanguageServer with CompletionProvider {
+    val languageServer: LanguageServer = new TestLanguageServer with CompletionProvider {
       override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
 
       override def complete(request: DocumentPosition): CompletionList =
@@ -123,7 +142,7 @@ class LSPServerTest extends AsyncFunSpec {
     ServerAndClient(client, server, clientOutCopy, serverOutCopy)
   }
 
-  class DefaultLanguageServer extends LanguageServer {
+  class TestLanguageServer extends LanguageServer {
     override def didOpen(parameters: TextDocumentItem): Unit = {}
 
     override def didChange(parameters: DidChangeTextDocumentParams): Unit = {}

@@ -10,6 +10,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   val handler = new SimpleJsonRpcHandler(connection)
   addRequestHandlers()
+  addNotificationHandlers()
 
   def listen(): Unit = {
     connection.listen()
