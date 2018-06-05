@@ -8,7 +8,7 @@ import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 class SimplifiedByteCodeTest extends FunSuite {
 
-  test("javaToSimplified") {
+  ignore("javaToSimplified") {
     val deltas = JavaLanguage.spliceBeforeTransformations(JavaLanguage.simpleByteCodeDeltas, Seq(PrettyPrint()))
     val utils = new TestUtils(TestLanguageBuilder.build(deltas))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("Fibonacci.java"))
