@@ -67,6 +67,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
   }
 
   def findReference(location: SourceElement): Option[Reference] = {
+    val referenceRanges = nodes.collect({ case n: ReferenceNode => n.reference }).flatMap(reference => reference.origin.flatMap(s => s.position).toSeq)
     val references = for {
       elementRange <- location.position.toSeq
       reference <- nodes.collect({ case n: ReferenceNode => n.reference })  //TODO change O(N) to O(1).

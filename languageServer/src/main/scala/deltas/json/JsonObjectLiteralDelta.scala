@@ -1,6 +1,6 @@
 package deltas.json
 
-import core.bigrammar.grammars.{Keyword, Parse, StringLiteral}
+import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
 import core.deltas.Delta
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -22,7 +22,8 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
     import grammars._
 
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    val member = StringLiteral.as(MemberKey) ~ ":" ~~ expressionGrammar.as(MemberValue) asNode MemberShape
+    val keyGrammar = "\"" ~> RegexGrammar(JsonStringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\""
+    val member = keyGrammar ~ ":" ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" % (member.manySeparatedVertical(",").as(Members) ~ Parse(Keyword(",") | value(Unit))).indent() % "}"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
@@ -44,7 +45,6 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
 
   implicit class ObjectLiteralMember(val node: Node) extends NodeWrapper[Node] {
     def key: String = node(MemberKey).asInstanceOf[String]
-    def keyWithQuotes: String = "\"" + key + "\""
     def value: Node = node(MemberValue).asInstanceOf[Node]
   }
 
