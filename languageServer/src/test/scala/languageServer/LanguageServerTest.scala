@@ -20,6 +20,11 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[DefinitionProvider].gotoDefinition(DocumentPosition(document, position))
   }
 
+  def references(server: LanguageServer, program: String, position: HumanPosition): Seq[Location] = {
+    val document = openDocument(server, program)
+    server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(false)))
+  }
+
   def complete(server: LanguageServer, program: String, position: HumanPosition): CompletionList = {
     val document = openDocument(server, program)
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))

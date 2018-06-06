@@ -21,7 +21,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       if (!solver.unifyDeclarations(declaration, resolvedDeclaration)) //TODO maybe we don't need ResolvesToType. If we can store the type of a variable declaration, then we can replace ResolvesToType with ResolvesTo and DeclarationHasType.
         throw new IllegalStateException("what?!")
 
-      solver.proofs.resolutions += reference -> resolvedDeclaration
+      solver.proofs.addResolution(reference, resolvedDeclaration)
       true
     }
     else if (declarations.length > 1)

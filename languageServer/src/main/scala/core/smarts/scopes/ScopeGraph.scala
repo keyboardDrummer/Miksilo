@@ -50,11 +50,26 @@ A declaration can declare a scope.
  */
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
-  def declarations: Seq[DeclarationNode] = this.keys.collect({case x: DeclarationNode => x}).toSeq
+  var nodes : Set[GraphNode] = Set.empty
+
+  def declarations: Seq[DeclarationNode] = nodes.collect({case x: DeclarationNode => x}).toSeq
+
+  def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
+    val declarations = for {
+      elementRange <- location.position.toSeq
+      declaration <- nodes.collect({ case n: DeclarationNode => n.declaration })  //TODO change O(N) to O(1).
+      referenceRange <- declaration.origin.flatMap(s => s.position).toSeq
+      valid = elementRange == referenceRange
+      result <- if (valid) Seq(declaration) else Seq.empty
+    } yield result
+
+    declarations.headOption
+  }
+
   def findReference(location: SourceElement): Option[Reference] = {
     val references = for {
       elementRange <- location.position.toSeq
-      reference <- this.keys.collect({ case n: ReferenceNode => n.reference })  //TODO change O(N) to O(1).
+      reference <- nodes.collect({ case n: ReferenceNode => n.reference })  //TODO change O(N) to O(1).
       referenceRange <- reference.origin.flatMap(s => s.position).toSeq
       valid = elementRange == referenceRange
       result <- if (valid) Seq(reference) else Seq.empty
@@ -120,6 +135,8 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 
   def add(node: GraphNode, edge: GraphEdge): Boolean =
   {
+    nodes += node
+    nodes += edge.target
     val edges = this.getOrElseUpdate(node, mutable.Set.empty)
     edges.add(edge)
   }

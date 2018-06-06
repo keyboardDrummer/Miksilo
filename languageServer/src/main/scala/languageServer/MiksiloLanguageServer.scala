@@ -15,6 +15,7 @@ import languageServer.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
+  with ReferencesProvider
   with CompletionProvider
   with LazyLogging {
 
@@ -93,11 +94,11 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
     currentDocumentId = parameters.textDocument
-    logger.debug("Went into gotoDefinitionRequest")
+    logger.debug("Went into gotoDefinition")
     val location = for {
       proofs <- getProofs
       element = getSourceElement(parameters.position)
-      declaration <- proofs.resolveLocation(element)
+      declaration <- proofs.gotoDefinition(element)
       range <- declaration.position
     } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
     location.toSeq
@@ -106,7 +107,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def complete(params: DocumentPosition): CompletionList = {
     currentDocumentId = params.textDocument
     val position = params.position
-    logger.debug("Went into completionRequest")
+    logger.debug("Went into complete")
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
@@ -125,4 +126,15 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
 
+  override def references(parameters: ReferencesParams): Seq[Location] = {
+    currentDocumentId = parameters.textDocument
+    logger.debug("Went into references")
+    val location = for {
+      proofs <- getProofs.toSeq
+      element = getSourceElement(parameters.position)
+      references <- proofs.findReferences(element)
+      range <- references.origin.flatMap(e => e.position).toSeq
+    } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
+    location
+  }
 }
