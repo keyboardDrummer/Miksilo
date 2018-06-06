@@ -165,9 +165,38 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
+  it("can receive diagnostics") {
+    val document = TextDocumentItem("a","",0,"content")
+
+    val clientOutExpectation =
+      """Content-Length: 132
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
+
+    val diagnostics = Seq(Diagnostic(Range(HumanPosition(0,1), HumanPosition(0, 5)),Some(2), None, None, "Woeps"))
+    val p = Promise[Assertion]()
+    val languageClient = new TestLanguageClient {
+      override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {
+        p.success(assertResult(diagnostics)(receivedDiagnostics.diagnostics))
+      }
+    }
+    val languageServer: LanguageServer = new TestLanguageServer {
+      override def getDiagnostics: Seq[Diagnostic] = {
+        diagnostics
+      }
+    }
+    val serverAndClient = setupServerAndClient(languageServer, languageClient)
+
+    val client = serverAndClient.client
+    client.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, document.version), Seq.empty))
+
+    p.future
+  }
+
+
   def fixNewlines(text: String): String = text.replace("\n","\r\n")
 
-  private def setupServerAndClient(languageServer: LanguageServer): ServerAndClient = {
+  private def setupServerAndClient(languageServer: LanguageServer, languageClient: LanguageClient = new TestLanguageClient()): ServerAndClient = {
     val clientToServer = new InOutStream()
     val serverToClient = new InOutStream()
 
@@ -177,16 +206,24 @@ class LSPServerTest extends AsyncFunSpec {
     val serverOut = new StreamMultiplexer(Seq(serverToClient.out, serverOutCopy))
     val serverConnection = new JsonRpcConnection(clientToServer.in, serverOut)
     val server = new LSPServer(languageServer, serverConnection)
-    val client = new LSPClient(new JsonRpcConnection(serverToClient.in, clientOut))
+    val client = new LSPClient(languageClient, new JsonRpcConnection(serverToClient.in, clientOut))
     new Thread(() => server.listen()).start()
     new Thread(() => client.listen()).start()
     ServerAndClient(client, server, clientOutCopy, serverOutCopy)
   }
 
+  class TestLanguageClient extends LanguageClient {
+    override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {}
+  }
+
   class TestLanguageServer extends LanguageServer {
     override def didOpen(parameters: TextDocumentItem): Unit = {}
 
-    override def didChange(parameters: DidChangeTextDocumentParams): Unit = {}
+    override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
+      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, getDiagnostics))
+    }
+
+    def getDiagnostics: Seq[Diagnostic] = Seq.empty
 
     override def didClose(parameters: TextDocumentIdentifier): Unit = {}
 
@@ -195,5 +232,10 @@ class LSPServerTest extends AsyncFunSpec {
     override def initialized(): Unit = {}
 
     override def initialize(parameters: InitializeParams): Unit = {}
+
+    var client: LanguageClient = _
+    override def setClient(client: LanguageClient): Unit = {
+      this.client = client
+    }
   }
 }

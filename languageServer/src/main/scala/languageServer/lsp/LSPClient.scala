@@ -2,15 +2,19 @@ package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
 import langserver.types.{Location, ReferenceContext, TextDocumentIdentifier, TextDocumentItem}
-import languageServer.ReferencesParams
+import languageServer.{LanguageClient, ReferencesParams}
 import play.api.libs.json.{Json, OFormat, Reads}
 
 import scala.concurrent.Promise
 
-class LSPClient(connection: JsonRpcConnection) {
+class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
 
   val simpleConnection = new SimpleJsonRpcHandler(connection)
   var correlationId = 0
+
+  simpleConnection.addNotificationHandler[PublishDiagnostics](LSPProtocol.diagnostics, notification => {
+    languageClient.sendDiagnostics(notification)
+  })(Json.format)
 
   def listen(): Unit = {
     connection.listen()

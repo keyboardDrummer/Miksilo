@@ -20,6 +20,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with CompletionProvider
   with LazyLogging {
 
+  var client: LanguageClient = _
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
   private val documentManager = new TextDocumentManager()
@@ -35,6 +36,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = None
     documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+    if (client != null) {
+      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, Seq.empty)) //TODO replace Seq.empty
+    }
   }
 
   def compile(): Unit = {
@@ -152,5 +156,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       positions.map(position => Location(parameters.textDocument.uri, new langserver.types.Range(position.start, position.end)))
     }
     maybeResult.getOrElse(Seq.empty)
+  }
+
+  override def setClient(client: LanguageClient): Unit = {
+    this.client = client
   }
 }

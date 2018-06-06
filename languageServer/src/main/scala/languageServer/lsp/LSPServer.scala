@@ -11,6 +11,14 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
   val handler = new SimpleJsonRpcHandler(connection)
   addRequestHandlers()
   addNotificationHandlers()
+  languageServer.setClient(new LanguageClientProxy())
+
+  class LanguageClientProxy extends LanguageClient {
+    override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
+      implicit val publishDiagnosticsFormat: OFormat[PublishDiagnostics] = Json.format
+      handler.sendNotification(LSPProtocol.diagnostics, diagnostics)
+    }
+  }
 
   def listen(): Unit = {
     connection.listen()

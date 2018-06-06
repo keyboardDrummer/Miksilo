@@ -26,7 +26,13 @@ trait ReferencesProvider {
   def references(location: ReferencesParams): Seq[Location]
 }
 
+trait LanguageClient {
+  def sendDiagnostics(diagnostics: PublishDiagnostics)
+}
+
 trait LanguageServer {
+  def setClient(client: LanguageClient): Unit
+
   def initialize(parameters: InitializeParams): Unit
   def didOpen(parameters: TextDocumentItem): Unit
   def didClose(parameters: TextDocumentIdentifier): Unit
