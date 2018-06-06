@@ -3,6 +3,8 @@ package deltas.cloudformation
 import core.deltas.Delta
 import core.deltas.path.PathRoot
 import core.language.Language
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
 import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta
@@ -24,34 +26,22 @@ object CloudFormationTemplate extends Delta {
     val resourceTypes = parsedFile.value("ResourceTypes").as[JsObject]
 
     language.collectConstraints = (compilation, builder) => {
-      val universe = builder.newScope(debugName = "universe")
+      val rootScope = builder.newScope(debugName = "universe")
 
-      for(resourceType <- resourceTypes.value) {
-        val typeDeclaration = builder.declare(resourceType._1, universe)
-        val typeScope = builder.declareScope(typeDeclaration)
-
-        val typeObject = resourceType._2.as[JsObject]
-        val properties = typeObject.value("Properties").as[JsObject]
-        for(property <- properties.value) {
-          builder.declare(inQuotes(property._1), typeScope, null, Some(propertyType))
-        }
-      }
+      addResouceTypesFromSchema(resourceTypes, builder, rootScope)
 
       val program: ObjectLiteral = compilation.program
 
-      val parameters: ObjectLiteral = program.getValue("Parameters")
-      for(parameter <- parameters.members) {
-        builder.declare(parameter.keyWithQuotes, universe, parameter.node.getLocation(MemberKey), Some(valueType))
-      }
+      addParameters(builder, rootScope, program)
 
       val resources: ObjectLiteral = program.getValue("Resources")
       for(resource <- resources.members) {
-        builder.declare(resource.key, universe, resource.node.getLocation(MemberKey))
+        builder.declare(resource.keyWithQuotes, rootScope, resource.node.getLocation(MemberKey), Some(valueType))
 
         val resourceMembers: ObjectLiteral = resource.value
         val typeString = resourceMembers.getValue("Type")
         val resourceType = StringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getLocation(StringLiteralDelta.Value), universe)
+        val typeDeclaration = builder.resolve(resourceType, typeString.getLocation(StringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
 
         val properties: ObjectLiteral = resourceMembers.getValue("Properties")
@@ -64,11 +54,31 @@ object CloudFormationTemplate extends Delta {
         val member: JsonObjectLiteralDelta.ObjectLiteralMember = _member.current
         if (member.key == "Ref") {
           val value = StringLiteralDelta.getValue(member.value)
-          builder.resolveToType(inQuotes(value), _member.getLocation(MemberValue), universe, valueType)
+          builder.resolveToType(inQuotes(value), _member.getLocation(MemberValue), rootScope, valueType)
         }
       })
 
     }
     super.inject(language)
+  }
+
+  private def addParameters(builder: ConstraintBuilder, universe: ConcreteScope, program: ObjectLiteral) = {
+    val parameters: ObjectLiteral = program.getValue("Parameters")
+    for (parameter <- parameters.members) {
+      builder.declare(parameter.keyWithQuotes, universe, parameter.node.getLocation(MemberKey), Some(valueType))
+    }
+  }
+
+  private def addResouceTypesFromSchema(resourceTypes: JsObject, builder: ConstraintBuilder, universe: ConcreteScope) = {
+    for (resourceType <- resourceTypes.value) {
+      val typeDeclaration = builder.declare(resourceType._1, universe)
+      val typeScope = builder.declareScope(typeDeclaration)
+
+      val typeObject = resourceType._2.as[JsObject]
+      val properties = typeObject.value("Properties").as[JsObject]
+      for (property <- properties.value) {
+        builder.declare(inQuotes(property._1), typeScope, null, Some(propertyType))
+      }
+    }
   }
 }

@@ -12,6 +12,12 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(CloudFormationLanguage.language)
 
+  test("Goto definition resource reference") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val result: Seq[Location] = gotoDefinition(server, program, new HumanPosition(365, 37))
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(336,5), new HumanPosition(336,29)))))(result)
+  }
+
   test("Goto definition") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result: Seq[Location] = gotoDefinition(server, program, new HumanPosition(437, 36))
