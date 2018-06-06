@@ -35,8 +35,8 @@ class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
         for(diagnostic <- diagnostics) {
 
           val lineLengths = text.split("\n").map(line => line.length + 1)
-          val row = diagnostic.range.start.line - 1
-          val offset = lineLengths.take(row).sum + diagnostic.range.start.character - 1
+          val row = diagnostic.range.start.line
+          val offset = lineLengths.take(row).sum + diagnostic.range.start.character
           val notice = new DefaultParserNotice(this, diagnostic.message, row, offset, 1)
           result.addNotice(notice)
         }

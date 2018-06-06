@@ -8,7 +8,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
 import core.language.node.{Node, SourceRange}
 import core.smarts.ConstraintBuilder
-import langserver.types.{Diagnostic, DiagnosticSeverity, Position}
+import langserver.types.{Diagnostic, DiagnosticSeverity}
+import languageServer.HumanPosition
 
 import scala.collection.mutable
 import scala.reflect.io.File
@@ -42,7 +43,7 @@ class Language {
     val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
     val row = messageMatch.group(1).toInt
     val column = messageMatch.group(2).toInt
-    Diagnostic(SourceRange(Position(row, column), Position(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
   }
 
   def parseAndTransform(input: File): Compilation = {
