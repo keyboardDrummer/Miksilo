@@ -162,7 +162,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
       var positions: Seq[SourceRange] = referencesRanges
       if (parameters.context.includeDeclaration)
-        positions = Seq(definition.origin.get.position.get) ++ positions
+        positions = definition.origin.flatMap(o => o.position).toSeq ++ positions
 
       positions.map(position => Location(parameters.textDocument.uri, new langserver.types.Range(position.start, position.end)))
     }
