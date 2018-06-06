@@ -32,6 +32,7 @@ object CloudFormationTemplate extends Delta {
 
       val program: ObjectLiteral = compilation.program
 
+      addPseudoParameters(builder, rootScope)
       addParameters(builder, rootScope, program)
 
       val resources: ObjectLiteral = program.getValue("Resources")
@@ -60,6 +61,12 @@ object CloudFormationTemplate extends Delta {
 
     }
     super.inject(language)
+  }
+
+  private def addPseudoParameters(builder: ConstraintBuilder, rootScope: ConcreteScope) = {
+    val pseudoParameters = Seq("AWS::AccountId", "AWS::NotificationARNs", "AWS::NoValue", "AWS::Partition", "AWS::Region", "AWS::StackId", "AWS::StackName", "AWS::URLSuffix")
+    for (pseudoParameter <- pseudoParameters)
+      builder.declare(inQuotes(pseudoParameter), rootScope, null, Some(valueType))
   }
 
   private def addParameters(builder: ConstraintBuilder, universe: ConcreteScope, program: ObjectLiteral) = {

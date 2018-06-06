@@ -30,6 +30,18 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))
   }
 
+  def getDiagnostic(server: LanguageServer, program: String): Seq[Diagnostic] = {
+    var result: Seq[Diagnostic] = null
+    val document = openDocument(server, program)
+    server.setClient(new LanguageClient {
+      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
+        result = diagnostics.diagnostics
+      }
+    })
+    server.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0), Seq.empty))
+    result
+  }
+
   val random = new Random()
   def openDocument(server: LanguageServer, content: String): TextDocumentIdentifier = {
     val item = new TextDocumentItem(itemUri, "", 1, content)
