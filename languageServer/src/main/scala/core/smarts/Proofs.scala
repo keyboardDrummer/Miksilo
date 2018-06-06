@@ -16,15 +16,18 @@ class Proofs {
   var declarations = Map.empty[Reference, NamedDeclaration]
   var referencesPerDeclaration = mutable.Map.empty[NamedDeclaration, ArrayBuffer[Reference]]
 
-  def gotoDefinition(location: SourceElement): Option[SourceElement] = {
+  def gotoDefinition(location: SourceElement): Option[NamedDeclaration] = {
     val maybeReference = scopeGraph.findReference(location)
-    maybeReference.flatMap(reference => declarations(reference).origin)
+    maybeReference.flatMap(reference => declarations.get(reference))
   }
 
   def findReferences(location: SourceElement): Seq[Reference] = {
     val maybeDeclaration = scopeGraph.findDeclaration(location)
-    maybeDeclaration.toSeq.flatMap(
-      declaration => referencesPerDeclaration.getOrElse(declaration, ArrayBuffer.empty))
+    maybeDeclaration.toSeq.flatMap(declaration => findReferences(declaration))
+  }
+
+  def findReferences(declaration: NamedDeclaration): Seq[Reference] = {
+    referencesPerDeclaration.getOrElse(declaration, ArrayBuffer.empty)
   }
 
   def getDeclarationsInScope(location: SourceElement): Seq[NamedDeclaration] = {

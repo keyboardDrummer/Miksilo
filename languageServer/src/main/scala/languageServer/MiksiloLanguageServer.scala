@@ -6,8 +6,9 @@ import java.nio.charset.StandardCharsets
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
-import core.language.node.NodeLike
+import core.language.node.{NodeLike, SourceRange}
 import core.language.{Compilation, Language, SourceElement}
+import core.smarts.objects.NamedDeclaration
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.core.TextDocument
 import langserver.types._
@@ -98,8 +99,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val location = for {
       proofs <- getProofs
       element = getSourceElement(parameters.position)
-      declaration <- proofs.gotoDefinition(element)
-      range <- declaration.position
+      definition <- proofs.gotoDefinition(element)
+      range <- definition.origin.flatMap(o => o.position)
     } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
     location.toSeq
   }
@@ -126,15 +127,30 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
 
+  def getDefinitionFromDefinitionOrReferencePosition(proofs: Proofs, element: SourceElement): Option[NamedDeclaration] = {
+    proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
+  }
+
   override def references(parameters: ReferencesParams): Seq[Location] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
-    val location = for {
-      proofs <- getProofs.toSeq
+    val maybeResult = for {
+      proofs <- getProofs
       element = getSourceElement(parameters.position)
-      references <- proofs.findReferences(element)
-      range <- references.origin.flatMap(e => e.position).toSeq
-    } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
-    location
+      definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
+    } yield {
+
+      val referencesRanges = for {
+        references <- proofs.findReferences(definition)
+        range <- references.origin.flatMap(e => e.position).toSeq
+      } yield range
+
+      var positions: Seq[SourceRange] = referencesRanges
+      if (parameters.context.includeDeclaration)
+        positions = Seq(definition.origin.get.position.get) ++ positions
+
+      positions.map(position => Location(parameters.textDocument.uri, new langserver.types.Range(position.start, position.end)))
+    }
+    maybeResult.getOrElse(Seq.empty)
   }
 }

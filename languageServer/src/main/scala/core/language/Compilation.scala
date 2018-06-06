@@ -17,7 +17,6 @@ class Compilation(val language: Language) {
     for(phase <- language.compilerPhases)
       phase.action(this)
   }
-
 }
 
 object Compilation
