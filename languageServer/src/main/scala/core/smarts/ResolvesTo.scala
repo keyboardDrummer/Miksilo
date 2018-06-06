@@ -2,6 +2,7 @@ package core.smarts
 
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
+import langserver.types.{Diagnostic, DiagnosticSeverity}
 
 case class ResolvesTo(reference: Reference, var declaration: Declaration) extends ResolutionConstraint
 {
@@ -28,6 +29,12 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       false
     else
       false
+  }
+
+  override def getDiagnostic: Option[Diagnostic] = {
+    for {
+      range <- reference.origin.flatMap(e => e.position)
+    } yield Diagnostic(range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
   }
 }
 

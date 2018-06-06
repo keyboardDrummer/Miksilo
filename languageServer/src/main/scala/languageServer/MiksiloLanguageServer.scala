@@ -35,22 +35,33 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = None
-    documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+    if (parameters.contentChanges.nonEmpty)
+      documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
     if (client != null) {
-      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, Seq.empty)) //TODO replace Seq.empty
+      currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
+      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, getCompilation.diagnostics))
     }
   }
 
   def compile(): Unit = {
     val compilation = new Compilation(language)
+    this.compilation = Some(compilation)
     try {
       val input = getInputStreamFromDocument(currentDocument)
-      compilation.program = language.parse(input).get
-      for(phase <- proofPhases)
-        phase.action(compilation)
-      this.compilation = Some(compilation)
+      language.parseIntoDiagnostic(input) match {
+        case Left(program) =>
+
+          compilation.program = program
+          for(phase <- proofPhases)
+            phase.action(compilation)
+
+          compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
+        case Right(diagnostics) =>
+          compilation.diagnostics ++= diagnostics
+      }
+
     } catch {
-      case e: BadInputException =>
+      case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
     }
   }
@@ -66,14 +77,14 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     })
   }
 
-  def getCompilation: Option[Compilation] = {
+  def getCompilation: Compilation = {
     if (compilation.isEmpty)
       compile()
-    compilation
+    compilation.get
   }
 
   def getProofs: Option[Proofs] = {
-    getCompilation.map(c => c.proofs)
+    Option(getCompilation.proofs)
   }
 
   def getSourceElement(position: Position): SourceElement = {
@@ -90,7 +101,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
-    getForNode(PathRoot(getCompilation.get.program))
+    getForNode(PathRoot(getCompilation.program))
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}

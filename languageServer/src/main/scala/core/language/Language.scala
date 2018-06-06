@@ -6,12 +6,13 @@ import java.nio.charset.StandardCharsets
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
-import core.language.node.Node
+import core.language.node.{Node, SourceRange}
 import core.smarts.ConstraintBuilder
+import langserver.types.{Diagnostic, DiagnosticSeverity, Position}
 
 import scala.collection.mutable
 import scala.reflect.io.File
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class Language {
 
@@ -24,6 +25,25 @@ class Language {
   var extraCompileOptions: List[CustomCommand] = List.empty
 
   def parse(input: InputStream): Try[Node] = parser(input)
+
+  def parseIntoDiagnostic(input: InputStream): Either[Node, List[Diagnostic]] = {
+    val parseResult: Try[Node] = parse(input)
+    parseResult match {
+      case Failure(NoSourceException) => Right(List.empty) //TODO fill in diagnostic
+      case Failure(ParseException(message)) =>
+        Right(List(getDiagnosticFromParseException(message)))
+      case Success(node) => Left(node)
+      case _ => Right(List.empty) //TODO fill in diagnostic
+    }
+  }
+
+  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
+  private def getDiagnosticFromParseException(message: String): Diagnostic = {
+    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
+    val row = messageMatch.group(1).toInt
+    val column = messageMatch.group(2).toInt
+    Diagnostic(SourceRange(Position(row, column), Position(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+  }
 
   def parseAndTransform(input: File): Compilation = {
     parseAndTransform(input.inputStream())
