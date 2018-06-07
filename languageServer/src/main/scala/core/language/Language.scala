@@ -3,6 +3,7 @@ package core.language
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
+import com.typesafe.scalalogging.LazyLogging
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
@@ -15,7 +16,7 @@ import scala.collection.mutable
 import scala.reflect.io.File
 import scala.util.{Failure, Success, Try}
 
-class Language {
+class Language extends LazyLogging {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
@@ -30,11 +31,13 @@ class Language {
   def parseIntoDiagnostic(input: InputStream): Either[Node, List[Diagnostic]] = {
     val parseResult: Try[Node] = parse(input)
     parseResult match {
-      case Failure(NoSourceException) => Right(List.empty) //TODO fill in diagnostic
+      case Failure(NoSourceException) => Right(List.empty)
       case Failure(ParseException(message)) =>
         Right(List(getDiagnosticFromParseException(message)))
       case Success(node) => Left(node)
-      case _ => Right(List.empty) //TODO fill in diagnostic
+      case Failure(e) =>
+        logger.error("Received unknown error during parsing: " + e.toString)
+        Right(List.empty)
     }
   }
 

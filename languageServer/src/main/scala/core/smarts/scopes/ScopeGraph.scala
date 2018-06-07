@@ -1,23 +1,34 @@
 package core.smarts.scopes
 
 import core.language.SourceElement
+import core.language.node.SourceRange
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
 
 import scala.collection.mutable
 
-trait GraphNode
+trait GraphNode {
+  def maybeOrigin: Option[SourceElement]
+}
+
 case class ScopeNode(scope: ConcreteScope) extends GraphNode
 {
   override def toString: String = scope.toString
+
+  override def maybeOrigin: Option[SourceElement] = None
 }
+
 case class ReferenceNode(reference: Reference) extends GraphNode
 {
   override def toString: String = reference.toString
+
+  override def maybeOrigin: Option[SourceElement] = reference.origin
 }
 case class DeclarationNode(declaration: NamedDeclaration) extends GraphNode
 {
   override def toString: String = declaration.toString
+
+  override def maybeOrigin: Option[SourceElement] = declaration.origin
 }
 
 
@@ -50,33 +61,24 @@ A declaration can declare a scope.
  */
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
-  var nodes : Set[GraphNode] = Set.empty
-
-  def declarations: Seq[DeclarationNode] = nodes.collect({case x: DeclarationNode => x}).toSeq
+  var nodes : Map[SourceRange, GraphNode] = Map.empty
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
     val declarations = for {
-      elementRange <- location.position.toSeq
-      declaration <- nodes.collect({ case n: DeclarationNode => n.declaration })  //TODO change O(N) to O(1).
-      referenceRange <- declaration.origin.flatMap(s => s.position).toSeq
-      valid = elementRange == referenceRange
-      result <- if (valid) Seq(declaration) else Seq.empty
+      elementRange <- location.position
+      result <- nodes.get(elementRange)
     } yield result
 
-    declarations.headOption
+    declarations.collect({ case n: DeclarationNode => n.declaration })
   }
 
   def findReference(location: SourceElement): Option[Reference] = {
-    val referenceRanges = nodes.collect({ case n: ReferenceNode => n.reference }).flatMap(reference => reference.origin.flatMap(s => s.position).toSeq)
     val references = for {
-      elementRange <- location.position.toSeq
-      reference <- nodes.collect({ case n: ReferenceNode => n.reference })  //TODO change O(N) to O(1).
-      referenceRange <- reference.origin.flatMap(s => s.position).toSeq
-      valid = elementRange == referenceRange
-      result <- if (valid) Seq(reference) else Seq.empty
+      elementRange <- location.position
+      result <- nodes.get(elementRange)
     } yield result
 
-    references.headOption
+    references.collect({ case n: ReferenceNode => n.reference })
   }
 
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
@@ -136,8 +138,8 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 
   def add(node: GraphNode, edge: GraphEdge): Boolean =
   {
-    nodes += node
-    nodes += edge.target
+    node.maybeOrigin.flatMap(e => e.position).foreach(range => nodes += range -> node)
+    edge.target.maybeOrigin.flatMap(e => e.position).foreach(range => nodes += range -> edge.target)
     val edges = this.getOrElseUpdate(node, mutable.Set.empty)
     edges.add(edge)
   }

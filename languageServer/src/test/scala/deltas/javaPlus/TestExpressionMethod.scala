@@ -9,7 +9,7 @@ import scala.reflect.io.Path
 
 class TestExpressionMethod extends FunSuite {
 
-  ignore("basic") {
+  test("basic") {
     val inputDirectory = Path("")
     val compiler = TestLanguageBuilder.build(Seq(ExpressionMethodDelta) ++ JavaLanguage.javaCompilerDeltas)
     val result = new TestUtils(compiler).compileAndRun("FibonacciWithExpressionMethod", inputDirectory)
