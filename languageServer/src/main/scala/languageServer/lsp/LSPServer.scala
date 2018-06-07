@@ -1,6 +1,6 @@
 package languageServer.lsp
 
-import langserver.types.Location
+import langserver.types.{Location, ReferenceContext}
 import languageServer._
 import play.api.libs.json._
 
@@ -10,6 +10,15 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   val handler = new SimpleJsonRpcHandler(connection)
   addRequestHandlers()
+  addNotificationHandlers()
+  languageServer.setClient(new LanguageClientProxy())
+
+  class LanguageClientProxy extends LanguageClient {
+    override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
+      implicit val publishDiagnosticsFormat: OFormat[PublishDiagnostics] = Json.format
+      handler.sendNotification(LSPProtocol.diagnostics, diagnostics)
+    }
+  }
 
   def listen(): Unit = {
     connection.listen()
@@ -29,15 +38,17 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     }
 
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
+    implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
+    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
   }
 
   def addNotificationHandlers(): Unit = {
-    handler.addNotificationHandler(LSPProtocol.didOpen, languageServer.didOpen)(Json.format)
+    handler.addNotificationHandler(LSPProtocol.didOpen, (params: DidOpenTextDocumentParams) => languageServer.didOpen(params.textDocument))(Json.format)
     handler.addNotificationHandler(LSPProtocol.didChange, languageServer.didChange)(Json.format)
-    handler.addNotificationHandler(LSPProtocol.didClose, languageServer.didClose)(Json.format)
+    handler.addNotificationHandler(LSPProtocol.didClose, (params: DidCloseTextDocumentParams) => languageServer.didClose(params.identifier))(Json.format)
     handler.addNotificationHandler(LSPProtocol.didSave, languageServer.didSave)(Json.format)
 
     handler.getNotificationHandlersForMethod(LSPProtocol.initialized).append(_ => languageServer.initialized())
@@ -51,6 +62,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
   def getCapabilities: ServerCapabilities = {
     ServerCapabilities(
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
+      referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
       completionProvider = languageServer match {

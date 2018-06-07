@@ -6,8 +6,9 @@ import java.nio.charset.StandardCharsets
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
-import core.language.node.NodeLike
+import core.language.node.{NodeLike, SourceRange}
 import core.language.{Compilation, Language, SourceElement}
+import core.smarts.objects.NamedDeclaration
 import core.smarts.{Proofs, SolveConstraintsDelta}
 import langserver.core.TextDocument
 import langserver.types._
@@ -15,9 +16,11 @@ import languageServer.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
+  with ReferencesProvider
   with CompletionProvider
   with LazyLogging {
 
+  var client: LanguageClient = _
   private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
   private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
   private val documentManager = new TextDocumentManager()
@@ -28,23 +31,37 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
 
-  override def didSave(parameters: TextDocumentIdentifier): Unit = {}
+  override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = None
-    documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+    if (parameters.contentChanges.nonEmpty)
+      documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+    if (client != null) {
+      currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
+      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, getCompilation.diagnostics))
+    }
   }
 
   def compile(): Unit = {
     val compilation = new Compilation(language)
+    this.compilation = Some(compilation)
     try {
       val input = getInputStreamFromDocument(currentDocument)
-      compilation.program = language.parse(input).get
-      for(phase <- proofPhases)
-        phase.action(compilation)
-      this.compilation = Some(compilation)
+      language.parseIntoDiagnostic(input) match {
+        case Left(program) =>
+
+          compilation.program = program
+          for(phase <- proofPhases)
+            phase.action(compilation)
+
+          compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
+        case Right(diagnostics) =>
+          compilation.diagnostics ++= diagnostics
+      }
+
     } catch {
-      case e: BadInputException =>
+      case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
     }
   }
@@ -60,14 +77,14 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     })
   }
 
-  def getCompilation: Option[Compilation] = {
+  def getCompilation: Compilation = {
     if (compilation.isEmpty)
       compile()
-    compilation
+    compilation.get
   }
 
   def getProofs: Option[Proofs] = {
-    getCompilation.map(c => c.proofs)
+    Option(getCompilation.proofs)
   }
 
   def getSourceElement(position: Position): SourceElement = {
@@ -84,7 +101,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
-    getForNode(PathRoot(getCompilation.get.program))
+    getForNode(PathRoot(getCompilation.program))
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
@@ -93,12 +110,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
     currentDocumentId = parameters.textDocument
-    logger.debug("Went into gotoDefinitionRequest")
+    logger.debug("Went into gotoDefinition")
     val location = for {
       proofs <- getProofs
       element = getSourceElement(parameters.position)
-      declaration <- proofs.resolveLocation(element)
-      range <- declaration.position
+      definition <- proofs.gotoDefinition(element)
+      range <- definition.origin.flatMap(o => o.position)
     } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
     location.toSeq
   }
@@ -106,7 +123,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def complete(params: DocumentPosition): CompletionList = {
     currentDocumentId = params.textDocument
     val position = params.position
-    logger.debug("Went into completionRequest")
+    logger.debug("Went into complete")
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
@@ -125,4 +142,34 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
 
+  def getDefinitionFromDefinitionOrReferencePosition(proofs: Proofs, element: SourceElement): Option[NamedDeclaration] = {
+    proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
+  }
+
+  override def references(parameters: ReferencesParams): Seq[Location] = {
+    currentDocumentId = parameters.textDocument
+    logger.debug("Went into references")
+    val maybeResult = for {
+      proofs <- getProofs
+      element = getSourceElement(parameters.position)
+      definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
+    } yield {
+
+      val referencesRanges = for {
+        references <- proofs.findReferences(definition)
+        range <- references.origin.flatMap(e => e.position).toSeq
+      } yield range
+
+      var positions: Seq[SourceRange] = referencesRanges
+      if (parameters.context.includeDeclaration)
+        positions = definition.origin.flatMap(o => o.position).toSeq ++ positions
+
+      positions.map(position => Location(parameters.textDocument.uri, new langserver.types.Range(position.start, position.end)))
+    }
+    maybeResult.getOrElse(Seq.empty)
+  }
+
+  override def setClient(client: LanguageClient): Unit = {
+    this.client = client
+  }
 }

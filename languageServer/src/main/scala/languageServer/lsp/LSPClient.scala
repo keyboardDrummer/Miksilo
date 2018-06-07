@@ -1,15 +1,20 @@
 package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import langserver.types.{Location, TextDocumentIdentifier, TextDocumentItem}
-import play.api.libs.json.{Json, Reads}
+import langserver.types.{Location, ReferenceContext, TextDocumentIdentifier, TextDocumentItem}
+import languageServer.{LanguageClient, ReferencesParams}
+import play.api.libs.json.{Json, OFormat, Reads}
 
 import scala.concurrent.Promise
 
-class LSPClient(connection: JsonRpcConnection) {
+class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
 
   val simpleConnection = new SimpleJsonRpcHandler(connection)
   var correlationId = 0
+
+  simpleConnection.addNotificationHandler[PublishDiagnostics](LSPProtocol.diagnostics, notification => {
+    languageClient.sendDiagnostics(notification)
+  })(Json.format)
 
   def listen(): Unit = {
     connection.listen()
@@ -19,6 +24,12 @@ class LSPClient(connection: JsonRpcConnection) {
     val result = correlationId
     correlationId += 1
     NumericCorrelationId(result)
+  }
+
+  def references(parameters: ReferencesParams): Promise[Seq[Location]] = {
+    implicit val referenceContext: OFormat[ReferenceContext] = Json.format
+    simpleConnection.sendRequest[ReferencesParams, Seq[Location]](
+      LSPProtocol.references, getCorrelationId, parameters)(Json.format, Reads.of[Seq[Location]])
   }
 
   def gotoDefinition(parameters: DocumentPosition): Promise[Seq[Location]] = {
@@ -37,15 +48,15 @@ class LSPClient(connection: JsonRpcConnection) {
   }
 
   def didOpen(parameters: TextDocumentItem): Unit = {
-    simpleConnection.sendNotification[TextDocumentItem](LSPProtocol.didOpen, parameters)(Json.format)
+    simpleConnection.sendNotification[DidOpenTextDocumentParams](LSPProtocol.didOpen, DidOpenTextDocumentParams(parameters))(Json.format)
   }
 
   def didClose(identifier: TextDocumentIdentifier): Unit = {
-    simpleConnection.sendNotification[TextDocumentIdentifier](LSPProtocol.didOpen, identifier)(Json.format)
+    simpleConnection.sendNotification[DidCloseTextDocumentParams](LSPProtocol.didOpen, DidCloseTextDocumentParams(identifier))(Json.format)
   }
 
-  def didSave(identifier: TextDocumentIdentifier): Unit = {
-    simpleConnection.sendNotification[TextDocumentIdentifier](LSPProtocol.didSave, identifier)(Json.format)
+  def didSave(params: DidSaveTextDocumentParams): Unit = {
+    simpleConnection.sendNotification[DidSaveTextDocumentParams](LSPProtocol.didSave, params)(Json.format)
   }
 
   def didChange(parameters: DidChangeTextDocumentParams): Unit = {

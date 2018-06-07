@@ -1,6 +1,8 @@
 package languageServer.lsp
 
 object LSPProtocol {
+  val diagnostics = "textDocument/publishDiagnostics"
+  val references = "textDocument/references"
   val definition = "textDocument/definition"
   val completion = "textDocument/completion"
   val hover = "textDocument/hover"
