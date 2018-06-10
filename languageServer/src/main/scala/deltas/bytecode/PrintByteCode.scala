@@ -13,7 +13,6 @@ object PrintByteCode {
 
   //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
-  var debugCounter: Int = 0
 
   val cafeBabeBytes: Seq[Byte] = intToBytes(0xCAFEBABE)
 
@@ -69,11 +68,7 @@ object PrintByteCode {
   }
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
-    hexToBytes("cafebabe")
-    val counterBefore = debugCounter
     val bytes = _bytes()
-    if (counterBefore + bytes.length != debugCounter)
-      System.out.append('a')
     Ints.toByteArray(bytes.length) ++ bytes
   }
 
@@ -86,11 +81,11 @@ object PrintByteCode {
     shortToBytes(classAccessFlags("super"))
   }
 
-  def hexToBytes(hex: String): Seq[Byte] = debugBytes(new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2))
+  def hexToBytes(hex: String): Seq[Byte] = new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2)
 
   def toUTF8ConstantEntry(utf8: String): Seq[Byte] = {
     val bytes = utf8.toString.getBytes("UTF-8")
-    byteToBytes(1) ++ shortToBytes(bytes.length) ++ debugBytes(bytes)
+    byteToBytes(1) ++ shortToBytes(bytes.length) ++ bytes
   }
 
   def getExceptionByteCode(exception: Node): Seq[Byte] = ???
@@ -108,21 +103,15 @@ object PrintByteCode {
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
   def byteToBytes(value: Int): Seq[Byte] = {
-    debugBytes(Ints.toByteArray(value).drop(3))
+    Ints.toByteArray(value).drop(3)
   }
 
   def shortToBytes(short: Int): Seq[Byte] = {
-    debugBytes(Ints.toByteArray(short).takeRight(2))
+    Ints.toByteArray(short).takeRight(2)
   }
 
   def intToBytes(int: Int): Seq[Byte] = {
-    debugBytes(Ints.toByteArray(int))
-  }
-
-  def debugBytes(bytes: Seq[Byte]) = {
-    val diff = bytes.length
-    debugCounter = debugCounter + diff
-    bytes
+    Ints.toByteArray(int)
   }
 
   def printBytes(bytes: Seq[Byte]): String = {
