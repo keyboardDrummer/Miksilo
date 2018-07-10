@@ -11,6 +11,8 @@ case class ParseSuccess[R](size: Size, result: R) extends ParseResult[R] {
   }
 
   override def map[R2](mapping: R => R2): ParseResult[R2] = ParseSuccess(size, mapping(result))
+
+  override def toString: String = s"Success(${size.height},${size.width})\n${result.toString}\n"
 }
 
 case class ParseFailure[R](message: String, location: Location) extends ParseResult[R] {

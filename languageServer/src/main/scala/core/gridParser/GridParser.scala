@@ -20,8 +20,9 @@ trait GridParser[T, R] {
   def ~<[R2](right: => GridParser[T, R2]): GridParser[T, R] = new LeftRight(this, right).map(r => r._1)
 
   def %[R2](right: GridParser[T, R2]) = TopBottom(this, right)
+  def %<[R2](bottom: GridParser[T, R2]) = (this % bottom).map(r => r._1)
   def |[R2](right: => GridParser[T, R]) = new OrParser(this, right)
-  def indent(amount: Int = 2, canBeWider: Boolean = true): GridParser[T, R] = Indent(amount, canBeWider) ~> this
+  def indent(amount: Int = 2, canBeWider: Boolean = true): GridParser[T, R] = Indent(amount, canBeWider, mustParseSomething = true) ~> this
 
   def someVertical: GridParser[T, List[R]] = {
     (this % new ManyVertical[T, R](this)).map(t => t._1 :: t._2)
