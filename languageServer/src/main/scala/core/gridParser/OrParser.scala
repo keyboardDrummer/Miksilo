@@ -8,13 +8,7 @@ class OrParser[T, R](first: GridParser[T, R], _second: => GridParser[T, R]) exte
     val firstResult = first.parse(grid)
     firstResult match {
       case success: ParseSuccess[R] => success
-      case failure: ParseFailure[R] => second.parse(grid) match {
-        case secondSuccess: ParseSuccess[R] =>
-          val newBiggestFailure = secondSuccess.biggestFailure.map(f => getBiggestFailure(failure, f)).orElse(Some(failure))
-          ParseSuccess[R](secondSuccess.size, secondSuccess.result, newBiggestFailure)
-        case secondFailure: ParseFailure[R] =>
-          getBiggestFailure(failure, secondFailure)
-      }
+      case failure: ParseFailure[R] => second.parse(grid).addFailure(failure)
     }
   }
 

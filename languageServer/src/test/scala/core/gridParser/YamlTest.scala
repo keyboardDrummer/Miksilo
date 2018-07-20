@@ -91,6 +91,21 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
     assertResult(expectation)(result)
   }
 
+  test("array failure") {
+    val program =
+      """- 2
+        |- 3
+        |x""".stripMargin
+
+    val result = parseValue.parseEntireGrid(program)
+    val expectation = ParseFailure("`- ' expected but `x' found",Location(2,0))
+    assertResult(expectation)(result)
+
+    val partialResult = parseValue.parse(program).asInstanceOf[ParseSuccess[YamlExpression]]
+    val partialExpectation = ParseSuccess(Size(3, 2), Array(Seq(Number(2), Number(3))))
+    assertResult(partialExpectation)(ParseSuccess(partialResult.size, partialResult.result))
+  }
+
   test("array") {
     val program =
       """- 2
