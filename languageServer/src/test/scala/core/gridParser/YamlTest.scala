@@ -40,12 +40,12 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
     val key = FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = true, mustParseSomething = false)
-    val member: GridParser[Char, (String, YamlExpression)] = key ~ parseValue | key % parseValue.indent(1)
+    val member: GridParser[Char, (String, YamlExpression)] = key ~ parseValue //| key % parseValue.indent(1)
     member.someVertical.map(values => Object(values.toMap))
   }
 
   lazy val parseArray: GridParser[Char, YamlExpression] = {
-    val element = FromLinearParser(literal("- ")) ~> parseValue //(FromLinearParser(literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
+    val element = (FromLinearParser(literal("- ")) %< Indent(1, canBeWider = true, mustParseSomething = false)) ~> parseValue //(FromLinearParser(literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
     element.someVertical.map(elements => Array(elements))
   }
 
@@ -57,7 +57,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   test("number") {
     val program = "3"
 
-    val result = parseNumber.parse(program)
+    val result = parseNumber.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(1, 1), Number(3))
     assertResult(expectation)(result)
   }
@@ -66,7 +66,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
     val key = FromLinearParser(ident <~ literal(":"))
     val member: GridParser[Char, (String, YamlExpression)] = key ~ parseNumber
     val program = "hallo: 3"
-    val result = member.parse(program)
+    val result = member.parseEntireGrid(program)
     assertResult(ParseSuccess(Size(8, 1), ("hallo", Number(3))))(result)
   }
 
@@ -77,7 +77,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
     val program =
       """minecraft: 2
         |cancelled: 3""".stripMargin
-    val result = member.someVertical.parse(program)
+    val result = member.someVertical.parseEntireGrid(program)
     assertResult(ParseSuccess(Size(12, 2), List("minecraft" -> Number(2), "cancelled" -> Number(3))))(result)
   }
 
@@ -86,7 +86,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
       """minecraft: 2
         |cancelled: 3""".stripMargin
 
-    val result = parseValue.parse(program)
+    val result = parseValue.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(12, 2), Object(Map("minecraft" -> Number(2), "cancelled" -> Number(3))))
     assertResult(expectation)(result)
   }
@@ -96,8 +96,18 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
       """- 2
         |- 3""".stripMargin
 
-    val result = parseValue.parse(program)
+    val result = parseValue.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(3, 2), Array(Seq(Number(2), Number(3))))
+    assertResult(expectation)(result)
+  }
+
+  test("object nested in singleton array") {
+    val program =
+      """- x: 3
+        |  y: 4""".stripMargin
+
+    val result = parseValue.parseEntireGrid(program)
+    val expectation = ParseSuccess(Size(6, 2), Array(Seq(Object(Map("x" -> Number(3), "y" -> Number(4))))))
     assertResult(expectation)(result)
   }
 
@@ -107,7 +117,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
         |  y: 4
         |- 2""".stripMargin
 
-    val result = parseValue.parse(program)
+    val result = parseValue.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(6, 3), Array(Seq(Object(Map("x" -> Number(3), "y" -> Number(4))), Number(2))))
     assertResult(expectation)(result)
   }
@@ -118,7 +128,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
         |- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.parse(program)
+    val result = parseValue.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(6, 3), Array(Seq(Number(2), Object(Map("x" -> Number(3), "y" -> Number(4))))))
     assertResult(expectation)(result)
   }
@@ -128,8 +138,8 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
       """- a: - 1
         |- b: - 2""".stripMargin
 
-    val result = parseValue.parse(program)
-    val expectation = ParseSuccess(Size(2, 8),
+    val result = parseValue.parseEntireGrid(program)
+    val expectation = ParseSuccess(Size(8, 2),
       Array(Seq(
         Object(Map(
           "a" -> Array(Seq(Number(1))))),
@@ -152,7 +162,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
         |     - 8
         |  r: 9""".stripMargin
 
-    val result = parseValue.parse(program)
+    val result = parseValue.parseEntireGrid(program)
     val expectation = ParseSuccess(Size(9, 10),
       Array(Seq(
         Number(2),

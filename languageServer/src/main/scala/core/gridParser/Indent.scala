@@ -4,7 +4,7 @@ import core.gridParser.grids.Grid
 
 case class Indent[T](minimumWidth: Int, canBeWider: Boolean, mustParseSomething: Boolean) extends GridParser[T, Unit] {
 
-  override def parseInner(grid: Grid[T]): ParseResult[Unit] = {
+  override def parse(grid: Grid[T]): ParseResult[Unit] = {
     val whitespace = Some(grid.whitespace)
     var row = 0
 
@@ -15,9 +15,9 @@ case class Indent[T](minimumWidth: Int, canBeWider: Boolean, mustParseSomething:
 
     if (row == 0 && minimumWidth > 0) {
       if (mustParseSomething)
-        return ParseFailure("no indentation parsed", Location.zero)
+        return ParseFailure("no indentation parsed", Location.zero + grid.origin)
       else
-        return ParseSuccess(Size.zero, Unit)
+        return ParseSuccess(Size.zero, Unit, None)
     }
 
     var column = minimumWidth
@@ -28,6 +28,6 @@ case class Indent[T](minimumWidth: Int, canBeWider: Boolean, mustParseSomething:
       }
     }
 
-    ParseSuccess(Size(column, row), Unit)
+    ParseSuccess(Size(column, row), Unit, None)
   }
 }

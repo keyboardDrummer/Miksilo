@@ -6,7 +6,7 @@ case class ManyVertical[T, R](parser: GridParser[T, R]) extends GridParser[T, Li
   private val topBottom = new TopBottom[T, R, List[R]](parser, this).map(t => t._1 :: t._2)
   private val result = new OrParser[T, List[R]](topBottom, Succeed[T, List[R]](List.empty))
 
-  override def parseInner(grid: Grid[T]): ParseResult[List[R]] = {
-    result.parseInner(grid)
+  override def parse(grid: Grid[T]): ParseResult[List[R]] = {
+    result.parse(grid)
   }
 }

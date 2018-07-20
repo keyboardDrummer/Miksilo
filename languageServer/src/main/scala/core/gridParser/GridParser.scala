@@ -3,14 +3,17 @@ package core.gridParser
 import core.gridParser.grids.Grid
 
 trait GridParser[T, R] {
-  def parseInner(grid: Grid[T]): ParseResult[R]
 
-  def parse(grid: Grid[T]): ParseResult[R] = {
-    parseInner(grid) match {
-      case success: ParseSuccess[R] => success
-      case failure: ParseFailure[T] => ParseFailure(failure.message, failure.location + grid.origin)
-    }
+  def parseEntireGrid(grid: Grid[T]): ParseResult[R] = {
+    parse(grid).flatMap(success => {
+      if (success.size == grid.size) {
+        return ParseSuccess(success.size, success.result)
+      }
+      success.biggestFailure.get
+    })
   }
+
+  def parse(grid: Grid[T]): ParseResult[R]
 
   def name(name: String) = Named(name, this)
   def map[R2](f: R => R2): GridParser[T, R2] = MapParser(this, f)
