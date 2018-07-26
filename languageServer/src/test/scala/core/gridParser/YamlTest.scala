@@ -3,6 +3,7 @@ package core.gridParser
 import core.gridParser.grids.GridFromString
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
+import util.SourceUtils
 
 import scala.util.parsing.combinator.JavaTokenParsers
 
@@ -13,6 +14,30 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
 
     override def toString: String = toDocument.renderString()
   }
+
+//  var tokens = [
+//  ['comment', /^#[^\n]*/],
+//  ['indent', /^\n( *)/],
+//  ['space', /^ +/],
+//  ['true', /^\b(enabled|true|yes|on)\b/],
+//  ['false', /^\b(disabled|false|no|off)\b/],
+//  ['null', /^\b(null|Null|NULL|~)\b/],
+//  ['string', /^"(.*?)"/],
+//  ['string', /^'(.*?)'/],
+//  ['timestamp', /^((\d{4})-(\d\d?)-(\d\d?)(?:(?:[ \t]+)(\d\d?):(\d\d)(?::(\d\d))?)?)/],
+//  ['float', /^(\d+\.\d+)/],
+//  ['int', /^(\d+)/],
+//  ['doc', /^---/],
+//  [',', /^,/],
+//  ['{', /^\{(?![^\n\}]*\}[^\n]*[^\s\n\}])/],
+//['}', /^\}/],
+//['[', /^\[(?![^\n\]]*\][^\n]*[^\s\n\]])/],
+//[']', /^\]/],
+//['-', /^\-/],
+//[':', /^[:]/],
+//['string', /^(?![^:\n\s]*:[^\/]{2})(([^:,\]\}\n\s]|(?!\n)\s(?!\s*?\n)|:\/\/|,(?=[^\n]*\s*[^\]\}\s\n]\s*\n)|[\]\}](?=[^\n]*\s*[^\]\}\s\n]\s*\n))*)(?=[,:\]\}\s\n]|$)/],
+//  ['id', /^([\w][\w -]*)/]
+//  ]
 
   case class Object(members: Map[String, YamlExpression]) extends YamlExpression {
 
@@ -33,14 +58,19 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   }
 
   case class Number(value: Int) extends YamlExpression {
-    override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString())
+    override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
   }
 
-  lazy val parseValue: GridParser[Char, YamlExpression] = parseObject.name("object") | parseArray | parseNumber
+  case class StringLiteral(value: String) extends YamlExpression {
+    override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
+  }
+
+  lazy val parseValue: GridParser[Char, YamlExpression] = parseObject.name("object") | parseArray |
+    parseNumber | parseStringLiteral
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
     val key = FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = true, mustParseSomething = false)
-    val member: GridParser[Char, (String, YamlExpression)] = key ~ parseValue //| key % parseValue.indent(1)
+    val member: GridParser[Char, (String, YamlExpression)] = (key ~ parseValue).name("lrMember") | (key % parseValue.indent(1))
     member.someVertical.map(values => Object(values.toMap))
   }
 
@@ -52,7 +82,20 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   lazy val parseNumber: GridParser[Char, YamlExpression] =
     FromLinearParser(wholeNumber).map(n => Number(Integer.parseInt(n)))
 
+  lazy val parseStringLiteral: GridParser[Char, YamlExpression] =
+    FromLinearParser(regex("""'(.*?)'""".r)).
+    //FromLinearParser(regex("""/^(?![^:\\n\\s]*:[^\\/]{2})(([^:,\\]\\}\\n\\s]|(?!\\n)\\s(?!\\s*?\\n)|:\\/\\/|,(?=[^\\n]*\\s*[^\\]\\}\\s\\n]\\s*\\n)|[\\]\\}](?=[^\\n]*\\s*[^\\]\\}\\s\\n]\\s*\\n))*)(?=[,:\\]\\}\\s\\n]|$)/""".r)).
+      map(n => StringLiteral(n))
+
   implicit def toGrid(value: String): GridFromString = GridFromString(value)
+
+  test("string") {
+    val program = "'hello'"
+
+    val result = parseStringLiteral.parseEntireGrid(program)
+    val expectation = ParseSuccess(Size(7, 1), StringLiteral("'hello'"))
+    assertResult(expectation)(result)
+  }
 
   test("number") {
     val program = "3"
@@ -190,5 +233,11 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
             Array(Seq(Number(7), Number(8))),
           "r" -> Number(9))))))
     assertResult(expectation)(result)
+  }
+
+  test("big yaml file") {
+    val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val result = parseValue.parseEntireGrid(contents)
+    assert(result.isInstanceOf[ParseSuccess[YamlExpression]], result.toString)
   }
 }
