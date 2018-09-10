@@ -2,7 +2,7 @@ package core.gridParser.grids
 
 import core.gridParser.{Location, Size}
 
-class ZoomClipGrid[T](zoom: Location, size: Size, original: DefaultGrid[T]) extends DefaultGrid[T] {
+class ZoomClipGrid[T](zoom: Location, override val size: Size, original: DefaultGrid[T]) extends DefaultGrid[T] {
 
   override val rows: List[Range] = original.rows.
     slice(zoom.row, zoom.row + size.height).

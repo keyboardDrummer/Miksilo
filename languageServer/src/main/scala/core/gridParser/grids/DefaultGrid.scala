@@ -5,7 +5,7 @@ import core.gridParser.{Location, Size}
 trait DefaultGrid[T] extends Grid[T] {
   def text: Seq[T]
   def rows: List[Range]
-  lazy val width: Int = (Seq(0) ++ rows.map(r => r.length)).max
+  lazy val width: Int = (Seq(0) ++ rows.map(r => r.length)).max //TODO gek conflict met ZoomClipGrid size.
 
   override def get(row: Int, column: Int): Option[T] = {
     if (rows.length <= row)

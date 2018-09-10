@@ -1,9 +1,12 @@
 package core.gridParser
 
+import core.gridParser.grids.Grid
+
 trait ParseResult[R] {
   def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2]
   def map[R2](mapping: R => R2): ParseResult[R2]
   def addFailure[R2](failure: ParseFailure[R2]): ParseResult[R]
+  val testProperties: Any
 }
 
 case class ParseSuccess[R](size: Size, result: R, biggestFailure: Option[ParseFailure[R]] = None)
@@ -22,29 +25,30 @@ case class ParseSuccess[R](size: Size, result: R, biggestFailure: Option[ParseFa
     val castFailure = failure.asInstanceOf[ParseFailure[R]]
     ParseSuccess[R](size, result, Some(this.biggestFailure.fold(castFailure)(f => f.getBiggestFailure[R](castFailure))))
   }
+
+  override lazy val testProperties: Any = (size, result)
 }
 
-case class ParseFailure[R](message: String, location: Location) extends ParseResult[R] {
+case class ParseFailure[R](message: String, inside: Grid[_], location: Location, parsedOverride: Option[Int] = None)
+  extends ParseResult[R] {
 
-  override def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] = new ParseFailure[R2](message, location)
+  lazy val testProperties = (message, absoluteLocation)
+  val absoluteLocation = location + inside.origin
+  lazy val parsed = parsedOverride.getOrElse(location.row * location.column)
+  val totalParsed = inside.areaBeforeStart + parsed
+  override def flatMap[R2](next: ParseSuccess[R] => ParseResult[R2]): ParseResult[R2] =
+    new ParseFailure[R2](message, inside, location, parsedOverride)
 
-  override def map[R2](mapping: R => R2): ParseResult[R2] = ParseFailure(message, location)
+  override def map[R2](mapping: R => R2): ParseResult[R2] = ParseFailure(message, inside, location, parsedOverride)
 
   def getBiggestFailure[R2](other: ParseFailure[R2]): ParseFailure[R2] = {
-    if (this.location.row > other.location.row) {
-      return this.asInstanceOf[ParseFailure[R2]]
-    }
-
-    if (other.location.row > this.location.row) {
-      return other
-    }
-
-    if (this.location.column > other.location.column) {
-      return this.asInstanceOf[ParseFailure[R2]]
-    }
-
-    other
+    if (totalParsed > other.totalParsed)
+      this.asInstanceOf[ParseFailure[R2]]
+    else
+      other
   }
 
   override def addFailure[R2](failure: ParseFailure[R2]): ParseResult[R] = this.getBiggestFailure(failure.asInstanceOf[ParseFailure[R]])
+
+  override def toString = s"$message at $absoluteLocation"
 }

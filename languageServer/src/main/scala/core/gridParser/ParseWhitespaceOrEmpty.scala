@@ -8,7 +8,8 @@ case class ParseWhitespaceOrEmpty[T](size: Size) extends GridParser[T, Unit] {
     for(row <- 0.until(size.height)) {
       val columnFailure = 0.until(size.width).find(column => grid.isEmpty(row, column))
       if (columnFailure.nonEmpty)
-        new ParseFailure[Unit]("No whitespace or empty found", Location(row, columnFailure.get))
+        new ParseFailure[Unit]("No whitespace or empty found", grid, Location(row, columnFailure.get),
+          Some(row * size.width + columnFailure.get))
     }
     ParseSuccess(size, Unit, None)
   }

@@ -51,7 +51,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   case class Array(elements: Seq[YamlExpression]) extends YamlExpression {
     override def toDocument: ResponsiveDocument = {
       elements.
-        map(member => ResponsiveDocument.text("-") ~~ member.toDocument).
+        map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
         reduce((t,b) => t % b)
     }
 
@@ -65,17 +65,19 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
   }
 
-  lazy val parseValue: GridParser[Char, YamlExpression] = parseObject.name("object") | parseArray |
+  lazy val parseValue: GridParser[Char, YamlExpression] = parseArray.name("array") | parseObject.name("object") |
     parseNumber | parseStringLiteral
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
-    val key = FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = true, mustParseSomething = false)
-    val member: GridParser[Char, (String, YamlExpression)] = (key ~ parseValue).name("lrMember") | (key % parseValue.indent(1))
+    val key = FromLinearParser(ident <~ literal(":"))
+    val lrMember = (FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = true, mustParseSomething = false)) ~
+      (Indent(1, canBeWider = true, mustParseSomething = true) ~> parseValue)
+    val member: GridParser[Char, (String, YamlExpression)] = lrMember.name("lrMember") | (key % parseValue.indent(1).name("objectPropValue"))
     member.someVertical.map(values => Object(values.toMap))
   }
 
   lazy val parseArray: GridParser[Char, YamlExpression] = {
-    val element = (FromLinearParser(literal("- ")) %< Indent(1, canBeWider = true, mustParseSomething = false)) ~> parseValue //(FromLinearParser(literal("- ")) % Indent(2, canBeWider = false)) ~> parseValue
+    val element = (FromLinearParser(literal("- ")) %< Indent(1, canBeWider = true, mustParseSomething = false)) ~> parseValue
     element.someVertical.map(elements => Array(elements))
   }
 
@@ -106,7 +108,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   }
 
   test("inline member") {
-    val key = FromLinearParser(ident <~ literal(":"))
+    val key = FromLinearParser(ident <~ literal(": "))
     val member: GridParser[Char, (String, YamlExpression)] = key ~ parseNumber
     val program = "hallo: 3"
     val result = member.parseEntireGrid(program)
@@ -114,7 +116,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
   }
 
   test("inline members") {
-    val key = FromLinearParser(ident <~ literal(":"))
+    val key = FromLinearParser(ident <~ literal(": "))
     val member: GridParser[Char, (String, YamlExpression)] = (key ~ parseNumber).name("member")
 
     val program =
@@ -141,19 +143,20 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
         |c: 4""".stripMargin
 
     val result = parseValue.parseEntireGrid(program)
-    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].location
-    assertResult(Location(1, 4))(failureLocation)
+    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].absoluteLocation
+    assertResult(Location(1, 15))(failureLocation)
   }
 
   test("complex failure 2") {
     val program =
       """a:
-        |  b: CannotParse
-        |c: 4""".stripMargin
+        |   b: /
+        |c:
+        |   4""".stripMargin
 
     val result = parseValue.parseEntireGrid(program)
-    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].location
-    assertResult(Location(1, 5))(failureLocation)
+    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].absoluteLocation
+    assertResult(Location(1, 6))(failureLocation)
   }
 
   test("array failure") {
@@ -163,8 +166,8 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
         |x""".stripMargin
 
     val result = parseValue.parseEntireGrid(program)
-    val expectation = ParseFailure("`- ' expected but `x' found",Location(2,0))
-    assertResult(expectation)(result)
+    val expectation = ("`- ' expected but `x' found", Location(2,0))
+    assertResult(expectation)(result.testProperties)
 
     val partialResult = parseValue.parse(program).asInstanceOf[ParseSuccess[YamlExpression]]
     val partialExpectation = ParseSuccess(Size(3, 2), Array(Seq(Number(2), Number(3))))

@@ -6,6 +6,9 @@ import scala.util.parsing.combinator.RegexParsers
 import scala.util.parsing.input.Reader
 
 trait RegexGridParsers extends RegexParsers {
+
+  override val whiteSpace = "".r
+
   case class FromLinearParser[R](parser: Parser[R]) extends GridParser[Char, R] {
 
     override def parse(grid: Grid[Char]): core.gridParser.ParseResult[R] = {
@@ -14,18 +17,21 @@ trait RegexGridParsers extends RegexParsers {
       val reader = new CharGridReader('\n', defaultGrid, LinearGridParsers.getIndexToLocation(grid), 0)
       val result = parser(reader)
       val position = result.next.pos
+      val location = Location(position.line - 1, position.column - 1)
       result match {
         case success: Success[R] =>
-          val height = position.line
-          val lastLineWidth = position.column - 1
+          val height = location.row + 1
+          val lastLineWidth = location.column
           val nonLastLineWidths = 0.until(height - 1).map(row => defaultGrid.getRowWidth(row))
           val width = (Seq(lastLineWidth) ++ nonLastLineWidths).max
           //TODO hier nog forceren dat (width - position.column) ook nog geparsed wordt.
           ParseSuccess(Size(width, height), success.result, None)
         case failure: Failure =>
-          ParseFailure(failure.msg, Location(position.line - 1, position.column - 1) + grid.origin)
-        case error: Error =>
-          ParseFailure(error.msg, Location(position.line - 1, position.column - 1) + grid.origin)
+          ParseFailure(failure.msg, grid, location,
+            Some(result.next.offset))
+        case failure: Error =>
+          ParseFailure(failure.msg, grid, location,
+            Some(result.next.offset))
       }
     }
   }

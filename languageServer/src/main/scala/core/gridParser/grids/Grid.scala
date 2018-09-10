@@ -14,6 +14,7 @@ trait Grid[T] {
   def width: Int
   def size: Size = Size(width, height)
   def origin: Size
+  def areaBeforeStart: Int = origin.width * origin.height + origin.height * size.width + origin.width * size.height
 
   def zoom(start: Location): Grid[T]
   def zoomColumn(column: Int): Grid[T] = zoom(Location(0, column))

@@ -5,7 +5,10 @@ import core.gridParser.grids.Grid
 case class TopBottom[T, R, R2](top: GridParser[T, R], bottom: GridParser[T, R2]) extends GridParser[T, (R, R2)] {
   override def parse(topGrid: Grid[T]): ParseResult[(R, R2)] = {
     top.parse(topGrid).flatMap(topSuccess => {
-      val bottomGrid = topGrid.zoomRow(topSuccess.size.height)
+      val topWhitespace = topGrid.zoomColumn(topSuccess.size.width).clipHeight(topSuccess.size.height)
+      val topWhitespaceResult = Indent(0, canBeWider = true, mustParseSomething = false).parse(topWhitespace).asInstanceOf[ParseSuccess[Unit]]
+      val maximumBottomWidth = topSuccess.size.width + topWhitespaceResult.size.width
+      val bottomGrid = topGrid.zoomRow(topSuccess.size.height).clipWidth(maximumBottomWidth)
       bottom.parse(bottomGrid).flatMap(bottomSuccess => {
         val difference = topSuccess.size.width - bottomSuccess.size.width
         val remainderGrid = difference.compareTo(0) match {

@@ -24,13 +24,14 @@ trait LinearGridParsers extends Parsers {
       val reader = new GridReader[Elem](newLine, defaultGrid, LinearGridParsers.getIndexToLocation(defaultGrid), 0)
       val result = parser(reader)
       val position = result.next.pos
+      val location = Location(position.line - 1, position.column - 1)
       result match {
         case success: Success[R] =>
           ParseSuccess(Size(position.line, position.column), success.result, None)
         case failure: Failure =>
-          ParseFailure(failure.msg, Location(position.line - 1, position.column - 1))
-        case error: Error =>
-          ParseFailure(error.msg, Location(position.line - 1, position.column - 1))
+          ParseFailure(failure.msg, grid, location, Some(result.next.offset))
+        case failure: Error =>
+          ParseFailure(failure.msg, grid, location, Some(result.next.offset))
       }
     }
   }
