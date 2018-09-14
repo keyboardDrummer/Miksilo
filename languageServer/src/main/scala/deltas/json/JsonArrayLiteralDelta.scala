@@ -18,8 +18,8 @@ object JsonArrayLiteralDelta extends ExpressionInstance {
 
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
-    val grammar = inner.asLabelledNode(Shape)
-    expressionGrammar.addAlternative(grammar)
+    val arrayGrammar = inner.asLabelledNode(Shape)
+    expressionGrammar.addAlternative(arrayGrammar)
   }
 
   override def getType(expression: NodePath, compilation: Compilation): Node = ???

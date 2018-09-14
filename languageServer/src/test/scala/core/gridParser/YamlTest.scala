@@ -70,7 +70,7 @@ class YamlTest extends FunSuite with RegexGridParsers with JavaTokenParsers {
 
   lazy val parseObject: GridParser[Char, YamlExpression] = {
     val key = FromLinearParser(ident <~ literal(":"))
-    val lrMember = (FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = true, mustParseSomething = false)) ~
+    val lrMember = (FromLinearParser(ident <~ literal(":")) %< Indent(1, canBeWider = false, mustParseSomething = false)) ~
       (Indent(1, canBeWider = true, mustParseSomething = true) ~> parseValue)
     val member: GridParser[Char, (String, YamlExpression)] = lrMember.name("lrMember") | (key % parseValue.indent(1).name("objectPropValue"))
     member.someVertical.map(values => Object(values.toMap))
