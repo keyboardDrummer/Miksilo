@@ -6,12 +6,13 @@ import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
+import deltas.expressions.VariableDelta
 import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
 import deltas.javac.methods.assignment.AssignmentSkeleton
-import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 
 object AssignToMember extends DeltaWithGrammar {
 

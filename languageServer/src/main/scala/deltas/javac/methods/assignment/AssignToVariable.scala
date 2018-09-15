@@ -12,11 +12,12 @@ import deltas.bytecode.types.ArrayTypeDelta.ArrayTypeKey
 import deltas.bytecode.types.IntTypeDelta.IntTypeKey
 import deltas.bytecode.types.LongTypeDelta.LongTypeKey
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
-import deltas.javac.methods.{MethodDelta, VariableDelta, VariableInfo}
+import deltas.expressions.VariableDelta
+import deltas.javac.methods.{MethodDelta, VariableInfo, VariableToByteCodeDelta}
 
 object AssignToVariable extends DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableDelta)
+  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableToByteCodeDelta)
 
   override def inject(language: Language): Unit = {
     AssignmentSkeleton.hasAssignFromStackByteCode.add(language, VariableDelta.Shape,

@@ -9,9 +9,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.TypeFromDeclaration
+import deltas.expressions.VariableDelta
 import deltas.javac.classes.skeleton.{HasConstraints, JavaClassSkeleton}
-import deltas.javac.methods.VariableDelta
-import deltas.javac.methods.VariableDelta.{Name, Shape}
+import deltas.expressions.VariableDelta._
 
 object ThisVariableDelta extends DeltaWithGrammar
 {

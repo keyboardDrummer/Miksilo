@@ -4,16 +4,16 @@ import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{ComparisonOptions, Node}
 import deltas.bytecode.types._
 import deltas.expression.IntLiteralDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, _}
+import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.JavaLanguage
 import deltas.javac.trivia.JavaStyleBlockCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass

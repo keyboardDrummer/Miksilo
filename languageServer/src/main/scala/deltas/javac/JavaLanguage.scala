@@ -20,7 +20,7 @@ import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeCons
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
 import deltas.expression.IntLiteralDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -67,7 +67,7 @@ object JavaLanguage {
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ThisVariableDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
+    AssignmentPrecedence, PostFixIncrementDelta, VariableToByteCodeDelta, VariableDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 

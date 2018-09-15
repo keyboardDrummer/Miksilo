@@ -18,7 +18,8 @@ object IfThenElseToByteCodeDelta extends StatementInstance {
 
   override def description: String = "Enables using the if-then-else construct."
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenElseDelta, IfThenToByteCodeDelta, LabelledLocations, InferredStackFrames, BlockDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++
+    Set(IfThenElseDelta, IfThenToByteCodeDelta, LabelledLocations, InferredStackFrames, BlockDelta)
 
   override def toByteCode(ifThenElse: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)

@@ -16,6 +16,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
+  def parse(input: String): Node = {
+    parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
+  }
+
   def parseAndTransform(input: String): Compilation = {
     parseAndTransform(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }

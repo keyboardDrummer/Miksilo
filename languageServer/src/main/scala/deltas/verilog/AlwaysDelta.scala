@@ -1,6 +1,7 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.ValueGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -16,9 +17,9 @@ object AlwaysDelta extends DeltaWithGrammar {
     import grammars._
 
     val statement = find(StatementDelta.Grammar)
-    val edge: BiGrammar = "posedge" | "negedge" | ""
+    val edge: BiGrammar = "posedge" | "negedge" | ValueGrammar("")
     val variable: BiGrammar = edge.as(SensitivityVariable.Edge) ~~ identifier.as(SensitivityVariable.Name) asNode SensitivityVariable.Shape
-    val sensitivityList: BiGrammar = "@" ~ variable.manySeparated(",").as(SensitivityVariables)
+    val sensitivityList: BiGrammar = "@" ~ variable.manySeparated("," | "or").as(SensitivityVariables).inParenthesis
     val always: BiGrammar = "always" ~~ sensitivityList % statement.as(Body) asNode Shape
     statement.addAlternative(always)
   }

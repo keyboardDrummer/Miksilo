@@ -1,5 +1,6 @@
 package deltas.verilog
 
+import core.bigrammar.grammars.ValueGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -16,10 +17,12 @@ object BeginEndDelta extends DeltaWithGrammar {
     val statement = find(StatementDelta.Grammar)
     val block = find(BlockDelta.Grammar)
     val label = (":" ~~< identifier).option.as(Label)
-    val beginEnd = "begin" ~ label ~ (statement ~< ";").manyVertical.as(Statements) ~ "end"
+    val beginEnd = "begin" ~ label ~ (statement ~< ";").manyVertical.as(Statements) ~ "end" asNode Shape
     block.inner = beginEnd
 
-    findPath(BlockDelta.BlockOrStatementGrammar, BlockDelta.StatementAsBlockGrammar).removeMeFromOption() //Turn BlockOrStatement into just Block
+    find(BlockDelta.StatementAsBlockGrammar).inner =
+      (ValueGrammar(None).as(Label) ~
+      statement.map[Any, Seq[Any]](statement => Seq(statement), x => x.head).as(Statements)) asNode Shape
   }
 
   override def description: String = "Adds the begin-end block"

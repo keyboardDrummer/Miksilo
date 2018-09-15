@@ -17,7 +17,7 @@ object PortTypeSpecifierDelta extends DeltaWithGrammar {
     val member = find(VerilogModuleDelta.MemberShape)
 
     val _type: BiGrammar = "input" | "output" | "reg"
-    val input: BiGrammar = _type.as(Type) ~~ identifier.manySeparated(",").as(Variables) asNode Shape
+    val input: BiGrammar = _type.as(Type) ~~ identifier.manySeparated(",").as(Variables) ~ ";" asNode Shape
     member.addAlternative(input)
   }
 

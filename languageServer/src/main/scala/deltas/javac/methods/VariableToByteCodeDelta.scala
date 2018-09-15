@@ -12,30 +12,16 @@ import deltas.bytecode.coreInstructions.integers.LoadIntegerDelta
 import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
-import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
+import deltas.expressions.VariableDelta._
 
-object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
+object VariableToByteCodeDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
 
-  def getVariableName(variable: Node) = variable(Name).asInstanceOf[String]
-
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    import grammars._
-    val core = find(ExpressionDelta.LastPrecedenceGrammar)
-    val variableGrammar = create(VariableGrammar, identifier.as(Name) asNode Shape)
-    core.addAlternative(variableGrammar)
   }
-
-  object VariableGrammar extends GrammarKey
-
-  def variable(name: String) = new Node(Shape, Name -> name)
-
-  object Name extends NodeField
-
-  object Shape extends NodeShape
 
   override val shape = Shape
 
@@ -44,7 +30,7 @@ object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
   }
 
   def getVariableInfo(variable: NodePath, compilation: Compilation): VariableInfo = {
-    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(VariableDelta.getVariableName(variable))
+    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(getVariableName(variable))
   }
 
   override def toByteCode(variable: NodePath, compilation: Compilation): Seq[Node] = {
@@ -59,7 +45,7 @@ object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
     })
   }
 
-  override def description: String = "Enables referencing a variable."
+  override def description: String = "Compiles a variable to byte-code"
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.resolve(getVariableName(variable), variable.asInstanceOf[ChildPath], parentScope, Some(_type))

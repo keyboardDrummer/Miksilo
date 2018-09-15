@@ -5,12 +5,12 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import deltas.expressions.ExpressionDelta
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableToByteCodeDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
 

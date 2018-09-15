@@ -10,7 +10,7 @@ object IfThenElseDelta extends DeltaWithGrammar {
 
   override def description: String = "Enables using the if-then-else construct."
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, LabelledLocations, InferredStackFrames, BlockDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, BlockDelta)
 
   object Shape extends NodeShape
   object ElseKey extends NodeField

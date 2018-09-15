@@ -25,7 +25,7 @@ object VerilogModuleDelta extends DeltaWithGrammar {
     member.addAlternative(statement)
     val parameterList: BiGrammar = identifier.manySeparatedVertical(",").as(Parameters).inParenthesis
     val body: BiGrammar = member.manyVertical.as(Body)
-    val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule"
+    val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
     find(BodyGrammar).inner = moduleGrammar
   }
 

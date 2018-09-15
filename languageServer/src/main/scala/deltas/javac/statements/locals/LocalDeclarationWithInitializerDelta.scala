@@ -6,8 +6,7 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expressions.ExpressionDelta
-import deltas.javac.methods.VariableDelta
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.statements.locals.LocalDeclarationDelta.{LocalDeclaration, Name, Type}

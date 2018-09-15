@@ -9,7 +9,7 @@ import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.methods.ReturnExpressionDelta
-import deltas.javac.methods.VariableDelta._
+import deltas.expressions.VariableDelta._
 import deltas.javac.methods.call.CallDelta._
 import util.TestLanguageBuilder
 import util.TestUtils
@@ -18,7 +18,6 @@ class FibonacciWithoutMain {
   val className = "OnlyFibonacci"
   val defaultPackage = Seq("transformations", "bytecode", "testing")
   val methodName = "fibonacci"
-
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
