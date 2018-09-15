@@ -8,11 +8,10 @@ import core.language.Language
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
 import deltas.expression.IntLiteralDelta
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.javac.statements.BlockDelta
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import deltas.statement.StatementDelta
+import deltas.statement.{BlockDelta, StatementDelta}
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 import scala.reflect.io.Path
@@ -64,7 +63,7 @@ class JavaStyleCommentsTest
   object ExpressionAsRoot extends DeltaWithGrammar
   {
     override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-      grammars.find(BodyGrammar).inner = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+      grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     }
 
     override def description: String = ""
@@ -75,12 +74,12 @@ class JavaStyleCommentsTest
       JavaLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
-    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
+    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("addition") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -91,7 +90,7 @@ class JavaStyleCommentsTest
 
   test("addition2") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -102,7 +101,7 @@ class JavaStyleCommentsTest
 
   test("addition3") {
     val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+      Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
     JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 

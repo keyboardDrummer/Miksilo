@@ -2,14 +2,15 @@ package deltas.javac.expressions.literals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeShape}
 import core.deltas.path.NodePath
+import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 
 object NullDelta extends ExpressionInstance with ConvertsToByteCode {
 
@@ -17,12 +18,12 @@ object NullDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val parseNull = "null" ~> value(_null)
     expressionGrammar.inner = expressionGrammar.inner | parseNull
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, PushNullDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta, PushNullDelta)
 
   object Shape extends NodeShape
 

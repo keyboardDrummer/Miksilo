@@ -11,6 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
 object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
@@ -22,11 +23,11 @@ object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
     metaObject(Condition).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, LabelledLocations)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta, LabelledLocations)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val parseTernary = (expressionGrammar.as(Condition) ~~< "?") ~~
       (expressionGrammar.as(TrueBranch) ~~< ":") ~~
       expressionGrammar.as(FalseBranch) asNode Shape
@@ -49,7 +50,7 @@ object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
   override val shape = Shape
 
   override def getType(_ternary: NodePath, compilation: Compilation): Node = {
-    val getExpressionType = ExpressionSkeleton.getType(compilation)
+    val getExpressionType = ByteCodeExpressionSkeleton.getType(compilation)
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
@@ -86,11 +87,11 @@ object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
-    val conditionType = ExpressionSkeleton.getType(compilation, builder, condition, parentScope)
+    val conditionType = ByteCodeExpressionSkeleton.getType(compilation, builder, condition, parentScope)
     builder.typesAreEqual(BooleanTypeDelta.constraintType, conditionType)
 
-    val trueType = ExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
-    val falseType = ExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
+    val trueType = ByteCodeExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
+    val falseType = ByteCodeExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
 
     builder.typesAreEqual(_type, builder.getCommonSuperType(trueType, falseType))
   }

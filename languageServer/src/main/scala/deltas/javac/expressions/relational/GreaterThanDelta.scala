@@ -7,7 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ToByteCodeSkeleton}
 
 object GreaterThanDelta extends ComparisonOperatorDelta with ConvertsToByteCode { //TODO move more code into comparisonOperatorDelta.
 

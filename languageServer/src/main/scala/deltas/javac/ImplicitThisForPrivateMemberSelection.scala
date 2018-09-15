@@ -2,13 +2,13 @@ package deltas.javac
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.Node
 import core.deltas.path._
+import core.language.node.Node
 import core.language.{Compilation, Language}
-import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableDelta}
 
@@ -75,7 +75,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val callee = grammars.find(CallDelta.Callee)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     callee.inner = expression
   }
 }

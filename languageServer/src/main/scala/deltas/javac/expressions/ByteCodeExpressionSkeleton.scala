@@ -1,17 +1,14 @@
 package deltas.javac.expressions
 
-import core.deltas._
-import core.deltas.grammars.LanguageGrammars
+import core.deltas.ShapeProperty
 import core.deltas.path.NodePath
-import core.language.node._
+import core.language.node.{Node, NodeLike, NodeWrapper}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-object ExpressionSkeleton extends DeltaWithGrammar {
-
-  override def dependencies: Set[Contract] = Set.empty
+object ByteCodeExpressionSkeleton {
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
@@ -31,15 +28,5 @@ object ExpressionSkeleton extends DeltaWithGrammar {
     expression => expressionInstances.get(language, expression.shape)
   }
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
-    val core = grammars.create(CoreGrammar)
-    grammars.create(ExpressionGrammar, core)
-  }
-
   val expressionInstances = new ShapeProperty[ExpressionInstance]
-
-  object CoreGrammar extends GrammarKey
-  object ExpressionGrammar extends GrammarKey
-
-  override def description: String = "Introduces the concept of an expression."
 }

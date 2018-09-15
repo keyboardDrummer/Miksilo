@@ -7,8 +7,7 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.BlockDelta
-import deltas.statement.StatementDelta
+import deltas.statement.{BlockDelta, StatementDelta}
 
 object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 {

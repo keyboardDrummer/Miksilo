@@ -20,6 +20,7 @@ import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeCons
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
 import deltas.expression.IntLiteralDelta
+import deltas.expressions.ExpressionDelta
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -38,7 +39,7 @@ import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
-import deltas.statement.{IfThenDelta, IfThenElseDelta, StatementDelta}
+import deltas.statement.{BlockDelta, IfThenDelta, IfThenElseDelta, StatementDelta}
 
 object JavaLanguage {
 
@@ -77,7 +78,7 @@ object JavaLanguage {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta,
-    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisDelta, ExpressionSkeleton) ++ allByteCodeDeltas
+    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisDelta, ExpressionDelta) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

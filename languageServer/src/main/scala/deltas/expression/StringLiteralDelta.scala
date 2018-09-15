@@ -9,7 +9,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 
 object StringLiteralDelta extends ExpressionInstance {
 
@@ -17,13 +18,13 @@ object StringLiteralDelta extends ExpressionInstance {
 
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val inner = StringLiteral
     val grammar = inner.as(Value).asLabelledNode(Shape)
-    find(ExpressionSkeleton.ExpressionGrammar).addAlternative(grammar)
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
   }
 
   def literal(value: String) = new Node(Shape, Value -> value)

@@ -4,8 +4,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node._
-import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.statements.BlockDelta
+import deltas.expressions.ExpressionDelta
 
 object IfThenDelta extends DeltaWithGrammar {
 
@@ -30,7 +29,7 @@ object IfThenDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val ifThenGrammar = create(Shape, ("if" ~> ("(" ~> expressionGrammar.as(Condition) ~< ")") % bodyGrammar.as(Then)).
       asNode(Shape))

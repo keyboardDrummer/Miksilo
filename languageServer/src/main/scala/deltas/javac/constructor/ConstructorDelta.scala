@@ -14,7 +14,7 @@ import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
-import deltas.javac.statements.BlockDelta
+import deltas.statement.BlockDelta
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 

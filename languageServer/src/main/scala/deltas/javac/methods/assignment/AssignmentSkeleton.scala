@@ -12,9 +12,10 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
 import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.MethodDelta
 import deltas.bytecode.types.TypeSkeleton
+import deltas.expressions.ExpressionDelta
 
 object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
 
@@ -27,7 +28,7 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar) //TODO shouldn't this use AssignmentPrecedence?
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar) //TODO shouldn't this use AssignmentPrecedence?
     val assignmentGrammar = targetGrammar.as(Target) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
     expressionGrammar.addAlternative(assignmentGrammar)
   }
@@ -46,7 +47,7 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
 
   override def getType(assignment: NodePath, compilation: Compilation): Node = {
     val target = getAssignmentTarget(assignment)
-    ExpressionSkeleton.getType(compilation)(target)
+    ByteCodeExpressionSkeleton.getType(compilation)(target)
   }
 
   trait HasAssignFromStackByteCode {
@@ -60,7 +61,7 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
     val valueInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
     val assignInstructions = hasAssignFromStackByteCode.get(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
-    val valueType = ExpressionSkeleton.getType(compilation)(value)
+    val valueType = ByteCodeExpressionSkeleton.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {
       case 1 => DuplicateInstructionDelta.duplicate
@@ -73,9 +74,9 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, assignment: NodePath, _type: Type, parentScope: Scope): Unit = {
     val value = getAssignmentValue(assignment)
-    val valueType = ExpressionSkeleton.getType(compilation, builder, value, parentScope)
+    val valueType = ByteCodeExpressionSkeleton.getType(compilation, builder, value, parentScope)
     val target = getAssignmentTarget(assignment)
-    val targetType = ExpressionSkeleton.getType(compilation, builder, target, parentScope)
+    val targetType = ByteCodeExpressionSkeleton.getType(compilation, builder, target, parentScope)
     builder.typesAreEqual(targetType, _type)
     builder.isFirstSubsetOfSecond(valueType, targetType)
   }

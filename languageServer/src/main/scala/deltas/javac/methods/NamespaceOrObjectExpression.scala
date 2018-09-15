@@ -6,7 +6,7 @@ import core.language.Compilation
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.ByteCodeExpressionSkeleton
 
 object NamespaceOrObjectExpression {
 
@@ -16,7 +16,7 @@ object NamespaceOrObjectExpression {
 
   def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
     namespaceOrObjectExpression.get(compilation).get(expression.shape).fold({
-      val _type = ExpressionSkeleton.getType(compilation, builder, expression, scope)
+      val _type = ByteCodeExpressionSkeleton.getType(compilation, builder, expression, scope)
       builder.getDeclarationOfType(_type)
     })(reference => reference.getScopeDeclaration(compilation, builder, expression, scope))
   }

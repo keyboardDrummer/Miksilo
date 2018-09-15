@@ -2,8 +2,8 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{ChildPath, NodePath}
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -12,8 +12,8 @@ import deltas.bytecode.coreInstructions.integers.LoadIntegerDelta
 import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
 object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
@@ -24,7 +24,7 @@ object VariableDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val core = find(ExpressionSkeleton.CoreGrammar)
+    val core = find(ExpressionDelta.LastPrecedenceGrammar)
     val variableGrammar = create(VariableGrammar, identifier.as(Name) asNode Shape)
     core.addAlternative(variableGrammar)
   }

@@ -1,4 +1,4 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
@@ -7,7 +7,7 @@ import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.statement.StatementDelta
+import deltas.javac.statements.ByteCodeStatementSkeleton
 
 object BlockDelta extends DeltaWithGrammar {
 

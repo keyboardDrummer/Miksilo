@@ -7,7 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.statement.StatementDelta
+import deltas.statement.{BlockDelta, StatementDelta}
 
 object BlockAsStatementDelta extends StatementInstance {
   override def description: String = "Allows using a block as a statement, to create a new scope."

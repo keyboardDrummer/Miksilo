@@ -21,8 +21,9 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
-import deltas.javac.statements.{BlockDelta, ByteCodeStatementSkeleton}
+import deltas.javac.statements.ByteCodeStatementSkeleton
 import deltas.javac.types.{MethodType, TypeAbstraction}
+import deltas.statement.BlockDelta
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState
   with ClassMemberDelta with HasDeclaration with HasConstraints with HasShape {

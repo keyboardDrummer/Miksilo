@@ -5,9 +5,10 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.expressions.ByteCodeExpressionSkeleton
 
 object MemberSelectorDelta extends DeltaWithGrammar {
 
@@ -18,7 +19,7 @@ object MemberSelectorDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Shape
     create(SelectGrammar, selection)
   }
@@ -52,7 +53,7 @@ object MemberSelectorDelta extends DeltaWithGrammar {
   }
 
   def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: NodePath): ClassOrObjectReference = {
-    val classInfo: ClassSignature = classCompiler.findClass(ExpressionSkeleton.getType(classCompiler.compilation)(expression))
+    val classInfo: ClassSignature = classCompiler.findClass(ByteCodeExpressionSkeleton.getType(classCompiler.compilation)(expression))
     ClassOrObjectReference(classInfo, wasClass = false)
   }
 

@@ -10,10 +10,11 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
-import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta._
+import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 
 object SelectField extends ExpressionInstance with ConvertsToByteCode {
 
@@ -54,7 +55,7 @@ object SelectField extends ExpressionInstance with ConvertsToByteCode {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val core = grammars.find(ExpressionSkeleton.CoreGrammar)
+    val core = grammars.find(ExpressionDelta.LastPrecedenceGrammar)
     core.addAlternative(grammars.find(SelectGrammar))
   }
 

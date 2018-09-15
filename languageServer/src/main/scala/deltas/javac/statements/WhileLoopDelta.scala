@@ -2,13 +2,13 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement.{IfThenDelta, StatementDelta}
+import deltas.statement.{BlockDelta, IfThenDelta, StatementDelta}
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -18,7 +18,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     import grammars._
 
     val statementGrammar = find(StatementDelta.Grammar)
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
         blockGrammar.as(Body) asLabelledNode Shape

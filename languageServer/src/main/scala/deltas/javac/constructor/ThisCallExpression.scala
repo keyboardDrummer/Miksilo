@@ -1,17 +1,18 @@
 package deltas.javac.constructor
 
-import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeShape}
-import core.deltas.path.NodePath
 import core.deltas.Contract
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 import deltas.javac.methods.call.CallDelta
 
 object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
@@ -40,7 +41,7 @@ object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
     import grammars._
     val callArguments = find(CallDelta.CallArgumentsGrammar)
     val thisCallGrammar = "this" ~> callArguments.as(CallDelta.Arguments) asNode ThisCall
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(thisCallGrammar)
   }
 

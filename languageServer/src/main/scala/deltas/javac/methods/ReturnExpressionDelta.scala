@@ -2,8 +2,8 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -12,8 +12,9 @@ import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
 import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
-import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
-import deltas.javac.statements.{ByteCodeStatementSkeleton, StatementInstance}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.statements.StatementInstance
 import deltas.statement.StatementDelta
 
 object ReturnExpressionDelta extends StatementInstance {
@@ -27,7 +28,7 @@ object ReturnExpressionDelta extends StatementInstance {
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: NodePath = getReturnValue(_return)
     val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
-    val getType = ExpressionSkeleton.getType(compiler.compilation)
+    val getType = ByteCodeExpressionSkeleton.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
     {
       case x if x == IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
@@ -44,7 +45,7 @@ object ReturnExpressionDelta extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val statement = find(StatementDelta.Grammar)
 
     val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
@@ -65,6 +66,6 @@ object ReturnExpressionDelta extends StatementInstance {
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    ExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
+    ByteCodeExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
   }
 }

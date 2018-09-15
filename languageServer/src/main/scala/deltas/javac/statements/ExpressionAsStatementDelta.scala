@@ -8,7 +8,8 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.statement.StatementDelta
 
 object ExpressionAsStatementDelta extends StatementInstance {
@@ -23,7 +24,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
-    val _type = ExpressionSkeleton.getType(compilation)(expression)
+    val _type = ByteCodeExpressionSkeleton.getType(compilation)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
       case 0 => Seq.empty
       case 1 => Seq(PopDelta.pop)
@@ -38,7 +39,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val statementGrammar = find(StatementDelta.Grammar)
     val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Shape
     statementGrammar.addAlternative(expressionAsStatement)
@@ -47,6 +48,6 @@ object ExpressionAsStatementDelta extends StatementInstance {
   override def description: String = "Enables using an expression as a statement."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    ExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
+    ByteCodeExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
   }
 }

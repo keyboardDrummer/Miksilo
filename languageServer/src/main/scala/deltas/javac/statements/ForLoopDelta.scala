@@ -1,13 +1,13 @@
 package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.expressions.ExpressionSkeleton.Expression
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ByteCodeExpressionSkeleton.Expression
 import deltas.javac.statements.ByteCodeStatementSkeleton.Statement
-import deltas.statement.StatementDelta
+import deltas.statement.{BlockDelta, StatementDelta}
 
 object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -19,7 +19,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     import grammars._
 
     val statementGrammar = find(StatementDelta.Grammar)
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
       expressionGrammar.as(Condition) ~< ";" ~

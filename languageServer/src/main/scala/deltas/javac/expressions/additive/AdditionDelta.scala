@@ -11,7 +11,7 @@ import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 
 object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCode {
 
@@ -41,7 +41,7 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with Conve
   }
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
-    val getType = ExpressionSkeleton.getType(compilation)
+    val getType = ByteCodeExpressionSkeleton.getType(compilation)
     val firstType = getType(expression.left)
     val secondType = getType(expression.right)
     firstType match
@@ -80,8 +80,8 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with Conve
   }
 
   def additionOrSubtractionConstraints(compilation: Compilation, builder: ConstraintBuilder, _type: Type, parentScope: Scope, left: NodePath, right: NodePath): Unit = {
-    val firstType = ExpressionSkeleton.getType(compilation, builder, left, parentScope)
-    val secondType = ExpressionSkeleton.getType(compilation, builder, right, parentScope)
+    val firstType = ByteCodeExpressionSkeleton.getType(compilation, builder, left, parentScope)
+    val secondType = ByteCodeExpressionSkeleton.getType(compilation, builder, right, parentScope)
     builder.add((solver: ConstraintSolver) => {
       val resolved = solver.resolveType(firstType)
       val additionTypeOption: Option[Type] = resolved match {

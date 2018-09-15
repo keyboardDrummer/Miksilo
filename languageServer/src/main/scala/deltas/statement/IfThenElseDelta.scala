@@ -5,7 +5,6 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node._
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelledLocations}
-import deltas.javac.statements.BlockDelta
 
 object IfThenElseDelta extends DeltaWithGrammar {
 

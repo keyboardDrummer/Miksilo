@@ -7,7 +7,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 
 object JsonArrayLiteralDelta extends ExpressionInstance {
 
@@ -16,7 +17,7 @@ object JsonArrayLiteralDelta extends ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)

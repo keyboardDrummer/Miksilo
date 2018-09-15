@@ -11,7 +11,7 @@ import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.IfThenDelta._
-import deltas.statement.IfThenElseDelta
+import deltas.statement.{BlockDelta, IfThenElseDelta}
 import deltas.statement.IfThenElseDelta._
 
 object IfThenElseToByteCodeDelta extends StatementInstance {

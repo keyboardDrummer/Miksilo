@@ -9,9 +9,9 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
-import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
-import deltas.statement.IfThenDelta
+import deltas.statement.{BlockDelta, IfThenDelta}
 
 object IfThenToByteCodeDelta extends StatementInstance {
 
@@ -54,7 +54,7 @@ object IfThenToByteCodeDelta extends StatementInstance {
     val body = IfThenDelta.getThenStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, body, bodyScope)
     val condition = IfThenDelta.getCondition(statement)
-    ExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
+    ByteCodeExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {}

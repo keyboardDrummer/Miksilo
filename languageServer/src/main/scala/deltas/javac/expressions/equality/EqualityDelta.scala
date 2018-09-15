@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
@@ -42,7 +42,7 @@ object EqualityDelta extends ExpressionInstance with ConvertsToByteCode {
 
   def getInputType(equality: NodePath, compilation: Compilation) = {
     val first = getFirst(equality)
-    ExpressionSkeleton.getType(compilation)(first)
+    ByteCodeExpressionSkeleton.getType(compilation)(first)
   }
 
   override def toByteCode(equality: NodePath, compilation: Compilation): Seq[Node] = {

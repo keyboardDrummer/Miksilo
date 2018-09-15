@@ -17,7 +17,8 @@ import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.ClassCompiler
-import deltas.javac.statements.BlockDelta
+import deltas.statement.BlockDelta
+
 import scala.collection.mutable
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
