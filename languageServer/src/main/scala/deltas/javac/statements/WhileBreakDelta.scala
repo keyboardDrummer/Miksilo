@@ -7,6 +7,7 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
+import deltas.statement.StatementDelta
 
 import scala.collection.mutable
 
@@ -16,7 +17,7 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val statementGrammar = language.grammars.find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = language.grammars.find(StatementDelta.Grammar)
     statementGrammar.addAlternative(new NodeGrammar("break" ~ ";", BreakShape))
   }
 

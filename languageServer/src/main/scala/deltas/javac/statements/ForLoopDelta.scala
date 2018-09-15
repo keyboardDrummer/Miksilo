@@ -6,7 +6,8 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.{Compilation, Language}
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.ExpressionSkeleton.Expression
-import deltas.javac.statements.StatementSkeleton.Statement
+import deltas.javac.statements.ByteCodeStatementSkeleton.Statement
+import deltas.statement.StatementDelta
 
 object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -17,7 +18,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~

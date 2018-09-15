@@ -7,6 +7,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
+import deltas.statement.StatementDelta
 
 object JustJavaGoto extends StatementInstance {
   override val shape = GotoKey
@@ -24,7 +25,7 @@ object JustJavaGoto extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 

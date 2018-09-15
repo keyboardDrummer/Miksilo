@@ -4,14 +4,15 @@ import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import core.language.Language
+import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
 import deltas.expression.IntLiteralDelta
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.javac.statements.{BlockDelta, StatementSkeleton}
+import deltas.javac.statements.BlockDelta
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.statement.StatementDelta
 import util.{SourceUtils, TestLanguageBuilder, TestUtils}
 
 import scala.reflect.io.Path
@@ -122,7 +123,7 @@ class JavaStyleCommentsTest
 
   test("block transformation") {
     val java = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).buildLanguage
-    val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = java.grammars.find(StatementDelta.Grammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
     val language = Delta.buildLanguage(Seq.empty)
@@ -131,7 +132,7 @@ class JavaStyleCommentsTest
 
     val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
 
-    val expectedBlockGrammar = new TopBottom(new TopBottom("{", new ManyVertical(new Labelled(StatementSkeleton.StatementGrammar)).indent()).ignoreLeft,
+    val expectedBlockGrammar = new TopBottom(new TopBottom("{", new ManyVertical(new Labelled(StatementDelta.Grammar)).indent()).ignoreLeft,
       new WithTrivia("}", language.grammars.trivia, false)).ignoreRight
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString

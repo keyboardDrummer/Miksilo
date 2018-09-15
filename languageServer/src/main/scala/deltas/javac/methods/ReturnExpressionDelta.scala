@@ -13,7 +13,8 @@ import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
 import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
-import deltas.javac.statements.{StatementInstance, StatementSkeleton}
+import deltas.javac.statements.{ByteCodeStatementSkeleton, StatementInstance}
+import deltas.statement.StatementDelta
 
 object ReturnExpressionDelta extends StatementInstance {
 
@@ -44,7 +45,7 @@ object ReturnExpressionDelta extends StatementInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
 
     val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
     statement.addAlternative(returnExpression)

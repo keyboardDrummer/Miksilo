@@ -7,6 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.statement.StatementDelta
 
 object BlockAsStatementDelta extends StatementInstance {
   override def description: String = "Allows using a block as a statement, to create a new scope."
@@ -15,7 +16,7 @@ object BlockAsStatementDelta extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     val blockGrammar = "block" ~> find(BlockDelta.Grammar).as(Statements) asLabelledNode Shape
     statementGrammar.addAlternative(blockGrammar)
   }
@@ -30,7 +31,7 @@ object BlockAsStatementDelta extends StatementInstance {
   override def shape: NodeShape = Shape
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = { //TODO consider changing this to a transformation to statements, but then that would have to come after SolveConstraints
-    val toInstructions = StatementSkeleton.getToInstructions(compilation)
+    val toInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
     val block: BlockStatement[NodePath] = statement
     block.statements.flatMap(childStatement => toInstructions(childStatement))
   }
@@ -38,7 +39,7 @@ object BlockAsStatementDelta extends StatementInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val block: BlockStatement[NodePath] = statement
     val blockScope = builder.newScope(Some(parentScope))
-    block.statements.foreach(childStatement => StatementSkeleton.constraints(compilation, builder, childStatement, blockScope))
+    block.statements.foreach(childStatement => ByteCodeStatementSkeleton.constraints(compilation, builder, childStatement, blockScope))
   }
 
   override def getLabels(statement: NodePath): Map[Any, NodePath] = {

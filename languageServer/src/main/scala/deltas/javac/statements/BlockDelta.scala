@@ -7,15 +7,16 @@ import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.statement.StatementDelta
 
 object BlockDelta extends DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(StatementSkeleton)
+  override def dependencies: Set[Contract] = Set(StatementDelta)
 
   val indentAmount = 4
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
 
     val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.indent(indentAmount) %< "}")
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head))
@@ -24,7 +25,7 @@ object BlockDelta extends DeltaWithGrammar {
 
   def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[NodePath], parentScope: Scope): Unit = {
     for(statement <- statements) {
-      StatementSkeleton.constraints(compilation, builder, statement, parentScope)
+      ByteCodeStatementSkeleton.constraints(compilation, builder, statement, parentScope)
     }
   }
 

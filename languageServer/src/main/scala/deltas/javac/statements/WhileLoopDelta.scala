@@ -8,6 +8,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.MethodDelta
+import deltas.statement.{IfThenDelta, StatementDelta}
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -16,7 +17,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
@@ -40,7 +41,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
-  override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)
+  override def dependencies: Set[Contract] = Set(IfThenToByteCodeDelta, BlockDelta, JavaGotoDelta)
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]

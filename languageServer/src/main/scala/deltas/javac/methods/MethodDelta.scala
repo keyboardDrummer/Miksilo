@@ -21,7 +21,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
-import deltas.javac.statements.{BlockDelta, StatementSkeleton}
+import deltas.javac.statements.{BlockDelta, ByteCodeStatementSkeleton}
 import deltas.javac.types.{MethodType, TypeAbstraction}
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState
@@ -103,7 +103,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       setMethodCompiler(method, compilation)
       val statements = method.body
       method.current.data.remove(Body)
-      val statementToInstructions = StatementSkeleton.getToInstructions(compilation)
+      val statementToInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
       val instructions = statements.flatMap(statement => statementToInstructions(statement))
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()

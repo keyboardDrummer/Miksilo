@@ -6,11 +6,12 @@ import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.statement.StatementDelta
 
 trait StatementInstance extends DeltaWithGrammar with HasShape {
 
   override def inject(language: Language): Unit = {
-    StatementSkeleton.instances.add(language, this)
+    ByteCodeStatementSkeleton.instances.add(language, this)
     super.inject(language)
   }
 
@@ -18,7 +19,7 @@ trait StatementInstance extends DeltaWithGrammar with HasShape {
 
   def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node]
 
-  override def dependencies: Set[Contract] = Set(StatementSkeleton)
+  override def dependencies: Set[Contract] = Set(StatementDelta)
 
   case class SequenceDoesNotEndInJump(sequence: Seq[Node]) extends Exception
   {

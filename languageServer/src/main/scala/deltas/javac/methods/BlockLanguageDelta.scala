@@ -2,12 +2,13 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.path.{ChildPath, PathRoot}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.{BlockDelta, StatementSkeleton}
+import deltas.javac.statements.BlockDelta
+import deltas.statement.StatementDelta
 
 object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 {
@@ -24,7 +25,7 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statements = find(StatementSkeleton.StatementGrammar).manyVertical.as(Statements).asNode(Shape)
+    val statements = find(StatementDelta.Grammar).manyVertical.as(Statements).asNode(Shape)
     find(BodyGrammar).inner = statements
   }
 

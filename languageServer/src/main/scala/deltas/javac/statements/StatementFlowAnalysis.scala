@@ -8,7 +8,7 @@ import util.DataFlowAnalysis
 abstract class StatementFlowAnalysis[State](language: Language, method: Node)
   extends DataFlowAnalysis[NodePath, State]
 {
-  val instances = StatementSkeleton.instances.get(language)
+  val instances = ByteCodeStatementSkeleton.instances.get(language)
   val labels = getLabels
 
   def getLabels: Map[Any, NodePath] = {

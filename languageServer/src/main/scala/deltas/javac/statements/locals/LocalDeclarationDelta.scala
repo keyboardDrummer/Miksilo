@@ -1,16 +1,17 @@
 package deltas.javac.statements.locals
 
 import core.deltas._
-import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.{NodePath, PathRoot}
+import core.language.exceptions.BadInputException
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.{StatementInstance, StatementSkeleton}
+import deltas.javac.statements.StatementInstance
+import deltas.statement.StatementDelta
 
 object LocalDeclarationDelta extends StatementInstance {
 
@@ -19,11 +20,11 @@ object LocalDeclarationDelta extends StatementInstance {
     def name: String = node(Name).asInstanceOf[String]
   }
 
-  override def dependencies: Set[Contract] = Set(StatementSkeleton)
+  override def dependencies: Set[Contract] = Set(StatementDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     statement.addAlternative(parseDeclaration)

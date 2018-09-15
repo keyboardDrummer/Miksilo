@@ -1,19 +1,15 @@
 package deltas.javac.statements
 
 import core.deltas._
-import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{GrammarKey, Node, NodeLike, NodeWrapper}
-import core.language.{Compilation, Language}
+import core.language.Compilation
+import core.language.node.{Node, NodeLike, NodeWrapper}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.javac.expressions.ExpressionSkeleton
 
-object StatementSkeleton extends DeltaWithGrammar {
+object ByteCodeStatementSkeleton {
 
   implicit class Statement[T <: NodeLike](val node: T) extends NodeWrapper[T] { }
-
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
 
   def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
     statement => getInstance(compilation, statement).toByteCode(statement, compilation)
@@ -22,14 +18,6 @@ object StatementSkeleton extends DeltaWithGrammar {
   def getInstance(compilation: Compilation, statement: NodePath): StatementInstance = {
     instances.get(compilation, statement.shape)
   }
-
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
-    grammars.create(StatementGrammar)
-  }
-
-  object StatementGrammar extends GrammarKey
-
-  override def description: String = "Defines the concept of a statement."
 
   val instances = new ShapeProperty[StatementInstance]
 

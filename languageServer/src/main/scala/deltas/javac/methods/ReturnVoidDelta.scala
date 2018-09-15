@@ -8,7 +8,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
-import deltas.javac.statements.{StatementInstance, StatementSkeleton}
+import deltas.javac.statements.{ByteCodeStatementSkeleton, StatementInstance}
+import deltas.statement.StatementDelta
 
 object ReturnVoidDelta extends StatementInstance {
 
@@ -22,7 +23,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
 
     val returnExpression = ("return" ~ ";") ~> value(_return)
     statement.inner = statement.inner | returnExpression

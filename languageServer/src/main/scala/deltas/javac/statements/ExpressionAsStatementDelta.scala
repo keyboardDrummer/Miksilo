@@ -9,6 +9,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.{ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.statement.StatementDelta
 
 object ExpressionAsStatementDelta extends StatementInstance {
 
@@ -38,7 +39,7 @@ object ExpressionAsStatementDelta extends StatementInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     val expressionAsStatement = expressionGrammar.as(Expression) ~< ";" asNode Shape
     statementGrammar.addAlternative(expressionAsStatement)
   }

@@ -38,6 +38,7 @@ import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
+import deltas.statement.{IfThenDelta, IfThenElseDelta, StatementDelta}
 
 object JavaLanguage {
 
@@ -69,8 +70,10 @@ object JavaLanguage {
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
-  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta, IfThenDelta, BlockDelta,
-    ExpressionAsStatementDelta, StatementSkeleton) ++ javaSimpleExpression
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseToByteCodeDelta, IfThenElseDelta,
+    IfThenToByteCodeDelta, IfThenDelta,
+    BlockDelta,
+    ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta,

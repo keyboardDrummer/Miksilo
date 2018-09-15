@@ -2,15 +2,16 @@ package deltas.javac.statements.locals
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.VariableDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
+import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.statements.locals.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
-import deltas.javac.statements.{ExpressionAsStatementDelta, StatementSkeleton}
+import deltas.statement.StatementDelta
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -22,7 +23,7 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression = find(ExpressionSkeleton.ExpressionGrammar)
     val parseDeclarationWithInitializer = create(Shape,

@@ -1,4 +1,4 @@
-package languageServer.lsp
+package languageServer
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Level, Logger}
@@ -8,7 +8,8 @@ import ch.qos.logback.core.layout.EchoLayout
 import com.typesafe.scalalogging.LazyLogging
 import deltas.cloudformation.CloudFormationLanguage
 import deltas.javac.JavaLanguage
-import languageServer.MiksiloLanguageServer
+import deltas.verilog.VerilogLanguage
+import languageServer.lsp.{JsonRpcConnection, LSPServer}
 import org.slf4j.LoggerFactory
 
 import scala.util.Try
@@ -17,6 +18,7 @@ object Program extends LazyLogging {
 
   val languages = Map(
     "cloudFormation" -> CloudFormationLanguage.language,
+    "verilog" -> VerilogLanguage.language,
     "java" -> JavaLanguage.getJava
   )
 
@@ -28,8 +30,8 @@ object Program extends LazyLogging {
     sendAllLoggingToStdErr(innerLogger)
     logger.debug(s"Starting server in ${System.getenv("PWD")}")
 
-    val languageString = args.headOption
-    val language = languageString.flatMap(s => languages.get(s)).getOrElse(languages.values.head)
+    val languageNameOption = args.headOption
+    val language = languageNameOption.flatMap(languageName => languages.get(languageName)).getOrElse(languages.values.head)
     val connection = new JsonRpcConnection(System.in, System.out)
     val lspServer = Try {
       val languageServer = new MiksiloLanguageServer(language)

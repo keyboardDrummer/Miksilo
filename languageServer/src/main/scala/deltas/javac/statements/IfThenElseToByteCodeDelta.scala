@@ -10,13 +10,15 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ToByteCodeSkeleton
-import deltas.javac.statements.IfThenDelta._
+import deltas.statement.IfThenDelta._
+import deltas.statement.IfThenElseDelta
+import deltas.statement.IfThenElseDelta._
 
-object IfThenElseDelta extends StatementInstance {
+object IfThenElseToByteCodeDelta extends StatementInstance {
 
   override def description: String = "Enables using the if-then-else construct."
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta, LabelledLocations, InferredStackFrames, BlockDelta)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenElseDelta, IfThenToByteCodeDelta, LabelledLocations, InferredStackFrames, BlockDelta)
 
   override def toByteCode(ifThenElse: NodePath, compilation: Compilation): Seq[Node] = {
     val condition = getCondition(ifThenElse)
@@ -29,7 +31,7 @@ object IfThenElseDelta extends StatementInstance {
 
     val jumpToElseIfFalse = LabelledLocations.ifZero(elseLabelName)
     val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
-    val toInstructionsStatement = StatementSkeleton.getToInstructions(compilation)
+    val toInstructionsStatement = ByteCodeStatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToElseIfFalse) ++
       thenBody.flatMap(toInstructionsStatement) ++
@@ -38,22 +40,9 @@ object IfThenElseDelta extends StatementInstance {
       Seq(endLabel)
   }
 
-  def shape = Shape
-  object Shape extends NodeShape
-  object ElseKey extends NodeField
+  def shape: NodeShape = IfThenElseDelta.Shape
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val bodyGrammar = find(BlockDelta.BlockOrStatementGrammar)
-    val ifThenGrammar = find(IfThenDelta.shape)
-    val ifThenElseGrammar = ifThenGrammar.inner.asInstanceOf[NodeGrammar].inner ~ ("else" ~> bodyGrammar.as(ElseKey)) asNode shape
-    statementGrammar.addAlternative(ifThenElseGrammar)
-  }
-
-  def getElseStatements[T <: NodeLike](ifThen: T): Seq[T] = {
-    ifThen(ElseKey).asInstanceOf[Seq[T]]
-  }
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = { }
 
   override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] =
   {
@@ -62,12 +51,12 @@ object IfThenElseDelta extends StatementInstance {
 
   override def getLabels(obj: NodePath): Map[Any, NodePath] = {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
-    Map(IfThenDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
+    Map(IfThenToByteCodeDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenToByteCodeDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
       super.getLabels(obj)
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    IfThenDelta.constraints(compilation, builder, statement, parentScope)
+    IfThenToByteCodeDelta.constraints(compilation, builder, statement, parentScope)
     val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
     val elseBody = getElseStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, elseBody, elseBodyScope)

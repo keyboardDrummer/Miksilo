@@ -8,7 +8,7 @@ import deltas.javac.expressions.equality.EqualityDelta
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, NullDelta}
 import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods.assignment.AssignmentPrecedence
-import deltas.javac.statements.StatementSkeleton
+import deltas.statement.StatementDelta
 
 object JavaSimpleExpression extends DeltaGroup {
 
@@ -16,5 +16,5 @@ object JavaSimpleExpression extends DeltaGroup {
     Set(LessThanDelta, AdditionDelta, BooleanLiteralDelta, IntLiteralDelta, SubtractionDelta, TernaryDelta, ParenthesisDelta, NullDelta, EqualityDelta) ++
       Set[Contract](AssignmentPrecedence) //TODO not sure
 
-  override def dependants: Set[Contract] = Set(StatementSkeleton)
+  override def dependants: Set[Contract] = Set(StatementDelta)
 }

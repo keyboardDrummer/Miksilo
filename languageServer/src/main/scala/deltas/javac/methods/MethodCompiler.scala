@@ -8,7 +8,7 @@ import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
-import deltas.javac.statements.StatementSkeleton
+import deltas.javac.statements.ByteCodeStatementSkeleton
 import deltas.javac.statements.locals.LocalsAnalysis
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
@@ -37,7 +37,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   }
 
   def getVariables(obj: NodePath): VariablePool = {
-    val instances = StatementSkeleton.instances.get(compilation)
+    val instances = ByteCodeStatementSkeleton.instances.get(compilation)
     val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
     val variablesPerStatement: Map[NodePath, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
     try
