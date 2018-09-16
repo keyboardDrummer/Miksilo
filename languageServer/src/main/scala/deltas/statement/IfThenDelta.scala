@@ -2,11 +2,16 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.deltas.path.NodePath
+import core.language.{Compilation, Language}
 import core.language.node._
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ByteCodeExpressionSkeleton
+import deltas.javac.types.BooleanTypeDelta
 
-object IfThenDelta extends DeltaWithGrammar {
+object IfThenDelta extends DeltaWithGrammar with StatementInstance {
 
   def neww(condition: Node, thenBody: Seq[Node]): Node = Shape.create(Condition -> condition, Then -> thenBody)
 
@@ -37,4 +42,14 @@ object IfThenDelta extends DeltaWithGrammar {
   }
 
   override def description: String = "Enables using the if-then (no else) construct."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+    val bodyScope = builder.newScope(Some(parentScope), "thenScope")
+    val body = IfThenDelta.getThenStatements(statement)
+    BlockDelta.collectConstraints(compilation, builder, body, bodyScope)
+    val condition = IfThenDelta.getCondition(statement)
+    ByteCodeExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
+  }
+
+  override def shape: NodeShape = Shape
 }

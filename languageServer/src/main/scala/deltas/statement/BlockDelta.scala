@@ -7,7 +7,6 @@ import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.javac.statements.ByteCodeStatementSkeleton
 
 object BlockDelta extends DeltaWithGrammar {
 
@@ -25,7 +24,7 @@ object BlockDelta extends DeltaWithGrammar {
 
   def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[NodePath], parentScope: Scope): Unit = {
     for(statement <- statements) {
-      ByteCodeStatementSkeleton.constraints(compilation, builder, statement, parentScope)
+      StatementDelta.constraints(compilation, builder, statement, parentScope)
     }
   }
 

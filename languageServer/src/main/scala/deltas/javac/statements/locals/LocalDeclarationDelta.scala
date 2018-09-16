@@ -10,10 +10,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.StatementInstance
-import deltas.statement.StatementDelta
+import deltas.javac.statements.ByteCodeStatementInstance
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object LocalDeclarationDelta extends StatementInstance {
+object LocalDeclarationDelta extends ByteCodeStatementInstance with StatementInstance {
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]

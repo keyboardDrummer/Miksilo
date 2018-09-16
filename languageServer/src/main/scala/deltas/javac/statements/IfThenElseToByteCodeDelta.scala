@@ -14,7 +14,7 @@ import deltas.statement.IfThenDelta._
 import deltas.statement.{BlockDelta, IfThenElseDelta}
 import deltas.statement.IfThenElseDelta._
 
-object IfThenElseToByteCodeDelta extends StatementInstance {
+object IfThenElseToByteCodeDelta extends ByteCodeStatementInstance {
 
   override def description: String = "Enables using the if-then-else construct."
 
@@ -54,12 +54,5 @@ object IfThenElseToByteCodeDelta extends StatementInstance {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     Map(IfThenToByteCodeDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenToByteCodeDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
       super.getLabels(obj)
-  }
-
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    IfThenToByteCodeDelta.constraints(compilation, builder, statement, parentScope)
-    val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
-    val elseBody = getElseStatements(statement)
-    BlockDelta.collectConstraints(compilation, builder, elseBody, elseBodyScope)
   }
 }

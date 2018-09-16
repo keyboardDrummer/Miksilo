@@ -7,9 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
-import deltas.statement.StatementDelta
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaGoto extends StatementInstance {
+object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
   override val shape = GotoKey
 
   object GotoKey extends NodeShape

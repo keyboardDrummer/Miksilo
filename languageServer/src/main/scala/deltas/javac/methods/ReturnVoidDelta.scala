@@ -8,10 +8,10 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
-import deltas.javac.statements.{ByteCodeStatementSkeleton, StatementInstance}
-import deltas.statement.StatementDelta
+import deltas.javac.statements.ByteCodeStatementInstance
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnVoidDelta extends StatementInstance {
+object ReturnVoidDelta extends ByteCodeStatementInstance with StatementInstance {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 

@@ -20,9 +20,7 @@ object VerilogModuleDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val statement = find(StatementDelta.Grammar)
     val member = create(MemberShape)
-    member.addAlternative(statement)
     val parameterList: BiGrammar = identifier.manySeparatedVertical(",").as(Parameters).inParenthesis
     val body: BiGrammar = member.manyVertical.as(Body)
     val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape

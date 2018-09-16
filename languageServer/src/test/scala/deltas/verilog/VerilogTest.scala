@@ -36,6 +36,5 @@ class VerilogTest extends FunSuite {
   test("Can parse") {
     val language = TestLanguageBuilder.build(VerilogLanguage.deltas)
     val node = language.parse(code)
-    System.out.append("jo")
   }
 }

@@ -10,9 +10,9 @@ import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
-import deltas.statement.StatementDelta
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object ExpressionAsStatementDelta extends StatementInstance {
+object ExpressionAsStatementDelta extends ByteCodeStatementInstance with StatementInstance {
 
   object Shape extends NodeShape
 

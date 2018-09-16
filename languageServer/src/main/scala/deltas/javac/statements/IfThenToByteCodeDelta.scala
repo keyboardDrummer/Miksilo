@@ -13,7 +13,7 @@ import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 import deltas.statement.{BlockDelta, IfThenDelta}
 
-object IfThenToByteCodeDelta extends StatementInstance {
+object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
 
   override val shape = IfThenDelta.Shape
 
@@ -47,14 +47,6 @@ object IfThenToByteCodeDelta extends StatementInstance {
       next => Map(getNextLabel(IfThenDelta.getThenStatements(obj).last) -> next)
     ) //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
     nextMap ++ super.getLabels(obj)
-  }
-
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    val bodyScope = builder.newScope(Some(parentScope), "thenScope")
-    val body = IfThenDelta.getThenStatements(statement)
-    BlockDelta.collectConstraints(compilation, builder, body, bodyScope)
-    val condition = IfThenDelta.getCondition(statement)
-    ByteCodeExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {}

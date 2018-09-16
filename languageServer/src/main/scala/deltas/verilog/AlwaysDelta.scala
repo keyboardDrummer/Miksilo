@@ -16,12 +16,13 @@ object AlwaysDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
+    val member = find(VerilogModuleDelta.MemberShape)
     val statement = find(StatementDelta.Grammar)
     val edge: BiGrammar = "posedge" | "negedge" | ValueGrammar("")
     val variable: BiGrammar = edge.as(SensitivityVariable.Edge) ~~ identifier.as(SensitivityVariable.Name) asNode SensitivityVariable.Shape
     val sensitivityList: BiGrammar = "@" ~ variable.manySeparated("," | "or").as(SensitivityVariables).inParenthesis
     val always: BiGrammar = "always" ~~ sensitivityList % statement.as(Body) asNode Shape
-    statement.addAlternative(always)
+    member.addAlternative(always)
   }
 
   override def description: String = "Adds the always statement"

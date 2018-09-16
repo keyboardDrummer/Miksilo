@@ -7,9 +7,9 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.statement.{BlockDelta, StatementDelta}
+import deltas.statement.{BlockDelta, StatementDelta, StatementInstance}
 
-object BlockAsStatementDelta extends StatementInstance {
+object BlockAsStatementDelta extends ByteCodeStatementInstance with StatementInstance {
   override def description: String = "Allows using a block as a statement, to create a new scope."
 
   override def dependencies: Set[Contract] = Set(BlockDelta)
@@ -39,7 +39,7 @@ object BlockAsStatementDelta extends StatementInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val block: BlockStatement[NodePath] = statement
     val blockScope = builder.newScope(Some(parentScope))
-    block.statements.foreach(childStatement => ByteCodeStatementSkeleton.constraints(compilation, builder, childStatement, blockScope))
+    block.statements.foreach(childStatement => StatementDelta.constraints(compilation, builder, childStatement, blockScope))
   }
 
   override def getLabels(statement: NodePath): Map[Any, NodePath] = {

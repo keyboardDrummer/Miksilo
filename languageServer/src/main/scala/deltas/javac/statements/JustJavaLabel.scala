@@ -7,9 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
-import deltas.statement.StatementDelta
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaLabel extends StatementInstance {
+object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance {
   override val shape = LabelKey
 
   object LabelKey extends NodeShape

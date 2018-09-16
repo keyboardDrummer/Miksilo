@@ -2,24 +2,17 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.path.{NodePath, SequenceElement}
-import core.language.node.{Node, NodeShape}
+import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
-import deltas.statement.StatementDelta
 
-trait StatementInstance extends DeltaWithGrammar with HasShape {
+trait ByteCodeStatementInstance extends DeltaWithGrammar with HasShape {
 
   override def inject(language: Language): Unit = {
     ByteCodeStatementSkeleton.instances.add(language, this)
     super.inject(language)
   }
 
-  def shape: NodeShape
-
   def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node]
-
-  override def dependencies: Set[Contract] = Set(StatementDelta)
 
   case class SequenceDoesNotEndInJump(sequence: Seq[Node]) extends Exception
   {
@@ -42,6 +35,4 @@ trait StatementInstance extends DeltaWithGrammar with HasShape {
   def getLabels(obj: NodePath): Map[Any, NodePath] = Map.empty
 
   def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
-
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit
 }
