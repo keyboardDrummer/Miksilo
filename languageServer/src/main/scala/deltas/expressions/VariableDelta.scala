@@ -1,11 +1,16 @@
 package deltas.expressions
 
-import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.deltas.path.{ChildPath, NodePath}
 import core.language.node._
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
+import deltas.javac.expressions.ExpressionInstance
+import deltas.javac.methods.{MethodDelta, VariableInfo}
 
-object VariableDelta extends DeltaWithGrammar {
+object VariableDelta extends ExpressionInstance {
 
   object VariableGrammar extends GrammarKey //TODO replace with Shape?
 
@@ -29,4 +34,18 @@ object VariableDelta extends DeltaWithGrammar {
   }
 
   override def description: String = "Enables referencing a variable."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
+    builder.resolve(getName(variable), variable.asInstanceOf[ChildPath], parentScope, Some(_type))
+  }
+
+  def getVariableInfo(variable: NodePath, compilation: Compilation): VariableInfo = {
+    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(getName(variable))
+  }
+
+  override def getType(variable: NodePath, compilation: Compilation): Node = {
+    getVariableInfo(variable, compilation)._type
+  }
+
+  override def shape: NodeShape = Shape
 }

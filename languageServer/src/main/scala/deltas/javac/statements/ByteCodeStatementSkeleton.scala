@@ -2,7 +2,7 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.path.NodePath
-import core.language.Compilation
+import core.language.{Compilation, Language}
 import core.language.node.{Node, NodeLike, NodeWrapper}
 
 object ByteCodeStatementSkeleton {
@@ -13,8 +13,8 @@ object ByteCodeStatementSkeleton {
     statement => getInstance(compilation, statement).toByteCode(statement, compilation)
   }
 
-  def getInstance(compilation: Compilation, statement: NodePath): ByteCodeStatementInstance = {
-    instances.get(compilation, statement.shape)
+  def getInstance(language: Language, statement: NodePath): ByteCodeStatementInstance = {
+    instances.get(language, statement.shape)
   }
 
   val instances = new ShapeProperty[ByteCodeStatementInstance]

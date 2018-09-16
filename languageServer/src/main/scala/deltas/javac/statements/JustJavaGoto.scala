@@ -29,7 +29,7 @@ object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
     statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 
-  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set(labels(getTarget(obj.current)))
+  override def getNextStatements(language: Language, obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set(labels(getTarget(obj.current)))
 
   override def description: String = "Adds a goto statement"
 

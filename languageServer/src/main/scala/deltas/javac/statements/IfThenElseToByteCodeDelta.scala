@@ -5,14 +5,12 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, SequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.IfThenDelta._
-import deltas.statement.{BlockDelta, IfThenElseDelta}
 import deltas.statement.IfThenElseDelta._
+import deltas.statement.{BlockDelta, IfThenElseDelta}
 
 object IfThenElseToByteCodeDelta extends ByteCodeStatementInstance {
 
@@ -28,16 +26,16 @@ object IfThenElseToByteCodeDelta extends ByteCodeStatementInstance {
     val elseLabelName = LabelDelta.getUniqueLabel("else", methodInfo)
     val endLabel = InferredStackFrames.label(endLabelName)
     val elseLabel = InferredStackFrames.label(elseLabelName)
-    val thenBody = getThenStatements(ifThenElse)
+    val thenBody = getThenStatement(ifThenElse)
 
     val jumpToElseIfFalse = LabelledLocations.ifZero(elseLabelName)
     val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
     val toInstructionsStatement = ByteCodeStatementSkeleton.getToInstructions(compilation)
     toInstructionsExpr(condition) ++
       Seq(jumpToElseIfFalse) ++
-      thenBody.flatMap(toInstructionsStatement) ++
+      toInstructionsStatement(thenBody) ++
       Seq(LabelledLocations.goTo(endLabelName), elseLabel) ++
-      getElseStatements(ifThenElse).flatMap(toInstructionsStatement) ++
+      toInstructionsStatement(getElseStatements(ifThenElse)) ++
       Seq(endLabel)
   }
 
@@ -45,14 +43,21 @@ object IfThenElseToByteCodeDelta extends ByteCodeStatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = { }
 
-  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] =
+  override def getNextStatements(language: Language, obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] =
   {
-    Set(getThenStatements(obj).head, getElseStatements(obj).head) ++ super.getNextStatements(obj, labels)
+    val thenStatement = getThenStatement(obj)
+    val elseStatement = getElseStatements(obj)
+    val thenNextStatements = ByteCodeStatementSkeleton.getInstance(language, thenStatement).getNextStatements(language, thenStatement, labels)
+    val elseNextStatements = ByteCodeStatementSkeleton.getInstance(language, elseStatement).getNextStatements(language, elseStatement, labels)
+    thenNextStatements ++ elseNextStatements ++ super.getNextStatements(language, obj, labels)
   }
 
-  override def getLabels(obj: NodePath): Map[Any, NodePath] = {
+  override def getLabels(language: Language, obj: NodePath): Map[Any, NodePath] = {
     val next = obj.asInstanceOf[SequenceElement].next //TODO this will not work for an if-if nesting. Should generate a next label for each statement. But this also requires labels referencing other labels.
-    Map(IfThenToByteCodeDelta.getNextLabel(getThenStatements(obj).last) -> next, IfThenToByteCodeDelta.getNextLabel(getElseStatements(obj).last) -> next) ++
-      super.getLabels(obj)
+    val thenStatement = getThenStatement(obj)
+    val elseStatement = getElseStatements(obj)
+    val thenNextLabel = ByteCodeStatementSkeleton.getInstance(language, thenStatement).getNextLabel(thenStatement)
+    val elseNextLabel = ByteCodeStatementSkeleton.getInstance(language, elseStatement).getNextLabel(elseStatement)
+    Map(thenNextLabel -> next, elseNextLabel -> next) ++ super.getLabels(language, obj)
   }
 }

@@ -13,10 +13,10 @@ abstract class StatementFlowAnalysis[State](language: Language, method: Node)
 
   def getLabels: Map[Any, NodePath] = {
     val statements: Seq[NodePath] = PathRoot(method).selfAndDescendants.filter(node => instances.contains(node.shape))
-    statements.flatMap(statement => instances(statement.shape).getLabels(statement)).toMap
+    statements.flatMap(statement => instances(statement.shape).getLabels(language, statement)).toMap
   }
 
   override def getOutgoingNodes(node: NodePath): Set[NodePath] = {
-    instances(node.shape).getNextStatements(node, labels)
+    instances(node.shape).getNextStatements(language, node, labels)
   }
 }

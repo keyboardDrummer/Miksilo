@@ -8,6 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import IfThenDelta._
+import deltas.ConstraintSkeleton
 object IfThenElseDelta extends DeltaWithGrammar with StatementInstance {
 
   override def description: String = "Enables using the if-then-else construct."
@@ -29,15 +30,14 @@ object IfThenElseDelta extends DeltaWithGrammar with StatementInstance {
     statementGrammar.addAlternative(ifThenElseGrammar)
   }
 
-  def getElseStatements[T <: NodeLike](ifThen: T): Seq[T] = {
-    ifThen(ElseBody).asInstanceOf[Seq[T]]
+  def getElseStatements[T <: NodeLike](ifThen: T): T = {
+    ifThen(ElseBody).asInstanceOf[T]
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     IfThenDelta.collectConstraints(compilation, builder, statement, parentScope)
-    val elseBodyScope = builder.newScope(Some(parentScope), "elseScope")
     val elseBody = getElseStatements(statement)
-    BlockDelta.collectConstraints(compilation, builder, elseBody, elseBodyScope)
+    ConstraintSkeleton.constraints(compilation, builder, elseBody, parentScope)
   }
 
   override def shape: NodeShape = Shape

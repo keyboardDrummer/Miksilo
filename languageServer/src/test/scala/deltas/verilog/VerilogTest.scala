@@ -79,7 +79,13 @@ class VerilogTest extends FunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(VerilogLanguage.language)
   test("Goto definition") {
-    val result: Seq[Location] = gotoDefinition(server, code, new HumanPosition(10, 10))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(result)
+    val first: Seq[Location] = gotoDefinition(server, code, new HumanPosition(10, 10))
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(first)
+
+    val second: Seq[Location] = gotoDefinition(server, code, new HumanPosition(15, 21))
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(second)
+
+    val third: Seq[Location] = gotoDefinition(server, code, new HumanPosition(20, 6))
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(6,2), new HumanPosition(6, 7)))))(third)
   }
 }

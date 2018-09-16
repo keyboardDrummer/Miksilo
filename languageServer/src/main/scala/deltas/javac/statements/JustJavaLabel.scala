@@ -33,8 +33,8 @@ object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance {
 
   override def description: String = "Adds a label statement"
 
-  override def getLabels(obj: NodePath): Map[Any, NodePath] = {
-    super.getLabels(obj) + (getName(obj.current) -> obj)
+  override def getLabels(language: Language, obj: NodePath): Map[Any, NodePath] = {
+    super.getLabels(language, obj) + (getName(obj.current) -> obj)
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
