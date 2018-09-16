@@ -8,6 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
@@ -88,7 +89,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
+    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

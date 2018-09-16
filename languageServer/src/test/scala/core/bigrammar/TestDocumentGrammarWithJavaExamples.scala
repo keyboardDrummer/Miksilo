@@ -4,7 +4,6 @@ import core.deltas.Delta
 import deltas.expressions.ExpressionDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
-import deltas.javac.expressions.ByteCodeExpressionSkeleton
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaLanguage}
 import deltas.statement.BlockDelta

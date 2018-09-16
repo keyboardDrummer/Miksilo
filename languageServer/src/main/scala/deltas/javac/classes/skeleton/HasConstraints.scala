@@ -5,12 +5,13 @@ import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 
 trait HasConstraintsDelta extends Delta with HasShape with HasConstraints {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    JavaClassSkeleton.hasConstraints.add(language, this)
+    ConstraintSkeleton.hasConstraints.add(language, this)
   }
 }
 

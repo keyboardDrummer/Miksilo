@@ -3,15 +3,12 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, SequenceElement}
-import core.language.{Compilation, Language}
 import core.language.node._
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
+import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
-import deltas.javac.types.BooleanTypeDelta
-import deltas.statement.{BlockDelta, IfThenDelta}
+import deltas.javac.expressions.ToByteCodeSkeleton
+import deltas.statement.IfThenDelta
 
 object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
 

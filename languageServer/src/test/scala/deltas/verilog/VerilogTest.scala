@@ -4,10 +4,12 @@ import core.language.node.NodeComparer
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.VariableDelta
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
+import langserver.types.{Location, Range}
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
-class VerilogTest extends FunSuite {
+class VerilogTest extends FunSuite with LanguageServerTest {
 
   val code = """ module arbiter (
                | clock,
@@ -41,29 +43,42 @@ class VerilogTest extends FunSuite {
     val language = TestLanguageBuilder.build(VerilogLanguage.deltas)
     val actual = language.parse(code)
 
-    val thirdIf = IfThenDelta.neww(VariableDelta.neww("req_1"), BeginEndDelta.neww(Seq(
+    val requestOne = VariableDelta.neww("req_1")
+    val requestZero = VariableDelta.neww("req_0")
+    val reset = VariableDelta.neww("reset")
+    val clock = VariableDelta.neww("clock")
+    val grantZero = VariableDelta.neww("gnt_0")
+    val grantOne = VariableDelta.neww("gnt_1")
+
+    val thirdIf = IfThenDelta.neww(requestOne, BeginEndDelta.neww(Seq(
       NonBlockingAssignmentDelta.neww("gnt_0", IntLiteralDelta.neww(0)),
       NonBlockingAssignmentDelta.neww("gnt_1", IntLiteralDelta.neww(1)))))
-    val secondIf = IfThenElseDelta.neww(VariableDelta.neww("req_0"), BeginEndDelta.neww(Seq(
+    val secondIf = IfThenElseDelta.neww(requestZero, BeginEndDelta.neww(Seq(
       NonBlockingAssignmentDelta.neww("gnt_0", IntLiteralDelta.neww(1)),
       NonBlockingAssignmentDelta.neww("gnt_1", IntLiteralDelta.neww(0)))),
       thirdIf)
-    val firstIf = IfThenElseDelta.neww(VariableDelta.neww("reset"), BeginEndDelta.neww(Seq(
+    val firstIf = IfThenElseDelta.neww(reset, BeginEndDelta.neww(Seq(
       NonBlockingAssignmentDelta.neww("gnt_0", IntLiteralDelta.neww(0)),
       NonBlockingAssignmentDelta.neww("gnt_1", IntLiteralDelta.neww(0)))),
       secondIf)
     val moduleMembers = Seq(
-      PortTypeSpecifierDelta.neww("input", Seq("clock", "reset", "req_0", "req_1")),
-      PortTypeSpecifierDelta.neww("output", Seq("gnt_0", "gnt_1")),
-      PortTypeSpecifierDelta.neww("reg", Seq("gnt_0", "gnt_1")),
+      PortTypeSpecifierDelta.neww("input", Seq(clock, reset, requestZero, requestOne)),
+      PortTypeSpecifierDelta.neww("output", Seq(grantZero, grantOne)),
+      PortTypeSpecifierDelta.neww("reg", Seq(grantZero, grantOne)),
       AlwaysDelta.neww(
-        Seq(SensitivityVariable.neww("posedge", "clock"),
-          SensitivityVariable.neww("posedge", "reset")),
+        Seq(SensitivityVariable.neww("posedge", clock),
+          SensitivityVariable.neww("posedge", reset)),
         firstIf)
     )
     val ports = Seq("clock", "reset", "req_0", "req_1", "gnt_0", "gnt_1")
     val expectation = VerilogModuleDelta.neww("arbiter", ports, moduleMembers)
 
     assert(NodeComparer().deepEquality(expectation, actual))
+  }
+
+  val server = new MiksiloLanguageServer(VerilogLanguage.language)
+  test("Goto definition") {
+    val result: Seq[Location] = gotoDefinition(server, code, new HumanPosition(10, 10))
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(result)
   }
 }

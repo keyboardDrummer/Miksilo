@@ -9,7 +9,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.{StatementDelta, StatementInstance}
 
 object ExpressionAsStatementDelta extends ByteCodeStatementInstance with StatementInstance {
@@ -24,7 +24,7 @@ object ExpressionAsStatementDelta extends ByteCodeStatementInstance with Stateme
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
-    val _type = ByteCodeExpressionSkeleton.getType(compilation)(expression)
+    val _type = ExpressionDelta.getType(compilation)(expression)
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
       case 0 => Seq.empty
       case 1 => Seq(PopDelta.pop)
@@ -48,6 +48,6 @@ object ExpressionAsStatementDelta extends ByteCodeStatementInstance with Stateme
   override def description: String = "Enables using an expression as a statement."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    ByteCodeExpressionSkeleton.getType(compilation, builder, getExpression(statement), parentScope)
+    ExpressionDelta.getType(compilation, builder, getExpression(statement), parentScope)
   }
 }

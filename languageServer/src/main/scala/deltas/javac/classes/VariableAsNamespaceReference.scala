@@ -26,7 +26,7 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
 
   def getReferenceKind(variable: NodePath, classCompiler: ClassCompiler): ReferenceKind = {
 
-    val name = VariableDelta.getVariableName(variable)
+    val name = VariableDelta.getName(variable)
     val isClass = classCompiler.classNames.contains(name)
     if (isClass)
       new ClassOrObjectReference(classCompiler.findClass(name), true)
@@ -44,7 +44,7 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     val namespaceOrObjectVariableDeclaration =
-      builder.resolve(VariableDelta.getVariableName(variable), variable.getLocation(VariableDelta.Name), scope)
+      builder.resolve(VariableDelta.getName(variable), variable.getLocation(VariableDelta.Name), scope)
     val result = builder.declarationVariable()
     builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result

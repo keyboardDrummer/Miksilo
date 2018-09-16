@@ -9,12 +9,11 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 
-
 trait ExpressionInstance extends DeltaWithGrammar with HasShape {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    ByteCodeExpressionSkeleton.expressionInstances.add(language, this)
+    ExpressionDelta.expressionInstances.add(language, this)
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)

@@ -13,7 +13,7 @@ import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.statements.ByteCodeStatementInstance
 import deltas.statement.{StatementDelta, StatementInstance}
 
@@ -28,7 +28,7 @@ object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementIns
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: NodePath = getReturnValue(_return)
     val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
-    val getType = ByteCodeExpressionSkeleton.getType(compiler.compilation)
+    val getType = ExpressionDelta.getType(compiler.compilation)
     returnValueInstructions ++ (getType(returnValue) match
     {
       case x if x == IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
@@ -66,6 +66,6 @@ object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementIns
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    ByteCodeExpressionSkeleton.getType(compilation, builder, getReturnValue(statement), parentScope)
+    ExpressionDelta.getType(compilation, builder, getReturnValue(statement), parentScope)
   }
 }

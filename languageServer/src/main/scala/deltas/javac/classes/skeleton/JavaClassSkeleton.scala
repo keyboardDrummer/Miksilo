@@ -10,6 +10,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
+import deltas.ConstraintSkeleton
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
@@ -122,7 +123,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members
-    members.foreach(member => hasDeclarations.get(compilation, member.shape).
+    members.foreach(member => ConstraintSkeleton.hasDeclarations.get(compilation, member.shape).
       getDeclaration(compilation, builder, member, classScope))
 
     clazzDeclaration
@@ -130,9 +131,6 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
 
   object ImportGrammar extends GrammarKey
   object Shape extends NodeShape
-
-  val hasDeclarations: ShapeProperty[HasDeclaration] = new ShapeProperty[HasDeclaration]
-  val hasConstraints: ShapeProperty[HasConstraints] = new ShapeProperty[HasConstraints]
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
@@ -165,14 +163,14 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object Name extends NodeField
 
   override def inject(language: Language): Unit = {
-    hasDeclarations.add(language, Shape, this)
+    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
       val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
-      hasConstraints.get(compilation, Shape).collectConstraints(
+      ConstraintSkeleton.hasConstraints.get(compilation, Shape).collectConstraints(
         compilation, builder, PathRoot(compilation.program), defaultPackageScope)
     }
     super.inject(language)
@@ -187,12 +185,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
     val classScope = builder.getDeclaredScope(clazzDeclaration)
     for (_import <- clazz.imports)
-      hasConstraints.get(compilation, _import.shape).collectConstraints(compilation, builder, _import, classScope)
+      ConstraintSkeleton.hasConstraints.get(compilation, _import.shape).collectConstraints(compilation, builder, _import, classScope)
 
     val members = clazz.members
 
     members.foreach(member =>
-      hasConstraints.get(compilation, member.shape).collectConstraints(compilation, builder, member, classScope))
+      ConstraintSkeleton.hasConstraints.get(compilation, member.shape).collectConstraints(compilation, builder, member, classScope))
 
     classScope
   }

@@ -13,13 +13,13 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
+import deltas.expressions.ExpressionDelta
 
 object NewDelta extends ExpressionInstance with ConvertsToByteCode {
 
@@ -58,7 +58,7 @@ object NewDelta extends ExpressionInstance with ConvertsToByteCode {
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val callTypes = callArguments.map(argument => ByteCodeExpressionSkeleton.getType(compilation)(argument))
+    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
 
     val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++

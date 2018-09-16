@@ -21,7 +21,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   def addThisToVariable(compilation: Compilation, variable: ChildPath) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val name = VariableDelta.getVariableName(variable)
+    val name = VariableDelta.getName(variable)
     val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
     if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
       val currentClass = compiler.currentClassInfo

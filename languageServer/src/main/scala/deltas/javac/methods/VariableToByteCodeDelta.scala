@@ -30,7 +30,7 @@ object VariableToByteCodeDelta extends ExpressionInstance with ConvertsToByteCod
   }
 
   def getVariableInfo(variable: NodePath, compilation: Compilation): VariableInfo = {
-    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(getVariableName(variable))
+    MethodDelta.getMethodCompiler(compilation).getVariables(variable)(getName(variable))
   }
 
   override def toByteCode(variable: NodePath, compilation: Compilation): Seq[Node] = {
@@ -48,6 +48,6 @@ object VariableToByteCodeDelta extends ExpressionInstance with ConvertsToByteCod
   override def description: String = "Compiles a variable to byte-code"
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
-    builder.resolve(getVariableName(variable), variable.asInstanceOf[ChildPath], parentScope, Some(_type))
+    builder.resolve(getName(variable), variable.asInstanceOf[ChildPath], parentScope, Some(_type))
   }
 }

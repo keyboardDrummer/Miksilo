@@ -23,7 +23,7 @@ object AssignToVariable extends DeltaWithGrammar {
     AssignmentSkeleton.hasAssignFromStackByteCode.add(language, VariableDelta.Shape,
       (compilation, targetVariable: NodePath) => {
       val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-      val target = VariableDelta.getVariableName(targetVariable)
+      val target = VariableDelta.getName(targetVariable)
       val variableInfo = methodCompiler.getVariables(targetVariable)(target)
       val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, language)
       Seq(getStoreInstruction(variableInfo, byteCodeType))

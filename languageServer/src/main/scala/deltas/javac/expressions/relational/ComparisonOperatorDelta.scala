@@ -7,7 +7,8 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ExpressionInstance}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.types.BooleanTypeDelta
 
 trait ComparisonOperatorDelta extends ExpressionInstance {
@@ -29,14 +30,14 @@ trait ComparisonOperatorDelta extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType. Share code with other comparisons.
-    val firstType = ByteCodeExpressionSkeleton.getType(compilation, builder, expression.left, parentScope)
-    val secondType = ByteCodeExpressionSkeleton.getType(compilation, builder, expression.right, parentScope)
+    val firstType = ExpressionDelta.getType(compilation, builder, expression.left, parentScope)
+    val secondType = ExpressionDelta.getType(compilation, builder, expression.right, parentScope)
     builder.typesAreEqual(firstType, secondType)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
   }
 
   override def getType(lessThan: NodePath, compilation: Compilation): Node = {
-    val getType = ByteCodeExpressionSkeleton.getType(compilation)
+    val getType = ExpressionDelta.getType(compilation)
     val firstType = getType(lessThan.left)
     val secondType = getType(lessThan.right)
     TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)

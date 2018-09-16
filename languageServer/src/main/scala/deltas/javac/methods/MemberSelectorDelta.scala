@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
-import deltas.javac.expressions.ByteCodeExpressionSkeleton
 
 object MemberSelectorDelta extends DeltaWithGrammar {
 
@@ -53,7 +52,7 @@ object MemberSelectorDelta extends DeltaWithGrammar {
   }
 
   def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: NodePath): ClassOrObjectReference = {
-    val classInfo: ClassSignature = classCompiler.findClass(ByteCodeExpressionSkeleton.getType(classCompiler.compilation)(expression))
+    val classInfo: ClassSignature = classCompiler.findClass(ExpressionDelta.getType(classCompiler.compilation)(expression))
     ClassOrObjectReference(classInfo, wasClass = false)
   }
 

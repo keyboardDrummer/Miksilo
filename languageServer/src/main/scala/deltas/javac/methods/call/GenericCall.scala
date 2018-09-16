@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
@@ -57,7 +57,7 @@ trait GenericCall extends ExpressionInstance {
     val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val callArguments = call.arguments
-    val callTypes: Seq[Node] = callArguments.map(argument => ByteCodeExpressionSkeleton.getType(compiler.compilation)(argument))
+    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionDelta.getType(compiler.compilation)(argument))
 
     val member = callCallee.member
     MethodQuery(kind.info.getQualifiedName, member, callTypes)

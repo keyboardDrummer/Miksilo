@@ -50,7 +50,7 @@ object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
   override val shape = Shape
 
   override def getType(_ternary: NodePath, compilation: Compilation): Node = {
-    val getExpressionType = ByteCodeExpressionSkeleton.getType(compilation)
+    val getExpressionType = ExpressionDelta.getType(compilation)
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
@@ -87,11 +87,11 @@ object TernaryDelta extends ExpressionInstance with ConvertsToByteCode {
     val condition = TernaryDelta.getCondition(_ternary)
     val truePath = TernaryDelta.trueBranch(_ternary)
     val falsePath = TernaryDelta.falseBranch(_ternary)
-    val conditionType = ByteCodeExpressionSkeleton.getType(compilation, builder, condition, parentScope)
+    val conditionType = ExpressionDelta.getType(compilation, builder, condition, parentScope)
     builder.typesAreEqual(BooleanTypeDelta.constraintType, conditionType)
 
-    val trueType = ByteCodeExpressionSkeleton.getType(compilation, builder, truePath, parentScope)
-    val falseType = ByteCodeExpressionSkeleton.getType(compilation, builder, falsePath, parentScope)
+    val trueType = ExpressionDelta.getType(compilation, builder, truePath, parentScope)
+    val falseType = ExpressionDelta.getType(compilation, builder, falsePath, parentScope)
 
     builder.typesAreEqual(_type, builder.getCommonSuperType(trueType, falseType))
   }

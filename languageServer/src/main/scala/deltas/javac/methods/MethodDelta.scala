@@ -10,6 +10,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.{ConcreteScope, Scope}
+import deltas.ConstraintSkeleton
 import deltas.bytecode.attributes.CodeAttributeDelta.{CodeAttributesKey, CodeExceptionTableKey, CodeMaxLocalsKey, Instructions}
 import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta}
 import deltas.bytecode.constants.Utf8ConstantDelta
@@ -197,8 +198,8 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
-    JavaClassSkeleton.hasConstraints.add(language, this)
+    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
+    ConstraintSkeleton.hasConstraints.add(language, this)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

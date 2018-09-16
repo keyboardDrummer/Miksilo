@@ -9,7 +9,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ByteCodeExpressionSkeleton, ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object NotDelta extends ExpressionInstance with ConvertsToByteCode {
@@ -35,7 +35,7 @@ object NotDelta extends ExpressionInstance with ConvertsToByteCode {
   override def description: String = "Adds the ! (not) operator."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val targetType = ByteCodeExpressionSkeleton.getType(compilation, builder, expression(NotExpression).asInstanceOf[NodePath], parentScope)
+    val targetType = ExpressionDelta.getType(compilation, builder, expression(NotExpression).asInstanceOf[NodePath], parentScope)
     builder.typesAreEqual(targetType, BooleanTypeDelta.constraintType)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
   }

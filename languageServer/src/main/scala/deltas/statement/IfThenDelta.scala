@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.ByteCodeExpressionSkeleton
 import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends DeltaWithGrammar with StatementInstance {
@@ -48,7 +47,7 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
     val body = IfThenDelta.getThenStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, body, bodyScope)
     val condition = IfThenDelta.getCondition(statement)
-    ByteCodeExpressionSkeleton.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
+    ExpressionDelta.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
   }
 
   override def shape: NodeShape = Shape

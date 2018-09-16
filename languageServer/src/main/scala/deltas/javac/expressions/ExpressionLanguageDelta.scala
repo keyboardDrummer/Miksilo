@@ -14,7 +14,7 @@ object ExpressionLanguageDelta extends DeltaWithGrammar {
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation: Compilation, builder: ConstraintBuilder) => {
-      val _type = ByteCodeExpressionSkeleton.getType(compilation, builder, PathRoot(compilation.program), builder.newScope(debugName = "programScope"))
+      val _type = ExpressionDelta.getType(compilation, builder, PathRoot(compilation.program), builder.newScope(debugName = "programScope"))
       //TODO check that the type is printable.
     }
   }

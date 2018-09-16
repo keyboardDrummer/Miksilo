@@ -5,7 +5,7 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.ByteCodeExpressionSkeleton.Expression
+import deltas.expressions.ExpressionDelta.Expression
 import deltas.javac.statements.ByteCodeStatementSkeleton.Statement
 import deltas.statement.{BlockDelta, StatementDelta}
 
