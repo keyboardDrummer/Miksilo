@@ -26,6 +26,7 @@ import deltas.javac.methods.MethodParameterDelta.MethodParameter
 import deltas.javac.statements.ByteCodeStatementSkeleton
 import deltas.javac.types.{MethodType, TypeAbstraction}
 import deltas.statement.BlockDelta
+import deltas.statement.BlockDelta.BlockStatement
 
 
 
@@ -43,7 +44,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     def parameters: Seq[MethodParameter[T]] = NodeWrapper.wrapList(node(Parameters).asInstanceOf[Seq[T]])
     def parameters_=(value: Seq[MethodParameter[T]]): Unit = node(Parameters) = NodeWrapper.unwrapList(value)
 
-    def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
+    def body: BlockStatement[T] = node(Body).asInstanceOf[T]
   }
 
   def compile(compilation: Compilation, program: Node): Unit = {
@@ -106,10 +107,9 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
-      val statements = method.body
       method.current.data.remove(Body)
       val statementToInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
-      val instructions = statements.flatMap(statement => statementToInstructions(statement))
+      val instructions = statementToInstructions(method.body)
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
       val maxLocalCount: Int = getMethodCompiler(compilation).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
@@ -163,7 +163,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     memberGrammar.addAlternative(methodGrammar)
   }
 
-  def neww(name: String, _returnType: Any, _parameters: Seq[Node], _body: Seq[Node],
+  def neww(name: String, _returnType: Any, _parameters: Seq[Node], _body: Node,
            static: Boolean = false,
            visibility: AccessibilityFieldsDelta.Visibility = PrivateVisibility,
            typeParameters: Seq[Node] = Seq.empty): Node = {

@@ -2,19 +2,20 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeGrammar, NodeShape}
 import core.deltas.path.{NodePath, PathRoot}
+import core.language.node.{Node, NodeGrammar, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.expressions.VariableDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
+import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MethodDelta, VariableToByteCodeDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
 import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
+import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
@@ -52,16 +53,17 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
-    val fieldInitializerMethod = MethodDelta.neww(getFieldInitialiserMethodName,VoidTypeDelta.voidType, Seq.empty, reversedInitialiserStatements)
+    val fieldInitializerMethod = MethodDelta.neww(getFieldInitialiserMethodName,VoidTypeDelta.voidType, Seq.empty,
+      BlockDelta.neww(reversedInitialiserStatements))
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- ConstructorDelta.getConstructors(program)) {
-      val body = constructor.body
+      val body = constructor.body.statements
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
         val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallDelta.neww(VariableDelta.neww(getFieldInitialiserMethodName)))
-        constructor(MethodDelta.Body) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
+        constructor.body.statements = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }
   }

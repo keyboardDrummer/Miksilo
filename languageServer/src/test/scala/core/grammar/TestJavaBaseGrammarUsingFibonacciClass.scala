@@ -1,7 +1,7 @@
 package core.grammar
 
 import core.bigrammar.TestLanguageGrammarUtils
-import core.language.node.{NodeComparer, Node}
+import core.language.node.{Node, NodeComparer}
 import deltas.bytecode.types._
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.{ExpressionDelta, VariableDelta}
@@ -15,6 +15,7 @@ import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.trivia.JavaStyleBlockCommentsDelta
+import deltas.statement.BlockDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
   extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
@@ -119,12 +120,12 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val printCall = CallDelta.neww(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.neww("System"), "out"), "print"),
       Seq(fibonacciCall))
     MethodDelta.neww("main", VoidTypeDelta.voidType, Seq(MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
-      Seq(ExpressionAsStatementDelta.create(printCall)), static = true, AccessibilityFieldsDelta.PublicVisibility)
+      BlockDelta.neww(Seq(ExpressionAsStatementDelta.create(printCall))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {
     MethodDelta.neww("fibonacci", IntTypeDelta.intType, Seq(MethodParameterDelta.neww("index", IntTypeDelta.intType)),
-      Seq(ReturnExpressionDelta._return(getFibonacciExpression)), static = true, AccessibilityFieldsDelta.PublicVisibility)
+      BlockDelta.neww(Seq(ReturnExpressionDelta._return(getFibonacciExpression))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciExpression: Node = {

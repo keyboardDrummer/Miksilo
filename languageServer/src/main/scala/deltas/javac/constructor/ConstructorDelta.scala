@@ -43,7 +43,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == ConstructorKey))
   }
 
-  def constructor(className: String, _parameters: Seq[Node], _body: Seq[Node],
+  def constructor(className: String, _parameters: Seq[Node], _body: Node,
                   visibility: AccessibilityFieldsDelta.Visibility = PublicVisibility) = new Node(ConstructorKey,
     Parameters -> _parameters, Body -> _body, AccessibilityFieldsDelta.VisibilityField -> visibility,
     ConstructorClassNameKey -> className)
@@ -58,7 +58,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
     val parseParameters = find(MethodDelta.ParametersGrammar) as Parameters
-    val block = find(BlockDelta.Grammar) as Body
+    val block = find(BlockDelta.Grammar).as(Body)
     val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
     memberGrammar.addAlternative(constructorGrammar)
   }

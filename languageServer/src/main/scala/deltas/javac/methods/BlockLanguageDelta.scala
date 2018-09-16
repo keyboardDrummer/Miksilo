@@ -2,7 +2,7 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.path.{ChildPath, PathRoot}
+import core.deltas.path.PathRoot
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
@@ -17,21 +17,21 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.collectConstraints = (compilation, builder) => {
-      val statements = PathRoot(compilation.program)(Statements).asInstanceOf[Seq[ChildPath]]
-      BlockDelta.collectConstraints(compilation, builder, statements, builder.newScope(debugName = "programScope"))
+      val block = PathRoot(compilation.program)
+      BlockDelta.collectConstraints(compilation, builder, block, builder.newScope(debugName = "programScope"))
     }
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statements = find(StatementDelta.Grammar).manyVertical.as(Statements).asNode(Shape)
+    val statements = find(StatementDelta.Grammar).manyVertical.as(BlockDelta.Statements).asNode(BlockDelta.Shape)
     find(BodyGrammar).inner = statements
   }
 
-  override def transformProgram(program: Node, state: Compilation): Unit = {
-    val statements = program(Statements).asInstanceOf[Seq[Node]]
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    val block = program
     val mainArgument: Node = MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
-    val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
+    val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), block, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))
     program.replaceWith(javaClass)
   }

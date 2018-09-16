@@ -18,10 +18,11 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
   object Shape extends NodeShape
   object Statements extends NodeField
 
-  def neww(statements: Seq[Node]): Node = Shape.create(Statements -> statements)
+  def neww(statements: Seq[Node] = Seq.empty): Node = Shape.create(Statements -> statements)
 
   implicit class BlockStatement[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def statements: Seq[T] = node(Statements).asInstanceOf[Seq[T]]
+    def statements_=(value: Seq[T]): Unit = node(Statements) = value
   }
 
   val indentAmount = 4
@@ -29,7 +30,7 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
 
-    val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.as(Statements).indent(indentAmount) %< "}" asNode Shape)
+    val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.as(Statements).asNode(Shape).indent(indentAmount) %< "}")
     val statementAsSequence = statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head)
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementAsSequence.as(Statements).asNode(Shape))
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)

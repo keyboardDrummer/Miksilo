@@ -18,7 +18,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   private val initialVariables = getInitialVariables
 
   val localAnalysis = new LocalsAnalysis(compilation, method)
-  private val intermediate = new Method(PathRoot(method)).body
+  private val intermediate = new Method(PathRoot(method)).body.statements
   val firstInstruction: NodePath = intermediate.head
   val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
 

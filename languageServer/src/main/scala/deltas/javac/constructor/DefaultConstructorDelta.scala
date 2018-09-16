@@ -5,6 +5,7 @@ import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
+import deltas.statement.BlockDelta
 
 object DefaultConstructorDelta extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ConstructorDelta)
@@ -13,7 +14,7 @@ object DefaultConstructorDelta extends DeltaWithPhase {
     val javaClass: JavaClass[Node] = program
     val noConstructors = !javaClass.members.exists(member => member.shape == ConstructorDelta.ConstructorKey)
     if (noConstructors) {
-      val defaultConstructor = ConstructorDelta.constructor(javaClass.name, Seq(), Seq(), AccessibilityFieldsDelta.PublicVisibility)
+      val defaultConstructor = ConstructorDelta.constructor(javaClass.name, Seq(), BlockDelta.neww(), AccessibilityFieldsDelta.PublicVisibility)
       javaClass.members = Seq(defaultConstructor) ++ javaClass.members
     }
   }

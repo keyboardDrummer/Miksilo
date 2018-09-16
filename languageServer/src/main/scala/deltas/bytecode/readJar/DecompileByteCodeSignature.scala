@@ -14,6 +14,7 @@ import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameterDelta}
 import deltas.javac.types.{MethodType, TypeAbstraction}
+import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -93,7 +94,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
 	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
         MethodParameterDelta.neww("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 
-      val method = MethodDelta.neww(name, returnType, parameters, Seq.empty, typeParameters = typeParameters)
+      val method = MethodDelta.neww(name, returnType, parameters, BlockDelta.neww(), typeParameters = typeParameters)
       setVisibility(methodInfo, method)
       method
     })

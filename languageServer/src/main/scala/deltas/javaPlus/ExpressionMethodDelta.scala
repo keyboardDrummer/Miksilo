@@ -9,6 +9,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.methods.MethodDelta.{Name, _}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
+import deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -36,7 +37,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     {
       val expression = expressionMethod(Expression).asInstanceOf[Node]
       expressionMethod.shape = MethodDelta.Shape
-      expressionMethod(MethodDelta.Body) = Seq(ReturnExpressionDelta._return(expression))
+      expressionMethod(MethodDelta.Body) = BlockDelta.neww(Seq(ReturnExpressionDelta._return(expression)))
       expressionMethod.data.remove(Expression)
     }
   }
