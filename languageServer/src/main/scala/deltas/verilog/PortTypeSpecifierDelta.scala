@@ -4,13 +4,15 @@ import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
-import core.language.node.{NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
 
 object PortTypeSpecifierDelta extends DeltaWithGrammar {
 
   object Shape extends NodeShape
   object Variables extends NodeField
   object Type extends NodeField
+
+  def neww(_type: String, variables: Seq[String]): Node = Shape.create(Type -> _type, Variables -> variables)
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._

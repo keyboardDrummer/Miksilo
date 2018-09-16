@@ -3,8 +3,8 @@ package deltas.statement
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.{Compilation, Language}
 import core.language.node._
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.expressions.ExpressionDelta
@@ -13,7 +13,7 @@ import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends DeltaWithGrammar with StatementInstance {
 
-  def neww(condition: Node, thenBody: Seq[Node]): Node = Shape.create(Condition -> condition, Then -> thenBody)
+  def neww(condition: Node, thenBody: Any): Node = Shape.create(Condition -> condition, Then -> thenBody)
 
   object Shape extends NodeShape
 

@@ -2,7 +2,7 @@ package core.language.node
 
 import scala.collection.mutable
 
-case class ComparisonOptions(compareIntegers: Boolean = true, takeAllLeftKeys: Boolean = true, takeAllRightKeys: Boolean = true)
+case class NodeComparer(compareIntegers: Boolean = true, takeAllLeftKeys: Boolean = true, takeAllRightKeys: Boolean = true)
 {
   def deepEquality(first: Any, second: Any): Boolean = {
 

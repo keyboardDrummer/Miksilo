@@ -44,7 +44,7 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val withInitializer: LocalDeclarationWithInitializer[NodePath] = path
     val name: String = withInitializer.name
     path.shape = LocalDeclarationDelta.Shape
-    val target = VariableDelta.variable(name)
+    val target = VariableDelta.neww(name)
     val assignment = AssignmentSkeleton.Shape.createWithSource(
       AssignmentSkeleton.Target -> target,
       AssignmentSkeleton.Value -> path.getWithSource(Initializer))

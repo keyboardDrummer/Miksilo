@@ -9,7 +9,7 @@ object VariableDelta extends DeltaWithGrammar {
 
   object VariableGrammar extends GrammarKey
 
-  def variable(name: String) = new Node(Shape, Name -> name)
+  def neww(name: String) = new Node(Shape, Name -> name)
 
   object Name extends NodeField
 

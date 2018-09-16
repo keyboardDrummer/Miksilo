@@ -40,7 +40,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: ChildPath): Unit = {
     val newVariableName = if (classMember._static) currentClass.name else ThisVariableDelta.thisName
     val selector = MemberSelectorDelta.Shape.createWithSource(
-      MemberSelectorDelta.Target -> VariableDelta.variable(newVariableName),
+      MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
       MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
     variable.replaceWith(selector)
   }

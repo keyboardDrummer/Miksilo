@@ -37,7 +37,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val name: String = field.name
     val fieldDeclaration = FieldDeclarationDelta.field(field._type, name)
 
-    val assignment = AssignmentSkeleton.assignment(VariableDelta.variable(name), field.initializer)
+    val assignment = AssignmentSkeleton.assignment(VariableDelta.neww(name), field.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
     field.node.replaceWith(fieldDeclaration)
@@ -52,7 +52,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
     val reversedInitialiserStatements: ArrayBuffer[Node] = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
 
-    val fieldInitializerMethod = MethodDelta.method(getFieldInitialiserMethodName,VoidTypeDelta.voidType, Seq.empty, reversedInitialiserStatements)
+    val fieldInitializerMethod = MethodDelta.neww(getFieldInitialiserMethodName,VoidTypeDelta.voidType, Seq.empty, reversedInitialiserStatements)
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- ConstructorDelta.getConstructors(program)) {
@@ -60,7 +60,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
       if (statementIsSuperCall(body.head)) {
         val bodyAfterHead = body.drop(1)
         val head = body.head
-        val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallDelta.call(VariableDelta.variable(getFieldInitialiserMethodName)))
+        val callToFieldInitialiser = ExpressionAsStatementDelta.create(CallDelta.neww(VariableDelta.neww(getFieldInitialiserMethodName)))
         constructor(MethodDelta.Body) = Seq(head, callToFieldInitialiser) ++ bodyAfterHead
       }
     }

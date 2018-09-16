@@ -17,7 +17,7 @@ object BlockAsStatementDelta extends ByteCodeStatementInstance with StatementIns
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    val blockGrammar = "block" ~> find(BlockDelta.Grammar).as(Statements) asLabelledNode Shape
+    val blockGrammar = find(BlockDelta.Grammar).as(Statements) asLabelledNode Shape
     statementGrammar.addAlternative(blockGrammar)
   }
 

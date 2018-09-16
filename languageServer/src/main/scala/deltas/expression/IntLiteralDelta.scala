@@ -24,7 +24,7 @@ object IntLiteralDelta extends ExpressionInstance {
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(parseNumber)
   }
 
-  def literal(value: Int) = new Node(Shape, Value -> value)
+  def neww(value: Int) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): Int = literal(Value).asInstanceOf[Int]
 

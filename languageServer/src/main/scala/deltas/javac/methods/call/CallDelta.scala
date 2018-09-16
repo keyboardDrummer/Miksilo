@@ -26,9 +26,9 @@ object CallDelta
   }
 
   def call(callee: Any, arguments: Any): Node =
-    call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
+    neww(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
-  def call(callee: Node, arguments: Seq[Node] = Seq()): Node = {
+  def neww(callee: Node, arguments: Seq[Node] = Seq()): Node = {
     new Node(CallDelta.Shape, CallDelta.Callee -> callee, CallDelta.Arguments -> arguments)
   }
 

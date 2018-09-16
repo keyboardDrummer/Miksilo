@@ -27,7 +27,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
     if (!method.isStatic)
       result = result.add("this", QualifiedObjectTypeDelta.neww(classCompiler.fullyQualify(classCompiler.currentClassInfo.name)))
     for (parameter <- parameters)
-      result = result.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
+      result = result.add(MethodParameterDelta.getName(parameter), getParameterType(parameter, classCompiler))
     result
   }
 

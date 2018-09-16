@@ -5,8 +5,11 @@ import core.language.node.GrammarKey
 
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
-  def addAlternative(addition: BiGrammar) {
-    inner = inner | addition
+  def addAlternative(addition: BiGrammar, prioritize: Boolean = true) {
+    if (prioritize)
+      inner = addition | inner
+    else
+      inner = inner | addition
   }
 
   override def children = Seq(inner)

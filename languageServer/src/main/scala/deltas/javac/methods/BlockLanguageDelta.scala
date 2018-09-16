@@ -30,8 +30,8 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val statements = program(Statements).asInstanceOf[Seq[Node]]
-    val mainArgument: Node = MethodDelta.parameter("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
-    val method = MethodDelta.method("main",VoidTypeDelta.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
+    val mainArgument: Node = MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
+    val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), statements, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))
     program.replaceWith(javaClass)
   }

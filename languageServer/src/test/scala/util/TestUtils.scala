@@ -6,7 +6,7 @@ import java.nio.file.Files
 
 import ch.qos.logback.classic.{Level, Logger}
 import core.language.Compilation
-import core.language.node.{ComparisonOptions, Node}
+import core.language.node.{NodeComparer, Node}
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
@@ -55,7 +55,7 @@ class TestUtils(val language: TestingLanguage) extends FunSuite with BeforeAndAf
 
   def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
-      assert(ComparisonOptions(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
+      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }
   }
 
@@ -194,7 +194,7 @@ class TestUtils(val language: TestingLanguage) extends FunSuite with BeforeAndAf
     assertResult(expectedConstantPoolSet.length)(compiledConstantPoolSet.length)
     assert(expectedConstantPoolSet.forall(expectedItem => {
       val hasEquivalent = compiledConstantPoolSet.exists(compiledItem =>
-        ComparisonOptions(compareIntegers = false, takeAllLeftKeys = false).deepEquality(compiledItem, expectedItem))
+        NodeComparer(compareIntegers = false, takeAllLeftKeys = false).deepEquality(compiledItem, expectedItem))
       hasEquivalent
     }), s"$expectedConstantPoolSet was not $compiledConstantPoolSet")
   }
