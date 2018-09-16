@@ -47,7 +47,7 @@ object ExpressionAsStatementDelta extends ByteCodeStatementInstance with Stateme
 
   override def description: String = "Enables using an expression as a statement."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     ExpressionDelta.getType(compilation, builder, getExpression(statement), parentScope)
   }
 }

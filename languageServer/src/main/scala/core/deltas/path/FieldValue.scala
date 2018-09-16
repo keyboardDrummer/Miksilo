@@ -2,6 +2,8 @@ package core.deltas.path
 
 import core.language.node.{Node, NodeField, SourceRange}
 
+/** A path to a value in an AST. This is similar to a NodePath, except that the value doesn't have to be of type Node.
+  */
 case class FieldValue(parent: NodePath, field: NodeField) extends ChildPath {
   val current: Node = parent.current(field).asInstanceOf[Node]
 

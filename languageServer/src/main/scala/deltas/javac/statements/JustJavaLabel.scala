@@ -37,7 +37,7 @@ object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance {
     super.getLabels(obj) + (getName(obj.current) -> obj)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val label = getName(statement)
     builder.declare(label, parentScope, statement.getLocation(Name))
   }

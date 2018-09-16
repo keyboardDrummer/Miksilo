@@ -33,7 +33,7 @@ object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
 
   override def description: String = "Adds a goto statement"
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val target = getTarget(statement)
     builder.resolve(target, statement, parentScope)
   }

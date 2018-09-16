@@ -7,6 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.statement.{BlockDelta, StatementDelta, StatementInstance}
 
 object BlockAsStatementDelta extends ByteCodeStatementInstance with StatementInstance {
@@ -36,10 +37,10 @@ object BlockAsStatementDelta extends ByteCodeStatementInstance with StatementIns
     block.statements.flatMap(childStatement => toInstructions(childStatement))
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val block: BlockStatement[NodePath] = statement
     val blockScope = builder.newScope(Some(parentScope))
-    block.statements.foreach(childStatement => StatementDelta.constraints(compilation, builder, childStatement, blockScope))
+    block.statements.foreach(childStatement => ConstraintSkeleton.constraints(compilation, builder, childStatement, blockScope))
   }
 
   override def getLabels(statement: NodePath): Map[Any, NodePath] = {

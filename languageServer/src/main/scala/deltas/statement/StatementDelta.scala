@@ -5,8 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object StatementDelta extends DeltaWithGrammar {
 
@@ -23,13 +22,9 @@ object StatementDelta extends DeltaWithGrammar {
   def getInstance(compilation: Compilation, statement: NodePath): StatementInstance = {
     instances.get(compilation, statement.shape)
   }
-
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    getInstance(compilation, statement).constraints(compilation, builder, statement, parentScope)
-  }
 }
 
-trait StatementInstance extends Delta with HasShape {
+trait StatementInstance extends Delta with HasConstraintsDelta {
 
   override def inject(language: Language): Unit = {
     StatementDelta.instances.add(language, this)
@@ -37,6 +32,4 @@ trait StatementInstance extends Delta with HasShape {
   }
 
   override def dependencies: Set[Contract] = Set(StatementDelta)
-
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit
 }

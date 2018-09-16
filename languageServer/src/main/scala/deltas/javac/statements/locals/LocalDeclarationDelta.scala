@@ -59,7 +59,7 @@ object LocalDeclarationDelta extends ByteCodeStatementInstance with StatementIns
 
   override def description: String = "Enables declaring a local variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
     builder.declare(statement.name, parentScope, statement.getLocation(Name), Some(_type))

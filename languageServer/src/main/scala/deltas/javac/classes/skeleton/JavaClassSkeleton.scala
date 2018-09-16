@@ -170,7 +170,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
-      ConstraintSkeleton.hasConstraints.get(compilation, Shape).collectConstraints(
+      ConstraintSkeleton.constraints(
         compilation, builder, PathRoot(compilation.program), defaultPackageScope)
     }
     super.inject(language)
@@ -185,12 +185,12 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     val clazzDeclaration = getDeclaration(compilation, builder, clazz.node, defaultPackageScope)
     val classScope = builder.getDeclaredScope(clazzDeclaration)
     for (_import <- clazz.imports)
-      ConstraintSkeleton.hasConstraints.get(compilation, _import.shape).collectConstraints(compilation, builder, _import, classScope)
+      ConstraintSkeleton.constraints(compilation, builder, _import, classScope)
 
     val members = clazz.members
 
     members.foreach(member =>
-      ConstraintSkeleton.hasConstraints.get(compilation, member.shape).collectConstraints(compilation, builder, member, classScope))
+      ConstraintSkeleton.constraints(compilation, builder, member, classScope))
 
     classScope
   }

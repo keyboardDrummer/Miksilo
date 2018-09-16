@@ -8,6 +8,7 @@ import langserver.types.{Location, Range}
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
+import VariableDelta.Variable
 
 class VerilogTest extends FunSuite with LanguageServerTest {
 
@@ -66,8 +67,8 @@ class VerilogTest extends FunSuite with LanguageServerTest {
       PortTypeSpecifierDelta.neww("output", Seq(grantZero, grantOne)),
       PortTypeSpecifierDelta.neww("reg", Seq(grantZero, grantOne)),
       AlwaysDelta.neww(
-        Seq(SensitivityVariable.neww("posedge", clock),
-          SensitivityVariable.neww("posedge", reset)),
+        Seq(SensitivityVariableDelta.neww("posedge", clock.name),
+          SensitivityVariableDelta.neww("posedge", reset.name)),
         firstIf)
     )
     val ports = Seq("clock", "reset", "req_0", "req_1", "gnt_0", "gnt_1")

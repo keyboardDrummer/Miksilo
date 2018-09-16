@@ -7,6 +7,7 @@ import core.language.node.GrammarKey
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 
 object BlockDelta extends DeltaWithGrammar {
 
@@ -24,7 +25,7 @@ object BlockDelta extends DeltaWithGrammar {
 
   def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statements: Seq[NodePath], parentScope: Scope): Unit = {
     for(statement <- statements) {
-      StatementDelta.constraints(compilation, builder, statement, parentScope)
+      ConstraintSkeleton.constraints(compilation, builder, statement, parentScope)
     }
   }
 

@@ -65,7 +65,7 @@ object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementIns
     returnToLines(_return, methodCompiler)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     ExpressionDelta.getType(compilation, builder, getReturnValue(statement), parentScope)
   }
 }

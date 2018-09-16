@@ -42,7 +42,7 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
 
   override def description: String = "Enables using the if-then (no else) construct."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val bodyScope = builder.newScope(Some(parentScope), "thenScope")
     val body = IfThenDelta.getThenStatements(statement)
     BlockDelta.collectConstraints(compilation, builder, body, bodyScope)

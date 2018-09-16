@@ -41,5 +41,5 @@ object ReturnVoidDelta extends ByteCodeStatementInstance with StatementInstance 
 
   override def description: String = "Allows returning void."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {}
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {}
 }

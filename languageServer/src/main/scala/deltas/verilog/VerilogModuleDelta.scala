@@ -52,8 +52,7 @@ object VerilogModuleDelta extends DeltaWithGrammar {
       }
 
       for(member <- module.body) {
-        ConstraintSkeleton.hasConstraints.get(language, member.shape).
-          collectConstraints(compilation, builder, member, moduleScope)
+        ConstraintSkeleton.constraints(compilation, builder, member, moduleScope)
       }
     }
     super.inject(language)
