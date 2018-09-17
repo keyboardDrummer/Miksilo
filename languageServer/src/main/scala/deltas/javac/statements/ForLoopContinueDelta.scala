@@ -7,6 +7,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ForLoopDelta.ForLoop
+import deltas.statement.BlockDelta
 
 import scala.collection.mutable
 
@@ -34,7 +35,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     val forLoop = forLoopPath.current
     val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
     val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)
-    forLoop(ForLoopDelta.Body) = forLoop.body ++ Seq(JustJavaLabel.label(beforeIncrementLabel))
+    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, JustJavaLabel.label(beforeIncrementLabel)))
     beforeIncrementLabel
   }
 }

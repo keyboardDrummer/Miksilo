@@ -2,7 +2,7 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, SequenceElement}
+import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -26,6 +26,8 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
   }
 
   val indentAmount = 4
+
+
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
@@ -62,20 +64,18 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
 
   override def getNextLabel(statement: NodePath): (NodePath, String) = {
     val block: BlockStatement[NodePath] = statement
-    (block.statements.last, "next") //TODO this is prone to crash. Can we just delete this whole label system?
-  }
-
-  override def getLabels(language: Language, statement: NodePath): Map[Any, NodePath] = {
-    val block: BlockStatement[NodePath] = statement
-    val statementAfterBlockOption = statement.asInstanceOf[SequenceElement].getNext
-    val nextMap: Map[Any, NodePath] = statementAfterBlockOption.fold[Map[Any, NodePath]](Map.empty)(
-      (next: NodePath) => Map(getNextLabel(statement) -> next))
-    nextMap ++ super.getLabels(language, statement)
+    if (block.statements.nonEmpty)
+      (block.statements.last, "next")
+    else
+      super.getNextLabel(statement)
   }
 
   override def getNextStatements(language: Language, statement: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = {
     val block: BlockStatement[NodePath] = statement
     val childStatements = block.statements
-    Set(childStatements.head)
+    if (childStatements.nonEmpty)
+      Set(childStatements.head)
+    else
+      super.getNextStatements(language, statement, labels)
   }
 }

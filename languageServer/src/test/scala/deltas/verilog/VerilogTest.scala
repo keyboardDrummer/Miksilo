@@ -71,7 +71,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
           SensitivityVariableDelta.neww("posedge", reset.name)),
         firstIf)
     )
-    val ports = Seq("clock", "reset", "req_0", "req_1", "gnt_0", "gnt_1")
+    val ports = Seq(clock, reset, requestZero, requestOne, grantZero, grantOne)
     val expectation = VerilogModuleDelta.neww("arbiter", ports, moduleMembers)
 
     assert(NodeComparer().deepEquality(expectation, actual))

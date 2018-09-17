@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.deltas.path.{NodePath, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -107,7 +107,6 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
-      method.current.data.remove(Body)
       val statementToInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
       val instructions = statementToInstructions(method.body)
       val exceptionTable = Seq[Node]()
@@ -120,6 +119,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
         CodeExceptionTableKey -> exceptionTable,
         CodeAttributesKey -> codeAttributes)
       method(ByteCodeMethodInfo.MethodAttributes) = Seq(codeAttribute)
+      method.current.data.remove(Body)
     }
   }
 
@@ -221,7 +221,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     method.parameters.foreach(parameter => {
       MethodParameterDelta.declare(compilation, builder, parameter, parentScope, bodyScope)
     })
-    BlockDelta.collectConstraints(compilation, builder, method.body.asInstanceOf[Seq[ChildPath]], bodyScope)
+    ConstraintSkeleton.constraints(compilation, builder, method.body, bodyScope)
     bodyScope
   }
 

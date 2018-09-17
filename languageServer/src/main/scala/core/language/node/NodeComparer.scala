@@ -20,8 +20,12 @@ case class NodeComparer(compareIntegers: Boolean = true, takeAllLeftKeys: Boolea
             return false
           seq1.zip(seq2).forall(p => deepEquality(p._1, p._2, closed))
         case (meta1: Node, meta2: Node) => deepEqualityMeta(meta1, meta2, closed)
-        case (int1: Integer, int2: Integer) => if (compareIntegers) first == second else true
-        case _ => first == second
+        case (int1: Integer, int2: Integer) =>
+          if (compareIntegers)
+            first == second
+          else true
+        case _ =>
+          first == second
       }
     }
 

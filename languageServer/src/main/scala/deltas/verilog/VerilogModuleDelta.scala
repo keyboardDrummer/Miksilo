@@ -19,7 +19,7 @@ object VerilogModuleDelta extends DeltaWithGrammar {
 
   object MemberShape extends NodeShape
 
-  def neww(name: String, ports: Seq[String], body: Seq[Node]): Node = Shape.create(
+  def neww(name: String, ports: Seq[Node], body: Seq[Node]): Node = Shape.create(
     Name -> name,
     Ports -> ports,
     Body -> body)

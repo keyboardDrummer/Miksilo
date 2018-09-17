@@ -9,7 +9,6 @@ import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.types.TypeAbstraction.ParameterName
 
 object MethodParameterDelta extends NodeGrammarWriter {
 
@@ -18,8 +17,8 @@ object MethodParameterDelta extends NodeGrammarWriter {
               bodyScope: Scope): Unit = {
 
     val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-    val name = parameter(ParameterName).asInstanceOf[String]
-    builder.declare(name, bodyScope, parameter.getLocation(ParameterName), Some(parameterType))
+    val name = parameter(Name).asInstanceOf[String]
+    builder.declare(name, bodyScope, parameter.getLocation(Name), Some(parameterType))
   }
 
   def getName(metaObject: Node): String = metaObject(Name).asInstanceOf[String]

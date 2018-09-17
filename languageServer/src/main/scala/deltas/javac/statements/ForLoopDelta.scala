@@ -34,9 +34,8 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformForLoop(forLoopPath: NodePath): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
-    val whileBody = forLoop.body ++
-      Seq(ExpressionAsStatementDelta.create(forLoop.increment))
-    val _while = WhileLoopDelta.create(forLoop.condition, whileBody)
+    val whileBody = Seq(forLoop.body, ExpressionAsStatementDelta.create(forLoop.increment))
+    val _while = WhileLoopDelta.create(forLoop.condition, BlockDelta.neww(whileBody))
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
     val block = BlockDelta.Shape.create(BlockDelta.Statements -> newStatements)
@@ -53,11 +52,11 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     def increment: Expression = node(Increment).asInstanceOf[Node]
     def increment_=(value: Node): Unit = node(Increment) = value
 
-    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
+    def body: T = node(Body).asInstanceOf[T]
     def body_=(value: Node): Unit = node(Body) = value
   }
 
-  def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
+  def forLoop(initializer: Node, condition: Node, increment: Node, body: Node) =
     new Node(Shape, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
   object Shape extends NodeShape

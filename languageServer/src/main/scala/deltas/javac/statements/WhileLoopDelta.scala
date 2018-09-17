@@ -34,7 +34,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
     val startLabel = JustJavaLabel.label(label)
-    val ifBody = BlockDelta.neww(whileLoop.body ++ Seq(JustJavaGoto.goto(label)))
+    val ifBody = BlockDelta.neww(Seq(whileLoop.body, JustJavaGoto.goto(label)))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)
@@ -45,10 +45,10 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]
-    def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
+    def body: T = node(Body).asInstanceOf[T]
   }
 
-  def create(condition: Node, body: Seq[Node]) = new Node(Shape, Condition -> condition, Body -> body)
+  def create(condition: Node, body: Node) = new Node(Shape, Condition -> condition, Body -> body)
 
   object Shape extends NodeShape
 
