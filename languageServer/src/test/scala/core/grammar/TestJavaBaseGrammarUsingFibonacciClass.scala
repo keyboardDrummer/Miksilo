@@ -125,7 +125,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
 
   def getFibonacciMethod: Node = {
     MethodDelta.neww("fibonacci", IntTypeDelta.intType, Seq(MethodParameterDelta.neww("index", IntTypeDelta.intType)),
-      BlockDelta.neww(Seq(ReturnExpressionDelta._return(getFibonacciExpression))), static = true, AccessibilityFieldsDelta.PublicVisibility)
+      BlockDelta.neww(Seq(ReturnExpressionDelta.neww(getFibonacciExpression))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciExpression: Node = {

@@ -7,6 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.expressions.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
@@ -22,12 +23,9 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
 
   override def dependencies: Set[Contract] = super.dependencies ++ Set(BlockDelta)
 
-  def getCondition[T <: NodeLike](ifThen: T): T = {
-    ifThen(Condition).asInstanceOf[T]
-  }
-
-  def getThenStatement[T <: NodeLike](ifThen: T): T = {
-    ifThen(Then).asInstanceOf[T]
+  implicit class IfThen[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def condition: T = node(Condition).asInstanceOf[T]
+    def thenStatement: T = node(Then).asInstanceOf[T]
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
@@ -43,10 +41,9 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
   override def description: String = "Enables using the if-then (no else) construct."
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    val body = IfThenDelta.getThenStatement(statement)
-    BlockDelta.collectConstraints(compilation, builder, body, parentScope)
-    val condition = IfThenDelta.getCondition(statement)
-    ExpressionDelta.constraints(compilation, builder, condition, BooleanTypeDelta.constraintType, parentScope)
+    val ifThen: IfThen[NodePath] = statement
+    ConstraintSkeleton.constraints(compilation, builder, ifThen.thenStatement, parentScope)
+    ExpressionDelta.constraints(compilation, builder, ifThen.condition, BooleanTypeDelta.constraintType, parentScope)
   }
 
   override def shape: NodeShape = Shape

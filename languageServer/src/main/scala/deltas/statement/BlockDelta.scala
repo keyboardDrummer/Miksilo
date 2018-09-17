@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
-import deltas.javac.statements.{ByteCodeStatementInstance, ByteCodeStatementSkeleton}
+import deltas.javac.statements.{ByteCodeStatementInstance, ByteCodeStatementSkeleton, ControlFlowGraph}
 
 object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with StatementInstance {
 
@@ -62,20 +62,11 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
     block.statements.foreach(childStatement => ConstraintSkeleton.constraints(compilation, builder, childStatement, blockScope))
   }
 
-  override def getNextLabel(statement: NodePath): (NodePath, String) = {
+  override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
     val block: BlockStatement[NodePath] = statement
-    if (block.statements.nonEmpty)
-      (block.statements.last, "next")
-    else
-      super.getNextLabel(statement)
-  }
-
-  override def getNextStatements(language: Language, statement: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = {
-    val block: BlockStatement[NodePath] = statement
-    val childStatements = block.statements
-    if (childStatements.nonEmpty)
-      Set(childStatements.head)
-    else
-      super.getNextStatements(language, statement, labels)
+    block.statements.map(statement => {
+      val instance = ByteCodeStatementSkeleton.getInstance(language, statement)
+      instance.getControlFlowGraph(language, statement, labels)
+    }).fold[ControlFlowGraph](ControlFlowGraph.empty)((l,r) => l.sequence(r))
   }
 }

@@ -15,7 +15,7 @@ object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance {
   object LabelKey extends NodeShape
   object Name extends NodeField
 
-  def label(name: String) = new Node(LabelKey, Name -> name)
+  def neww(name: String) = new Node(LabelKey, Name -> name)
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(InferredStackFrames.label(getName(statement.current)))

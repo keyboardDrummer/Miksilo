@@ -71,7 +71,7 @@ object JavaLanguage {
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
-  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseToByteCodeDelta, IfThenElseDelta,
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(IfThenElseToIfThenAndGotoDelta, JavaGotoDelta, IfThenElseDelta,
     IfThenToByteCodeDelta, IfThenDelta,
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression

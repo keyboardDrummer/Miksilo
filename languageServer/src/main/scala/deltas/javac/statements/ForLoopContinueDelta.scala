@@ -27,7 +27,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.shape == ForLoopDelta.Shape || ancestor.shape == WhileLoopDelta.Shape)
     containingLoopOption.filter(ancestor => ancestor.shape == ForLoopDelta.Shape).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, addAndReturnBeforeIncrementLabel(containingForLoop))
-      continuePath.replaceWith(JustJavaGoto.goto(label))
+      continuePath.replaceWith(JustJavaGoto.neww(label))
     })
   }
 
@@ -35,7 +35,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     val forLoop = forLoopPath.current
     val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
     val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)
-    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, JustJavaLabel.label(beforeIncrementLabel)))
+    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, JustJavaLabel.neww(beforeIncrementLabel)))
     beforeIncrementLabel
   }
 }

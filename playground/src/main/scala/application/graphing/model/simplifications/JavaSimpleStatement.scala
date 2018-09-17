@@ -7,7 +7,7 @@ import deltas.javac.statements.locals.LocalDeclarationDelta
 
 object JavaSimpleStatement extends DeltaGroup {
 
-  override def dependencies: Set[Contract] = Set(LocalDeclarationDelta, IfThenElseToByteCodeDelta, IfThenToByteCodeDelta,
+  override def dependencies: Set[Contract] = Set(LocalDeclarationDelta, IfThenElseToIfThenAndGotoDelta, IfThenToByteCodeDelta,
     ForLoopContinueDelta, ExpressionAsStatementDelta, ForLoopDelta)
 
   override def dependants: Set[Contract] = Set(JavaClassSkeleton)

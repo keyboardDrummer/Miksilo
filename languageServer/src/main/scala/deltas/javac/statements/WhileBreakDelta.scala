@@ -29,13 +29,13 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   def transformBreak(continuePath: NodePath, endLabels: mutable.Map[NodePath, String], language: Language): Unit = {
     val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.Shape)
     val label = endLabels.getOrElseUpdate(containingWhile, addEndLabel(containingWhile))
-    continuePath.replaceWith(JustJavaGoto.goto(label))
+    continuePath.replaceWith(JustJavaGoto.neww(label))
   }
 
   def addEndLabel(whilePath: NodePath): String = {
     val method = whilePath.findAncestorShape(MethodDelta.Shape)
     val endLabel = LabelDelta.getUniqueLabel("whileEnd", method)
-    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, JustJavaLabel.label(endLabel)))
+    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, JustJavaLabel.neww(endLabel)))
     endLabel
   }
 

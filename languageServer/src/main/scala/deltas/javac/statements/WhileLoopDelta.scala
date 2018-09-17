@@ -33,8 +33,8 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
-    val startLabel = JustJavaLabel.label(label)
-    val ifBody = BlockDelta.neww(Seq(whileLoop.body, JustJavaGoto.goto(label)))
+    val startLabel = JustJavaLabel.neww(label)
+    val ifBody = BlockDelta.neww(Seq(whileLoop.body, JustJavaGoto.neww(label)))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)

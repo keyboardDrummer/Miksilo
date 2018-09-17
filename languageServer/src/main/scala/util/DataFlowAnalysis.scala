@@ -17,10 +17,9 @@ abstract class DataFlowAnalysis[Node, State] {
     states.put(rootNode, rootState)
     nodeQueue.enqueue(rootNode)
     run()
-    states.toMap
   }
 
-  def run() {
+  def run(): Map[Node, State] = {
     while (nodeQueue.nonEmpty) {
       val node = nodeQueue.dequeue()
       val ingoingState = states(node)
@@ -37,5 +36,6 @@ abstract class DataFlowAnalysis[Node, State] {
         })
       }
     }
+    states.toMap
   }
 }

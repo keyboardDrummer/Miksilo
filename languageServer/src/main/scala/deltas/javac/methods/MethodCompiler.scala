@@ -15,12 +15,11 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   val parameters: Seq[Node] = method.parameters
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-  private val initialVariables = getInitialVariables
+  private val initialVariables: VariablePool = getInitialVariables
 
-  val localAnalysis = new LocalsAnalysis(compilation, method)
-  private val intermediate = new Method(PathRoot(method)).body.statements
-  val firstInstruction: NodePath = intermediate.head
-  val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
+  val firstInstruction: NodePath = new Method(PathRoot(method)).body
+  val localAnalysis = new LocalsAnalysis(compilation, method, firstInstruction, initialVariables)
+  val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run()
 
   def getInitialVariables: VariablePool = {
     var result = VariablePool(compilation)

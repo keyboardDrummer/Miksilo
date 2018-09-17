@@ -37,7 +37,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     {
       val expression = expressionMethod(Expression).asInstanceOf[Node]
       expressionMethod.shape = MethodDelta.Shape
-      expressionMethod(MethodDelta.Body) = BlockDelta.neww(Seq(ReturnExpressionDelta._return(expression)))
+      expressionMethod(MethodDelta.Body) = BlockDelta.neww(Seq(ReturnExpressionDelta.neww(expression)))
       expressionMethod.data.remove(Expression)
     }
   }

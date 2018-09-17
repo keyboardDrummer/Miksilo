@@ -5,11 +5,17 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import util.DataFlowAnalysis
 
-abstract class StatementFlowAnalysis[State](language: Language, method: Node)
+abstract class StatementFlowAnalysis[State](language: Language, method: Node, methodBody: NodePath, initialState: State)
   extends DataFlowAnalysis[NodePath, State]
 {
-  val instances = ByteCodeStatementSkeleton.instances.get(language)
-  val labels = getLabels
+  private val instances = ByteCodeStatementSkeleton.instances.get(language)
+  private val labels = getLabels
+  private val controlFlowGraph = ByteCodeStatementSkeleton.getInstance(language, methodBody).
+      getControlFlowGraph(language, methodBody, labels)
+
+  private val rootNode: NodePath = controlFlowGraph.root.get
+  states.put(rootNode, initialState)
+  nodeQueue.enqueue(rootNode)
 
   def getLabels: Map[Any, NodePath] = {
     val statements: Seq[NodePath] = PathRoot(method).selfAndDescendants.filter(node => instances.contains(node.shape))
@@ -17,6 +23,6 @@ abstract class StatementFlowAnalysis[State](language: Language, method: Node)
   }
 
   override def getOutgoingNodes(node: NodePath): Set[NodePath] = {
-    instances(node.shape).getNextStatements(language, node, labels)
+    controlFlowGraph(node)
   }
 }

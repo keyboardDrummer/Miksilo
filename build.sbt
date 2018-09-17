@@ -48,6 +48,7 @@ lazy val commonSettings = Seq(
 
 lazy val assemblySettings = Seq(
   assemblyJarName in assembly := name.value + ".jar",
+  test in assembly := {},
   assemblyMergeStrategy in assembly := {
     case PathList("META-INF", xs @ _*) => MergeStrategy.discard
     case _                             => MergeStrategy.first
@@ -59,7 +60,7 @@ lazy val languageServer = (project in file("languageServer")).
   settings(
     name := "MiksiloLspServer",
     assemblySettings,
-    mainClass in Compile := Some("languageServer.lsp.Program"),
+    mainClass in Compile := Some("languageServer.Program"),
   )
 
 lazy val playground = (project in file("playground")).

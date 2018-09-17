@@ -15,13 +15,13 @@ object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
   object GotoKey extends NodeShape
   object Target extends NodeField
 
-  def goto(label: String) = new Node(GotoKey, Target -> label)
+  def neww(label: String) = new Node(GotoKey, Target -> label)
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(LabelledLocations.goTo(getTarget(statement.current)))
   }
 
-  def getTarget(node: Node) = node(Target).asInstanceOf[String]
+  def getTarget(node: Node): String = node(Target).asInstanceOf[String]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -29,7 +29,9 @@ object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
     statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asNode GotoKey)
   }
 
-  override def getNextStatements(language: Language, obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set(labels(getTarget(obj.current)))
+  override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
+    ControlFlowGraph.singleton(labels(getTarget(statement.current))) //TODO add crash prevention.
+  }
 
   override def description: String = "Adds a goto statement"
 

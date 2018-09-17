@@ -15,8 +15,6 @@ object ReturnVoidDelta extends ByteCodeStatementInstance with StatementInstance 
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 
-  override def getNextStatements(language: Language, obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
-
   def returnToLines(_return: Node, compiler: MethodCompiler): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
   }

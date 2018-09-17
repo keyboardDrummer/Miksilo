@@ -23,8 +23,6 @@ object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementIns
 
   override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
 
-  override def getNextStatements(language: Language, obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
-
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: NodePath = getReturnValue(_return)
     val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
@@ -52,7 +50,7 @@ object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementIns
     statement.addAlternative(returnExpression)
   }
 
-  def _return(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
+  def neww(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
 
   object ReturnInteger extends NodeShape
 

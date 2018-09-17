@@ -6,8 +6,8 @@ import core.language.Compilation
 import deltas.javac.methods.VariablePool
 import deltas.javac.statements.{StatementFlowAnalysis, ByteCodeStatementSkeleton}
 
-class LocalsAnalysis(compilation: Compilation, method: Node)
-  extends StatementFlowAnalysis[VariablePool](compilation, method) {
+class LocalsAnalysis(compilation: Compilation, method: Node, methodBody: NodePath, initialVariables: VariablePool)
+  extends StatementFlowAnalysis[VariablePool](compilation, method, methodBody, initialVariables) {
 
   override def updateState(state: VariablePool, node: NodePath): VariablePool = {
     val instances = ByteCodeStatementSkeleton.instances.get(compilation)
