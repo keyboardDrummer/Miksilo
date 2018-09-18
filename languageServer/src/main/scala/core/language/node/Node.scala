@@ -21,7 +21,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   override def asNode: Node = this
   override def asPath: Option[NodePath] = None
 
-  def replaceWith(node: Node, keepData: Boolean = false): Unit = {
+  def replaceWith(node: Node, keepData: Boolean = false): Unit = { //TODO give this a name that doesn't conflict with the name in ChildPath
     shape = node.shape
     if (!keepData) {
       data.clear()

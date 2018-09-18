@@ -61,7 +61,7 @@ object JavaLanguage {
   def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
   def fields = Seq(FieldDeclarationDelta, AssignToMember)
 
-  val noVariableSyntaxSugarStatements = Seq(ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
+  val noVariableSyntaxSugarStatements = Seq(IfThenElseToIfThenAndGotoDelta, ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
   def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
     Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ThisVariableDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
@@ -71,7 +71,7 @@ object JavaLanguage {
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
 
-  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(IfThenElseToIfThenAndGotoDelta, JavaGotoDelta, IfThenElseDelta,
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta,
     IfThenToByteCodeDelta, IfThenDelta,
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression

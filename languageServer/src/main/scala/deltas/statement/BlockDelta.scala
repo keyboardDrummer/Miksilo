@@ -50,7 +50,7 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
 
   override def shape: NodeShape = Shape
 
-  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = { //TODO consider changing this to a transformation to statements, but then that would have to come after SolveConstraints
+  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val toInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
     val block: BlockStatement[NodePath] = statement
     block.statements.flatMap(childStatement => toInstructions(childStatement))
