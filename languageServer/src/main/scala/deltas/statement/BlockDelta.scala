@@ -25,14 +25,18 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
     def statements_=(value: Seq[T]): Unit = node(Statements) = value
   }
 
+
+
+  object BlockOrStatementGrammar extends GrammarKey
+  object StatementAsBlockGrammar extends GrammarKey
+  object Grammar extends GrammarKey
+
   val indentAmount = 4
-
-
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
 
-    val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.as(Statements).asNode(Shape).indent(indentAmount) %< "}")
+    val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.as(Statements).indent(indentAmount) %< "}" asNode Shape)
     val statementAsSequence = statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head)
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementAsSequence.as(Statements).asNode(Shape))
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)
@@ -43,10 +47,6 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
       ConstraintSkeleton.constraints(compilation, builder, statement, parentScope)
     }
   }
-
-  object BlockOrStatementGrammar extends GrammarKey
-  object StatementAsBlockGrammar extends GrammarKey
-  object Grammar extends GrammarKey
 
   override def shape: NodeShape = Shape
 
