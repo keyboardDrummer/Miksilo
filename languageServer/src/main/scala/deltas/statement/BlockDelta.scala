@@ -25,8 +25,6 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
     def statements_=(value: Seq[T]): Unit = node(Statements) = value
   }
 
-
-
   object BlockOrStatementGrammar extends GrammarKey
   object StatementAsBlockGrammar extends GrammarKey
   object Grammar extends GrammarKey
@@ -64,9 +62,7 @@ object BlockDelta extends ByteCodeStatementInstance with DeltaWithGrammar with S
 
   override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
     val block: BlockStatement[NodePath] = statement
-    block.statements.map(statement => {
-      val instance = ByteCodeStatementSkeleton.getInstance(language, statement)
-      instance.getControlFlowGraph(language, statement, labels)
-    }).fold[ControlFlowGraph](ControlFlowGraph.empty)((l,r) => l.sequence(r))
+    val childGraphs = block.statements.map(statement => ControlFlowGraph.getControlFlowGraph(language, statement, labels))
+    childGraphs.fold[ControlFlowGraph](ControlFlowGraph.empty)((l,r) => l.sequence(r))
   }
 }

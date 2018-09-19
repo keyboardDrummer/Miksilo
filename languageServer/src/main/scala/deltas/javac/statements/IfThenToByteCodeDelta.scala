@@ -33,14 +33,5 @@ object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
 
   override def description: String = "Translates if-then statements to bytecode"
 
-  override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
-    val thenStatement = statement.thenStatement
-    val thenInstance = ByteCodeStatementSkeleton.getInstance(language, thenStatement)
-    val conditionGraph = ControlFlowGraph.singleton(statement)
-    val trueGraph = conditionGraph.sequence(thenInstance.getControlFlowGraph(language, thenStatement, labels))
-    val elseGraph = conditionGraph
-    trueGraph.parallel(elseGraph)
-  }
-
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {}
 }

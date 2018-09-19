@@ -11,7 +11,7 @@ import deltas.statement.{BlockDelta, IfThenDelta, IfThenElseDelta}
 
 object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
 
-  override def description: String = "Enables using the if-then-else construct."
+  override def description: String = "Translates the if-then-else into if-then and goto."
 
   override def dependencies: Set[Contract] = super.dependencies ++
     Set(IfThenElseDelta, JavaGotoDelta, BlockDelta)

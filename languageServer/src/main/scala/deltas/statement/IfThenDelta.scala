@@ -9,6 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.expressions.ExpressionDelta
+import deltas.javac.statements.ControlFlowGraph
 import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends DeltaWithGrammar with StatementInstance {
@@ -47,4 +48,13 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
   }
 
   override def shape: NodeShape = Shape
+
+  override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
+    val thenStatement = statement.thenStatement
+    val thenGraph = ControlFlowGraph.getControlFlowGraph(language, thenStatement, labels)
+    val conditionGraph = ControlFlowGraph.singleton(statement)
+    val trueGraph = conditionGraph.sequence(thenGraph)
+    val elseGraph = conditionGraph
+    trueGraph.parallel(elseGraph)
+  }
 }

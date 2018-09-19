@@ -90,7 +90,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
     override def toString: String = contract.toString
 
-    override def dependencies: Set[Contract] = contract.dependencies.map(dependency => new WrappedContract(dependency))
+    override def dependencies: Set[Contract] = contract.dependencies.map {
+      case delta: Delta => new WrappedDelta(delta)
+      case dependency => new WrappedContract(dependency)
+    }
 
     override def equals(obj: scala.Any): Boolean = obj.equals(contract)
 

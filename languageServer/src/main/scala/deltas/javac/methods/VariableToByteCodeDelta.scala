@@ -8,13 +8,14 @@ import deltas.bytecode.coreInstructions.integers.LoadIntegerDelta
 import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
+import deltas.expressions.VariableDelta
 import deltas.expressions.VariableDelta._
 import deltas.javac.expressions.ConvertsToByteCode
 import deltas.javac.types.BooleanTypeDelta
 
 object VariableToByteCodeDelta extends Delta with ConvertsToByteCode {
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, LoadIntegerDelta)
+  override def dependencies: Set[Contract] = Set(VariableDelta, MethodDelta, LoadIntegerDelta)
 
   override val shape = Shape
 

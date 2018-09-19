@@ -8,10 +8,9 @@ import util.DataFlowAnalysis
 abstract class StatementFlowAnalysis[State](language: Language, method: Node, methodBody: NodePath, initialState: State)
   extends DataFlowAnalysis[NodePath, State]
 {
-  private val instances = ByteCodeStatementSkeleton.instances.get(language)
+  private val instances = ControlFlowGraph.instances.get(language)
   private val labels = getLabels
-  private val controlFlowGraph = ByteCodeStatementSkeleton.getInstance(language, methodBody).
-      getControlFlowGraph(language, methodBody, labels)
+  private val controlFlowGraph = ControlFlowGraph.getControlFlowGraph(language, methodBody, labels)
 
   private val rootNode: NodePath = controlFlowGraph.root.get
   states.put(rootNode, initialState)
