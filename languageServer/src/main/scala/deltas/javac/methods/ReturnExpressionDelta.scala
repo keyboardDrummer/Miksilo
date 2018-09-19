@@ -17,7 +17,8 @@ import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.statements.ByteCodeStatementInstance
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementInstance {
+object ReturnExpressionDelta extends ByteCodeStatementInstance with StatementInstance
+  with DeltaWithGrammar {
 
   override def description: String = "Allows returning a value using an expression."
 

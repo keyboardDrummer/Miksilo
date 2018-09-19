@@ -1,10 +1,9 @@
 package deltas.javac.statements
 
 import core.deltas._
-import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.javac.expressions.ToByteCodeSkeleton
@@ -32,6 +31,4 @@ object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
   }
 
   override def description: String = "Translates if-then statements to bytecode"
-
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {}
 }

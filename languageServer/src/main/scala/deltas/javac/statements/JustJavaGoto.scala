@@ -1,5 +1,6 @@
 package deltas.javac.statements
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
@@ -9,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaGoto extends ByteCodeStatementInstance with StatementInstance {
+object JustJavaGoto extends ByteCodeStatementInstance with DeltaWithGrammar with StatementInstance {
   override val shape = GotoKey
 
   object GotoKey extends NodeShape

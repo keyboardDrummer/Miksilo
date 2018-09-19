@@ -39,7 +39,7 @@ import deltas.javac.statements._
 import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
-import deltas.statement.{BlockDelta, IfThenDelta, IfThenElseDelta, StatementDelta}
+import deltas.statement._
 
 object JavaLanguage {
 

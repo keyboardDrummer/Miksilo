@@ -11,7 +11,7 @@ import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
 import deltas.javac.statements.ByteCodeStatementInstance
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnVoidDelta extends ByteCodeStatementInstance with StatementInstance {
+object ReturnVoidDelta extends ByteCodeStatementInstance with StatementInstance with DeltaWithGrammar  {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
 

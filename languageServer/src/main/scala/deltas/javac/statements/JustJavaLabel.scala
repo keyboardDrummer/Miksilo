@@ -1,5 +1,6 @@
 package deltas.javac.statements
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
@@ -9,7 +10,8 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance {
+object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance
+  with DeltaWithGrammar {
   override val shape = LabelKey
 
   object LabelKey extends NodeShape

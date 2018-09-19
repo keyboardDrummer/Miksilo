@@ -1,5 +1,6 @@
 package deltas.javac.statements
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
@@ -12,7 +13,9 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ExpressionAsStatementDelta extends ByteCodeStatementInstance with StatementInstance {
+object ExpressionAsStatementDelta extends ByteCodeStatementInstance
+  with StatementInstance
+  with DeltaWithGrammar {
 
   object Shape extends NodeShape
 

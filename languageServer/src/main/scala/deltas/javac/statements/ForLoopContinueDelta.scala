@@ -7,7 +7,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
 import deltas.javac.statements.ForLoopDelta.ForLoop
-import deltas.statement.BlockDelta
+import deltas.statement.{BlockDelta, WhileLoopDelta}
 
 import scala.collection.mutable
 

@@ -13,7 +13,8 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.ByteCodeStatementInstance
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object LocalDeclarationDelta extends ByteCodeStatementInstance with StatementInstance {
+object LocalDeclarationDelta extends ByteCodeStatementInstance with StatementInstance
+  with DeltaWithGrammar {
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]

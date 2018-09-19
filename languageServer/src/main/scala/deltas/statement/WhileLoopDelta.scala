@@ -1,4 +1,4 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.expressions.ExpressionDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement.{BlockDelta, IfThenDelta, StatementDelta}
+import deltas.javac.statements.{JavaGotoDelta, JustJavaGoto, JustJavaLabel}
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -41,7 +41,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
-  override def dependencies: Set[Contract] = Set(IfThenToByteCodeDelta, BlockDelta, JavaGotoDelta)
+  override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]

@@ -7,7 +7,7 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement.StatementDelta
+import deltas.statement.{StatementDelta, WhileLoopDelta}
 
 import scala.collection.mutable
 
