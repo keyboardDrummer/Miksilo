@@ -9,13 +9,13 @@ import deltas.javac.statements.ForLoopDelta
 import deltas.statement._
 
 object VerilogLanguage {
-  val genericDelta = Seq(ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
+  val genericDeltas = Seq(ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
     IntLiteralDelta, VariableDelta, ExpressionDelta,
     ParseUsingTextualGrammar, SolveConstraintsDelta)
 
   val deltas: Seq[Delta] = Seq(AlwaysDelta, NonBlockingAssignmentDelta, BeginEndDelta,
     PortTypeSpecifierDelta,
     VerilogModuleDelta,
-    ) ++ genericDelta
+    ) ++ genericDeltas
   val language: Language = Delta.buildLanguage(deltas)
 }
