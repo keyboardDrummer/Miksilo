@@ -119,12 +119,12 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val fibonacciCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(IntLiteralDelta.neww(5)))
     val printCall = CallDelta.neww(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.neww("System"), "out"), "print"),
       Seq(fibonacciCall))
-    MethodDelta.neww("main", VoidTypeDelta.voidType, Seq(MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
+    MethodDelta.neww("main", VoidTypeDelta.voidType, Seq(MethodParameters.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
       BlockDelta.neww(Seq(ExpressionAsStatementDelta.create(printCall))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 
   def getFibonacciMethod: Node = {
-    MethodDelta.neww("fibonacci", IntTypeDelta.intType, Seq(MethodParameterDelta.neww("index", IntTypeDelta.intType)),
+    MethodDelta.neww("fibonacci", IntTypeDelta.intType, Seq(MethodParameters.neww("index", IntTypeDelta.intType)),
       BlockDelta.neww(Seq(ReturnExpressionDelta.neww(getFibonacciExpression))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 

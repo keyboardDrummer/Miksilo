@@ -10,7 +10,9 @@ import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.IfThenDelta
 import deltas.statement.IfThenDelta.IfThen
 
-object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
+object IfThenToByteCodeDelta extends StatementToByteCodeDelta {
+
+  override def description: String = "Compiler if-then statements to bytecode"
 
   override val shape = IfThenDelta.Shape
 
@@ -23,12 +25,10 @@ object IfThenToByteCodeDelta extends ByteCodeStatementInstance {
     val end = InferredStackFrames.label(endLabelName)
     val jumpToEndIfFalse = LabelledLocations.ifZero(endLabelName)
     val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
-    val toInstructionsStatement = ByteCodeStatementSkeleton.getToInstructions(compilation)
+    val toInstructionsStatement = StatementToByteCodeSkeleton.getToInstructions(compilation)
     toInstructionsExpr(ifThen.condition) ++
       Seq(jumpToEndIfFalse) ++
       toInstructionsStatement(ifThen.thenStatement) ++
       Seq(end)
   }
-
-  override def description: String = "Translates if-then statements to bytecode"
 }

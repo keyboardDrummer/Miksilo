@@ -33,7 +33,7 @@ object VerilogModuleDelta extends DeltaWithGrammar {
     import grammars._
 
     val member = create(MemberShape)
-    val variable = find(VariableDelta.VariableGrammar)
+    val variable = find(VariableDelta.Shape)
     val parameterList: BiGrammar = variable.manySeparatedVertical(",").as(Ports).inParenthesis
     val body: BiGrammar = member.manyVertical.as(Body)
     val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape

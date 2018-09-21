@@ -20,7 +20,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
-import deltas.javac.statements.ByteCodeStatementSkeleton
+import deltas.javac.statements.StatementToByteCodeSkeleton
 
 object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
 
@@ -51,7 +51,7 @@ object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
     val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
-    val argumentInstructions = callArguments.flatMap(argument => ByteCodeStatementSkeleton.getToInstructions(compilation)(argument))
+    val argumentInstructions = callArguments.flatMap(argument => StatementToByteCodeSkeleton.getToInstructions(compilation)(argument))
     Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 

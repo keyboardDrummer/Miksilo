@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaGoto extends ByteCodeStatementInstance with DeltaWithGrammar with StatementInstance {
+object JustJavaGoto extends StatementToByteCodeDelta with DeltaWithGrammar with StatementInstance {
   override val shape = GotoKey
 
   object GotoKey extends NodeShape
@@ -31,7 +31,7 @@ object JustJavaGoto extends ByteCodeStatementInstance with DeltaWithGrammar with
   }
 
   override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {
-    ControlFlowGraph.singleton(labels(getTarget(statement.current))) //TODO add crash prevention.
+    labels.get(getTarget(statement.current)).fold(ControlFlowGraph.empty)(ControlFlowGraph.singleton)
   }
 
   override def description: String = "Adds a goto statement"

@@ -23,7 +23,9 @@ import deltas.statement.BlockDelta
 import scala.collection.mutable
 
 object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
-  with WithCompilationState with HasDeclaration with HasConstraints {
+  with WithCompilationState with HasDeclarationDelta with HasConstraintsDelta {
+
+  override def shape: NodeShape = Shape
 
   override def description: String = "Defines a skeleton for the Java class."
 
@@ -163,7 +165,6 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   object Name extends NodeField
 
   override def inject(language: Language): Unit = {
-    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")

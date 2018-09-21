@@ -36,7 +36,7 @@ object AssignToMember extends DeltaWithGrammar {
     import grammars._
     val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
-    val variableGrammar = find(VariableDelta.VariableGrammar)
+    val variableGrammar = find(VariableDelta.Shape)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Shape)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addAlternative(selectGrammar)

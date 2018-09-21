@@ -32,7 +32,7 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
       AdditionDelta.Left -> incrementAssignment.current(AssignmentSkeleton.Target),
       AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentSkeleton.Value))
     val assignment = AssignmentSkeleton.assignment(target, newValue)
-    incrementAssignment.replaceWith(assignment)
+    incrementAssignment.replaceData(assignment)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

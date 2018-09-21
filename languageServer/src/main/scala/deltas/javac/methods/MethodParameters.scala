@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 
-object MethodParameterDelta extends NodeGrammarWriter {
+object MethodParameters extends NodeGrammarWriter {
 
   def declare(compilation: Compilation, builder: ConstraintBuilder, parameter: MethodParameter[NodePath],
               parentScope: Scope,
@@ -21,14 +21,12 @@ object MethodParameterDelta extends NodeGrammarWriter {
     builder.declare(name, bodyScope, parameter.getLocation(Name), Some(parameterType))
   }
 
-  def getName(metaObject: Node): String = metaObject(Name).asInstanceOf[String]
-
   implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
     def _type_=(value: T): Unit = node(Type) = value
 
-    def name: Any = node(Name)
-    def name_=(value: Any): Unit = node(Name) = value
+    def name: String = node(Name).asInstanceOf[String]
+    def name_=(value: String): Unit = node(Name) = value
   }
 
   def neww(name: String, _type: Any): Node = {
@@ -37,7 +35,7 @@ object MethodParameterDelta extends NodeGrammarWriter {
       Type -> _type)
   }
 
-  def getParameterGrammar(grammars: LanguageGrammars): BiGrammar = {
+  def getGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)

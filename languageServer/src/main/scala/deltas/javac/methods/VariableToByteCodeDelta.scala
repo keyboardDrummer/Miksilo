@@ -15,6 +15,8 @@ import deltas.javac.types.BooleanTypeDelta
 
 object VariableToByteCodeDelta extends Delta with ConvertsToByteCode {
 
+  override def description: String = "Compiles a variable to byte-code"
+
   override def dependencies: Set[Contract] = Set(VariableDelta, MethodDelta, LoadIntegerDelta)
 
   override val shape = Shape
@@ -30,6 +32,4 @@ object VariableToByteCodeDelta extends Delta with ConvertsToByteCode {
       case QualifiedObjectTypeDelta.Shape => LoadAddressDelta.addressLoad(variableAddress)
     })
   }
-
-  override def description: String = "Compiles a variable to byte-code"
 }

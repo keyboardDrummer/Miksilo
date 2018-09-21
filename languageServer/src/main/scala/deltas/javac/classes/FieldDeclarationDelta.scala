@@ -16,7 +16,9 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 
-object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraintsDelta {
+object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
+  with HasDeclarationDelta
+  with HasConstraintsDelta {
 
   override def description: String = "Enables adding a field declaration without an initializer to a Java class."
 
@@ -85,11 +87,6 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     memberGrammar.addAlternative(fieldGrammar)
-  }
-
-  override def inject(language: Language): Unit = {
-    super.inject(language)
-    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

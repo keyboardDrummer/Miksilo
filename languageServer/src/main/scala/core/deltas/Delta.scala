@@ -14,7 +14,7 @@ trait Delta extends Contract with Key {
 }
 
 object Delta {
-  def buildLanguage(topToBottom: Seq[Delta]): Language = { //TODO verse de deltas.
+  def buildLanguage(topToBottom: Seq[Delta]): Language = {
     val explicitDeltas = topToBottom.reverse
     val allDeltas = validateDependencies(explicitDeltas)
     val result = new Language()

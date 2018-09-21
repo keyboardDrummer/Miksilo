@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaLabel extends ByteCodeStatementInstance with StatementInstance
+object JustJavaLabel extends StatementToByteCodeDelta with StatementInstance
   with DeltaWithGrammar {
   override val shape = LabelKey
 

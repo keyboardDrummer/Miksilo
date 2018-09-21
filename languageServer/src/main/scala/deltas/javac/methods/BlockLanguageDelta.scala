@@ -30,10 +30,10 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val block = program
-    val mainArgument: Node = MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
+    val mainArgument: Node = MethodParameters.neww("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
     val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), block, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))
-    program.replaceWith(javaClass)
+    program.replaceData(javaClass)
   }
 
   //TODO bring back. override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)

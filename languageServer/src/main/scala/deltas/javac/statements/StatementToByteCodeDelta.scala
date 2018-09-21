@@ -5,10 +5,10 @@ import core.deltas.path.NodePath
 import core.language.node.Node
 import core.language.{Compilation, Language}
 
-trait ByteCodeStatementInstance extends Delta with HasShape {
+trait StatementToByteCodeDelta extends Delta with HasShape {
 
   override def inject(language: Language): Unit = {
-    ByteCodeStatementSkeleton.instances.add(language, this)
+    StatementToByteCodeSkeleton.instances.add(language, this)
     super.inject(language)
   }
 

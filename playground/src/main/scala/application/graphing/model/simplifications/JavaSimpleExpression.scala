@@ -13,7 +13,7 @@ import deltas.statement.StatementDelta
 object JavaSimpleExpression extends DeltaGroup {
 
   override def dependencies: Set[Contract] =
-    Set(LessThanDelta, AdditionDelta, BooleanLiteralDelta, IntLiteralDelta, SubtractionDelta, TernaryDelta, ParenthesisDelta, NullDelta, EqualityDelta) ++
+    Set(LessThanDelta, AdditionDelta, BooleanLiteralDelta, IntLiteralDelta, SubtractionDelta, TernaryDelta, ParenthesisInExpressionDelta, NullDelta, EqualityDelta) ++
       Set[Contract](AssignmentPrecedence) //TODO not sure
 
   override def dependants: Set[Contract] = Set(StatementDelta)

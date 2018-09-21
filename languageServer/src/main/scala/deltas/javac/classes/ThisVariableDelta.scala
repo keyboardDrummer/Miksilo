@@ -22,7 +22,7 @@ object ThisVariableDelta extends DeltaWithGrammar
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val variable = find(VariableDelta.VariableGrammar)
+    val variable = find(VariableDelta.Shape)
     val thisGrammar = create(Grammar, (thisName: BiGrammar).as(Name)).asNode(Shape)
     variable.addAlternative(thisGrammar)
   }

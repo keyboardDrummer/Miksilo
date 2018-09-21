@@ -5,12 +5,13 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
 import core.language.node.Node
 import core.language.{Compilation, Language}
+import deltas.expressions.VariableDelta.Variable
 import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
 import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableToByteCodeDelta}
+import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -18,21 +19,21 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, ThisVariableDelta)
 
-  def addThisToVariable(compilation: Compilation, variable: ChildPath) {
+  def addThisToVariable(compilation: Compilation, path: ChildPath) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val name = VariableDelta.getName(variable)
+    val variable: Variable[NodePath] = path
     val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
-    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
+    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(variable.name)) {
       val currentClass = compiler.currentClassInfo
-      currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
+      currentClass.methods.keys.find(key => key.methodName == variable.name).foreach(key => {
         val classMember: ClassMember = currentClass.methods(key)
-        addThisToVariable(classMember, currentClass, variable)
+        addThisToVariable(classMember, currentClass, path)
       })
 
-      currentClass.fields.keys.find(key => key == name).foreach(key => {
+      currentClass.fields.keys.find(key => key == variable.name).foreach(key => {
         val classMember = currentClass.fields(key)
-        addThisToVariable(classMember, currentClass, variable)
+        addThisToVariable(classMember, currentClass, path)
       })
     }
   }

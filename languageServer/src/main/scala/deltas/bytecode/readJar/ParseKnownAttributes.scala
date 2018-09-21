@@ -41,6 +41,6 @@ object ParseKnownAttributes extends DeltaWithPhase {
     val inputBytes = typedNode.data.toArray
     val parseResult = parser(new ArrayReader(0, inputBytes))
     val newNode = parseResult.get
-    typedNode.node.replaceWith(newNode)
+    typedNode.node.replaceData(newNode)
   }
 }

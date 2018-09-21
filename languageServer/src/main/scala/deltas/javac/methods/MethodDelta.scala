@@ -22,8 +22,8 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
-import deltas.javac.methods.MethodParameterDelta.MethodParameter
-import deltas.javac.statements.ByteCodeStatementSkeleton
+import deltas.javac.methods.MethodParameters.MethodParameter
+import deltas.javac.statements.StatementToByteCodeSkeleton
 import deltas.javac.types.{MethodType, TypeAbstraction}
 import deltas.statement.BlockDelta
 import deltas.statement.BlockDelta.BlockStatement
@@ -31,7 +31,7 @@ import deltas.statement.BlockDelta.BlockStatement
 
 
 object MethodDelta extends DeltaWithGrammar with WithCompilationState
-  with ClassMemberDelta with HasDeclaration with HasConstraints with HasShape {
+  with ClassMemberDelta with HasDeclarationDelta with HasConstraintsDelta with HasShape {
 
   override def description: String = "Enables Java classes to contain methods."
 
@@ -68,7 +68,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     def bindMethod(method: Method[Node]) = {
       val methodName: String = MethodDelta.getMethodName(method)
       val parameters = method.parameters
-      val parameterTypes = parameters.map(p => getParameterType(p, classCompiler))
+      val parameterTypes = parameters.map(p => getParameterType(PathRoot(p), classCompiler))
       val _type = getMethodType(method)
       val key = MethodClassKey(methodName, parameterTypes.toVector)
       classInfo.methods(key) = MethodInfo(_type, method.isStatic)
@@ -76,15 +76,15 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   private def getMethodType[T <: NodeLike](method: Method[T]) = {
-    val parameterTypes = method.parameters.map(p => p(MethodParameterDelta.Type).asInstanceOf[Node])
+    val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[Node])
     MethodType.construct(method.returnType.asNode, parameterTypes)
   }
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
     AccessibilityFieldsDelta)
 
-  def getParameterType(metaObject: Node, classCompiler: ClassCompiler): Node = {
-    val result = PathRoot(metaObject)(MethodParameterDelta.Type).asInstanceOf[NodePath]
+  def getParameterType(parameter: MethodParameter[NodePath], classCompiler: ClassCompiler): Node = {
+    val result = parameter._type
     JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
@@ -107,7 +107,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
-      val statementToInstructions = ByteCodeStatementSkeleton.getToInstructions(compilation)
+      val statementToInstructions = StatementToByteCodeSkeleton.getToInstructions(compilation)
       val instructions = statementToInstructions(method.body)
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
@@ -148,7 +148,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
     val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeDelta.voidType) | parseType)
 
-    val parseParameter = MethodParameterDelta.getParameterGrammar(_grammars)
+    val parseParameter = MethodParameters.getGrammar(_grammars)
     val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
 
 
@@ -196,15 +196,9 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   object TypeParameters extends NodeField
 
-  override def inject(language: Language): Unit = {
-    super.inject(language)
-    ConstraintSkeleton.hasDeclarations.add(language, Shape, this)
-    ConstraintSkeleton.hasConstraints.add(language, this)
-  }
-
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
     val method: Method[NodePath] = path
-    val parameterTypes = method.parameters.map(p => p(MethodParameterDelta.Type).asInstanceOf[NodePath])
+    val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath])
     val returnType = method.returnType
     val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
 
@@ -219,7 +213,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val method: Method[NodePath] = path
     val bodyScope = builder.newScope(Some(parentScope), "methodBody")
     method.parameters.foreach(parameter => {
-      MethodParameterDelta.declare(compilation, builder, parameter, parentScope, bodyScope)
+      MethodParameters.declare(compilation, builder, parameter, parentScope, bodyScope)
     })
     ConstraintSkeleton.constraints(compilation, builder, method.body, bodyScope)
     bodyScope

@@ -9,7 +9,7 @@ import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MethodDelta, MethodParameterDelta, ReturnExpressionDelta}
+import deltas.javac.methods.{MethodDelta, MethodParameters, ReturnExpressionDelta}
 import deltas.statement.BlockDelta
 import util.{TestLanguageBuilder, TestUtils}
 
@@ -29,7 +29,7 @@ class FibonacciWithoutMain {
   }
 
   def getFibonacciMethodJava: Node = {
-    val parameters = Seq(MethodParameterDelta.neww("i", IntTypeDelta.intType))
+    val parameters = Seq(MethodParameters.neww("i", IntTypeDelta.intType))
     val recursiveCall1 = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.subtraction(VariableDelta.neww("i"), IntLiteralDelta.neww(1))))
     val recursiveCall2 = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.subtraction(VariableDelta.neww("i"), IntLiteralDelta.neww(2))))
     val condition = LessThanDelta.neww(VariableDelta.neww("i"), IntLiteralDelta.neww(2))

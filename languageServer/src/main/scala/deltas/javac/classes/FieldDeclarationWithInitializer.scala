@@ -41,7 +41,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val assignment = AssignmentSkeleton.assignment(VariableDelta.neww(name), field.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
-    field.node.replaceWith(fieldDeclaration)
+    field.node.replaceData(fieldDeclaration)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

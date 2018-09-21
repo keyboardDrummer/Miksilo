@@ -78,7 +78,7 @@ object JavaLanguage {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanDelta, GreaterThanDelta, AddRelationalPrecedence, AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta,
-    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisDelta, ExpressionDelta) ++ allByteCodeDeltas
+    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

@@ -3,7 +3,7 @@ package deltas.javac
 import core.language.node.Node
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
-import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameterDelta}
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
 import deltas.statement.BlockDelta
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
@@ -29,7 +29,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(MethodParameterDelta.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(MethodParameters.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))
     MethodDelta.neww("main", VoidTypeDelta.voidType, parameters,  BlockDelta.neww(), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 }

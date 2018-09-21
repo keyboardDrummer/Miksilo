@@ -19,7 +19,7 @@ object IntLiteralToByteCodeDelta extends ConvertsToByteCode {
     if (-1 <= value && value <= 5) {
       val node = literal.current.shallowClone
       node.data.remove(Value)
-      node.replaceWith(SmallIntegerConstantDelta.integerConstant(value), keepData = true)
+      node.replaceData(SmallIntegerConstantDelta.integerConstant(value), keepData = true)
       Seq(node) //TODO dit mooier maken. Maak de nieuwe node gewoon en en schuif deze over de oude node.
     }
     else

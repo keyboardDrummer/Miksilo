@@ -13,7 +13,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ExpressionAsStatementDelta extends ByteCodeStatementInstance
+object ExpressionAsStatementDelta extends StatementToByteCodeDelta
   with StatementInstance
   with DeltaWithGrammar {
 

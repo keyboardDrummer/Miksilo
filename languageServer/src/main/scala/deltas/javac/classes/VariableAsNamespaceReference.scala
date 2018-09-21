@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.expressions.VariableDelta
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, ResolveNamespaceOrObjectVariableAmbiguity, VariableToByteCodeDelta}
-import deltas.expressions.VariableDelta.Shape
+import deltas.expressions.VariableDelta.{Shape, Variable}
 
 object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
 
@@ -18,22 +18,22 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, variable) => {
+    MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, _variable) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
+      val variable: Variable[NodePath] = _variable
       getReferenceKind(variable, compiler)
     })
   }
 
-  def getReferenceKind(variable: NodePath, classCompiler: ClassCompiler): ReferenceKind = {
+  def getReferenceKind(variable: Variable[NodePath], classCompiler: ClassCompiler): ReferenceKind = {
 
-    val name = VariableDelta.getName(variable)
-    val isClass = classCompiler.classNames.contains(name)
+    val isClass = classCompiler.classNames.contains(variable.name)
     if (isClass)
-      new ClassOrObjectReference(classCompiler.findClass(name), true)
+      ClassOrObjectReference(classCompiler.findClass(variable.name), wasClass = true)
     else {
-      val mbPackage = classCompiler.javaCompiler.classPath.content.get(name)
+      val mbPackage = classCompiler.javaCompiler.classPath.content.get(variable.name)
       if (mbPackage.isDefined)
-        new PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
+        PackageReference(mbPackage.get.asInstanceOf[PackageSignature])
       else {
         MemberSelectorDelta.getReferenceKindFromExpressionType(classCompiler, variable)
       }
@@ -44,7 +44,7 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     val namespaceOrObjectVariableDeclaration =
-      builder.resolve(VariableDelta.getName(variable), variable.getLocation(VariableDelta.Name), scope)
+      builder.resolve(variable.name, variable.getLocation(VariableDelta.Name), scope)
     val result = builder.declarationVariable()
     builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result

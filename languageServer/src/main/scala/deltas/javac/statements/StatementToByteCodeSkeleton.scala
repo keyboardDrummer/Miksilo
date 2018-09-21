@@ -5,7 +5,7 @@ import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
 import core.language.node.{Node, NodeLike, NodeWrapper}
 
-object ByteCodeStatementSkeleton {
+object StatementToByteCodeSkeleton {
 
   implicit class Statement[T <: NodeLike](val node: T) extends NodeWrapper[T] { }
 
@@ -13,9 +13,9 @@ object ByteCodeStatementSkeleton {
     statement => getInstance(compilation, statement).toByteCode(statement, compilation)
   }
 
-  def getInstance(language: Language, statement: NodePath): ByteCodeStatementInstance = {
+  def getInstance(language: Language, statement: NodePath): StatementToByteCodeDelta = {
     instances.get(language, statement.shape)
   }
 
-  val instances = new ShapeProperty[ByteCodeStatementInstance]
+  val instances = new ShapeProperty[StatementToByteCodeDelta]
 }

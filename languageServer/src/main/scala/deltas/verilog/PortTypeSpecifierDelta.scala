@@ -28,7 +28,7 @@ object PortTypeSpecifierDelta extends DeltaWithGrammar with HasConstraintsDelta 
     import grammars._
     val member = find(VerilogModuleDelta.MemberShape)
 
-    val variable = find(VariableDelta.VariableGrammar)
+    val variable = find(VariableDelta.Shape)
     val _type: BiGrammar = "input" | "output" | "reg"
     val input: BiGrammar = _type.as(Type) ~~ variable.manySeparated(",").as(Variables) ~ ";" asNode Shape
     member.addAlternative(input)
