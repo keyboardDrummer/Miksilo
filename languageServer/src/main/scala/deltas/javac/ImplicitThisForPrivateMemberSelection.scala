@@ -46,14 +46,8 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
     variable.replaceWith(selector)
   }
 
-  def getVariableWithCorrectPath(obj: NodePath): NodePath = {
-    if (obj.shape == MethodDelta.Shape)
-      return PathRoot(obj.current)
-
-    obj match {
-      case FieldValue(parent, field) => FieldValue(getVariableWithCorrectPath(parent), field)
-      case SequenceElement(parent, field, index) => SequenceElement(getVariableWithCorrectPath(parent), field, index)
-    }
+  def getVariableWithCorrectPath(path: NodePath): NodePath = {
+    path.stopAt(ancestor => ancestor.shape == MethodDelta.Shape)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
