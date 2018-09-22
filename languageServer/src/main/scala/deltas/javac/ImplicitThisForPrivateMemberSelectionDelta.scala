@@ -13,7 +13,7 @@ import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
-object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
+object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
@@ -53,7 +53,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val programWithOrigin: NodePath = PathRoot(program)
     programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
-        case JavaClassSkeleton.Shape =>
+        case JavaClassSkeleton.Shape => //TODO get rid of this ugly mess
           JavaLang.loadIntoClassPath(compilation)
 
           val classCompiler = ClassCompiler(obj, compilation)

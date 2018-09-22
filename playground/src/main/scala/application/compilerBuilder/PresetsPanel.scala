@@ -2,10 +2,10 @@ package application.compilerBuilder
 
 import java.awt.event._
 import java.awt.{GridBagConstraints, GridBagLayout}
+
 import javax.swing._
 import javax.swing.event.ListSelectionEvent
 import javax.swing.text.AbstractDocument
-
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.deltas.Delta
@@ -16,8 +16,8 @@ import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
-import deltas.javac.statements.{ForLoopContinueDelta, ForLoopDelta}
+import deltas.javac.statements.ForLoopContinueDelta
+import deltas.statement.{ForLoopDelta, LocalDeclarationWithInitializerDelta}
 
 object PresetsPanel
 {
@@ -68,7 +68,7 @@ object PresetsPanel
 
   def getAddImplicitsPreset: Preset = {
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, ImplicitReturnAtEndOfMethod)
+      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelectionDelta, ImplicitReturnAtEndOfMethod)
 
     new Preset("Reveal Java Implicits", JavaLanguage.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
@@ -76,7 +76,7 @@ object PresetsPanel
   def getRevealSyntaxSugar: Preset = {
     val implicits = Seq[Delta](DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
       ConstructorDelta, ImplicitReturnAtEndOfMethod, IncrementAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerDelta,
-      ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
+      ImplicitThisForPrivateMemberSelectionDelta, ImplicitJavaLangImport)
 
     Preset("Reveal Syntax Sugar", JavaLanguage.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
       "Performs all compiler phases that still maintain a valid Java program.")

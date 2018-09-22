@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.expressions.ExpressionDelta
 import deltas.javac.methods.MethodDelta
-import deltas.javac.statements.{JavaGotoDelta, JustJavaGoto, JustJavaLabel}
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -33,15 +32,15 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
-    val startLabel = JustJavaLabel.neww(label)
-    val ifBody = BlockDelta.neww(Seq(whileLoop.body, JustJavaGoto.neww(label)))
+    val startLabel = LabelStatementDelta.neww(label)
+    val ifBody = BlockDelta.neww(Seq(whileLoop.body, GotoStatementDelta.neww(label)))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)
     whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
   }
 
-  override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, JavaGotoDelta)
+  override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, LabelStatementDelta, GotoStatementDelta)
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]

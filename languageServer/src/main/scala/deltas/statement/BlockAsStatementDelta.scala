@@ -1,9 +1,8 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
-import deltas.statement.{BlockDelta, StatementDelta}
 
 object BlockAsStatementDelta extends DeltaWithGrammar {
   override def description: String = "Allows using a block as a statement, to create a new scope."

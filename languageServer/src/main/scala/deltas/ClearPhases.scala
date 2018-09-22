@@ -1,6 +1,6 @@
 package deltas
 
-import core.deltas.Delta
+import core.deltas.{Contract, Delta}
 import core.language.Language
 
 object ClearPhases extends Delta {
@@ -9,4 +9,6 @@ object ClearPhases extends Delta {
   override def inject(language: Language): Unit = {
     language.compilerPhases = List.empty
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }

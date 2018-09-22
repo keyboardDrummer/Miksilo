@@ -1,7 +1,7 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
@@ -46,6 +46,8 @@ object AlwaysDelta extends DeltaWithGrammar with HasConstraintsDelta {
     }
     ConstraintSkeleton.constraints(compilation, builder, always.body, parentScope)
   }
+
+  override def dependencies: Set[Contract] = Set(StatementDelta, VerilogModuleDelta)
 }
 
 

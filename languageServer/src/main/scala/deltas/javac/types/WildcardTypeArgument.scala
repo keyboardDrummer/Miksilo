@@ -2,7 +2,7 @@ package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeLike, NodeShape}
-import core.deltas.{DeltaWithGrammar, HasShape}
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -28,5 +28,7 @@ object WildcardTypeArgument extends DeltaWithGrammar with HasType with HasShape 
   }
 
   override def shape: NodeShape = Shape
+
+  override def dependencies: Set[Contract] = Set(TypeApplicationDelta)
 }
 

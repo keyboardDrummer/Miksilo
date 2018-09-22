@@ -41,4 +41,6 @@ object ExpressionDelta extends DeltaWithGrammar {
   object FirstPrecedenceGrammar extends GrammarKey
 
   override def description: String = "Introduces the concept of an expression."
+
+  override def dependencies: Set[Contract] = Set.empty
 }

@@ -12,11 +12,11 @@ import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 
-object SelectField extends ExpressionInstance with ConvertsToByteCode {
+object SelectField extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables using the . operator to select a member from a class."
 

@@ -3,7 +3,7 @@ package deltas.javac.trivia
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension, BiGrammarWriter}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.{Delta, GrammarForAst, NodeGrammarWriter}
+import core.deltas.{Contract, Delta, GrammarForAst, NodeGrammarWriter}
 import core.language.Language
 import core.language.node.NodeShape
 
@@ -38,4 +38,6 @@ object AddTriviaDelta extends Delta {
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }

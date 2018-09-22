@@ -9,10 +9,10 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
-object NotDelta extends ExpressionInstance with ConvertsToByteCode {
+object NotDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   object NotKey extends NodeShape
 

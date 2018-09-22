@@ -7,10 +7,10 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.InvokeVirtualDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.{ConvertsToByteCode, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 
-object CallInstanceDelta extends GenericCall with ConvertsToByteCode {
+object CallInstanceDelta extends GenericCall with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling instance methods."
 

@@ -1,6 +1,6 @@
 package deltas.verilog
 
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{Node, NodeField}
@@ -26,4 +26,6 @@ object BeginEndDelta extends DeltaWithGrammar {
   }
 
   override def description: String = "Adds the begin-end block"
+
+  override def dependencies: Set[Contract] = Set(BlockDelta)
 }

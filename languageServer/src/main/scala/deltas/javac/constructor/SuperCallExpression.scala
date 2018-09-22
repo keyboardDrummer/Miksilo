@@ -17,12 +17,11 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
-import deltas.javac.statements.StatementToByteCodeSkeleton
 
-object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
+object SuperCallExpression extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a super constructor."
 
@@ -51,7 +50,7 @@ object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
     val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
-    val argumentInstructions = callArguments.flatMap(argument => StatementToByteCodeSkeleton.getToInstructions(compilation)(argument))
+    val argumentInstructions = callArguments.flatMap(argument => ToByteCodeSkeleton.getToInstructions(compilation)(argument))
     Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 

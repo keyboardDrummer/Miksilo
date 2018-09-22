@@ -2,7 +2,7 @@ package deltas.javac.methods
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.bytecode.ByteCodeMethodInfo
 
@@ -58,4 +58,6 @@ object AccessibilityFieldsDelta extends DeltaWithGrammar {
     (PrivateVisibility, Set[ByteCodeMethodInfo.MethodAccessFlag](ByteCodeMethodInfo.PrivateAccess)),
     (DefaultVisibility, Set.empty[ByteCodeMethodInfo.MethodAccessFlag])
   )
+
+  override def dependencies: Set[Contract] = Set.empty
 }

@@ -67,6 +67,8 @@ class JavaStyleCommentsTest
     }
 
     override def description: String = ""
+
+    override def dependencies: Set[Contract] = Set.empty
   }
 
   test("relational") {

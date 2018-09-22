@@ -5,10 +5,10 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.{Node, NodeShape}
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
-import deltas.javac.expressions.ConvertsToByteCode
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.expressions.literals.BooleanLiteralDelta.getValue
 
-object BooleanLiteralToByteCodeDelta extends ConvertsToByteCode {
+object BooleanLiteralToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Enables boolean literals to be converted to bytecode"
 

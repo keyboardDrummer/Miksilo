@@ -29,18 +29,18 @@ import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import deltas.javac.expressions.literals._
-import deltas.javac.expressions.postfix.PostFixIncrementDelta
+import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.prefix.NotDelta
 import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanDelta, LessThanDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
-import deltas.javac.statements.locals.{LocalDeclarationDelta, LocalDeclarationWithInitializerDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 import deltas.statement._
 
+//TODO split the compilation to ByteCode from the language definition
 object JavaLanguage {
 
   def getJava: Language = Delta.buildLanguage(javaCompilerDeltas)
@@ -64,14 +64,17 @@ object JavaLanguage {
   val noVariableSyntaxSugarStatements = Seq(IfThenElseToIfThenAndGotoDelta, ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
   def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
-    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelection, ThisVariableDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
+    Seq(ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
 
-  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDelta, IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
-    AssignmentPrecedence, PostFixIncrementDelta, VariableToByteCodeDelta) ++ Seq(MethodDelta, AccessibilityFieldsDelta) ++ Seq(SolveConstraintsDelta) ++ javaClassSkeleton
+  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode,
+    IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+    AssignmentPrecedence, PostFixIncrementToByteCodeDelta, VariableToByteCodeDelta) ++
+    Seq(MethodDelta, AccessibilityFieldsDelta) ++
+    Seq(SolveConstraintsDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock //TODO What is JavaClassSkeleton doing here?
+  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock
 
-  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(JavaGotoDelta, IfThenElseDelta,
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(GotoToByteCodeDelta, LabelToByteCodeDelta, IfThenElseDelta,
     IfThenToByteCodeDelta, IfThenDelta,
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
@@ -97,15 +100,16 @@ object JavaLanguage {
       integerInstructions ++ longInstructions ++ floatInstructions ++ doubleInstructions
   }
 
-  def objectInstructions = Seq(LoadAddressDelta, AddressReturnInstructionDelta, StoreAddressDelta)
+  def objectInstructions: Seq[InstructionInstance] = Seq(LoadAddressDelta, AddressReturnInstructionDelta, StoreAddressDelta)
 
-  def doubleInstructions = Seq(DoubleReturnInstructionDelta)
+  def doubleInstructions: Seq[InstructionInstance] = Seq(DoubleReturnInstructionDelta)
 
-  def floatInstructions = Seq(FloatReturnInstructionDelta)
+  def floatInstructions: Seq[InstructionInstance] = Seq(FloatReturnInstructionDelta)
 
-  def longInstructions = Seq(LongReturnInstructionDelta, AddLongsDelta, CompareLongDelta, PushLongDelta, LoadLongDelta, StoreLongDelta)
+  def longInstructions: Seq[InstructionInstance] = Seq(LongReturnInstructionDelta, AddLongsDelta, CompareLongDelta, PushLongDelta, LoadLongDelta, StoreLongDelta)
 
-  def integerInstructions = Seq(AddIntegersDelta, SmallIntegerConstantDelta, LoadConstantDelta, IncrementIntegerDelta, IntegerReturnInstructionDelta, LoadIntegerDelta, IfIntegerCompareGreaterOrEqualDelta,
+  def integerInstructions: Seq[InstructionInstance] = Seq(AddIntegersDelta, SmallIntegerConstantDelta,
+    LoadConstantDelta, IncrementIntegerDelta, IntegerReturnInstructionDelta, LoadIntegerDelta, IfIntegerCompareGreaterOrEqualDelta,
     IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
 
   def byteCodeWithoutInstructions: Seq[Delta] = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)

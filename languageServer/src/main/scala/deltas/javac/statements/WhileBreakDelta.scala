@@ -7,7 +7,8 @@ import core.deltas.path.{NodePath, PathRoot, SequenceElement}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement.{StatementDelta, WhileLoopDelta}
+import deltas.statement
+import deltas.statement.{GotoStatementDelta, StatementDelta, WhileLoopDelta}
 
 import scala.collection.mutable
 
@@ -29,15 +30,17 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   def transformBreak(continuePath: NodePath, endLabels: mutable.Map[NodePath, String], language: Language): Unit = {
     val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.Shape)
     val label = endLabels.getOrElseUpdate(containingWhile, addEndLabel(containingWhile))
-    continuePath.replaceData(JustJavaGoto.neww(label))
+    continuePath.replaceData(GotoStatementDelta.neww(label))
   }
 
   def addEndLabel(whilePath: NodePath): String = {
-    val method = whilePath.findAncestorShape(MethodDelta.Shape)
+    val method = whilePath.findAncestorShape(MethodDelta.Shape) //TODO break away from method dependency
     val endLabel = LabelDelta.getUniqueLabel("whileEnd", method)
-    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, JustJavaLabel.neww(endLabel)))
+    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, statement.LabelStatementDelta.neww(endLabel)))
     endLabel
   }
 
   object BreakShape extends NodeShape
+
+  override def dependencies: Set[Contract] = Set(MethodDelta, GotoStatementDelta, WhileLoopDelta)
 }

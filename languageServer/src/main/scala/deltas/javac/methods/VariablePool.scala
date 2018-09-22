@@ -1,9 +1,8 @@
 package deltas.javac.methods
 
+import core.language.Language
 import core.language.exceptions.BadInputException
 import core.language.node.Node
-import core.language.Language
-import deltas.bytecode.types.TypeSkeleton
 
 case class VariableDoesNotExist(name: String) extends BadInputException {
   override def toString = s"variable '$name' does not exist."
@@ -27,7 +26,7 @@ case class VariablePool(language: Language, typedVariables: Map[String, Node] = 
 
   private def privateAdd(variable: String, _type: Node) {
     variables = variables.updated(variable, VariableInfo(offset, _type))
-    offset += TypeSkeleton.getTypeSize(_type, language)
+    //offset += TypeSkeleton.getTypeSize(_type, language)
   }
 
   def add(variable: String, _type: Node): VariablePool = {

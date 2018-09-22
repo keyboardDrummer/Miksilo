@@ -13,9 +13,8 @@ import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
-import deltas.statement.BlockDelta
+import deltas.statement.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
+import deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
 
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
@@ -38,7 +37,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val name: String = field.name
     val fieldDeclaration = FieldDeclarationDelta.field(field._type, name)
 
-    val assignment = AssignmentSkeleton.assignment(VariableDelta.neww(name), field.initializer)
+    val assignment = AssignmentSkeleton.neww(VariableDelta.neww(name), field.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
     field.node.replaceData(fieldDeclaration)

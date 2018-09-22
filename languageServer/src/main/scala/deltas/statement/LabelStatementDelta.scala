@@ -1,4 +1,4 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
@@ -7,21 +7,14 @@ import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.bytecode.simpleBytecode.InferredStackFrames
-import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaLabel extends StatementToByteCodeDelta with StatementInstance
-  with DeltaWithGrammar {
-  override val shape = LabelKey
+object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
+  override val shape = Shape
 
-  object LabelKey extends NodeShape
+  object Shape extends NodeShape
   object Name extends NodeField
 
-  def neww(name: String) = new Node(LabelKey, Name -> name)
-
-  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(InferredStackFrames.label(getName(statement.current)))
-  }
+  def neww(name: String) = new Node(Shape, Name -> name)
 
   def getName(statement: Node) = statement(Name).asInstanceOf[String]
 
@@ -30,7 +23,7 @@ object JustJavaLabel extends StatementToByteCodeDelta with StatementInstance
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    statementGrammar.addAlternative(create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode LabelKey))
+    statementGrammar.addAlternative(create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode Shape))
   }
 
   override def description: String = "Adds a label statement"

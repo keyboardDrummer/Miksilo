@@ -1,6 +1,6 @@
 package deltas.cloudformation
 
-import core.deltas.Delta
+import core.deltas.{Contract, Delta}
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import core.language.node.Node
@@ -87,4 +87,6 @@ object CloudFormationTemplate extends Delta {
       }
     }
   }
+
+  override def dependencies: Set[Contract] = Set(JsonObjectLiteralDelta)
 }

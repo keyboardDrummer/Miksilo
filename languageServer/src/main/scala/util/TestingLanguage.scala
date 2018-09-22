@@ -128,6 +128,8 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
           }
           super.inject(language)
         }
+
+        override def dependencies: Set[Contract] = Set.empty
       }) ++ deltas.map(delta => new WrappedDelta(delta)))
     })
   }

@@ -3,7 +3,7 @@ package application.graphing.model.simplifications
 import core.deltas.Contract
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements._
-import deltas.javac.statements.locals.LocalDeclarationDelta
+import deltas.statement.{ForLoopDelta, LocalDeclarationDelta}
 
 object JavaSimpleStatement extends DeltaGroup {
 

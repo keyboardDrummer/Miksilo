@@ -1,7 +1,7 @@
 package core.smarts
 
 import com.typesafe.scalalogging.LazyLogging
-import core.deltas.Delta
+import core.deltas.{Contract, Delta}
 import core.language.exceptions.BadInputException
 import core.language.{Language, Phase}
 
@@ -35,4 +35,6 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
   }
 
   override def description: String = "Solves the semantic constraints"
+
+  override def dependencies: Set[Contract] = Set.empty
 }

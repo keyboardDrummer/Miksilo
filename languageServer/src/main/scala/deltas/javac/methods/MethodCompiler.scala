@@ -8,8 +8,7 @@ import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
-import deltas.javac.statements.locals.LocalsAnalysis
-import deltas.statement.StatementDelta
+import deltas.statement.{LocalsAnalysis, StatementDelta}
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)

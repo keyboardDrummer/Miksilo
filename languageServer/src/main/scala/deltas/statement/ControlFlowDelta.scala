@@ -1,4 +1,4 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas.path.NodePath
 import core.deltas.{Delta, HasShape, ShapeProperty}

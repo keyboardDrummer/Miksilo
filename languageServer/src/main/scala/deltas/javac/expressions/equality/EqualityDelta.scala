@@ -10,12 +10,12 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
-object EqualityDelta extends ExpressionInstance with ConvertsToByteCode {
+object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
   def getFirst[T <: NodeLike](equality: T): T = equality(FirstKey).asInstanceOf[T]

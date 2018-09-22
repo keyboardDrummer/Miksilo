@@ -3,7 +3,7 @@ package deltas.javac.trivia
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.NodeGrammar
 
@@ -65,4 +65,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
       grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
     }
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }

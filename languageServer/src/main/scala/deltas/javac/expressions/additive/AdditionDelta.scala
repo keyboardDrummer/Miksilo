@@ -12,9 +12,9 @@ import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
-object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCode {
+object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Adds the + operator."
 

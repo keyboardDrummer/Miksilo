@@ -7,9 +7,9 @@ import core.language.Compilation
 import deltas.bytecode.coreInstructions.InvokeStaticDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions.ConvertsToByteCode
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object CallStaticDelta extends GenericCall with ConvertsToByteCode {
+object CallStaticDelta extends GenericCall with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static methods."
 

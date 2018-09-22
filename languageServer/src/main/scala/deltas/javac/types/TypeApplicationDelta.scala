@@ -1,7 +1,7 @@
 package deltas.javac.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.{DeltaWithGrammar, HasShape}
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
 import core.language.{Compilation, Language}
@@ -49,7 +49,7 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape 
       asNode(Shape))
 
     val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
-    val argumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
+    val argumentGrammar = find(ByteCodeTypeArgumentGrammar)
     argumentGrammar.addAlternative(typeGrammar)
   }
 
@@ -60,5 +60,7 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape 
   }
 
   override def shape: NodeShape = Shape
+
+  override def dependencies: Set[Contract] = Set(QualifiedObjectTypeDelta, TypeSkeleton)
 }
 

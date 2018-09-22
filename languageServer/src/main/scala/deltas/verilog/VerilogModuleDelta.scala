@@ -1,7 +1,7 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
@@ -57,6 +57,8 @@ object VerilogModuleDelta extends DeltaWithGrammar {
     }
     super.inject(language)
   }
+
+  override def dependencies: Set[Contract] = Set(VariableDelta)
 }
 
 

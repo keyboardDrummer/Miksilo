@@ -1,4 +1,5 @@
-package deltas.javac.statements
+package deltas.statement
+
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
@@ -6,8 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.expressions.ExpressionDelta
 import deltas.expressions.ExpressionDelta.Expression
-import deltas.javac.statements.StatementToByteCodeSkeleton.Statement
-import deltas.statement.{BlockDelta, StatementDelta, WhileLoopDelta}
+import deltas.javac.statements.ExpressionAsStatementDelta
 
 object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -43,7 +43,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def initializer: Statement[T] = node(Initializer).asInstanceOf[T]
+    def initializer: T = node(Initializer).asInstanceOf[T]
     def initializer_=(value: T): Unit = node(Initializer) = value
 
     def condition: Expression = node(Condition).asInstanceOf[Node]

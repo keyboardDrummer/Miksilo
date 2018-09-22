@@ -1,20 +1,16 @@
-package deltas.javac.statements.locals
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot}
+import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.StatementToByteCodeDelta
-import deltas.statement.{StatementDelta, StatementInstance}
 
-//TODO decouple this from JavaClassSkeleton, perhaps by having JavaClassSkeleton add a separate phase for fully qualifying the types.
-object LocalDeclarationDelta extends StatementToByteCodeDelta with StatementInstance
+object LocalDeclarationDelta extends StatementInstance
   with DeltaWithGrammar {
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
@@ -47,15 +43,9 @@ object LocalDeclarationDelta extends StatementToByteCodeDelta with StatementInst
 
   override val shape = Shape
 
-  override def toByteCode(declaration: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq.empty[Node]
-  }
-
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
-    val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
-    JavaClassSkeleton.fullyQualify(localDeclaration._type, JavaClassSkeleton.getClassCompiler(compilation))
-    val name: String = declaration.name
-    Map(name -> localDeclaration._type)
+    val localDeclaration: LocalDeclaration[Node] = declaration
+    Map(localDeclaration.name -> localDeclaration._type)
   }
 
   override def description: String = "Enables declaring a local variable."

@@ -10,9 +10,9 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 
-object NullDelta extends ExpressionInstance with ConvertsToByteCode {
+object NullDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   val _null = new Node(Shape)
 

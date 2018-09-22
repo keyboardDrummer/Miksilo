@@ -1,4 +1,4 @@
-package deltas.javac.statements.locals
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
@@ -9,12 +9,11 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.statements.locals.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
-import deltas.statement.StatementDelta
+import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, LocalDeclarationDelta)
+  override def dependencies: Set[Contract] = Set(AssignmentSkeleton, ExpressionAsStatementDelta, LocalDeclarationDelta)
 
   implicit class LocalDeclarationWithInitializer[T <: NodeLike](node: T) extends LocalDeclaration[T](node) {
     def initializer: T = node(Initializer).asInstanceOf[T]

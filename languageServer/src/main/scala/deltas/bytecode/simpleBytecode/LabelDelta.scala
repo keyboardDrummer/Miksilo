@@ -48,6 +48,7 @@ object LabelDelta extends InstructionInstance {
   override def grammarName: String = "label"
 
   object GeneratedLabels extends NodeField
+
   def getUniqueLabel(suggestion: String, methodInfo: Node): String = {
     val taken: mutable.Set[String] = methodInfo.data.getOrElseUpdate(GeneratedLabels, mutable.Set.empty).
       asInstanceOf[mutable.Set[String]]

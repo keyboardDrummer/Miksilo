@@ -1,7 +1,7 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
@@ -44,4 +44,6 @@ object PortTypeSpecifierDelta extends DeltaWithGrammar with HasConstraintsDelta 
       builder.resolve(variable.name, variable, parentScope)
     }
   }
+
+  override def dependencies: Set[Contract] = Set(VerilogModuleDelta)
 }

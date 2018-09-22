@@ -7,7 +7,7 @@ import core.bigrammar.printer.TryState
 import core.bigrammar.{BiGrammar, StateFull, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.language.node.{Key, NodeField, NodeGrammar}
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.responsiveDocument.ResponsiveDocument
 
@@ -117,4 +117,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }
