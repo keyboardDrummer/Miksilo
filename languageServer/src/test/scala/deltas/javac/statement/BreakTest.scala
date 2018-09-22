@@ -1,7 +1,7 @@
 package deltas.javac.statement
 
 import org.scalatest.FunSuite
-import util.TestUtils
+import util.LanguageTest
 
 class BreakTest extends FunSuite {
 
@@ -19,7 +19,7 @@ class BreakTest extends FunSuite {
         |  }
         |}
       """.stripMargin
-    TestUtils.compareWithJavacAfterRunning("BreakInWhile", program)
+    LanguageTest.compareWithJavacAfterRunning("BreakInWhile", program)
   }
 
   test("BreakInForLoop") {
@@ -35,6 +35,6 @@ class BreakTest extends FunSuite {
         |  }
         |}
       """.stripMargin
-    TestUtils.compareWithJavacAfterRunning("BreakInWhile", program)
+    LanguageTest.compareWithJavacAfterRunning("BreakInWhile", program)
   }
 }

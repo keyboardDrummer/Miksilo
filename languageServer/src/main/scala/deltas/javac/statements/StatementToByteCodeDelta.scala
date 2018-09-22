@@ -18,6 +18,4 @@ trait StatementToByteCodeDelta extends Delta with HasShape {
   {
     override def toString = s"SequenceDoesNotEndInJump: $sequence"
   }
-
-  def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
 }

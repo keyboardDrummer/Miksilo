@@ -14,6 +14,8 @@ import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends DeltaWithGrammar with StatementInstance {
 
+  override def description: String = "Enables using the if-then (no else) construct."
+
   def neww(condition: Node, thenBody: Node): Node = Shape.create(Condition -> condition, Then -> thenBody)
 
   object Shape extends NodeShape
@@ -38,8 +40,6 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
       asNode(Shape))
     statementGrammar.addAlternative(ifThenGrammar)
   }
-
-  override def description: String = "Enables using the if-then (no else) construct."
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val ifThen: IfThen[NodePath] = statement

@@ -3,7 +3,7 @@ package deltas.statement
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.GrammarKey
+import core.language.node.{GrammarKey, Node}
 import core.language.{Compilation, Language}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.statements.ControlFlowDelta
@@ -33,4 +33,7 @@ trait StatementInstance extends Delta with HasConstraintsDelta with ControlFlowD
   }
 
   override def dependencies: Set[Contract] = Set(StatementDelta)
+
+  //TODO replace this by using the constraint system.
+  def definedVariables(compilation: Compilation, obj: Node): Map[String, Node] = Map.empty
 }

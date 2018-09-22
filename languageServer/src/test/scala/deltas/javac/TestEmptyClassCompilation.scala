@@ -13,7 +13,7 @@ import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.types.MethodType
-import util.{TestLanguageBuilder, TestUtils}
+import util.{TestLanguageBuilder, LanguageTest}
 
 class TestEmptyClassCompilation extends FunSuite {
   val className: String = "EmptyClass"
@@ -23,7 +23,7 @@ class TestEmptyClassCompilation extends FunSuite {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
     val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(javaCode).program
-    TestUtils.compareConstantPools(expectedByteCode, compiledCode)
+    LanguageTest.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
@@ -31,7 +31,7 @@ class TestEmptyClassCompilation extends FunSuite {
     val javaCode = getEmptyClass
     val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(javaCode).program
 
-    TestUtils.testInstructionEquivalence(expectedByteCode, compiledCode)
+    LanguageTest.testInstructionEquivalence(expectedByteCode, compiledCode)
   }
 
   def getEmptyClassByteCode: Node = {

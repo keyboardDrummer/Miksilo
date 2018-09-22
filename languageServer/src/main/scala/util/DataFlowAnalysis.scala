@@ -13,9 +13,13 @@ abstract class DataFlowAnalysis[Node, State] {
   val states = mutable.Map[Node, State]()
   val nodeQueue = mutable.Queue[Node]()
 
-  def run(rootNode: Node, rootState: State): Map[Node, State] = { /TODO deze rootNode & rootState in de constructor stoppen.
+  def addRootNode(rootNode: Node, rootState: State): Unit = {
     states.put(rootNode, rootState)
     nodeQueue.enqueue(rootNode)
+  }
+
+  def run(rootNode: Node, rootState: State): Map[Node, State] = {
+    addRootNode(rootNode, rootState)
     run()
   }
 

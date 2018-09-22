@@ -1,15 +1,16 @@
 package deltas.javac.statements.locals
 
-import core.language.node.Node
 import core.deltas.path.NodePath
 import core.language.Compilation
+import core.language.node.Node
 import deltas.javac.methods.VariablePool
-import deltas.javac.statements.{StatementFlowAnalysis, StatementToByteCodeSkeleton}
+import deltas.javac.statements.StatementFlowAnalysis
+import deltas.statement.StatementDelta
 
-class LocalsAnalysis(compilation: Compilation, method: Node, methodBody: NodePath, initialVariables: VariablePool)
-  extends StatementFlowAnalysis[VariablePool](compilation, method, methodBody, initialVariables) {
+class LocalsAnalysis(compilation: Compilation, body: Node, initialVariables: VariablePool)
+  extends StatementFlowAnalysis[VariablePool](compilation, body, initialVariables) {
 
-  private val instances = StatementToByteCodeSkeleton.instances.get(compilation)
+  private val instances = StatementDelta.instances.get(compilation)
   override def updateState(state: VariablePool, node: NodePath): VariablePool = {
     var newState = state
     for(entry <- instances(node.shape).definedVariables(compilation, node.current))

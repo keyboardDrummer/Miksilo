@@ -1,12 +1,12 @@
 package deltas.javac.expressions
 
 import org.junit.Test
-import util.TestUtils
+import util.LanguageTest
 
 class TestBooleans {
 
 
   def test() {
-    TestUtils.compareWithJavacAfterRunning("Booleans")
+    LanguageTest.compareWithJavacAfterRunning("Booleans")
   }
 }

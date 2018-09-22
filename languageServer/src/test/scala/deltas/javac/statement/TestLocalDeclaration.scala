@@ -2,16 +2,16 @@ package deltas.javac.statement
 
 import org.junit.{Assert, Ignore, Test}
 import org.scalatest.FunSuite
-import util.TestUtils
+import util.LanguageTest
 
 class TestLocalDeclaration extends FunSuite {
 
   test("IfElseBlockScoping") {
-    TestUtils.compareWithJavacAfterRunning("IfElseBlockScoping.java")
+    LanguageTest.compareWithJavacAfterRunning("IfElseBlockScoping.java")
   }
 
   test("WhileBlockScoping") {
-    TestUtils.compareWithJavacAfterRunning("WhileBlockScoping.java")
+    LanguageTest.compareWithJavacAfterRunning("WhileBlockScoping.java")
   }
 
   ignore("IfElseWhereBothBranchesDefineSameVariableAndItIsUsedAfterwards") {

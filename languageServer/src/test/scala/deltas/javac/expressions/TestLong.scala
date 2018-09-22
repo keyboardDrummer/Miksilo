@@ -3,18 +3,18 @@ package deltas.javac.expressions
 import org.scalatest.FunSuite
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.javac.JavaLanguage
-import util.{TestLanguageBuilder, TestUtils}
+import util.{TestLanguageBuilder, LanguageTest}
 
 class TestLong extends FunSuite {
 
   test("simpleLong") {
-    TestUtils.compareWithJavacAfterRunning("SimpleLong")
+    LanguageTest.compareWithJavacAfterRunning("SimpleLong")
   }
 
   test("longWithoutPoptimize") {
     val regularParticles = JavaLanguage.javaCompilerDeltas
     val withoutPoptimize = regularParticles.filter(p => p != PoptimizeDelta)
-    new TestUtils(TestLanguageBuilder.build(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
+    new LanguageTest(TestLanguageBuilder.build(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
   }
 
   test("overloadedLongMethod") {
@@ -38,7 +38,7 @@ class TestLong extends FunSuite {
         |    }
         |}""".stripMargin
 
-    TestUtils.compareWithJavacAfterRunning(TestUtils.toFile("OverloadedLongMethod", program))
+    LanguageTest.compareWithJavacAfterRunning(LanguageTest.toFile("OverloadedLongMethod", program))
   }
 
 }

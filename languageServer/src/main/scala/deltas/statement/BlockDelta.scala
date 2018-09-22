@@ -10,8 +10,6 @@ import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.javac.statements.{StatementToByteCodeDelta, StatementToByteCodeSkeleton, ControlFlowGraph}
 
-
-
 object BlockDelta extends StatementToByteCodeDelta with DeltaWithGrammar with StatementInstance {
 
   override def description: String = "Defines a grammar for blocks."

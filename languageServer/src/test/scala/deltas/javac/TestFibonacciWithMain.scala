@@ -1,7 +1,7 @@
 package deltas.javac
 
 import org.junit.Test
-import util.TestUtils
+import util.LanguageTest
 
 import scala.reflect.io.Path
 
@@ -9,12 +9,12 @@ class TestFibonacciWithMain {
 
 
   def test() {
-    TestUtils.compareWithJavacAfterRunning("Fibonacci")
+    LanguageTest.compareWithJavacAfterRunning("Fibonacci")
   }
 
 
   def testInstanceMethod() {
-    TestUtils.compareWithJavacAfterRunning("FibonacciInstanceMethod")
+    LanguageTest.compareWithJavacAfterRunning("FibonacciInstanceMethod")
   }
 
 }

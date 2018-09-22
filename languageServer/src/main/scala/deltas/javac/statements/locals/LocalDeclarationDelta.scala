@@ -13,6 +13,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.statements.StatementToByteCodeDelta
 import deltas.statement.{StatementDelta, StatementInstance}
 
+//TODO decouple this from JavaClassSkeleton, perhaps by having JavaClassSkeleton add a separate phase for fully qualifying the types.
 object LocalDeclarationDelta extends StatementToByteCodeDelta with StatementInstance
   with DeltaWithGrammar {
 
@@ -52,7 +53,6 @@ object LocalDeclarationDelta extends StatementToByteCodeDelta with StatementInst
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
     val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
-    val _type = localDeclaration._type
     JavaClassSkeleton.fullyQualify(localDeclaration._type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
     Map(name -> localDeclaration._type)

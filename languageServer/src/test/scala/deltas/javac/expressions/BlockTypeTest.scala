@@ -5,9 +5,9 @@ import core.smarts.SolveConstraintsDelta
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
-import util.{TestLanguageBuilder, TestUtils}
+import util.{TestLanguageBuilder, LanguageTest}
 
-class BlockTypeTest extends TestUtils(TestLanguageBuilder.build(
+class BlockTypeTest extends LanguageTest(TestLanguageBuilder.build(
   Seq(DropPhases(1), BlockLanguageDelta) ++
     Delta.spliceAndFilterTop(
       JavaLanguage.blockWithVariables,

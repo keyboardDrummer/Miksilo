@@ -19,10 +19,10 @@ import util.SourceUtils.LineProcessLogger
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object TestUtils extends TestUtils(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {
+object LanguageTest extends LanguageTest(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {
 }
 
-class TestUtils(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
+class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
 
   override protected def beforeAll(configMap: ConfigMap): Unit = {
     val level = configMap.get("level") match {

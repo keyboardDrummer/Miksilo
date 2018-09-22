@@ -12,7 +12,7 @@ import deltas.statement.IfThenDelta.IfThen
 
 object IfThenToByteCodeDelta extends StatementToByteCodeDelta {
 
-  override def description: String = "Compiler if-then statements to bytecode"
+  override def description: String = "Compiles if-then statements to bytecode"
 
   override val shape = IfThenDelta.Shape
 

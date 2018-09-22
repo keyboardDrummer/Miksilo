@@ -28,7 +28,7 @@ object ControlFlowGraph {
   val instances = new ShapeProperty[ControlFlowDelta]
   val empty = ControlFlowGraph(None, Map.empty, Set.empty)
   def singleton(value: NodePath) = ControlFlowGraph(Some(value), Map.empty, Set(value))
-}/Tests toevoegen voor de CFG cases die het nu wel doen.
+}
 
 case class ControlFlowGraph(root: Option[NodePath], edges: Map[NodePath, Set[NodePath]], leafs: Set[NodePath]) {
 

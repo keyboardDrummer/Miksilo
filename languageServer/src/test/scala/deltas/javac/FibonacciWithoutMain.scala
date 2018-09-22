@@ -11,7 +11,7 @@ import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters, ReturnExpressionDelta}
 import deltas.statement.BlockDelta
-import util.{TestLanguageBuilder, TestUtils}
+import util.{TestLanguageBuilder, LanguageTest}
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"
@@ -21,7 +21,7 @@ class FibonacciWithoutMain {
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
     val byteCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(fibonacci).program
-    TestUtils.printByteCode(byteCode)
+    LanguageTest.printByteCode(byteCode)
   }
 
   def getJavaFibonacciWithoutMain: Node = {
