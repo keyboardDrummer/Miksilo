@@ -62,8 +62,8 @@ object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType.
-//    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
-//    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    val firstType = ExpressionDelta.getType(compilation, builder, getFirst(expression), parentScope)
+    val secondType = ExpressionDelta.getType(compilation, builder, getSecond(expression), parentScope)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
   }
 }

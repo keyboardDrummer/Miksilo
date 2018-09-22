@@ -1,15 +1,13 @@
 package deltas.javac.statement
 
-import org.junit.Test
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
 import scala.reflect.io.Path
 
-class TestExpressionAsStatement extends FunSuite {
+class TestExpressionAsStatement extends JavaLanguageTest {
 
   test("basic") {
     val inputDirectory = Path("")
-    LanguageTest.compareWithJavacAfterRunning("ExpressionAsStatement", inputDirectory)
+    compareWithJavacAfterRunning("ExpressionAsStatement", inputDirectory)
   }
 }

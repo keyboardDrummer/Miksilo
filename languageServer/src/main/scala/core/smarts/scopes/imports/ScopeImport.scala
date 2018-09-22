@@ -14,7 +14,7 @@ case class ScopeImport(var importingScope: Scope, var importedScope: Scope) exte
 
   override def apply(solver: ConstraintSolver): Boolean = (importingScope, importedScope) match {
     case (concreteImporting: ConcreteScope, concreteImported: ConcreteScope) =>
-      solver.scopeGraph.add(ScopeNode(concreteImporting), ImportEdge(ScopeNode(concreteImported))); true
+      solver.scopeGraph.add(concreteImporting, ImportEdge(concreteImported)); true
     case _ => false
   }
 }

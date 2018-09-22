@@ -10,10 +10,12 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expressions.ExpressionDelta
+import deltas.expressions.VariableDelta.Variable
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.{ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
@@ -65,13 +67,24 @@ trait GenericCall extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
-    val callCallee = call.callee
-    val calleeTarget = callCallee.target
-    val calleeMember = callCallee.member
+    val callCallee = call.callee.node
 
-    val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
-    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, calleeTarget, parentScope)
-    builder.add(ReferenceInScope(calleeReference, targetScope))
+    val calleeReference = callCallee.shape match {
+      case MemberSelectorDelta.Shape =>
+        val memberSelector: MemberSelector[NodePath] = callCallee
+        val calleeTarget = memberSelector.target
+        val calleeMember = memberSelector.member
+
+        val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
+        val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, calleeTarget, parentScope)
+        builder.add(ReferenceInScope(calleeReference, targetScope))
+        calleeReference
+      case VariableDelta.Shape => //TODO move this addition this implicitThisDelta
+        val variable: Variable[NodePath] = callCallee
+        val calleeReference = new Reference(variable.name, Some(callCallee))
+        builder.add(ReferenceInScope(calleeReference, parentScope))
+        calleeReference
+    }
     CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
   }
 }

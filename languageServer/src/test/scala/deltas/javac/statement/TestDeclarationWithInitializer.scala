@@ -1,15 +1,13 @@
 package deltas.javac.statement
 
-import org.junit.Test
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
 import scala.reflect.io.Path
 
-class TestDeclarationWithInitializer extends FunSuite {
+class TestDeclarationWithInitializer extends JavaLanguageTest {
 
   test("test") {
     val inputDirectory = Path("")
-    LanguageTest.compareWithJavacAfterRunning("DeclarationWithInitializer", inputDirectory)
+    compareWithJavacAfterRunning("DeclarationWithInitializer", inputDirectory)
   }
 }

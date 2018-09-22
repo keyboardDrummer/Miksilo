@@ -3,15 +3,16 @@ package deltas.javac.classes
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
-import core.language.node.{Node, NodeGrammar, NodeShape}
+import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
-import deltas.bytecode.types.VoidTypeDelta
-import deltas.expressions.VariableDelta
+import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
+import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
-import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.assignment.AssignmentSkeleton
 import deltas.javac.methods.call.CallDelta
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
 import deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
@@ -19,28 +20,32 @@ import deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
 import scala.collection.mutable.ArrayBuffer
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def description: String = "Enables fields to have initialisers."
+  override def description: String = "Enables fields to have initializers."
 
   override def dependencies: Set[Contract] = Set(FieldDeclarationDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
+    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val memberGrammar = find(ClassMemberGrammar)
-    val fieldDeclarationWithInitializer = find(LocalDeclarationWithInitializerDelta.Shape).inner.asInstanceOf[NodeGrammar].inner asNode Shape
-    memberGrammar.addAlternative(fieldDeclarationWithInitializer)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
+    val fieldDeclarationGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
+      typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(LocalDeclarationWithInitializerDelta.Initializer)) ~< ";"  asNode Shape
+    memberGrammar.addAlternative(fieldDeclarationGrammar)
   }
 
   object Shape extends NodeShape
 
   def transformDeclarationWithInitializer(node: NodePath, initializerStatements: ArrayBuffer[Node], state: Language): Unit = {
-    val field: LocalDeclarationWithInitializer[NodePath] = node
+    val localDeclaration: LocalDeclarationWithInitializer[NodePath] = node
+    val field: Field[NodePath] = node
     val name: String = field.name
-    val fieldDeclaration = FieldDeclarationDelta.field(field._type, name)
 
-    val assignment = AssignmentSkeleton.neww(VariableDelta.neww(name), field.initializer)
+    val assignment = AssignmentSkeleton.neww(VariableDelta.neww(name), localDeclaration.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
-    field.node.replaceData(fieldDeclaration)
+    field.node.shape = FieldDeclarationDelta.Shape
+    field.node.removeField(LocalDeclarationWithInitializerDelta.Initializer)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

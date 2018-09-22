@@ -1,12 +1,10 @@
 package deltas.javac.expressions
 
-import org.junit.Test
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
-class TestEquality extends FunSuite {
+class TestEquality extends JavaLanguageTest {
 
   test("equality") {
-    LanguageTest.compareWithJavacAfterRunning("SimpleEquality")
+    compareWithJavacAfterRunning("SimpleEquality")
   }
 }

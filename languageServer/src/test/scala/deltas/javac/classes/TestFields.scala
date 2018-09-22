@@ -1,26 +1,24 @@
 package deltas.javac.classes
 
-import org.junit.{Ignore, Test}
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
-class TestFields extends FunSuite {
+class TestFields extends JavaLanguageTest {
 
   test("FieldAssignment") {
-    LanguageTest.compareWithJavacAfterRunning("FieldAssignment.java")
+    compareWithJavacAfterRunning("FieldAssignment.java")
   }
 
   test("fieldMethodMix") {
-    LanguageTest.compareWithJavacAfterRunning("FieldMethodMix.java")
+    compareWithJavacAfterRunning("FieldMethodMix.java")
   }
 
   //Don't yet feel like testing cases where Javac fails.
   ignore("illegalForwardFieldReference") {
-    LanguageTest.compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
+    compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
   }
 
   //Don't yet feel like testing cases where Javac fails.
   ignore("fieldAndMethodOverloading") {
-    LanguageTest.compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
+    compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
   }
 }

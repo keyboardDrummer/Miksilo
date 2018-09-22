@@ -1,6 +1,7 @@
 package core.bigrammar
 
 import core.deltas.Delta
+import core.smarts.SolveConstraintsDelta
 import deltas.expressions.ExpressionDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
@@ -66,7 +67,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val expectation = SourceUtils.getJavaTestFileContents("ExplicitFibonacci.java")
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelectionDelta)
+      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
     val newTransformations = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = TestLanguageBuilder.build(newTransformations).parseAndTransform(input)

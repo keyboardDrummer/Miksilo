@@ -1,20 +1,15 @@
 package deltas.javac
 
-import org.junit.Test
-import util.LanguageTest
+import util.JavaLanguageTest
 
-import scala.reflect.io.Path
-
-class TestFibonacciWithMain {
-
+class TestFibonacciWithMain extends JavaLanguageTest {
 
   def test() {
-    LanguageTest.compareWithJavacAfterRunning("Fibonacci")
+    compareWithJavacAfterRunning("Fibonacci")
   }
 
-
   def testInstanceMethod() {
-    LanguageTest.compareWithJavacAfterRunning("FibonacciInstanceMethod")
+    compareWithJavacAfterRunning("FibonacciInstanceMethod")
   }
 
 }

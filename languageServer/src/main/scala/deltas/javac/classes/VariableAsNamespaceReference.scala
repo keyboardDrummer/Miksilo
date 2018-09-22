@@ -2,15 +2,14 @@ package deltas.javac.classes
 
 import core.deltas._
 import core.deltas.path.NodePath
-import core.language.{Compilation, Language}
 import core.language.node.NodeShape
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.VariableDelta
+import deltas.expressions.VariableDelta.{Shape, Variable}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, ResolveNamespaceOrObjectVariableAmbiguity, VariableToByteCodeDelta}
-import deltas.expressions.VariableDelta.{Shape, Variable}
 
 object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
 
@@ -44,7 +43,7 @@ object VariableAsNamespaceReference extends Delta with IsNamespaceOrObjectExpres
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
     val namespaceOrObjectVariableDeclaration =
-      builder.resolve(variable.name, variable.getLocation(VariableDelta.Name), scope)
+      builder.resolve(variable.name, variable, scope)
     val result = builder.declarationVariable()
     builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result

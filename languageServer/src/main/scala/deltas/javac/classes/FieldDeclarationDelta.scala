@@ -8,13 +8,13 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.ConstraintSkeleton
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
+import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 
 object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
   with HasDeclarationDelta
@@ -26,14 +26,14 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
   object Type extends NodeField
   object Name extends NodeField
 
-  implicit class Field[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class Field[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
     def name: String = node(Name).asInstanceOf[String]
     def _type: T = node(Type).asInstanceOf[T]
   }
 
   override def dependencies: Set[Contract] = Set(JavaClassSkeleton, TypeConstant, AccessibilityFieldsDelta)
 
-  def field(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
+  def neww(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
 
   def bind(compilation: Compilation, signature: ClassSignature, javaClass: Node): Unit = {
 
@@ -86,7 +86,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
-    memberGrammar.addAlternative(fieldGrammar)
+    memberGrammar.addAlternative(create(Shape, fieldGrammar))
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

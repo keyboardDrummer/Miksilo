@@ -34,7 +34,7 @@ class Statistics(parent: Statistics = null) extends LazyLogging {
       val total = timings.sum
       val totalString = "%06.0f".format(total)
       if (total > 10)
-        logger.debug(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
+        System.out.println(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
     }
   }
 }

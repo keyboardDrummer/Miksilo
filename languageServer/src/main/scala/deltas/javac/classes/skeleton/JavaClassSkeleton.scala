@@ -187,6 +187,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       })
     }
 
+    //TODO here there should be an instance, a static, and a lexical scope.
     val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getLocation(Name))
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 

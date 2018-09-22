@@ -110,7 +110,8 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       val instructions = statementToInstructions(method.body)
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
-      val maxLocalCount: Int = getMethodCompiler(compilation).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
+      val methodCompiler = getMethodCompiler(compilation)
+      val maxLocalCount: Int = methodCompiler.variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
       val codeAttribute = new Node(CodeAttributeDelta.CodeKey,
         AttributeNameKey -> CodeAttributeDelta.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,

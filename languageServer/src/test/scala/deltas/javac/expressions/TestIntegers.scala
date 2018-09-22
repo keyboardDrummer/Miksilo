@@ -1,12 +1,10 @@
 package deltas.javac.expressions
 
-import org.junit.Test
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
-class TestIntegers extends FunSuite {
+class TestIntegers extends JavaLanguageTest {
 
   test("simpleInteger") {
-    LanguageTest.compareWithJavacAfterRunning("BigInteger")
+    compareWithJavacAfterRunning("BigInteger")
   }
 }

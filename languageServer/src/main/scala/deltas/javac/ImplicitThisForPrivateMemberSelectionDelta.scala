@@ -3,43 +3,26 @@ package deltas.javac
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
-import core.language.node.Node
+import core.language.node.{FieldLocation, Node}
 import core.language.{Compilation, Language}
-import deltas.expressions.VariableDelta.Variable
+import core.smarts.objects.{NamedDeclaration, Reference}
 import deltas.expressions.{ExpressionDelta, VariableDelta}
-import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
-import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
-import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
-import deltas.javac.methods.call.CallDelta
+import deltas.javac.classes.FieldDeclarationDelta.Field
+import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
+import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
+import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, ThisVariableDelta)
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, MethodDelta, JavaClassSkeleton, ThisVariableDelta)
 
-  def addThisToVariable(compilation: Compilation, path: ChildPath) {
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-
-    val variable: Variable[NodePath] = path
-    val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
-    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(variable.name)) {
-      val currentClass = compiler.currentClassInfo
-      currentClass.methods.keys.find(key => key.methodName == variable.name).foreach(key => {
-        val classMember: ClassMember = currentClass.methods(key)
-        addThisToVariable(classMember, currentClass, path)
-      })
-
-      currentClass.fields.keys.find(key => key == variable.name).foreach(key => {
-        val classMember = currentClass.fields(key)
-        addThisToVariable(classMember, currentClass, path)
-      })
-    }
-  }
-
-  def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: ChildPath): Unit = {
-    val newVariableName = if (classMember._static) currentClass.name else ThisVariableDelta.thisName
+  def addThisToVariable(static: Boolean, clazzName: String, variable: ChildPath): Unit = {
+    val newVariableName = if (static) clazzName else ThisVariableDelta.thisName
     val selector = MemberSelectorDelta.Shape.createWithSource(
       MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
       MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
@@ -51,20 +34,24 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val programWithOrigin: NodePath = PathRoot(program)
-    programWithOrigin.visit(beforeChildren = obj => { obj.shape match {
-        case JavaClassSkeleton.Shape => //TODO get rid of this ugly mess
-          JavaLang.loadIntoClassPath(compilation)
-
-          val classCompiler = ClassCompiler(obj, compilation)
-          getState(compilation).classCompiler = classCompiler
-          classCompiler.bind()
-
-        case MethodDelta.Shape => MethodDelta.setMethodCompiler(obj, compilation)
-        case VariableDelta.Shape => addThisToVariable(compilation, obj.asInstanceOf[ChildPath])
-        case _ =>
-      }
-      true
+    val clazz: JavaClass[Node] = program
+    PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
+      //TODO this should have 1 or Log(N) cost.
+      val references = compilation.proofs.scopeGraph.keys.collect({ case r: Reference => r})
+      val reference: Reference = references.find(n => n.origin.contains(variable)).get
+      val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
+      maybeDeclaration.foreach(declaration => {
+        val declarationNode = declaration.origin.get.asInstanceOf[FieldLocation].node
+        declarationNode.shape match {
+          case MethodDelta.Shape =>
+            val method: Method[Node] = declarationNode
+            addThisToVariable(method.isStatic, clazz.name, variable.asInstanceOf[ChildPath])
+          case FieldDeclarationDelta.Shape =>
+            val field: Field[Node] = declarationNode
+            addThisToVariable(field.isStatic, clazz.name, variable.asInstanceOf[ChildPath])
+          case _ =>
+        }
+      })
     })
   }
 
