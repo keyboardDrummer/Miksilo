@@ -1,29 +1,32 @@
 package deltas.javac.statements.locals
 
 import core.deltas._
-import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.{NodePath, PathRoot}
+import core.language.exceptions.BadInputException
 import core.language.node._
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.statements.{StatementInstance, StatementSkeleton}
+import deltas.javac.statements.StatementToByteCodeDelta
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object LocalDeclarationDelta extends StatementInstance {
+//TODO decouple this from JavaClassSkeleton, perhaps by having JavaClassSkeleton add a separate phase for fully qualifying the types.
+object LocalDeclarationDelta extends StatementToByteCodeDelta with StatementInstance
+  with DeltaWithGrammar {
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
     def name: String = node(Name).asInstanceOf[String]
   }
 
-  override def dependencies: Set[Contract] = Set(StatementSkeleton)
+  override def dependencies: Set[Contract] = Set(StatementDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     statement.addAlternative(parseDeclaration)
@@ -50,7 +53,6 @@ object LocalDeclarationDelta extends StatementInstance {
 
   override def definedVariables(compilation: Compilation, declaration: Node): Map[String, Node] = {
     val localDeclaration = LocalDeclaration[NodePath](PathRoot(declaration))
-    val _type = localDeclaration._type
     JavaClassSkeleton.fullyQualify(localDeclaration._type, JavaClassSkeleton.getClassCompiler(compilation))
     val name: String = declaration.name
     Map(name -> localDeclaration._type)
@@ -58,7 +60,7 @@ object LocalDeclarationDelta extends StatementInstance {
 
   override def description: String = "Enables declaring a local variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
     builder.declare(statement.name, parentScope, statement.getLocation(Name), Some(_type))

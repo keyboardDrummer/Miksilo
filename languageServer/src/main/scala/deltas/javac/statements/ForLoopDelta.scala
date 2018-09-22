@@ -1,12 +1,13 @@
 package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.javac.expressions.ExpressionSkeleton
-import deltas.javac.expressions.ExpressionSkeleton.Expression
-import deltas.javac.statements.StatementSkeleton.Statement
+import deltas.expressions.ExpressionDelta
+import deltas.expressions.ExpressionDelta.Expression
+import deltas.javac.statements.StatementToByteCodeSkeleton.Statement
+import deltas.statement.{BlockDelta, StatementDelta, WhileLoopDelta}
 
 object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -17,8 +18,8 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
       expressionGrammar.as(Condition) ~< ";" ~
@@ -33,12 +34,11 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformForLoop(forLoopPath: NodePath): Unit = {
     val forLoop: ForLoop[Node] = forLoopPath.current
-    val whileBody = forLoop.body ++
-      Seq(ExpressionAsStatementDelta.create(forLoop.increment))
-    val _while = WhileLoopDelta.create(forLoop.condition, whileBody)
+    val whileBody = Seq(forLoop.body, ExpressionAsStatementDelta.create(forLoop.increment))
+    val _while = WhileLoopDelta.create(forLoop.condition, BlockDelta.neww(whileBody))
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
-    val block = BlockAsStatementDelta.Shape.create(BlockAsStatementDelta.Statements -> newStatements)
+    val block = BlockDelta.Shape.create(BlockDelta.Statements -> newStatements)
     forLoopPath.asInstanceOf[SequenceElement].replaceWith(block)
   }
 
@@ -52,11 +52,11 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     def increment: Expression = node(Increment).asInstanceOf[Node]
     def increment_=(value: Node): Unit = node(Increment) = value
 
-    def body: Seq[Node] = node(Body).asInstanceOf[Seq[Node]]
+    def body: T = node(Body).asInstanceOf[T]
     def body_=(value: Node): Unit = node(Body) = value
   }
 
-  def forLoop(initializer: Node, condition: Node, increment: Node, body: Seq[Node]) =
+  def forLoop(initializer: Node, condition: Node, increment: Node, body: Node) =
     new Node(Shape, Initializer -> initializer, Condition -> condition, Increment -> increment, Body -> body)
 
   object Shape extends NodeShape

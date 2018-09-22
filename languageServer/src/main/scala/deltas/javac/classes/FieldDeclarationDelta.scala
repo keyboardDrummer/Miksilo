@@ -8,6 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
@@ -15,7 +16,9 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 
-object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with HasDeclaration with HasConstraintsDelta {
+object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
+  with HasDeclarationDelta
+  with HasConstraintsDelta {
 
   override def description: String = "Enables adding a field declaration without an initializer to a Java class."
 
@@ -84,11 +87,6 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta with
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
     memberGrammar.addAlternative(fieldGrammar)
-  }
-
-  override def inject(language: Language): Unit = {
-    super.inject(language)
-    JavaClassSkeleton.hasDeclarations.add(language, Shape, this)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

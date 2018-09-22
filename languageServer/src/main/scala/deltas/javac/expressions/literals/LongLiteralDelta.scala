@@ -2,10 +2,10 @@ package deltas.javac.expressions.literals
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexGrammar
-import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeField, NodeShape}
-import core.deltas.path.NodePath
 import core.deltas.Contract
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -13,12 +13,13 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 
 object LongLiteralDelta extends ExpressionInstance with ConvertsToByteCode {
   val shape = LongLiteralKey
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton, SmallIntegerConstantDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta, SmallIntegerConstantDelta)
 
   private def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
@@ -26,7 +27,7 @@ object LongLiteralDelta extends ExpressionInstance with ConvertsToByteCode {
     import grammars._
     val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r).map[String, Long](
       number => parseLong(number), l => s"${l}l") as ValueKey asNode LongLiteralKey
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(longGrammar)
   }
 

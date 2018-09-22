@@ -13,6 +13,6 @@ Building Miksilo is as simple as:
 
    If you don't have it installed, download the JDK <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.
 1. Install <a href="http://www.scala-sbt.org/">sbt</a>
-1. Call 'sbt run' in the project root to build Miksilo and start the sandbox desktop application.
+1. Run 'sbt playground/run' in the project root to build Miksilo and start the playground desktop application.
 
 If you'd like to write your own Delta's, use IntelliJ to open the Miksilo source directory.

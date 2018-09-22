@@ -2,15 +2,16 @@ package deltas.javac
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.Node
 import core.deltas.path._
+import core.language.node.Node
 import core.language.{Compilation, Language}
-import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
+import deltas.expressions.VariableDelta.Variable
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton.getState
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassSkeleton}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.javac.classes.{ClassCompiler, ThisVariableDelta}
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MemberSelectorDelta, MethodDelta, VariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -18,21 +19,21 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, ThisVariableDelta)
 
-  def addThisToVariable(compilation: Compilation, variable: ChildPath) {
+  def addThisToVariable(compilation: Compilation, path: ChildPath) {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val name = VariableDelta.getVariableName(variable)
+    val variable: Variable[NodePath] = path
     val variableWithCorrectPath: NodePath = getVariableWithCorrectPath(variable)
-    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(name)) {
+    if (!MethodDelta.getMethodCompiler(compilation).getVariables(variableWithCorrectPath).contains(variable.name)) {
       val currentClass = compiler.currentClassInfo
-      currentClass.methods.keys.find(key => key.methodName == name).foreach(key => {
+      currentClass.methods.keys.find(key => key.methodName == variable.name).foreach(key => {
         val classMember: ClassMember = currentClass.methods(key)
-        addThisToVariable(classMember, currentClass, variable)
+        addThisToVariable(classMember, currentClass, path)
       })
 
-      currentClass.fields.keys.find(key => key == name).foreach(key => {
+      currentClass.fields.keys.find(key => key == variable.name).foreach(key => {
         val classMember = currentClass.fields(key)
-        addThisToVariable(classMember, currentClass, variable)
+        addThisToVariable(classMember, currentClass, path)
       })
     }
   }
@@ -40,19 +41,13 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
   def addThisToVariable(classMember: ClassMember, currentClass: ClassSignature, variable: ChildPath): Unit = {
     val newVariableName = if (classMember._static) currentClass.name else ThisVariableDelta.thisName
     val selector = MemberSelectorDelta.Shape.createWithSource(
-      MemberSelectorDelta.Target -> VariableDelta.variable(newVariableName),
+      MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
       MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
     variable.replaceWith(selector)
   }
 
-  def getVariableWithCorrectPath(obj: NodePath): NodePath = {
-    if (obj.shape == MethodDelta.Shape)
-      return PathRoot(obj.current)
-
-    obj match {
-      case FieldValue(parent, field) => FieldValue(getVariableWithCorrectPath(parent), field)
-      case SequenceElement(parent, field, index) => SequenceElement(getVariableWithCorrectPath(parent), field, index)
-    }
+  def getVariableWithCorrectPath(path: NodePath): NodePath = {
+    path.stopAt(ancestor => ancestor.shape == MethodDelta.Shape)
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
@@ -75,7 +70,7 @@ object ImplicitThisForPrivateMemberSelection extends DeltaWithPhase with DeltaWi
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val callee = grammars.find(CallDelta.Callee)
-    val expression = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expression = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     callee.inner = expression
   }
 }

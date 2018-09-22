@@ -1,20 +1,23 @@
 package deltas.javac.statements
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
-import core.deltas.path.{ChildPath, NodePath}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.InferredStackFrames
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object JustJavaLabel extends StatementInstance {
+object JustJavaLabel extends StatementToByteCodeDelta with StatementInstance
+  with DeltaWithGrammar {
   override val shape = LabelKey
 
   object LabelKey extends NodeShape
   object Name extends NodeField
 
-  def label(name: String) = new Node(LabelKey, Name -> name)
+  def neww(name: String) = new Node(LabelKey, Name -> name)
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(InferredStackFrames.label(getName(statement.current)))
@@ -26,17 +29,17 @@ object JustJavaLabel extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
     statementGrammar.addAlternative(create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode LabelKey))
   }
 
   override def description: String = "Adds a label statement"
 
-  override def getLabels(obj: NodePath): Map[Any, NodePath] = {
-    super.getLabels(obj) + (getName(obj.current) -> obj)
+  override def getLabels(language: Language, obj: NodePath): Map[Any, NodePath] = {
+    super.getLabels(language, obj) + (getName(obj.current) -> obj)
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val label = getName(statement)
     builder.declare(label, parentScope, statement.getLocation(Name))
   }

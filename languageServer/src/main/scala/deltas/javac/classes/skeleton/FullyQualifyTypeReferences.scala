@@ -14,7 +14,7 @@ object FullyQualifyTypeReferences extends DeltaWithPhase {
       val declaration = compilation.proofs.gotoDefinition(_type).get.origin.get.asInstanceOf[FieldLocation].node
       val clazz: JavaClassSkeleton.JavaClass[Node] = declaration
       val parts = clazz._package ++ Seq(clazz.name)
-      _type.replaceWith(QualifiedObjectTypeDelta.neww(QualifiedClassName(parts)))
+      _type.replaceData(QualifiedObjectTypeDelta.neww(QualifiedClassName(parts)))
     })
   }
 }

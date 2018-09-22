@@ -7,7 +7,7 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import core.smarts.{ConstraintBuilder, ResolvesToType}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 
 object CallDelta
@@ -26,15 +26,15 @@ object CallDelta
   }
 
   def call(callee: Any, arguments: Any): Node =
-    call(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
+    neww(callee.asInstanceOf[Node], arguments.asInstanceOf[Seq[Node]])
 
-  def call(callee: Node, arguments: Seq[Node] = Seq()): Node = {
+  def neww(callee: Node, arguments: Seq[Node] = Seq()): Node = {
     new Node(CallDelta.Shape, CallDelta.Callee -> callee, CallDelta.Arguments -> arguments)
   }
 
   def callConstraints(compilation: Compilation, builder: ConstraintBuilder, callArguments: Seq[NodePath], parentScope: Scope,
                       methodReference: Reference, returnType: Type): Unit = {
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation, builder, argument, parentScope))
+    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation, builder, argument, parentScope))
     val functionType = FunctionType.curry(callTypes, returnType)
     builder.add(new ResolvesToType(methodReference, builder.declarationVariable(), functionType))
   }

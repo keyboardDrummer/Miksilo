@@ -11,7 +11,7 @@ import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.ConstantPool
 import util.TestLanguageBuilder
-import util.TestUtils
+import util.LanguageTest
 
 class TestByteCodeGoTo extends FunSuite {
 
@@ -24,7 +24,7 @@ class TestByteCodeGoTo extends FunSuite {
     val labelledWhile = getLabelledJumpWhile
     val compiledWhile = TestLanguageBuilder.build(Seq(LabelledLocations) ++ JavaLanguage.byteCodeDeltas).transform(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
-    TestUtils.testInstructionEquivalence(compiledWhile, expectedCode)
+    LanguageTest.testInstructionEquivalence(compiledWhile, expectedCode)
   }
 
   def getExpectedJumpWhile: Node = {

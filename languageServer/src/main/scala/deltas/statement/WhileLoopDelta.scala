@@ -1,13 +1,14 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.methods.MethodDelta
+import deltas.javac.statements.{JavaGotoDelta, JustJavaGoto, JustJavaLabel}
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -16,8 +17,8 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
-    val statementGrammar = find(StatementSkeleton.StatementGrammar)
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val statementGrammar = find(StatementDelta.Grammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val blockGrammar = find(BlockDelta.Grammar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
         blockGrammar.as(Body) asLabelledNode Shape
@@ -32,8 +33,8 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
     val label: String = LabelDelta.getUniqueLabel("whileStart", method)
-    val startLabel = JustJavaLabel.label(label)
-    val ifBody = whileLoop.body ++ Seq(JustJavaGoto.goto(label))
+    val startLabel = JustJavaLabel.neww(label)
+    val ifBody = BlockDelta.neww(Seq(whileLoop.body, JustJavaGoto.neww(label)))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)
@@ -44,10 +45,10 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   implicit class While[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def condition: T = node(Condition).asInstanceOf[T]
-    def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
+    def body: T = node(Body).asInstanceOf[T]
   }
 
-  def create(condition: Node, body: Seq[Node]) = new Node(Shape, Condition -> condition, Body -> body)
+  def create(condition: Node, body: Node) = new Node(Shape, Condition -> condition, Body -> body)
 
   object Shape extends NodeShape
 

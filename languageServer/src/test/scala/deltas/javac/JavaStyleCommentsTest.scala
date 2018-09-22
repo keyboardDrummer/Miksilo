@@ -4,20 +4,20 @@ import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import core.language.Language
+import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
 import deltas.expression.IntLiteralDelta
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.javac.statements.{BlockDelta, StatementSkeleton}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import util.{SourceUtils, TestLanguageBuilder, TestUtils}
+import deltas.statement.{BlockDelta, StatementDelta}
+import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
 
 import scala.reflect.io.Path
 
 class JavaStyleCommentsTest
-  extends TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas))
+  extends LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas))
   with NodeGrammarWriter
 {
   object ParentClass extends NodeShape
@@ -63,23 +63,23 @@ class JavaStyleCommentsTest
   object ExpressionAsRoot extends DeltaWithGrammar
   {
     override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-      grammars.find(BodyGrammar).inner = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+      grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     }
 
     override def description: String = ""
   }
 
   test("relational") {
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
-    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionSkeleton.ExpressionGrammar)
+    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("addition") {
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
+      Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -89,8 +89,8 @@ class JavaStyleCommentsTest
   }
 
   test("addition2") {
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
+      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -100,8 +100,8 @@ class JavaStyleCommentsTest
   }
 
   test("addition3") {
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionSkeleton) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
+      Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
     JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -111,7 +111,7 @@ class JavaStyleCommentsTest
   }
 
   test("addition4") {
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
@@ -122,7 +122,7 @@ class JavaStyleCommentsTest
 
   test("block transformation") {
     val java = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).buildLanguage
-    val statementGrammar = java.grammars.find(StatementSkeleton.StatementGrammar)
+    val statementGrammar = java.grammars.find(StatementDelta.Grammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
     val language = Delta.buildLanguage(Seq.empty)
@@ -131,8 +131,9 @@ class JavaStyleCommentsTest
 
     val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
 
-    val expectedBlockGrammar = new TopBottom(new TopBottom("{", new ManyVertical(new Labelled(StatementSkeleton.StatementGrammar)).indent()).ignoreLeft,
-      new WithTrivia("}", language.grammars.trivia, false)).ignoreRight
+    val expectedBlockGrammar = new TopBottom(new TopBottom("{",
+      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent()).ignoreLeft,
+      new WithTrivia("}", language.grammars.trivia, false)).ignoreRight.asNode(BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }
@@ -157,7 +158,7 @@ class JavaStyleCommentsTest
 
   test("comments are maintained in bytecode") {
     val initialCompiler = TestLanguageBuilder.build(JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(PrettyPrint())))
-    val utils = new TestUtils(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++
+    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta) ++
       initialCompiler.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta))))
     val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")

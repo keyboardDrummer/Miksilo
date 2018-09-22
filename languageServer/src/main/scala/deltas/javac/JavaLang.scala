@@ -6,9 +6,10 @@ import core.language.Compilation
 import core.language.node.Node
 import core.smarts._
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
+import deltas.javac.classes.skeleton.PackageSignature
 import util.SourceUtils
 
 object JavaLang {
@@ -32,7 +33,7 @@ object JavaLang {
   def getProofs(compilation: Compilation, factory: Factory, scope: Scope): Proofs = {
     val builder = new ConstraintBuilder(factory)
     for(clazz <- Seq(objectClass, stringClass, systemClass, printStreamClass)) {
-      JavaClassSkeleton.hasDeclarations.get(compilation, clazz.shape).
+      ConstraintSkeleton.hasDeclarations.get(compilation, clazz.shape).
         getDeclaration(compilation, builder, PathRoot(clazz), scope)
     }
     val solver = new ConstraintSolver(builder, builder.getConstraints)

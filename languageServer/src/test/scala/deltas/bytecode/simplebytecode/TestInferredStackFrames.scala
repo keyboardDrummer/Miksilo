@@ -1,11 +1,11 @@
 package deltas.bytecode.simplebytecode
 
 import org.scalatest.FunSuite
-import util.TestUtils
+import util.LanguageTest
 
 class TestInferredStackFrames extends FunSuite {
 
   test("regression1") {
-    TestUtils.compareWithJavacAfterRunning("ComparisonOptimization.java")
+    LanguageTest.compareWithJavacAfterRunning("ComparisonOptimization.java")
   }
 }

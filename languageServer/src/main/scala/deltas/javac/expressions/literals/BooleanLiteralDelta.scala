@@ -8,18 +8,19 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.types.BooleanTypeDelta
 
 object BooleanLiteralDelta extends ExpressionInstance {
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val parseNumber = ("true" ~> value(true) | "false" ~> value(false)).as(Value).asNode(Shape)
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.inner = expressionGrammar.inner | parseNumber
   }
 

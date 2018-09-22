@@ -16,6 +16,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
+  def parse(input: String): Node = {
+    parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
+  }
+
   def parseAndTransform(input: String): Compilation = {
     parseAndTransform(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
@@ -86,7 +90,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
     override def toString: String = contract.toString
 
-    override def dependencies: Set[Contract] = contract.dependencies.map(dependency => new WrappedContract(dependency))
+    override def dependencies: Set[Contract] = contract.dependencies.map {
+      case delta: Delta => new WrappedDelta(delta)
+      case dependency => new WrappedContract(dependency)
+    }
 
     override def equals(obj: scala.Any): Boolean = obj.equals(contract)
 

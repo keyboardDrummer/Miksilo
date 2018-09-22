@@ -16,9 +16,10 @@ import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidType
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
+import deltas.expressions.ExpressionDelta
 
 object NewDelta extends ExpressionInstance with ConvertsToByteCode {
 
@@ -37,7 +38,7 @@ object NewDelta extends ExpressionInstance with ConvertsToByteCode {
     val objectGrammar = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape
-    val expressionGrammar = find(ExpressionSkeleton.CoreGrammar)
+    val expressionGrammar = find(ExpressionDelta.LastPrecedenceGrammar)
     expressionGrammar.addAlternative(newGrammar)
   }
 
@@ -57,7 +58,7 @@ object NewDelta extends ExpressionInstance with ConvertsToByteCode {
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
+    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
 
     val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++

@@ -7,16 +7,16 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-
+import deltas.expressions.ExpressionDelta
 
 trait ExpressionInstance extends DeltaWithGrammar with HasShape {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    ExpressionSkeleton.expressionInstances.add(language, this)
+    ExpressionDelta.expressionInstances.add(language, this)
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
 

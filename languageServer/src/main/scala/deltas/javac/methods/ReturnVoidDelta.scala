@@ -8,13 +8,12 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
-import deltas.javac.statements.{StatementInstance, StatementSkeleton}
+import deltas.javac.statements.StatementToByteCodeDelta
+import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnVoidDelta extends StatementInstance {
+object ReturnVoidDelta extends StatementToByteCodeDelta with StatementInstance with DeltaWithGrammar  {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
-
-  override def getNextStatements(obj: NodePath, labels: Map[Any, NodePath]): Set[NodePath] = Set.empty
 
   def returnToLines(_return: Node, compiler: MethodCompiler): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
@@ -22,7 +21,7 @@ object ReturnVoidDelta extends StatementInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val statement = find(StatementSkeleton.StatementGrammar)
+    val statement = find(StatementDelta.Grammar)
 
     val returnExpression = ("return" ~ ";") ~> value(_return)
     statement.inner = statement.inner | returnExpression
@@ -40,5 +39,5 @@ object ReturnVoidDelta extends StatementInstance {
 
   override def description: String = "Allows returning void."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {}
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {}
 }

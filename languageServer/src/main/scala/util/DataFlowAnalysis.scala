@@ -13,14 +13,17 @@ abstract class DataFlowAnalysis[Node, State] {
   val states = mutable.Map[Node, State]()
   val nodeQueue = mutable.Queue[Node]()
 
-  def run(rootNode: Node, rootState: State): Map[Node, State] = {
+  def addRootNode(rootNode: Node, rootState: State): Unit = {
     states.put(rootNode, rootState)
     nodeQueue.enqueue(rootNode)
-    run()
-    states.toMap
   }
 
-  def run() {
+  def run(rootNode: Node, rootState: State): Map[Node, State] = {
+    addRootNode(rootNode, rootState)
+    run()
+  }
+
+  def run(): Map[Node, State] = {
     while (nodeQueue.nonEmpty) {
       val node = nodeQueue.dequeue()
       val ingoingState = states(node)
@@ -37,5 +40,6 @@ abstract class DataFlowAnalysis[Node, State] {
         })
       }
     }
+    states.toMap
   }
 }

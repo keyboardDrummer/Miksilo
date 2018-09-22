@@ -1,12 +1,12 @@
 package core.bigrammar
 
 import core.deltas.Delta
+import deltas.expressions.ExpressionDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
-import deltas.javac.expressions.ExpressionSkeleton
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
-import deltas.javac.statements.BlockDelta
 import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelection, JavaLanguage}
+import deltas.statement.BlockDelta
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
@@ -32,12 +32,12 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Ternary") {
     val input = "1 ? 2 : 3"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("SystemPrintX") {
     val input = s"System.print(x)"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   /*
@@ -48,7 +48,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
    */
   test("SystemOutPrintX") {
     val input = s"System.out.print(x)"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionSkeleton.ExpressionGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("FibonacciMainMethod") {

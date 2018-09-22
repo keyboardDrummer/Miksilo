@@ -13,13 +13,14 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ExpressionSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
-import deltas.javac.statements.StatementSkeleton
+import deltas.javac.statements.StatementToByteCodeSkeleton
 
 object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
 
@@ -47,10 +48,10 @@ object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
     val call: Call[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val callArguments = call.arguments
-    val callTypes = callArguments.map(argument => ExpressionSkeleton.getType(compilation)(argument))
+    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
     val qualifiedName = compiler.fullyQualify(className)
     val methodRefIndex = compiler.getMethodRefIndex(MethodQuery(qualifiedName, constructorName, callTypes))
-    val argumentInstructions = callArguments.flatMap(argument => StatementSkeleton.getToInstructions(compilation)(argument))
+    val argumentInstructions = callArguments.flatMap(argument => StatementToByteCodeSkeleton.getToInstructions(compilation)(argument))
     Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 
@@ -58,7 +59,7 @@ object SuperCallExpression extends ExpressionInstance with ConvertsToByteCode {
     import grammars._
     val callArguments = find(CallDelta.CallArgumentsGrammar)
     val superCallGrammar = "super" ~> callArguments.as(CallDelta.Arguments) asNode SuperCall
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(superCallGrammar)
   }
 

@@ -9,9 +9,10 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.TypeFromDeclaration
+import deltas.ConstraintSkeleton
+import deltas.expressions.VariableDelta
 import deltas.javac.classes.skeleton.{HasConstraints, JavaClassSkeleton}
-import deltas.javac.methods.VariableDelta
-import deltas.javac.methods.VariableDelta.{Name, Shape}
+import deltas.expressions.VariableDelta._
 
 object ThisVariableDelta extends DeltaWithGrammar
 {
@@ -21,13 +22,13 @@ object ThisVariableDelta extends DeltaWithGrammar
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val variable = find(VariableDelta.VariableGrammar)
+    val variable = find(VariableDelta.Shape)
     val thisGrammar = create(Grammar, (thisName: BiGrammar).as(Name)).asNode(Shape)
     variable.addAlternative(thisGrammar)
   }
 
   override def inject(language: Language): Unit = {
-    JavaClassSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
+    ConstraintSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
         val classScope = JavaClassSkeleton.getClassScope(compilation, builder, path, parentScope)
         val clazz: JavaClassSkeleton.JavaClass[NodePath] = path

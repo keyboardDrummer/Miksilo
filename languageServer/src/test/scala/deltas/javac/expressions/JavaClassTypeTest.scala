@@ -3,9 +3,9 @@ package deltas.javac.expressions
 import core.deltas.Delta
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
-import util.{SourceUtils, TestLanguageBuilder, TestUtils}
+import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
 
-class JavaClassTypeTest extends TestUtils(TestLanguageBuilder.build(
+class JavaClassTypeTest extends LanguageTest(TestLanguageBuilder.build(
     Delta.spliceAndFilterTop(
         JavaLanguage.javaCompilerDeltas,
         JavaLanguage.javaClassSkeleton,

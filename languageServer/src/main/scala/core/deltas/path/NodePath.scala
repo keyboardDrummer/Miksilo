@@ -1,7 +1,7 @@
 package core.deltas.path
 
-import core.language.node._
 import core.language.SourceElement
+import core.language.node._
 
 object NodePath {
   implicit def toSimpleObject(withOrigin: NodePath): Node = withOrigin.current
@@ -43,4 +43,15 @@ trait NodePath extends NodeLike with SourceElement {
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
   override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
+
+  //TODO replace this with some NodePath 'view' to improve performance.
+  def stopAt(predicate: NodePath => Boolean): NodePath = {
+    if (predicate(this))
+      return PathRoot(current)
+
+    this match {
+      case FieldValue(parent, field) => FieldValue(parent.stopAt(predicate), field)
+      case SequenceElement(parent, field, index) => SequenceElement(parent.stopAt(predicate), field, index)
+    }
+  }
 }

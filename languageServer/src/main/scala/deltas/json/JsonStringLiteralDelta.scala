@@ -9,7 +9,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 
 import scala.util.matching.Regex
 
@@ -19,14 +20,14 @@ object JsonStringLiteralDelta extends ExpressionInstance {
 
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   val stringInnerRegex: Regex = """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val grammar = ("\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< "\"").asLabelledNode(Shape)
-    find(ExpressionSkeleton.ExpressionGrammar).addAlternative(grammar)
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
   }
 
   def literal(value: String) = new Node(Shape, Value -> value)

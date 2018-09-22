@@ -2,9 +2,9 @@ package deltas.javac.methods.assignment
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.Node
 import core.deltas.path.NodePath
 import core.language.Language
+import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
@@ -12,21 +12,25 @@ import deltas.bytecode.types.ArrayTypeDelta.ArrayTypeKey
 import deltas.bytecode.types.IntTypeDelta.IntTypeKey
 import deltas.bytecode.types.LongTypeDelta.LongTypeKey
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
-import deltas.javac.methods.{MethodDelta, VariableDelta, VariableInfo}
+import deltas.expressions.VariableDelta
+import deltas.expressions.VariableDelta.Variable
+import deltas.javac.methods.{MethodDelta, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
+
+  override def description: String = "Enables assigning to a variable."
 
   override def dependencies: Set[Contract] = Set(AssignmentSkeleton, VariableDelta)
 
   override def inject(language: Language): Unit = {
     AssignmentSkeleton.hasAssignFromStackByteCode.add(language, VariableDelta.Shape,
-      (compilation, targetVariable: NodePath) => {
-      val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-      val target = VariableDelta.getVariableName(targetVariable)
-      val variableInfo = methodCompiler.getVariables(targetVariable)(target)
-      val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, language)
-      Seq(getStoreInstruction(variableInfo, byteCodeType))
-    })
+      (compilation, _targetVariable: NodePath) => {
+        val methodCompiler = MethodDelta.getMethodCompiler(compilation)
+        val targetVariable: Variable[NodePath] = _targetVariable
+        val variableInfo = methodCompiler.getVariables(targetVariable)(targetVariable.name)
+        val byteCodeType = TypeSkeleton.toStackType(variableInfo._type, language)
+        Seq(getStoreInstruction(variableInfo, byteCodeType))
+      })
     super.inject(language)
   }
 
@@ -41,9 +45,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val targetGrammar = grammars.find(AssignmentSkeleton.AssignmentTargetGrammar)
-    val variableGrammar = grammars.find(VariableDelta.VariableGrammar)
+    val variableGrammar = grammars.find(VariableDelta.Shape)
     targetGrammar.addAlternative(variableGrammar)
   }
-
-  override def description: String = "Enables assigning to a variable."
 }

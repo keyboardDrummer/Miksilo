@@ -6,12 +6,13 @@ import core.deltas.path.NodePath
 import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
+import deltas.expressions.VariableDelta
 import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
 import deltas.javac.methods.assignment.AssignmentSkeleton
-import deltas.javac.methods.{MemberSelectorDelta, VariableDelta}
 
 object AssignToMember extends DeltaWithGrammar {
 
@@ -35,7 +36,7 @@ object AssignToMember extends DeltaWithGrammar {
     import grammars._
     val assignTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
 
-    val variableGrammar = find(VariableDelta.VariableGrammar)
+    val variableGrammar = find(VariableDelta.Shape)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Shape)
     //val selectGrammar = grammars.find(SelectorC.SelectGrammar) TODO replace two lines above with this line.
     assignTarget.addAlternative(selectGrammar)

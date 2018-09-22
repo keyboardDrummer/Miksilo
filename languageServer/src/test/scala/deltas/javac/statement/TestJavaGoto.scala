@@ -1,11 +1,11 @@
 package deltas.javac.statement
 
 import org.scalatest.FunSuite
-import util.TestUtils
+import util.LanguageTest
 
 class TestJavaGoto extends FunSuite {
 
   test("WithContinue") {
-    TestUtils.compareWithJavacAfterRunning("ForLoopWithContinue")
+    LanguageTest.compareWithJavacAfterRunning("ForLoopWithContinue")
   }
 }

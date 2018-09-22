@@ -10,9 +10,10 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
@@ -23,8 +24,8 @@ trait GenericCall extends ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val core = find(ExpressionSkeleton.CoreGrammar)
-    val expression = find(ExpressionSkeleton.ExpressionGrammar)
+    val core = find(ExpressionDelta.LastPrecedenceGrammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val selectorGrammar = find(MemberSelectorDelta.SelectGrammar)
     val calleeGrammar = create(CallDelta.Callee, selectorGrammar)
     val callArguments = create(CallDelta.CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
@@ -56,7 +57,7 @@ trait GenericCall extends ExpressionInstance {
     val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
     val callArguments = call.arguments
-    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionSkeleton.getType(compiler.compilation)(argument))
+    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionDelta.getType(compiler.compilation)(argument))
 
     val member = callCallee.member
     MethodQuery(kind.info.getQualifiedName, member, callTypes)

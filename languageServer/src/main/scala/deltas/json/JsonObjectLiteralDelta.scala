@@ -10,7 +10,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.javac.expressions.{ExpressionInstance, ExpressionSkeleton}
+import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
@@ -21,7 +22,7 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val expressionGrammar = find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val keyGrammar = "\"" ~> RegexGrammar(JsonStringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\""
     val member = keyGrammar ~ ":" ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" % (member.manySeparatedVertical(",").as(Members) ~ Parse(Keyword(",") | value(Unit))).indent() % "}"

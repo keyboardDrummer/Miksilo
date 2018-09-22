@@ -11,7 +11,7 @@ object ClassifyTypeIdentifiers extends DeltaWithPhase {
     program.visit(node => node.shape match {
       case TypeVariableDelta.Shape =>
         val objectType = UnqualifiedObjectTypeDelta.neww(TypeVariableDelta.getTypeVariableName(node))
-        node.replaceWith(objectType)
+        node.replaceData(objectType)
       case _ =>
     })
   }

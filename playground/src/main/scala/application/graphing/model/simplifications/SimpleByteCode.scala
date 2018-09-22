@@ -2,10 +2,10 @@ package application.graphing.model.simplifications
 
 import core.deltas.Contract
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import deltas.javac.expressions.ExpressionSkeleton
+import deltas.expressions.ExpressionDelta
 
 object SimpleByteCode extends DeltaGroup {
   override def dependencies: Set[Contract] = Set(InferredStackFrames, InferredMaxStack)
 
-  override def dependants: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependants: Set[Contract] = Set(ExpressionDelta)
 }

@@ -1,33 +1,30 @@
 package deltas.javac.methods
 
-import core.language.exceptions.BadInputException
-import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Compilation
+import core.language.exceptions.BadInputException
+import core.language.node.Node
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MethodDelta._
-import deltas.javac.statements.StatementSkeleton
 import deltas.javac.statements.locals.LocalsAnalysis
+import deltas.statement.StatementDelta
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
-  val parameters: Seq[Node] = method.parameters
   val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-  private val initialVariables = getInitialVariables
+  private val initialVariables: VariablePool = getInitialVariables
 
-  val localAnalysis = new LocalsAnalysis(compilation, method)
-  private val intermediate = new Method(PathRoot(method)).body
-  val firstInstruction: NodePath = intermediate.head
-  val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run(firstInstruction, initialVariables)
+  val localAnalysis = new LocalsAnalysis(compilation, method.body, initialVariables)
+  val variablesPerStatement: Map[NodePath, VariablePool] = localAnalysis.run()
 
   def getInitialVariables: VariablePool = {
     var result = VariablePool(compilation)
     if (!method.isStatic)
       result = result.add("this", QualifiedObjectTypeDelta.neww(classCompiler.fullyQualify(classCompiler.currentClassInfo.name)))
-    for (parameter <- parameters)
-      result = result.add(getParameterName(parameter), getParameterType(parameter, classCompiler))
+    for (parameter <- method.parameters)
+      result = result.add(parameter.name, getParameterType(PathRoot(parameter), classCompiler))
     result
   }
 
@@ -36,13 +33,14 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
     override def toString = s"the following statement is unreachable:\n$statement"
   }
 
-  def getVariables(obj: NodePath): VariablePool = {
-    val instances = StatementSkeleton.instances.get(compilation)
-    val statement = obj.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
-    val variablesPerStatement: Map[NodePath, VariablePool] = MethodDelta.getMethodCompiler(compilation).variablesPerStatement
+  def getVariables(node: NodePath): VariablePool = {
+    val instances = StatementDelta.instances.get(compilation)
+    val statement: NodePath = node.ancestors.filter(ancestor => instances.contains(ancestor.shape)).head
+    val statementStartingAtBlock = statement.stopAt(p => p.parentOption.exists(
+      maybeMethod => maybeMethod.shape == method.shape))
     try
     {
-      variablesPerStatement(statement)
+      variablesPerStatement(statementStartingAtBlock)
     } catch
       {
         case e: NoSuchElementException => throw StatementWasNotFoundDuringLocalsAnalysis(statement)

@@ -1,17 +1,17 @@
 package deltas.javac.methods.assignment
 
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.GrammarKey
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
-import deltas.javac.expressions.ExpressionSkeleton
+import core.language.node.GrammarKey
+import deltas.expressions.ExpressionDelta
 
 object AssignmentPrecedence extends DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(ExpressionSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val expressionGrammar = grammars.find(ExpressionSkeleton.ExpressionGrammar)
+    val expressionGrammar = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     val assignmentGrammar = grammars.create(AssignmentGrammar, expressionGrammar.inner)
     expressionGrammar.inner = assignmentGrammar
   }

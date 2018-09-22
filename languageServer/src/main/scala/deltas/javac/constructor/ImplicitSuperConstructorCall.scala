@@ -1,9 +1,8 @@
 package deltas.javac.constructor
 
-import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
-import deltas.javac.methods.MethodDelta
+import core.language.node.Node
 import deltas.javac.statements.ExpressionAsStatementDelta
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {
@@ -12,7 +11,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
   override def transformProgram(program: Node, state: Compilation): Unit = {
 
     for (constructor <- ConstructorDelta.getConstructors(program)) {
-      val statements = constructor.body
+      val statements = constructor.body.statements
       var addSuperCall = false
       if (statements.isEmpty)
         addSuperCall = true
@@ -24,7 +23,7 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
       }
 
       if (addSuperCall)
-        constructor(MethodDelta.Body) = Seq(ExpressionAsStatementDelta.create(SuperCallExpression.superCall())) ++ statements
+        constructor.body.statements = Seq(ExpressionAsStatementDelta.create(SuperCallExpression.superCall())) ++ statements
     }
   }
 
