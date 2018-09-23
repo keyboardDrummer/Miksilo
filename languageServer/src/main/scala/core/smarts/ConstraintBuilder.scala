@@ -48,28 +48,15 @@ class ConstraintBuilder(val factory: Factory) {
   }
 
   def resolveOption(name: String, origin: Option[SourceElement], scope: Scope, _type: Option[Type] = None): DeclarationVariable = {
-    val result = _type.fold(declarationVariable())(t => declarationVariable(t))
-    reference(name, origin, scope, result)
-    result
+    val declaration = _type.fold(declarationVariable())(t => declarationVariable(t))
+    val reference = refer(name, scope, origin)
+    constraints ::= ResolvesTo(reference, declaration)
+    declaration
   }
 
-  def reference(name: String, scope: Scope, declaration: Declaration) : Reference = {
-    reference(name, None, scope, declaration)
-  }
-
-  def reference(name: String, origin: SourceElement, scope: Scope, declaration: Declaration) : Reference = {
-    reference(name, Some(origin), scope, declaration)
-  }
-
-  private def reference(name: String, origin: Option[SourceElement], scope: Scope, declaration: Declaration) : Reference = {
-    val result = reference(name, origin, scope)
-    constraints ::= ResolvesTo(result, declaration)
-    result
-  }
-
-  def reference(name: String, origin: Option[SourceElement], scope: Scope) : Reference = {
+  def refer(name: String, scope: Scope, origin: Option[SourceElement]): Reference = {
     val result = new Reference(name, origin)
-    constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
+    constraints ::= ReferenceInScope(result, scope)
     result
   }
 

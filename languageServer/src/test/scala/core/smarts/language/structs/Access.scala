@@ -28,9 +28,8 @@ case class Access(target: Expression, field: String) extends Expression
    */
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
-    val fieldDeclaration = builder.declarationVariable(_type)
     val structScope = builder.getDeclaredScope(structDeclaration)
-    builder.reference(field, this, structScope, fieldDeclaration)
+    builder.resolve(field, this, structScope, Some(_type))
     target.constraints(builder, TypeFromDeclaration(structDeclaration), scope)
   }
 }

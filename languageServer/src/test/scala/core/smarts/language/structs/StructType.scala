@@ -8,8 +8,7 @@ import core.smarts.language.types.{LanguageType, LanguageTypeVariable}
 
 class StructType(name: String) extends LanguageType with FakeSourceElement {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    val structDeclaration = builder.declarationVariable()
-    builder.reference(name, this, scope, structDeclaration)
+    val structDeclaration = builder.resolve(name, this, scope)
     builder.typesAreEqual(_type, TypeFromDeclaration(structDeclaration))
   }
 

@@ -1,16 +1,19 @@
 package deltas.expressions
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
+import core.smarts.objects.Reference
+import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
+import core.smarts.{ConstraintBuilder, ResolvesTo}
 import deltas.javac.expressions.ExpressionInstance
+import deltas.javac.methods.call.{ReferenceExpression, ReferenceExpressionDelta, ReferenceExpressionSkeleton}
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 
-object VariableDelta extends ExpressionInstance {
+object VariableDelta extends ExpressionInstance with ReferenceExpressionDelta {
 
   implicit class Variable[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def name: String = node(Name).asInstanceOf[String]
@@ -31,10 +34,6 @@ object VariableDelta extends ExpressionInstance {
 
   override def description: String = "Enables referencing a variable."
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
-    builder.resolve(variable.name, variable.asInstanceOf[ChildPath], parentScope, Some(_type))
-  }
-
   def getVariableInfo(variable: NodePath, compilation: Compilation): VariableInfo = {
     MethodDelta.getMethodCompiler(compilation).getVariables(variable)(variable.name)
   }
@@ -44,4 +43,15 @@ object VariableDelta extends ExpressionInstance {
   }
 
   override def shape: NodeShape = Shape
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, _type: Type, parentScope: Scope): Unit = {
+    val reference = getReference(compilation, builder, variable, parentScope)
+    val declaration = builder.declarationVariable(_type)
+    builder.add(ResolvesTo(reference, declaration))
+  }
+
+  override def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
+    val variable: Variable[NodePath] = expression
+    builder.refer(variable.name, parentScope, Some(expression))
+  }
 }

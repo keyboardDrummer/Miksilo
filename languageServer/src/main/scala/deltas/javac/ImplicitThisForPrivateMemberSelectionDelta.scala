@@ -5,11 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
 import core.language.node.{FieldLocation, Node}
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
 import core.smarts.objects.{NamedDeclaration, Reference}
-import core.smarts.scopes.ReferenceInScope
-import core.smarts.scopes.objects.Scope
-import deltas.expressions.VariableDelta.Variable
 import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.FieldDeclarationDelta.Field
 import deltas.javac.classes.skeleton.JavaClassSkeleton
@@ -62,17 +58,5 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
     val callee = grammars.find(CallDelta.Callee)
     val expression = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
     callee.inner = expression
-  }
-
-  override def inject(language: Language): Unit = {
-    ReferenceExpressionSkeleton.instances.add(language, VariableDelta.Shape, new ReferenceExpression { //TODO move this to VariableDelta?
-      override def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
-        val variable: Variable[NodePath] = expression
-        val calleeReference = new Reference(variable.name, Some(expression))
-        builder.add(ReferenceInScope(calleeReference, parentScope))
-        calleeReference
-      }
-    })
-    super.inject(language)
   }
 }

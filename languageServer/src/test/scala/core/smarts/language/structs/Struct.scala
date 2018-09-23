@@ -12,17 +12,17 @@ trait TypeDefinition
   def constraints(builder: ConstraintBuilder, parentScope: Scope) : Unit
 }
 
-case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
+case class Struct(name: String, fields: Seq[Field], maybeParent: Option[String] = None, typeParameter: Option[String] = None)
   extends TypeDefinition with FakeSourceElement
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
     val structDeclaration: NamedDeclaration = builder.declare(name, parentScope, this)
     builder.add(DeclarationHasType(structDeclaration, TypeFromDeclaration(structDeclaration)))
-    val scopeOfParent: Option[Scope] = parent.map(p => {
-      val parentDeclaration = builder.declarationVariable()
+    val scopeOfParent: Option[Scope] = maybeParent.map(parent => {
+      val parentDeclaration = builder.resolve(parent, this, parentScope)
       val scopeOfParent = builder.getDeclaredScope(parentDeclaration)
-      builder.reference(p, this, parentScope, parentDeclaration)
+
       builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))
       scopeOfParent
     })
