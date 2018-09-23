@@ -2,7 +2,7 @@ package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{NodeField, NodeLike, NodeShape}
-import core.deltas.{DeltaWithGrammar, HasShape}
+import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -30,4 +30,6 @@ object ExtendsDelta extends DeltaWithGrammar with HasShape with HasType {
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
     builder.typeVariable() //TODO add generics.
   }
+
+  override def dependencies: Set[Contract] = Set(TypeApplicationDelta)
 }

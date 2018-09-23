@@ -12,12 +12,12 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
 import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.MethodDelta
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.ExpressionDelta
 
-object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
+object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
@@ -35,7 +35,7 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCode {
 
   object AssignmentTargetGrammar extends GrammarKey
 
-  def assignment(target: Node, value: Node) = new Node(Shape, Target -> target, Value -> value)
+  def neww(target: Node, value: Node) = new Node(Shape, Target -> target, Value -> value)
 
   object Shape extends NodeShape
 

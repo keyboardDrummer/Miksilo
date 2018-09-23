@@ -107,29 +107,6 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     find(BodyGrammar).inner = classGrammar
   }
 
-  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
-    val clazz: JavaClass[NodePath] = path
-
-    val packageScope = if (clazz._package.isEmpty) {
-      defaultPackageScope
-    } else {
-      val packageParts = clazz.node._package.toList
-      val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
-      getState(compilation).packageScopes.getOrElseUpdate(fullPackage, {
-        val packageDeclaration = builder.declare(fullPackage, defaultPackageScope, path)
-        builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
-      })
-    }
-
-    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getLocation(Name))
-    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
-
-    val members = clazz.members
-    members.foreach(member => ConstraintSkeleton.hasDeclarations.get(compilation, member.shape).
-      getDeclaration(compilation, builder, member, classScope))
-
-    clazzDeclaration
-  }
 
   object ImportGrammar extends GrammarKey
   object Shape extends NodeShape
@@ -194,5 +171,30 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       ConstraintSkeleton.constraints(compilation, builder, member, classScope))
 
     classScope
+  }
+
+  override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
+    val clazz: JavaClass[NodePath] = path
+
+    val packageScope = if (clazz._package.isEmpty) {
+      defaultPackageScope
+    } else {
+      val packageParts = clazz.node._package.toList
+      val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
+      getState(compilation).packageScopes.getOrElseUpdate(fullPackage, {
+        val packageDeclaration = builder.declare(fullPackage, defaultPackageScope, path)
+        builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
+      })
+    }
+
+    //TODO here there should be an instance, a static, and a lexical scope.
+    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getLocation(Name))
+    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
+
+    val members = clazz.members
+    members.foreach(member => ConstraintSkeleton.hasDeclarations.get(compilation, member.shape).
+      getDeclaration(compilation, builder, member, classScope))
+
+    clazzDeclaration
   }
 }

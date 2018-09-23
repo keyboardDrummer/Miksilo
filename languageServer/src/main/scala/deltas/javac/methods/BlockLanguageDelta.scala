@@ -39,4 +39,6 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
   //TODO bring back. override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)
 
   override def description: String = "Creates a language where the program is simply a Java block."
+
+  override def dependencies: Set[Contract] = Set(BlockDelta)
 }

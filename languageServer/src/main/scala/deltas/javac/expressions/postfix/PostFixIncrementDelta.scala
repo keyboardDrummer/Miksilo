@@ -8,35 +8,29 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
+import deltas.bytecode.coreInstructions.integers.IncrementIntegerDelta
 import deltas.bytecode.types.IntTypeDelta
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
+import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.MethodDelta
 
-object PostFixIncrementDelta extends ExpressionInstance with ConvertsToByteCode {
+object PostFixIncrementDelta extends ExpressionInstance {
 
-  override val shape = PostfixIncrementKey
+  override val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta, MethodDelta, IncrementIntegerDelta)
 
   override def getType(expression: NodePath, compilation: Compilation): Node = IntTypeDelta.intType
 
-  override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
-    val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-    val name: String = plusPlus(Target).asInstanceOf[String]
-    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset
-    Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
-  }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val coreGrammar = find(ExpressionDelta.LastPrecedenceGrammar)
-    val postFixIncrement = identifier.as(Target) ~< "++" asNode PostfixIncrementKey
+    val postFixIncrement = identifier.as(Target) ~< "++" asNode Shape
     coreGrammar.addAlternative(postFixIncrement)
   }
 
-  object PostfixIncrementKey extends NodeShape
+  object Shape extends NodeShape
 
   object Target extends NodeField
 

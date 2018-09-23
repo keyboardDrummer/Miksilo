@@ -10,6 +10,7 @@ class NodeGrammar(inner: BiGrammar, val key: NodeShape)
     input => NodeGrammar.construct(input, key),
     obj => NodeGrammar.destruct(obj, key))
 {
+  override def withChildren(newChildren: Seq[BiGrammar]): MapGrammarWithMap = new NodeGrammar(newChildren(0), key)
 }
 
 object NodeGrammar {

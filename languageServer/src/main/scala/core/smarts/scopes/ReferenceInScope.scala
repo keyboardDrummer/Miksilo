@@ -11,7 +11,7 @@ case class ReferenceInScope(reference: Reference, var scope: Scope) extends Scop
   }
 
   override def apply(solver: ConstraintSolver): Boolean = scope match {
-    case concrete: ConcreteScope => solver.scopeGraph.add(ReferenceNode(reference), ReferenceEdge(ScopeNode(concrete))); true
+    case concrete: ConcreteScope => solver.scopeGraph.addEdge(reference, ReferenceEdge(concrete)); true
     case _ => false
   }
 }

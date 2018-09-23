@@ -51,5 +51,7 @@ object ReorderMembersDelta extends Delta {
     }
 
     override def description: String = "Used by ReorderMembersDelta"
+
+    override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
   }
 }

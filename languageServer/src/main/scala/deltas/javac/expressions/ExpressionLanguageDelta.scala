@@ -2,7 +2,7 @@ package deltas.javac.expressions
 
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.PathRoot
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import deltas.expressions.ExpressionDelta
@@ -23,4 +23,6 @@ object ExpressionLanguageDelta extends DeltaWithGrammar {
     import grammars._
     find(BodyGrammar).inner = find(ExpressionDelta.FirstPrecedenceGrammar)
   }
+
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

@@ -1,9 +1,5 @@
 package core.smarts.types
 
-import core.smarts._
-import core.smarts.objects.{NamedDeclaration, Reference}
-import core.smarts.scopes.ReferenceNode
-import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.{ConcreteType, Type}
 
 import scala.collection.mutable

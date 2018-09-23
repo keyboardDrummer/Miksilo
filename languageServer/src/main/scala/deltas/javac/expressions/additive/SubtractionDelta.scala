@@ -12,9 +12,9 @@ import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.AdditionDelta.{Left, Right, additionOrSubtractionConstraints}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
-object SubtractionDelta extends ExpressionInstance with ConvertsToByteCode {
+object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
   object SubtractionKey extends NodeShape
   object FirstKey extends NodeField
   object SecondKey extends NodeField

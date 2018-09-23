@@ -1,14 +1,10 @@
 package deltas.javac
 
-import core.language.node.Node
-import org.scalatest.FunSuite
-import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.classes.skeleton.MethodClassKey
-import util.LanguageTest
+import util.JavaLanguageTest
 
-class TestUnqualifiedString extends FunSuite {
+class TestUnqualifiedString extends JavaLanguageTest {
 
   test("basic") {
-    LanguageTest.compareWithJavacAfterRunning("UnqualifiedString")
+    compareWithJavacAfterRunning("UnqualifiedString")
   }
 }

@@ -12,10 +12,10 @@ import deltas.bytecode.types.VoidTypeDelta
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 import deltas.javac.methods.call.CallDelta
 
-object ThisCallExpression extends ExpressionInstance with ConvertsToByteCode {
+object ThisCallExpression extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a different constructor using 'this'"
 

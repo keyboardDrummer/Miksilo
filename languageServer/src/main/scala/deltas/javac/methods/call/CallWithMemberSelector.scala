@@ -1,37 +1,45 @@
 package deltas.javac.methods.call
 
-import core.deltas.Contract
-import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, Delta, HasShape, ShapeProperty}
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
-import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
-import deltas.javac.expressions.{ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.ToByteCodeSkeleton
+import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
-import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 import deltas.javac.types.MethodType._
 
-trait GenericCall extends ExpressionInstance {
+object ReferenceExpressionSkeleton {
+  val instances = new ShapeProperty[ReferenceExpression]
+  def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
+    instances.get(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+  }
+}
+
+trait ReferenceExpression {
+  def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference
+
+}
+
+trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpression {
+  override def inject(language: Language): Unit = {
+    ReferenceExpressionSkeleton.instances.add(language, shape, this)
+    super.inject(language)
+  }
+
+}
+
+//TODO extend from Delta, can be done once old getType is out of ExpressionInstance.
+trait CallWithMemberSelector extends CallDelta {
 
   override def dependencies: Set[Contract] = Set(MemberSelectorDelta)
-
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    import grammars._
-    val core = find(ExpressionDelta.LastPrecedenceGrammar)
-    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val selectorGrammar = find(MemberSelectorDelta.SelectGrammar)
-    val calleeGrammar = create(CallDelta.Callee, selectorGrammar)
-    val callArguments = create(CallDelta.CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
-    val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asNode CallDelta.Shape
-    core.addAlternative(parseCall)
-  }
 
   override val shape = CallDelta.Shape
 
@@ -52,7 +60,7 @@ trait GenericCall extends ExpressionInstance {
   }
 
   def getMethodKey(call: Call[NodePath], compiler: ClassCompiler): MethodQuery = {
-    val callCallee = call.callee
+    val callCallee: MemberSelector[NodePath] = call.callee
     val objectExpression = callCallee.target
     val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 
@@ -61,17 +69,5 @@ trait GenericCall extends ExpressionInstance {
 
     val member = callCallee.member
     MethodQuery(kind.info.getQualifiedName, member, callTypes)
-  }
-
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
-    val call: Call[NodePath] = path
-    val callCallee = call.callee
-    val calleeTarget = callCallee.target
-    val calleeMember = callCallee.member
-
-    val calleeReference = new Reference(calleeMember, Some(callCallee.getLocation(MemberSelectorDelta.Member)))
-    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, calleeTarget, parentScope)
-    builder.add(ReferenceInScope(calleeReference, targetScope))
-    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
   }
 }

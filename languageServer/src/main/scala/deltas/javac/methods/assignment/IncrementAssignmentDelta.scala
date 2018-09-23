@@ -31,7 +31,7 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     val newValue = AdditionDelta.Shape.createWithSource(
       AdditionDelta.Left -> incrementAssignment.current(AssignmentSkeleton.Target),
       AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentSkeleton.Value))
-    val assignment = AssignmentSkeleton.assignment(target, newValue)
+    val assignment = AssignmentSkeleton.neww(target, newValue)
     incrementAssignment.replaceData(assignment)
   }
 

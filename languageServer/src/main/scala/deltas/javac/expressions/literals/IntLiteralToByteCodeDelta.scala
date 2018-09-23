@@ -7,10 +7,10 @@ import core.language.node.{Node, NodeShape}
 import deltas.bytecode.constants.IntegerInfoConstant
 import deltas.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
 import deltas.expression.IntLiteralDelta
-import deltas.javac.expressions.ConvertsToByteCode
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.expression.IntLiteralDelta.{Value, getValue}
 
-object IntLiteralToByteCodeDelta extends ConvertsToByteCode {
+object IntLiteralToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Enabled int literals to convert to bytecode"
 

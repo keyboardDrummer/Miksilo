@@ -1,15 +1,13 @@
 package deltas.javac.expressions
 
-import org.junit.Test
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
 import scala.reflect.io.Path
 
-class TestIncrementAssignment extends FunSuite {
+class TestIncrementAssignment extends JavaLanguageTest {
 
   test("incrementAssignment") {
     val inputDirectory = Path("")
-    LanguageTest.compareWithJavacAfterRunning("IncrementAssignment", inputDirectory)
+    compareWithJavacAfterRunning("IncrementAssignment", inputDirectory)
   }
 }

@@ -6,7 +6,7 @@ import deltas.javac.classes.{BasicImportDelta, FieldDeclarationDelta}
 import deltas.javac.expressions.postfix.PostFixIncrementDelta
 import deltas.javac.methods.assignment.{AssignToVariable, IncrementAssignmentDelta}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelectorDelta}
-import deltas.javac.statements.locals.LocalDeclarationWithInitializerDelta
+import deltas.statement.LocalDeclarationWithInitializerDelta
 
 object JavaMethod extends DeltaGroup {
 

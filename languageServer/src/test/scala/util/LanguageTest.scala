@@ -4,35 +4,37 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-import ch.qos.logback.classic.{Level, Logger}
 import core.language.Compilation
-import core.language.node.{NodeComparer, Node}
+import core.language.node.{Node, NodeComparer}
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaLanguage
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
-import org.slf4j.LoggerFactory
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-object LanguageTest extends LanguageTest(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {
+class JavaLanguageTest extends LanguageTest(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {}
+
+object LanguageTest {
+
+  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
+    for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
+      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
+    }
+  }
+
+  def getMethodInstructions(method: MethodInfo[Node]): Seq[Node] = method.codeAttribute.instructions
+
+  def printByteCode(byteCode: Node): String = {
+    PrintByteCode.printBytes(SourceUtils.getBytes(byteCode))
+  }
 }
 
 class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
-
-  override protected def beforeAll(configMap: ConfigMap): Unit = {
-    val level = configMap.get("level") match {
-      case Some("debug") => Level.DEBUG
-      case Some("info") => Level.INFO
-      case _ => Level.INFO
-    }
-    val logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
-    logger.setLevel(level)
-  }
 
   override protected def afterAll(configMap: ConfigMap): Unit = {
     TestLanguageBuilder.statistics.printAll()
@@ -52,18 +54,6 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   def expectedOutputDirectory: Directory = Directory(rootOutput / "expected")
   actualOutputDirectory.createDirectory(force = true)
   expectedOutputDirectory.createDirectory(force = true)
-
-  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
-    for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
-      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
-    }
-  }
-
-  def getMethodInstructions(method: MethodInfo[Node]): Seq[Node] = method.codeAttribute.instructions
-
-  def printByteCode(byteCode: Node): String = {
-    PrintByteCode.printBytes(SourceUtils.getBytes(byteCode))
-  }
 
   def runByteCode(className: String, code: Node, expectedResult: Int) {
     val line = SourceUtils.runByteCode(className, code)
@@ -128,9 +118,9 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val state = profile("Miksilo compile", language.compile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
-    val expectedOutput = profile("Java run expected", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
+    val expectedOutput = profile("Run classfile from javac", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
     try {
-      val actualOutput = profile("Java run actual", SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
+      val actualOutput = profile("Run classfile from Miksilo", SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
       assertResult(expectedOutput)(actualOutput)
     }
     catch {

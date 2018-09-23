@@ -126,7 +126,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
           descriptorType
       }
       val name: String = constantPool.getUtf8(nameIndex)
-      val field = FieldDeclarationDelta.field(_type, name)
+      val field = FieldDeclarationDelta.neww(_type, name)
       setVisibility(fieldInfo, field)
       field
     })

@@ -1,7 +1,7 @@
 package core.deltas
 
 trait Contract {
-  def dependencies: Set[Contract] = Set.empty
+  def dependencies: Set[Contract]
 
   override def toString: String = name
   def suffix: String

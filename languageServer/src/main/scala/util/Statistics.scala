@@ -28,13 +28,14 @@ class Statistics(parent: Statistics = null) extends LazyLogging {
 
   def printAll(): Unit = {
 
+    System.out.println("Profiling global results:")
     for(timingsForKey <- timingsPerKey.toSeq.sortBy(p => -1 * p._2.sum)) {
       val timings = timingsForKey._2
       val average = "%05.1f".format(timings.sum / timings.length)
       val total = timings.sum
       val totalString = "%06.0f".format(total)
       if (total > 10)
-        logger.debug(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
+        System.out.println(s"${totalString}ms total, ${average}ms average, for ${timingsForKey._1}")
     }
   }
 }

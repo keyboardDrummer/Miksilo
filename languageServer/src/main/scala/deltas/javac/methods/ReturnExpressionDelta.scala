@@ -13,11 +13,10 @@ import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.ToByteCodeSkeleton
-import deltas.javac.statements.StatementToByteCodeDelta
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnExpressionDelta extends StatementToByteCodeDelta with StatementInstance
+object ReturnExpressionDelta extends ConvertsToByteCodeDelta with StatementInstance
   with DeltaWithGrammar {
 
   override def description: String = "Allows returning a value using an expression."

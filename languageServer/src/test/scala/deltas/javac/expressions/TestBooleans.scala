@@ -1,12 +1,10 @@
 package deltas.javac.expressions
 
-import org.junit.Test
-import util.LanguageTest
+import util.JavaLanguageTest
 
-class TestBooleans {
-
+class TestBooleans extends JavaLanguageTest {
 
   def test() {
-    LanguageTest.compareWithJavacAfterRunning("Booleans")
+    compareWithJavacAfterRunning("Booleans")
   }
 }

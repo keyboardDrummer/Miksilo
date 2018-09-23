@@ -1,6 +1,6 @@
 package deltas.javac.classes
 
-import core.deltas.DeltaWithPhase
+import core.deltas.{Contract, DeltaWithPhase}
 import core.language.node.Node
 import core.language.Compilation
 import deltas.bytecode.types.UnqualifiedObjectTypeDelta
@@ -17,4 +17,6 @@ object ClassifyTypeIdentifiers extends DeltaWithPhase {
   }
 
   override def description: String = "Determines which TypeVariables are actually object types."
+
+  override def dependencies: Set[Contract] = Set(UnqualifiedObjectTypeDelta, TypeVariableDelta)
 }

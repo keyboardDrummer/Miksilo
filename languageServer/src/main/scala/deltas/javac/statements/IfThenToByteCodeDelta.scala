@@ -6,17 +6,17 @@ import core.language.Compilation
 import core.language.node._
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
-import deltas.javac.expressions.ToByteCodeSkeleton
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.statement.IfThenDelta
 import deltas.statement.IfThenDelta.IfThen
 
-object IfThenToByteCodeDelta extends StatementToByteCodeDelta {
+object IfThenToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Compiles if-then statements to bytecode"
 
   override val shape = IfThenDelta.Shape
 
-  override def dependencies: Set[Contract] = super.dependencies ++ Set(IfThenDelta)
+  override def dependencies: Set[Contract] = Set(IfThenDelta)
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val ifThen: IfThen[NodePath] = statement
@@ -25,7 +25,7 @@ object IfThenToByteCodeDelta extends StatementToByteCodeDelta {
     val end = InferredStackFrames.label(endLabelName)
     val jumpToEndIfFalse = LabelledLocations.ifZero(endLabelName)
     val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)
-    val toInstructionsStatement = StatementToByteCodeSkeleton.getToInstructions(compilation)
+    val toInstructionsStatement = ToByteCodeSkeleton.getToInstructions(compilation)
     toInstructionsExpr(ifThen.condition) ++
       Seq(jumpToEndIfFalse) ++
       toInstructionsStatement(ifThen.thenStatement) ++

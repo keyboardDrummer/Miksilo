@@ -8,7 +8,7 @@ import deltas.javac.constructor.{DefaultConstructorDelta, ImplicitSuperConstruct
 object JavaGroup extends DeltaGroup {
   override def dependencies: Set[Contract] =
     Set(ImplicitSuperConstructorCall, DefaultConstructorDelta, ImplicitObjectSuperClass, VariableAsNamespaceReference, MemberSelectorAsNamespaceReference,
-    ImplicitThisForPrivateMemberSelection, ImplicitJavaLangImport)
+    ImplicitThisForPrivateMemberSelectionDelta, ImplicitJavaLangImport)
 
   override def dependants: Set[Contract] = Set.empty
 }

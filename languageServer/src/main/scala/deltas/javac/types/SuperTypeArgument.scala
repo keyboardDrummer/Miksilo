@@ -2,7 +2,7 @@ package deltas.javac.types
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{NodeField, NodeShape}
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 
@@ -21,4 +21,6 @@ object SuperTypeArgument extends DeltaWithGrammar {
   }
 
   override def description: String = "Adds the 'extends' type function. Example: 'T extends U'."
+
+  override def dependencies: Set[Contract] = Set(TypeApplicationDelta)
 }

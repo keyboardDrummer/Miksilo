@@ -64,6 +64,8 @@ object SourceUtils {
     }
 
     override def description: String = "Writes the current program as JVM class file bytes to a function."
+
+    override def dependencies: Set[Contract] = Set.empty
   }
 
   def runByteCode(className: String, code: Node) : String = {

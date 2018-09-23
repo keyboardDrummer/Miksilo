@@ -1,11 +1,10 @@
-package deltas.javac.statements.locals
+package deltas.statement
 
 import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.Node
 import deltas.javac.methods.VariablePool
 import deltas.javac.statements.StatementFlowAnalysis
-import deltas.statement.StatementDelta
 
 class LocalsAnalysis(compilation: Compilation, body: Node, initialVariables: VariablePool)
   extends StatementFlowAnalysis[VariablePool](compilation, body, initialVariables) {

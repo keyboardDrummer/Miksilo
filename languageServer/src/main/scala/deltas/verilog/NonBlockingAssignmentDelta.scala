@@ -1,7 +1,7 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
@@ -29,7 +29,7 @@ object NonBlockingAssignmentDelta extends DeltaWithGrammar with HasConstraintsDe
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val statement = find(StatementDelta.Grammar)
     val assignment: BiGrammar = identifier.as(Target) ~~ "<=" ~~ expression.as(Value) asNode Shape
-    statement.addAlternative(assignment)
+    statement.addAlternative(assignment) //TODO shouldn't this be added to expression?
   }
 
   override def description: String = "Adds the non-blocking assignment operator <="
@@ -41,4 +41,6 @@ object NonBlockingAssignmentDelta extends DeltaWithGrammar with HasConstraintsDe
     ExpressionDelta.constraints(compilation, builder, assignment.value, builder.typeVariable(), parentScope)
     builder.resolve(assignment.target, path.getLocation(Target), parentScope)
   }
+
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

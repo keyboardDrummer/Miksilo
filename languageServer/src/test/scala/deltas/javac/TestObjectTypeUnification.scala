@@ -1,15 +1,13 @@
 package deltas.javac
 
-import org.junit.{Assert, Test}
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
 import scala.reflect.io.Path
 
-class TestObjectTypeUnification extends FunSuite {
+class TestObjectTypeUnification extends JavaLanguageTest {
 
   test("compareWithJavaC") {
     val inputDirectory = Path("")
-    LanguageTest.compareWithJavacAfterRunning("ObjectTypeUnification", inputDirectory)
+    compareWithJavacAfterRunning("ObjectTypeUnification", inputDirectory)
   }
 }

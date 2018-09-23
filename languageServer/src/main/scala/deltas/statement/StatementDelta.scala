@@ -6,7 +6,6 @@ import core.deltas.path.NodePath
 import core.language.node.{GrammarKey, Node}
 import core.language.{Compilation, Language}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.statements.ControlFlowDelta
 
 object StatementDelta extends DeltaWithGrammar {
 
@@ -23,9 +22,11 @@ object StatementDelta extends DeltaWithGrammar {
   def getInstance(compilation: Compilation, statement: NodePath): StatementInstance = {
     instances.get(compilation, statement.shape)
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }
 
-trait StatementInstance extends Delta with HasConstraintsDelta with ControlFlowDelta  {
+trait StatementInstance extends Delta with HasConstraintsDelta with ControlFlowDelta  { //TODO maybe merge this with ControlFlowDelta
 
   override def inject(language: Language): Unit = {
     StatementDelta.instances.add(language, this)

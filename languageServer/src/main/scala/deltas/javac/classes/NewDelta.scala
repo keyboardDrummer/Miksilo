@@ -16,12 +16,12 @@ import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidType
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.expressions.ExpressionDelta
 
-object NewDelta extends ExpressionInstance with ConvertsToByteCode {
+object NewDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables using the new keyword to create a new object."
 

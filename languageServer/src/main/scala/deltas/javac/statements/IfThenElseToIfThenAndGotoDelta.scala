@@ -7,14 +7,13 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
 import deltas.statement.IfThenElseDelta.IfThenElse
-import deltas.statement.{BlockDelta, IfThenDelta, IfThenElseDelta}
+import deltas.statement._
 
 object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
 
   override def description: String = "Compiles the if-then-else into if-then and goto."
 
-  override def dependencies: Set[Contract] = super.dependencies ++
-    Set(IfThenElseDelta, JavaGotoDelta, BlockDelta)
+  override def dependencies: Set[Contract] = Set(IfThenElseDelta, GotoStatementDelta, LabelStatementDelta, BlockDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     PathRoot(program).visitShape(shape, path => transform(path, compilation))
@@ -24,10 +23,10 @@ object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
     val method = ifElsePath.findAncestorShape(MethodDelta.Shape)
     val ifThenElse: IfThenElse[NodePath] = ifElsePath
     val endLabel = LabelDelta.getUniqueLabel("ifThenElseEnd", method)
-    val ifThen = IfThenDelta.neww(ifThenElse.condition, BlockDelta.neww(Seq(ifThenElse.thenStatement, JustJavaGoto.neww(endLabel))))
+    val ifThen = IfThenDelta.neww(ifThenElse.condition, BlockDelta.neww(Seq(ifThenElse.thenStatement, GotoStatementDelta.neww(endLabel))))
     val replacement = BlockDelta.neww(Seq(ifThen,
       ifThenElse.elseStatement,
-      JustJavaLabel.neww(endLabel)))
+      LabelStatementDelta.neww(endLabel)))
     ifElsePath.asInstanceOf[ChildPath].replaceWith(replacement)
   }
 

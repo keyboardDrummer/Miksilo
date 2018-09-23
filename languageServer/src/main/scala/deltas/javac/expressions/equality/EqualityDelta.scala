@@ -10,12 +10,12 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
-object EqualityDelta extends ExpressionInstance with ConvertsToByteCode {
+object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
   def getFirst[T <: NodeLike](equality: T): T = equality(FirstKey).asInstanceOf[T]
@@ -62,8 +62,8 @@ object EqualityDelta extends ExpressionInstance with ConvertsToByteCode {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType.
-//    val firstType = ExpressionSkeleton.getType(compilation, builder, getFirst(expression), parentScope)
-//    val secondType = ExpressionSkeleton.getType(compilation, builder, getSecond(expression), parentScope)
+    val firstType = ExpressionDelta.getType(compilation, builder, getFirst(expression), parentScope)
+    val secondType = ExpressionDelta.getType(compilation, builder, getSecond(expression), parentScope)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
   }
 }

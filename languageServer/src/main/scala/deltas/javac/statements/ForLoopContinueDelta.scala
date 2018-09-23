@@ -6,8 +6,9 @@ import core.deltas.{Contract, DeltaWithPhase}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
-import deltas.javac.statements.ForLoopDelta.ForLoop
-import deltas.statement.{BlockDelta, WhileLoopDelta}
+import deltas.statement
+import deltas.statement.ForLoopDelta.ForLoop
+import deltas.statement._
 
 import scala.collection.mutable
 
@@ -27,7 +28,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     val containingLoopOption = continuePath.ancestors.find(ancestor => ancestor.shape == ForLoopDelta.Shape || ancestor.shape == WhileLoopDelta.Shape)
     containingLoopOption.filter(ancestor => ancestor.shape == ForLoopDelta.Shape).foreach(containingForLoop => {
       val label = beforeIncrementLabels.getOrElseUpdate(containingForLoop, addAndReturnBeforeIncrementLabel(containingForLoop))
-      continuePath.replaceData(JustJavaGoto.neww(label))
+      continuePath.replaceData(GotoStatementDelta.neww(label))
     })
   }
 
@@ -35,7 +36,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
     val forLoop = forLoopPath.current
     val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
     val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)
-    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, JustJavaLabel.neww(beforeIncrementLabel)))
+    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, statement.LabelStatementDelta.neww(beforeIncrementLabel)))
     beforeIncrementLabel
   }
 }

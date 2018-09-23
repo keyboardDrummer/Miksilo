@@ -3,7 +3,7 @@ package deltas.javac.trivia
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 
 object JavaStyleBlockCommentsDelta extends DeltaWithGrammar {
@@ -21,4 +21,6 @@ object JavaStyleBlockCommentsDelta extends DeltaWithGrammar {
     val coloredComment = Colorize(comment, TokenTypes.COMMENT_MULTILINE)
     (coloredComment ~ printSpace).ignoreRight
   }
+
+  override def dependencies: Set[Contract] = Set.empty
 }

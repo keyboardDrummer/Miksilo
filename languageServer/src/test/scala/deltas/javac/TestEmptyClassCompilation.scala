@@ -1,7 +1,6 @@
 package deltas.javac
 
 import core.language.node.Node
-import org.scalatest.FunSuite
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
@@ -13,9 +12,9 @@ import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.types.MethodType
-import util.{TestLanguageBuilder, LanguageTest}
+import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
-class TestEmptyClassCompilation extends FunSuite {
+class TestEmptyClassCompilation extends JavaLanguageTest {
   val className: String = "EmptyClass"
   val classPackage: Seq[String] = Seq("transformations", "java", "testing")
 
@@ -23,7 +22,7 @@ class TestEmptyClassCompilation extends FunSuite {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
     val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).transform(javaCode).program
-    LanguageTest.compareConstantPools(expectedByteCode, compiledCode)
+    compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {

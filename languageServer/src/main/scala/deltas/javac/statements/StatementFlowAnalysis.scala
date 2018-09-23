@@ -3,6 +3,7 @@ package deltas.javac.statements
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.Language
 import core.language.node.Node
+import deltas.statement.ControlFlowGraph
 import util.DataFlowAnalysis
 
 abstract class StatementFlowAnalysis[State](language: Language, body: Node, initialState: State)

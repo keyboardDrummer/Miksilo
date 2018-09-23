@@ -1,7 +1,6 @@
 package deltas.bytecode
 
 import core.language.node.Node
-import org.scalatest.FunSuite
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions._
@@ -14,11 +13,11 @@ import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.types.MethodType
-import util.LanguageTest
+import util.{JavaLanguageTest, LanguageTest}
 
 import scala.collection.mutable.ArrayBuffer
 
-class TestPrintByteCodeFibonacciWithMain extends FunSuite {
+class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
 
   val className = "Fibonacci"
   val fibonacciMethodName = "fibonacci"
@@ -36,7 +35,7 @@ class TestPrintByteCodeFibonacciWithMain extends FunSuite {
   test("runCompiledFibonacci") {
     val code = getByteCode
     val expectedResult = 8
-    LanguageTest.runByteCode(className, code, expectedResult)
+    runByteCode(className, code, expectedResult)
   }
 
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: Node = {

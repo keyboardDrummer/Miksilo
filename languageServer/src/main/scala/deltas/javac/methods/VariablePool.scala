@@ -1,8 +1,8 @@
 package deltas.javac.methods
 
+import core.language.Language
 import core.language.exceptions.BadInputException
 import core.language.node.Node
-import core.language.Language
 import deltas.bytecode.types.TypeSkeleton
 
 case class VariableDoesNotExist(name: String) extends BadInputException {

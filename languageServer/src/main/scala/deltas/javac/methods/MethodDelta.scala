@@ -21,9 +21,9 @@ import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.statements.StatementToByteCodeSkeleton
 import deltas.javac.types.{MethodType, TypeAbstraction}
 import deltas.statement.BlockDelta
 import deltas.statement.BlockDelta.BlockStatement
@@ -65,7 +65,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     for (method <- methods)
       bindMethod(method)
 
-    def bindMethod(method: Method[Node]) = {
+    def bindMethod(method: Method[Node]): Unit = {
       val methodName: String = MethodDelta.getMethodName(method)
       val parameters = method.parameters
       val parameterTypes = parameters.map(p => getParameterType(PathRoot(p), classCompiler))
@@ -85,7 +85,6 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def getParameterType(parameter: MethodParameter[NodePath], classCompiler: ClassCompiler): Node = {
     val result = parameter._type
-    JavaClassSkeleton.fullyQualify(result, classCompiler)
     result
   }
 
@@ -107,11 +106,12 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
-      val statementToInstructions = StatementToByteCodeSkeleton.getToInstructions(compilation)
+      val statementToInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
       val instructions = statementToInstructions(method.body)
       val exceptionTable = Seq[Node]()
       val codeAttributes = Seq[Node]()
-      val maxLocalCount: Int = getMethodCompiler(compilation).variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
+      val methodCompiler = getMethodCompiler(compilation)
+      val maxLocalCount: Int = methodCompiler.variablesPerStatement.values.map(pool => pool.localCount).max //TODO move this to a lower level.
       val codeAttribute = new Node(CodeAttributeDelta.CodeKey,
         AttributeNameKey -> CodeAttributeDelta.constantEntry,
         CodeMaxLocalsKey -> maxLocalCount,
@@ -124,7 +124,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   def setMethodCompiler(method: Node, compilation: Compilation) {
-    val methodCompiler = new MethodCompiler(compilation, method)
+    val methodCompiler = MethodCompiler(compilation, method)
     getState(compilation).methodCompiler = methodCompiler
   }
 

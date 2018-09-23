@@ -1,14 +1,13 @@
 package deltas.javac.expressions
 
-import org.scalatest.FunSuite
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.javac.JavaLanguage
-import util.{TestLanguageBuilder, LanguageTest}
+import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
-class TestLong extends FunSuite {
+class TestLong extends JavaLanguageTest {
 
   test("simpleLong") {
-    LanguageTest.compareWithJavacAfterRunning("SimpleLong")
+    compareWithJavacAfterRunning("SimpleLong")
   }
 
   test("longWithoutPoptimize") {
@@ -38,7 +37,7 @@ class TestLong extends FunSuite {
         |    }
         |}""".stripMargin
 
-    LanguageTest.compareWithJavacAfterRunning(LanguageTest.toFile("OverloadedLongMethod", program))
+    compareWithJavacAfterRunning(toFile("OverloadedLongMethod", program))
   }
 
 }

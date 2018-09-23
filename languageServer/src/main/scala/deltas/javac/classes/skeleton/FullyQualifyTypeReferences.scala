@@ -1,6 +1,6 @@
 package deltas.javac.classes.skeleton
 
-import core.deltas.DeltaWithPhase
+import core.deltas.{Contract, DeltaWithPhase}
 import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.{FieldLocation, Node}
@@ -17,4 +17,6 @@ object FullyQualifyTypeReferences extends DeltaWithPhase {
       _type.replaceData(QualifiedObjectTypeDelta.neww(QualifiedClassName(parts)))
     })
   }
+
+  override def dependencies: Set[Contract] = Set(QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta)
 }

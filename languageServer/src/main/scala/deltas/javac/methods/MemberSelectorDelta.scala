@@ -20,10 +20,8 @@ object MemberSelectorDelta extends DeltaWithGrammar {
     import grammars._
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Shape
-    create(SelectGrammar, selection)
+    create(Shape, selection)
   }
-
-  object SelectGrammar extends GrammarKey
 
   object Shape extends NodeShape
 
@@ -31,9 +29,9 @@ object MemberSelectorDelta extends DeltaWithGrammar {
 
   object Member extends NodeField
 
-  def selector(_object: Any, member: Any): Node = selector(_object.asInstanceOf[Node], member.asInstanceOf[String])
+  def neww(_object: Any, member: Any): Node = neww(_object.asInstanceOf[Node], member.asInstanceOf[String])
 
-  def selector(_object: Node, member: String): Node = {
+  def neww(_object: Node, member: String): Node = {
     new Node(Shape,
       Target -> _object,
       Member -> member)

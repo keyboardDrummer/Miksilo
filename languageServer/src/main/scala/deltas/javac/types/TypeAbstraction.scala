@@ -1,7 +1,7 @@
 package deltas.javac.types
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.Language
@@ -56,4 +56,6 @@ object TypeAbstraction extends DeltaWithGrammar {
   }
 
   override def description: String = "Adds type abstraction or 'generics'."
+
+  override def dependencies: Set[Contract] = Set(TypeSkeleton)
 }

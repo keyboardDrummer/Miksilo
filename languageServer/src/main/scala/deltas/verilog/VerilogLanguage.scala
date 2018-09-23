@@ -5,8 +5,7 @@ import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.{ExpressionDelta, VariableDelta}
-import deltas.javac.statements.ForLoopDelta
-import deltas.statement._
+import deltas.statement.{ForLoopDelta, _}
 
 object VerilogLanguage {
   val genericDeltas = Seq(ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,

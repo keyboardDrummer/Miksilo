@@ -1,14 +1,13 @@
 package deltas.javac
 
-import org.scalatest.FunSuite
-import util.LanguageTest
+import util.JavaLanguageTest
 
 import scala.reflect.io.Path
 
-class ClassWithJump extends FunSuite {
+class ClassWithJump extends JavaLanguageTest {
 
   test("basic") {
     val inputDirectory = Path("")
-    LanguageTest.compareWithJavacAfterRunning("ClassWithJump", inputDirectory)
+    compareWithJavacAfterRunning("ClassWithJump", inputDirectory)
   }
 }

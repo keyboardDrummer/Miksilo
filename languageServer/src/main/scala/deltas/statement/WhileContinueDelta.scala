@@ -1,13 +1,12 @@
-package deltas.javac.statements
+package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeGrammar, NodeShape}
 import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.language.node.{Node, NodeGrammar, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement.{StatementDelta, WhileLoopDelta}
 
 import scala.collection.mutable
 
@@ -18,7 +17,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Moves the control flow to the start of the while loop."
 
-  override def dependencies: Set[Contract] = Set(WhileLoopDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, WhileLoopDelta, LabelStatementDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[NodePath, String]()
@@ -28,13 +27,13 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
   def transformContinue(continuePath: NodePath, startLabels: mutable.Map[NodePath, String], language: Language): Unit = {
     val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.Shape)
     val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(containingWhile))
-    continuePath.replaceData(JustJavaGoto.neww(label))
+    continuePath.replaceData(GotoStatementDelta.neww(label))
   }
 
   def addStartLabel(whilePath: NodePath): String = {
-    val method = whilePath.findAncestorShape(MethodDelta.Shape)
+    val method = whilePath.findAncestorShape(MethodDelta.Shape) //TODO break away from method dependency
     val startLabel = LabelDelta.getUniqueLabel("whileStart", method)
-    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(JustJavaLabel.neww(startLabel), whilePath.current))
+    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(LabelStatementDelta.neww(startLabel), whilePath.current))
     startLabel
   }
 

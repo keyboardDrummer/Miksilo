@@ -14,9 +14,9 @@ import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCode, ExpressionInstance}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 
-object LongLiteralDelta extends ExpressionInstance with ConvertsToByteCode {
+object LongLiteralDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
   val shape = LongLiteralKey
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta, SmallIntegerConstantDelta)
