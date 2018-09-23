@@ -12,6 +12,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.types.MethodType._
 
@@ -59,7 +60,7 @@ trait CallWithMemberSelector extends CallDelta {
   }
 
   def getMethodKey(call: Call[NodePath], compiler: ClassCompiler): MethodQuery = {
-    val callCallee = call.callee
+    val callCallee: MemberSelector[NodePath] = call.callee
     val objectExpression = callCallee.target
     val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
 

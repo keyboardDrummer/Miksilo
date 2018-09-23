@@ -8,6 +8,7 @@ import deltas.bytecode.coreInstructions.InvokeVirtualDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
 
 object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
@@ -24,7 +25,7 @@ object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeD
 
   def getInstructionsGivenMethodRefIndex(path: NodePath, compilation: Compilation, methodRef: Node): Seq[Node] = {
     val call: Call[NodePath] = path
-    val callCallee = call.callee
+    val callCallee: MemberSelector[NodePath] = call.callee
     val objectExpression = callCallee.target
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
     val calleeInstructions = expressionToInstruction(objectExpression)

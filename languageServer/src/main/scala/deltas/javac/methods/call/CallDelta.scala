@@ -12,7 +12,6 @@ import core.smarts.{ConstraintBuilder, ResolvesToType}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.{Call, Shape}
 
 //TODO move this into object. Can be done once the old getType is out of ExpressionInstance
@@ -33,8 +32,7 @@ trait CallDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
-    val callCallee = call.callee.node
-    val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, callCallee, parentScope)
+    val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, call.callee, parentScope)
     CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
   }
 
@@ -53,7 +51,7 @@ object CallDelta {
   object CallArgumentsGrammar extends GrammarKey
 
   implicit class Call[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def callee: MemberSelector[T] = node(Callee).asInstanceOf[T]
+    def callee: T = node(Callee).asInstanceOf[T]
     def arguments: Seq[T] = NodeWrapper.wrapList(node(Arguments).asInstanceOf[Seq[T]])
   }
 
