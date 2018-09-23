@@ -39,10 +39,11 @@ Scopes can be inside other scopes.
 Declarations are inside scopes.
 A declaration can declare a scope.
  */
-class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
+class ScopeGraph extends
 {
-  var rangeToNode : mutable.Map[SourceRange, GraphNode] = mutable.Map.empty
-  var elementToNode : mutable.Map[SourceElement, GraphNode] = mutable.Map.empty
+  val nodes = mutable.Map.empty[GraphNode, mutable.Set[GraphEdge]]
+  val rangeToNode = mutable.Map.empty[SourceRange, GraphNode]
+  val elementToNode = mutable.Map.empty[SourceElement, GraphNode]
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
     val declarations = for {
@@ -90,7 +91,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
 
   case class DebugNode(node: GraphNode, graph: ScopeGraph) {
     def next: Seq[DebugNode] = {
-      graph(node).map(n => DebugNode(n.target, graph)).toSeq
+      graph.nodes(node).map(n => DebugNode(n.target, graph)).toSeq
     }
   }
 
@@ -107,7 +108,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
       if (visited.add(element))
       {
         result ::= element
-        this.get(element).foreach(x => x.filter(c => c.traverse).foreach(c => queue.enqueue(c.target)))
+        nodes.get(element).foreach(x => x.filter(c => c.traverse).foreach(c => queue.enqueue(c.target)))
       }
     }
     result.reverse
@@ -120,8 +121,8 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
   def add(node: GraphNode, edge: GraphEdge): Boolean =
   {
     node.origin.foreach(addOrigin(node, _))
-    edge.target.origin.foreach(addOrigin(node, _))
-    val edges = this.getOrElseUpdate(node, mutable.Set.empty)
+    edge.target.origin.foreach(addOrigin(edge.target, _))
+    val edges = nodes.getOrElseUpdate(node, mutable.Set.empty)
     edges.add(edge)
   }
 

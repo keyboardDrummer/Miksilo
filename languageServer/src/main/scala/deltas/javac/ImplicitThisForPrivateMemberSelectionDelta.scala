@@ -37,7 +37,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
     val clazz: JavaClass[Node] = program
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
       //TODO this should have 1 or Log(N) cost.
-      val references = compilation.proofs.scopeGraph.keys.collect({ case r: Reference => r})
+      val references = compilation.proofs.scopeGraph.nodes.keys.collect({ case r: Reference => r})
       val reference: Reference = references.find(n => n.origin.contains(variable)).get
       val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
       maybeDeclaration.foreach(declaration => {

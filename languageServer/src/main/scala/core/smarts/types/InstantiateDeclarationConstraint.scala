@@ -10,8 +10,8 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
   override def apply(solver: ConstraintSolver): Boolean = template match {
     case named:NamedDeclaration =>
       val scopeGraph = solver.scopeGraph
-      val declaredScope = scopeGraph(named).collect({ case x: DeclaresScope => x}).head.target
-      val fieldDeclarations = scopeGraph(declaredScope).collect({ case x: DeclaresDeclaration => x})
+      val declaredScope = scopeGraph.nodes(named).collect({ case x: DeclaresScope => x}).head.target
+      val fieldDeclarations = scopeGraph.nodes(declaredScope).collect({ case x: DeclaresDeclaration => x})
 
       def copy(d: NamedDeclaration): NamedDeclaration = new NamedDeclaration(d.name, d.origin)
 
