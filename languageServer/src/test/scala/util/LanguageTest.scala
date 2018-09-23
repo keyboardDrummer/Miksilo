@@ -4,16 +4,14 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-import ch.qos.logback.classic.{Level, Logger}
 import core.language.Compilation
-import core.language.node.{NodeComparer, Node}
+import core.language.node.{Node, NodeComparer}
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.JavaLanguage
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
-import org.slf4j.LoggerFactory
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
@@ -37,13 +35,6 @@ object LanguageTest {
 }
 
 class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
-
-  override protected def beforeAll(configMap: ConfigMap): Unit = {
-    val level = Level.DEBUG
-    //val level = Level.INFO
-    val logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
-    logger.setLevel(level)
-  }
 
   override protected def afterAll(configMap: ConfigMap): Unit = {
     TestLanguageBuilder.statistics.printAll()
