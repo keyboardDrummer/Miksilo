@@ -62,9 +62,14 @@ class ConstraintBuilder(val factory: Factory) {
   }
 
   private def reference(name: String, origin: Option[SourceElement], scope: Scope, declaration: Declaration) : Reference = {
+    val result = reference(name, origin, scope)
+    constraints ::= ResolvesTo(result, declaration)
+    result
+  }
+
+  def reference(name: String, origin: Option[SourceElement], scope: Scope) : Reference = {
     val result = new Reference(name, origin)
     constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
-    constraints ::= ResolvesTo(result, declaration)
     result
   }
 

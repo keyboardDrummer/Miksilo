@@ -23,11 +23,11 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
 
       val typeParameter = freeVariables.head
       val declaredScopeCopy = solver.builder.newScope()
-      scopeGraph.add(declarationCopy, DeclaresScope(declaredScopeCopy))
+      scopeGraph.addEdge(declarationCopy, DeclaresScope(declaredScopeCopy))
       fieldDeclarations.foreach(d => {
         val originalDeclaration: NamedDeclaration = d.target
         val fieldDeclarationCopy: NamedDeclaration = copy(originalDeclaration)
-        scopeGraph.add(declaredScopeCopy, DeclaresDeclaration(fieldDeclarationCopy))
+        scopeGraph.addEdge(declaredScopeCopy, DeclaresDeclaration(fieldDeclarationCopy))
         solver.declare(fieldDeclarationCopy, solver.environment(originalDeclaration).instantiateType(typeParameter, _type))
       })
 

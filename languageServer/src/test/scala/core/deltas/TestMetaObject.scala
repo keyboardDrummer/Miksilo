@@ -16,9 +16,9 @@ class TestMetaObject extends FunSuite {
   }
 
   test("EqualsOnJavaModel") {
-    val first = CallDelta.neww(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.neww("System"), "out"), "print"),
+    val first = CallDelta.neww(MemberSelectorDelta.neww(MemberSelectorDelta.neww(VariableDelta.neww("System"), "out"), "print"),
       List(CallDelta.neww(VariableDelta.neww("fibonacci"), List(IntLiteralDelta.neww(5)))))
-    val second = CallDelta.neww(MemberSelectorDelta.selector(MemberSelectorDelta.selector(VariableDelta.neww("System"), "out"), "print"),
+    val second = CallDelta.neww(MemberSelectorDelta.neww(MemberSelectorDelta.neww(VariableDelta.neww("System"), "out"), "print"),
       List(CallDelta.neww(VariableDelta.neww("fibonacci"), List(IntLiteralDelta.neww(5)))))
     assertResult(first)(second)
   }

@@ -12,7 +12,7 @@ case class ParentScope(var child: Scope, var parent: Scope) extends ScopeConstra
   }
 
   override def apply(solver: ConstraintSolver): Boolean = (child, parent) match {
-    case (concreteChild: ConcreteScope, concreteParent: ConcreteScope) => solver.scopeGraph.add(concreteChild, Parent(concreteParent)); true
+    case (concreteChild: ConcreteScope, concreteParent: ConcreteScope) => solver.scopeGraph.addEdge(concreteChild, Parent(concreteParent)); true
     case _ => false
   }
 }

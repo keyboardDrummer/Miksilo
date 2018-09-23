@@ -13,7 +13,7 @@ case class DeclarationInsideScope(var declaration: NamedDeclaration, var scope: 
 
   override def apply(solver: ConstraintSolver): Boolean = scope match {
     case concrete: ConcreteScope =>
-      val duplicate = solver.scopeGraph.add(concrete, DeclaresDeclaration(declaration))
+      val duplicate = solver.scopeGraph.addEdge(concrete, DeclaresDeclaration(declaration))
       if (duplicate && !solver.allowDuplicateDeclaration)
         throw DuplicateDeclarationException(declaration)
       true

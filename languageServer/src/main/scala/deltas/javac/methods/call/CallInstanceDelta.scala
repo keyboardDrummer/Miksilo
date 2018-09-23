@@ -10,7 +10,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 
-object CallInstanceDelta extends GenericCall with ConvertsToByteCodeDelta {
+object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling instance methods."
 

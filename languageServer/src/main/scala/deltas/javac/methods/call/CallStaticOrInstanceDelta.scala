@@ -8,7 +8,7 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object CallStaticOrInstanceDelta extends GenericCall with ConvertsToByteCodeDelta {
+object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static and virtual methods."
 

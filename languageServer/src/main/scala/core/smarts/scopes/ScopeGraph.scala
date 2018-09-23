@@ -63,7 +63,7 @@ class ScopeGraph extends
     references.collect({ case n: Reference => n })
   }
 
-  def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(currentScope, ImportEdge(importedScope))
+  def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = addEdge(currentScope, ImportEdge(importedScope))
 
   def resolveScope(importedModule: NamedDeclaration): ConcreteScope = {
     val reachableNodes = depthFirst(importedModule).collect({case d:ConcreteScope => d})
@@ -74,7 +74,7 @@ class ScopeGraph extends
     null
   }
 
-  def addReference(reference: Reference, currentScope: ConcreteScope): Unit = add(reference, ReferenceEdge(currentScope))
+  def addReference(reference: Reference, currentScope: ConcreteScope): Unit = addEdge(reference, ReferenceEdge(currentScope))
 
   def resolveWithoutNameCheck(reference: Reference): Seq[NamedDeclaration] = {
     val reachableNodes = depthFirst(reference).collect({case d:NamedDeclaration => d})
@@ -114,19 +114,19 @@ class ScopeGraph extends
     result.reverse
   }
 
-  def parent(child: ConcreteScope, parent: ConcreteScope): Unit = add(child, Parent(parent))
-  def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration): Unit = add(inside, DeclaresDeclaration(declaration))
-  def declareScope(declaration: NamedDeclaration, scope: ConcreteScope): Unit = add(declaration, DeclaresScope(scope))
+  def parent(child: ConcreteScope, parent: ConcreteScope): Unit = addEdge(child, Parent(parent))
+  def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration): Unit = addEdge(inside, DeclaresDeclaration(declaration))
+  def declareScope(declaration: NamedDeclaration, scope: ConcreteScope): Unit = addEdge(declaration, DeclaresScope(scope))
 
-  def add(node: GraphNode, edge: GraphEdge): Boolean =
+  def addEdge(source: GraphNode, edge: GraphEdge): Boolean =
   {
-    node.origin.foreach(addOrigin(node, _))
-    edge.target.origin.foreach(addOrigin(edge.target, _))
-    val edges = nodes.getOrElseUpdate(node, mutable.Set.empty)
+    source.origin.foreach(addNode(source, _))
+    edge.target.origin.foreach(addNode(edge.target, _))
+    val edges = nodes.getOrElseUpdate(source, mutable.Set.empty)
     edges.add(edge)
   }
 
-  private def addOrigin(node: GraphNode, element: SourceElement) {
+  private def addNode(node: GraphNode, element: SourceElement) {
     elementToNode(element) = node
     element.position.foreach(position => rangeToNode(position) = node)
   }

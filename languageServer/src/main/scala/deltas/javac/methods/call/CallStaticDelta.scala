@@ -9,7 +9,7 @@ import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object CallStaticDelta extends GenericCall with ConvertsToByteCodeDelta {
+object CallStaticDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static methods."
 
