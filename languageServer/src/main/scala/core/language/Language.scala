@@ -61,7 +61,7 @@ class Language extends LazyLogging {
   }
 
   def transform(program: Node): Compilation = {
-    val state = new Compilation(this)
+    val state = Compilation.fromAst(this, program)
     state.program = program
     state.runPhases()
     state
@@ -70,7 +70,7 @@ class Language extends LazyLogging {
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(input: InputStream): Compilation = {
-    val compilation = new Compilation(this)
+    val compilation = Compilation.singleFile(this, input)
     compilation.program = parse(input).get
     compilation.runPhases()
     compilation

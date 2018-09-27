@@ -36,7 +36,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def transform(program: Node): Compilation = {
-    val state = new Compilation(language)
+    val state = Compilation.fromAst(language, program)
     state.program = program
     runPhases(state)
     state
@@ -66,7 +66,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def parse(input: InputStream): Node = {
-    val compilation = new Compilation(language)
+    val compilation = Compilation.singleFile(language, input)
     justParse(input, compilation)
     compilation.program
   }
@@ -78,7 +78,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   def parseAndTransform(input: InputStream): Compilation = {
-    val compilation = new Compilation(language)
+    val compilation = Compilation.singleFile(language, input)
     justParse(input, compilation)
     runPhases(compilation)
     compilation

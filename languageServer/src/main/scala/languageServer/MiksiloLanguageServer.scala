@@ -44,7 +44,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def compile(): Unit = {
-    val compilation = new Compilation(language)
+    val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))
     this.compilation = Some(compilation)
     try {
       val input = getInputStreamFromDocument(currentDocument)
@@ -71,7 +71,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   private def currentDocument: TextDocument = {
-    documentManager.documentForUri(currentDocumentId.uri).getOrElse({
+    documentManager.getOpenDocumentForUri(currentDocumentId.uri).getOrElse({
       val contents = scala.io.Source.fromFile(currentDocumentId.uri.drop(7)).mkString
       TextDocument(currentDocumentId.uri, contents.toCharArray)
     })
