@@ -19,7 +19,7 @@ import deltas.javac.types.MethodType._
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
-    instances.get(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+    instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
   }
 }
 
@@ -30,10 +30,9 @@ trait ReferenceExpression {
 
 trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpression {
   override def inject(language: Language): Unit = {
-    ReferenceExpressionSkeleton.instances.add(language, shape, this)
     super.inject(language)
+    ReferenceExpressionSkeleton.instances.add(language, shape, this)
   }
-
 }
 
 //TODO extend from Delta, can be done once old getType is out of ExpressionInstance.

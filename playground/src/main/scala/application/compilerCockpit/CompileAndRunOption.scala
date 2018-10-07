@@ -16,7 +16,7 @@ object CompileAndRunOption extends CompileOption {
   }
 
   override def run(sandbox: LanguageSandbox, inputStream: InputStream): TextWithGrammar = {
-    val state = language.parseAndTransform(inputStream)
+    val state = language.compileFile(inputStream)
     TextWithGrammar(state.output)
   }
 

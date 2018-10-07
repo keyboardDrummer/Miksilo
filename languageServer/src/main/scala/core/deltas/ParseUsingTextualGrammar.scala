@@ -1,36 +1,55 @@
 package core.deltas
 
-import java.io.InputStream
-
 import core.bigrammar.BiGrammarToParser
-import core.language.node.Node
-import core.language.{Language, NoSourceException, ParseException}
+import core.language.node.{Node, SourceRange}
+import core.language.{Compilation, Language}
+import langserver.types.{Diagnostic, DiagnosticSeverity}
+import languageServer.HumanPosition
 import util.SourceUtils
 
-import scala.util.{Failure, Success, Try}
+import scala.tools.nsc.interpreter.InputStream
 import scala.util.parsing.input.CharArrayReader
 
-object ParseUsingTextualGrammar extends Delta {
-  override def inject(language: Language): Unit = {
+object DiagnosticUtil {
 
-    language.buildParser = () => {
+  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
+  def getDiagnosticFromParseException(message: String): Diagnostic = {
+    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
+    val row = messageMatch.group(1).toInt
+    val column = messageMatch.group(2).toInt
+    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+  }
+}
 
-      val parser: BiGrammarToParser.PackratParser[Any] = BiGrammarToParser.toParser(language.grammars.root)
+object ParseUsingTextualGrammar extends DeltaWithPhase {
 
-      def parse(input: InputStream): Try[Node] = {
-        val reader = new CharArrayReader(SourceUtils.streamToString(input).mkString.toCharArray)
-        if (reader.source.length() == 0)
-          return Failure(NoSourceException)
 
-        val parseResult: BiGrammarToParser.ParseResult[Any] = parser(reader)
-        if (!parseResult.successful)
-          Failure(ParseException(parseResult.toString))
-        else
-          Success(parseResult.get.asInstanceOf[Node])
-      }
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    val parser: BiGrammarToParser.PackratParser[Any] = parserProp.get(compilation)
 
-      parse
+    val input = compilation.fileSystem.getFile(compilation.rootFile.get)
+    val parseResult: BiGrammarToParser.ParseResult[Any] = parseStream(parser, input)
+    if (parseResult.successful)
+      compilation.program = parseResult.get.asInstanceOf[Node]
+    else
+      compilation.diagnostics ++= List(DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString))
+  }
+
+  def parseStream(parser: BiGrammarToParser.PackratParser[Any], input: InputStream): BiGrammarToParser.ParseResult[Any] = {
+    val reader = new CharArrayReader(SourceUtils.streamToString(input).mkString.toCharArray)
+    if (reader.source.length() == 0) {
+      ???
     }
+
+    val parseResult: BiGrammarToParser.ParseResult[Any] = parser(reader)
+    parseResult
+  }
+
+  val parserProp = new Property[BiGrammarToParser.PackratParser[Any]](null)
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    parserProp.add(language, BiGrammarToParser.toParser(language.grammars.root))
   }
 
   override def description: String = "Parses the input file using a textual grammar."

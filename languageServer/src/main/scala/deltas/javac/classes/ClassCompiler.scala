@@ -86,7 +86,7 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
 
   private def getClassMapFromImports(imports: Seq[Node]): Map[String, QualifiedClassName] = {
     imports.flatMap(_import => {
-      JavaClassSkeleton.importToClassMap.get(compilation, _import.shape)(compilation, _import)
+      JavaClassSkeleton.importToClassMap(compilation, _import.shape)(compilation, _import)
     }).toMap ++ Map(className -> JavaClassSkeleton.getQualifiedClassName(currentClass))
   }
 }

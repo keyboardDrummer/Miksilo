@@ -21,8 +21,11 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   val state: mutable.Map[Any,Any] = mutable.Map.empty
 
   def runPhases(): Unit = {
-    for(phase <- language.compilerPhases)
+    for(phase <- language.compilerPhases) {
       phase.action(this)
+      if (diagnostics.nonEmpty)
+        return
+    }
   }
 }
 
@@ -30,6 +33,9 @@ object EmptyFileSystem extends FileSystem {
   override def getFile(path: String): InputStream = throw new IllegalArgumentException(s"no file for path $path")
 }
 
+case class MultiFileSystem(files: Map[String, InputStream]) extends FileSystem {
+  override def getFile(path: String): InputStream = files(path)
+}
 
 object Compilation
 {

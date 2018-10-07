@@ -17,7 +17,7 @@ object FormatOption extends CompileOption {
   }
 
   override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
-    val state = language.parseAndTransform(input)
+    val state = language.compileFile(input)
     val outputGrammar = prettyPrint.getOutputGrammar(state.language)
     TextWithGrammar(state.output, outputGrammar)
   }

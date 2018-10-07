@@ -31,16 +31,14 @@ class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
       val stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8.name()))
 
       val result = new DefaultParseResult(this)
-      language.parseIntoDiagnostic(stream).fold(node => {}, diagnostics => {
-        for(diagnostic <- diagnostics) {
+      for(diagnostic <- language.getParseDiagnostics(stream)) {
 
-          val lineLengths = text.split("\n").map(line => line.length + 1)
-          val row = diagnostic.range.start.line
-          val offset = lineLengths.take(row).sum + diagnostic.range.start.character
-          val notice = new DefaultParserNotice(this, diagnostic.message, row, offset, 1)
-          result.addNotice(notice)
-        }
-      })
+        val lineLengths = text.split("\n").map(line => line.length + 1)
+        val row = diagnostic.range.start.line
+        val offset = lineLengths.take(row).sum + diagnostic.range.start.character
+        val notice = new DefaultParserNotice(this, diagnostic.message, row, offset, 1)
+        result.addNotice(notice)
+      }
       result
     }
 

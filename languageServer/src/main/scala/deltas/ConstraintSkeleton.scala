@@ -13,6 +13,6 @@ object ConstraintSkeleton {
   val hasConstraints: ShapeProperty[HasConstraints] = new ShapeProperty[HasConstraints]
 
   def constraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    hasConstraints.get(compilation, statement.shape).collectConstraints(compilation, builder, statement, parentScope)
+    hasConstraints(compilation, statement.shape).collectConstraints(compilation, builder, statement, parentScope)
   }
 }

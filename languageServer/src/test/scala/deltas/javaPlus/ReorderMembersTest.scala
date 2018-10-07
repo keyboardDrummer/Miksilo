@@ -3,10 +3,9 @@ package deltas.javaPlus
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import core.language.ParseException
-import deltas.PrettyPrint
 import deltas.javac.JavaLanguage
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.{ClearPhases, PrettyPrint}
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
@@ -25,13 +24,10 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
 
-    val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    assertThrows[ParseException]({
-      val state = compiler.parseAndTransform(inputStream)
-      assertResult(null)(state.output)
-    })
+    val compilation = compiler.compile(input)
+    assert(compilation.diagnostics.nonEmpty)
   }
 
   test("basic") {
@@ -54,10 +50,10 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.parseAndTransform(inputStream)
+    val state = compiler.compile(inputStream)
     assertResult(expectation)(state.output)
   }
 
@@ -85,12 +81,12 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
       JavaStyleBlockCommentsDelta, StoreTriviaDelta) ++
       JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.parseAndTransform(inputStream)
+    val state = compiler.compile(inputStream)
     assertResult(expectation)(state.output)
   }
 
@@ -118,12 +114,12 @@ class ReorderMembersTest extends FunSuite {
         |    /* third comes last */
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.build(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
       JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
       JavaLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.parseAndTransform(inputStream)
+    val state = compiler.compile(inputStream)
     assertResult(expectation)(state.output)
   }
 }

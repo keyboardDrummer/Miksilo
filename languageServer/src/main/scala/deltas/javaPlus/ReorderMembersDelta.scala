@@ -17,8 +17,8 @@ object ReorderMembersDelta extends Delta {
   override def dependencies: Set[Contract] = Set[Contract](JavaClassSkeleton, AccessibilityFieldsDelta, MethodDelta)
 
   override def inject(language: Language): Unit = {
-    language.extraCompileOptions ::= ReorderOption
     super.inject(language)
+    language.extraCompileOptions ::= ReorderOption
   }
 
   object ReorderOption extends CustomCommand {

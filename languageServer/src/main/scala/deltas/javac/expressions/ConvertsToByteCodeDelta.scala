@@ -9,8 +9,8 @@ trait ConvertsToByteCodeDelta extends Delta with HasShape {
   def toByteCode(node: NodePath, compilation: Compilation): Seq[Node]
 
   override def inject(language: Language): Unit = {
-    ToByteCodeSkeleton.toByteCode.add(language, shape, this)
     super.inject(language)
+    ToByteCodeSkeleton.toByteCode.add(language, shape, this)
   }
 }
 
@@ -18,6 +18,6 @@ object ToByteCodeSkeleton {
   val toByteCode = new ShapeProperty[ConvertsToByteCodeDelta]
 
   def getToInstructions(compilation: Compilation): NodePath => Seq[Node] = {
-    expression => toByteCode.get(compilation, expression.shape).toByteCode(expression, compilation)
+    expression => toByteCode(compilation, expression.shape).toByteCode(expression, compilation)
   }
 }

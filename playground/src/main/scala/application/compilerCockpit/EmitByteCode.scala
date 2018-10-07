@@ -9,7 +9,7 @@ object EmitByteCode extends CompileOption {
   override def initialize(sandbox: LanguageSandbox): Unit = {}
 
   override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
-    val compilation = sandbox.language.parseAndTransform(input)
+    val compilation = sandbox.language.compileFile(input)
     val bytes = PrintByteCode.getBytes(compilation, compilation.program).toArray
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }

@@ -9,9 +9,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.types.{HasType, TypeSkeleton}
+import deltas.bytecode.types.{HasTypeDelta, TypeSkeleton}
 
-object TypeVariableDelta extends DeltaWithGrammar with HasType {
+object TypeVariableDelta extends DeltaWithGrammar with HasTypeDelta {
 
   override def description: String = "Adds references to type variables."
 

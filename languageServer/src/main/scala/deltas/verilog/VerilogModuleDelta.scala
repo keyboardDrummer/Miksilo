@@ -1,16 +1,19 @@
 package deltas.verilog
 
 import core.bigrammar.BiGrammar
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
-import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.path.{NodePath, PathRoot}
-import core.language.Language
 import core.language.node._
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.expressions.VariableDelta
 import deltas.expressions.VariableDelta.Variable
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
-object VerilogModuleDelta extends DeltaWithGrammar {
+object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
   object Name extends NodeField
@@ -34,31 +37,29 @@ object VerilogModuleDelta extends DeltaWithGrammar {
 
     val member = create(MemberShape)
     val variable = find(VariableDelta.Shape)
-    val parameterList: BiGrammar = variable.manySeparatedVertical(",").as(Ports).inParenthesis
+    val parameterList: BiGrammar = (variable.manySeparatedVertical(",").inParenthesis | value(Seq.empty)).as(Ports)
     val body: BiGrammar = member.manyVertical.as(Body)
     val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
-    find(BodyGrammar).inner = moduleGrammar
+    find(VerilogFileDelta.Members).addAlternative(moduleGrammar)
   }
 
   override def description: String = "Adds the Verilog module"
 
-  override def inject(language: Language): Unit = {
+  override def dependencies: Set[Contract] = Set(VerilogFileDelta, VariableDelta)
 
-    language.collectConstraints = (compilation, builder) => {
-      val moduleScope = builder.newScope(None, "moduleScope")
-      val module: Module[NodePath] = PathRoot(compilation.program)
-      for(port <- module.ports) {
-        builder.declare(port.name, moduleScope, port, None)
-      }
-
-      for(member <- module.body) {
-        ConstraintSkeleton.constraints(compilation, builder, member, moduleScope)
-      }
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    val moduleScope = builder.newScope(Some(parentScope), "moduleScope")
+    val module: Module[NodePath] = path
+    for(port <- module.ports) {
+      builder.declare(port.name, moduleScope, port, None)
     }
-    super.inject(language)
+
+    for(member <- module.body) {
+      ConstraintSkeleton.constraints(compilation, builder, member, moduleScope)
+    }
   }
 
-  override def dependencies: Set[Contract] = Set(VariableDelta)
+  override def shape: NodeShape = Shape
 }
 
 

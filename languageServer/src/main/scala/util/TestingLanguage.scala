@@ -20,26 +20,31 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
 
-  def parseAndTransform(input: String): Compilation = {
-    parseAndTransform(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
+  def compile(input: String): Compilation = {
+    compile(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
 
-  def parseAndTransform(input: File): Compilation = {
-    parseAndTransform(input.inputStream())
+  def compile(input: File): Compilation = {
+    compile(input.inputStream())
   }
 
-  def compile(inputStream: InputStream, outputFile: File): Compilation = {
-    val state: Compilation = parseAndTransform(inputStream)
+  def compileToFile(inputStream: InputStream, outputFile: File): Compilation = {
+    val state: Compilation = compile(inputStream)
 
     PrintByteCodeToOutputDirectory.perform(outputFile, state)
     state
   }
 
-  def transform(program: Node): Compilation = {
-    val state = Compilation.fromAst(language, program)
-    state.program = program
-    runPhases(state)
-    state
+  def compile(input: InputStream): Compilation = {
+    val compilation = Compilation.singleFile(language, input)
+    runPhases(compilation)
+    compilation
+  }
+
+  def compileAst(program: Node): Compilation = {
+    val compilation = Compilation.fromAst(language, program)
+    runPhases(compilation)
+    compilation
   }
 
   def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] = {
@@ -60,29 +65,21 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   private def runPhases(compilation: Compilation): Unit = {
     statistics.profile("running phases", {
-      for(phase <- language.compilerPhases)
+      for(phase <- language.compilerPhases) {
         statistics.profile("run " + phase.key.description, phase.action(compilation))
+        if (compilation.diagnostics.nonEmpty)
+          return
+      }
     })
   }
 
   def parse(input: InputStream): Node = {
-    val compilation = Compilation.singleFile(language, input)
-    justParse(input, compilation)
+    val compilation = Compilation.singleFile(language.justParse, input)
+    compilation.runPhases()
     compilation.program
   }
 
-  private def justParse(input: InputStream, state: Compilation): Unit = {
-    statistics.profile("parse", state.program = language.parse(input).get)
-  }
-
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-
-  def parseAndTransform(input: InputStream): Compilation = {
-    val compilation = Compilation.singleFile(language, input)
-    justParse(input, compilation)
-    runPhases(compilation)
-    compilation
-  }
 
   class WrappedContract(contract: Contract) extends Contract {
 
@@ -118,19 +115,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   def buildLanguage: Language = {
     statistics.profile("build language", {
-      Delta.buildLanguage(Seq(new Delta {
-        override def description: String = "Instrument buildParser"
-
-        override def inject(language: Language): Unit = {
-          val old = language.buildParser
-          language.buildParser = () => {
-            statistics.profile("build parser", old())
-          }
-          super.inject(language)
-        }
-
-        override def dependencies: Set[Contract] = Set.empty
-      }) ++ deltas.map(delta => new WrappedDelta(delta)))
+      Delta.buildLanguage(deltas.map(delta => new WrappedDelta(delta)))
     })
   }
 }

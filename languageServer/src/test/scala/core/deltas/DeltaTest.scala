@@ -1,5 +1,6 @@
 package core.deltas
 
+import core.language.Language
 import org.scalatest.FunSuite
 
 class DeltaTest extends FunSuite {
@@ -10,12 +11,15 @@ class DeltaTest extends FunSuite {
       override def description: String = "A"
 
       override def dependencies: Set[Contract] = Set(B)
+
+      override def inject(language: Language): Unit = {}
     }
     object B extends Delta {
 
       override def description: String = "B"
 
       override def dependencies: Set[Contract] = Set.empty
+      override def inject(language: Language): Unit = {}
     }
 
     assertResult(Seq(B, A))(Delta.validateDependencies(Seq(A)))
@@ -27,12 +31,14 @@ class DeltaTest extends FunSuite {
       override def description: String = "A"
 
       override def dependencies: Set[Contract] = Set(B)
+      override def inject(language: Language): Unit = {}
     }
     object B extends Delta {
 
       override def description: String = "B"
 
       override def dependencies: Set[Contract] = Set(A)
+      override def inject(language: Language): Unit = {}
     }
 
     assertThrows[DeltaDependencyViolation](Delta.buildLanguage(Seq(A,B)))

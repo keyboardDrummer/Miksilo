@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types._
 
-object TypeApplicationDelta extends DeltaWithGrammar with HasType with HasShape {
+object TypeApplicationDelta extends DeltaWithGrammar with HasTypeDelta with HasShape {
 
   override def description: String = "Adds application of generic types"
 

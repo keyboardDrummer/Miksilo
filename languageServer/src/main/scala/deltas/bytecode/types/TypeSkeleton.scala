@@ -13,14 +13,14 @@ import deltas.bytecode.ByteCodeSkeleton
 
 object TypeSkeleton extends DeltaWithGrammar {
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
-    hasTypes.get(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
+    hasTypes(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
   }
 
   def toStackType(_type: Node, language: Language) : Node = {
-    byteCodeInstances.get(language, _type.shape).getStackType(_type, language)
+    byteCodeInstances(language, _type.shape).getStackType(_type, language)
   }
 
-  def getTypeSize(_type: Node, language: Language): Int = hasStackSize.get(language, _type.shape)
+  def getTypeSize(_type: Node, language: Language): Int = hasStackSize(language, _type.shape)
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
@@ -28,7 +28,7 @@ object TypeSkeleton extends DeltaWithGrammar {
       rendered
   }
 
-  val hasTypes = new ShapeProperty[HasType]
+  val hasTypes = new ShapeProperty[HasTypeDelta]
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
 
   def checkAssignableTo(language: Language)(to: Node, from: Node): Unit = {
@@ -44,7 +44,7 @@ object TypeSkeleton extends DeltaWithGrammar {
     fromSuperTypes.exists(_type => _type.equals(to))
   }
 
-  def getSuperTypes(language: Language)(_type: Node): Seq[Node] = hasSuperTypes.get(language, _type.shape).getSuperTypes(_type)
+  def getSuperTypes(language: Language)(_type: Node): Seq[Node] = hasSuperTypes(language, _type.shape).getSuperTypes(_type)
 
   def union(state: Language)(first: Node, second: Node): Node = {
     val filteredDepths = getAllSuperTypes(state)(first).map(depthTypes => depthTypes.filter(_type => isAssignableTo(state)(_type, second)))

@@ -20,7 +20,7 @@ object StatementDelta extends DeltaWithGrammar {
   val instances = new ShapeProperty[StatementInstance]
 
   def getInstance(compilation: Compilation, statement: NodePath): StatementInstance = {
-    instances.get(compilation, statement.shape)
+    instances(compilation, statement.shape)
   }
 
   override def dependencies: Set[Contract] = Set.empty

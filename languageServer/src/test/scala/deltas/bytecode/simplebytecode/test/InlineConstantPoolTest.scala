@@ -223,14 +223,14 @@ class InlineConstantPoolTest extends FunSuite {
 
   test("inline to numbered bytecode") {
     val deltas = Seq(InlineConstantPool, PrettyPrint(), ConstantPoolIndices) ++ JavaLanguage.byteCodeDeltas
-    val compiler = TestLanguageBuilder.build(deltas)
+    val compiler = TestLanguageBuilder.buildWithParser(deltas)
     val result = new LanguageTest(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCodeWithLineNumbers)(result)
   }
 
   test("inline to bytecode") {
     val deltas = Seq(InlineConstantPool, PrettyPrint()) ++ JavaLanguage.byteCodeDeltas
-    val compiler = TestLanguageBuilder.build(deltas)
+    val compiler = TestLanguageBuilder.buildWithParser(deltas)
     val result = new LanguageTest(compiler).compileAndPrettyPrint(emptyInlined)
     assertResult(emptyByteCode)(result)
   }

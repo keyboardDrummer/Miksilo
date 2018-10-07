@@ -11,7 +11,7 @@ class TestExpressionMethod extends FunSuite {
 
   test("basic") {
     val inputDirectory = Path("")
-    val compiler = TestLanguageBuilder.build(Seq(ExpressionMethodDelta) ++ JavaLanguage.javaCompilerDeltas)
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ExpressionMethodDelta) ++ JavaLanguage.javaCompilerDeltas)
     val result = new LanguageTest(compiler).compileAndRun("FibonacciWithExpressionMethod", inputDirectory)
     assertResult(8)(Integer.parseInt(result))
   }

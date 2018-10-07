@@ -22,7 +22,8 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val compiledWhile = TestLanguageBuilder.build(Seq(LabelledLocations) ++ JavaLanguage.byteCodeDeltas).transform(labelledWhile).program
+    val language = TestLanguageBuilder.build(Seq(LabelledLocations) ++ JavaLanguage.byteCodeDeltas)
+    val compiledWhile = language.compileAst(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     LanguageTest.testInstructionEquivalence(compiledWhile, expectedCode)
   }

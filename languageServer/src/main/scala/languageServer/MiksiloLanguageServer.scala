@@ -47,18 +47,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))
     this.compilation = Some(compilation)
     try {
-      val input = getInputStreamFromDocument(currentDocument)
-      language.parseIntoDiagnostic(input) match {
-        case Left(program) =>
+      for(phase <- proofPhases)
+        phase.action(compilation)
 
-          compilation.program = program
-          for(phase <- proofPhases)
-            phase.action(compilation)
-
-          compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
-        case Right(diagnostics) =>
-          compilation.diagnostics ++= diagnostics
-      }
+      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
 
     } catch {
       case e: BadInputException => //TODO move to diagnostics.

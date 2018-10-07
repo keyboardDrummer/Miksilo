@@ -43,7 +43,7 @@ import deltas.statement._
 //TODO split the compilation to ByteCode from the language definition
 object JavaLanguage {
 
-  def getJava: Language = Delta.buildLanguage(javaCompilerDeltas)
+  def getJava: Language = Delta.buildLanguage(Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
@@ -113,7 +113,7 @@ object JavaLanguage {
     LoadConstantDelta, IncrementIntegerDelta, IntegerReturnInstructionDelta, LoadIntegerDelta, IfIntegerCompareGreaterOrEqualDelta,
     IfIntegerCompareEqualDelta, IfIntegerCompareNotEqualDelta)
 
-  def byteCodeWithoutInstructions: Seq[Delta] = byteCodeWithoutTextualParser ++ Seq(ParseUsingTextualGrammar)
+  def byteCodeWithoutInstructions: Seq[Delta] = byteCodeWithoutTextualParser
 
   def byteCodeWithoutTextualParser: Seq[Delta] = bytecodeAttributes ++ constantEntryDeltas ++
     Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
@@ -139,7 +139,7 @@ object JavaLanguage {
     Delta.spliceAndFilterBottom(implicits, javaCompilerDeltas, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler: Language = {
-    Delta.buildLanguage(spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(new PrettyPrint)))
+    Delta.buildLanguage(Seq(ParseUsingTextualGrammar) ++ spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(new PrettyPrint)))
   }
 }
 

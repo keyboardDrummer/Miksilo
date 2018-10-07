@@ -60,7 +60,7 @@ object AssignmentSkeleton extends ExpressionInstance with ConvertsToByteCodeDelt
     val value = getAssignmentValue(assignment)
     val valueInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(value)
     val target = getAssignmentTarget(assignment)
-    val assignInstructions = hasAssignFromStackByteCode.get(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
+    val assignInstructions = hasAssignFromStackByteCode(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
     val valueType = ExpressionDelta.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {

@@ -6,6 +6,7 @@ import com.typesafe.scalalogging.LazyLogging
 import core.language.FileSystem
 import langserver.core.TextDocument
 import langserver.types.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import util.SourceUtils
 
 import scala.collection.JavaConverters._
 import scala.tools.nsc.interpreter.InputStream
@@ -43,5 +44,8 @@ class TextDocumentManager extends LazyLogging with FileSystem {
     docs.remove(td.uri)
   }
 
-  override def getFile(path: String): InputStream = ???
+  override def getFile(path: String): InputStream = {
+    val bytes = getOpenDocumentForUri(path).get.contents
+    SourceUtils.stringToStream(new String(bytes)) //TODO maybe instead of Input stream een byte array gebruiken?
+  }
 }

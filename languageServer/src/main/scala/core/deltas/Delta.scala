@@ -10,7 +10,7 @@ trait Delta extends Contract with Key {
 
   def suffix = "Delta"
 
-  def inject(language: Language): Unit = {  }
+  def inject(language: Language): Unit = {}
 }
 
 object Delta {

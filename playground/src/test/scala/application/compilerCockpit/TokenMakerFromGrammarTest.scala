@@ -11,7 +11,7 @@ import scala.util.parsing.input.CharArrayReader
 
 class TokenMakerFromGrammarTest extends FunSuite {
 
-  private val language = TestLanguageBuilder.build(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas)
+  private val language = TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas)
 
   test("fibonacci") {
     val grammar = language.grammars.root

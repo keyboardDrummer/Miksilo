@@ -13,7 +13,7 @@ class TestOptimizeBooleanInstructions extends JavaLanguageTest {
   test("ForFibonacci") {
     val withOptimization = parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaLanguage.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
-    val withoutOptimization = new LanguageTest(TestLanguageBuilder.build(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
+    val withoutOptimization = new LanguageTest(TestLanguageBuilder.buildWithParser(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)
     val optimizedInstructions = getFibonacciInstructions(withOptimization)

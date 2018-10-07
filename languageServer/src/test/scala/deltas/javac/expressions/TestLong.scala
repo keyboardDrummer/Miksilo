@@ -13,7 +13,7 @@ class TestLong extends JavaLanguageTest {
   test("longWithoutPoptimize") {
     val regularParticles = JavaLanguage.javaCompilerDeltas
     val withoutPoptimize = regularParticles.filter(p => p != PoptimizeDelta)
-    new LanguageTest(TestLanguageBuilder.build(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
+    new LanguageTest(TestLanguageBuilder.buildWithParser(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
   }
 
   test("overloadedLongMethod") {

@@ -5,7 +5,7 @@ import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
 
-class JavaClassTypeTest extends LanguageTest(TestLanguageBuilder.build(
+class JavaClassTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
     Delta.spliceAndFilterTop(
         JavaLanguage.javaCompilerDeltas,
         JavaLanguage.javaClassSkeleton,

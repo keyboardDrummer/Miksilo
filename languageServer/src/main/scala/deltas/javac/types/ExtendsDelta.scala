@@ -7,9 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.types.{HasType, TypeSkeleton}
+import deltas.bytecode.types.{HasTypeDelta, TypeSkeleton}
 
-object ExtendsDelta extends DeltaWithGrammar with HasShape with HasType {
+object ExtendsDelta extends DeltaWithGrammar with HasShape with HasTypeDelta {
 
   override def description: String = "Adds the 'extends' type function. Example: 'T extends U'."
 

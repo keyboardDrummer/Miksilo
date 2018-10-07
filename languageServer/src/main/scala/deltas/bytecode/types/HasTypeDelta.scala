@@ -7,7 +7,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-trait HasType extends Delta with HasShape {
+trait HasTypeDelta extends Delta with HasShape {
 
   override def inject(language: Language): Unit = {
     super.inject(language)

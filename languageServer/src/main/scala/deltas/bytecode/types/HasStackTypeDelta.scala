@@ -8,7 +8,7 @@ trait HasStackTypeDelta extends Delta with HasShape //TODO should this be merged
   def getStackSize: Int
 
   override def inject(language: Language): Unit = {
-    TypeSkeleton.hasStackSize.add(language, shape, getStackSize)
     super.inject(language)
+    TypeSkeleton.hasStackSize.add(language, shape, getStackSize)
   }
 }

@@ -57,7 +57,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar {
     def getBytes(compilation: Compilation, node: Node): Seq[Byte]
   }
 
-  def getBytes(compilation: Compilation, node: Node): Seq[Byte] = hasBytes.get(compilation, node.shape).getBytes(compilation, node)
+  def getBytes(compilation: Compilation, node: Node): Seq[Byte] = hasBytes(compilation, node.shape).getBytes(compilation, node)
 
   val hasBytes = new ShapeProperty[HasBytes]
   val constantEntries = new ShapeProperty[ConstantEntry]

@@ -1,23 +1,22 @@
 package deltas.javac.expressions
 
-import core.deltas.Delta
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import langserver.types.{Location, Range}
 import languageServer.{HumanPosition, LanguageServerTest}
 import org.scalatest.FunSuite
-import util.SourceUtils
+import util.{SourceUtils, TestLanguageBuilder}
 
 class GotoDefinitionTest extends FunSuite with LanguageServerTest {
 
-  private val blockLanguage = Delta.buildLanguage(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
+  private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
 
   test("int variable") {
     val program =
       """int x;
         |x = 3;
       """.stripMargin
-    val result = gotoDefinition(blockLanguage, program, new HumanPosition(2, 1))
+    val result = gotoDefinition(blockLanguage.language, program, new HumanPosition(2, 1))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(1,5), new HumanPosition(1,6)))))(result)
   }
 
@@ -29,10 +28,10 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
         |  x += y;
         |}
       """.stripMargin
-    val xDefinition = gotoDefinition(blockLanguage, program, new HumanPosition(4, 3))
+    val xDefinition = gotoDefinition(blockLanguage.language, program, new HumanPosition(4, 3))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(1,5), new HumanPosition(1,6)))))(xDefinition)
 
-    val yDefinition = gotoDefinition(blockLanguage, program, new HumanPosition(4, 8))
+    val yDefinition = gotoDefinition(blockLanguage.language, program, new HumanPosition(4, 8))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(3,7), new HumanPosition(3,8)))))(yDefinition)
   }
 

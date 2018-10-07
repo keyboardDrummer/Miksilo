@@ -53,8 +53,8 @@ object SourceUtils {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val particles: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaLanguage.byteCodeDeltas
-    TestLanguageBuilder.build(particles).transform(byteCode)
+    val deltas: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaLanguage.byteCodeDeltas
+    TestLanguageBuilder.build(deltas).compileAst(byteCode)
     output
   }
 
