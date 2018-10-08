@@ -47,7 +47,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
                | endmodule""".stripMargin
 
   test("Can parse") {
-    val actual = justParseLanguage.compile(code)
+    val actual = justParseLanguage.compile(code).program
 
     val requestOne = VariableDelta.neww("req_1")
     val requestZero = VariableDelta.neww("req_0")

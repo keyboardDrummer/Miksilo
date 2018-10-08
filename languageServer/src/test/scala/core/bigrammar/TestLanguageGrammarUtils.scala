@@ -65,7 +65,7 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def parse(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ getDeltas(grammarTransformer))
-    compiler.compile(input)
+    compiler.compile(input).program
   }
 
   def getDeltas(key: GrammarKey): Seq[Delta] = {

@@ -45,8 +45,6 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def description: String = "Adds the Verilog module"
 
-  override def dependencies: Set[Contract] = Set(VerilogFileDelta, VariableDelta)
-
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val moduleScope = builder.newScope(Some(parentScope), "moduleScope")
     val module: Module[NodePath] = path
@@ -60,6 +58,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def shape: NodeShape = Shape
+  override def dependencies: Set[Contract] = Set(VerilogFileDelta, VariableDelta)
 }
 
 
