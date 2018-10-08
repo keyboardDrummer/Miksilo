@@ -27,7 +27,7 @@ object ExpressionDelta extends DeltaWithGrammar {
   }
 
   def getInstance(language: Language): NodeLike => ExpressionInstance = {
-    expression => expressionInstances.get(language, expression.shape)
+    expression => expressionInstances(language, expression.shape)
   }
 
   val expressionInstances = new ShapeProperty[ExpressionInstance]

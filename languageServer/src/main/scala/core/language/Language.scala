@@ -7,71 +7,45 @@ import com.typesafe.scalalogging.LazyLogging
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
-import core.language.node.{Node, SourceRange}
+import core.language.node.Node
 import core.smarts.ConstraintBuilder
-import langserver.types.{Diagnostic, DiagnosticSeverity}
-import languageServer.HumanPosition
 
 import scala.collection.mutable
 import scala.reflect.io.File
-import scala.util.{Failure, Success, Try}
 
 class Language extends LazyLogging {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
   var compilerPhases: List[Phase] = List.empty
-  var buildParser: () => (InputStream => Try[Node]) = () => null
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
-  lazy val parser: InputStream => Try[Node] = buildParser()
   var extraCompileOptions: List[CustomCommand] = List.empty
 
-  def parse(input: InputStream): Try[Node] = parser(input)
-
-  def parseIntoDiagnostic(input: InputStream): Either[Node, List[Diagnostic]] = {
-    val parseResult: Try[Node] = parse(input)
-    parseResult match {
-      case Failure(NoSourceException) => Right(List.empty)
-      case Failure(ParseException(message)) =>
-        Right(List(getDiagnosticFromParseException(message)))
-      case Success(node) => Left(node)
-      case Failure(e) =>
-        logger.error("Received unknown error during parsing: " + e.toString)
-        Right(List.empty)
-    }
+  def compileString(input: String): Compilation = {
+    compileStream(stringToInputStream(input))
   }
 
-  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
-  private def getDiagnosticFromParseException(message: String): Diagnostic = {
-    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
-    val row = messageMatch.group(1).toInt
-    val column = messageMatch.group(2).toInt
-    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+  def compileFile(input: File): Compilation = {
+    compileStream(input.inputStream())
   }
 
-  def parseAndTransform(input: File): Compilation = {
-    parseAndTransform(input.inputStream())
+  def compileFileToOutputFile(inputStream: InputStream, outputFile: File): Compilation = {
+    val compilation = compileStream(inputStream)
+    PrintByteCodeToOutputDirectory.perform(outputFile, compilation)
+    compilation
   }
 
-  def compile(inputStream: InputStream, outputFile: File): Compilation = {
-    val state: Compilation = parseAndTransform(inputStream)
-
-    PrintByteCodeToOutputDirectory.perform(outputFile, state)
-    state
-  }
-
-  def transform(program: Node): Compilation = {
-    val state = new Compilation(this)
-    state.program = program
-    state.runPhases()
-    state
+  def compileAst(program: Node): Compilation = {
+    val compilation = Compilation.fromAst(this, program)
+    compilation.program = program
+    compilation.runPhases()
+    compilation
   }
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
-  def parseAndTransform(input: InputStream): Compilation = {
-    val compilation = new Compilation(this)
-    compilation.program = parse(input).get
+  def compileStream(input: InputStream): Compilation = {
+    val compilation = Compilation.singleFile(this, input)
     compilation.runPhases()
     compilation
   }

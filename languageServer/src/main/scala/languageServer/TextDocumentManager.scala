@@ -3,21 +3,24 @@ package languageServer
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import com.typesafe.scalalogging.LazyLogging
+import core.language.FileSystem
 import langserver.core.TextDocument
 import langserver.types.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import util.SourceUtils
 
 import scala.collection.JavaConverters._
+import scala.tools.nsc.interpreter.InputStream
 
 /**
   * A class to manage text documents coming over the wire from a Language Server client.
   *
   * The manager keeps an up to date version of each document that is currently open by the client.
   */
-class TextDocumentManager extends LazyLogging {
+class TextDocumentManager extends LazyLogging with FileSystem {
 
   private val docs: ConcurrentMap[String, TextDocument] = new ConcurrentHashMap
 
-  def documentForUri(uri: String): Option[TextDocument] =
+  def getOpenDocumentForUri(uri: String): Option[TextDocument] =
     Option(docs.get(uri))
 
   def allOpenDocuments: Seq[TextDocument] = docs.values.asScala.toSeq
@@ -41,4 +44,8 @@ class TextDocumentManager extends LazyLogging {
     docs.remove(td.uri)
   }
 
+  override def getFile(path: String): InputStream = {
+    val bytes = getOpenDocumentForUri(path).get.contents
+    SourceUtils.stringToStream(new String(bytes)) //TODO maybe instead of Input stream een byte array gebruiken?
+  }
 }

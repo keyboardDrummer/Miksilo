@@ -18,6 +18,7 @@ object CloudFormationTemplate extends Delta {
   val propertyType = PrimitiveType("PropertyKey")
   val valueType = PrimitiveType("Value")
   override def inject(language: Language): Unit = {
+    super.inject(language)
 
     val file = SourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
     val parsedFile = Json.parse(file).as[JsObject]
@@ -59,7 +60,6 @@ object CloudFormationTemplate extends Delta {
       })
 
     }
-    super.inject(language)
   }
 
   private def addPseudoParameters(builder: ConstraintBuilder, rootScope: ConcreteScope): Unit = {

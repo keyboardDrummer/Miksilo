@@ -5,7 +5,7 @@ import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import util.{TestLanguageBuilder, LanguageTest}
 
-class ExpressionTypeTest extends LanguageTest(TestLanguageBuilder.build(
+class ExpressionTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(SolveConstraintsDelta,
     ExpressionLanguageDelta,
     ClearPhases) ++

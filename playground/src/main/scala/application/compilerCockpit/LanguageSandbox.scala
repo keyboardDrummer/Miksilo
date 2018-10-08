@@ -3,16 +3,15 @@ package application.compilerCockpit
 import java.awt._
 import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
-import javax.swing._
-import javax.swing.event.{ListDataEvent, ListDataListener}
-import javax.swing.text.DefaultCaret
 
 import application.StyleSheet
 import core.bigrammar.BiGrammar
-import core.deltas.Delta
-import core.language.Language
+import core.deltas.{Delta, LanguageFromDeltas}
 import core.language.exceptions.CompileException
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
+import javax.swing._
+import javax.swing.event.{ListDataEvent, ListDataListener}
+import javax.swing.text.DefaultCaret
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 
@@ -24,7 +23,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
                       presentationMode: Boolean = StyleSheet.presentationMode)
   extends Frame {
   this.title = name
-  val language: Language = Delta.buildLanguage(deltas)
+  val language = LanguageFromDeltas(deltas)
 
   private val inputPanel = new EditorFromLanguage(language)
   private def getInputStream = () => {

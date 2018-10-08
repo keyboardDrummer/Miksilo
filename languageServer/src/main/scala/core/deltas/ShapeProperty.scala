@@ -15,8 +15,10 @@ class ShapeProperty[T] {
 
   def get(language: Language): scala.collection.Map[NodeShape, T] = map(language)
 
-  def get(language: Language, shape: NodeShape): T = {
-    map(language)(shape)
+  def apply(language: Language, shape: NodeShape) : T = get(language, shape).get
+
+  def get(language: Language, shape: NodeShape): Option[T] = {
+    map(language).get(shape)
   }
 
   def add[U <: T with HasShape](language: Language, value: U): Unit = add(language, value.shape, value)
@@ -24,7 +26,7 @@ class ShapeProperty[T] {
   def add(language: Language, shape: NodeShape, value: T): Unit = map(language).put(shape, value)
 }
 
-class Property[T](default: => T) {
+class Property[T](default: => T = null) {
 
   private def map(language: Language): T =
     language.data.getOrElseUpdate(this, default).asInstanceOf[T]

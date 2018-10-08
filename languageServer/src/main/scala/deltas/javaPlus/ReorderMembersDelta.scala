@@ -1,6 +1,6 @@
 package deltas.javaPlus
 
-import core.deltas.{Contract, Delta, DeltaWithPhase}
+import core.deltas.{Contract, Delta, DeltaWithPhase, LanguageFromDeltas}
 import core.language.node.Node
 import core.language.{Compilation, CustomCommand, Language}
 import deltas.PrettyPrint
@@ -17,8 +17,8 @@ object ReorderMembersDelta extends Delta {
   override def dependencies: Set[Contract] = Set[Contract](JavaClassSkeleton, AccessibilityFieldsDelta, MethodDelta)
 
   override def inject(language: Language): Unit = {
-    language.extraCompileOptions ::= ReorderOption
     super.inject(language)
+    language.extraCompileOptions ::= ReorderOption
   }
 
   object ReorderOption extends CustomCommand {
@@ -28,7 +28,7 @@ object ReorderMembersDelta extends Delta {
     val prettyPrint = PrettyPrint(recover = true)
     var language: Language = _
     override def initialize(deltas: Seq[Delta]): Unit = {
-      language = Delta.buildLanguage(Seq(ActuallyReorderMembers, prettyPrint) ++ deltas)
+      language = LanguageFromDeltas(Seq(ActuallyReorderMembers, prettyPrint) ++ deltas)
     }
 
     override def perform(server: LanguageServer): Unit = {

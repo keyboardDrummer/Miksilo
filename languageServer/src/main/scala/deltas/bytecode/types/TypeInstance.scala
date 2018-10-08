@@ -8,12 +8,12 @@ import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.types.TypeSkeleton.HasSuperTypes
 
-trait TypeInstance extends DeltaWithGrammar with HasShape with HasType with HasSuperTypes {
+trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with HasSuperTypes {
 
   override def inject(language: Language): Unit = {
+    super.inject(language)
     TypeSkeleton.hasSuperTypes.add(language, this)
     TypeSkeleton.typeInstances.add(language, this)
-    super.inject(language)
   }
 
   def getSuperTypes(_type: Node): Seq[Node]

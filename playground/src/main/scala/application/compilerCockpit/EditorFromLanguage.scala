@@ -5,14 +5,14 @@ import java.io.ByteArrayInputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-import core.language.Language
+import core.deltas.LanguageFromDeltas
 import javax.swing._
 import languageServer.MiksiloLanguageServer
 import org.fife.ui.rsyntaxtextarea.parser._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane
 
-class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
+class EditorFromLanguage(language: LanguageFromDeltas) extends JPanel(new CardLayout()) {
 
   val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
 
@@ -31,16 +31,15 @@ class EditorFromLanguage(language: Language) extends JPanel(new CardLayout()) {
       val stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8.name()))
 
       val result = new DefaultParseResult(this)
-      language.parseIntoDiagnostic(stream).fold(node => {}, diagnostics => {
-        for(diagnostic <- diagnostics) {
+      val compilation = language.compileStream(stream)
+      for(diagnostic <- compilation.diagnostics) {
 
-          val lineLengths = text.split("\n").map(line => line.length + 1)
-          val row = diagnostic.range.start.line
-          val offset = lineLengths.take(row).sum + diagnostic.range.start.character
-          val notice = new DefaultParserNotice(this, diagnostic.message, row, offset, 1)
-          result.addNotice(notice)
-        }
-      })
+        val lineLengths = text.split("\n").map(line => line.length + 1)
+        val row = diagnostic.range.start.line
+        val offset = lineLengths.take(row).sum + diagnostic.range.start.character
+        val notice = new DefaultParserNotice(this, diagnostic.message, row, offset, 1)
+        result.addNotice(notice)
+      }
       result
     }
 

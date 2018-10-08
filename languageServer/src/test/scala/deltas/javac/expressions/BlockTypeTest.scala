@@ -7,7 +7,7 @@ import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import util.{TestLanguageBuilder, LanguageTest}
 
-class BlockTypeTest extends LanguageTest(TestLanguageBuilder.build(
+class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(DropPhases(1), BlockLanguageDelta) ++
     Delta.spliceAndFilterTop(
       JavaLanguage.blockWithVariables,

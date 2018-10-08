@@ -6,6 +6,10 @@ object TestLanguageBuilder {
   val statistics = new Statistics()
 
   var compilers : Map[Seq[Delta], TestingLanguage] = Map.empty
+  def buildWithParser(deltas: Seq[Delta], description: String = "testing"): TestingLanguage = {
+    build(Seq(ParseUsingTextualGrammar) ++ deltas, description)
+  }
+
   def build(deltas: Seq[Delta], description: String = "testing"): TestingLanguage = {
     val result = compilers.getOrElse(deltas, new TestingLanguage(deltas, description))
     compilers += (deltas -> result)

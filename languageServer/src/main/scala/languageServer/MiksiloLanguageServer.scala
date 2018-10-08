@@ -44,21 +44,13 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def compile(): Unit = {
-    val compilation = new Compilation(language)
+    val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))
     this.compilation = Some(compilation)
     try {
-      val input = getInputStreamFromDocument(currentDocument)
-      language.parseIntoDiagnostic(input) match {
-        case Left(program) =>
+      for(phase <- proofPhases)
+        phase.action(compilation)
 
-          compilation.program = program
-          for(phase <- proofPhases)
-            phase.action(compilation)
-
-          compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
-        case Right(diagnostics) =>
-          compilation.diagnostics ++= diagnostics
-      }
+      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
 
     } catch {
       case e: BadInputException => //TODO move to diagnostics.
@@ -71,7 +63,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   private def currentDocument: TextDocument = {
-    documentManager.documentForUri(currentDocumentId.uri).getOrElse({
+    documentManager.getOpenDocumentForUri(currentDocumentId.uri).getOrElse({
       val contents = scala.io.Source.fromFile(currentDocumentId.uri.drop(7)).mkString
       TextDocument(currentDocumentId.uri, contents.toCharArray)
     })

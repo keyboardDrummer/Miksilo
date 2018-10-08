@@ -7,8 +7,8 @@ import core.language.Language
 trait ControlFlowDelta extends Delta with HasShape {
 
   override def inject(language: Language): Unit = {
-    ControlFlowGraph.instances.add(language, this)
     super.inject(language)
+    ControlFlowGraph.instances.add(language, this)
   }
 
   def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph =
@@ -23,7 +23,7 @@ trait ControlFlowDelta extends Delta with HasShape {
 object ControlFlowGraph {
 
   def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph =
-    instances.get(language, statement.shape).getControlFlowGraph(language, statement, labels)
+    instances(language, statement.shape).getControlFlowGraph(language, statement, labels)
 
   val instances = new ShapeProperty[ControlFlowDelta]
   val empty = ControlFlowGraph(None, Map.empty, Set.empty)

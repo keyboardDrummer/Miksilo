@@ -17,7 +17,7 @@ import util.SourceUtils.LineProcessLogger
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-class JavaLanguageTest extends LanguageTest(TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas)) {}
+class JavaLanguageTest extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaLanguage.javaCompilerDeltas)) {}
 
 object LanguageTest {
 
@@ -62,7 +62,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.parseAndTransform(SourceUtils.stringToStream(input)).program
+    language.compile(SourceUtils.stringToStream(input)).program
   }
 
     def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
@@ -72,13 +72,13 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val outputDirectory = actualOutputDirectory / inputDirectory
     outputDirectory.createDirectory(force = true)
     val outputFile = outputDirectory / className addExtension "class"
-    language.compile(input, outputFile.toFile)
+    language.compileToFile(input, outputFile.toFile)
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
     SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
   }
 
   def compile(input: String): Compilation = {
-    language.parseAndTransform(input)
+    language.compile(input)
   }
 
   def compileAndPrettyPrint(input: String): String = {
@@ -86,8 +86,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   }
 
   def compileAndPrettyPrint(input: InputStream): String = {
-    val newCompiler = TestLanguageBuilder.build(language.deltas)
-    val compilation = newCompiler.parseAndTransform(input)
+    val compilation = language.compile(input)
     compilation.output
   }
 
@@ -115,7 +114,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     assertResult("")(javaCompilerOutput)
 
     val outputFile = File((actualOutputDirectory / className).addExtension("class"))
-    val state = profile("Miksilo compile", language.compile(input, outputFile))
+    val state = profile("Miksilo compile", language.compileToFile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
     val expectedOutput = profile("Run classfile from javac", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
@@ -137,8 +136,8 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = TestLanguageBuilder.build(Seq(new PrettyPrint) ++ JavaLanguage.byteCodeDeltas)
-    val output = prettyPrintByteCodeCompiler.transform(state.program).output
+    val prettyPrintByteCodeCompiler = TestLanguageBuilder.buildWithParser(Seq(new PrettyPrint) ++ JavaLanguage.byteCodeDeltas)
+    val output = prettyPrintByteCodeCompiler.compileAst(state.program).output
     val prettyPrintActualByteCode = output
 
     val originalMessage = e.getMessage

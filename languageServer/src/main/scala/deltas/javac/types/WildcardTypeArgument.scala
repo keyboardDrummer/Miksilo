@@ -7,9 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.types.HasType
+import deltas.bytecode.types.HasTypeDelta
 
-object WildcardTypeArgument extends DeltaWithGrammar with HasType with HasShape {
+object WildcardTypeArgument extends DeltaWithGrammar with HasTypeDelta with HasShape {
 
   override def description: String = "Adds the wildcard type argument '*'."
 
