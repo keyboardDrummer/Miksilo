@@ -8,6 +8,8 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 
+import scala.collection.immutable
+
 object DecodeByteCodeParser extends DeltaWithPhase {
 
   override def description: String = "Decodes a binary bytecode classfile."
@@ -18,8 +20,8 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     val parser = parserProp.get(compilation)
     val inputStream = compilation.fileSystem.getFile(compilation.rootFile.get)
     val bis = new BufferedInputStream(inputStream)
-    val inputBytes = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
-    val parseResult = parser(new ArrayReader(0, inputBytes))
+    val inputBytes: immutable.Seq[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
+    val parseResult = parser.apply(new ArrayReader(0, inputBytes))
     if (parseResult.successful)
       compilation.program = parseResult.get
     else

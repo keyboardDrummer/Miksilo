@@ -9,7 +9,6 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.exceptions.BadInputException
 import core.language.node.Node
 import core.smarts.ConstraintBuilder
-import langserver.types.Diagnostic
 
 import scala.collection.mutable
 import scala.reflect.io.File
@@ -21,23 +20,17 @@ class Language extends LazyLogging {
   var compilerPhases: List[Phase] = List.empty
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
   var extraCompileOptions: List[CustomCommand] = List.empty
-  lazy val justParse: Language = this //TODO correct
-
-  def getParseDiagnostics(input: InputStream): List[Diagnostic] = {
-    val compilation = justParse.compileFile(input)
-    compilation.diagnostics
-  }
 
   def compileString(input: String): Compilation = {
-    compileFile(stringToInputStream(input))
+    compileStream(stringToInputStream(input))
   }
 
   def compileFile(input: File): Compilation = {
-    compileFile(input.inputStream())
+    compileStream(input.inputStream())
   }
 
   def compileFileToOutputFile(inputStream: InputStream, outputFile: File): Compilation = {
-    val compilation = compileFile(inputStream)
+    val compilation = compileStream(inputStream)
     PrintByteCodeToOutputDirectory.perform(outputFile, compilation)
     compilation
   }
@@ -51,7 +44,7 @@ class Language extends LazyLogging {
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
-  def compileFile(input: InputStream): Compilation = {
+  def compileStream(input: InputStream): Compilation = {
     val compilation = Compilation.singleFile(this, input)
     compilation.runPhases()
     compilation

@@ -16,10 +16,6 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
-  def parse(input: String): Node = {
-    parse(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
-  }
-
   def compile(input: String): Compilation = {
     compile(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
@@ -73,12 +69,6 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     })
   }
 
-  def parse(input: InputStream): Node = {
-    val compilation = Compilation.singleFile(language.justParse, input)
-    compilation.runPhases()
-    compilation.program
-  }
-
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   class WrappedContract(contract: Contract) extends Contract {
@@ -115,7 +105,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   def buildLanguage: Language = {
     statistics.profile("build language", {
-      Delta.buildLanguage(deltas.map(delta => new WrappedDelta(delta)))
+      LanguageFromDeltas(deltas.map(delta => new WrappedDelta(delta)))
     })
   }
 }

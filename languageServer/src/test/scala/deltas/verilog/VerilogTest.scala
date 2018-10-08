@@ -1,7 +1,8 @@
 package deltas.verilog
 
 import core.language.node.NodeComparer
-import core.language.{Compilation, MultiFileSystem}
+import core.language.{Compilation, InMemoryFileSystem}
+import deltas.ClearPhases
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.VariableDelta
 import deltas.expressions.VariableDelta.Variable
@@ -16,6 +17,7 @@ import scala.reflect.io.Path
 class VerilogTest extends FunSuite with LanguageServerTest {
 
   val language = TestLanguageBuilder.buildWithParser(VerilogLanguage.deltas)
+  val justParseLanguage = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ VerilogLanguage.deltas)
   val code = """ module arbiter (
                | clock,
                | reset,
@@ -45,7 +47,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
                | endmodule""".stripMargin
 
   test("Can parse") {
-    val actual = language.parse(code)
+    val actual = justParseLanguage.compile(code)
 
     val requestOne = VariableDelta.neww("req_1")
     val requestZero = VariableDelta.neww("req_0")
@@ -94,7 +96,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
   }
 
   test("can parse multiple files") {
-    val fileSystem = MultiFileSystem(Map(
+    val fileSystem = InMemoryFileSystem(Map(
       "Bus_pkg.sv" -> SourceUtils.getTestFile(Path("verilog") / "Bus_pkg.sv"),
       "testbench.sv" -> SourceUtils.getTestFile(Path("verilog") / "testbench.sv")))
     val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))

@@ -82,7 +82,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val prettyPrintCompiler = JavaLanguage.getPrettyPrintJavaToByteCodeCompiler
 
-    val state = prettyPrintCompiler.compileFile(input)
+    val state = prettyPrintCompiler.compileStream(input)
     assertResult(expectation)(state.output)
   }
 
@@ -92,7 +92,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCodeTransformations = JavaLanguage.byteCodeDeltas
     val prettyPrintCompiler = JavaLanguage.getPrettyPrintJavaToByteCodeCompiler
 
-    val state = prettyPrintCompiler.compileFile(input)
+    val state = prettyPrintCompiler.compileStream(input)
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations

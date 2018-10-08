@@ -7,10 +7,6 @@ import langserver.types.Diagnostic
 import scala.collection.mutable
 import scala.tools.nsc.interpreter.InputStream
 
-trait FileSystem {
-  def getFile(path: String): InputStream
-}
-
 class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String]) {
   var program: Node = _
   var proofs: Proofs = _
@@ -27,14 +23,6 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
         return
     }
   }
-}
-
-object EmptyFileSystem extends FileSystem {
-  override def getFile(path: String): InputStream = throw new IllegalArgumentException(s"no file for path $path")
-}
-
-case class MultiFileSystem(files: Map[String, InputStream]) extends FileSystem {
-  override def getFile(path: String): InputStream = files(path)
 }
 
 object Compilation
@@ -56,4 +44,16 @@ object Compilation
     result
   }
   implicit def toLanguage(compilation: Compilation): Language = compilation.language
+}
+
+object EmptyFileSystem extends FileSystem {
+  override def getFile(path: String): InputStream = throw new IllegalArgumentException(s"no file for path $path")
+}
+
+case class InMemoryFileSystem(files: Map[String, InputStream]) extends FileSystem {
+  override def getFile(path: String): InputStream = files(path)
+}
+
+trait FileSystem {
+  def getFile(path: String): InputStream
 }

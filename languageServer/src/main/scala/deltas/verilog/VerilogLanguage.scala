@@ -1,6 +1,6 @@
 package deltas.verilog
 
-import core.deltas.{Delta, ParseUsingTextualGrammar}
+import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.expression.IntLiteralDelta
@@ -23,5 +23,5 @@ object VerilogLanguage {
     VerilogClassDelta,
     VerilogModuleDelta,
     VerilogFileDelta) ++ genericDeltas
-  val language: Language = Delta.buildLanguage(Seq(ParseUsingTextualGrammar) ++ deltas)
+  val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
 }

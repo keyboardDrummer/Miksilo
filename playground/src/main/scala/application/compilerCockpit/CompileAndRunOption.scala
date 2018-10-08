@@ -12,11 +12,11 @@ object CompileAndRunOption extends CompileOption {
   var language: Language = _
   override def initialize(sandbox: LanguageSandbox): Unit = {
     val deltas = Delta.spliceAndFilterTop(sandbox.deltas, JavaLanguage.byteCodeDeltas, Seq(RunWithJVM))
-    language = Delta.buildLanguage(deltas)
+    language = LanguageFromDeltas(deltas)
   }
 
   override def run(sandbox: LanguageSandbox, inputStream: InputStream): TextWithGrammar = {
-    val state = language.compileFile(inputStream)
+    val state = language.compileStream(inputStream)
     TextWithGrammar(state.output)
   }
 

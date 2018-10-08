@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.deltas.Delta
+import core.deltas.LanguageFromDeltas
 import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.Node
@@ -14,12 +14,12 @@ import util.SourceUtils
 
 object JavaLang {
 
-  val byteCodeDecompiler = Delta.buildLanguage(ClassFileSignatureDecompiler.getDecompiler)
+  val byteCodeDecompiler = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
-  val systemClass: Node = byteCodeDecompiler.compileFile(SourceUtils.getTestFile("System.class")).program
-  val printStreamClass: Node = byteCodeDecompiler.compileFile(SourceUtils.getTestFile("PrintStream.class")).program
-  val objectClass: Node = byteCodeDecompiler.compileFile(SourceUtils.getTestFile("Object.class")).program
-  val stringClass: Node = byteCodeDecompiler.compileFile(SourceUtils.getTestFile("String2.class")).program
+  val systemClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("System.class")).program
+  val printStreamClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("PrintStream.class")).program
+  val objectClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("Object.class")).program
+  val stringClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("String2.class")).program
 
   def loadIntoClassPath(compilation: Compilation) {
     ClassCompiler(objectClass, compilation).bind()

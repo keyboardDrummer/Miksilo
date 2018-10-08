@@ -10,17 +10,6 @@ import util.SourceUtils
 import scala.tools.nsc.interpreter.InputStream
 import scala.util.parsing.input.CharArrayReader
 
-object DiagnosticUtil {
-
-  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
-  def getDiagnosticFromParseException(message: String): Diagnostic = {
-    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
-    val row = messageMatch.group(1).toInt
-    val column = messageMatch.group(2).toInt
-    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
-  }
-}
-
 object ParseUsingTextualGrammar extends DeltaWithPhase {
 
 
@@ -36,13 +25,12 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   }
 
   def parseStream(parser: BiGrammarToParser.PackratParser[Any], input: InputStream): BiGrammarToParser.ParseResult[Any] = {
-    val reader = new CharArrayReader(SourceUtils.streamToString(input).mkString.toCharArray)
+    val reader = new CharArrayReader(SourceUtils.streamToString(input).toCharArray)
     if (reader.source.length() == 0) {
       ???
     }
 
-    val parseResult: BiGrammarToParser.ParseResult[Any] = parser(reader)
-    parseResult
+    parser(reader)
   }
 
   val parserProp = new Property[BiGrammarToParser.PackratParser[Any]](null)
@@ -55,4 +43,15 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   override def description: String = "Parses the input file using a textual grammar."
 
   override def dependencies: Set[Contract] = Set.empty
+}
+
+object DiagnosticUtil {
+
+  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
+  def getDiagnosticFromParseException(message: String): Diagnostic = {
+    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
+    val row = messageMatch.group(1).toInt
+    val column = messageMatch.group(2).toInt
+    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+  }
 }

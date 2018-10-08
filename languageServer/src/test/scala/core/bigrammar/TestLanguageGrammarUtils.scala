@@ -9,7 +9,7 @@ import core.language.node.GrammarKey
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
-import util.{SourceUtils, TestLanguageBuilder}
+import util.TestLanguageBuilder
 
 import scala.util.parsing.input.CharArrayReader
 
@@ -65,7 +65,7 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def parse(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ getDeltas(grammarTransformer))
-    compiler.parse(SourceUtils.stringToStream(input))
+    compiler.compile(input)
   }
 
   def getDeltas(key: GrammarKey): Seq[Delta] = {

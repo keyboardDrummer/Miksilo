@@ -27,7 +27,7 @@ class JavaStyleCommentsTest
   object ChildName extends NodeField
 
   test("comments with trivia inside node on tiny grammar") {
-    val language = Delta.buildLanguage(Seq.empty)
+    val language = LanguageFromDeltas(Seq.empty)
     val grammars = language.grammars
     import grammars._
 
@@ -127,7 +127,7 @@ class JavaStyleCommentsTest
     val statementGrammar = java.grammars.find(StatementDelta.Grammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.Grammar)
-    val language = Delta.buildLanguage(Seq.empty)
+    val language = LanguageFromDeltas(Seq.empty)
     language.grammars.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammars, language)
 
