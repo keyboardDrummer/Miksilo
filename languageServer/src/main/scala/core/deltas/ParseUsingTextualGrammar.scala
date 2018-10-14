@@ -47,11 +47,17 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
 object DiagnosticUtil {
 
-  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
+  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: ((.|\n)*)\n\n""".r
   def getDiagnosticFromParseException(message: String): Diagnostic = {
-    val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
-    val row = messageMatch.group(1).toInt
-    val column = messageMatch.group(2).toInt
-    Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+    try {
+      val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
+      val row = messageMatch.group(1).toInt
+      val column = messageMatch.group(2).toInt
+      Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
+
+    } catch
+    {
+      case e: java.util.NoSuchElementException => throw new Exception("Failed to parse message " + message)
+    }
   }
 }

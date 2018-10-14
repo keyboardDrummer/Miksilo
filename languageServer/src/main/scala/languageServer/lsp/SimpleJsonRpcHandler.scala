@@ -1,5 +1,7 @@
 package languageServer.lsp
 
+import java.io.{PrintWriter, StringWriter}
+
 import com.dhpcs.jsonrpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
 import com.dhpcs.jsonrpc._
 import com.typesafe.scalalogging.LazyLogging
@@ -45,7 +47,11 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
         try {
           handler(notification)
         } catch {
-          case error: Throwable => logger.error("Notification handler failed with: " + error)
+          case error: Throwable =>
+            val stringWriter = new StringWriter
+            error.printStackTrace(new PrintWriter(stringWriter))
+            logger.error("Notification handler failed with: " + error +
+            "\n Stack trace:" + stringWriter.toString)
         }
       })
       case None =>
@@ -92,8 +98,8 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
           val typedResponse = handler(typedRequest)
           val jsonResponse = responseFormat.writes(typedResponse)
           JsonRpcResponseSuccessMessage(jsonResponse, request.id)
-        case JsError(errors) =>
-          JsonRpcResponseErrorMessage.invalidParams(null, request.id)
+        case error:JsError =>
+          JsonRpcResponseErrorMessage.invalidParams(error, request.id)
       }
     }
     requestHandlers += method -> handle

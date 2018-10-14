@@ -1,0 +1,93 @@
+{
+	"name": "miksilo",
+	"description": "Miksilo extension for VS code",
+	"author": "@keyboardDrummer",
+	"license": "MIT",
+	"version": "0.0.1",
+	"publisher": "vscode",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/vscode-extension-samples"
+	},
+	"engines": {
+		"vscode": "^1.16.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:systemverilog"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		
+        "languages": [
+            {
+                "id": "systemverilog",
+                "aliases": [
+                    "SystemVerilog",
+                    "systemverilog",
+                    "System Verilog",
+                    "Systemverilog"
+                ],
+                "extensions": [
+                    ".sv",
+                    ".svh"
+                ],
+                "configuration": "./src/verilog/language-configuration.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "systemverilog",
+                "path": "./src/verilog/snippets.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "systemverilog",
+                "scopeName": "text.systemverilog",
+                "path": "./src/verilog/tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "systemverilog.build_index",
+                "title": "SystemVerilog: Build index of modules in workspace"
+            }
+        ],
+		"configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"miksilo.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Traces the communication between VSCode and the language server."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -p ./",
+		"watch": "tsc -w -p ./",
+		"update-vscode": "node ./node_modules/vscode/bin/install",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"dependencies": {
+		"vscode": "^1.1.5",
+		"vscode-languageclient": "^3.5.0"
+	},
+	"devDependencies": {
+		"@types/mocha": "^2.2.48",
+		"@types/node": "^6.0.101",
+		"typescript": "^2.7.2"
+	}
+}

@@ -47,11 +47,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))
     this.compilation = Some(compilation)
     try {
-      for(phase <- proofPhases)
-        phase.action(compilation)
-
-      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
-
+      compilation.runPhases()
     } catch {
       case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
