@@ -43,7 +43,7 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
     val indexDefinition = gotoDefinition(JavaLanguage.getJavaFrontend, program, new HumanPosition(10, 16))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(8,37), new HumanPosition(8,42)))))(indexDefinition)
 
-    val fibonacciDefinition = gotoDefinition(JavaLanguage.getJava, program, new HumanPosition(5, 36))
+    val fibonacciDefinition = gotoDefinition(JavaLanguage.getJavaFrontend, program, new HumanPosition(5, 36))
     val methodRange = Seq(Location(itemUri, Range(new HumanPosition(8, 23), new HumanPosition(8, 32))))
     assertResult(methodRange)(fibonacciDefinition)
   }
