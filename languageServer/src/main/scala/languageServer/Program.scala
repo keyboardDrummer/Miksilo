@@ -19,7 +19,7 @@ object Program extends LazyLogging {
   val languages = Map(
     "cloudFormation" -> CloudFormationLanguage.language,
     "verilog" -> VerilogLanguage.language,
-    "java" -> JavaLanguage.getJava
+    "java" -> JavaLanguage.getJavaFrontend
   )
 
   def main(args: Array[String]): Unit = {

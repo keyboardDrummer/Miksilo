@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas._
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
-import deltas.PrettyPrint
+import deltas.{PrettyPrint, RemovePhasesAfterSolveConstraints}
 import deltas.bytecode._
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes._
@@ -40,10 +40,15 @@ import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, Trivi
 import deltas.javac.types._
 import deltas.statement._
 
+
+
 //TODO split the compilation to ByteCode from the language definition
 object JavaLanguage {
 
-  def getJava: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
+  def getJavaFrontend: LanguageFromDeltas = LanguageFromDeltas(Seq(RemovePhasesAfterSolveConstraints) ++
+    Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
+
+  def getJava: LanguageFromDeltas = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 

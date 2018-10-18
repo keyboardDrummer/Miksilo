@@ -1,5 +1,6 @@
 package deltas.javac.expressions
 
+import deltas.RemovePhasesAfterSolveConstraints
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import langserver.types.{Location, Range}
@@ -9,7 +10,9 @@ import util.{SourceUtils, TestLanguageBuilder}
 
 class GotoDefinitionTest extends FunSuite with LanguageServerTest {
 
-  private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(DropPhases(1), BlockLanguageDelta) ++ JavaLanguage.blockWithVariables)
+  private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(
+    DropPhases(1), BlockLanguageDelta) ++
+    Seq(RemovePhasesAfterSolveConstraints) ++ JavaLanguage.blockWithVariables)
 
   test("int variable") {
     val program =
@@ -47,7 +50,7 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
 
   test("assignment") {
     val program = SourceUtils.getJavaTestFileContents("FieldAssignment")
-    val myFieldDefinition = gotoDefinition(JavaLanguage.getJava, program, new HumanPosition(11, 9))
+    val myFieldDefinition = gotoDefinition(JavaLanguage.getJavaFrontend, program, new HumanPosition(11, 9))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,9), new HumanPosition(2,16)))))(myFieldDefinition)
   }
 }

@@ -1,16 +1,12 @@
 package languageServer
 
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.exceptions.BadInputException
 import core.language.node.{NodeLike, SourceRange}
 import core.language.{Compilation, Language, SourceElement}
+import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import core.smarts.{Proofs, SolveConstraintsDelta}
-import langserver.core.TextDocument
 import langserver.types._
 import languageServer.lsp._
 
@@ -21,8 +17,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with LazyLogging {
 
   var client: LanguageClient = _
-  private val constraintsPhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-  private val proofPhases = language.compilerPhases.take(constraintsPhaseIndex + 1)
   private val documentManager = new TextDocumentManager()
   var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
@@ -52,17 +46,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
     }
-  }
-
-  private def getInputStreamFromDocument(document: langserver.core.TextDocument) = {
-    new ByteArrayInputStream(new String(document.contents).getBytes(StandardCharsets.UTF_8))
-  }
-
-  private def currentDocument: TextDocument = {
-    documentManager.getOpenDocumentForUri(currentDocumentId.uri).getOrElse({
-      val contents = scala.io.Source.fromFile(currentDocumentId.uri.drop(7)).mkString
-      TextDocument(currentDocumentId.uri, contents.toCharArray)
-    })
   }
 
   def getCompilation: Compilation = {
