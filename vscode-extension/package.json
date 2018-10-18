@@ -70,6 +70,11 @@
 					],
 					"default": "off",
 					"description": "Traces the communication between VSCode and the language server."
+				},
+				"miksilo.jar": {
+					"scope": "window",
+					"type": "string",
+					"description": "Configures the location of the .jar file for Miksilo."
 				}
 			}
 		}

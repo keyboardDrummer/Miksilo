@@ -1,5 +1,5 @@
 ---
-title: Build
+title: Build Miksilo
 category: Practical
 order: 1
 ---

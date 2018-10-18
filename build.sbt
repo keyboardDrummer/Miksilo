@@ -1,3 +1,4 @@
+import scala.sys.process._
 
 lazy val miksilo = project
   .in(file("."))
@@ -61,6 +62,16 @@ lazy val languageServer = (project in file("languageServer")).
     name := "MiksiloLspServer",
     assemblySettings,
     mainClass in Compile := Some("languageServer.Program"),
+    vscode := {
+      val assemblyFile: String = assembly.value.getAbsolutePath
+      val extensionDirectory: File = file("./vscode-extension").getAbsoluteFile
+      val tsc = Process("tsc", file("./vscode-extension"))
+      val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"),
+        None,
+        "MIKSILO" -> assemblyFile)
+
+      tsc.#&&(vscode).run
+    }
   )
 
 lazy val playground = (project in file("playground")).
@@ -76,3 +87,5 @@ lazy val playground = (project in file("playground")).
     libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
   ).dependsOn(languageServer)
+
+lazy val vscode = taskKey[Unit]("Run VS Code with Miksilo")

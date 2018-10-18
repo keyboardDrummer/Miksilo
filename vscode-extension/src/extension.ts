@@ -1,33 +1,51 @@
 'use strict';
 
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, window, Disposable } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
 interface LanguageConfiguration {
 	vscodeName: string,
 	miksiloName?: string,
 }
+const languages: Array<LanguageConfiguration> = [
+	{ 
+		vscodeName: "systemverilog", 
+		miksiloName: "verilog"
+	}
+]
 
-export function activate(context: ExtensionContext) {
-	
-	const languages: Array<LanguageConfiguration> = [
-		{ 
-			vscodeName: "systemverilog", 
-			miksiloName: "verilog"
-		}]
+export function activate(context: ExtensionContext) {	
+	workspace.onDidChangeConfiguration(() => activateJar(context));
+	activateJar(context);
+}
+
+let previousJar: string | null | undefined = undefined;
+function activateJar(context: ExtensionContext) {
+	const jar: string = workspace.getConfiguration('miksilo').get("jar") || process.env.MIKSILO || null;
+	if (jar === previousJar)
+		return;
+	previousJar = jar;
+
+	if (!jar) {
+		window.showErrorMessage("Could not locate a .jar for Miksilo. Please configure \"miksilo.jar\" in settings.");
+		return;
+	} 
+
+	for(const previousClient of context.subscriptions) {
+		previousClient.dispose()
+	}
+	context.subscriptions.length = 0;
 
 	for(const language of languages) {
-		activateLanguage(context, language)
+		const disposable = activateLanguage(jar, language);
+		context.subscriptions.push(disposable);
 	}
 }
 
-function activateLanguage(context: ExtensionContext, language: LanguageConfiguration) {
+function activateLanguage(jar: string, language: LanguageConfiguration): Disposable {
 
-	const jar: string = workspace.getConfiguration('miksilo').get("jar") || process.env.MIKSILO;	
 	language.miksiloName = language.miksiloName || language.vscodeName;
 
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
 		command: "java",
 		args: ["-jar",
@@ -40,15 +58,11 @@ function activateLanguage(context: ExtensionContext, language: LanguageConfigura
 		documentSelector: [{scheme: 'file', language: language.vscodeName}],
 		synchronize: {
 			configurationSection: 'miksilo',
-			// Notify the server about file changes to '.clientrc files contain in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	}
 	
-	let disposable = new LanguageClient(
+	return new LanguageClient(
 		'miksilo' + language.vscodeName, 
 		language.vscodeName + " Miksilo", 
 		serverOptions, clientOptions).start();
-	
-	context.subscriptions.push(disposable);
 }
