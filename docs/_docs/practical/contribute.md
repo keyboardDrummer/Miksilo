@@ -20,3 +20,9 @@ Some examples of cool features:
 1. Look through the open issues to see if you find something interesting
 1. Enjoy the work ;-)
 1. Once you're done, submit a pull request and make sure the build server approves it.
+
+### FAQ
+
+##### How can I preview the documentation locally?
+
+Go to the `docs` folder and run `bundle exec jekyll serve`.

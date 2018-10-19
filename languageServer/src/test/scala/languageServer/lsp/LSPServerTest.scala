@@ -126,7 +126,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/completion","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
     completePromise.future.map(result => {
-      assert(result.items == Seq(CompletionItem("hello")))
+      assertResult(Seq(CompletionItem("hello")))(result.items)
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
     })

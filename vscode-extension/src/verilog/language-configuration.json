@@ -1,0 +1,56 @@
+{
+    "comments": {
+        // symbol used for single line comment. Remove this entry if your language does not support line comments
+        "lineComment": "//",
+        // symbols used for start and end a block comment. Remove this entry if your language does not support block comments
+        "blockComment": [ "/*", "*/" ]
+    },
+    // symbols used as brackets
+    "brackets": [
+        ["'{", "}"],
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["fork", "join"],
+        ["fork", "join_any"],
+        ["fork", "join_none"],
+        ["begin", "end"],
+        ["task", "endtask"],
+        ["case", "endcase"],
+        ["class", "endclass"],
+        ["table", "endtable"],
+        ["config", "endconfig"],
+        ["module", "endmodule"],
+        ["specify", "endspecify"],
+        ["package", "endpackage"],
+        ["program", "endprogram"],
+        ["property", "endproperty"],
+        ["sequence", "endsequence"],
+        ["function", "endfunction"],
+        ["clocking", "endclocking"],
+        ["generate", "endgenerate"],
+        ["primitive", "endprimitive"],
+        ["interface", "endinterface"],
+    ],
+    // symbols that are auto closed when typing
+    "autoClosingPairs": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"]
+    ],
+    // symbols that that can be used to surround a selection
+    "surroundingPairs": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["'", "'"],
+        ["\"", "\""]
+    ],
+    "folding": {
+        "offSide": false,
+        "markers": {
+            "start": "^\\s*`(ifdef|ifndef|elsif|else)",
+            "end": "^\\s*`(elsif|else|endif)"
+        },
+    }
+}

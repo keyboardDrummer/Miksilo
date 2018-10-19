@@ -9,7 +9,7 @@ import util.SourceUtils
 
 class CompletionTest extends FunSuite with LanguageServerTest {
 
-  val server = new MiksiloLanguageServer(JavaLanguage.getJava)
+  val server = new MiksiloLanguageServer(JavaLanguage.getJavaFrontend)
 
   test("fibonacci") {
     val program = SourceUtils.getJavaTestFileContents("Fibonacci")

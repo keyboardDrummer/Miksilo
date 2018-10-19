@@ -10,7 +10,7 @@ import deltas.statement.{ForLoopDelta, _}
 import deltas.verilog.preprocessor.{IncludeDelta, PreprocessorDelta}
 
 object VerilogLanguage {
-  val genericDeltas = Seq(JavaStyleBlockCommentsDelta, JavaStyleLineCommentsDelta,
+  val genericDeltas: Seq[Delta] = Seq(JavaStyleBlockCommentsDelta, JavaStyleLineCommentsDelta,
     ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
     IntLiteralDelta, VariableDelta, ExpressionDelta,
     SolveConstraintsDelta)
