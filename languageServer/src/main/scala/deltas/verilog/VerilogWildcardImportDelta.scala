@@ -9,24 +9,27 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
-object VerilogClassDelta extends DeltaWithGrammar with HasConstraintsDelta {
-  override def description: String = "Adds Verilog classes"
+object VerilogWildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
-  object Name extends NodeField
+  object Package extends NodeField
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-
-    val clazz = ("class" ~~ identifier.as(Name) ~ ";" % "endclass" ~~ (":" ~~ identifier).option) asNode(Shape)
-    create(Shape, clazz)
+    val member = find(VerilogModuleDelta.MemberShape)
+    val _import = "import" ~~> (identifier.as(Package) ~ "::" ~ "*" asNode Shape) ~< ";"
+    member.addAlternative(_import)
   }
 
+  override def description: String = "Adds Verilog wildcard import to the language"
 
-  override def dependencies: Set[Contract] = Set.empty
+  override def dependencies: Set[Contract] = Set(VerilogModuleDelta)
 
   override def shape: NodeShape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-
+    val packageDeclaration = builder.resolve(path(Package).asInstanceOf[String], path.getLocation(Package), parentScope)
+    val importedScope = builder.getDeclaredScope(packageDeclaration)
+    builder.importScope(parentScope, importedScope)
   }
 }

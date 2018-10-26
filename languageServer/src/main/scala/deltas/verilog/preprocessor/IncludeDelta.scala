@@ -3,10 +3,14 @@ package deltas.verilog.preprocessor
 import core.bigrammar.BiGrammarToParser
 import core.bigrammar.grammars.{ParseWhiteSpace, StringLiteral}
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.{NodePath, SequenceElement}
 import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property}
 import core.language.Language
-import core.language.node.{NodeField, NodeShape}
+import core.language.node.{Node, NodeField, NodeShape}
+import deltas.verilog.VerilogFileDelta.VerilogFile
+
+import scala.reflect.io.Path
+
 
 object IncludeDelta extends DirectiveDelta {
   override def description: String = "Adds the `include <filename> directive"
@@ -14,12 +18,16 @@ object IncludeDelta extends DirectiveDelta {
   override def apply(preprocessor: Preprocessor, path: NodePath): Unit = {
     val fileName = path.current(FileName).asInstanceOf[String]
     val compilation = preprocessor.compilation
-    val input = preprocessor.compilation.fileSystem.getFile(fileName)
+    val rootDirectory = Path(preprocessor.compilation.rootFile.get).parent
+    val filePath: Path = rootDirectory / Path.apply(fileName)
+    val input = preprocessor.compilation.fileSystem.getFile(filePath.toString())
 
     val parser: BiGrammarToParser.PackratParser[Any] = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
-    if (parseResult.successful)
-      path.asInstanceOf[ChildPath].replaceWith(parseResult.get)
+    if (parseResult.successful) {
+      val value: VerilogFile[Node] = parseResult.get.asInstanceOf[Node]
+      path.asInstanceOf[SequenceElement].replaceWith(value.members)
+    }
     else
       compilation.diagnostics ++= List(DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString))
   }

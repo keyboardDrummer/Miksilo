@@ -43,8 +43,8 @@ trait LanguageServerTest extends FunSuite {
   }
 
   val random = new Random()
-  def openDocument(server: LanguageServer, content: String): TextDocumentIdentifier = {
-    val item = new TextDocumentItem(itemUri, "", 1, content)
+  def openDocument(server: LanguageServer, content: String, uri: String = itemUri): TextDocumentIdentifier = {
+    val item = new TextDocumentItem(uri, "", 1, content)
     server.didOpen(item)
     TextDocumentIdentifier(item.uri)
   }

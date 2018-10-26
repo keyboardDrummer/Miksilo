@@ -2,7 +2,7 @@
 
 module use_Bus_trans;
 
-// import Bus_pkg::*;
+ import Bus_pkg::*;
 /*
   Bus_trans t1;
   Bus_trans t2;

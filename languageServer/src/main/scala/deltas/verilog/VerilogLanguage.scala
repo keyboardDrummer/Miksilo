@@ -16,6 +16,7 @@ object VerilogLanguage {
     SolveConstraintsDelta)
 
   val deltas: Seq[Delta] = Seq(
+    VerilogWildcardImportDelta,
     IncludeDelta, PreprocessorDelta,
     AlwaysDelta, NonBlockingAssignmentDelta, BeginEndDelta,
     PortTypeSpecifierDelta,
