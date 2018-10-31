@@ -1,7 +1,7 @@
 package core.smarts.language.modules
 
 import core.language.SourceElement
-import core.language.node.SourceRange
+import core.language.node.FileRange
 import core.smarts.ConstraintBuilder
 import core.smarts.language.structs.TypeDefinition
 import core.smarts.scopes.objects.Scope

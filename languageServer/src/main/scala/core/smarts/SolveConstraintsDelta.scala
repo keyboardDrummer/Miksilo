@@ -27,7 +27,7 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
         case Failure(e) => throw e
       }
       compilation.proofs = solver.proofs
-      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic.toSeq)
+      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(constraint => constraint.getDiagnostic().toSeq)
     })
   }
 

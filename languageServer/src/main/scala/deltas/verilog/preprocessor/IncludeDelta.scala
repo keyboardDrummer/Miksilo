@@ -7,6 +7,7 @@ import core.deltas.path.{NodePath, SequenceElement}
 import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeShape}
+import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
 
 import scala.reflect.io.Path
@@ -28,8 +29,10 @@ object IncludeDelta extends DirectiveDelta {
       val value: VerilogFile[Node] = parseResult.get.asInstanceOf[Node]
       path.asInstanceOf[SequenceElement].replaceWith(value.members)
     }
-    else
-      compilation.diagnostics ++= List(DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString))
+    else {
+      val diagnostic = DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)
+      compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
+    }
   }
 
   val parserProp = new Property[BiGrammarToParser.PackratParser[Any]](null)

@@ -31,10 +31,13 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       false
   }
 
-  override def getDiagnostic: Option[Diagnostic] = {
+  override def getDiagnostic(): Option[FileDiagnostic] = {
     for {
-      range <- reference.origin.flatMap(e => e.position)
-    } yield Diagnostic(range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
+      fileRange <- reference.origin.flatMap(e => e.position)
+    } yield {
+      val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
+      FileDiagnostic(fileRange.uri, diagnostic)
+    }
   }
 }
 

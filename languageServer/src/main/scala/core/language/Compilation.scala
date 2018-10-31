@@ -1,7 +1,7 @@
 package core.language
 
 import core.language.node.Node
-import core.smarts.{Constraint, Proofs}
+import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import langserver.types.Diagnostic
 
 import scala.collection.mutable
@@ -11,7 +11,7 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   var program: Node = _
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
-  var diagnostics: List[Diagnostic] = List.empty
+  var diagnostics: List[FileDiagnostic] = List.empty
 
   var output: String = _
   val state: mutable.Map[Any,Any] = mutable.Map.empty
@@ -22,6 +22,12 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
       if (diagnostics.nonEmpty)
         return
     }
+  }
+
+  def diagnosticsForFile(uri: String): Seq[Diagnostic] = {
+    diagnostics.
+      filter(p => p.uri == uri).
+      map(d => d.diagnostic)
   }
 }
 

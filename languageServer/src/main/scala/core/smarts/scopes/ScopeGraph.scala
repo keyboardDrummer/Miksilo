@@ -1,7 +1,7 @@
 package core.smarts.scopes
 
 import core.language.SourceElement
-import core.language.node.SourceRange
+import core.language.node.FileRange
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
 
@@ -42,7 +42,7 @@ A declaration can declare a scope.
 class ScopeGraph extends
 {
   val nodes = mutable.Map.empty[GraphNode, mutable.Set[GraphEdge]]
-  val rangeToNode = mutable.Map.empty[SourceRange, GraphNode]
+  val rangeToNode = mutable.Map.empty[FileRange, GraphNode]
   val elementToNode = mutable.Map.empty[SourceElement, GraphNode]
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
