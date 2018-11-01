@@ -8,4 +8,6 @@ trait ChildPath extends NodePath with SourceElement {
   def parent: NodePath
   def replaceWith(replacement: Any): Unit
   val field: NodeField
+
+  override def uriOption: Option[String] = super.uriOption.orElse(parent.uriOption)
 }

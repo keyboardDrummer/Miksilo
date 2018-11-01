@@ -40,7 +40,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
       val reference: Reference = maybeGraphNode.get.asInstanceOf[Reference]
       val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
       maybeDeclaration.foreach(declaration => {
-        val declarationNode = declaration.origin.get.asInstanceOf[FieldLocation].node
+        val declarationNode = declaration.origin.get.asInstanceOf[FieldLocation].path.current
         declarationNode.shape match {
           case MethodDelta.Shape =>
             val method: Method[Node] = declarationNode

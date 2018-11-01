@@ -1,7 +1,7 @@
 package core.deltas
 
 import core.bigrammar.BiGrammarToParser
-import core.language.node.{Node, SourceRange}
+import core.language.node.{Node, SourceRange, UriEntrance}
 import core.language.{Compilation, Language}
 import core.smarts.FileDiagnostic
 import langserver.types.{Diagnostic, DiagnosticSeverity}
@@ -19,8 +19,10 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     val uri = compilation.rootFile.get
     val input = compilation.fileSystem.getFile(uri)
     val parseResult: BiGrammarToParser.ParseResult[Any] = parseStream(parser, input)
-    if (parseResult.successful)
+    if (parseResult.successful) {
       compilation.program = parseResult.get.asInstanceOf[Node]
+      compilation.program(UriEntrance) = uri
+    }
     else
       compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)))
   }

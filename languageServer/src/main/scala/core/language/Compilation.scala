@@ -1,5 +1,6 @@
 package core.language
 
+import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import langserver.types.Diagnostic
@@ -9,6 +10,7 @@ import scala.tools.nsc.interpreter.InputStream
 
 class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String]) {
   var program: Node = _
+  def root: PathRoot = PathRoot(program)
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
   var diagnostics: List[FileDiagnostic] = List.empty

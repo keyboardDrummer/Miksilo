@@ -1,7 +1,7 @@
 package core.smarts.language.modules
 
 import core.language.SourceElement
-import core.language.node.FileRange
+import core.language.node.{FileRange, SourceRange}
 import core.smarts.ConstraintBuilder
 import core.smarts.language.structs.TypeDefinition
 import core.smarts.scopes.objects.Scope
@@ -10,6 +10,8 @@ trait FakeSourceElement extends SourceElement {
   override def current: Any = ???
 
   override def position: Option[SourceRange] = None
+
+  override def filePosition: Option[FileRange] = None
 }
 
 case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,

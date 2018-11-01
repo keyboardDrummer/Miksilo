@@ -1,9 +1,9 @@
 package languageServer
 
 import com.typesafe.scalalogging.LazyLogging
-import core.deltas.path.{NodePath, PathRoot}
+import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{FilePosition, FileRange, NodeLike}
+import core.language.node.{FilePosition, FileRange, NodeLike, UriEntrance}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -70,10 +70,27 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
           childPaths.map(child => getForNode(child))
         }
       })
-      val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
+      val childPosition = childPositions.find(kv => kv.filePosition.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
-    getForNode(PathRoot(getCompilation.program))
+    getForNode(getCompilation.root)
+  }
+
+  def getSourceElementForNode(path: NodePath, position: FilePosition): Option[SourceElement] = {
+    val maybeUri = path.get(UriEntrance)
+    val doesContain = maybeUri match {
+      case Some(uri) => position.uri == uri
+      case None => true
+    }
+    if (!doesContain)
+      return None
+
+    val childResults = path.dataView.flatMap(t => {
+      val childrenForField = NodeLike.getChildNodeLikes[NodePath](t._2)
+      childrenForField.flatMap(child => getSourceElementForNode(child, position).toSeq)
+    })
+
+    Some(childResults.headOption.getOrElse(path))
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
@@ -87,7 +104,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       proofs <- getProofs
       element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
-      fileRange <- definition.origin.flatMap(o => o.position)
+      fileRange <- definition.origin.flatMap(o => o.filePosition)
     } yield Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
     location.toSeq
   }
@@ -101,7 +118,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       scopeGraph = proofs.scopeGraph
       element = getSourceElement(FilePosition(params.textDocument.uri, position))
       reference <- scopeGraph.findReference(element).toSeq
-      prefixLength = position.character - reference.origin.get.position.get.range.start.character
+      prefixLength = position.character - reference.origin.get.position.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
@@ -129,12 +146,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
       val referencesRanges = for {
         references <- proofs.findReferences(definition)
-        range <- references.origin.flatMap(e => e.position).toSeq
+        range <- references.origin.flatMap(e => e.filePosition).toSeq
       } yield range
 
       var fileRanges: Seq[FileRange] = referencesRanges
       if (parameters.context.includeDeclaration)
-        fileRanges = definition.origin.flatMap(o => o.position).toSeq ++ fileRanges
+        fileRanges = definition.origin.flatMap(o => o.filePosition).toSeq ++ fileRanges
 
       fileRanges.map(fileRange => Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)))
     }

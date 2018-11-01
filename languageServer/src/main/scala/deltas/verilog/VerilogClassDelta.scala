@@ -17,7 +17,7 @@ object VerilogClassDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val clazz = ("class" ~~ identifier.as(Name) ~ ";" % "endclass" ~~ (":" ~~ identifier).option) asNode(Shape)
+    val clazz = ("class" ~~ identifier.as(Name) ~ ";" % "endclass" ~~ (":" ~~ identifier).option) asNode Shape
     create(Shape, clazz)
   }
 

@@ -120,6 +120,6 @@ class VerilogTest extends FunSuite with LanguageServerTest {
 
     val gotoBusResult: Seq[Location] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(7, 5)))
     val gotoBusExpectation = Seq(Location(busIdentifier.uri, Range(new HumanPosition(8, 9), new HumanPosition(8, 18))))
-    assertResult(gotoBusResult)(gotoBusExpectation)
+    assertResult(gotoBusExpectation)(gotoBusResult)
   }
 }

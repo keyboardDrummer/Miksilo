@@ -5,7 +5,7 @@ import core.deltas.Delta
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{Node, NodeField, NodeShape, NodeWrapper}
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -44,13 +44,13 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
 
   override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
-  implicit class ObjectLiteralMember(val node: Node) extends NodeWrapper[Node] {
+  implicit class ObjectLiteralMember[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def key: String = node(MemberKey).asInstanceOf[String]
-    def value: Node = node(MemberValue).asInstanceOf[Node]
+    def value: T = node(MemberValue).asInstanceOf[T]
   }
 
-  implicit class ObjectLiteral(val node: Node) extends NodeWrapper[Node] {
-    def getValue(key: String): Node = members.find(member => member.key == key).get.value
-    def members: Seq[ObjectLiteralMember] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[Node]])
+  implicit class ObjectLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def getValue(key: String): T = members.find(member => member.key == key).get.value
+    def members: Seq[ObjectLiteralMember[T]] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[T]])
   }
 }

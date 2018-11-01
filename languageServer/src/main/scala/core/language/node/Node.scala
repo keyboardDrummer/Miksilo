@@ -1,12 +1,11 @@
 package core.language.node
 
 import core.deltas.path.NodePath
-import core.language.SourceElement
+import core.language.node.Node._
 import langserver.types.Position
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
-import core.language.node.Node._
 
 class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   extends NodeLike {
@@ -92,8 +91,6 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   override def get(key: NodeField): Option[Any] = data.get(key)
-
-  override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
 
   def position: Option[SourceRange] =
     if (sources.values.isEmpty) None

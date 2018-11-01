@@ -1,7 +1,6 @@
 package core.language.node
 
 import core.deltas.path.NodePath
-import core.language.SourceElement
 
 import scala.collection.mutable
 
@@ -15,8 +14,6 @@ trait NodeLike {
   def dataView: Map[NodeField, Any]
   def asPath: Option[NodePath]
   def asNode: Node
-
-  def getLocation(field: NodeField): SourceElement
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]

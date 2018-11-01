@@ -1,6 +1,7 @@
 package deltas.json
 
 import core.bigrammar.TestLanguageGrammarUtils
+import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
 import langserver.types.Position
@@ -16,15 +17,15 @@ class JsonGrammarTest extends FunSuite {
         |  "x": "stringValue"
         |}""".stripMargin
 
-    val result: ObjectLiteral = utils.parse(example).asInstanceOf[Node]
+    val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
-    assertResult(Position(1, 7))(member.getLocation(MemberValue).position.get.range.start)
-    assertResult(Position(1, 20))(member.getLocation(MemberValue).position.get.range.end)
+    assertResult(Position(1, 7))(member.getLocation(MemberValue).position.get.start)
+    assertResult(Position(1, 20))(member.getLocation(MemberValue).position.get.end)
 
     val stringValue = member.value
     val stringLocation = stringValue.getLocation(JsonStringLiteralDelta.Value)
-    assertResult(Position(1, 8))(stringLocation.position.get.range.start)
-    assertResult(Position(1, 19))(stringLocation.position.get.range.end)
+    assertResult(Position(1, 8))(stringLocation.position.get.start)
+    assertResult(Position(1, 19))(stringLocation.position.get.end)
   }
 
   test("parseSimpleJson") {

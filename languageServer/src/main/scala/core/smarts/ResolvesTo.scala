@@ -33,7 +33,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
 
   override def getDiagnostic(): Option[FileDiagnostic] = {
     for {
-      fileRange <- reference.origin.flatMap(e => e.position)
+      fileRange <- reference.origin.flatMap(e => e.filePosition)
     } yield {
       val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
       FileDiagnostic(fileRange.uri, diagnostic)

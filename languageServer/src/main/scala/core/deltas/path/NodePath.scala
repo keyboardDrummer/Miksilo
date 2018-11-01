@@ -42,7 +42,7 @@ trait NodePath extends NodeLike with SourceElement {
 
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
-  override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
+  def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
 
   //TODO replace this with some NodePath 'view' to improve performance.
   def stopAt(predicate: NodePath => Boolean): NodePath = {
@@ -54,4 +54,8 @@ trait NodePath extends NodeLike with SourceElement {
       case SequenceElement(parent, field, index) => SequenceElement(parent.stopAt(predicate), field, index)
     }
   }
+
+  def uriOption: Option[String] = get(UriEntrance).collect({ case x: String => x })
+
+  override def filePosition: Option[FileRange] = position.flatMap(p => uriOption.map(r => FileRange(r, p)))
 }
