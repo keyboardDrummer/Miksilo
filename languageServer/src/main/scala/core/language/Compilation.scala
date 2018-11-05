@@ -35,8 +35,9 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
 
 object Compilation
 {
+  val singleFileDefaultName = "singleFileDefault"
   def singleFile(language: Language, inputStream: InputStream): Compilation = {
-    val filePath = "foo"
+    val filePath = singleFileDefaultName
     val result = new Compilation(language, new FileSystem {
       override def getFile(path: String): InputStream =
         if (path == filePath) inputStream
