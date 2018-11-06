@@ -63,7 +63,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     def getForNode(node: NodePath): SourceElement = {
       val childPositions = node.dataView.flatMap(kv => {
         val value = kv._2
-        val childPaths = NodeLike.getChildNodeLikes[NodePath](value)
+        val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
         if (childPaths.isEmpty) {
           Seq(node.getLocation(kv._1))
         } else {
@@ -74,23 +74,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       childPosition.fold[SourceElement](node)(x => x)
     }
     getForNode(getCompilation.root)
-  }
-
-  def getSourceElementForNode(path: NodePath, position: FilePosition): Option[SourceElement] = {
-    val maybeUri = path.current.startOfUri
-    val doesContain = maybeUri match {
-      case Some(uri) => position.uri == uri
-      case None => true
-    }
-    if (!doesContain)
-      return None
-
-    val childResults = path.dataView.flatMap(t => {
-      val childrenForField = NodeLike.getChildNodeLikes[NodePath](t._2)
-      childrenForField.flatMap(child => getSourceElementForNode(child, position).toSeq)
-    })
-
-    Some(childResults.headOption.getOrElse(path))
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
