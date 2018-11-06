@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, SequenceElement}
 import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property}
 import core.language.Language
-import core.language.node.{Node, NodeField, NodeShape, UriEntrance}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
 
@@ -27,7 +27,7 @@ object IncludeDelta extends DirectiveDelta {
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     if (parseResult.successful) {
       val value: VerilogFile[Node] = parseResult.get.asInstanceOf[Node]
-      value.members.foreach(member => member(UriEntrance) = filePath.toString())
+      value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
       path.asInstanceOf[SequenceElement].replaceWith(value.members)
     }
     else {

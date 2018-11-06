@@ -34,6 +34,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     data.remove(field)
   }
 
+  var startOfUri: Option[String] = None
   val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries

@@ -3,7 +3,7 @@ package languageServer
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{FilePosition, FileRange, NodeLike, UriEntrance}
+import core.language.node.{FilePosition, FileRange, NodeLike}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -77,7 +77,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getSourceElementForNode(path: NodePath, position: FilePosition): Option[SourceElement] = {
-    val maybeUri = path.get(UriEntrance)
+    val maybeUri = path.current.startOfUri
     val doesContain = maybeUri match {
       case Some(uri) => position.uri == uri
       case None => true

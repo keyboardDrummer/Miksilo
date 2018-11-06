@@ -55,7 +55,10 @@ trait NodePath extends NodeLike with SourceElement {
     }
   }
 
-  def uriOption: Option[String] = get(UriEntrance).collect({ case x: String => x })
+  /*
+  A None value means the Path is above the file level.
+   */
+  def uriOption: Option[String] = current.startOfUri
 
   override def filePosition: Option[FileRange] = position.flatMap(p => uriOption.map(r => FileRange(r, p)))
 }

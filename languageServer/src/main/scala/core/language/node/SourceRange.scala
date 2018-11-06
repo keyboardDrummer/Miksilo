@@ -15,8 +15,6 @@ case class FileRange(uri: String, range: SourceRange) {
   }
 }
 
-object UriEntrance extends NodeField
-
 case class FilePosition(uri: String, position: Position)
 
 case class SourceRange(start: Position, end: Position) {
