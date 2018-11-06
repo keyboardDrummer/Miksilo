@@ -53,11 +53,10 @@ object CloudFormationTemplate extends Delta {
         val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
         if (member.key == "Ref") {
           val value = JsonStringLiteralDelta.getValue(member.value)
-          val refLocation = member.value
+          val refLocation = member.value.getLocation(JsonStringLiteralDelta.Value)
           builder.resolveToType(value, refLocation, rootScope, valueType)
         }
       })
-
     }
   }
 
