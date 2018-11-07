@@ -1,0 +1,61 @@
+package core.parsers
+
+import scala.util.matching.Regex
+
+trait RegexParsers extends Parsers {
+  type Elem = Char
+  type Input = StringReader
+
+  implicit class Literal(value: String) extends Parser[String] {
+    override def parse(inputs: Input): ParseResult[String] = {
+      var index = 0
+      var array = inputs.array
+      while(index < value.length) {
+        val arrayIndex = index + inputs.offset
+        if (array.length <= arrayIndex || array.charAt(arrayIndex) != value.charAt(index)) {
+          return ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found ${array.subSequence(inputs.offset, arrayIndex)}")
+        }
+        index += 1
+      }
+      ParseSuccess(value, inputs.drop(value.length))
+    }
+
+    override def default: Option[String] = Some(value)
+  }
+
+  implicit class RegexFrom(regex: Regex) extends Parser[String] {
+    override def parse(inputs: Input): ParseResult[String] = {
+      regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
+        case Some(matched) => ParseSuccess(
+          inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
+          inputs.drop(matched.end))
+        case None =>
+          val found = if (inputs.array.length == inputs.offset) "end of source" else inputs.array.charAt(inputs.offset)
+          ParseFailure(None, inputs, s"expected '$regex' but found $found") // TODO dit moet beter
+      }
+    }
+
+    override def default: Option[String] = None
+  }
+}
+
+case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
+  def drop(amount: Int): StringReader = StringReader(array, offset + amount)
+}
+
+class SubSequence(original: CharSequence, start: Int, val length: Int) extends CharSequence {
+  def this(s: CharSequence, start: Int) = this(s, start, s.length - start)
+
+  def charAt(index: Int): Char =
+    if (index >= 0 && index < length) original.charAt(start + index) else throw new IndexOutOfBoundsException(s"index: $index, length: $length")
+
+  def subSequence(_start: Int, _end: Int): SubSequence = {
+    if (_start < 0 || _end < 0 || _end > length || _start > _end)
+      throw new IndexOutOfBoundsException(s"start: ${_start}, end: ${_end}, length: $length")
+
+    new SubSequence(original, start + _start, _end - _start)
+  }
+
+  override def toString: String = original.subSequence(start, start + length).toString
+}
+
