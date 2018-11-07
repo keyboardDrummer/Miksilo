@@ -2,6 +2,7 @@ package core.parsers
 
 trait InputLike {
   def offset: Int
+  def finished: Boolean
 }
 
 // TODO misschien proberen door te parsen wanneer er een failure plaatsvindt, zodat ik bij 'missende input' gewoon verder ga. Ik zou ook nog recovery parsers kunnen toevoegen zoals in de paper, maar dat lijkt overkil.
@@ -12,15 +13,31 @@ trait Parsers {
     def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
   }
 
-  case class ParseSuccess[+Result](result: Result, remainder: Input) extends ParseResult[Result] {
-    override def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = ParseSuccess(f(result), remainder)
+  def getBiggestFailure[Left, Right](first: Option[ParseFailure[Left]], second: Option[ParseFailure[Right]]):
+    Option[Either[ParseFailure[Left], ParseFailure[Right]]] = (first, second) match {
+    case (Some(l),Some(r)) => Some(if (l.remainder.offset > r.remainder.offset) Left(l) else Right(r))
+    case (Some(l), None) => Some(Left(l))
+    case (None, Some(r)) => Some(Right(r))
+    case _ => None
+  }
+
+  case class ParseSuccess[+Result](result: Result, remainder: Input, biggestFailure: Option[ParseFailure[Result]]) extends ParseResult[Result] {
+    override def map[NewResult](f: Result => NewResult): ParseSuccess[NewResult] =
+      ParseSuccess(f(result), remainder, biggestFailure.map(failure => failure.map(f)))
   }
 
   case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String) extends ParseResult[Result] {
-    override def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = ParseFailure(partialResult.map(r => f(r)), remainder, message)
+    override def map[NewResult](f: Result => NewResult): ParseFailure[NewResult] = ParseFailure(partialResult.map(r => f(r)), remainder, message)
   }
 
   trait Parser[+Result] {
+    def parseWhole(inputs: Input): ParseResult[Result] = parse(inputs) match {
+      case success: ParseSuccess[Result] =>
+        if (success.remainder.finished) success
+        else success.biggestFailure.
+          getOrElse(new ParseFailure[Result](Some(success.result), success.remainder, "Did not parse entire input"))
+      case f => f
+    }
     def parse(inputs: Input): ParseResult[Result]
     def default: Option[Result]
 
@@ -40,9 +57,23 @@ trait Parsers {
         case leftSuccess: ParseSuccess[Left] =>
           val rightResult = right.parse(leftSuccess.remainder)
           rightResult match {
-            case rightSuccess: ParseSuccess[Right] => ParseSuccess(combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder)
+            case rightSuccess: ParseSuccess[Right] =>
+              val biggestFailure = getBiggestFailure(leftSuccess.biggestFailure, rightSuccess.biggestFailure)
+              val biggestFailureResult: Option[ParseFailure[Result]] = biggestFailure.map(e => e.fold(
+                lf => lf.map(l => combine(l, rightSuccess.result)),
+                rf => rf.map(r => combine(leftSuccess.result, r))))
+              ParseSuccess[Result](combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder, biggestFailureResult)
             case rightFailure: ParseFailure[Right] =>
-              rightFailure.map(right => combine(leftSuccess.result, right))
+              val combinedRightFailure = rightFailure.map(right => combine(leftSuccess.result, right))
+              leftSuccess.biggestFailure match {
+                case None => combinedRightFailure
+                case Some(lf) =>
+                  val combinedLeftFailure = lf.map(l => combine(l, right.default.get))
+                  if (combinedLeftFailure.remainder.offset > combinedRightFailure.remainder.offset)
+                    combinedLeftFailure
+                  else
+                    combinedRightFailure
+              }
         }
         case leftFailure: ParseFailure[Left] =>
           val result = for {
@@ -75,7 +106,7 @@ trait Parsers {
       val result = single.parse(inputs)
       result match {
         case success: ParseSuccess[Result] => parse(success.remainder).map(r => success.result :: r)
-        case failure: ParseFailure[Result] => ParseSuccess(List.empty, inputs) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
+        case failure: ParseFailure[Result] => ParseSuccess[List[Result]](List.empty, inputs, Some(failure.map(r => List(r)))) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
       }
     }
 

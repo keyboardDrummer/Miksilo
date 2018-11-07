@@ -9,7 +9,7 @@ trait RegexParsers extends Parsers {
   implicit class Literal(value: String) extends Parser[String] {
     override def parse(inputs: Input): ParseResult[String] = {
       var index = 0
-      var array = inputs.array
+      val array = inputs.array
       while(index < value.length) {
         val arrayIndex = index + inputs.offset
         if (array.length <= arrayIndex || array.charAt(arrayIndex) != value.charAt(index)) {
@@ -17,7 +17,7 @@ trait RegexParsers extends Parsers {
         }
         index += 1
       }
-      ParseSuccess(value, inputs.drop(value.length))
+      ParseSuccess(value, inputs.drop(value.length), None)
     }
 
     override def default: Option[String] = Some(value)
@@ -28,7 +28,7 @@ trait RegexParsers extends Parsers {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) => ParseSuccess(
           inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
-          inputs.drop(matched.end))
+          inputs.drop(matched.end), None)
         case None =>
           val found = if (inputs.array.length == inputs.offset) "end of source" else inputs.array.charAt(inputs.offset)
           ParseFailure(None, inputs, s"expected '$regex' but found $found") // TODO dit moet beter
@@ -41,6 +41,8 @@ trait RegexParsers extends Parsers {
 
 case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
   def drop(amount: Int): StringReader = StringReader(array, offset + amount)
+
+  override def finished: Boolean = offset == array.length
 }
 
 class SubSequence(original: CharSequence, start: Int, val length: Int) extends CharSequence {

@@ -17,9 +17,10 @@ class JsonTest extends FunSuite with CommonParsers {
 
   test("did not finish") {
     val input = """3blaa"""
-    val result = jsonParser.parse(StringReader(input.toCharArray))
+    val result = jsonParser.parseWhole(StringReader(input.toCharArray))
     assert(result.isInstanceOf[ParseFailure[_]])
-    //val failure = result.asInstanceOf[ParseFailure[Any]]
+    val failure = result.asInstanceOf[ParseFailure[Any]]
+    assertResult(Some("3"))(failure.partialResult)
   }
 
   test("basic error") {
