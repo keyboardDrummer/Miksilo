@@ -17,7 +17,7 @@ trait RegexParsers extends Parsers {
         }
         index += 1
       }
-      ParseSuccess(value, inputs.drop(value.length), None)
+      ParseSuccess(value, inputs.drop(value.length), new NoFailure[String])
     }
 
     override def default: Option[String] = Some(value)
@@ -28,7 +28,7 @@ trait RegexParsers extends Parsers {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) => ParseSuccess(
           inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
-          inputs.drop(matched.end), None)
+          inputs.drop(matched.end), new NoFailure[String])
         case None =>
           val found = if (inputs.array.length == inputs.offset) "end of source" else inputs.array.charAt(inputs.offset)
           ParseFailure(None, inputs, s"expected '$regex' but found $found") // TODO dit moet beter

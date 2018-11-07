@@ -13,28 +13,38 @@ trait Parsers {
     def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
   }
 
-  def getBiggestFailure[Left, Right](first: Option[ParseFailure[Left]], second: Option[ParseFailure[Right]]):
-    Option[Either[ParseFailure[Left], ParseFailure[Right]]] = (first, second) match {
-    case (Some(l),Some(r)) => Some(if (l.remainder.offset > r.remainder.offset) Left(l) else Right(r))
-    case (Some(l), None) => Some(Left(l))
-    case (None, Some(r)) => Some(Right(r))
-    case _ => None
-  }
-
-  case class ParseSuccess[+Result](result: Result, remainder: Input, biggestFailure: Option[ParseFailure[Result]]) extends ParseResult[Result] {
+  case class ParseSuccess[+Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result]) extends ParseResult[Result] {
     override def map[NewResult](f: Result => NewResult): ParseSuccess[NewResult] =
-      ParseSuccess(f(result), remainder, biggestFailure.map(failure => failure.map(f)))
+      ParseSuccess(f(result), remainder, biggestFailure.map(f))
+
+    def biggestRealFailure: Option[ParseFailure[Result]] = biggestFailure match {
+      case failure: ParseFailure[Result] => Some(failure)
+      case _ => None
+    }
   }
 
-  case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String) extends ParseResult[Result] {
+  trait OptionFailure[+Result] {
+    def offset: Int
+    def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
+  }
+
+  class NoFailure[+Result] extends OptionFailure[Result] {
+    override def offset: Int = -1
+
+    override def map[NewResult](f: Result => NewResult): OptionFailure[NewResult] = new NoFailure[NewResult]
+  }
+
+  case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String) extends ParseResult[Result] with OptionFailure[Result] {
     override def map[NewResult](f: Result => NewResult): ParseFailure[NewResult] = ParseFailure(partialResult.map(r => f(r)), remainder, message)
+
+    override def offset: Int = remainder.offset
   }
 
   trait Parser[+Result] {
     def parseWhole(inputs: Input): ParseResult[Result] = parse(inputs) match {
       case success: ParseSuccess[Result] =>
         if (success.remainder.finished) success
-        else success.biggestFailure.
+        else success.biggestRealFailure.
           getOrElse(new ParseFailure[Result](Some(success.result), success.remainder, "Did not parse entire input"))
       case f => f
     }
@@ -58,22 +68,19 @@ trait Parsers {
           val rightResult = right.parse(leftSuccess.remainder)
           rightResult match {
             case rightSuccess: ParseSuccess[Right] =>
-              val biggestFailure = getBiggestFailure(leftSuccess.biggestFailure, rightSuccess.biggestFailure)
-              val biggestFailureResult: Option[ParseFailure[Result]] = biggestFailure.map(e => e.fold(
-                lf => lf.map(l => combine(l, rightSuccess.result)),
-                rf => rf.map(r => combine(leftSuccess.result, r))))
-              ParseSuccess[Result](combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder, biggestFailureResult)
+              val leftBiggestFailure = leftSuccess.biggestFailure
+              val rightBiggestFailure = rightSuccess.biggestFailure
+              val biggestFailure = if (leftBiggestFailure.offset > rightBiggestFailure.offset)
+                leftBiggestFailure.map(l => combine(l, rightSuccess.result))
+                else rightBiggestFailure.map(r => combine(leftSuccess.result, r))
+              ParseSuccess[Result](combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder, biggestFailure)
             case rightFailure: ParseFailure[Right] =>
-              val combinedRightFailure = rightFailure.map(right => combine(leftSuccess.result, right))
-              leftSuccess.biggestFailure match {
-                case None => combinedRightFailure
-                case Some(lf) =>
-                  val combinedLeftFailure = lf.map(l => combine(l, right.default.get))
-                  if (combinedLeftFailure.remainder.offset > combinedRightFailure.remainder.offset)
-                    combinedLeftFailure
-                  else
-                    combinedRightFailure
+              if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
+                val rightDefault = right.default.get
+                leftSuccess.biggestFailure.map(l => combine(l, rightDefault)).asInstanceOf[ParseFailure[Result]]
               }
+              else
+                rightFailure.map(right => combine(leftSuccess.result, right))
         }
         case leftFailure: ParseFailure[Left] =>
           val result = for {
@@ -106,7 +113,7 @@ trait Parsers {
       val result = single.parse(inputs)
       result match {
         case success: ParseSuccess[Result] => parse(success.remainder).map(r => success.result :: r)
-        case failure: ParseFailure[Result] => ParseSuccess[List[Result]](List.empty, inputs, Some(failure.map(r => List(r)))) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
+        case failure: ParseFailure[Result] => ParseSuccess[List[Result]](List.empty, inputs, failure.map(r => List(r))) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
       }
     }
 
