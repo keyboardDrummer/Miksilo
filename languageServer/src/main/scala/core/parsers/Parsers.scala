@@ -98,7 +98,11 @@ trait Parsers {
   }
 
   case class WithDefault[Result](original: Parser[Result], _default: Result) extends Parser[Result] {
-    override def parse(inputs: Input): ParseResult[Result] = original.parse(inputs)
+    override def parse(inputs: Input): ParseResult[Result] = original.parse(inputs) match {
+      case failure: ParseFailure[Result] if failure.partialResult.isEmpty =>
+        new ParseFailure[Result](Some(_default), failure.remainder, failure.message)
+      case x => x
+    }
 
     override def default: Option[Result] = Some(_default)
   }
