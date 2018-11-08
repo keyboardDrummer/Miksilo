@@ -25,64 +25,61 @@ class JsonTest extends FunSuite with CommonParsers {
 
   test("garbage after number") {
     val input = """3blaa"""
-    val result = jsonParser.parseWhole(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some("3"))(failure.partialResult)
+    assertInputGivesPartialFailureExpectation(input, "3")
   }
 
   test("nothing as input") {
     val input = ""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(UnknownExpression))(failure.partialResult)
+    assertInputGivesPartialFailureExpectation(input, UnknownExpression)
   }
 
   test("object start with nothing else") {
     val input = """{"""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(List()))(failure.partialResult)
+    assertInputGivesPartialFailureExpectation(input, List.empty)
   }
 
   test("object member with only the key") {
     val input = """{"person""""
-    val result = jsonParser.parse(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(List(("""person""", UnknownExpression))))(failure.partialResult)
+    val expectation = List(("""person""", UnknownExpression))
+    assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
   test("object member with no expression") {
     val input = """{"person":"""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(List(("person", UnknownExpression))))(failure.partialResult)
+    val expectation = List(("person", UnknownExpression))
+    assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
   test("object member with only an unfinished key") {
     val input = """{"person"""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(List(("person", UnknownExpression))))(failure.partialResult)
+    val expectation = List(("person", UnknownExpression))
+    assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
   test("object member with an unfinished value") {
     val input = """{"person":"remy"""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
+    val result = jsonParser.parse(StringReader(input.toCharArray))
     val failure: ParseFailure[Any] = getFailure(result)
     assertResult(Some(List(("person", "remy"))))(failure.partialResult)
   }
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val parser = jsonParser
-    val result = parser.parse(StringReader(input.toCharArray))
+    val expectation = List(("person", "3"))
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  test("object with a single member and half second member") {
+    val input = """{"person":3,"second""""
+    val expectation = List(("person", "3"), ("second", UnknownExpression))
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
+    val result = jsonParser.parseWhole(StringReader(input.toCharArray))
     val failure: ParseFailure[Any] = getFailure(result)
-    assertResult(Some(List(("person", "3"))))(failure.partialResult)
+    assert(failure.partialResult.nonEmpty)
+    assertResult(expectation)(failure.partialResult.get)
   }
 
   private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
