@@ -91,7 +91,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
     val field: Field[NodePath] = path
-    builder.declare(field.name, parentScope, path.getLocation(Name), Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
+    builder.declare(field.name, parentScope, path.getMember(Name), Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {

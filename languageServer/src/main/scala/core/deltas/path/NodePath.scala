@@ -42,7 +42,7 @@ trait NodePath extends NodeLike with SourceElement {
 
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
-  def getLocation(field: NodeField): SourceElement = ValuePath(this, field)
+  def getMember(field: NodeField): SourceElement = ValuePath(this, field)
 
   //TODO replace this with some NodePath 'view' to improve performance.
   def stopAt(predicate: NodePath => Boolean): NodePath = {

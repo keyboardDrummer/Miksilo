@@ -71,6 +71,6 @@ object SelectField extends ExpressionInstance with ConvertsToByteCodeDelta with 
     val target = selector.target
     val scope = NamespaceOrObjectExpression.getScope(compilation, builder, target, parentScope)
     val member = selector.member
-    builder.refer(member, scope, Some(selector.getLocation(Member)))
+    builder.refer(member, scope, Some(selector.getMember(Member)))
   }
 }

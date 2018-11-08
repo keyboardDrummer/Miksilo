@@ -65,7 +65,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
         val value = kv._2
         val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
         if (childPaths.isEmpty) {
-          Seq(node.getLocation(kv._1))
+          Seq(node.getMember(kv._1))
         } else {
           childPaths.map(child => getForNode(child))
         }
