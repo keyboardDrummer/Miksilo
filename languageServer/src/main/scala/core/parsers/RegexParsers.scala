@@ -30,10 +30,10 @@ trait RegexParsers extends Parsers {
           inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
           inputs.drop(matched.end), new NoFailure[String])
         case None =>
-          val found = if (inputs.array.length == inputs.offset)
-            "end of source"
-          else inputs.array.charAt(inputs.offset)
-          ParseFailure(None, inputs, s"expected '$regex' but found $found") // TODO dit moet beter
+          val nextCharacter =
+            if (inputs.array.length == inputs.offset) "end of source"
+            else inputs.array.charAt(inputs.offset)
+          ParseFailure(None, inputs, s"expected '$regex' but found $nextCharacter") // TODO dit moet beter
       }
     }
 
