@@ -21,6 +21,10 @@ trait Parsers {
       case failure: ParseFailure[Result] => Some(failure)
       case _ => None
     }
+
+    def addFailure[Other >: Result](other: OptionFailure[Other]): ParseSuccess[Other] =
+      if (biggestFailure.offset > other.offset) this else
+      ParseSuccess(result, remainder, other)
   }
 
   trait OptionFailure[+Result] {
@@ -83,12 +87,7 @@ trait Parsers {
           val rightResult = right.parse(leftSuccess.remainder)
           rightResult match {
             case rightSuccess: ParseSuccess[Right] =>
-              val leftBiggestFailure = leftSuccess.biggestFailure
-              val rightBiggestFailure = rightSuccess.biggestFailure
-              val biggestFailure = if (leftBiggestFailure.offset > rightBiggestFailure.offset)
-                leftBiggestFailure.map(l => combine(l, rightSuccess.result))
-                else rightBiggestFailure.map(r => combine(leftSuccess.result, r)) //TODO rightSuccess.map().addFailure() gebruiken
-              ParseSuccess[Result](combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder, biggestFailure)
+              rightSuccess.map(r => combine(leftSuccess.result, r)).addFailure(leftSuccess.biggestFailure.map(l => combine(l, rightSuccess.result)))
             case rightFailure: ParseFailure[Right] =>
               if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
                 val rightDefault = right.default.get
