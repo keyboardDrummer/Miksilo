@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 class JsonTest extends FunSuite with CommonParsers {
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
-  private lazy val objectParser = "{" ~> Many(memberParser) ~< "}"
+  private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
   private lazy val jsonParser: Parser[Any] = WithDefault(stringLiteral | objectParser | wholeNumber, UnknownExpression)
 

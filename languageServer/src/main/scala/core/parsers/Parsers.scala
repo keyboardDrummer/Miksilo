@@ -28,24 +28,29 @@ trait Parsers {
     def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
   }
 
-  class NoFailure[+Result] extends OptionFailure[Result] {
+  object NoFailure extends OptionFailure[Nothing] {
     override def offset: Int = -1
 
-    override def map[NewResult](f: Result => NewResult): OptionFailure[NewResult] = new NoFailure[NewResult]
+    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
   }
 
   case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String) extends ParseResult[Result] with OptionFailure[Result] {
     override def map[NewResult](f: Result => NewResult): ParseFailure[NewResult] = ParseFailure(partialResult.map(r => f(r)), remainder, message)
 
     override def offset: Int = remainder.offset
+
+    def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Other] =
+      if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Result]]
   }
 
   trait Parser[+Result] {
     def parseWhole(inputs: Input): ParseResult[Result] = parse(inputs) match {
       case success: ParseSuccess[Result] =>
         if (success.remainder.finished) success
-        else success.biggestRealFailure.
-          getOrElse(new ParseFailure[Result](Some(success.result), success.remainder, "Did not parse entire input"))
+        else {
+          val failedSuccess = ParseFailure(Some(success.result), success.remainder, "Did not parse entire input")
+          failedSuccess.getBiggest(success.biggestFailure)
+        }
       case f => f
     }
     def parse(inputs: Input): ParseResult[Result]
@@ -56,6 +61,15 @@ trait Parsers {
     def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
     def |[Other >: Result](other: Parser[Other]) = new OrElse[Result, Other, Other](this, other)
     def ^^[NewResult](f: Result => NewResult) = new Map(this, f)
+    def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
+      new Sequence(this, Many(separator ~> this), (h: Result, t: List[Result]) => h :: t) |
+      Return(List.empty)
+  }
+
+  case class Return[Result](value: Result) extends Parser[Result] {
+    override def parse(inputs: Input): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
+
+    override def default: Option[Result] = Some(value)
   }
 
   class Sequence[+Left, +Right, +Result](left: Parser[Left], _right: => Parser[Right],
@@ -108,12 +122,12 @@ trait Parsers {
     override def default: Option[Result] = Some(_default)
   }
 
-  class IgnoreRight[+Result, +Right](left: Parser[Result], right: Parser[Right]) extends
+  class IgnoreRight[+Result, +Right](left: Parser[Result], right: Parser[Right]) extends //TODO IgnoreRight en IgnoreLeft zouden met een custom implementatie sneller zijn.
     Sequence[Result, Right, Result](left, right, (l,_) => l)
   class IgnoreLeft[+Left, +Result](left: Parser[Left], right: Parser[Result]) extends
     Sequence[Left, Result, Result](left, right, (_,r) => r)
 
-  case class Many[Result](single: Parser[Result]) extends Parser[List[Result]] {
+  case class Many[Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
     override def parse(inputs: Input): ParseResult[List[Result]] = {
       val result = single.parse(inputs)
       result match {
@@ -133,10 +147,11 @@ trait Parsers {
     override def parse(inputs: Input): ParseResult[Result] = first.parse(inputs) match {
       case firstSuccess: ParseSuccess[Result] => firstSuccess
       case firstFailure: ParseFailure[Result] => second.parse(inputs) match {
-        case secondSuccess: ParseSuccess[Result] => secondSuccess
+        case secondSuccess: ParseSuccess[Result] =>
+          val biggestFailure = firstFailure.getBiggest(secondSuccess.biggestFailure)
+          ParseSuccess(secondSuccess.result, secondSuccess.remainder, biggestFailure)
         case secondFailure: ParseFailure[Result] =>
-          if (firstFailure.remainder.offset > secondFailure.remainder.offset) firstFailure
-          else secondFailure
+          firstFailure.getBiggest(secondFailure)
       }
     }
 
