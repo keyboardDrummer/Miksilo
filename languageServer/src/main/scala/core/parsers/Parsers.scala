@@ -87,7 +87,7 @@ trait Parsers {
               val rightBiggestFailure = rightSuccess.biggestFailure
               val biggestFailure = if (leftBiggestFailure.offset > rightBiggestFailure.offset)
                 leftBiggestFailure.map(l => combine(l, rightSuccess.result))
-                else rightBiggestFailure.map(r => combine(leftSuccess.result, r))
+                else rightBiggestFailure.map(r => combine(leftSuccess.result, r)) //TODO rightSuccess.map().addFailure() gebruiken
               ParseSuccess[Result](combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder, biggestFailure)
             case rightFailure: ParseFailure[Right] =>
               if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
@@ -132,7 +132,10 @@ trait Parsers {
       val result = single.parse(inputs)
       result match {
         case success: ParseSuccess[Result] => parse(success.remainder).map(r => success.result :: r)
-        case failure: ParseFailure[Result] => ParseSuccess[List[Result]](List.empty, inputs, failure.map(r => List(r))) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
+        case failure: ParseFailure[Result] =>
+          val partialResult = failure.partialResult.fold(List.empty[Result])(r => List(r))
+          val newFailure = ParseFailure[List[Result]](Some(partialResult), failure.remainder, failure.message)
+          ParseSuccess[List[Result]](List.empty, inputs, newFailure) // Voor het doorparsen kan ik kijken of de failure iets geparsed heeft, en zo ja verder parsen op de remainder.
       }
     }
 

@@ -77,6 +77,14 @@ class JsonTest extends FunSuite with CommonParsers {
     assertResult(Some(List(("person", "remy"))))(failure.partialResult)
   }
 
+  test("object with a single member and comma") {
+    val input = """{"person":3,"""
+    val parser = jsonParser
+    val result = parser.parse(StringReader(input.toCharArray))
+    val failure: ParseFailure[Any] = getFailure(result)
+    assertResult(Some(List(("person", "3"))))(failure.partialResult)
+  }
+
   private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
     assert(result.isInstanceOf[ParseFailure[_]])
     result.asInstanceOf[ParseFailure[Any]]
