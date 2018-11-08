@@ -5,7 +5,7 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.document.BlankLine
 import core.language.Language
-import core.language.node.{NodeField, NodeShape}
+import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import deltas.ConstraintSkeleton
 
 object VerilogFileDelta extends DeltaWithGrammar {
@@ -13,6 +13,11 @@ object VerilogFileDelta extends DeltaWithGrammar {
 
   object Shape extends NodeShape
   object Members extends NodeField
+
+  implicit class VerilogFile[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
+  }
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val member = create(Members)

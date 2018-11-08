@@ -1,7 +1,6 @@
 package core.language.node
 
 import core.deltas.path.NodePath
-import core.language.SourceElement
 
 import scala.collection.mutable
 
@@ -15,8 +14,6 @@ trait NodeLike {
   def dataView: Map[NodeField, Any]
   def asPath: Option[NodePath]
   def asNode: Node
-
-  def getLocation(field: NodeField): SourceElement
 
   def selfAndDescendants: List[Self] = {
     var result = List.empty[Self]
@@ -49,7 +46,7 @@ trait NodeLike {
 
       val children = node.dataView.values
       for(child <- children)
-        NodeLike.getChildNodeLikes[Self](child).foreach(visitNode)
+        NodeLike.getNodeLikesFromValue[Self](child).foreach(visitNode)
 
       afterChildren(node)
     }
@@ -58,7 +55,7 @@ trait NodeLike {
 
 object NodeLike {
 
-  def getChildNodeLikes[Self <: NodeLike](value: Any): Seq[Self] = value match {
+  def getNodeLikesFromValue[Self <: NodeLike](value: Any): Seq[Self] = value match {
     case nodeLike: NodeLike =>
       Seq(nodeLike.asInstanceOf[Self])
     case sequence: Seq[_] =>

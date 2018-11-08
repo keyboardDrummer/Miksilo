@@ -42,7 +42,7 @@ object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObject
     val target = memberSelector.target
     val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
     val namespaceOrObjectVariableDeclaration =
-      builder.resolve(memberSelector.member, expression.getLocation(Member), targetScope)
+      builder.resolve(memberSelector.member, expression.getMember(Member), targetScope)
     val result = builder.declarationVariable()
     builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result

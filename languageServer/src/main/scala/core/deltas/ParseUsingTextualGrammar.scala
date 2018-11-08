@@ -3,6 +3,7 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser
 import core.language.node.{Node, SourceRange}
 import core.language.{Compilation, Language}
+import core.smarts.FileDiagnostic
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition
 import util.SourceUtils
@@ -12,16 +13,18 @@ import scala.util.parsing.input.CharArrayReader
 
 object ParseUsingTextualGrammar extends DeltaWithPhase {
 
-
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val parser: BiGrammarToParser.PackratParser[Any] = parserProp.get(compilation)
 
-    val input = compilation.fileSystem.getFile(compilation.rootFile.get)
+    val uri = compilation.rootFile.get
+    val input = compilation.fileSystem.getFile(uri)
     val parseResult: BiGrammarToParser.ParseResult[Any] = parseStream(parser, input)
-    if (parseResult.successful)
+    if (parseResult.successful) {
       compilation.program = parseResult.get.asInstanceOf[Node]
+      compilation.program.startOfUri = Some(uri)
+    }
     else
-      compilation.diagnostics ++= List(DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString))
+      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)))
   }
 
   def parseStream(parser: BiGrammarToParser.PackratParser[Any], input: InputStream): BiGrammarToParser.ParseResult[Any] = {

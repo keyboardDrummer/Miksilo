@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
-import core.language.node.{FieldLocation, Node}
+import core.language.node.{ValuePath, Node}
 import core.language.{Compilation, Language}
 import core.smarts.objects.{NamedDeclaration, Reference}
 import deltas.expressions.{ExpressionDelta, VariableDelta}
@@ -40,7 +40,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
       val reference: Reference = maybeGraphNode.get.asInstanceOf[Reference]
       val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
       maybeDeclaration.foreach(declaration => {
-        val declarationNode = declaration.origin.get.asInstanceOf[FieldLocation].node
+        val declarationNode = declaration.origin.get.asInstanceOf[ValuePath].path.current
         declarationNode.shape match {
           case MethodDelta.Shape =>
             val method: Method[Node] = declarationNode

@@ -1,9 +1,9 @@
 package languageServer
 
 import com.typesafe.scalalogging.LazyLogging
-import core.deltas.path.{NodePath, PathRoot}
+import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{NodeLike, SourceRange}
+import core.language.node.{FilePosition, FileRange, NodeLike}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -33,7 +33,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
     if (client != null) {
       currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
-      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, getCompilation.diagnostics))
+      val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
+      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
     }
   }
 
@@ -58,21 +59,21 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     Option(getCompilation.proofs)
   }
 
-  def getSourceElement(position: Position): SourceElement = {
+  def getSourceElement(position: FilePosition): SourceElement = {
     def getForNode(node: NodePath): SourceElement = {
       val childPositions = node.dataView.flatMap(kv => {
         val value = kv._2
-        val childPaths = NodeLike.getChildNodeLikes[NodePath](value)
+        val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
         if (childPaths.isEmpty) {
-          Seq(node.getLocation(kv._1))
+          Seq(node.getMember(kv._1))
         } else {
           childPaths.map(child => getForNode(child))
         }
       })
-      val childPosition = childPositions.find(kv => kv.position.exists(r => r.contains(position)))
+      val childPosition = childPositions.find(kv => kv.fileRange.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
-    getForNode(PathRoot(getCompilation.program))
+    getForNode(getCompilation.root)
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
@@ -84,10 +85,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     logger.debug("Went into gotoDefinition")
     val location = for {
       proofs <- getProofs
-      element = getSourceElement(parameters.position)
+      element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
-      range <- definition.origin.flatMap(o => o.position)
-    } yield Location(parameters.textDocument.uri, new langserver.types.Range(range.start, range.end))
+      fileRange <- definition.origin.flatMap(o => o.fileRange)
+    } yield Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
     location.toSeq
   }
 
@@ -98,9 +99,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
-      element = getSourceElement(position)
+      element = getSourceElement(FilePosition(params.textDocument.uri, position))
       reference <- scopeGraph.findReference(element).toSeq
-      prefixLength = position.character - reference.origin.get.position.get.start.character
+      prefixLength = position.character - reference.origin.get.range.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
@@ -122,20 +123,20 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     logger.debug("Went into references")
     val maybeResult = for {
       proofs <- getProofs
-      element = getSourceElement(parameters.position)
+      element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
     } yield {
 
       val referencesRanges = for {
         references <- proofs.findReferences(definition)
-        range <- references.origin.flatMap(e => e.position).toSeq
+        range <- references.origin.flatMap(e => e.fileRange).toSeq
       } yield range
 
-      var positions: Seq[SourceRange] = referencesRanges
+      var fileRanges: Seq[FileRange] = referencesRanges
       if (parameters.context.includeDeclaration)
-        positions = definition.origin.flatMap(o => o.position).toSeq ++ positions
+        fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 
-      positions.map(position => Location(parameters.textDocument.uri, new langserver.types.Range(position.start, position.end)))
+      fileRanges.map(fileRange => Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)))
     }
     maybeResult.getOrElse(Seq.empty)
   }

@@ -2,10 +2,11 @@ package deltas.verilog.preprocessor
 
 import core.bigrammar.grammars.Keyword
 import core.deltas._
-import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.{GrammarKey, Node}
 import core.language.{Compilation, Language}
+import deltas.verilog.VerilogFileDelta
 
 object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -30,8 +31,8 @@ object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import core.bigrammar.BasicSequenceCombinators._
 
-    val directiveGrammar = Keyword("`") ~ grammars.create(BodyGrammar)
-    grammars.find(TriviaGrammar).addAlternative(grammars.create(Grammar, directiveGrammar))
+    val directiveGrammar = Keyword("`") ~> grammars.create(BodyGrammar)
+    grammars.find(VerilogFileDelta.Members).addAlternative(grammars.create(Grammar, directiveGrammar))
   }
 }
 

@@ -5,7 +5,7 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
-import core.language.node.GrammarKey
+import core.language.node.{GrammarKey}
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
@@ -65,7 +65,9 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def parse(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ getDeltas(grammarTransformer))
-    compiler.compile(input).program
+    val result = compiler.compile(input).program
+    result.startOfUri = None
+    result
   }
 
   def getDeltas(key: GrammarKey): Seq[Delta] = {

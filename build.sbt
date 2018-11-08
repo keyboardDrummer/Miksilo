@@ -1,3 +1,5 @@
+import sbt.Keys.{homepage, scmInfo}
+
 import scala.sys.process._
 
 lazy val miksilo = project
@@ -6,7 +8,6 @@ lazy val miksilo = project
     languageServer,
     playground,
   )
-
 
 lazy val commonSettings = Seq(
 
@@ -48,6 +49,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val assemblySettings = Seq(
+
   assemblyJarName in assembly := name.value + ".jar",
   test in assembly := {},
   assemblyMergeStrategy in assembly := {
@@ -71,7 +73,26 @@ lazy val languageServer = (project in file("languageServer")).
         "MIKSILO" -> assemblyFile)
 
       tsc.#&&(vscode).run
-    }
+    },
+
+    organization := "com.github.keyboardDrummer",
+    homepage := Some(url("http://keyboarddrummer.github.io/Miksilo/")),
+    scmInfo := Some(ScmInfo(url("https://github.com/keyboardDrummer/Miksilo"),
+      "git@github.com:keyboardDrummer/Miksilo.git")),
+    developers := List(Developer("keyboardDrummer",
+      "Remy Willems",
+      "rgv.willems@gmail.com",
+      url("https://github.com/keyboardDrummer"))),
+    licenses += ("GPL-3.0", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
+    publishMavenStyle := true,
+
+    publishTo := Some(
+      if (isSnapshot.value)
+        Opts.resolver.sonatypeSnapshots
+      else
+        Opts.resolver.sonatypeStaging
+    ),
+
   )
 
 lazy val playground = (project in file("playground")).

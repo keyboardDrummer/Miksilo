@@ -1,13 +1,14 @@
 package deltas.verilog
 
-import core.language.node.NodeComparer
 import core.language.{Compilation, InMemoryFileSystem}
+import core.language.node.{NodeComparer}
 import deltas.ClearPhases
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.VariableDelta
 import deltas.expressions.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import langserver.types.{Location, Range}
+import langserver.types.{Location, Range, TextDocumentIdentifier}
+import languageServer.lsp.DocumentPosition
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
@@ -79,12 +80,12 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     val ports = Seq(clock, reset, requestZero, requestOne, grantZero, grantOne)
     val module = VerilogModuleDelta.neww("arbiter", ports, moduleMembers)
     val expectation = VerilogFileDelta.Shape.create(VerilogFileDelta.Members -> Seq(module))
-
+    expectation.startOfUri = Some(Compilation.singleFileDefaultName)
     assert(NodeComparer().deepEquality(expectation, actual))
   }
 
-  val server = new MiksiloLanguageServer(VerilogLanguage.language)
   test("Goto definition") {
+    val server = new MiksiloLanguageServer(VerilogLanguage.language)
     val first: Seq[Location] = gotoDefinition(server, code, new HumanPosition(10, 10))
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(first)
 
@@ -95,12 +96,30 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(6,2), new HumanPosition(6, 7)))))(third)
   }
 
-  test("can parse multiple files") {
+  test("can compile multiple files") {
     val fileSystem = InMemoryFileSystem(Map(
-      "Bus_pkg.sv" -> SourceUtils.getTestFile(Path("verilog") / "Bus_pkg.sv"),
+      "./Bus_pkg.sv" -> SourceUtils.getTestFile(Path("verilog") / "Bus_pkg.sv"),
       "testbench.sv" -> SourceUtils.getTestFile(Path("verilog") / "testbench.sv")))
     val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))
     compilation.runPhases()
     assert(compilation.diagnostics.isEmpty, compilation.diagnostics)
+  }
+
+  test("goto definition works in multiple files") {
+    val server = new MiksiloLanguageServer(VerilogLanguage.language)
+    val files = Seq(Path("verilog") / "Bus_pkg.sv", Path("verilog") / "testbench.sv")
+    for(file <- files) {
+      openDocument(server, SourceUtils.getTestFileContents(file), file.toString())
+    }
+    val mainIdentifier = TextDocumentIdentifier(files(1).toString())
+    val busIdentifier = TextDocumentIdentifier(files(0).toString())
+
+    val gotoPackageResult: Seq[Location] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(5, 11)))
+    val gotoPackageExpectation = Seq(Location(busIdentifier.uri, Range(new HumanPosition(1, 9), new HumanPosition(1, 16))))
+    assertResult(gotoPackageExpectation)(gotoPackageResult)
+
+//    val gotoBusResult: Seq[Location] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(7, 5)))
+//    val gotoBusExpectation = Seq(Location(busIdentifier.uri, Range(new HumanPosition(8, 9), new HumanPosition(8, 18))))
+//    assertResult(gotoBusExpectation)(gotoBusResult)
   }
 }

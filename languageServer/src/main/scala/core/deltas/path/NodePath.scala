@@ -42,7 +42,7 @@ trait NodePath extends NodeLike with SourceElement {
 
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
-  override def getLocation(field: NodeField): SourceElement = FieldLocation(this, field)
+  def getMember(field: NodeField): SourceElement = ValuePath(this, field)
 
   //TODO replace this with some NodePath 'view' to improve performance.
   def stopAt(predicate: NodePath => Boolean): NodePath = {
@@ -54,4 +54,11 @@ trait NodePath extends NodeLike with SourceElement {
       case SequenceElement(parent, field, index) => SequenceElement(parent.stopAt(predicate), field, index)
     }
   }
+
+  /*
+  A None value means the Path is above the file level.
+   */
+  def uriOption: Option[String] = current.startOfUri
+
+  override def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(r => FileRange(r, p)))
 }
