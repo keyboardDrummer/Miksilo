@@ -29,5 +29,5 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
 
   override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
 
-  override def position: Option[SourceRange] = current.asNode.position
+  override def range: Option[SourceRange] = current.asNode.position
 }
