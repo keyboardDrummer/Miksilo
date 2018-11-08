@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 
 class JsonTest extends FunSuite with CommonParsers {
 
+
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> Many(memberParser) ~< "}"
   object UnknownExpression
@@ -28,7 +29,7 @@ class JsonTest extends FunSuite with CommonParsers {
     val result = jsonParser.parse(StringReader(input.toCharArray))
     assert(result.isInstanceOf[ParseFailure[_]])
     val failure = result.asInstanceOf[ParseFailure[Any]]
-    assertResult(Some(List((""""person"""", UnknownExpression))))(failure.partialResult)
+    assertResult(Some(List(("""person""", UnknownExpression))))(failure.partialResult)
   }
 
   test("object member with no expression") {
@@ -37,6 +38,6 @@ class JsonTest extends FunSuite with CommonParsers {
     val result = parser.parse(StringReader(input.toCharArray))
     assert(result.isInstanceOf[ParseFailure[_]])
     val failure = result.asInstanceOf[ParseFailure[Any]]
-    assertResult(Some(List((""""person"""", UnknownExpression))))(failure.partialResult)
+    assertResult(Some(List(("""person""", UnknownExpression))))(failure.partialResult)
   }
 }

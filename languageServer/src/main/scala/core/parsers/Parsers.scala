@@ -55,6 +55,7 @@ trait Parsers {
     def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
     def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
     def |[Other >: Result](other: Parser[Other]) = new OrElse[Result, Other, Other](this, other)
+    def ^^[NewResult](f: Result => NewResult) = new Map(this, f)
   }
 
   class Sequence[+Left, +Right, +Result](left: Parser[Left], _right: => Parser[Right],
@@ -140,6 +141,12 @@ trait Parsers {
     }
 
     override def default: Option[Result] = first.default.orElse(second.default)
+  }
+
+  class Map[+Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
+    override def parse(inputs: Input): ParseResult[NewResult] = original.parse(inputs).map(f)
+
+    override def default: Option[NewResult] = original.default.map(f)
   }
 }
 
