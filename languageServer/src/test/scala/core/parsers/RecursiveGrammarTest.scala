@@ -23,7 +23,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParsers {
     val parseResult = head.parseWhole(new StringReader(input))
     assert(parseResult.isInstanceOf[ParseSuccess[_]])
     val result = parseResult.asInstanceOf[ParseSuccess[Any]]
-    val expectation = (("a","a"),"a")
+    val expectation = (((("c","a"),"a"),"b"),"b")
     assertResult(expectation)(result.result)
   }
 }
