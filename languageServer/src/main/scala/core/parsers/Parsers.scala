@@ -55,7 +55,7 @@ trait Parsers {
 
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
     val callStack = mutable.HashSet[ParseNode]()
-    val recursiveNodes = mutable.HashSet[ParseNode]()
+    val recursiveNodes = mutable.HashSet[ParseNode]() //TODO possible this can be only the parsers.
 
     def putIntermediate(key: ParseNode, value: ParseResult[Any]): Unit = {
       recursionIntermediates.put(key, value)
@@ -65,10 +65,10 @@ trait Parsers {
       recursionIntermediates.remove(node)
     }
 
-    def getRecursiveResult[Result](node: ParseNode): Option[ParseResult[Result]] = {
+    def getPreviousResult[Result](node: ParseNode): Option[ParseResult[Result]] = {
       if (callStack.contains(node)) {
         recursiveNodes.add(node)
-        return Some(recursionIntermediates.getOrElse(node, ParseFailure(None, node._1, "Entered recursive node without a seed value")).
+        return Some(recursionIntermediates.getOrElse(node, ParseFailure(None, node._1, "Entered recursive node without a previous result")).
           asInstanceOf[ParseResult[Result]])
       }
       None
@@ -85,7 +85,7 @@ trait Parsers {
   trait Parser[+Result] {
     def parseWhole(inputs: Input): ParseResult[Result] = {
       val cache = new ParseState()
-      parse(inputs, cache) match {
+      parseRecursively(inputs, cache) match {
         case success: ParseSuccess[Result] =>
           if (success.remainder.finished) success
           else {
@@ -96,9 +96,9 @@ trait Parsers {
       }
     }
 
-    final def parse(input: Input, state: ParseState): ParseResult[Result] = {
+    final def parseRecursively(input: Input, state: ParseState): ParseResult[Result] = {
       val node = (input, this)
-      state.getRecursiveResult(node) match {
+      state.getPreviousResult(node) match {
         case None =>
           state.withNode(node, () => {
             var result = parseInner(input, state)
@@ -163,10 +163,10 @@ trait Parsers {
     lazy val right: Parser[Right] = _right
 
     override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
-      val leftResult = left.parse(input, cache)
+      val leftResult = left.parseRecursively(input, cache)
       leftResult match {
         case leftSuccess: ParseSuccess[Left] =>
-          val rightResult = right.parse(leftSuccess.remainder, cache)
+          val rightResult = right.parseRecursively(leftSuccess.remainder, cache)
           rightResult match {
             case rightSuccess: ParseSuccess[Right] =>
               rightSuccess.map(r => combine(leftSuccess.result, r)).
@@ -199,7 +199,7 @@ trait Parsers {
 
   case class WithDefault[Result](original: Parser[Result], _default: Result) extends Parser[Result] {
     override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
-      original.parse(input, cache) match {
+      original.parseRecursively(input, cache) match {
         case failure: ParseFailure[Result] if failure.partialResult.isEmpty =>
           new ParseFailure[Result](Some(_default), failure.remainder, failure.message)
         case x => x
@@ -216,10 +216,10 @@ trait Parsers {
 
   case class Many[Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
     override def parseInner(inputs: Input, cache: ParseState): ParseResult[List[Result]] = {
-      val result = single.parse(inputs, cache)
+      val result = single.parseRecursively(inputs, cache)
       result match {
         case success: ParseSuccess[Result] =>
-          parse(success.remainder, cache).map(r => success.result :: r)
+          parseRecursively(success.remainder, cache).map(r => success.result :: r)
         case failure: ParseFailure[Result] =>
           val partialResult = failure.partialResult.fold(List.empty[Result])(r => List(r))
           val newFailure = ParseFailure[List[Result]](Some(partialResult), failure.remainder, failure.message)
@@ -238,11 +238,11 @@ trait Parsers {
     lazy val second = _second
 
     override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
-      val firstResult = first.parse(input, cache)
+      val firstResult = first.parseRecursively(input, cache)
       firstResult match {
         case _: ParseSuccess[Result] => firstResult
         case firstFailure: ParseFailure[Result] =>
-          val secondResult = second.parse(input, cache)
+          val secondResult = second.parseRecursively(input, cache)
           secondResult match {
             case secondSuccess: ParseSuccess[Result] =>
               val biggestFailure = firstFailure.getBiggest(secondSuccess.biggestFailure)
@@ -258,7 +258,7 @@ trait Parsers {
 
   class Map[+Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
     override def parseInner(input: Input, cache: ParseState): ParseResult[NewResult] = {
-      original.parse(input, cache).map(f)
+      original.parseRecursively(input, cache).map(f)
     }
 
     override def default: Option[NewResult] = original.default.map(f)
