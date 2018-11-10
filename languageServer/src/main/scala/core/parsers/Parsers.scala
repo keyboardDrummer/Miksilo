@@ -103,19 +103,7 @@ trait Parsers {
           state.withNode(node, () => {
             var result = parseInner(input, state)
             if (state.recursiveNodes.contains(node) && result.isInstanceOf[ParseSuccess[Result]]) {
-              state.putIntermediate(node, result)
-              var previousResult = result.asInstanceOf[ParseSuccess[Result]]
-              var continue = true
-              while (continue) {
-                parseInner(input, state) match {
-                  case success: ParseSuccess[Result] if success.remainder.offset > previousResult.remainder.offset =>
-                    state.putIntermediate(node, success)
-                    previousResult = success
-                  case _ => continue = false
-                }
-              }
-              result = previousResult
-              state.removeIntermediate(node)
+              result = growRecursiveSeed(input, result.asInstanceOf[ParseSuccess[Result]], state)
             }
             result
           })
@@ -123,6 +111,23 @@ trait Parsers {
         case Some(result) =>
           result
       }
+    }
+
+    private def growRecursiveSeed[GrowResult](input: Input, seed: ParseSuccess[GrowResult], state: ParseState): ParseResult[GrowResult] = {
+      val node = (input, this)
+      state.putIntermediate(node, seed)
+      var currentResult = seed
+      var continue = true
+      while (continue) {
+        parseInner(input, state) match {
+          case success: ParseSuccess[GrowResult] if success.remainder.offset > currentResult.remainder.offset =>
+            state.putIntermediate(node, success)
+            currentResult = success
+          case _ => continue = false
+        }
+      }
+      state.removeIntermediate(node)
+      currentResult
     }
 
     def parseInner(inputs: Input, cache: ParseState): ParseResult[Result]
