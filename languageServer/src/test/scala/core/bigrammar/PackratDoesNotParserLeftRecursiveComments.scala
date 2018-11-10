@@ -16,6 +16,17 @@ class PackratDoesNotParserLeftRecursiveComments extends FunSuite with JavaTokenP
   val input = "/* foo */ 2 + 3"
   def reader = new PackratReader[Char](new CharArrayReader(input.toCharArray))
 
+  test("direct left recursion") {
+    lazy val head: PackratParser[Any] = head ~ "a" | "a"
+
+    val input = "aaa"
+    val parseResult: ParseResult[Any] = head.apply(new PackratReader[Char](new CharArrayReader(input.toCharArray)))
+    assert(parseResult.isInstanceOf[Success[_]])
+    val result = parseResult.asInstanceOf[Success[Any]]
+    val expectation = "a"
+    assertResult(expectation)(result.result)
+  }
+
   test("Addition with comments") {
     lazy val expression: PackratParser[Any] =
       comments ~ expression ~ literal("+") ~ expression |

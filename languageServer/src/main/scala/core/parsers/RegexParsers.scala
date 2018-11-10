@@ -7,46 +7,52 @@ trait RegexParsers extends Parsers {
   type Input = StringReader
 
   implicit class Literal(value: String) extends Parser[String] {
-    override def parse(inputs: Input): ParseResult[String] = {
+    override def parseInner(inputs: StringReader, cache: ParseState): ParseMonad[String] = {
       var index = 0
       val array = inputs.array
       while(index < value.length) {
         val arrayIndex = index + inputs.offset
         if (array.length <= arrayIndex || array.charAt(arrayIndex) != value.charAt(index)) {
-          return ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found ${array.subSequence(inputs.offset, arrayIndex)}")
+          val parseResult = ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found ${array.subSequence(inputs.offset, arrayIndex)}")
+          return ParseMonad(parseResult)
         }
         index += 1
       }
-      ParseSuccess(value, inputs.drop(value.length), NoFailure)
+      ParseMonad(ParseSuccess(value, inputs.drop(value.length), NoFailure))
     }
 
     override def default: Option[String] = Some(value)
   }
 
   implicit class RegexFrom(regex: Regex) extends Parser[String] {
-    override def parse(inputs: Input): ParseResult[String] = {
+    override def parseInner(inputs: StringReader, cache: ParseState): ParseMonad[String] = {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) =>
-          ParseSuccess(
+          ParseMonad(ParseSuccess(
             inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
-            inputs.drop(matched.end), NoFailure)
+            inputs.drop(matched.end), NoFailure))
         case None =>
           val nextCharacter =
             if (inputs.array.length == inputs.offset) "end of source"
             else inputs.array.charAt(inputs.offset)
-          ParseFailure(None, inputs, s"expected '$regex' but found $nextCharacter") // Partial regex matching toevoegen
+          ParseMonad(ParseFailure(None, inputs, s"expected '$regex' but found $nextCharacter")) // Partial regex matching toevoegen
       }
     }
 
     override def default: Option[String] = None
   }
+
+  case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
+    def this(value: String) {
+      this(value.toCharArray)
+    }
+
+    def drop(amount: Int): StringReader = StringReader(array, offset + amount)
+
+    override def finished: Boolean = offset == array.length
+  }
 }
 
-case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
-  def drop(amount: Int): StringReader = StringReader(array, offset + amount)
-
-  override def finished: Boolean = offset == array.length
-}
 
 class SubSequence(original: CharSequence, start: Int, val length: Int) extends CharSequence {
   def this(s: CharSequence, start: Int) = this(s, start, s.length - start)
