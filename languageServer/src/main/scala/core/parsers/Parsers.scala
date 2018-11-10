@@ -74,7 +74,7 @@ trait Parsers {
       None
     }
 
-    def withParser[T](node: ParseNode, action: () => T): T = {
+    def withNode[T](node: ParseNode, action: () => T): T = {
       callStack.add(node)
       val result = action()
       callStack.remove(node)
@@ -100,7 +100,7 @@ trait Parsers {
       val node = (input, this)
       state.getRecursiveResult(node) match {
         case None =>
-          state.withParser(node, () => {
+          state.withNode(node, () => {
             var result = parseInner(input, state)
             if (state.recursiveNodes.contains(node) && result.isInstanceOf[ParseSuccess[Result]]) {
               state.putIntermediate(node, result)

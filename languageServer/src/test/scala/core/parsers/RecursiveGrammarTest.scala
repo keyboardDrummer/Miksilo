@@ -20,10 +20,15 @@ class RecursiveGrammarTest extends FunSuite with CommonParsers {
     lazy val second: Parser[Any] = new Lazy(second) ~ "b" | head | "c"
 
     val input = "caabb"
-    val parseResult = head.parseWhole(new StringReader(input))
-    assert(parseResult.isInstanceOf[ParseSuccess[_]])
-    val result = parseResult.asInstanceOf[ParseSuccess[Any]]
+    val headParseResult = head.parseWhole(new StringReader(input))
+    assert(headParseResult.isInstanceOf[ParseSuccess[_]])
+    val headSuccess = headParseResult.asInstanceOf[ParseSuccess[Any]]
     val expectation = (((("c","a"),"a"),"b"),"b")
-    assertResult(expectation)(result.result)
+    assertResult(expectation)(headSuccess.result)
+
+    val secondParseResult = second.parseWhole(new StringReader(input))
+    assert(secondParseResult.isInstanceOf[ParseSuccess[_]])
+    val secondSuccess = secondParseResult.asInstanceOf[ParseSuccess[Any]]
+    assertResult(expectation)(secondSuccess.result)
   }
 }
