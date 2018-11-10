@@ -7,7 +7,7 @@ trait RegexParsers extends Parsers {
   type Input = StringReader
 
   implicit class Literal(value: String) extends Parser[String] {
-    override def parseInner(inputs: StringReader, cache: ParseState): ParseResult[String] = {
+    override def parse(inputs: StringReader, cache: ParseState): ParseResult[String] = {
       var index = 0
       val array = inputs.array
       while(index < value.length) {
@@ -26,7 +26,7 @@ trait RegexParsers extends Parsers {
   }
 
   implicit class RegexFrom(regex: Regex) extends Parser[String] {
-    override def parseInner(inputs: StringReader, cache: ParseState): ParseResult[String] = {
+    override def parse(inputs: StringReader, cache: ParseState): ParseResult[String] = {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) =>
           ParseSuccess(

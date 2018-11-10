@@ -101,10 +101,11 @@ trait Parsers {
       state.getPreviousResult(node) match {
         case None =>
           state.withNode(node, () => {
-            var result = parseInner(input, state)
+            var result = parse(input, state)
             result match {
               case success: ParseSuccess[Result] if state.recursiveNodes.contains(node) =>
                 result = growRecursiveResult(input, success, state)
+              case _ =>
             }
             result
           })
@@ -118,7 +119,7 @@ trait Parsers {
       val node = (input, this)
       state.putIntermediate(node, previous)
 
-      parseInner(input, state) match {
+      parse(input, state) match {
         case success: ParseSuccess[GrowResult] if success.remainder.offset > previous.remainder.offset =>
           growRecursiveResult(input, success, state)
         case _ =>
@@ -127,7 +128,7 @@ trait Parsers {
       }
     }
 
-    def parseInner(inputs: Input, cache: ParseState): ParseResult[Result]
+    def parse(inputs: Input, cache: ParseState): ParseResult[Result]
 
     def default: Option[Result]
 
@@ -142,7 +143,7 @@ trait Parsers {
   }
 
   case class Return[Result](value: Result) extends Parser[Result] {
-    override def parseInner(inputs: Input, cache: ParseState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
+    override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
 
     override def default: Option[Result] = Some(value)
   }
@@ -150,7 +151,7 @@ trait Parsers {
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner = _inner
 
-    override def parseInner(inputs: Input, cache: ParseState): ParseResult[Result] = inner.parseInner(inputs, cache)
+    override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = inner.parse(inputs, cache)
 
     override def default: Option[Result] = inner.default
   }
@@ -159,7 +160,7 @@ trait Parsers {
                                       combine: (Left, Right) => Result) extends Parser[Result] {
     lazy val right: Parser[Right] = _right
 
-    override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
+    override def parse(input: Input, cache: ParseState): ParseResult[Result] = {
       val leftResult = left.parseRecursively(input, cache)
       leftResult match {
         case leftSuccess: ParseSuccess[Left] =>
@@ -195,7 +196,7 @@ trait Parsers {
   }
 
   case class WithDefault[Result](original: Parser[Result], _default: Result) extends Parser[Result] {
-    override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
+    override def parse(input: Input, cache: ParseState): ParseResult[Result] = {
       original.parseRecursively(input, cache) match {
         case failure: ParseFailure[Result] if failure.partialResult.isEmpty =>
           new ParseFailure[Result](Some(_default), failure.remainder, failure.message)
@@ -212,7 +213,7 @@ trait Parsers {
     Sequence[Left, Result, Result](left, right, (_,r) => r)
 
   case class Many[Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
-    override def parseInner(inputs: Input, cache: ParseState): ParseResult[List[Result]] = {
+    override def parse(inputs: Input, cache: ParseState): ParseResult[List[Result]] = {
       val result = single.parseRecursively(inputs, cache)
       result match {
         case success: ParseSuccess[Result] =>
@@ -234,7 +235,7 @@ trait Parsers {
     extends Parser[Result] {
     lazy val second = _second
 
-    override def parseInner(input: Input, cache: ParseState): ParseResult[Result] = {
+    override def parse(input: Input, cache: ParseState): ParseResult[Result] = {
       val firstResult = first.parseRecursively(input, cache)
       firstResult match {
         case _: ParseSuccess[Result] => firstResult
@@ -254,7 +255,7 @@ trait Parsers {
   }
 
   class Map[+Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
-    override def parseInner(input: Input, cache: ParseState): ParseResult[NewResult] = {
+    override def parse(input: Input, cache: ParseState): ParseResult[NewResult] = {
       original.parseRecursively(input, cache).map(f)
     }
 
