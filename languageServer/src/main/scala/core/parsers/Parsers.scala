@@ -50,7 +50,8 @@ trait Parsers {
       if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Result]]
   }
 
-  type ParseNode = (Input, Parser[Any])
+  case class ParseNode(input: Input, parser: Parser[Any])
+
   class ParseState {
 
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
@@ -68,7 +69,7 @@ trait Parsers {
     def getPreviousResult[Result](node: ParseNode): Option[ParseResult[Result]] = {
       if (callStack.contains(node)) {
         recursiveNodes.add(node)
-        return Some(recursionIntermediates.getOrElse(node, ParseFailure(None, node._1, "Entered recursive node without a previous result")).
+        return Some(recursionIntermediates.getOrElse(node, ParseFailure(None, node.input, "Entered recursive node without a previous result")).
           asInstanceOf[ParseResult[Result]])
       }
       None
@@ -84,8 +85,8 @@ trait Parsers {
 
   trait Parser[+Result] {
     def parseWhole(inputs: Input): ParseResult[Result] = {
-      val cache = new ParseState()
-      parseRecursively(inputs, cache) match {
+      val state = new ParseState()
+      parseRecursively(inputs, state) match {
         case success: ParseSuccess[Result] =>
           if (success.remainder.finished) success
           else {
@@ -97,14 +98,14 @@ trait Parsers {
     }
 
     final def parseRecursively(input: Input, state: ParseState): ParseResult[Result] = {
-      val node = (input, this)
+      val node = ParseNode(input, this)
       state.getPreviousResult(node) match {
         case None =>
           state.withNode(node, () => {
             var result = parse(input, state)
             result match {
               case success: ParseSuccess[Result] if state.recursiveNodes.contains(node) =>
-                result = growRecursiveResult(input, success, state)
+                result = growRecursiveResult(node, success, state)
               case _ =>
             }
             result
@@ -112,19 +113,6 @@ trait Parsers {
 
         case Some(result) =>
           result
-      }
-    }
-
-    private def growRecursiveResult[GrowResult](input: Input, previous: ParseSuccess[GrowResult], state: ParseState): ParseResult[GrowResult] = {
-      val node = (input, this)
-      state.putIntermediate(node, previous)
-
-      parse(input, state) match {
-        case success: ParseSuccess[GrowResult] if success.remainder.offset > previous.remainder.offset =>
-          growRecursiveResult(input, success, state)
-        case _ =>
-          state.removeIntermediate(node)
-          previous
       }
     }
 
@@ -140,6 +128,18 @@ trait Parsers {
     def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
       new Sequence(this, Many(separator ~> this), (h: Result, t: List[Result]) => h :: t) |
       Return(List.empty)
+  }
+
+  private def growRecursiveResult[GrowResult](node: ParseNode, previous: ParseSuccess[GrowResult], state: ParseState): ParseResult[GrowResult] = {
+    state.putIntermediate(node, previous)
+
+    node.parser.parse(node.input, state) match {
+      case success: ParseSuccess[GrowResult] @unchecked if success.remainder.offset > previous.remainder.offset =>
+        growRecursiveResult(node, success, state)
+      case _ =>
+        state.removeIntermediate(node)
+        previous
+    }
   }
 
   case class Return[Result](value: Result) extends Parser[Result] {
