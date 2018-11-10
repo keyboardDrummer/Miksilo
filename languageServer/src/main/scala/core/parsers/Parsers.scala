@@ -150,7 +150,7 @@ trait Parsers {
     def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result,b: Right) => (a,b))
     def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
     def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
-    def |[Other >: Result](other: Parser[Other]) = new OrElse[Result, Other, Other](this, other)
+    def |[Other >: Result](other: => Parser[Other]) = new OrElse[Result, Other, Other](this, other)
     def ^^[NewResult](f: Result => NewResult) = new Map(this, f)
     def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
       new Sequence(this, Many(separator ~> this), (h: Result, t: List[Result]) => h :: t) |
@@ -250,8 +250,10 @@ trait Parsers {
   case class SomeParser[Result](single: Parser[Result]) extends
     Sequence[Result, List[Result], List[Result]](single, Many(single), (f, rest) => f :: rest)
 
-  class OrElse[+First <: Result, +Second <: Result, +Result](first: Parser[First], second: Parser[Second])
+  class OrElse[+First <: Result, +Second <: Result, +Result](first: Parser[First], _second: => Parser[Second])
     extends Parser[Result] {
+    lazy val second = _second
+
     override def parseInner(input: Input, cache: ParseState): ParseMonad[Result] = {
       val firstResult = first.parse(input, cache)
       firstResult.result match {
