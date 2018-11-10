@@ -84,9 +84,9 @@ trait Parsers {
   }
 
   trait Parser[+Result] {
-    def parseWhole(inputs: Input): ParseResult[Result] = {
+    def parseWhole(input: Input): ParseResult[Result] = {
       val state = new ParseState()
-      parseIteratively(inputs, state) match {
+      parseIteratively(input, state) match {
         case success: ParseSuccess[Result] =>
           if (success.remainder.finished) success
           else {
@@ -116,7 +116,7 @@ trait Parsers {
       }
     }
 
-    def parse(inputs: Input, cache: ParseState): ParseResult[Result]
+    def parse(input: Input, cache: ParseState): ParseResult[Result]
 
     def default: Option[Result]
 

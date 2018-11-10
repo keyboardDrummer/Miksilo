@@ -2,7 +2,7 @@ package core.parsers
 
 import scala.util.matching.Regex
 
-trait RegexParsers extends Parsers {
+trait StringParsers extends Parsers {
   type Elem = Char
   type Input = StringReader
 
