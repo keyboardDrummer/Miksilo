@@ -31,4 +31,8 @@ class RecursiveGrammarTest extends FunSuite with CommonParsers {
     val secondSuccess = secondParseResult.asInstanceOf[ParseSuccess[Any]]
     assertResult(expectation)(secondSuccess.result)
   }
+
+  test("recursive defaults") {
+    ???
+  }
 }

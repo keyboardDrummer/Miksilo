@@ -58,12 +58,26 @@ trait Parsers {
     override def get: Result = throw new Exception("get was called on a ParseFailure")
 
     override def successful: Boolean = false
+
+    override def toString: String = message
   }
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
+  class DefaultCache {
+    var values = mutable.Map.empty[Parser[_], Option[_]]
+
+    def apply[Result](parser: Parser[Result]): Option[Result] = {
+      values.getOrElseUpdate(parser, {
+        values.put(parser, None)
+        parser.getDefault(this)
+      }).asInstanceOf[Option[Result]]
+    }
+  }
+
   class ParseState {
 
+    val defaultCache = new DefaultCache()
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
     val callStack = mutable.HashSet[ParseNode]()
     val nodesWithBackEdges = mutable.HashSet[ParseNode]() //TODO possible this can be only the parsers.
@@ -128,7 +142,8 @@ trait Parsers {
 
     def parse(input: Input, state: ParseState): ParseResult[Result]
 
-    def default: Option[Result]
+    final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
+    def getDefault(cache: DefaultCache): Option[Result]
 
     def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result,b: Right) => (a,b))
     def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
@@ -158,23 +173,23 @@ trait Parsers {
 
   class FlatMap[+Result, +NewResult](left: Parser[Result], f: Result => Parser[NewResult]) extends Parser[NewResult] {
 
-    override def parse(input: Input, cache: ParseState): ParseResult[NewResult] = {
-      val leftResult = left.parseIteratively(input, cache)
+    override def parse(input: Input, state: ParseState): ParseResult[NewResult] = {
+      val leftResult = left.parseIteratively(input, state)
       leftResult match {
         case leftSuccess: ParseSuccess[Result] =>
           val right = f(leftSuccess.result)
-          val rightResult = right.parseIteratively(leftSuccess.remainder, cache)
+          val rightResult = right.parseIteratively(leftSuccess.remainder, state)
           rightResult match {
             case rightSuccess: ParseSuccess[NewResult] =>
               rightSuccess.
                 addFailure(leftSuccess.biggestFailure match {
                   case NoFailure => NoFailure
-                  case ParseFailure(partialResult, remainder, message) => ParseFailure(partialResult.flatMap(r => f(r).default), remainder, message)
+                  case ParseFailure(partialResult, remainder, message) => ParseFailure(partialResult.flatMap(r => f(r).getDefault(state)), remainder, message)
                 })
 
             case rightFailure: ParseFailure[NewResult] =>
-              if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
-                val rightDefault = right.default.get
+              if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.getDefault(state).nonEmpty) {
+                val rightDefault = right.getDefault(state).get
                 leftSuccess.biggestFailure.map(l => rightDefault).asInstanceOf[ParseFailure[NewResult]]
               }
               else {
@@ -185,15 +200,15 @@ trait Parsers {
         case leftFailure: ParseFailure[Result] =>
           val result = for {
             leftPartial <- leftFailure.partialResult
-            rightDefault <- f(leftPartial).default
+            rightDefault <- f(leftPartial).getDefault(state)
           } yield rightDefault
           ParseFailure(result, leftFailure.remainder, leftFailure.message)
       }
     }
 
-    override def default: Option[NewResult] = for {
-      leftDefault <- left.default
-      rightDefault <- f(leftDefault).default
+    override def getDefault(cache: DefaultCache): Option[NewResult] = for {
+      leftDefault <- cache(left)
+      rightDefault <- cache(f(leftDefault))
     } yield rightDefault
   }
 
@@ -204,46 +219,48 @@ trait Parsers {
       case failure: ParseFailure[Result] => ParseFailure(failure.partialResult.filter(predicate), failure.remainder, failure.message)
     }
 
-    override def default: Option[Result] = default.filter(predicate)
+    override def getDefault(cache: DefaultCache): Option[Result] =
+      original.getDefault(cache).filter(predicate)
   }
 
   case class Return[Result](value: Result) extends Parser[Result] {
     override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
 
-    override def default: Option[Result] = Some(value)
+    override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
   }
 
   case class Fail(message: String) extends Parser[Nothing] {
     override def parse(input: Input, cache: ParseState): ParseResult[Nothing] = ParseFailure(None, input, message)
 
-    override def default: Option[Nothing] = None
+    override def getDefault(cache: DefaultCache): Option[Nothing] = None
   }
 
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
-    lazy val inner = _inner
+    lazy val inner: Parser[Result] = _inner
 
     override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = inner.parse(inputs, cache)
 
-    override def default: Option[Result] = inner.default
+    override def getDefault(cache: DefaultCache): Option[Result] = cache(inner)
   }
 
   class Sequence[+Left, +Right, +Result](left: Parser[Left], _right: => Parser[Right],
                                       combine: (Left, Right) => Result) extends Parser[Result] {
     lazy val right: Parser[Right] = _right
 
-    override def parse(input: Input, cache: ParseState): ParseResult[Result] = {
-      val leftResult = left.parseIteratively(input, cache)
+    override def parse(input: Input, state: ParseState): ParseResult[Result] = {
+      val leftResult = left.parseIteratively(input, state)
       leftResult match {
         case leftSuccess: ParseSuccess[Left] =>
-          val rightResult = right.parseIteratively(leftSuccess.remainder, cache)
+          val rightResult = right.parseIteratively(leftSuccess.remainder, state)
           rightResult match {
             case rightSuccess: ParseSuccess[Right] =>
               rightSuccess.map(r => combine(leftSuccess.result, r)).
                 addFailure(leftSuccess.biggestFailure.map(l => combine(l, rightSuccess.result)))
 
             case rightFailure: ParseFailure[Right] =>
-              if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
-                val rightDefault = right.default.get
+              val maybeRightDefault = right.getDefault(state)
+              if (leftSuccess.biggestFailure.offset > rightFailure.offset && maybeRightDefault.nonEmpty) {
+                val rightDefault = maybeRightDefault.get
                 leftSuccess.biggestFailure.map(l => combine(l, rightDefault)).asInstanceOf[ParseFailure[Result]]
               }
               else {
@@ -254,15 +271,15 @@ trait Parsers {
         case leftFailure: ParseFailure[Left] =>
           val result = for {
             leftPartial <- leftFailure.partialResult
-            rightDefault <- right.default
+            rightDefault <- right.getDefault(state)
           } yield combine(leftPartial, rightDefault)
           ParseFailure(result, leftFailure.remainder, leftFailure.message)
       }
     }
 
-    override def default: Option[Result] = for {
-      leftDefault <- left.default
-      rightDefault <- right.default
+    override def getDefault(cache: DefaultCache): Option[Result] = for {
+      leftDefault <- cache(left)
+      rightDefault <- cache(right)
     } yield combine(leftDefault, rightDefault)
   }
 
@@ -275,7 +292,7 @@ trait Parsers {
       }
     }
 
-    override def default: Option[Result] = Some(_default)
+    override def getDefault(cache: DefaultCache): Option[Result] = Some(_default)
   }
 
   class IgnoreRight[+Result, +Right](left: Parser[Result], right: Parser[Right]) extends //TODO IgnoreRight en IgnoreLeft zouden met een custom implementatie sneller zijn.
@@ -283,7 +300,7 @@ trait Parsers {
   class IgnoreLeft[+Left, +Result](left: Parser[Left], right: Parser[Result]) extends
     Sequence[Left, Result, Result](left, right, (_,r) => r)
 
-  case class Many[+Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
+  case class Many[+Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik Many ook in termen van de anderen opschrijven?
     override def parse(inputs: Input, cache: ParseState): ParseResult[List[Result]] = {
       val result = single.parseIteratively(inputs, cache)
       result match {
@@ -296,7 +313,8 @@ trait Parsers {
       }
     }
 
-    override def default: Option[List[Result]] = Some(List.empty[Result])
+    override def getDefault(cache: DefaultCache): Option[List[Result]] =
+      Some(List.empty[Result])
   }
 
   case class SomeParser[Result](single: Parser[Result]) extends
@@ -322,7 +340,11 @@ trait Parsers {
         }
       }
 
-    override def default: Option[Result] = first.default.orElse(second.default)
+
+    override def getDefault(cache: DefaultCache): Option[Result] = {
+      val value: Option[First] = cache(first)
+      value.orElse(cache(second))
+    }
   }
 
   class Map[+Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
@@ -330,7 +352,8 @@ trait Parsers {
       original.parseIteratively(input, cache).map(f)
     }
 
-    override def default: Option[NewResult] = original.default.map(f)
+
+    override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
   }
 }
 

@@ -14,11 +14,11 @@ trait StringParsers extends Parsers {
       ParseSuccess(new HumanPosition(input.position.line, input.position.column), input, NoFailure)
     }
 
-    override def default: Option[Position] = None
+    override def getDefault(cache: DefaultCache): Option[Position] = None
   }
 
-  def literal(value: String) = Literal(value)
-  def regex(value: Regex) = RegexFrom(value)
+  def literal(value: String): Literal = Literal(value)
+  def regex(value: Regex): RegexFrom = RegexFrom(value)
 
   implicit class Literal(value: String) extends Parser[String] {
     override def parse(inputs: StringReader, cache: ParseState): ParseResult[String] = {
@@ -36,7 +36,7 @@ trait StringParsers extends Parsers {
       ParseSuccess(value, inputs.drop(value.length), NoFailure)
     }
 
-    override def default: Option[String] = Some(value)
+    override def getDefault(cache: DefaultCache): Option[String] = None //TODO consider changing this to Some(value)
   }
 
   implicit class RegexFrom(regex: Regex) extends Parser[String] {
@@ -49,11 +49,11 @@ trait StringParsers extends Parsers {
           val nextCharacter =
             if (inputs.array.length == inputs.offset) "end of source"
             else inputs.array.charAt(inputs.offset)
-          ParseFailure(None, inputs, s"expected '$regex' but found $nextCharacter") // Partial regex matching toevoegen
+          ParseFailure(None, inputs, s"expected '$regex' but found '$nextCharacter'") // Partial regex matching toevoegen
       }
     }
 
-    override def default: Option[String] = None
+    override def getDefault(cache: DefaultCache): Option[String] = None
   }
 }
 

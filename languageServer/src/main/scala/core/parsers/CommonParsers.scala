@@ -8,10 +8,10 @@ trait CommonParsers extends StringParsers {
       if (predicate(char))
         ParseSuccess(char, input.drop(1), NoFailure)
       else
-        ParseFailure(None, input, s"$char was not a $kind")
+        ParseFailure(None, input, s"'$char' was not a $kind")
     }
 
-    override def default: Option[Char] = None
+    override def getDefault(cache: DefaultCache): Option[Char] = None
   }
 
   def ident: Parser[String] =
