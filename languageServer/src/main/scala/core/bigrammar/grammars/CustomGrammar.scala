@@ -6,9 +6,8 @@ import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.responsiveDocument.ResponsiveDocument
 
 trait CustomGrammar extends BiGrammar {
-  type Parser = BiGrammarToParser.Parser[Result]
 
   def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
-  def toParser(recursive: BiGrammar => Parser): Parser
+  def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result]
 }

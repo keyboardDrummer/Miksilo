@@ -2,18 +2,20 @@ package core.parsers
 
 import scala.collection.mutable
 
+trait InputLike {
+  def offset: Int
+  def finished: Boolean
+}
 
 // TODO misschien proberen door te parsen wanneer er een failure plaatsvindt, zodat ik bij 'missende input' gewoon verder ga. Ik zou ook nog recovery parsers kunnen toevoegen zoals in de paper, maar dat lijkt overkil.
 trait Parsers {
   type Input <: InputLike
 
-  trait InputLike {
-    def offset: Int
-    def finished: Boolean
-  }
 
   trait ParseResult[+Result] {
+    def successful: Boolean
     def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
+    def get: Result
   }
 
   case class ParseSuccess[+Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result]) extends ParseResult[Result] {
@@ -28,6 +30,10 @@ trait Parsers {
     def addFailure[Other >: Result](other: OptionFailure[Other]): ParseSuccess[Other] =
       if (biggestFailure.offset > other.offset) this else
       ParseSuccess(result, remainder, other)
+
+    override def get: Result = result
+
+    override def successful: Boolean = true
   }
 
   trait OptionFailure[+Result] {
@@ -48,6 +54,10 @@ trait Parsers {
 
     def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Other] =
       if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Result]]
+
+    override def get: Result = throw new Exception("get was called on a ParseFailure")
+
+    override def successful: Boolean = false
   }
 
   case class ParseNode(input: Input, parser: Parser[Any])
@@ -116,7 +126,7 @@ trait Parsers {
       }
     }
 
-    def parse(input: Input, cache: ParseState): ParseResult[Result]
+    def parse(input: Input, state: ParseState): ParseResult[Result]
 
     def default: Option[Result]
 
@@ -124,6 +134,10 @@ trait Parsers {
     def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
     def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
     def |[Other >: Result](other: => Parser[Other]) = new OrElse[Result, Other, Other](this, other)
+    def map[NewResult](f: Result => NewResult) = new Map(this, f)
+    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = new Filter(this, predicate, getMessage)
+
+    def * = Many(this)
     def ^^[NewResult](f: Result => NewResult) = new Map(this, f)
     def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
       new Sequence(this, Many(separator ~> this), (h: Result, t: List[Result]) => h :: t) |
@@ -142,10 +156,67 @@ trait Parsers {
     }
   }
 
+  class FlatMap[+Result, +NewResult](left: Parser[Result], f: Result => Parser[NewResult]) extends Parser[NewResult] {
+
+    override def parse(input: Input, cache: ParseState): ParseResult[NewResult] = {
+      val leftResult = left.parseIteratively(input, cache)
+      leftResult match {
+        case leftSuccess: ParseSuccess[Result] =>
+          val right = f(leftSuccess.result)
+          val rightResult = right.parseIteratively(leftSuccess.remainder, cache)
+          rightResult match {
+            case rightSuccess: ParseSuccess[NewResult] =>
+              rightSuccess.
+                addFailure(leftSuccess.biggestFailure match {
+                  case NoFailure => NoFailure
+                  case ParseFailure(partialResult, remainder, message) => ParseFailure(partialResult.flatMap(r => f(r).default), remainder, message)
+                })
+
+            case rightFailure: ParseFailure[NewResult] =>
+              if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.default.nonEmpty) {
+                val rightDefault = right.default.get
+                leftSuccess.biggestFailure.map(l => rightDefault).asInstanceOf[ParseFailure[NewResult]]
+              }
+              else {
+                rightFailure
+              }
+          }
+
+        case leftFailure: ParseFailure[Result] =>
+          val result = for {
+            leftPartial <- leftFailure.partialResult
+            rightDefault <- f(leftPartial).default
+          } yield rightDefault
+          ParseFailure(result, leftFailure.remainder, leftFailure.message)
+      }
+    }
+
+    override def default: Option[NewResult] = for {
+      leftDefault <- left.default
+      rightDefault <- f(leftDefault).default
+    } yield rightDefault
+  }
+
+  case class Filter[Other, +Result <: Other](original: Parser[Result], predicate: Other => Boolean, getMessage: Other => String) extends Parser[Result] {
+    override def parse(input: Input, state: ParseState): ParseResult[Result] = original.parse(input, state) match {
+      case success: ParseSuccess[Result] => if (predicate(success.result)) success else
+        ParseFailure(None, success.remainder, getMessage(success.result)).getBiggest(success.biggestFailure)
+      case failure: ParseFailure[Result] => ParseFailure(failure.partialResult.filter(predicate), failure.remainder, failure.message)
+    }
+
+    override def default: Option[Result] = default.filter(predicate)
+  }
+
   case class Return[Result](value: Result) extends Parser[Result] {
     override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
 
     override def default: Option[Result] = Some(value)
+  }
+
+  case class Fail(message: String) extends Parser[Nothing] {
+    override def parse(input: Input, cache: ParseState): ParseResult[Nothing] = ParseFailure(None, input, message)
+
+    override def default: Option[Nothing] = None
   }
 
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
@@ -212,7 +283,7 @@ trait Parsers {
   class IgnoreLeft[+Left, +Result](left: Parser[Left], right: Parser[Result]) extends
     Sequence[Left, Result, Result](left, right, (_,r) => r)
 
-  case class Many[Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
+  case class Many[+Result](single: Parser[Result]) extends Parser[List[Result]] { //TODO kan ik many ook in termen van de anderen opschrijven?
     override def parse(inputs: Input, cache: ParseState): ParseResult[List[Result]] = {
       val result = single.parseIteratively(inputs, cache)
       result match {

@@ -1,28 +1,24 @@
 package core.bigrammar
 
+import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import langserver.types.Position
-import languageServer.HumanPosition
+import core.parsers.{CommonParsers, StringReader}
 
 import scala.collection.mutable
-import scala.util.matching.Regex
-import scala.util.parsing.combinator.{JavaTokenParsers, PackratParsers}
-import scala.util.parsing.input.{CharArrayReader, OffsetPosition, Positional}
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
+object BiGrammarToParser extends CommonParsers {
   type WithMap = WithMapG[Any]
-  type State = Map[Any, Any]
   type Result = StateFull[WithMap]
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMapG(value, Map.empty))
 
   def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
-    input => toParser(grammar)(new CharArrayReader(input.toCharArray))
+    input => toParser(grammar).parseWhole(new StringReader(input))
 
-  def toParser(grammar: BiGrammar): PackratParser[Any] = {
+  def toParser(grammar: BiGrammar): Parser[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -32,13 +28,13 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
     })
 
     val valueParser: BiGrammarToParser.Parser[Any] = toParser(grammar, keywords)
-    phrase(valueParser)
+    valueParser
   }
 
   def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any] = {
-    val cache: mutable.Map[BiGrammar, PackratParser[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => PackratParser[Result] = grammar => {
-      cache.getOrElseUpdate(grammar, memo(toParser(keywords, recursive, grammar)))
+    val cache: mutable.Map[BiGrammar, Parser[Result]] = mutable.Map.empty
+    lazy val recursive: BiGrammar => Parser[Result] = grammar => {
+      cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
     val valueParser = resultParser.map(result => result(Map.empty[Any, Any])._2.value)
@@ -47,13 +43,10 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
 
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
-      case sequence: Sequence =>
+      case sequence: core.bigrammar.grammars.Sequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = for {
-          firstResult <- firstParser
-          secondResult <- secondParser
-        } yield {
+        val parser = new Sequence[Result, Result, Result](firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
           val result: Result = (state: State) => {
             val firstMap = firstResult(state)
             val secondMap = secondResult(firstMap._1)
@@ -62,19 +55,19 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
             (secondMap._1, WithMapG[Any](resultValue, resultMap)): (State, WithMapG[Any])
           }
           result
-        }
+        })
         parser
       case choice: Choice =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
-        if (choice.firstBeforeSecond) firstParser | secondParser else firstParser ||| secondParser
+        firstParser | secondParser // TODO if (choice.firstBeforeSecond) firstParser | secondParser else firstParser ||| secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
-      case custom: CustomGrammar => custom.toParser(recursive)
+      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult).asInstanceOf[Parser[Result]]
+      case custom: CustomGrammar => custom.toParser(recursive).asInstanceOf[Parser[Result]]
 
-      case many: Many =>
+      case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val manyInners = innerParser.* //TODO by implementing * ourselves we can get rid of the intermediate List.
+        val manyInners = Many(innerParser) //TODO by implementing * ourselves we can get rid of the intermediate List.
         val parser: Parser[Result] = manyInners.map(elements => {
           val result: Result = (initialState: State) => {
             var state = initialState
@@ -95,44 +88,13 @@ object BiGrammarToParser extends JavaTokenParsers with PackratParsers {
         val innerParser = recursive(mapGrammar.inner)
         innerParser.map(result => result.map(mapGrammar.construct))
 
-      case BiFailure(message) => failure(message)
-      case Print(_) => success(Unit).map(valueToResult)
-      case ValueGrammar(value) => success(value).map(valueToResult)
+      case BiFailure(message) => Fail(message)
+      case Print(_) => Return(Unit).map(valueToResult)
+      case ValueGrammar(value) => Return(value).map(valueToResult)
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
-        Parser { in => inner.apply(in) } //Laziness to prevent infinite recursion
+        new Lazy(inner) //Laziness to prevent infinite recursion
     }
-  }
-
-  /**
-    * Improves the error message slightly over the original
-    */
-  override implicit def literal(value: String): Parser[String] = new Parser[String] {
-    override def apply(in: BiGrammarToParser.Input): BiGrammarToParser.ParseResult[String] = {
-      val source = in.source
-      val offset = in.offset
-      val start = offset
-      var matchLength = 0
-      var currentPosition = start
-      while (matchLength < value.length && currentPosition < source.length && value.charAt(matchLength) == source.charAt(currentPosition)) {
-        matchLength += 1
-        currentPosition += 1
-      }
-      if (matchLength == value.length)
-        Success(source.subSequence(start, currentPosition).toString, in.drop(currentPosition - offset))
-      else {
-        val nextPosition = currentPosition + 1
-        val found = if (nextPosition >= source.length()) "end of source" else "`" + source.subSequence(start, nextPosition) + "'"
-        Failure("`" + value + "' expected but " + found + " found", in.drop(matchLength))
-      }
-    }
-  }
-
-  override val whiteSpace: Regex = "".r
-
-  def position[T <: Positional]: Parser[Position] = Parser { in =>
-    val offsetPosition = in.pos.asInstanceOf[OffsetPosition]
-    Success(new HumanPosition(offsetPosition.line, offsetPosition.column), in)
   }
 }

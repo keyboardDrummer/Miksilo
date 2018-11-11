@@ -1,10 +1,24 @@
 package core.parsers
 
+import langserver.types.Position
+import languageServer.HumanPosition
+
 import scala.util.matching.Regex
+import scala.util.parsing.input.{OffsetPosition, Positional}
 
 trait StringParsers extends Parsers {
-  type Elem = Char
   type Input = StringReader
+
+  def position[T <: Positional]: Parser[Position] = new Parser[Position] {
+    override def parse(input: Input, state: ParseState): ParseResult[Position] = {
+      ParseSuccess(new HumanPosition(input.position.line, input.position.column), input, NoFailure)
+    }
+
+    override def default: Option[Position] = None
+  }
+
+  def literal(value: String) = Literal(value)
+  def regex(value: Regex) = RegexFrom(value)
 
   implicit class Literal(value: String) extends Parser[String] {
     override def parse(inputs: StringReader, cache: ParseState): ParseResult[String] = {
@@ -41,18 +55,18 @@ trait StringParsers extends Parsers {
 
     override def default: Option[String] = None
   }
-
-  case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
-    def this(value: String) {
-      this(value.toCharArray)
-    }
-
-    def drop(amount: Int): StringReader = StringReader(array, offset + amount)
-
-    override def finished: Boolean = offset == array.length
-  }
 }
 
+case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
+  def this(value: String) {
+    this(value.toCharArray)
+  }
+
+  def drop(amount: Int): StringReader = StringReader(array, offset + amount)
+  def position = OffsetPosition(array, offset)
+
+  override def finished: Boolean = offset == array.length
+}
 
 class SubSequence(original: CharSequence, start: Int, val length: Int) extends CharSequence {
   def this(s: CharSequence, start: Int) = this(s, start, s.length - start)

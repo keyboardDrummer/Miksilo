@@ -1,18 +1,17 @@
 package application.compilerCockpit
 
-import javax.swing.text.Segment
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.parsers.StringReader
+import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 
 import scala.collection.mutable
 import scala.util.matching.Regex
-import scala.util.parsing.input.CharArrayReader
 
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
-
 
   val parser: Parser[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
@@ -35,8 +34,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
-    val tokenGrammar = (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
-    phrase(tokenGrammar)
+    (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
   }
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
@@ -45,10 +43,9 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val charArrayReader = new CharArrayReader(text.toString.toCharArray)
-    val resultOption: ParseResult[Seq[MyToken]] = parser(charArrayReader)
+    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWhole(new StringReader(text.toString))
     var start = text.offset
-    if (resultOption.isEmpty)
+    if (resultOption.isInstanceOf[ParseFailure[_]])
     {
       addToken(text, text.offset, start + text.length() - 1, TokenTypes.ERROR_CHAR, startOffset)
     } 

@@ -23,20 +23,20 @@ object IncludeDelta extends DirectiveDelta {
     val filePath: Path = rootDirectory / Path.apply(fileName)
     val input = preprocessor.compilation.fileSystem.getFile(filePath.toString())
 
-    val parser: BiGrammarToParser.PackratParser[Any] = parserProp.get(compilation)
+    val parser: BiGrammarToParser.Parser[Any] = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
-    if (parseResult.successful) {
-      val value: VerilogFile[Node] = parseResult.get.asInstanceOf[Node]
-      value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
-      path.asInstanceOf[SequenceElement].replaceWith(value.members)
-    }
-    else {
-      val diagnostic = DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)
-      compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
+    parseResult match {
+      case success: BiGrammarToParser.ParseSuccess[_] =>
+        val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
+        value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
+        path.asInstanceOf[SequenceElement].replaceWith(value.members)
+      case failure: BiGrammarToParser.ParseFailure[_] =>
+        val diagnostic = DiagnosticUtil.getDiagnosticFromParseException(failure.message)
+        compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }
   }
 
-  val parserProp = new Property[BiGrammarToParser.PackratParser[Any]](null)
+  val parserProp = new Property[BiGrammarToParser.Parser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

@@ -1,10 +1,9 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
-import core.bigrammar.{BiGrammar, WithMapG}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMapG}
+import core.parsers.StringReader
 import core.responsiveDocument.ResponsiveDocument
-
-import scala.util.parsing.input.CharArrayReader
 
 /**
   * Takes a grammar for parsing, and uses toString for printing.
@@ -22,11 +21,10 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
-          val parseResult = parser(new CharArrayReader(string.toCharArray))
-          if (parseResult.successful && parseResult.get.equals(from.value))
-            TryState.value(string)
-          else
-            Printer.fail("StringGrammar could not parse string")
+          parser.parseWhole(new StringReader(string)) match {
+            case success: BiGrammarToParser.ParseSuccess[_] if success.result.equals(from.value) => TryState.value(string)
+            case _ => Printer.fail("StringGrammar could not parse string")
+          }
         }
         else
           TryState.value(string)

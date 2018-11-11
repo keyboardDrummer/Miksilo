@@ -1,10 +1,11 @@
 package deltas.javac.trivia
 
 import core.bigrammar.BiGrammar.State
+import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, StateFull, WithMapG}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, StateFull, WithMapG}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -51,7 +52,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       (newState, field)
     }
 
-    override def toParser(recursive: BiGrammar => Parser): Parser = {
+    override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result] = {
       val triviaParser = recursive(triviaGrammar)
       triviaParser.map(statefulTrivias =>
         for {
@@ -100,20 +101,20 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       resetAndRestoreCounter(TryState.fromStateM(inner)).run(state).get
     }
 
-    override def toParser(recursive: BiGrammar => Parser): Parser = {
+    override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result] = {
       recursive(node).map(result => resetAndRestoreCounter(result))
     }
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {
       val nodePrinter: NodePrinter = recursive(node)
-      (from: WithMapG[Any]) => {
+      from: WithMapG[Any] => {
         resetAndRestoreCounter(nodePrinter.write(from))
       }
     }
 
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = NodeCounterReset(newChildren.head)
 
-    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
+    override def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument = toDocumentInner(node)
 
     override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(node)
   }
