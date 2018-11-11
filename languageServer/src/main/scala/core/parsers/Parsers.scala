@@ -147,7 +147,7 @@ trait Parsers {
       }
     }
 
-    final def parseCached(input: Input, state: ParseState): ParseResult[Result] = {
+    def parseCached(input: Input, state: ParseState): ParseResult[Result] = {
       val node = ParseNode(input, this)
       state.resultCache.get(node).getOrElse({
         val value = parseIteratively(input, state)
@@ -276,7 +276,8 @@ trait Parsers {
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner: Parser[Result] = _inner
 
-    override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = inner.parseCached(inputs, cache)
+    override def parseCached(inputs: Input, cache: ParseState): ParseResult[Result] = inner.parseCached(inputs, cache)
+    override def parse(inputs: Input, cache: ParseState): ParseResult[Result] = throw new Exception("should not be called")
 
     override def getDefault(cache: DefaultCache): Option[Result] = cache(inner)
   }
