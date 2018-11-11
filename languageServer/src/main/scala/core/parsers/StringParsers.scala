@@ -36,7 +36,7 @@ trait StringParsers extends Parsers {
       ParseSuccess(value, inputs.drop(value.length), NoFailure)
     }
 
-    override def getDefault(cache: DefaultCache): Option[String] = None //TODO consider changing this to Some(value)
+    override def getDefault(cache: DefaultCache): Option[String] = Some(value)
   }
 
   implicit class RegexFrom(regex: Regex) extends Parser[String] {
