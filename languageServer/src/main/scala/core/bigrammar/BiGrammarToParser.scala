@@ -60,10 +60,11 @@ object BiGrammarToParser extends CommonParsers {
       case choice: Choice =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
-        firstParser | secondParser // TODO if (choice.firstBeforeSecond) firstParser | secondParser else firstParser ||| secondParser
+        if (choice.firstBeforeSecond) firstParser | secondParser
+        else firstParser ||| secondParser
 
       case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult).asInstanceOf[Parser[Result]]
-      case custom: CustomGrammar => custom.toParser(recursive).asInstanceOf[Parser[Result]]
+      case custom: CustomGrammar => custom.toParser(recursive)
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)

@@ -6,7 +6,7 @@ import languageServer.HumanPosition
 import scala.util.matching.Regex
 import scala.util.parsing.input.{OffsetPosition, Positional}
 
-trait StringParsers extends Parsers {
+trait StringParsers extends SequenceParsers[Char] {
   type Input = StringReader
 
   def position[T <: Positional]: Parser[Position] = new Parser[Position] {
@@ -57,7 +57,7 @@ trait StringParsers extends Parsers {
   }
 }
 
-case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
+case class StringReader(array: Array[Char], offset: Int = 0) extends SequenceInput[StringReader, Char] {
   def this(value: String) {
     this(value.toCharArray)
   }
@@ -66,6 +66,12 @@ case class StringReader(array: Array[Char], offset: Int = 0) extends InputLike {
   def position = OffsetPosition(array, offset)
 
   override def finished: Boolean = offset == array.length
+
+  override def atEnd: Boolean = array.length == offset
+
+  override def head: Char = array(offset)
+
+  override def tail: StringReader = drop(1)
 }
 
 class SubSequence(original: CharSequence, start: Int, val length: Int) extends CharSequence {

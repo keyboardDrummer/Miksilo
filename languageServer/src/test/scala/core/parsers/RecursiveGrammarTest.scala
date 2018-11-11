@@ -67,20 +67,13 @@ class RecursiveGrammarTest extends FunSuite with CommonParsers {
     assert(!result.successful, result.toString)
   }
 
-  //  test("Addition with comments 3") {
-  //    lazy val expression: Parser[Any] =
-  //      comments ~ ("e" ||| expression ~ "s")
-  //    val result = expression.parseWhole(reader)
-  //    assert(!result.successful, result.toString)
-  //  }
-
   test("Ordered choice operator in the wrong order fails") {
     lazy val expression: Parser[Any] = optional ~ ("e" | expression ~ "s")
     val result = expression.parseWhole(aesReader)
     assert(!result.successful, result.toString)
   }
 
-  test("recursive defaults") {
+  test("Recursive defaults") {
     lazy val recursive: Parser[Any] = new Lazy(recursive) ~ "b" | "b"
     lazy val parser = "a" ~ recursive
     val input = "c"

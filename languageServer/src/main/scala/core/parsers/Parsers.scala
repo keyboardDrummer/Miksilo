@@ -149,6 +149,7 @@ trait Parsers {
     def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
     def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
     def |[Other >: Result](other: => Parser[Other]) = new OrElse[Result, Other, Other](this, other)
+    def |||[Other >: Result](other: => Parser[Other]) = new BiggestOfTwo[Result, Other, Other](this, other)
     def map[NewResult](f: Result => NewResult) = new Map(this, f)
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = new Filter(this, predicate, getMessage)
 
@@ -171,7 +172,7 @@ trait Parsers {
     }
   }
 
-  class FlatMap[+Result, +NewResult](left: Parser[Result], f: Result => Parser[NewResult]) extends Parser[NewResult] {
+  class FlatMap[+Result, +NewResult](left: Parser[Result], f: Result => Parser[NewResult]) extends Parser[NewResult] { //TODO add tests
 
     override def parse(input: Input, state: ParseState): ParseResult[NewResult] = {
       val leftResult = left.parseIteratively(input, state)
@@ -347,13 +348,40 @@ trait Parsers {
     }
   }
 
+  class BiggestOfTwo[+First <: Result, +Second <: Result, +Result](first: Parser[First], _second: => Parser[Second])
+    extends Parser[Result] {
+    lazy val second = _second
+
+    override def parse(input: Input, state: ParseState): ParseResult[Result] = {
+      val firstResult = first.parseIteratively(input, state)
+      val secondResult = second.parseIteratively(input, state)
+      (firstResult, secondResult) match {
+        case (firstSuccess: ParseSuccess[Result], secondSuccess: ParseSuccess[Result]) =>
+          if (firstSuccess.remainder.offset > secondSuccess.remainder.offset)
+            firstSuccess.addFailure(secondSuccess.biggestFailure)
+          else
+            secondSuccess.addFailure(firstSuccess.biggestFailure)
+        case (firstFailure: ParseFailure[Result], secondSuccess: ParseSuccess[Result]) =>
+          secondSuccess.addFailure(firstFailure)
+        case (firstSuccess: ParseSuccess[Result], secondFailure: ParseFailure[Result]) =>
+          firstSuccess.addFailure(secondFailure)
+        case (firstFailure: ParseFailure[Result], secondFailure: ParseFailure[Result]) =>
+          firstFailure.getBiggest(secondFailure)
+        case _ => throw new Exception("can not occur")
+      }
+    }
+
+    override def getDefault(cache: DefaultCache): Option[Result] = {
+      val value: Option[First] = cache(first)
+      value.orElse(cache(second))
+    }
+  }
+
   class Map[+Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
     override def parse(input: Input, cache: ParseState): ParseResult[NewResult] = {
       original.parseIteratively(input, cache).map(f)
     }
 
-
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
   }
 }
-

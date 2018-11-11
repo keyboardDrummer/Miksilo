@@ -2,21 +2,9 @@ package core.parsers
 
 trait CommonParsers extends StringParsers {
 
-  case class CharPredicate(predicate: Char => Boolean, kind: String) extends Parser[Char] {
-    override def parse(input: StringReader, cache: ParseState): ParseResult[Char] = {
-      val char = input.array(input.offset)
-      if (predicate(char))
-        ParseSuccess(char, input.drop(1), NoFailure)
-      else
-        ParseFailure(None, input, s"'$char' was not a $kind")
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Char] = None
-  }
-
   def ident: Parser[String] =
-    CharPredicate(Character.isJavaIdentifierStart, "identifier start") ~
-      SomeParser(CharPredicate(Character.isJavaIdentifierPart(_: Char), "identifier part")) ^^ (t => (t._1 :: t._2).mkString)
+    ElemPredicate(Character.isJavaIdentifierStart, "identifier start") ~
+      Many(ElemPredicate(Character.isJavaIdentifierPart(_: Char), "identifier part")) ^^ (t => (t._1 :: t._2).mkString)
 
 
   /** An integer, without sign or with a negative sign. */
