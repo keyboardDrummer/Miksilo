@@ -5,7 +5,7 @@ import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, BiGrammarToParser, StateFull, WithMapG}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, StateFull, WithMap}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -60,7 +60,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
           triviasWithMap <- statefulTrivias
         } yield {
           val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
-          WithMapG[Any](Unit, if (trivias.nonEmpty) Map(field -> trivias) else Map.empty)
+          WithMap[Any](Unit, if (trivias.nonEmpty) Map(field -> trivias) else Map.empty)
         }
       )
     }
@@ -68,10 +68,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new NodePrinter {
       val triviaPrinter: NodePrinter = recursive(triviaGrammar)
 
-      override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = for {
+      override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = for {
         key <- TryState.fromStateM(getFieldAndIncrementCounter)
         value = from.map.getOrElse(key, Seq.empty)
-        result <- triviaPrinter.write(WithMapG[Any](value, from.map))
+        result <- triviaPrinter.write(WithMap[Any](value, from.map))
       } yield result
     }
 
@@ -107,7 +107,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {
       val nodePrinter: NodePrinter = recursive(node)
-      from: WithMapG[Any] => {
+      from: WithMap[Any] => {
         resetAndRestoreCounter(nodePrinter.write(from))
       }
     }

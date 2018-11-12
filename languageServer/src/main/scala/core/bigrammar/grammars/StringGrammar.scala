@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
-import core.bigrammar.{BiGrammar, WithMapG}
+import core.bigrammar.{BiGrammar, WithMap}
 import core.parsers.ParseSuccess
 import core.parsers.strings.StringReader
 import core.responsiveDocument.ResponsiveDocument
@@ -18,7 +18,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
-  override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = {
+  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
