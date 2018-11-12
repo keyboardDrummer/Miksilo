@@ -8,8 +8,10 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
 
   override def offset: Int = remainder.offset
 
-  def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Input, Other] =
-    if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Input, Result]]
+  def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Input, Other] = {
+    val (first, second) = if (offset > other.offset) (this, other) else (other.asInstanceOf[ParseFailure[Input, Result]], this)
+    first //ParseFailure(first.partialResult.orElse(second.partialResult), first.remainder, first.message)
+  }
 
   override def get: Result = throw new Exception("get was called on a ParseFailure")
 
@@ -45,6 +47,7 @@ case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder:
 
 trait OptionFailure[+Result] {
   def offset: Int
+  def partialResult: Option[Result]
   def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
 }
 
@@ -52,4 +55,6 @@ object NoFailure extends OptionFailure[Nothing] {
   override def offset: Int = -1
 
   override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
+
+  override def partialResult: Option[Nothing] = None
 }

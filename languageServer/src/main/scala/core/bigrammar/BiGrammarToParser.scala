@@ -64,12 +64,12 @@ object BiGrammarToParser extends CommonParserWriter {
         if (choice.firstBeforeSecond) firstParser | secondParser
         else firstParser ||| secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult).asInstanceOf[Parser[Result]]
+      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val manyInners = Many(innerParser) //TODO by implementing * ourselves we can get rid of the intermediate List.
+        val manyInners = innerParser.* //TODO by implementing * ourselves we can get rid of the intermediate List.
         val parser: Parser[Result] = manyInners.map(elements => {
           val result: Result = (initialState: State) => {
             var state = initialState

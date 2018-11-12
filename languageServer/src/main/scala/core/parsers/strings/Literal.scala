@@ -12,7 +12,7 @@ case class Literal(value: String) extends Parser[StringReader, String] {
       if (array.length <= arrayIndex) {
         return ParseFailure(Some(value), inputs, s"expected '$value' but end of source found")
       } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-        return parsers.ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found ${array.subSequence(inputs.offset, arrayIndex)}")
+        return parsers.ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found '${array.subSequence(inputs.offset, arrayIndex + 1)}'")
       }
       index += 1
     }

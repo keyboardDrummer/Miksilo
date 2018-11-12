@@ -85,11 +85,18 @@ trait Parser[Input <: ParseInput, +Result] {
   def |||[Other >: Result](other: => Parser[Other]) = new BiggestOfTwo[Input, Result, Other, Other](this, other)
   def map[NewResult](f: Result => NewResult) = new MapParser(this, f)
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
+  def withDefault[Other >: Result](_default: Other) = WithDefault(this, _default)
 
-  def * = Many(this)
+  def * : Parser[List[Result]] = {
+    lazy val result: Parser[List[Result]] =
+      new Sequence(this, result, (h: Result, t: List[Result]) => h :: t).withDefault(List.empty) |
+      Return(List.empty)
+    result
+  }
+
   def ^^[NewResult](f: Result => NewResult) = new MapParser(this, f)
   def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
-    new Sequence(this, Many(separator ~> this), (h: Result, t: List[Result]) => h :: t) |
+    new Sequence(this, (separator ~> this)*, (h: Result, t: List[Result]) => h :: t) |
       Return(List.empty)
 }
 
