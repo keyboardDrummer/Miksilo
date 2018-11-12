@@ -26,7 +26,8 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
       nodesWithBackEdges.add(node.parser)
       val index = callStack.indexOf(node.parser)
       parsersPartOfACycle ++= callStack.take(index + 1)
-      return Some(recursionIntermediates.getOrElse(node, ParseFailure[Input, Result](None, node.input, "Traversed back edge without a previous result")).
+      return Some(recursionIntermediates.getOrElse(node,
+        ParseFailure[Input, Result](None, node.input, "Traversed back edge without a previous result")).
         asInstanceOf[ParseResult[Input, Result]])
     }
     None

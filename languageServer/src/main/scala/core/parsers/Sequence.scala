@@ -1,6 +1,8 @@
 package core.parsers
 
-class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, Left], _right: => Parser[Input, Right],
+// TODO consider replacing this with FlatMap[Input, Left, Result](left, l => _right.map(r => combine(l, r))) although for some reason that currently reduces the error recovery
+class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, Left],
+                                                            _right: => Parser[Input, Right],
                                        combine: (Left, Right) => Result) extends Parser[Input, Result] {
   lazy val right: Parser[Right] = _right
 

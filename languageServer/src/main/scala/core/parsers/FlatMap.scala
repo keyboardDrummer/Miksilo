@@ -1,6 +1,8 @@
 package core.parsers
 
-class FlatMap[Input <: ParseInput, +Result, +NewResult](left: Parser[Input, Result], f: Result => Parser[Input, NewResult]) extends Parser[Input, NewResult] { //TODO add tests
+class FlatMap[Input <: ParseInput, +Result, +NewResult](left: Parser[Input, Result],
+                                                        f: Result => Parser[Input, NewResult])
+  extends Parser[Input, NewResult] { //TODO add tests
 
   override def parse(input: Input, state: ParseState): ParseResult[NewResult] = {
     val leftResult = left.parseCached(input, state)
@@ -17,9 +19,9 @@ class FlatMap[Input <: ParseInput, +Result, +NewResult](left: Parser[Input, Resu
               })
 
           case rightFailure: ParseFailure[NewResult] =>
-            if (leftSuccess.biggestFailure.offset > rightFailure.offset && right.getDefault(state).nonEmpty) {
-              val rightDefault = right.getDefault(state).get
-              leftSuccess.biggestFailure.map(l => rightDefault).asInstanceOf[ParseFailure[NewResult]]
+            if (leftSuccess.biggestFailure.offset > rightFailure.offset) {
+              val biggestFailure = leftSuccess.biggestFailure.asInstanceOf[ParseFailure[Result]]
+              ParseFailure(rightFailure.partialResult, biggestFailure.remainder, biggestFailure.message)
             }
             else {
               rightFailure

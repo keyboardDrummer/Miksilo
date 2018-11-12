@@ -22,10 +22,10 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
 
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
-//    val headParseResult = head.parseWhole(new StringReader(input))
-//    assert(headParseResult.isInstanceOf[ParseSuccess[_]])
-//    val headSuccess = headParseResult.asInstanceOf[ParseSuccess[Any]]
-//    assertResult(expectation)(headSuccess.result)
+    val headParseResult = head.parseWholeInput(new StringReader(input))
+    assert(headParseResult.isInstanceOf[ParseSuccess[_]])
+    val headSuccess = headParseResult.asInstanceOf[ParseSuccess[Any]]
+    assertResult(expectation)(headSuccess.result)
 
     val secondParseResult = second.parseWholeInput(new StringReader(input))
     assert(secondParseResult.isInstanceOf[ParseSuccess[_]])
@@ -81,5 +81,25 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     val expectation = ("a", ("b", "b"))
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(expectation)(result.asInstanceOf[ParseFailure[Any]].partialResult.get)
+  }
+
+  // a cycle of lazy parsers causes a stack overflow, since they have no cycle check, but with a sequence in between it just fails.
+  test("only recursive with sequence indirection") {
+    lazy val first: Parser[Any] = new Lazy(first) ~ "a"
+    val input = "aaa"
+    val parseResult = first.parseWholeInput(new StringReader(input))
+    val result = parseResult.asInstanceOf[ParseFailure[Any]]
+    val expectation = None
+    assertResult(expectation)(result.partialResult)
+  }
+
+  test("only recursive with sequence indirection and default, " +
+    "only applies the default after failing the recursion") {
+    lazy val first: Parser[Any] = (new Lazy(first) ~ "a").withDefault("yes")
+    val input = "aaa"
+    val parseResult = first.parseWholeInput(new StringReader(input))
+    val result = parseResult.asInstanceOf[ParseFailure[Any]]
+    val expectation = Some("yes") //Could have been ("yes","a") with different implementation
+    assertResult(expectation)(result.partialResult)
   }
 }
