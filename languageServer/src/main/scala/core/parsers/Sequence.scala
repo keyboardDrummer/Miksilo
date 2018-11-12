@@ -42,7 +42,7 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
   } yield combine(leftDefault, rightDefault)
 }
 
-class IgnoreRight[Input <: ParseInput, +Result, +Right](left: Parser[Input, Result], right: Parser[Input, Right]) extends //TODO IgnoreRight en IgnoreLeft zouden met een custom implementatie sneller zijn.
+class IgnoreRight[Input <: ParseInput, +Result, +Right](left: Parser[Input, Result], right: Parser[Input, Right]) extends // TODO Optimize IgnoreRight and IgnoreLeft with a custom implementation
   Sequence[Input, Result, Right, Result](left, right, (l,_) => l)
 
 class IgnoreLeft[Input <: ParseInput, +Left, +Result](left: Parser[Input, Left], right: Parser[Input, Result]) extends

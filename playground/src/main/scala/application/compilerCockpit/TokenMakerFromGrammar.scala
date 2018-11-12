@@ -45,19 +45,15 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker with 
 
     val resultOption: ParseResult[Seq[MyToken]] = parser.parseWholeInput(new StringReader(text.toString))
     var start = text.offset
-    if (resultOption.isInstanceOf[ParseFailure[_]])
-    {
-      addToken(text, text.offset, start + text.length() - 1, TokenTypes.ERROR_CHAR, startOffset)
-    } 
-    else
-    {
+    if (resultOption.successful) {
       val tokens = resultOption.get
-      for(token <- tokens)
-      {
+      for (token <- tokens) {
         val end = start + token.text.length - 1
         addToken(text, start, end, token.tokenType, start - text.offset + startOffset)
         start = end + 1
       }
+    } else {
+      addToken(text, text.offset, start + text.length() - 1, TokenTypes.ERROR_CHAR, startOffset)
     }
     addNullToken()
     firstToken
