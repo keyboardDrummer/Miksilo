@@ -48,19 +48,19 @@ class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenc
     val grammarDocument = getExpressionGrammarDocument
 
     val expectedError = """could not deconstruct value
-Value: (WithMapG(Undefined,Map()),Map())
+Value: (WithMap(Undefined,Map()),Map())
 Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMapG(Add(Value(4),Undefined),Map()),Map())
+Value: (WithMap(Add(Value(4),Undefined),Map()),Map())
 Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMapG(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey % ()* % ? ()* StringKey % ()* % : ()* StringKey | StringKey
 Depth: 23
 Partial:
