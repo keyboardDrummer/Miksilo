@@ -11,7 +11,7 @@ object StateFull {
   }
 }
 
-trait StateFull[T] {
+trait StateFull[+T] {
   def run(state: State): (State, T)
 
   def map[U](f: T => U): StateFull[U] = state => {

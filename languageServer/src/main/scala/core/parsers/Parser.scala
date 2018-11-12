@@ -91,11 +91,13 @@ trait Parser[Input <: ParseInput, +Result] {
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
   def withDefault[Other >: Result](_default: Other) = WithDefault(this, _default)
 
-  def * : Parser[List[Result]] = {
-    lazy val result: Parser[List[Result]] =
-      new Sequence(this, result, (h: Result, t: List[Result]) => h :: t).withDefault(List.empty) |
-      Return(List.empty)
+  def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum) : Parser[Sum] = {
+    lazy val result: Parser[Sum] = new Sequence(this, result, reduce).withDefault[Sum](zero) | Return(zero)
     result
+  }
+
+  def * : Parser[List[Result]] = {
+    many(List.empty, (h: Result, t: List[Result]) => h :: t)
   }
 
   def ^^[NewResult](f: Result => NewResult) = new MapParser(this, f)

@@ -7,7 +7,7 @@ import core.parsers.strings.StringReader
 
 import scala.collection.mutable
 
-case class WithMapG[T](value: T, map: Map[Any,Any]) {}
+case class WithMapG[+T](value: T, map: Map[Any,Any]) {}
 
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter {
@@ -69,22 +69,10 @@ object BiGrammarToParser extends CommonParserWriter {
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val manyInners = innerParser.* //TODO by implementing * ourselves we can get rid of the intermediate List.
-        val parser: Parser[Result] = manyInners.map(elements => {
-          val result: Result = (initialState: State) => {
-            var state = initialState
-            var totalMap = Map.empty[Any, Any]
-            var totalValue = List.empty[Any]
-            elements.foreach(elementStateM => {
-              val elementResult = elementStateM(state)
-              state = elementResult._1
-              totalMap = totalMap ++ elementResult._2.map
-              totalValue ::= elementResult._2.value
-            })
-            (state, WithMapG[Any](totalValue.reverse, totalMap))
-          }
-          result
-        })
+        val parser = innerParser.many[StateFull[WithMapG[List[Any]]]](
+          StateFull.value(WithMapG(List.empty[Any], Map.empty[Any, Any])),
+          (element, result) => element.flatMap(w => result.map(w2 => WithMapG(w.value :: w2.value, w.map ++ w2.map))))
+
         parser
       case mapGrammar: MapGrammarWithMap =>
         val innerParser = recursive(mapGrammar.inner)
