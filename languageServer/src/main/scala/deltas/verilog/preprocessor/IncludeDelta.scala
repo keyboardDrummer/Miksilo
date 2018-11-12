@@ -7,11 +7,11 @@ import core.deltas.path.{NodePath, SequenceElement}
 import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeShape}
+import core.parsers.{ParseFailure, ParseSuccess}
 import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
 
 import scala.reflect.io.Path
-
 
 object IncludeDelta extends DirectiveDelta {
   override def description: String = "Adds the `include <filename> directive"
@@ -26,11 +26,11 @@ object IncludeDelta extends DirectiveDelta {
     val parser: BiGrammarToParser.Parser[Any] = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult match {
-      case success: BiGrammarToParser.ParseSuccess[_] =>
+      case success: ParseSuccess[_, _] =>
         val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[SequenceElement].replaceWith(value.members)
-      case failure: BiGrammarToParser.ParseFailure[_] =>
+      case failure: ParseFailure[_, _] =>
         val diagnostic = DiagnosticUtil.getDiagnosticFromParseException(failure.message)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }

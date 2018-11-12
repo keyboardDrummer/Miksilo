@@ -1,8 +1,9 @@
 package core.parsers
 
+import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
 
-class JsonTest extends FunSuite with CommonParsers {
+class JsonTest extends FunSuite with CommonParserWriter {
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"

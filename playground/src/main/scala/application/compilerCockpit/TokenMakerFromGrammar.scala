@@ -3,7 +3,7 @@ package application.compilerCockpit
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
-import core.parsers.StringReader
+import core.parsers.strings.StringReader
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 

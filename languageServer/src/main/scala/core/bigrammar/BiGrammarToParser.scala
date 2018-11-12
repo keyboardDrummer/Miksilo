@@ -2,20 +2,21 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.{CommonParsers, StringReader}
+import core.parsers._
+import core.parsers.strings.StringReader
 
 import scala.collection.mutable
 
 case class WithMapG[T](value: T, map: Map[Any,Any]) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParsers {
+object BiGrammarToParser extends CommonParserWriter {
   type WithMap = WithMapG[Any]
   type Result = StateFull[WithMap]
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMapG(value, Map.empty))
 
-  def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
+  def toStringParser(grammar: BiGrammar): String => ParseResult[Input, Any] =
     input => toParser(grammar).parseWhole(new StringReader(input))
 
   def toParser(grammar: BiGrammar): Parser[Any] = {
@@ -46,7 +47,7 @@ object BiGrammarToParser extends CommonParsers {
       case sequence: core.bigrammar.grammars.Sequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = new Sequence[Result, Result, Result](firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
+        val parser = new core.parsers.Sequence(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
           val result: Result = (state: State) => {
             val firstMap = firstResult(state)
             val secondMap = secondResult(firstMap._1)
@@ -89,9 +90,9 @@ object BiGrammarToParser extends CommonParsers {
         val innerParser = recursive(mapGrammar.inner)
         innerParser.map(result => result.map(mapGrammar.construct))
 
-      case BiFailure(message) => Fail(message)
-      case Print(_) => Return(Unit).map(valueToResult)
-      case ValueGrammar(value) => Return(value).map(valueToResult)
+      case BiFailure(message) => fail(message)
+      case Print(_) => succeed(Unit).map(valueToResult)
+      case ValueGrammar(value) => succeed(value).map(valueToResult)
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)

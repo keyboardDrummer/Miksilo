@@ -23,7 +23,7 @@ case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
 
   override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result] = {
     val innerParser = recursive(inner)
-    new BiGrammarToParser.Sequence(BiGrammarToParser.position ~ innerParser, BiGrammarToParser.position, (t: (Position, Result), end: Position) => {
+    new core.parsers.Sequence(BiGrammarToParser.position ~ innerParser, BiGrammarToParser.position, (t: (Position, Result), end: Position) => {
       t._2.map { case WithMapG(v, state) => WithMapG(inner, state +
         (field -> v) +
         (FieldPosition(field) -> SourceRange(t._1, end)))

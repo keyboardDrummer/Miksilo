@@ -6,7 +6,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import core.parsers.StringReader
+import core.parsers.ParseResult
+import core.parsers.strings.StringReader
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
@@ -39,7 +40,7 @@ object TestGrammarUtils extends FunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar): BiGrammarToParser.ParseResult[Any] = {
+  def parse(example: String, grammarDocument: BiGrammar): ParseResult[_, Any] = {
     val parser = BiGrammarToParser.toParser(grammarDocument)
     parser.parseWhole(new StringReader(example))
   }

@@ -1,7 +1,7 @@
 package application.compilerCockpit
 
 import core.bigrammar.BiGrammarToParser
-import core.parsers.StringReader
+import core.parsers.strings.StringReader
 import deltas.javac.JavaLanguage
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes

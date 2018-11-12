@@ -4,6 +4,8 @@ import core.bigrammar.BiGrammarToParser
 import core.deltas._
 import core.language.node.Node
 import core.language.{Compilation, Language}
+import core.parsers.{ParseResult, ParseSuccess}
+import core.parsers.strings.StringReader
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
@@ -30,14 +32,14 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     super.inject(language)
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
     val parser = BiGrammarToParser.toStringParser(typeGrammar)
-    val sourceLessParser: String => BiGrammarToParser.ParseResult[Any] = (input: String) => {
+    val sourceLessParser: String => ParseResult[StringReader, Any] = (input: String) => {
       val result = parser(input)
       result.map(r => r.asInstanceOf[Node].visit(node => {
         node.sources.clear()
       }))
       result
     }
-    parseTypeProperty.add(language, input => sourceLessParser(input).asInstanceOf[BiGrammarToParser.ParseSuccess[Node]].result)
+    parseTypeProperty.add(language, input => sourceLessParser(input).asInstanceOf[ParseSuccess[_, Node]].result)
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {

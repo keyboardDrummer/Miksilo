@@ -1,8 +1,9 @@
 package core.parsers
 
+import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
 
-class RecursiveGrammarTest extends FunSuite with CommonParsers {
+class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
 
   test("left recursion with lazy indirection") {
     lazy val head: Parser[Any] = new Lazy(head) ~ "a" | "a"

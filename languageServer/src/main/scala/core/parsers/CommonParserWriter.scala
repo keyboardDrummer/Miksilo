@@ -1,10 +1,12 @@
 package core.parsers
 
-trait CommonParsers extends StringParsers {
+import core.parsers.strings.StringParserWriter
 
-  def ident: Parser[String] =
-    ElemPredicate(Character.isJavaIdentifierStart, "identifier start") ~
-      Many(ElemPredicate(Character.isJavaIdentifierPart(_: Char), "identifier part")) ^^ (t => (t._1 :: t._2).mkString)
+trait CommonParserWriter extends StringParserWriter {
+
+  def identifier: Parser[String] =
+    elem(Character.isJavaIdentifierStart, "identifier start") ~
+      Many(elem(Character.isJavaIdentifierPart(_: Char), "identifier part")) ^^ (t => (t._1 :: t._2).mkString)
 
 
   /** An integer, without sign or with a negative sign. */
@@ -27,7 +29,7 @@ trait CommonParsers extends StringParsers {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   def stringLiteral: Parser[String] =
-    "\"" ~> """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r ~< "\""
+    literal("\"") ~> """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:

@@ -4,5 +4,5 @@ import core.bigrammar.BiGrammarToParser
 
 case class Identifier(verifyWhenPrinting: Boolean = false) extends StringGrammar(verifyWhenPrinting) {
   override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[String] =
-    BiGrammarToParser.ident.filter(identifier => !keywords.contains(identifier), identifier => s"$identifier is a keyword")
+    BiGrammarToParser.identifier.filter(identifier => !keywords.contains(identifier), identifier => s"$identifier is a keyword")
 }

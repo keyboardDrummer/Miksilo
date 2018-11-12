@@ -3,7 +3,8 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser
 import core.language.node.{Node, SourceRange}
 import core.language.{Compilation, Language}
-import core.parsers.StringReader
+import core.parsers.strings.StringReader
+import core.parsers.{ParseFailure, ParseResult, ParseSuccess}
 import core.smarts.FileDiagnostic
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition
@@ -18,17 +19,17 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: BiGrammarToParser.ParseResult[Any] = parseStream(parser, inputStream)
+    val parseResult: ParseResult[StringReader, Any] = parseStream(parser, inputStream)
     parseResult match {
-      case success: BiGrammarToParser.ParseSuccess[_] =>
+      case success: ParseSuccess[_, _] =>
         compilation.program = success.result.asInstanceOf[Node]
         compilation.program.startOfUri = Some(uri)
-      case failure: BiGrammarToParser.ParseFailure[_] =>
+      case failure: ParseFailure[StringReader, _] =>
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
     }
   }
 
-  def parseStream(parser: BiGrammarToParser.Parser[Any], input: InputStream): BiGrammarToParser.ParseResult[Any] = {
+  def parseStream(parser: BiGrammarToParser.Parser[Any], input: InputStream): ParseResult[StringReader, Any] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
     parser.parseWhole(reader)
   }
@@ -49,7 +50,7 @@ object DiagnosticUtil {
 
   private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: ((.|\n)*)\n\n""".r
 
-  def getDiagnosticFromParseFailure(failure: BiGrammarToParser.ParseFailure[Any]): Diagnostic = {
+  def getDiagnosticFromParseFailure(failure: ParseFailure[StringReader, Any]): Diagnostic = {
     val row = failure.remainder.position.line
     val column = failure.remainder.position.column
     Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, failure.message)
