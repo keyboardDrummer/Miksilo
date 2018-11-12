@@ -17,7 +17,7 @@ object BiGrammarToParser extends CommonParserWriter {
   def valueToResult(value: Any): Result = (state: State) => (state, WithMapG(value, Map.empty))
 
   def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
-    input => toParser(grammar).parseWhole(new StringReader(input))
+    input => toParser(grammar).parseWholeInput(new StringReader(input))
 
   def toParser(grammar: BiGrammar): Parser[Any] = {
 

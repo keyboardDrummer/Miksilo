@@ -31,7 +31,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
   def parseStream(parser: BiGrammarToParser.Parser[Any], input: InputStream): ParseResult[StringReader, Any] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
-    parser.parseWhole(reader)
+    parser.parseWholeInput(reader)
   }
 
   val parserProp = new Property[BiGrammarToParser.Parser[Any]](null)

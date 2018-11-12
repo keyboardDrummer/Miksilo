@@ -43,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWhole(new StringReader(text.toString))
+    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWholeInput(new StringReader(text.toString))
     var start = text.offset
     if (resultOption.isInstanceOf[ParseFailure[_]])
     {

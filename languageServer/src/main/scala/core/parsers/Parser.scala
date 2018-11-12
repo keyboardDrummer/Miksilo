@@ -14,12 +14,17 @@ trait Parser[Input <: ParseInput, +Result] {
   def parse(input: Input, state: ParseState): ParseResult[Result]
   def getDefault(cache: DefaultCache): Option[Result]
 
-  def parseWhole(input: Input,
-                 cache: Cache[ParseNode[Input], ParseResult[Any]] = new InfiniteCache()):
+  def parseWholeInput(input: Input,
+                      cache: Cache[ParseNode[Input], ParseResult[Any]] = new InfiniteCache()):
     ParseResult[Result] = {
 
+    parse(input, cache)
+  }
+
+  def parse(input: Input,
+            cache: Cache[ParseNode[Input], ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
     val state = new ParseState(cache)
-    val result = parseIteratively(input, state) match {
+    parseIteratively(input, state) match {
       case success: ParseSuccess[Result] =>
         if (success.remainder.finished) success
         else {
@@ -28,7 +33,6 @@ trait Parser[Input <: ParseInput, +Result] {
         }
       case f => f
     }
-    result
   }
 
   def parseCached(input: Input, state: ParseState): ParseResult[Result] = {
