@@ -19,4 +19,11 @@ case class StringReader(array: Array[Char], offset: Int = 0) extends SequenceInp
   override def head: Char = array(offset)
 
   override def tail: StringReader = drop(1)
+
+  override def hashCode(): Int = offset
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: StringReader => offset == other.offset
+    case _ => false
+  }
 }

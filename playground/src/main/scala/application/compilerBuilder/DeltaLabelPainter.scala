@@ -3,15 +3,15 @@ package application.compilerBuilder
 import javax.swing.JPanel
 
 import core.deltas.{Contract, Delta}
-import util.Cache
+import util.CachedValue
 
 import scala.collection.mutable
 
 class DeltaLabelPainter(container: JPanel, availableDeltas: Set[Delta]) {
   val dependants: mutable.HashMap[Contract, mutable.Set[Contract]] with mutable.MultiMap[Contract, Contract] = getDependants
   var selection: Seq[Delta] = Seq.empty
-  val dependenciesCache = new Cache[Set[Contract]](() => selection.flatMap(s => s.dependencies).toSet)
-  val dependantsCache = new Cache[Set[Contract]](() => selection.flatMap(s => dependants(s)).toSet)
+  val dependenciesCache = new CachedValue[Set[Contract]](() => selection.flatMap(s => s.dependencies).toSet)
+  val dependantsCache = new CachedValue[Set[Contract]](() => selection.flatMap(s => dependants(s)).toSet)
 
   private def getDependants = {
     val dependants = new mutable.HashMap[Contract, mutable.Set[Contract]]()

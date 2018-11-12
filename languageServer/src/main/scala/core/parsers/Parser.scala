@@ -1,5 +1,7 @@
 package core.parsers
 
+import util.cache.{Cache, InfiniteCache}
+
 // TODO misschien proberen door te parsen wanneer er een failure plaatsvindt, zodat ik bij 'missende input' gewoon verder ga. Ik zou ook nog recovery parsers kunnen toevoegen zoals in de paper, maar dat lijkt overkil.
 trait Parser[Input <: ParseInput, +Result] {
 
@@ -12,9 +14,12 @@ trait Parser[Input <: ParseInput, +Result] {
   def parse(input: Input, state: ParseState): ParseResult[Result]
   def getDefault(cache: DefaultCache): Option[Result]
 
-  def parseWhole(input: Input): ParseResult[Result] = {
-    val state = new ParseState(new EverythingCache[Input]())
-    parseIteratively(input, state) match {
+  def parseWhole(input: Input,
+                 cache: Cache[ParseNode[Input], ParseResult[Any]] = new InfiniteCache()):
+    ParseResult[Result] = {
+
+    val state = new ParseState(cache)
+    val result = parseIteratively(input, state) match {
       case success: ParseSuccess[Result] =>
         if (success.remainder.finished) success
         else {
@@ -23,6 +28,7 @@ trait Parser[Input <: ParseInput, +Result] {
         }
       case f => f
     }
+    result
   }
 
   def parseCached(input: Input, state: ParseState): ParseResult[Result] = {
@@ -43,7 +49,7 @@ trait Parser[Input <: ParseInput, +Result] {
         state.withNodeOnStack(node, () => {
           var result = parse(input, state)
           result match {
-            case success: ParseSuccess[Result] if state.nodesWithBackEdges.contains(node) =>
+            case success: ParseSuccess[Result] if state.nodesWithBackEdges.contains(this) =>
               result = growResult(node, success, state)
             case _ =>
           }

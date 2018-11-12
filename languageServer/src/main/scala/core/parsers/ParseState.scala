@@ -1,15 +1,17 @@
 package core.parsers
 
+import util.cache.Cache
+
 import scala.collection.mutable
 
-class ParseState[Input <: ParseInput](val resultCache: Cache[Input]) {
+class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], ParseResult[Input, Any]]) {
 
   val defaultCache = new DefaultCache()
   val recursionIntermediates = mutable.HashMap[ParseNode[Input], ParseResult[Input, Any]]()
   val callStackSet = mutable.HashSet[ParseNode[Input]]()
   val callStack = mutable.Stack[Parser[Input, _]]()
   var parsersPartOfACycle: Set[Parser[Input, _]] = Set.empty
-  val nodesWithBackEdges = mutable.HashSet[ParseNode[Input]]() //TODO possible this can be only the parsers.
+  val nodesWithBackEdges = mutable.HashSet[Parser[Input, _]]() //TODO possible this can be only the parsers.
 
   def putIntermediate(key: ParseNode[Input], value: ParseResult[Input, Any]): Unit = {
     recursionIntermediates.put(key, value)
@@ -21,7 +23,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[Input]) {
 
   def getPreviousResult[Result](node: ParseNode[Input]): Option[ParseResult[Input, Result]] = {
     if (callStackSet.contains(node)) {
-      nodesWithBackEdges.add(node)
+      nodesWithBackEdges.add(node.parser)
       val index = callStack.indexOf(node.parser)
       parsersPartOfACycle ++= callStack.take(index + 1)
       return Some(recursionIntermediates.getOrElse(node, ParseFailure[Input, Result](None, node.input, "Traversed back edge without a previous result")).
@@ -37,23 +39,6 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[Input]) {
     callStackSet.remove(node)
     callStack.pop()
     result
-  }
-}
-
-trait Cache[Input <: ParseInput] {
-  def get(node: ParseNode[Input]): Option[ParseResult[Input, Any]]
-  def add(node: ParseNode[Input], value: ParseResult[Input, Any]): Unit
-}
-
-class EverythingCache[Input <: ParseInput] extends Cache[Input] {
-  val data = mutable.Map[ParseNode[Input], ParseResult[Input, Any]]()
-
-  override def get(node: ParseNode[Input]): Option[ParseResult[Input, Any]] = {
-    data.get(node)
-  }
-
-  override def add(node: ParseNode[Input], value: ParseResult[Input, Any]): Unit = {
-    data.put(node, value)
   }
 }
 
