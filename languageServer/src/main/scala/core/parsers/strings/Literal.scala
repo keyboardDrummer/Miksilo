@@ -4,7 +4,7 @@ import core.parsers
 import core.parsers._
 
 case class Literal(value: String) extends Parser[StringReader, String] {
-  override def parse(inputs: StringReader, cache: ParseState): ParseResult[String] = {
+  override def parseNaively(inputs: StringReader, cache: ParseState): ParseResult[String] = {
     var index = 0
     val array = inputs.array
     while(index < value.length) {

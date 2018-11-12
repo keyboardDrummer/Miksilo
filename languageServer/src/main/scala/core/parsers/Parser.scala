@@ -14,7 +14,7 @@ trait Parser[Input <: ParseInput, +Result] {
   /**
     * When implementing, make sure that when returning a failure, if this Parser's default has a value, then the failure must do so to.
     */
-  def parse(input: Input, state: ParseState): ParseResult[Result]
+  def parseNaively(input: Input, state: ParseState): ParseResult[Result]
   def getDefault(cache: DefaultCache): Option[Result]
 
   def parseWholeInput(input: Input,
@@ -54,7 +54,7 @@ trait Parser[Input <: ParseInput, +Result] {
     state.getPreviousResult(node) match {
       case None =>
         state.withNodeOnStack(node, () => {
-          var result = parse(input, state)
+          var result = parseNaively(input, state)
           result match {
             case success: ParseSuccess[Result] if state.nodesWithBackEdges.contains(this) =>
               result = growResult(node, success, state)
@@ -70,7 +70,7 @@ trait Parser[Input <: ParseInput, +Result] {
   private def growResult[GrowResult](node: ParseNode[Input], previous: ParseSuccess[GrowResult], state: ParseState): ParseSuccess[GrowResult] = {
     state.putIntermediate(node, previous)
 
-    node.parser.parse(node.input, state) match {
+    node.parser.parseNaively(node.input, state) match {
       case success: ParseSuccess[GrowResult] @unchecked if success.remainder.offset > previous.remainder.offset =>
         growResult(node, success, state)
       case _ =>

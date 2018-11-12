@@ -4,7 +4,7 @@ class OrElse[Input <: ParseInput, +First <: Result, +Second <: Result, +Result](
   extends Parser[Input, Result] {
   lazy val second = _second
 
-  override def parse(input: Input, cache: ParseState): ParseResult[Result] = {
+  override def parseNaively(input: Input, cache: ParseState): ParseResult[Result] = {
     val firstResult = first.parseCached(input, cache)
     firstResult match {
       case _: ParseSuccess[Result] => firstResult

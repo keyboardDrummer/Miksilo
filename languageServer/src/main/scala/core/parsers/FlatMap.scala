@@ -4,7 +4,7 @@ class FlatMap[Input <: ParseInput, +Result, +NewResult](left: Parser[Input, Resu
                                                         f: Result => Parser[Input, NewResult])
   extends Parser[Input, NewResult] { //TODO add tests
 
-  override def parse(input: Input, state: ParseState): ParseResult[NewResult] = {
+  override def parseNaively(input: Input, state: ParseState): ParseResult[NewResult] = {
     val leftResult = left.parseCached(input, state)
     leftResult match {
       case leftSuccess: ParseSuccess[Result] =>

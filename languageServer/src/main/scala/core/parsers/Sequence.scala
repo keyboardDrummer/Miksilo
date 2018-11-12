@@ -6,7 +6,7 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
                                        combine: (Left, Right) => Result) extends Parser[Input, Result] {
   lazy val right: Parser[Right] = _right
 
-  override def parse(input: Input, state: ParseState): ParseResult[Result] = {
+  override def parseNaively(input: Input, state: ParseState): ParseResult[Result] = {
     val leftResult = left.parseCached(input, state)
     leftResult match {
       case leftSuccess: ParseSuccess[Left] =>

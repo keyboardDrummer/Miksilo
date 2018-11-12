@@ -13,7 +13,7 @@ trait StringParserWriter extends ParserWriter {
   def elem(predicate: Char => Boolean, kind: String) = new ElemPredicate[Input, Char](predicate, kind)
 
   def position[T <: Positional]: Parser[Position] = new Parser[Position] {
-    override def parse(input: Input, state: ParseState): ParseResult[Position] = {
+    override def parseNaively(input: Input, state: ParseState): ParseResult[Position] = {
       ParseSuccess(new HumanPosition(input.position.line, input.position.column), input, NoFailure)
     }
 

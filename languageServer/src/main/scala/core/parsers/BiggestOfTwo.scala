@@ -4,7 +4,7 @@ class BiggestOfTwo[Input <: ParseInput, +First <: Result, +Second <: Result, +Re
   extends Parser[Input, Result] {
   lazy val second = _second
 
-  override def parse(input: Input, state: ParseState): ParseResult[Result] = {
+  override def parseNaively(input: Input, state: ParseState): ParseResult[Result] = {
     val firstResult = first.parseCached(input, state)
     val secondResult = second.parseCached(input, state)
     (firstResult, secondResult) match {

@@ -7,7 +7,7 @@ trait SequenceInput[Input, Elem] extends ParseInput {
 }
 
 case class ElemPredicate[Input <: SequenceInput[Input, Elem], Elem](predicate: Elem => Boolean, kind: String) extends Parser[Input, Elem] {
-  override def parse(input: Input, cache: ParseState): ParseResult[Elem] = {
+  override def parseNaively(input: Input, cache: ParseState): ParseResult[Elem] = {
     if (input.atEnd) {
       return ParseFailure(None, input, s"$kind expected but end of source found")
     }
