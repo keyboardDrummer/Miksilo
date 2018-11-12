@@ -6,7 +6,8 @@ import langserver.types._
 import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
 
-import scala.concurrent.Promise
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Promise}
 
 class LSPServerTest extends AsyncFunSpec {
 
@@ -125,12 +126,11 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 133
         |
         |{"jsonrpc":"2.0","method":"textDocument/completion","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
-    completePromise.future.map(result => {
-      assertResult(Seq(CompletionItem("hello")))(result.items)
-      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
-      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
-    })
+    val result = Await.result(completePromise.future, Duration.Inf)
 
+    assertResult(Seq(CompletionItem("hello")))(result.items)
+    assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+    assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
   it("can use references") {

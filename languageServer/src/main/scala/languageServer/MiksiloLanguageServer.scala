@@ -65,12 +65,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
         val value = kv._2
         val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
         if (childPaths.isEmpty) {
-          Seq(node.getLocation(kv._1))
+          Seq(node.getMember(kv._1))
         } else {
           childPaths.map(child => getForNode(child))
         }
       })
-      val childPosition = childPositions.find(kv => kv.filePosition.exists(r => r.contains(position)))
+      val childPosition = childPositions.find(kv => kv.fileRange.exists(r => r.contains(position)))
       childPosition.fold[SourceElement](node)(x => x)
     }
     getForNode(getCompilation.root)
@@ -87,7 +87,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       proofs <- getProofs
       element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
-      fileRange <- definition.origin.flatMap(o => o.filePosition)
+      fileRange <- definition.origin.flatMap(o => o.fileRange)
     } yield Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
     location.toSeq
   }
@@ -101,7 +101,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       scopeGraph = proofs.scopeGraph
       element = getSourceElement(FilePosition(params.textDocument.uri, position))
       reference <- scopeGraph.findReference(element).toSeq
-      prefixLength = position.character - reference.origin.get.position.get.start.character
+      prefixLength = position.character - reference.origin.get.range.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
@@ -129,12 +129,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
       val referencesRanges = for {
         references <- proofs.findReferences(definition)
-        range <- references.origin.flatMap(e => e.filePosition).toSeq
+        range <- references.origin.flatMap(e => e.fileRange).toSeq
       } yield range
 
       var fileRanges: Seq[FileRange] = referencesRanges
       if (parameters.context.includeDeclaration)
-        fileRanges = definition.origin.flatMap(o => o.filePosition).toSeq ++ fileRanges
+        fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 
       fileRanges.map(fileRange => Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)))
     }

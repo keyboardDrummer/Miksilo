@@ -28,7 +28,7 @@ object VerilogWildcardImportDelta extends DeltaWithGrammar with HasConstraintsDe
   override def shape: NodeShape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-    val packageDeclaration = builder.resolve(path(Package).asInstanceOf[String], path.getLocation(Package), parentScope)
+    val packageDeclaration = builder.resolve(path(Package).asInstanceOf[String], path.getMember(Package), parentScope)
     val importedScope = builder.getDeclaredScope(packageDeclaration)
     builder.importScope(parentScope, importedScope)
   }

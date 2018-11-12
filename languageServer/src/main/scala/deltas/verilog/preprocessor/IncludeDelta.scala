@@ -10,7 +10,6 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.parsers.{ParseFailure, ParseSuccess}
 import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
-
 import scala.reflect.io.Path
 
 object IncludeDelta extends DirectiveDelta {

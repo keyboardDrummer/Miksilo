@@ -3,8 +3,8 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser
 import core.language.node.{Node, SourceRange}
 import core.language.{Compilation, Language}
-import core.parsers.strings.StringReader
 import core.parsers.{ParseFailure, ParseResult, ParseSuccess}
+import core.parsers.strings.StringReader
 import core.smarts.FileDiagnostic
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition

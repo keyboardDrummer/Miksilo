@@ -35,17 +35,17 @@ object CloudFormationTemplate extends Delta {
 
       val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
       for(resource <- resources.members) {
-        builder.declare(resource.key, rootScope, resource.getLocation(MemberKey), Some(valueType))
+        builder.declare(resource.key, rootScope, resource.getMember(MemberKey), Some(valueType))
 
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")
         val resourceType = JsonStringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getLocation(JsonStringLiteralDelta.Value), rootScope)
+        val typeDeclaration = builder.resolve(resourceType, typeString.getMember(JsonStringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
 
         val properties: ObjectLiteral[NodePath] = resourceMembers.getValue("Properties")
         for(property <- properties.members) {
-          builder.resolveToType(property.key, property.node.getLocation(MemberKey), typeScope, propertyType)
+          builder.resolveToType(property.key, property.node.getMember(MemberKey), typeScope, propertyType)
         }
       }
 
@@ -53,7 +53,7 @@ object CloudFormationTemplate extends Delta {
         val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
         if (member.key == "Ref") {
           val value = JsonStringLiteralDelta.getValue(member.value)
-          val refLocation = member.value.getLocation(JsonStringLiteralDelta.Value)
+          val refLocation = member.value.getMember(JsonStringLiteralDelta.Value)
           builder.resolveToType(value, refLocation, rootScope, valueType)
         }
       })
@@ -69,7 +69,7 @@ object CloudFormationTemplate extends Delta {
   private def addParameters(builder: ConstraintBuilder, universe: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
     val parameters: ObjectLiteral[NodePath] = program.getValue("Parameters")
     for (parameter <- parameters.members) {
-      builder.declare(parameter.key, universe, parameter.node.getLocation(MemberKey), Some(valueType))
+      builder.declare(parameter.key, universe, parameter.node.getMember(MemberKey), Some(valueType))
     }
   }
 

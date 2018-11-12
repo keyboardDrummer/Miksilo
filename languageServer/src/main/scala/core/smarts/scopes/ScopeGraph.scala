@@ -47,7 +47,7 @@ class ScopeGraph extends
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
     val declarations = for {
-      elementRange <- location.filePosition
+      elementRange <- location.fileRange
       result <- rangeToNode.get(elementRange)
     } yield result
 
@@ -56,7 +56,7 @@ class ScopeGraph extends
 
   def findReference(location: SourceElement): Option[Reference] = {
     val references = for {
-      elementRange <- location.filePosition
+      elementRange <- location.fileRange
       result <- rangeToNode.get(elementRange)
     } yield result
 
@@ -128,7 +128,7 @@ class ScopeGraph extends
 
   private def addNode(node: GraphNode, element: SourceElement) {
     elementToNode(element) = node
-    element.filePosition.foreach(position => rangeToNode(position) = node)
+    element.fileRange.foreach(position => rangeToNode(position) = node)
   }
 
 }

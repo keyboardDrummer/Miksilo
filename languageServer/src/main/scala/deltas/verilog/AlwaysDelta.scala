@@ -42,7 +42,7 @@ object AlwaysDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val always: Always[NodePath] = path
     for(variable <- always.variables) {
-      builder.resolve(variable.name, variable.getLocation(SensitivityVariableDelta.Name), parentScope)
+      builder.resolve(variable.name, variable.getMember(SensitivityVariableDelta.Name), parentScope)
     }
     ConstraintSkeleton.constraints(compilation, builder, always.body, parentScope)
   }
