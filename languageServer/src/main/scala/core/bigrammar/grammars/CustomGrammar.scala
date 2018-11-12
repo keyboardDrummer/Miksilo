@@ -1,13 +1,14 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
-import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.parsers.strings.StringParserWriter
 import core.responsiveDocument.ResponsiveDocument
 
-trait CustomGrammar extends BiGrammar {
+trait CustomGrammar extends BiGrammar with StringParserWriter {
 
-  def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument
+  def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
-  def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result]
+  def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result]
 }

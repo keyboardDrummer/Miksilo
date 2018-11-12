@@ -52,7 +52,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       (newState, field)
     }
 
-    override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result] = {
+    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
       val triviaParser = recursive(triviaGrammar)
       triviaParser.map(statefulTrivias =>
         for {
@@ -101,7 +101,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       resetAndRestoreCounter(TryState.fromStateM(inner)).run(state).get
     }
 
-    override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]): BiGrammarToParser.Parser[Result] = {
+    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
       recursive(node).map(result => resetAndRestoreCounter(result))
     }
 

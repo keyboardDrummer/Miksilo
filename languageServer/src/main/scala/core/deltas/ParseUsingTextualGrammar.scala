@@ -3,8 +3,8 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser
 import core.language.node.{Node, SourceRange}
 import core.language.{Compilation, Language}
-import core.parsers.{ParseFailure, ParseResult, ParseSuccess}
-import core.parsers.strings.StringReader
+import core.parsers.ParseFailure
+import core.parsers.strings.{StringParserWriter, StringReader}
 import core.smarts.FileDiagnostic
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition
@@ -12,29 +12,29 @@ import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream
 
-object ParseUsingTextualGrammar extends DeltaWithPhase {
+object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val parser: BiGrammarToParser.Parser[Any] = parserProp.get(compilation)
+    val parser: Parser[Any] = parserProp.get(compilation)
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: ParseResult[StringReader, Any] = parseStream(parser, inputStream)
+    val parseResult: ParseResult[Any] = parseStream(parser, inputStream)
     parseResult match {
-      case success: ParseSuccess[_, _] =>
+      case success: ParseSuccess[_] =>
         compilation.program = success.result.asInstanceOf[Node]
         compilation.program.startOfUri = Some(uri)
-      case failure: ParseFailure[StringReader, _] =>
+      case failure: ParseFailure[_] =>
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
     }
   }
 
-  def parseStream(parser: BiGrammarToParser.Parser[Any], input: InputStream): ParseResult[StringReader, Any] = {
+  def parseStream(parser: Parser[Any], input: InputStream): ParseResult[Any] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }
 
-  val parserProp = new Property[BiGrammarToParser.Parser[Any]](null)
+  val parserProp = new Property[Parser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

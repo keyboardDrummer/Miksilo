@@ -28,11 +28,10 @@ object BiGrammarToParser extends CommonParserWriter {
       case _ => Set.empty[String]
     })
 
-    val valueParser: BiGrammarToParser.Parser[Any] = toParser(grammar, keywords)
-    valueParser
+    toParser(grammar, keywords)
   }
 
-  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any] = {
+  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): Parser[Any] = {
     val cache: mutable.Map[BiGrammar, Parser[Result]] = mutable.Map.empty
     lazy val recursive: BiGrammar => Parser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
