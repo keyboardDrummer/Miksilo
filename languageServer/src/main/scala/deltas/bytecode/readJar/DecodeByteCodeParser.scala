@@ -5,6 +5,8 @@ import java.io.BufferedInputStream
 import core.deltas._
 import core.language.node.Node
 import core.language.{Compilation, Language}
+import core.parsers.bytes.ByteArrayReader
+import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 
@@ -18,14 +20,17 @@ object DecodeByteCodeParser extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val parser = parserProp.get(compilation)
-    val inputStream = compilation.fileSystem.getFile(compilation.rootFile.get)
+    val uri = compilation.rootFile.get
+    val inputStream = compilation.fileSystem.getFile(uri)
     val bis = new BufferedInputStream(inputStream)
     val inputBytes: immutable.Seq[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
-    val parseResult = parser.apply(new ArrayReader(0, inputBytes))
-    if (parseResult.successful)
+    val parseResult: ClassFileParser.ParseResult[Node] = parser(new ByteArrayReader(0, inputBytes))
+    if (parseResult.successful) {
       compilation.program = parseResult.get
-    else
-      compilation.diagnostics ++ List(DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString))
+      compilation.program.startOfUri = Some(uri)
+    } else {
+      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)))
+    }
   }
 
   val parserProp = new Property[ClassFileParser.Parser[Node]]()

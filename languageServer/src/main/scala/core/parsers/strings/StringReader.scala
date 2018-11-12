@@ -12,9 +12,7 @@ case class StringReader(array: Array[Char], offset: Int = 0) extends SequenceInp
   def drop(amount: Int): StringReader = StringReader(array, offset + amount)
   def position = OffsetPosition(array, offset)
 
-  override def finished: Boolean = offset == array.length
-
-  override def atEnd: Boolean = array.length == offset
+  override def atEnd: Boolean = offset == array.length
 
   override def head: Char = array(offset)
 

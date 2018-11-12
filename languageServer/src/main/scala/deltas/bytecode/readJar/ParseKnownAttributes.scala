@@ -3,6 +3,7 @@ package deltas.bytecode.readJar
 import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
+import core.parsers.bytes.ByteArrayReader
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.bytecode.attributes.UnParsedAttribute.UnParsedAttribute
@@ -39,7 +40,7 @@ object ParseKnownAttributes extends DeltaWithPhase {
       node
     })
     val inputBytes = typedNode.data.toArray
-    val parseResult = parser(new ArrayReader(0, inputBytes))
+    val parseResult = parser(new ByteArrayReader(0, inputBytes))
     val newNode = parseResult.get
     typedNode.node.replaceData(newNode)
   }

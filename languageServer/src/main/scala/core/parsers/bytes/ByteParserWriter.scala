@@ -1,17 +1,19 @@
-package deltas.bytecode.readJar
+package core.parsers.bytes
 
 import java.nio.ByteBuffer
 
 import core.language.node.Node
 import deltas.bytecode.constants.Utf8ConstantDelta
 
-trait ByteParsers extends scala.util.parsing.combinator.Parsers {
+import scala.util.parsing.combinator.Parsers
+
+trait ByteParserWriter extends Parsers {
   type Elem = Byte
 
-  val parseUtf8: Parser[Node] = ParseShort.into(length => new ParseString(length)).map(s => Utf8ConstantDelta.create(s))
+  val parseUtf8: Parser[Node] = ParseShort.flatMap(length => new ParseString(length)).map(s => Utf8ConstantDelta.create(s))
   class ParseString(length: Int) extends Parser[String] {
      override def apply(in: Input): ParseResult[String] = {
-       val (bytes, rest) = splitInput(in, length)       
+       val (bytes, rest) = splitInput(in, length)
        Success(new String(bytes.toArray, 0, length, "UTF-8"), rest)
      }
    }

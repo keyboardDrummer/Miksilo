@@ -8,7 +8,6 @@ import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeShape}
 import core.parsers.strings.StringParserWriter
-import core.parsers.{ParseFailure, ParseSuccess}
 import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
 
@@ -32,7 +31,7 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[SequenceElement].replaceWith(value.members)
       case failure: ParseFailure[_] =>
-        val diagnostic = DiagnosticUtil.getDiagnosticFromParseException(failure.message)
+        val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(failure)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }
   }

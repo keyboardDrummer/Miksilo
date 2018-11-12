@@ -21,3 +21,5 @@ case class ElemPredicate[Input <: SequenceInput[Input, Elem], Elem](predicate: E
 }
 
 
+
+

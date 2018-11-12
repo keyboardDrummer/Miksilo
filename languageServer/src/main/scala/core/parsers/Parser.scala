@@ -30,7 +30,7 @@ trait Parser[Input <: ParseInput, +Result] {
     val state = new ParseState(cache)
     parseIteratively(input, state) match {
       case success: ParseSuccess[Result] =>
-        if (success.remainder.finished) success
+        if (success.remainder.atEnd) success
         else {
           val failedSuccess = ParseFailure(Some(success.result), success.remainder, "Did not parse entire input")
           failedSuccess.getBiggest(success.biggestFailure)
@@ -109,7 +109,7 @@ trait Parser[Input <: ParseInput, +Result] {
 
 trait ParseInput {
   def offset: Int
-  def finished: Boolean
+  def atEnd: Boolean
 }
 
 case class ParseNode[Input <: ParseInput](input: Input, parser: Parser[Input, Any])

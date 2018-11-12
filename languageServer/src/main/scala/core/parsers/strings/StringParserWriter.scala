@@ -1,17 +1,16 @@
 package core.parsers.strings
 
 import core.parsers._
-import core.parsers.sequences.ElemPredicate
+import core.parsers.sequences.{ElemPredicate, SequenceParserWriter}
 import langserver.types.Position
 import languageServer.HumanPosition
 
 import scala.util.matching.Regex
 import scala.util.parsing.input.Positional
 
-trait StringParserWriter extends ParserWriter {
+trait StringParserWriter extends SequenceParserWriter {
+  type Elem = Char
   type Input = StringReader
-
-  def elem(predicate: Char => Boolean, kind: String) = new ElemPredicate[Input, Char](predicate, kind)
 
   def position[T <: Positional]: Parser[Position] = new Parser[Position] {
     override def parseNaively(input: Input, state: ParseState): ParseResult[Position] = {
