@@ -1,6 +1,7 @@
 package core.parsers.strings
 
 import core.parsers._
+import core.parsers.sequences.ElemPredicate
 import langserver.types.Position
 import languageServer.HumanPosition
 
@@ -21,7 +22,7 @@ trait StringParserWriter extends ParserWriter {
   }
 
   implicit def literal(value: String): Literal = Literal(value)
-  implicit def regex(value: Regex): RegexFrom = RegexFrom(value)
+  implicit def regex(value: Regex): RegexParser = RegexParser(value)
 }
 
 

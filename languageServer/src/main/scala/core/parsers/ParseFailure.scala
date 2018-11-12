@@ -9,8 +9,7 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
   override def offset: Int = remainder.offset
 
   def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Input, Other] = {
-    val (first, second) = if (offset > other.offset) (this, other) else (other.asInstanceOf[ParseFailure[Input, Result]], this)
-    first //ParseFailure(first.partialResult.orElse(second.partialResult), first.remainder, first.message)
+    if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Input, Result]]
   }
 
   override def get: Result = throw new Exception("get was called on a ParseFailure")

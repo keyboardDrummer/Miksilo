@@ -1,12 +1,9 @@
-package core.parsers
+package core.parsers.sequences
 
-trait SequenceInput[Input, Elem] extends ParseInput {
-  def atEnd: Boolean
-  def head: Elem
-  def tail: Input
-}
+import core.parsers._
 
-case class ElemPredicate[Input <: SequenceInput[Input, Elem], Elem](predicate: Elem => Boolean, kind: String) extends Parser[Input, Elem] {
+case class ElemPredicate[Input <: SequenceInput[Input, Elem], Elem](predicate: Elem => Boolean, kind: String)
+  extends Parser[Input, Elem] {
   override def parseNaively(input: Input, cache: ParseState): ParseResult[Elem] = {
     if (input.atEnd) {
       return ParseFailure(None, input, s"$kind expected but end of source found")
@@ -22,3 +19,5 @@ case class ElemPredicate[Input <: SequenceInput[Input, Elem], Elem](predicate: E
 
   override def getDefault(cache: DefaultCache): Option[Elem] = None
 }
+
+

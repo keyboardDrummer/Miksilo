@@ -12,7 +12,8 @@ trait Parser[Input <: ParseInput, +Result] {
   type ParseFailure[+R] = core.parsers.ParseFailure[Input, R]
 
   /**
-    * When implementing, make sure that when returning a failure, if this Parser's default has a value, then the failure must do so to.
+    * When implementing, make sure that when returning a failure,
+    * if this Parser's default has a value, then the failure must do so to.
     */
   def parseNaively(input: Input, state: ParseState): ParseResult[Result]
   def getDefault(cache: DefaultCache): Option[Result]

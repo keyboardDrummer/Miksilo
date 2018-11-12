@@ -4,7 +4,7 @@ import core.parsers._
 
 import scala.util.matching.Regex
 
-case class RegexFrom(regex: Regex) extends Parser[StringReader, String] {
+case class RegexParser(regex: Regex) extends Parser[StringReader, String] {
   override def parseNaively(inputs: StringReader, cache: ParseState): ParseResult[String] = {
     regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
       case Some(matched) =>

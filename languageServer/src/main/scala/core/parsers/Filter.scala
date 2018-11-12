@@ -6,7 +6,8 @@ case class Filter[Input <: ParseInput, Other, +Result <: Other](original: Parser
       if (predicate(success.result)) success
       else ParseFailure(this.getDefault(state), success.remainder, getMessage(success.result)).getBiggest(success.biggestFailure)
     case failure: ParseFailure[Result] =>
-      ParseFailure(failure.partialResult.filter(predicate), failure.remainder, failure.message)
+      val partialResult = failure.partialResult.filter(predicate).orElse(this.getDefault(state))
+      ParseFailure(partialResult, failure.remainder, failure.message)
   }
 
   override def getDefault(cache: DefaultCache): Option[Result] =
