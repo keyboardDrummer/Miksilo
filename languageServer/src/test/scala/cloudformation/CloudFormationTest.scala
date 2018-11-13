@@ -68,4 +68,21 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     utils.parse(source)
   }
+
+  test("Code completion for property when most of the line is missing") {
+    val program =
+      """{
+        |  "Resources" : {
+        |    "NotificationTopic": {
+        |      "Type": "AWS::SNS::Topic",
+        |      "Properties": {
+        |        "Subsc
+      """.stripMargin
+    val document = openDocument(server, program)
+    val start = new HumanPosition(6, 14)
+    val result = server.complete(DocumentPosition(document, start))
+
+    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("cription"))
+    assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
+  }
 }

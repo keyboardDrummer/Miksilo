@@ -12,30 +12,31 @@ import scala.tools.nsc.interpreter.InputStream
 object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val parser: Parser[Any] = parserProp.get(compilation)
+    val parser = parserProp.get(compilation)
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: ParseResult[Any] = parseStream(parser, inputStream)
+    val parseResult: ParseResult[Node] = parseStream(parser, inputStream)
     parseResult match {
-      case success: ParseSuccess[_] =>
-        compilation.program = success.result.asInstanceOf[Node]
+      case success: ParseSuccess[Node] =>
+        compilation.program = success.result
         compilation.program.startOfUri = Some(uri)
-      case failure: ParseFailure[_] =>
+      case failure: ParseFailure[Node] =>
+        failure.partialResult.foreach(program => compilation.program = program)
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
     }
   }
 
-  def parseStream(parser: Parser[Any], input: InputStream): ParseResult[Any] = {
+  def parseStream[T](parser: Parser[T], input: InputStream): ParseResult[T] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }
 
-  val parserProp = new Property[Parser[Any]](null)
+  val parserProp = new Property[Parser[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, BiGrammarToParser.toParser(language.grammars.root))
+    parserProp.add(language, BiGrammarToParser.toParser(language.grammars.root).map(r => r.asInstanceOf[Node]))
   }
 
   override def description: String = "Parses the input file using a textual grammar."

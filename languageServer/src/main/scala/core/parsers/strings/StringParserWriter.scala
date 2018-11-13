@@ -1,7 +1,7 @@
 package core.parsers.strings
 
 import core.parsers._
-import core.parsers.sequences.{ElemPredicate, SequenceParserWriter}
+import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 import languageServer.HumanPosition
 
@@ -12,17 +12,19 @@ trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input = StringReader
 
-  def position[T <: Positional]: Parser[Position] = new Parser[Position] {
-    override def parseNaively(input: Input, state: ParseState): ParseResult[Position] = {
-      ParseSuccess(new HumanPosition(input.position.line, input.position.column), input, NoFailure)
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Position] = None
-  }
+  def position[T <: Positional]: Parser[Position] = PositionParser
 
   implicit def literal(value: String): Literal = Literal(value)
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 }
 
+object PositionParser extends Parser[StringReader, Position] {
+
+  override def parseNaively(input: StringReader, state: ParseState): ParseResult[Position] = {
+    ParseSuccess(new HumanPosition(input.position.line, input.position.column), input, NoFailure)
+  }
+
+  override def getDefault(cache: DefaultCache): Option[Position] = None
+}
 
 

@@ -24,4 +24,8 @@ case class StringReader(array: Array[Char], offset: Int = 0) extends SequenceInp
     case other: StringReader => offset == other.offset
     case _ => false
   }
+
+  override def toString: String = {
+    array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+  }
 }

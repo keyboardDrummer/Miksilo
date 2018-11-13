@@ -90,7 +90,7 @@ trait Parser[Input <: ParseInput, +Result] {
   def map[NewResult](f: Result => NewResult) = new MapParser(this, f)
   def flatMap[NewResult](f: Result => Parser[NewResult]) = new FlatMap(this, f)
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
-  def withDefault[Other >: Result](_default: Other) = WithDefault(this, _default)
+  def withDefault[Other >: Result](_default: Other): Parser[Other] = WithDefault[Input, Other](this, _default)
 
   def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum) : Parser[Sum] = {
     lazy val result: Parser[Sum] = new Sequence(this, result, reduce).withDefault[Sum](zero) | Return(zero)
