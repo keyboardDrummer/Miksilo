@@ -1,42 +1,37 @@
 package core.deltas
 
 import core.bigrammar.BiGrammarToParser
-import core.language.node.{Node, SourceRange}
+import core.language.node.Node
 import core.language.{Compilation, Language}
+import core.parsers.strings.{StringParserWriter, StringReader}
 import core.smarts.FileDiagnostic
-import langserver.types.{Diagnostic, DiagnosticSeverity}
-import languageServer.HumanPosition
 import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream
-import scala.util.parsing.input.CharArrayReader
 
-object ParseUsingTextualGrammar extends DeltaWithPhase {
+object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val parser: BiGrammarToParser.PackratParser[Any] = parserProp.get(compilation)
+    val parser: Parser[Any] = parserProp.get(compilation)
 
     val uri = compilation.rootFile.get
-    val input = compilation.fileSystem.getFile(uri)
-    val parseResult: BiGrammarToParser.ParseResult[Any] = parseStream(parser, input)
-    if (parseResult.successful) {
-      compilation.program = parseResult.get.asInstanceOf[Node]
-      compilation.program.startOfUri = Some(uri)
+    val inputStream = compilation.fileSystem.getFile(uri)
+    val parseResult: ParseResult[Any] = parseStream(parser, inputStream)
+    parseResult match {
+      case success: ParseSuccess[_] =>
+        compilation.program = success.result.asInstanceOf[Node]
+        compilation.program.startOfUri = Some(uri)
+      case failure: ParseFailure[_] =>
+        compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
     }
-    else
-      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)))
   }
 
-  def parseStream(parser: BiGrammarToParser.PackratParser[Any], input: InputStream): BiGrammarToParser.ParseResult[Any] = {
-    val reader = new CharArrayReader(SourceUtils.streamToString(input).toCharArray)
-    if (reader.source.length() == 0) {
-      ???
-    }
-
-    parser(reader)
+  def parseStream(parser: Parser[Any], input: InputStream): ParseResult[Any] = {
+    val reader = new StringReader(SourceUtils.streamToString(input))
+    parser.parseWholeInput(reader)
   }
 
-  val parserProp = new Property[BiGrammarToParser.PackratParser[Any]](null)
+  val parserProp = new Property[Parser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -48,19 +43,3 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set.empty
 }
 
-object DiagnosticUtil {
-
-  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: ((.|\n)*)\n\n""".r
-  def getDiagnosticFromParseException(message: String): Diagnostic = {
-    try {
-      val messageMatch = rowColumnRegex.findFirstMatchIn(message).get
-      val row = messageMatch.group(1).toInt
-      val column = messageMatch.group(2).toInt
-      Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, messageMatch.group(3))
-
-    } catch
-    {
-      case e: java.util.NoSuchElementException => throw new Exception("Failed to parse message " + message)
-    }
-  }
-}

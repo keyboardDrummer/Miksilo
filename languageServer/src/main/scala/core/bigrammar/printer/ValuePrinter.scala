@@ -2,13 +2,13 @@ package core.bigrammar.printer
 
 import java.util.Objects
 
-import core.bigrammar.WithMapG
+import core.bigrammar.WithMap
 import core.bigrammar.printer.Printer.NodePrinter
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
 class ValuePrinter(value: Any) extends NodePrinter {
-  override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = {
+  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
     if (Objects.equals(value, from.value)) TryState.value(Empty)
     else Printer.fail(ValueDiffers(from.value, value), -100)
   }

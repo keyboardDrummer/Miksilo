@@ -1,8 +1,8 @@
 package util
 
 
-class Cache[T >: Null <: AnyRef](supplier: () => T) {
-  var value: T = null
+class CachedValue[T >: Null <: AnyRef](supplier: () => T) {
+  var value: T = _
 
   def get: T = {
     if (value == null) {

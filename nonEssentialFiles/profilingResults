@@ -1,58 +1,48 @@
-018468ms total, 174.2ms average, for running phases
-009174ms total, 398.9ms average, for Run classfile from Miksilo
-008920ms total, 387.8ms average, for Run classfile from javac
-007714ms total, 137.8ms average, for run Solves the semantic constraints
-006406ms total, 068.1ms average, for build language
-003665ms total, 159.4ms average, for Miksilo compile
-003645ms total, 607.4ms average, for run Decodes a binary bytecode classfile.
-002507ms total, 147.5ms average, for inject trivia inside node
-002381ms total, 125.3ms average, for run Prints the program by generating a pretty printer from its grammar.
-002234ms total, 026.9ms average, for run Parses the input file using a textual grammar.
-001522ms total, 084.5ms average, for inject store trivia
-000638ms total, 318.9ms average, for run Takes the bytecode program and runs it using the JVM.
-000465ms total, 116.3ms average, for run Decompiles the field and method signatures in a classfile.
-000382ms total, 010.9ms average, for run Defines a skeleton for the Java class.
-000223ms total, 003.3ms average, for inject inline constant pool
-000174ms total, 001.8ms average, for inject parse using textual grammar
-000171ms total, 028.6ms average, for run Writes the current program as JVM class file bytes to a function.
-000164ms total, 002.4ms average, for inject labelled locations
-000157ms total, 157.5ms average, for inject cloud formation template
-000126ms total, 003.4ms average, for run Removes the constant pool in favor of inline constant entries
-000114ms total, 002.9ms average, for run Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop.
-000112ms total, 003.0ms average, for run Replaces the jump instructions from bytecode. The new instructions are similar to the old ones except that they use labels as target instead of instruction indices.
-000095ms total, 001.1ms average, for inject byte code skeleton
-000065ms total, 003.6ms average, for inject pretty print
-000062ms total, 001.8ms average, for run Generates the code max stack value for code attributes which is required by the JVM.
-000058ms total, 001.6ms average, for run Generates a stack frame for each label instruction. Stack frames can be used to determine the stack and variable types at a particular instruction.
-000056ms total, 001.6ms average, for run Adds a while loop.
-000034ms total, 001.5ms average, for javac
-000033ms total, 000.9ms average, for run Enables fields to have initializers.
-000031ms total, 000.8ms average, for run Determines which TypeVariables are actually object types.
-000031ms total, 000.7ms average, for run Enables declaring a local and initializing it in one statement.
-000028ms total, 000.8ms average, for run Enables using the non-iterator for loop.
-000026ms total, 000.4ms average, for inject inferred max stack
-000026ms total, 000.3ms average, for inject byte code method info
+019899ms total, 187.7ms average, for running phases
+007885ms total, 342.8ms average, for Run classfile from javac
+007730ms total, 336.1ms average, for Run classfile from Miksilo
+005875ms total, 062.5ms average, for build language
+005627ms total, 100.5ms average, for run Solves the semantic constraints
+005256ms total, 876.0ms average, for run Decodes a binary bytecode classfile.
+003824ms total, 201.3ms average, for run Prints the program by generating a pretty printer from its grammar.
+002928ms total, 172.2ms average, for inject trivia inside node
+002811ms total, 122.2ms average, for Miksilo compile
+002802ms total, 033.8ms average, for run Parses the input file using a textual grammar.
+001427ms total, 079.3ms average, for inject store trivia
+000628ms total, 314.1ms average, for run Takes the bytecode program and runs it using the JVM.
+000475ms total, 118.9ms average, for run Decompiles the field and method signatures in a classfile.
+000365ms total, 010.4ms average, for run Defines a skeleton for the Java class.
+000158ms total, 002.4ms average, for inject inline constant pool
+000143ms total, 001.5ms average, for inject parse using textual grammar
+000102ms total, 002.8ms average, for run Removes the constant pool in favor of inline constant entries
+000100ms total, 016.6ms average, for run Writes the current program as JVM class file bytes to a function.
+000098ms total, 002.6ms average, for run Enables fields to have initializers.
+000093ms total, 002.3ms average, for run Optimizes a bytecode program by removing instructions in cases where an instructions output will always be consumed by a pop.
+000084ms total, 084.2ms average, for inject cloud formation template
+000078ms total, 001.2ms average, for inject labelled locations
+000067ms total, 003.7ms average, for inject pretty print
+000067ms total, 001.8ms average, for run Replaces the jump instructions from bytecode. The new instructions are similar to the old ones except that they use labels as target instead of instruction indices.
+000053ms total, 001.5ms average, for run Compiles the if-then-else into if-then and goto.
+000050ms total, 001.4ms average, for run Generates a stack frame for each label instruction. Stack frames can be used to determine the stack and variable types at a particular instruction.
+000049ms total, 001.4ms average, for run Adds a while loop.
+000048ms total, 001.3ms average, for run Determines which TypeVariables are actually object types.
+000043ms total, 008.6ms average, for run In the initial parsing of bytecode, the attributes are not parsed. This phase parses the attributes, but only if the attribute type is known by the compiler.
+000028ms total, 000.8ms average, for run Add proper C-style for-loop continue semantics.
+000028ms total, 000.8ms average, for run Generates the code max stack value for code attributes which is required by the JVM.
 000026ms total, 000.6ms average, for run Implicitly prefixes references to private methods with the 'this' qualified if it is missing.
-000025ms total, 000.7ms average, for run Combines instructions to reduce the instruction count. Applies mostly to custom instructions related to comparison operations, followed by a jumps.
-000025ms total, 000.3ms average, for inject type abstraction
-000023ms total, 000.5ms average, for run Defines the += operator.
-000022ms total, 000.3ms average, for inject code attribute
-000022ms total, 000.6ms average, for run Add proper C-style for-loop continue semantics.
-000021ms total, 000.3ms average, for inject stack map table attribute
-000020ms total, 000.1ms average, for inject method type
-000020ms total, 000.2ms average, for inject method
-000018ms total, 003.6ms average, for run In the initial parsing of bytecode, the attributes are not parsed. This phase parses the attributes, but only if the attribute type is known by the compiler.
-000018ms total, 000.5ms average, for run Replaces unqualified type references with qualified ones.
-000017ms total, 000.5ms average, for run Compiles the if-then-else into if-then and goto.
-000017ms total, 000.5ms average, for run Moves the control flow to the start of the while loop.
-000016ms total, 000.2ms average, for inject type application
-000016ms total, 000.4ms average, for run Adds the break statement to the language
-000014ms total, 000.2ms average, for inject qualified object type
-000014ms total, 000.2ms average, for inject byte code field info
-000013ms total, 000.4ms average, for run Defines a phase where custom bytecode instructions can expand into one or several actual bytecode instructions.
-000012ms total, 000.2ms average, for inject greater than instruction
-000012ms total, 000.2ms average, for inject java class skeleton
-000011ms total, 000.1ms average, for inject call static or instance
-000011ms total, 000.3ms average, for run At the start of a constructor body, if no call to a super constructor is present, such a call is added.
-000010ms total, 000.1ms average, for inject signature attribute
-000010ms total, 000.1ms average, for inject short type
+000024ms total, 000.3ms average, for inject byte code skeleton
+000022ms total, 000.6ms average, for run Moves the control flow to the start of the while loop.
+000020ms total, 000.4ms average, for run Enables declaring a local and initializing it in one statement.
+000020ms total, 000.6ms average, for run Enables using the non-iterator for loop.
+000017ms total, 000.4ms average, for run Defines the += operator.
+000016ms total, 000.2ms average, for inject stack map table attribute
+000016ms total, 000.2ms average, for inject method type constant
+000016ms total, 000.5ms average, for run Replaces unqualified type references with qualified ones.
+000016ms total, 000.1ms average, for inject method type
+000015ms total, 000.2ms average, for inject byte code method info
+000015ms total, 000.1ms average, for inject method
+000015ms total, 000.4ms average, for run Adds the break statement to the language
+000014ms total, 000.2ms average, for inject inferred max stack
+000013ms total, 000.1ms average, for inject type abstraction
+000012ms total, 000.3ms average, for run Combines instructions to reduce the instruction count. Applies mostly to custom instructions related to comparison operations, followed by a jumps.
+000011ms total, 000.5ms average, for javac

@@ -1,9 +1,10 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.PrintBiGrammar.withParenthesis
-import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMapG}
 import core.bigrammar.printer.AsPrinter
 import core.bigrammar.printer.Printer.NodePrinter
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.language.node.{NodeField, SourceRange}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -19,15 +20,19 @@ case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new AsPrinter(recursive(inner), field)
 
-  override def toParser(recursive: BiGrammar => Parser): Parser = {
-
+  override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
     val innerParser = recursive(inner)
     for {
-      start <- BiGrammarToParser.position
+      start <- position
       inner <- innerParser
-      end <- BiGrammarToParser.position
-    } yield inner.map { case WithMapG(v, state) => WithMapG(inner, state +
-      (field -> v) +
-      (FieldPosition(field) -> SourceRange(start, end))) }
+      end <- position
+    } yield {
+      inner.map { case WithMap(value, state) =>
+        val map = state +
+          (field -> value) +
+          (FieldPosition(field) -> SourceRange(start, end))
+        WithMap(inner, map)
+      }
+    }
   }
 }

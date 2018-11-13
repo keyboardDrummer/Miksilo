@@ -5,13 +5,13 @@ import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
-import core.language.node.{GrammarKey}
+import core.language.node.GrammarKey
+import core.parsers.ParseResult
+import core.parsers.strings.StringReader
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
-
-import scala.util.parsing.input.CharArrayReader
 
 
 case class StringKey(value: String) extends GrammarKey
@@ -40,10 +40,9 @@ object TestGrammarUtils extends FunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar) = {
-    val packratParser = BiGrammarToParser.toParser(grammarDocument)
-    val parseResult = packratParser(new CharArrayReader(example.toCharArray))
-    parseResult
+  def parse(example: String, grammarDocument: BiGrammar): ParseResult[_, Any] = {
+    val parser = BiGrammarToParser.toParser(grammarDocument)
+    parser.parseWholeInput(new StringReader(example))
   }
 }
 

@@ -19,10 +19,12 @@ class TestClassFileDecompiler extends FunSuite {
   test("TypeVariableSimilarToBooleanSignature") {
     val signature = "<B:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/lang/Class<TB;>;Ljava/lang/String;Ljava/lang/String;)Lcom/sun/xml/internal/bind/api/RawAccessor<TB;TV;>;"
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.language
+    val language = compiler.language
 
-    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar))
-    val result = parser(signature).get.asInstanceOf[Node]
+    val grammar = language.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar)
+    val parser = BiGrammarToParser.toStringParser(grammar)
+    val parseResult = parser(signature)
+    val result = parseResult.get.asInstanceOf[Node]
   }
 
   test("TypeVariable") {

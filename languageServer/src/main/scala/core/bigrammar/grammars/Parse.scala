@@ -1,8 +1,9 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, WithMapG}
+import core.bigrammar.{BiGrammar, WithMap}
 import core.document.{Empty, Text}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -16,8 +17,8 @@ case class Parse(grammar: BiGrammar) extends CustomGrammar {
   override def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument = Text("Parse") ~ toDocumentInner(grammar)
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new NodePrinter() {
-    override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = TryState.value(Empty)
+    override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = TryState.value(Empty)
   }
 
-  override def toParser(recursive: BiGrammar => Parser): Parser = recursive(grammar)
+  override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = recursive(grammar)
 }

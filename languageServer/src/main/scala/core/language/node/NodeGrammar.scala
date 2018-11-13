@@ -1,9 +1,9 @@
 package core.language.node
 
-import core.bigrammar.BiGrammarToParser.WithMap
+import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar.grammars.{FieldPosition, MapGrammarWithMap}
 import core.bigrammar.printer.UndefinedDestructuringValue
-import core.bigrammar.{BiGrammar, WithMapG}
+import core.bigrammar.{BiGrammar, WithMap}
 
 class NodeGrammar(inner: BiGrammar, val key: NodeShape)
   extends MapGrammarWithMap(inner,
@@ -16,7 +16,7 @@ class NodeGrammar(inner: BiGrammar, val key: NodeShape)
 object NodeGrammar {
 
   //noinspection ComparingUnrelatedTypes
-  def destruct(withMap: WithMapG[Any], shape: NodeShape): Option[WithMapG[Any]] = {
+  def destruct(withMap: WithMap[Any], shape: NodeShape): Option[WithMap[Any]] = {
     val value = withMap.value
     if (!value.isInstanceOf[NodeLike])
       return None
@@ -25,7 +25,7 @@ object NodeGrammar {
 
     if (node.shape == shape) {
       val dataViewAsGenericMap = node.dataView.map(t => (t._1.asInstanceOf[Any], t._2))
-      Some(WithMapG(UndefinedDestructuringValue, dataViewAsGenericMap))
+      Some(WithMap(UndefinedDestructuringValue, dataViewAsGenericMap))
     }
     else {
       None
@@ -34,10 +34,10 @@ object NodeGrammar {
 
   case class ValueNotFound(meta: NodeLike, field: Any)
 
-  def construct(withMap: WithMap, key: NodeShape): WithMap = {
+  def construct(withMap: AnyWithMap, key: NodeShape): AnyWithMap = {
     val result = new Node(key)
     result.data ++= withMap.map.collect { case (k: NodeField,v) => (k,v) }
     result.sources ++= withMap.map.collect { case (k: FieldPosition,v) => (k.field,v.asInstanceOf[SourceRange]) }
-    WithMapG(result, Map.empty)
+    WithMap(result, Map.empty)
   }
 }

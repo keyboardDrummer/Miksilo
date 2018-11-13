@@ -1,15 +1,13 @@
 package deltas.bytecode.readJar
 
 import core.language.node.Node
+import core.parsers.bytes.ByteParserWriter
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.constants._
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 import deltas.javac.classes.ConstantPool
 
-import scala.util.parsing.combinator.PackratParsers
-import scala.util.parsing.input.Reader
-
-object ClassFileParser extends ByteParsers with PackratParsers {
+object ClassFileParser extends ByteParserWriter {
 
   def classFileParser: Parser[Node] = {
     for {

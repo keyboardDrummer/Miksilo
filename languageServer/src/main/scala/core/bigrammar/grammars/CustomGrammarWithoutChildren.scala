@@ -1,8 +1,9 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.printer.Printer.NodePrinter
-import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.parsers.CommonParserWriter
 
-trait CustomGrammarWithoutChildren extends BiGrammar with NodePrinter {
-  def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Parser[Any]
+trait CustomGrammarWithoutChildren extends BiGrammar with NodePrinter with CommonParserWriter {
+  def getParser(keywords: scala.collection.Set[String]): Parser[Any]
 }

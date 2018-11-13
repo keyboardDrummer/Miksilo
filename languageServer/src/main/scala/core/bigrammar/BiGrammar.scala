@@ -1,8 +1,8 @@
 package core.bigrammar
 
-import core.bigrammar.grammars._
-import core.language.node.GrammarKey
+import core.bigrammar.grammars.{Choice, Labelled, LeftRight, MapGrammar}
 import core.document.WhiteSpace
+import core.language.node.GrammarKey
 import util.{GraphBasics, Utility}
 
 import scala.reflect.ClassTag
@@ -14,7 +14,8 @@ object BiGrammar {
 /*
 A grammar that maps to both a parser and a printer
  */
-trait BiGrammar extends BiGrammarWriter {
+trait BiGrammar {
+  import BiGrammarWriter._
 
   override def toString: String = PrintBiGrammar.toDocument(this).renderString(trim = false)
 
@@ -49,7 +50,7 @@ trait BiGrammar extends BiGrammarWriter {
       reference.asInstanceOf[Labelled].inner = result.asInstanceOf[Labelled].inner
     }
 
-    override def handleGrammar(self: BiGrammar, children: Seq[BiGrammar], recursive: (BiGrammar) => BiGrammar): BiGrammar = self.withChildren(children)
+    override def handleGrammar(self: BiGrammar, children: Seq[BiGrammar], recursive: BiGrammar => BiGrammar): BiGrammar = self.withChildren(children)
   }.observe(this)
 
   def deepClone: BiGrammar = deepMap(x => x)

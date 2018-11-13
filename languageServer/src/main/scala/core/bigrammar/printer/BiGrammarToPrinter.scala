@@ -10,7 +10,7 @@ import scala.collection.mutable
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(WithMapG(outerValue, Map.empty)).run(Map.empty).get._2
+    printer.write(WithMap(outerValue, Map.empty)).run(Map.empty).get._2
   }
 }
 
@@ -57,7 +57,7 @@ class BiGrammarToPrinter {
   class RedirectingPrinter(labelled: Labelled) extends NodePrinter {
     var inner: NodePrinter = _
 
-    override def write(from: WithMapG[Any]): TryState[ResponsiveDocument] = inner.write(from)
+    override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = inner.write(from)
 
     override def toString: String = labelled.toString
   }
