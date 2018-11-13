@@ -29,7 +29,7 @@ object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
   object Grammar extends GrammarKey
   object BodyGrammar extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import core.bigrammar.BasicSequenceCombinators._
+    import core.bigrammar.DefaultBiGrammarWriter._
 
     val directiveGrammar = Keyword("`") ~> grammars.create(BodyGrammar)
     grammars.find(VerilogFileDelta.Members).addAlternative(grammars.create(Grammar, directiveGrammar))

@@ -48,7 +48,7 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
   override def shape: NodeShape = Shape
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import core.bigrammar.BasicSequenceCombinators._
+    import core.bigrammar.DefaultBiGrammarWriter._
 
     val grammar = "include" ~ ParseWhiteSpace ~~> StringLiteral.as(FileName).asNode(Shape)
     grammars.find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)

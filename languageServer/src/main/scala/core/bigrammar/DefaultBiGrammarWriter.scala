@@ -2,7 +2,10 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 
-object BasicSequenceCombinators {
+object DefaultBiGrammarWriter extends DefaultBiGrammarWriter
+
+trait DefaultBiGrammarWriter extends BiGrammarWriter {
+
   implicit def stringToAstGrammar(value: String): BiGrammarExtension =
     new BiGrammarExtension(BiGrammarWriter.stringToGrammar(value))
   implicit def grammarToAstGrammar(value: BiGrammar): BiGrammarExtension = new BiGrammarExtension(value)

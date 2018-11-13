@@ -46,15 +46,16 @@ object BiGrammarToParser extends CommonParserWriter {
       case sequence: core.bigrammar.grammars.Sequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = new core.parsers.Sequence(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
-          val result: Result = (state: State) => {
-            val firstMap = firstResult(state)
-            val secondMap = secondResult(firstMap._1)
-            val resultValue = (firstMap._2.value, secondMap._2.value)
-            val resultMap = firstMap._2.map ++ secondMap._2.map
-            (secondMap._1, WithMap[Any](resultValue, resultMap)): (State, WithMap[Any])
+        val parser = new core.parsers.Sequence[Input, Result, Result, Result](firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
+          new StateFull[AnyWithMap] {
+            def run(state: State): (State, WithMap[Any]) = {
+              val firstMap = firstResult(state)
+              val secondMap = secondResult(firstMap._1)
+              val resultValue = sequence.combine(firstMap._2.value, secondMap._2.value)
+              val resultMap = firstMap._2.map ++ secondMap._2.map
+              (secondMap._1, WithMap[Any](resultValue, resultMap)): (State, WithMap[Any])
+            }
           }
-          result
         })
         parser
       case choice: Choice =>

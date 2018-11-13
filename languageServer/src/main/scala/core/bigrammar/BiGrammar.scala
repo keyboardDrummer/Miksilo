@@ -38,7 +38,8 @@ trait BiGrammar {
     mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))
 
   def mapSome[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => Option[T]): BiGrammar =
-    new MapGrammar(this, value => afterParsing(value.asInstanceOf[T]),
+    new MapGrammar(this,
+      value => afterParsing(value.asInstanceOf[T]),
       value => Utility.cast[U](value).flatMap(value => beforePrinting(value)))
 
   def children: Seq[BiGrammar]

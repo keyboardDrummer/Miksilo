@@ -7,6 +7,7 @@ import core.responsiveDocument.ResponsiveDocument
 import scala.language.implicitConversions
 
 object BiGrammarWriter extends BiGrammarWriter
+
 trait BiGrammarWriter {
 
   def identifier: BiGrammar = Identifier()
