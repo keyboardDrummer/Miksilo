@@ -17,9 +17,8 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
               addFailure(leftSuccess.biggestFailure.map(l => combine(l, rightSuccess.result)))
 
           case rightFailure: ParseFailure[Right] =>
-            val maybeRightDefault = right.getDefault(state)
-            if (leftSuccess.biggestFailure.offset > rightFailure.offset && maybeRightDefault.nonEmpty) {
-              val rightDefault = maybeRightDefault.get
+            if (leftSuccess.biggestFailure.offset > rightFailure.offset && rightFailure.partialResult.nonEmpty) {
+              val rightDefault = rightFailure.partialResult.get
               leftSuccess.biggestFailure.map(l => combine(l, rightDefault)).asInstanceOf[ParseFailure[Result]]
             }
             else {

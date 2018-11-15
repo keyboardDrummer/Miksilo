@@ -43,10 +43,14 @@ object CloudFormationTemplate extends Delta {
         val typeDeclaration = builder.resolve(resourceType, typeString.getMember(JsonStringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
 
-        val properties: ObjectLiteral[NodePath] = resourceMembers.getValue("Properties")
-        for(property <- properties.members) {
-          builder.resolveToType(property.key, property.node.getMember(MemberKey), typeScope, propertyType)
-        }
+        resourceMembers.get("Properties").foreach(_properties => {
+          if (_properties.shape == JsonObjectLiteralDelta.Shape) {
+            val properties: ObjectLiteral[NodePath] = _properties
+            for(property <- properties.members) {
+              builder.resolveToType(property.key, property.node.getMember(MemberKey), typeScope, propertyType)
+            }
+          }
+        })
       }
 
       program.visitShape(MemberShape, (_member: NodePath) => {
@@ -67,9 +71,13 @@ object CloudFormationTemplate extends Delta {
   }
 
   private def addParameters(builder: ConstraintBuilder, universe: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
-    val parameters: ObjectLiteral[NodePath] = program.getValue("Parameters")
-    for (parameter <- parameters.members) {
-      builder.declare(parameter.key, universe, parameter.node.getMember(MemberKey), Some(valueType))
+    program.get("Parameters") match {
+      case Some(_parameters) =>
+        val parameters: ObjectLiteral[NodePath] = _parameters
+        for (parameter <- parameters.members) {
+          builder.declare(parameter.key, universe, parameter.node.getMember(MemberKey), Some(valueType))
+        }
+      case None =>
     }
   }
 

@@ -24,8 +24,8 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val keyGrammar = "\"" ~> RegexGrammar(JsonStringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\""
-    val member = keyGrammar ~ ":" ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val inner = "{" % (member.manySeparatedVertical(",").as(Members) ~ Parse(Keyword(",") | value(Unit))).indent() % "}"
+    val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
+    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
@@ -50,7 +50,8 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
   }
 
   implicit class ObjectLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def getValue(key: String): T = members.find(member => member.key == key).get.value
+    def getValue(key: String): T = get(key).get
+    def get(key: String): Option[T] = members.find(member => member.key == key).map(x => x.value)
     def members: Seq[ObjectLiteralMember[T]] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[T]])
   }
 }

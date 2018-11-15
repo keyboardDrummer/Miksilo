@@ -11,8 +11,8 @@ trait Sequence extends BiGrammar with Layout {
 
   def combine(firstValue: Any, secondValue: Any): Any
 
-  val skip = (a: Any, b: Any) => b
-  val const = (a: Any, b: Any) => a
+  private def skip = (a: Any, b: Any) => b
+  private def const = (a: Any, b: Any) => a
   def const(a: Any, b: Any): Any = a
   def ignoreLeft: Sequence = {
     withCombine(skip)

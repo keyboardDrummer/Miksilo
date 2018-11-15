@@ -76,7 +76,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |    "NotificationTopic": {
         |      "Type": "AWS::SNS::Topic",
         |      "Properties": {
-        |        "Subsc
+        |        "Subsc"
       """.stripMargin
     val document = openDocument(server, program)
     val start = new HumanPosition(6, 14)

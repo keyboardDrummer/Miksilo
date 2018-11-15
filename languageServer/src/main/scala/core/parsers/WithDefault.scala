@@ -9,5 +9,6 @@ case class WithDefault[Input <: ParseInput, +Result](original: Parser[Input, Res
     }
   }
 
-  override def getDefault(cache: DefaultCache): Option[Result] = Some(_default)
+  override def getDefault(cache: DefaultCache): Option[Result] =
+    Some(_default)
 }

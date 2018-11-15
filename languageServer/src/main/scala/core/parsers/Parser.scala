@@ -88,6 +88,7 @@ trait Parser[Input <: ParseInput, +Result] {
   def |[Other >: Result](other: => Parser[Other]) = new OrElse[Input, Result, Other, Other](this, other)
   def |||[Other >: Result](other: => Parser[Other]) = new BiggestOfTwo[Input, Result, Other, Other](this, other)
   def map[NewResult](f: Result => NewResult) = new MapParser(this, f)
+  def option: Parser[Option[Result]] = this.map(x => Some(x)) | Return[Input, Option[Result]](None)
   def flatMap[NewResult](f: Result => Parser[NewResult]) = new FlatMap(this, f)
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
   def withDefault[Other >: Result](_default: Other): Parser[Other] = WithDefault[Input, Other](this, _default)

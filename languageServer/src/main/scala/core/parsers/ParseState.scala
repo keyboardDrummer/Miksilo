@@ -47,9 +47,14 @@ class DefaultCache {
   var values = mutable.Map.empty[Parser[_, _], Option[_]]
 
   def apply[Result](parser: Parser[_, Result]): Option[Result] = {
-    values.getOrElseUpdate(parser, {
-      values.put(parser, None)
-      parser.getDefault(this)
-    }).asInstanceOf[Option[Result]]
+    values.get(parser) match {
+      case Some(v) =>
+        v.asInstanceOf[Option[Result]]
+      case None =>
+        values.put(parser, None)
+        val value = parser.getDefault(this)
+        values.put(parser, value)
+        value
+    }
   }
 }

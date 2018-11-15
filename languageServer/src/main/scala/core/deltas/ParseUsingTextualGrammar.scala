@@ -22,7 +22,10 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
         compilation.program = success.result
         compilation.program.startOfUri = Some(uri)
       case failure: ParseFailure[Node] =>
-        failure.partialResult.foreach(program => compilation.program = program)
+        failure.partialResult.foreach(program => {
+          compilation.program = program
+          compilation.program.startOfUri = Some(uri)
+        })
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
     }
   }

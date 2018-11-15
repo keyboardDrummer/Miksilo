@@ -60,20 +60,26 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getSourceElement(position: FilePosition): SourceElement = {
-    def getForNode(node: NodePath): SourceElement = {
-      val childPositions = node.dataView.flatMap(kv => {
-        val value = kv._2
-        val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
-        if (childPaths.isEmpty) {
-          Seq(node.getMember(kv._1))
-        } else {
-          childPaths.map(child => getForNode(child))
-        }
-      })
-      val childPosition = childPositions.find(kv => kv.fileRange.exists(r => r.contains(position)))
-      childPosition.fold[SourceElement](node)(x => x)
-    }
-    getForNode(getCompilation.root)
+    getSourceElementForNode(getCompilation.root, position).get
+  }
+
+  def getSourceElementForNode(path:NodePath,filePosition:FilePosition):Option[SourceElement]={
+//    val nodeIsInsideOtherFile = path.current.startOfUri match{
+//      case Some(uri) => filePosition.uri != uri
+//      case None =>false
+//    }
+//    if(nodeIsInsideOtherFile)
+//      return None
+
+    if(!path.position.exists(range=>range.contains(filePosition.position)))
+      return None
+
+    val childResults=path.dataView.values.flatMap(fieldValue=>{
+      val childrenForField=NodeLike.getNodeLikesFromValue[NodePath](fieldValue)
+      childrenForField.flatMap(child=>getSourceElementForNode(child,filePosition).toSeq)
+    })
+
+    Some(childResults.headOption.getOrElse(path))
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
