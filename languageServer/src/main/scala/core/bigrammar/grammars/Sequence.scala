@@ -2,6 +2,13 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
+object Sequence {
+
+  def ignoreLeft: (Any, Any) => Any = (a: Any, b: Any) => b
+  def ignoreRight: (Any, Any) => Any = (a: Any, b: Any) => a
+
+}
+
 trait Sequence extends BiGrammar with Layout {
   def first: BiGrammar
   def first_=(value: BiGrammar): Unit
@@ -10,17 +17,6 @@ trait Sequence extends BiGrammar with Layout {
   def second_=(value: BiGrammar): Unit
 
   def combine(firstValue: Any, secondValue: Any): Any
-
-  private def skip = (a: Any, b: Any) => b
-  private def const = (a: Any, b: Any) => a
-  def const(a: Any, b: Any): Any = a
-  def ignoreLeft: Sequence = {
-    withCombine(skip)
-  }
-
-  def ignoreRight: Sequence = withCombine(const)
-
-  def withCombine(combine: (Any, Any) => Any): Sequence
 
   override def children = Seq(first, second)
 

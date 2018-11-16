@@ -4,8 +4,8 @@ import core.bigrammar.grammars._
 
 trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {
 
-  def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
-    if (grammar.containsParser()) new WithTrivia(grammar, new ManyHorizontal(ParseWhiteSpace), horizontal) else grammar
+  def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true): BiGrammar =
+    if (grammar.containsParser()) WithTrivia.withTrivia(grammar, new ManyHorizontal(ParseWhiteSpace), horizontal) else grammar
 
   implicit def stringAsGrammar(value: String): BiGrammarExtension = new BiGrammarExtension(value)
   implicit class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {

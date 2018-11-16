@@ -18,7 +18,7 @@ class LanguageGrammars extends GrammarCatalogue {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new LeftRight(bodyGrammar, trivia)), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
+  create(ProgramGrammar, WithTrivia.withTrivia(new LeftRight(bodyGrammar, trivia, Sequence.ignoreRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
   def root: Labelled = find(ProgramGrammar)
 
@@ -30,7 +30,7 @@ class LanguageGrammars extends GrammarCatalogue {
     with BiGrammarSequenceCombinatorsExtension
   {
     def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
-      if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
+      if (grammar.containsParser()) WithTrivia.withTrivia(grammar, grammars.trivia, horizontal) else grammar
 
     def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 

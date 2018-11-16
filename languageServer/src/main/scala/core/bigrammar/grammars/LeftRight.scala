@@ -10,6 +10,4 @@ class LeftRight(var first: BiGrammar, var second: BiGrammar,
   override def withChildren(newChildren: Seq[BiGrammar]) = new LeftRight(newChildren(0), newChildren(1), combine)
 
   override def combine(firstValue: Any, secondValue: Any): Any = combineValue(firstValue, secondValue)
-
-  override def withCombine(combine: (Any, Any) => Any): Sequence = new LeftRight(first, second, combine)
 }

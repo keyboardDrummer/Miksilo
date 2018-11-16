@@ -43,12 +43,6 @@ object PrintBiGrammar {
     case NumberGrammar => "number"
     case StringLiteral => "string"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
-    case ignore: IgnoreLeft =>
-      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
-      toDocumentInner(sequenceLike.first) ~ "~>" ~ toDocumentInner(sequenceLike.second)
-    case ignore: IgnoreRight =>
-      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
-      toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
     case map: MapGrammarWithMap => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
     case custom: CustomGrammar => custom.print(toDocumentInner)

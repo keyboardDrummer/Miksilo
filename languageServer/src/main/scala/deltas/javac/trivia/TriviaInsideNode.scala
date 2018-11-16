@@ -17,15 +17,15 @@ object TriviaInsideNode extends DeltaWithGrammar {
     val descendants = grammars.root.descendants
     for(path <- descendants)
     {
-      path.value match {
-        case trivia: WithTrivia =>
+      WithTrivia.getWithTrivia(path.value, grammars.trivia) match {
+        case Some(trivia) =>
           if (!visited.contains(path.value)) {
             visited += path.value
 
-            val grammar = trivia.getGrammar
+            val grammar = trivia.second
             if (hasLeftNode(new RootGrammar(grammar))) {
-              path.set(trivia.getGrammar)
-              injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
+              path.set(trivia.second)
+              injectTrivia(grammars, path, trivia.isInstanceOf[LeftRight])
             }
           }
         case _ =>
@@ -39,6 +39,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
+    if (WithTrivia.getWithTrivia(grammar.value, grammars.trivia).nonEmpty)
+      return //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
+
     grammar.value match {
       case sequence: Sequence =>
         val left = sequence.getLeftChildren.drop(1).head
@@ -51,7 +54,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
       case _:Choice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
-      case _:WithTrivia => //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
       case _:BiFailure =>
       case _ =>
         if (grammar.children.length == 1)
@@ -61,8 +63,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser()) {
-      grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
+    if (WithTrivia.getWithTrivia(grammar.value, grammars.trivia).isEmpty && grammar.value.containsParser()) {
+      grammar.set(WithTrivia.withTrivia(grammar.value, grammars.trivia, horizontal))
     }
   }
 

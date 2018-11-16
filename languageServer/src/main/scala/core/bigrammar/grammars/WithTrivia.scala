@@ -2,11 +2,16 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
-class WithTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true)
-  extends IgnoreLeft(if (horizontal) new LeftRight(trivia, grammar) else new TopBottom(trivia, grammar)) {
-  def getGrammar = sequence.second
+object WithTrivia {
+  def withTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true): BiGrammar = {
+    if (horizontal) new LeftRight(trivia, grammar, Sequence.ignoreLeft)
+    else new TopBottom(trivia, grammar, Sequence.ignoreLeft)
+  }
 
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
-
-  override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]) = recursive(grammar) //TODO maybe if we can remove all the WithTrivia's first in TriviaInsideNode we wouldn't need this hack.
+  def getWithTrivia(grammar: BiGrammar, trivia: BiGrammar): Option[Sequence] = {
+    grammar match {
+      case sequence: Sequence if sequence.second == trivia => Some(sequence)
+      case _ => None
+    }
+  }
 }

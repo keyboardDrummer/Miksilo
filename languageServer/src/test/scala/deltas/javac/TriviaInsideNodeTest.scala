@@ -45,7 +45,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
     language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
     TriviaInsideNode.transformGrammars(grammars, new Language())
-    val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
+    val expectedParentGrammar = WithTrivia.withTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
 
@@ -68,15 +68,15 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     expressionGrammar.addAlternative(additionGrammar)
 
     grammars.find(BodyGrammar).inner = expressionGrammar
-    val expectedBeforeAdditionGrammar = new LeftRight(expressionGrammar.as(Left), new WithTrivia(new LeftRight("+",
-      new WithTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
+    val expectedBeforeAdditionGrammar = new LeftRight(expressionGrammar.as(Left), WithTrivia.withTrivia(new LeftRight("+",
+      WithTrivia.withTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
     val expectedBeforeNumberGrammar = (number : BiGrammar).as(Value)
     assertResult(expectedBeforeAdditionGrammar.toString)(additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult(expectedBeforeNumberGrammar.toString)(numberGrammar.inner.toString) //TODO use actual equality instead of toString
     TriviaInsideNode.transformGrammars(grammars, language)
 
     val expectedAdditionGrammar = expressionGrammar.as(Left) ~ new LeftRight("+", expressionGrammar.as(Right))
-    val expectedNumberGrammar = new WithTrivia((number : BiGrammar).as(Value), grammars.trivia)
+    val expectedNumberGrammar = WithTrivia.withTrivia((number : BiGrammar).as(Value), grammars.trivia)
     assertResult("1" + expectedAdditionGrammar.toString)("1" + additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult("2" + expectedNumberGrammar.toString)("2" + numberGrammar.inner.toString) //TODO use actual equality instead of toString
   }

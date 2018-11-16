@@ -12,7 +12,5 @@ class TopBottom(var first: BiGrammar, var second: BiGrammar,
 
   override def withChildren(newChildren: Seq[BiGrammar]) = new TopBottom(newChildren(0), newChildren(1), combine)
 
-  override def withCombine(combine: (Any, Any) => Any): Sequence = new TopBottom(first, second, combine)
-
   override def combine(firstValue: Any, secondValue: Any): Any = this.combineValue(firstValue, secondValue)
 }
