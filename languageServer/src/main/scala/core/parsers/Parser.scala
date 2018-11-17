@@ -57,7 +57,7 @@ trait Parser[Input <: ParseInput, +Result] {
         state.withNodeOnStack(node, () => {
           var result = parseNaively(input, state)
           result match {
-            case success: ParseSuccess[Result] if state.nodesWithBackEdges.contains(this) =>
+            case success: ParseSuccess[Result] if state.parsersWithBackEdges.contains(this) =>
               result = growResult(node, success, state)
             case _ =>
           }

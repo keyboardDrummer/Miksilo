@@ -11,11 +11,12 @@ trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {
   implicit class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, horizontal = false))
 
-    def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
+    def leftRight(other: BiGrammar, combine: (Any, Any) => Any) = new LeftRight(grammar, addTriviaIfUseful(other), combine)
 
     def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 
-    def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, horizontal = false))
+    def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any) =
+      new TopBottom(grammar, addTriviaIfUseful(bottom, horizontal = false), combine)
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension = new BiGrammarExtension(grammar)
   }

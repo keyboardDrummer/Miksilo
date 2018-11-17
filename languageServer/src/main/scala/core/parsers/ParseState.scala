@@ -11,7 +11,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
   val callStackSet = mutable.HashSet[ParseNode[Input]]()
   val callStack = mutable.Stack[Parser[Input, _]]()
   var parsersPartOfACycle: Set[Parser[Input, _]] = Set.empty
-  val nodesWithBackEdges = mutable.HashSet[Parser[Input, _]]() //TODO possible this can be only the parsers.
+  val parsersWithBackEdges = mutable.HashSet[Parser[Input, _]]() //TODO possible this can be only the parsers.
 
   def putIntermediate(key: ParseNode[Input], value: ParseResult[Input, Any]): Unit = {
     recursionIntermediates.put(key, value)
@@ -23,7 +23,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
 
   def getPreviousResult[Result](node: ParseNode[Input]): Option[ParseResult[Input, Result]] = {
     if (callStackSet.contains(node)) {
-      nodesWithBackEdges.add(node.parser)
+      parsersWithBackEdges.add(node.parser)
       val index = callStack.indexOf(node.parser)
       parsersPartOfACycle ++= callStack.take(index + 1)
       return Some(recursionIntermediates.getOrElse(node,

@@ -7,14 +7,24 @@ import core.language.node.Node
 trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def grammar: BiGrammar
-  def %(bottom: BiGrammar): Sequence
-  def ~(other: BiGrammar): Sequence
+  def topBottom(other: BiGrammar, combine: (Any, Any) => Any): TopBottom
+  def leftRight(other: BiGrammar, combine: (Any, Any) => Any): LeftRight
+  def ~(other: BiGrammar) = leftRight(other, (a: Any,b: Any) => (a,b))
+  def %(other: BiGrammar) = topBottom(other, (a: Any,b: Any) => (a,b))
+
+
+  def ~<(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreRight)
+
+  def ~>(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreLeft)
+
+  def %>(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreLeft)
+
+  def %<(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreRight)
+
   def many: ManyHorizontal
   def manyVertical: ManyVertical
 
   implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension
-
-  def ~<(right: BiGrammar): BiGrammar = new LeftRight(grammar, right, Sequence.ignoreRight)
 
   def ~~<(right: BiGrammar): BiGrammar = this ~< new LeftRight(printSpace, right)
 
@@ -40,8 +50,6 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
 
-  def ~>(right: BiGrammar): BiGrammar = new LeftRight(grammar, right, Sequence.ignoreLeft)
-
   def ~~>(right: BiGrammar): BiGrammar = new LeftRight(grammar, printSpace) ~> right
 
   def * : ManyHorizontal = many
@@ -49,9 +57,5 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
   def %%(bottom: BiGrammar): BiGrammar = {
     (this %< BlankLine) % bottom
   }
-
-  def %>(bottom: BiGrammar): BiGrammar = new TopBottom(grammar, bottom, Sequence.ignoreLeft)
-
-  def %<(bottom: BiGrammar): BiGrammar = new TopBottom(grammar, bottom, Sequence.ignoreRight)
 }
 

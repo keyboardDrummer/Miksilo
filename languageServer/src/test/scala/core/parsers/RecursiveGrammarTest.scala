@@ -56,6 +56,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     assert(!result.successful, result.toString)
   }
 
+
   test("Optional before recursive and seed") {
     lazy val expression: Parser[Any] = optional ~ expression ~ "s" | optional ~ "e"
     val result = expression.parseWholeInput(aesReader)

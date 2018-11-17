@@ -81,7 +81,7 @@ class ParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringPars
 
   test("real life example") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subsc"""
-    val expectation = List(("person", "3"), ("second", UnknownExpression))
+    val expectation = List(("Resources",List(("NotificationTopic",List("Type,AWS::SNS::Topic", ("Properties",List(("Subsc",UnknownExpression))))))))
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 

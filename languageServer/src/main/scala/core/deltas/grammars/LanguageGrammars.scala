@@ -29,18 +29,18 @@ class LanguageGrammars extends GrammarCatalogue {
   class BiGrammarExtension(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
     with BiGrammarSequenceCombinatorsExtension
   {
-    def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
+    private def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
       if (grammar.containsParser()) WithTrivia.withTrivia(grammar, grammars.trivia, horizontal) else grammar
 
     def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-    def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
+    def leftRight(other: BiGrammar, combine: (Any, Any) => Any) = new LeftRight(grammar, addTriviaIfUseful(other), combine)
 
     def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 
-    def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, false))
+    def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any) = new TopBottom(grammar, addTriviaIfUseful(bottom, false), combine)
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }

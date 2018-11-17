@@ -32,7 +32,7 @@ case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
         result match {
           case success: ParseSuccess[Result] => ParseSuccess(addPosition(success.result, success), success.remainder, success.biggestFailure match {
             case NoFailure => NoFailure
-            case failure: ParseFailure[Result] => failure.map(r => addPosition(r, failure))
+            case failure: ParseFailure[Result] @unchecked => failure.map(r => addPosition(r, failure))
           })
           case failure: ParseFailure[Result] => failure.map(r => addPosition(r, failure))
         }
