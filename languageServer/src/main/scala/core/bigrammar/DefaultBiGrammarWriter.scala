@@ -12,9 +12,11 @@ trait DefaultBiGrammarWriter extends BiGrammarWriter {
 
   class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {
 
-    override def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any): TopBottom = new TopBottom(grammar, bottom, combine)
+    override def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)): TopBottom =
+      new TopBottom(grammar, bottom, combine, split)
 
-    override def leftRight(other: BiGrammar, combine: (Any, Any) => Any): LeftRight = new LeftRight(grammar, other, combine)
+    override def leftRight(other: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)): LeftRight =
+      new LeftRight(grammar, other, combine, split)
 
     override def many: ManyHorizontal = new ManyHorizontal(grammar)
 

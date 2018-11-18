@@ -12,8 +12,8 @@ class SequencePrinter(first: NodePrinter, second: NodePrinter,
   val tuplePrinter = new BindPrinter[Any, Any](newFirst, second)
 
   override def write(value: WithMap[Any]): TryState[ResponsiveDocument] = value.value match {
-    case tuple: (Any, Any) => tuplePrinter.write(WithMap(tuple, value.map))
-    case UndefinedDestructuringValue => tuplePrinter.write(WithMap(SequencePrinter.undefinedTuple, value.map))
+    case tuple: (Any, Any) => tuplePrinter.write(WithMap(tuple, value.namedValues))
+    case UndefinedDestructuringValue => tuplePrinter.write(WithMap(SequencePrinter.undefinedTuple, value.namedValues))
     case _ => Printer.fail(s"$value is not a tuple.")
   }
 }

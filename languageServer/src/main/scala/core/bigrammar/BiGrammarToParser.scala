@@ -7,7 +7,8 @@ import core.parsers.strings.StringReader
 
 import scala.collection.mutable
 
-case class WithMap[+T](value: T, map: Map[Any,Any]) {}
+case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {
+}
 
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter {
@@ -52,7 +53,7 @@ object BiGrammarToParser extends CommonParserWriter {
               val firstMap = firstResult(state)
               val secondMap = secondResult(firstMap._1)
               val resultValue = sequence.combine(firstMap._2.value, secondMap._2.value)
-              val resultMap = firstMap._2.map ++ secondMap._2.map
+              val resultMap = firstMap._2.namedValues ++ secondMap._2.namedValues
               (secondMap._1, WithMap[Any](resultValue, resultMap)): (State, WithMap[Any])
             }
           }
@@ -71,7 +72,7 @@ object BiGrammarToParser extends CommonParserWriter {
         val innerParser = recursive(many.inner)
         val parser = innerParser.many[StateFull[WithMap[List[Any]]]](
           StateFull.value(WithMap(List.empty[Any], Map.empty[Any, Any])),
-          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.map ++ w2.map))))
+          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.namedValues ++ w2.namedValues))))
 
         parser
       case mapGrammar: MapGrammarWithMap =>

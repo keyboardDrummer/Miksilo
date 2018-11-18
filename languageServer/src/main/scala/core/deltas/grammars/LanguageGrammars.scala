@@ -36,11 +36,13 @@ class LanguageGrammars extends GrammarCatalogue {
 
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-    def leftRight(other: BiGrammar, combine: (Any, Any) => Any) = new LeftRight(grammar, addTriviaIfUseful(other), combine)
+    def leftRight(other: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)) =
+      new LeftRight(grammar, addTriviaIfUseful(other), combine, split)
 
     def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 
-    def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any) = new TopBottom(grammar, addTriviaIfUseful(bottom, false), combine)
+    def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)) =
+      new TopBottom(grammar, addTriviaIfUseful(bottom, false), combine, split)
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }

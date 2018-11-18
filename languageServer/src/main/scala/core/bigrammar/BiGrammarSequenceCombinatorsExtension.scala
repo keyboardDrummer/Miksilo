@@ -7,19 +7,19 @@ import core.language.node.Node
 trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def grammar: BiGrammar
-  def topBottom(other: BiGrammar, combine: (Any, Any) => Any): TopBottom
-  def leftRight(other: BiGrammar, combine: (Any, Any) => Any): LeftRight
-  def ~(other: BiGrammar) = leftRight(other, (a: Any,b: Any) => (a,b))
-  def %(other: BiGrammar) = topBottom(other, (a: Any,b: Any) => (a,b))
+  def topBottom(other: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)): TopBottom
+  def leftRight(other: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)): LeftRight
 
+  def ~(other: BiGrammar): LeftRight = leftRight(other, Sequence.packTuple, Sequence.unpackTuple)
+  def %(other: BiGrammar): TopBottom = topBottom(other, Sequence.packTuple, Sequence.unpackTuple)
 
-  def ~<(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreRight)
+  def ~<(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreRight, Sequence.produceRight)
 
-  def ~>(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreLeft)
+  def ~>(right: BiGrammar): BiGrammar = leftRight(right, Sequence.ignoreLeft, Sequence.produceLeft)
 
-  def %>(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreLeft)
+  def %>(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreLeft, Sequence.produceLeft)
 
-  def %<(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreRight)
+  def %<(bottom: BiGrammar): BiGrammar = topBottom(bottom, Sequence.ignoreRight, Sequence.produceRight)
 
   def many: ManyHorizontal
   def manyVertical: ManyVertical

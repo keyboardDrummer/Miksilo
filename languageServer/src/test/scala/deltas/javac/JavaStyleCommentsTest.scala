@@ -134,8 +134,8 @@ class JavaStyleCommentsTest
     val expectedStatementGrammar: BiGrammar = new NodeGrammar(WithTrivia.withTrivia("statement", language.grammars.trivia, false), ParentClass)
 
     val expectedBlockGrammar = new TopBottom(new TopBottom("{",
-      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent(), Sequence.ignoreLeft),
-      WithTrivia.withTrivia("}", language.grammars.trivia, false), Sequence.ignoreRight).asNode(BlockDelta.Shape)
+      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent(), Sequence.ignoreLeft, Sequence.produceLeft),
+      WithTrivia.withTrivia("}", language.grammars.trivia, false), Sequence.ignoreRight, Sequence.produceRight).asNode(BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

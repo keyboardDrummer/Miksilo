@@ -70,8 +70,8 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
       override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = for {
         key <- TryState.fromStateM(getFieldAndIncrementCounter)
-        value = from.map.getOrElse(key, Seq.empty)
-        result <- triviaPrinter.write(WithMap[Any](value, from.map))
+        value = from.namedValues.getOrElse(key, Seq.empty)
+        result <- triviaPrinter.write(WithMap[Any](value, from.namedValues))
       } yield result
     }
 

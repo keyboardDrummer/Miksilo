@@ -3,11 +3,10 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammar
 
 class LeftRight(var first: BiGrammar, var second: BiGrammar,
-                combineValue: (Any, Any) => Any = (a,b) => (a,b)) extends BiGrammar with Sequence
+                val combine: (Any, Any) => Any = (a,b) => (a,b),
+                val split: Any => (Any, Any) = x => x.asInstanceOf[(Any,Any)]) extends BiGrammar with Sequence
 {
   override def horizontal = true
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new LeftRight(newChildren(0), newChildren(1), combine)
-
-  override def combine(firstValue: Any, secondValue: Any): Any = combineValue(firstValue, secondValue)
+  override def withChildren(newChildren: Seq[BiGrammar]) = new LeftRight(newChildren(0), newChildren(1), combine, split)
 }

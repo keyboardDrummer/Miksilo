@@ -9,5 +9,5 @@ abstract class PrintUsingToStringGrammar(verifyWhenPrinting: Boolean = true)
   extends StringGrammar(verifyWhenPrinting) {
 
   override def write(from: AnyWithMap): TryState[ResponsiveDocument] =
-    super.write(WithMap(from.value.toString, from.map))
+    super.write(WithMap(from.value.toString, from.namedValues))
 }

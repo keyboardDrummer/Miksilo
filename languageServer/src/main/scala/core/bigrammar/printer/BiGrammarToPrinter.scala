@@ -1,5 +1,6 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
@@ -35,10 +36,16 @@ class BiGrammarToPrinter {
           new NestPrinter(labelled.inner, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left % right)
-        case sequence: LeftRight => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
-          (left, right) => left ~ right)
-        case topBottom: TopBottom => new SequencePrinter(toPrinterCached(topBottom.first), toPrinterCached(topBottom.second),
-          (topDoc, bottomDoc) => topDoc % bottomDoc)
+        case leftRight: LeftRight =>
+          val inner = new SequencePrinter(toPrinterCached(leftRight.first), toPrinterCached(leftRight.second),
+            (left, right) => left ~ right)
+          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(leftRight.split(withMap.value), withMap.namedValues))
+          new MapGrammarWithMapPrinter(inner, deconstruct)
+        case topBottom: TopBottom =>
+          val inner = new SequencePrinter(toPrinterCached(topBottom.first), toPrinterCached(topBottom.second),
+            (topDoc, bottomDoc) => topDoc % bottomDoc)
+          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(topBottom.split(withMap.value), withMap.namedValues))
+          new MapGrammarWithMapPrinter(inner, deconstruct)
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
