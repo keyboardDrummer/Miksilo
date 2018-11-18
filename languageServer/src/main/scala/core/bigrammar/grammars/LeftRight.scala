@@ -3,8 +3,8 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammar
 
 class LeftRight(var first: BiGrammar, var second: BiGrammar,
-                val combine: (Any, Any) => Any = (a,b) => (a,b),
-                val split: Any => (Any, Any) = x => x.asInstanceOf[(Any,Any)]) extends BiGrammar with Sequence
+                val combine: (Any, Any) => Any,
+                val split: Any => (Any, Any)) extends BiGrammar with Sequence
 {
   override def horizontal = true
 
