@@ -18,7 +18,7 @@ object JavaStyleBlockCommentsDelta extends DeltaWithGrammar with DefaultBiGramma
 
     val comment = RegexGrammar("""/\*+[^*]*\*+(?:[^/*][^*]*\*+)*/""".r)
     val coloredComment = Colorize(comment, TokenTypes.COMMENT_MULTILINE)
-    new LeftRight(coloredComment, printSpace, Sequence.ignoreRight, Sequence.produceRight)
+    new LeftRight(coloredComment, printSpace, Sequence.ignoreRight)
   }
 
   override def dependencies: Set[Contract] = Set.empty

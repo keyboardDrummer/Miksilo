@@ -52,7 +52,7 @@ object BiGrammarToParser extends CommonParserWriter {
             def run(state: State): (State, WithMap[Any]) = {
               val firstMap = firstResult(state)
               val secondMap = secondResult(firstMap._1)
-              val resultValue = sequence.combine(firstMap._2.value, secondMap._2.value)
+              val resultValue = sequence.bijective.construct(firstMap._2.value, secondMap._2.value)
               val resultMap = firstMap._2.namedValues ++ secondMap._2.namedValues
               (secondMap._1, WithMap[Any](resultValue, resultMap)): (State, WithMap[Any])
             }

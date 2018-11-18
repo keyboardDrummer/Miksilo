@@ -18,7 +18,7 @@ class LanguageGrammars extends GrammarCatalogue {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, WithTrivia.withTrivia(new LeftRight(bodyGrammar, trivia, Sequence.ignoreRight, Sequence.produceRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
+  create(ProgramGrammar, WithTrivia.withTrivia(new LeftRight(bodyGrammar, trivia, Sequence.ignoreRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
   def root: Labelled = find(ProgramGrammar)
 
@@ -36,13 +36,13 @@ class LanguageGrammars extends GrammarCatalogue {
 
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-    def leftRight(other: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)) =
-      new LeftRight(grammar, addTriviaIfUseful(other), combine, split)
+    def leftRight(other: BiGrammar, bijective: SequenceBijective) =
+      new LeftRight(grammar, addTriviaIfUseful(other), bijective)
 
     def many = new ManyHorizontal(addTriviaIfUseful(grammar))
 
-    def topBottom(bottom: BiGrammar, combine: (Any, Any) => Any, split: Any => (Any, Any)) =
-      new TopBottom(grammar, addTriviaIfUseful(bottom, false), combine, split)
+    def topBottom(bottom: BiGrammar, bijective: SequenceBijective) =
+      new TopBottom(grammar, addTriviaIfUseful(bottom, false), bijective)
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }

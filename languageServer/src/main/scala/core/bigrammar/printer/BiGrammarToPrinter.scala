@@ -39,12 +39,12 @@ class BiGrammarToPrinter {
         case leftRight: LeftRight =>
           val inner = new SequencePrinter(toPrinterCached(leftRight.first), toPrinterCached(leftRight.second),
             (left, right) => left ~ right)
-          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(leftRight.split(withMap.value), withMap.namedValues))
+          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(leftRight.bijective.destruct(withMap.value), withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
         case topBottom: TopBottom =>
           val inner = new SequencePrinter(toPrinterCached(topBottom.first), toPrinterCached(topBottom.second),
             (topDoc, bottomDoc) => topDoc % bottomDoc)
-          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(topBottom.split(withMap.value), withMap.namedValues))
+          val deconstruct = (withMap: AnyWithMap) => Some(WithMap(topBottom.bijective.destruct(withMap.value), withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)

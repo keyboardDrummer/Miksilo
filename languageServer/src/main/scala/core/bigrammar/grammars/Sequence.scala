@@ -5,16 +5,18 @@ import core.bigrammar.printer.UndefinedDestructuringValue
 
 object Sequence {
 
-  def packTuple: (Any, Any) => (Any, Any) = (a: Any, b: Any) => (a,b)
-  def unpackTuple: Any => (Any, Any) = {
+  def identity: SequenceBijective = SequenceBijective(packTuple, unpackTuple)
+
+  private def packTuple: (Any, Any) => (Any, Any) = (a: Any, b: Any) => (a,b)
+  private def unpackTuple: Any => (Any, Any) = {
     case UndefinedDestructuringValue => (UndefinedDestructuringValue, UndefinedDestructuringValue)
     case t: (Any, Any) => t
   }
-  def ignoreLeft: (Any, Any) => Any = (a: Any, b: Any) => b
-  def ignoreRight: (Any, Any) => Any = (a: Any, b: Any) => a
-  def produceRight: Any => (Any, Any) = x => (x, UndefinedDestructuringValue)
-  def produceLeft: Any => (Any, Any) = x => (x, UndefinedDestructuringValue)
+  def ignoreLeft = SequenceBijective((a: Any, b: Any) => b, x => (x, UndefinedDestructuringValue))
+  def ignoreRight = SequenceBijective((a: Any, b: Any) => a, x => (UndefinedDestructuringValue, x))
 }
+
+case class SequenceBijective(construct: (Any, Any) => Any, destruct: Any => (Any, Any))
 
 trait Sequence extends BiGrammar with Layout {
   def first: BiGrammar
@@ -23,8 +25,7 @@ trait Sequence extends BiGrammar with Layout {
   def second: BiGrammar
   def second_=(value: BiGrammar): Unit
 
-  def combine: (Any, Any) => Any
-  def split: Any => (Any, Any)
+  def bijective: SequenceBijective
 
   override def children = Seq(first, second)
 
