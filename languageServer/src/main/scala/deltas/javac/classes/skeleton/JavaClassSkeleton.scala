@@ -36,13 +36,13 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]) = node(ClassImports) = value
 
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def name_=(value: String): Unit = node(Name) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
 
-    def parent: Option[String] = node(ClassParent).asInstanceOf[Option[String]]
+    def parent: Option[String] = node.getValue(ClassParent).asInstanceOf[Option[String]]
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 

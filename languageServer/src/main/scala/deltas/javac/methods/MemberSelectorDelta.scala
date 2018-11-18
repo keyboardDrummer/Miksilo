@@ -12,7 +12,7 @@ import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 object MemberSelectorDelta extends DeltaWithGrammar {
 
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def member: String = node(Member).asInstanceOf[String]
+    def member: String = node.getValue(Member).asInstanceOf[String]
     def target: T = node(Target).asInstanceOf[T]
   }
 

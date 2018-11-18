@@ -6,6 +6,7 @@ import scala.collection.mutable
 
 trait NodeLike {
   type Self <: NodeLike
+  def getValue(key: NodeField): Any
   def get(key: NodeField): Option[Any]
   def apply(key: NodeField): Any
   def update(key: NodeField, value: Any): Unit

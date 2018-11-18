@@ -85,7 +85,7 @@ class JavaStyleCommentsTest
       JavaLanguage.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
-    grammarUtils.compareInputWithPrint("2 + 1")
+    //grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
     grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
   }

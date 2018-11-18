@@ -32,7 +32,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   implicit class Package[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
   }
 

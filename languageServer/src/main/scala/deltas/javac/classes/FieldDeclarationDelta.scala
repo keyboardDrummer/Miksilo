@@ -27,7 +27,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
   object Name extends NodeField
 
   implicit class Field[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def _type: T = node(Type).asInstanceOf[T]
   }
 

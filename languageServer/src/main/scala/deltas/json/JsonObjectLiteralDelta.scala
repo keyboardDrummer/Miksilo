@@ -45,7 +45,7 @@ object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
   override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
   implicit class ObjectLiteralMember[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def key: String = node(MemberKey).asInstanceOf[String]
+    def key: String = node.getValue(MemberKey).asInstanceOf[String]
     def value: T = node(MemberValue).asInstanceOf[T]
   }
 

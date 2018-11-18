@@ -12,8 +12,8 @@ object Sequence {
     case UndefinedDestructuringValue => (UndefinedDestructuringValue, UndefinedDestructuringValue)
     case t: (Any, Any) => t
   }
-  def ignoreLeft = SequenceBijective((a: Any, b: Any) => b, x => (x, UndefinedDestructuringValue))
-  def ignoreRight = SequenceBijective((a: Any, b: Any) => a, x => (UndefinedDestructuringValue, x))
+  def ignoreLeft = SequenceBijective((a: Any, b: Any) => b, x => (UndefinedDestructuringValue, x))
+  def ignoreRight = SequenceBijective((a: Any, b: Any) => a, x => (x, UndefinedDestructuringValue))
 }
 
 case class SequenceBijective(construct: (Any, Any) => Any, destruct: Any => (Any, Any))

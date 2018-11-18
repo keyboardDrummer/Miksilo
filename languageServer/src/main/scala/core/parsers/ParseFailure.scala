@@ -27,8 +27,11 @@ trait ParseResult[Input <: ParseInput, +Result] {
 }
 
 case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result]) extends ParseResult[Input, Result] {
-  override def map[NewResult](f: Result => NewResult): ParseSuccess[Input, NewResult] =
-    ParseSuccess(f(result), remainder, biggestFailure.map(f))
+  override def map[NewResult](f: Result => NewResult): ParseSuccess[Input, NewResult] = {
+    val mappedResult = f(result)
+    val mappedFailure = biggestFailure.map(f)
+    ParseSuccess(mappedResult, remainder, mappedFailure)
+  }
 
   def biggestRealFailure: Option[ParseFailure[Input, Result]] = biggestFailure match {
     case failure: ParseFailure[Input, Result] => Some(failure)

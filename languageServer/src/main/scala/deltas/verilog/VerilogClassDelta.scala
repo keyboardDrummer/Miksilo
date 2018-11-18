@@ -16,7 +16,7 @@ object VerilogClassDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Name extends NodeField
 
   implicit class Class[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {

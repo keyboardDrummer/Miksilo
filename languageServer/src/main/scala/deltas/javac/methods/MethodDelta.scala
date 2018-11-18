@@ -36,7 +36,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   override def description: String = "Enables Java classes to contain methods."
 
   implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
 
     def returnType: T = node(ReturnType).asInstanceOf[T]
     def returnType_=(value: T): Unit = node(ReturnType) = value

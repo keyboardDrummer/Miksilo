@@ -8,9 +8,16 @@ object NodePath {
   implicit def castList(list: Seq[NodePath]): Seq[Node] = list.map(x => x.current)
 }
 
-trait NodePath extends NodeLike with SourceElement {
+trait AnyPath extends SourceElement {
+
+  def uriOption: Option[String]
+
+  override def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(r => FileRange(r, p)))
+}
+
+trait NodePath extends NodeLike with AnyPath {
   type Self = NodePath
-  val current: Node
+  def current: Node
   def parentOption: Option[NodePath]
 
   def findAncestorShape(shape: NodeShape): NodePath = ancestors.find(p => p.shape == shape).get
@@ -29,7 +36,7 @@ trait NodePath extends NodeLike with SourceElement {
   def apply(key: NodeField): Any = get(key).get
   def update(key: NodeField, value: Any): Unit = current(key) = value
   def get(key: NodeField): Option[Any] = current.data.get(key).map {
-    case _: Node => FieldValue(this, key)
+    case _: Node => new NodeFieldValue(this, key)
     case sequence: Seq[_] => sequence.indices.map(index => {
       val element = sequence(index)
       element match {
@@ -37,12 +44,19 @@ trait NodePath extends NodeLike with SourceElement {
         case value => value
       }
     })
-    case value => value
+    case _ => FieldValue(this, key)
   }
+
+  def getValue(key: NodeField): Any = current.data(key)
 
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
   def getMember(field: NodeField): SourceElement = ValuePath(this, field)
+
+  /*
+  A None value means the Path is above the file level.
+   */
+  override def uriOption: Option[String] = current.startOfUri
 
   //TODO replace this with some NodePath 'view' to improve performance.
   def stopAt(predicate: NodePath => Boolean): NodePath = {
@@ -50,15 +64,8 @@ trait NodePath extends NodeLike with SourceElement {
       return PathRoot(current)
 
     this match {
-      case FieldValue(parent, field) => FieldValue(parent.stopAt(predicate), field)
+      case nfc: NodeFieldValue => new NodeFieldValue(nfc.parent.stopAt(predicate), nfc.field)
       case SequenceElement(parent, field, index) => SequenceElement(parent.stopAt(predicate), field, index)
     }
   }
-
-  /*
-  A None value means the Path is above the file level.
-   */
-  def uriOption: Option[String] = current.startOfUri
-
-  override def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(r => FileRange(r, p)))
 }

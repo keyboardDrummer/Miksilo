@@ -17,7 +17,7 @@ object MethodParameters extends NodeGrammarWriter {
               bodyScope: Scope): Unit = {
 
     val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-    val name = parameter(Name).asInstanceOf[String]
+    val name = parameter.getValue(Name).asInstanceOf[String]
     builder.declare(name, bodyScope, parameter.getMember(Name), Some(parameterType))
   }
 

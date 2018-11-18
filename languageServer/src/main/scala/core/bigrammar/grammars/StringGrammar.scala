@@ -2,7 +2,6 @@ package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
 import core.bigrammar.{BiGrammar, WithMap}
-import core.parsers.ParseSuccess
 import core.parsers.strings.StringReader
 import core.responsiveDocument.ResponsiveDocument
 
@@ -30,7 +29,8 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
         else
           TryState.value(string)
 
-      case _ => Printer.fail(s"StringGrammar expects a string value, and not a $from")
+      case _ =>
+        Printer.fail(s"StringGrammar expects a string value, and not a ${from.value}")
     }
   }
 }

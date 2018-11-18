@@ -1,13 +1,16 @@
 package core.deltas.path
 
-import core.language.SourceElement
 import core.language.node.{Node, NodeField}
 
-trait ChildPath extends NodePath with SourceElement {
-  val current: Node
-  def parent: NodePath
+trait AnyChildPath extends AnyPath {
   def replaceWith(replacement: Any): Unit
+  def parent: NodePath
   val field: NodeField
+  def current: Any
+  override def uriOption: Option[String] = parent.uriOption
+}
 
+trait ChildPath extends NodePath with AnyChildPath {
+  def current: Node
   override def uriOption: Option[String] = super.uriOption.orElse(parent.uriOption)
 }

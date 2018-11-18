@@ -15,7 +15,7 @@ object LocalDeclarationDelta extends StatementInstance
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
   }
 
   override def dependencies: Set[Contract] = Set(StatementDelta)
