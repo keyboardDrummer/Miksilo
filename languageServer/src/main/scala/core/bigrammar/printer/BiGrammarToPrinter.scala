@@ -11,7 +11,8 @@ import scala.collection.mutable
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(WithMap(outerValue, Map.empty)).run(Map.empty).get._2
+    val printResult = printer.write(WithMap(outerValue, Map.empty))
+    printResult.run(Map.empty).get._2
   }
 }
 
