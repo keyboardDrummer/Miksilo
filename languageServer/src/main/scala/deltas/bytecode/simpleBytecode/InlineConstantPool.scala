@@ -64,7 +64,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
     for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
-      grammars.find(entry.shape).inner.asInstanceOf[NodeGrammar].inner = entry.getConstantEntryGrammar(grammars)
+      val entryGrammar = grammars.find(entry.shape).find(g => g.value.isInstanceOf[NodeGrammar]).get.value.asInstanceOf[NodeGrammar]
+      entryGrammar.inner = entry.getConstantEntryGrammar(grammars)
     }
   }
 

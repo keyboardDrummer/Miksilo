@@ -10,7 +10,7 @@ object WithTrivia extends DefaultBiGrammarWriter {
 
   def getWithTrivia(grammar: BiGrammar, trivia: BiGrammar): Option[Sequence] = {
     grammar match {
-      case sequence: Sequence if sequence.second == trivia => Some(sequence)
+      case sequence: Sequence if sequence.first == trivia => Some(sequence)
       case _ => None
     }
   }
