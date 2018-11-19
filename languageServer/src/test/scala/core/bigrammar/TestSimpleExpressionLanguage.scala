@@ -62,7 +62,7 @@ Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey ()* + ()* StringKey | StringKey
 Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
 Grammar: | StringKey % ()* % ? ()* StringKey % ()* % : ()* StringKey | StringKey
-Depth: 23
+Depth: 25
 Partial:
     (3 * (4 + ("""
 

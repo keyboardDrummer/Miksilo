@@ -36,6 +36,7 @@ object PrintBiGrammar {
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
     case regex: RegexGrammar => s"Regex(${regex.regex})"
     case keyword: Keyword => keyword.value
+    case _: Identifier => "Identifier"
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
