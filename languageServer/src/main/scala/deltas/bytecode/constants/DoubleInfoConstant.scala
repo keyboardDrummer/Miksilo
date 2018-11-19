@@ -6,7 +6,7 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 
-object DoubleInfoConstant extends ConstantEntry {
+object DoubleInfoConstant extends ConstantPoolEntry {
 
   implicit class LongConstantEntry(node: Node) {
     def value: Long = node(DoubleEntryValue).asInstanceOf[Long]
@@ -27,5 +27,5 @@ object DoubleInfoConstant extends ConstantEntry {
 
   override def description: String = "Add the double constant entry."
 
-  override def getName = "Double"
+  override val getName = "Double"
 }

@@ -6,7 +6,7 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 
-object InvokeDynamicConstant extends ConstantEntry {
+object InvokeDynamicConstant extends ConstantPoolEntry {
 
   object InvokeDynamicKey extends NodeShape
   object InvokeDynamicBootstrapMethodIndex extends NodeField
@@ -29,5 +29,5 @@ object InvokeDynamicConstant extends ConstantEntry {
 
   override def description: String = "Adds the invoke dynamic constant"
 
-  override def getName = "InvokeDynamic"
+  override val getName = "InvokeDynamic"
 }

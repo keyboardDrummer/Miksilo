@@ -9,7 +9,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
-object MethodRefConstant extends ConstantEntry {
+object MethodRefConstant extends ConstantPoolEntry {
 
   object MethodRefKey extends NodeShape
 
@@ -56,11 +56,5 @@ object MethodRefConstant extends ConstantEntry {
       Map(ClassRef -> ClassInfoConstant.shape, NameAndType -> NameAndTypeConstant.shape))
   }
 
-  override def getName = "Methodref"
+  override val getName = "Methodref"
 }
-
-
-
-
-//En dan twee transformaties, 1 is RemoveConstantPool die de constantEntry grammars niet veranderd.
-//En de tweede is een JasminConstantPoolSyntax

@@ -11,7 +11,7 @@ import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import deltas.javac.classes.skeleton.QualifiedClassName
 
-object ClassInfoConstant extends ConstantEntry {
+object ClassInfoConstant extends ConstantPoolEntry {
 
   object Shape extends NodeShape
 
@@ -47,5 +47,5 @@ object ClassInfoConstant extends ConstantEntry {
   override def description: String = "Adds a new type of constant named the class reference. " +
     "It only contains an index pointing to a string constant that contains the name of the class."
 
-  override def getName = "Class"
+  override val getName = "Class"
 }

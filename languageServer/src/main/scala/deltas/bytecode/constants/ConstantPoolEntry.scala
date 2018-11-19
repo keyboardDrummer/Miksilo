@@ -7,7 +7,7 @@ import core.language.Language
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ConstantPoolItemContentGrammar, HasBytes}
 
-trait ConstantEntry extends DeltaWithGrammar with HasShape with HasBytes {
+trait ConstantPoolEntry extends DeltaWithGrammar with HasShape with HasBytes {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -22,7 +22,7 @@ trait ConstantEntry extends DeltaWithGrammar with HasShape with HasBytes {
     itemContent.addAlternative(create(shape, (getName ~~> constantEntryGrammar).asNode(shape)))
   }
 
-  def getName: BiGrammar
+  val getName: BiGrammar
   def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)

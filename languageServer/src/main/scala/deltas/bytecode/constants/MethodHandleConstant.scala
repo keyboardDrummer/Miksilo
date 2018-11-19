@@ -2,11 +2,11 @@ package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 
-object MethodHandleConstant extends ConstantEntry {
+object MethodHandleConstant extends ConstantPoolEntry {
 
   object MethodHandleKey extends NodeShape
   object MethodHandleReference extends NodeField
@@ -27,5 +27,5 @@ object MethodHandleConstant extends ConstantEntry {
 
   override def description: String = "Adds the method handle constant"
 
-  override def getName = "MethodHandle"
+  override val getName = "MethodHandle"
 }

@@ -8,7 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
-object MethodTypeConstant extends ConstantEntry {
+object MethodTypeConstant extends ConstantPoolEntry {
 
   object MethodTypeConstantKey extends NodeShape
   object MethodTypeDescriptorIndex extends NodeField
@@ -32,5 +32,5 @@ object MethodTypeConstant extends ConstantEntry {
 
   override def description: String = "Add the method type constant"
 
-  override def getName = "MethodType"
+  override val getName = "MethodType"
 }

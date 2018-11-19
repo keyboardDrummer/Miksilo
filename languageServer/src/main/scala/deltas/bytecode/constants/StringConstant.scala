@@ -3,12 +3,12 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
-object StringConstant extends ConstantEntry {
+object StringConstant extends ConstantPoolEntry {
 
   object StringKey extends NodeShape
   object StringIndex extends NodeField
@@ -27,5 +27,5 @@ object StringConstant extends ConstantEntry {
 
   override def description: String = "Adds the string constant entry."
 
-  override def getName = Keyword("String", reserved = false) //TODO all die getNames moeten geen reserved keywords zijn. Misschien de default van keyword switchen.
+  override val getName = Keyword("String", reserved = false) //TODO all die getNames moeten geen reserved keywords zijn. Misschien de default van keyword switchen.
 }

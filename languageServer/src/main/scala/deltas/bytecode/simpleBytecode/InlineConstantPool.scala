@@ -37,8 +37,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    inlineConstantPoolReferences(language)
     simplifyConstantEntryGrammars(language)
+    inlineConstantPoolReferences(language)
     removeConstantPoolGrammar(language)
   }
 
@@ -64,7 +64,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
     for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
-      grammars.find(entry.shape).inner = entry.getConstantEntryGrammar(grammars)
+      grammars.find(entry.shape).inner.asInstanceOf[NodeGrammar].inner = entry.getConstantEntryGrammar(grammars)
     }
   }
 

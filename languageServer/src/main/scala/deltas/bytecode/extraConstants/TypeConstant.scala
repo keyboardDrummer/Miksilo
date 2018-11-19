@@ -7,11 +7,11 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
 import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, Shape, MethodNameIndex}
 import deltas.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
-import deltas.bytecode.constants.{ConstantEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
+import deltas.bytecode.constants.{ConstantPoolEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
 
-object TypeConstant extends ConstantEntry {
+object TypeConstant extends ConstantPoolEntry {
   object Key extends NodeShape
   object Type extends NodeField
 
@@ -55,5 +55,5 @@ object TypeConstant extends ConstantEntry {
 
   override def description: String = "Adds the field descriptor constant. It contains the type of a field."
 
-  override def getName = "Utf8" //TODO do I want this?
+  override val getName = "Utf8" //TODO do I want this?
 }
