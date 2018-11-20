@@ -12,7 +12,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.statement.{BlockDelta, StatementDelta}
-import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
+import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -133,9 +133,9 @@ class JavaStyleCommentsTest
 
     val expectedStatementGrammar: BiGrammar = new NodeGrammar(WithTrivia.withTrivia("statement", language.grammars.trivia, false), ParentClass)
 
-    val expectedBlockGrammar = new TopBottom(new TopBottom("{",
-      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent(), Sequence.ignoreLeft),
-      WithTrivia.withTrivia("}", language.grammars.trivia, false), Sequence.ignoreRight).asNode(BlockDelta.Shape)
+    val expectedBlockGrammar = new BiSequence(new BiSequence("{",
+      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent(), Sequence.ignoreLeft, false),
+      WithTrivia.withTrivia("}", language.grammars.trivia, false), Sequence.ignoreRight, false).asNode(BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

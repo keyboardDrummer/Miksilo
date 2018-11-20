@@ -1,7 +1,6 @@
 package deltas.javac.methods
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.TopBottom
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
@@ -154,7 +153,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
     val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 
-    val methodUnmapped: TopBottom = find(AccessibilityFieldsDelta.VisibilityField) ~
+    val methodUnmapped: BiGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~
       find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
       parseReturnType.as(ReturnType) ~~ identifier.as(Name) ~ parseParameters.as(Parameters) % block.as(Body)
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))

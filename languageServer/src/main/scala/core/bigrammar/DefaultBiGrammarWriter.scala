@@ -12,16 +12,13 @@ trait DefaultBiGrammarWriter extends BiGrammarWriter {
 
   class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {
 
-    override def topBottom(bottom: BiGrammar, bijective: SequenceBijective): TopBottom =
-      new TopBottom(grammar, bottom, bijective)
-
-    override def leftRight(other: BiGrammar, bijective: SequenceBijective): LeftRight =
-      new LeftRight(grammar, other, bijective)
-
     override def many: ManyHorizontal = new ManyHorizontal(grammar)
 
     override def manyVertical: ManyVertical = new ManyVertical(grammar)
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension = new BiGrammarExtension(grammar)
+
+    override def sequence(other: BiGrammar, bijective: SequenceBijective, horizontal: Boolean): BiGrammar =
+      new BiSequence(grammar, other, bijective, horizontal)
   }
 }

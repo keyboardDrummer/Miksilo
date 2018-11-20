@@ -1,8 +1,8 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.language.node.GrammarKey
 import core.document.Empty
+import core.language.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
@@ -28,8 +28,11 @@ object PrintBiGrammar {
   def toDocument(grammar: BiGrammar): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
   private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case sequence: LeftRight => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
-    case topBottom: TopBottom => withChoiceParenthesis(topBottom.first) ~~ "%" ~~withChoiceParenthesis(topBottom.second)
+    case sequence: BiSequence =>
+      val first = withChoiceParenthesis(sequence.first)
+      val second = withChoiceParenthesis(sequence.second)
+      if (sequence.horizontal) first ~~ second
+      else first ~~ "%" ~~ second
     case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
     case many:ManyVertical => withParenthesis(many.inner) ~ "%*"

@@ -1,7 +1,6 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.{BiGrammar, DefaultBiGrammarWriter}
-import core.language.node.GrammarKey
 
 object WithTrivia extends DefaultBiGrammarWriter {
   def withTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true): BiGrammar = {
@@ -18,10 +17,9 @@ object WithTrivia extends DefaultBiGrammarWriter {
   }
 }
 
-object WithTriviaKey extends GrammarKey
-class WithTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, val horizontal: Boolean = true)
-  extends Labelled(WithTriviaKey, if (horizontal) new LeftRight(trivia, grammar, Sequence.ignoreLeft) else new TopBottom(trivia, grammar, Sequence.ignoreLeft)) {
-  def getGrammar = grammar
+class WithTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true)
+  extends BiSequence(trivia, grammar, Sequence.ignoreLeft, horizontal) {
+  def getGrammar: BiGrammar = grammar
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 

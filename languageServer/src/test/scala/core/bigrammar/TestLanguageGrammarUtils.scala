@@ -14,7 +14,9 @@ import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
 
-case class StringKey(value: String) extends GrammarKey
+case class StringKey(value: String) extends GrammarKey {
+  override lazy val toString: String = value
+}
 
 object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas)
 
