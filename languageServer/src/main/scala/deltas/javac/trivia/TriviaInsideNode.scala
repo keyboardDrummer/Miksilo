@@ -32,6 +32,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
         case _ =>
       }
     }
+    System.out.append("")
   }
 
   private def hasLeftNode(path: GrammarPath) = {

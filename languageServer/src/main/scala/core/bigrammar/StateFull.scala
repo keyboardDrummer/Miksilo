@@ -11,7 +11,7 @@ object StateFull {
   }
 }
 
-trait StateFull[+T] {
+trait StateFull[+T] { // TODO Can I get rid of the state monad and just store trivia in an array as a value? Like extend WithMap with a Trivia array.
   def run(state: State): (State, T)
 
   def map[U](f: T => U): StateFull[U] = state => {
