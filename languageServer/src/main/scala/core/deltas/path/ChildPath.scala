@@ -12,5 +12,5 @@ trait AnyChildPath extends AnyPath {
 
 trait ChildPath extends NodePath with AnyChildPath {
   def current: Node
-  override def uriOption: Option[String] = super.uriOption.orElse(parent.uriOption)
+  override def uriOption: Option[String] = super[NodePath].uriOption.orElse(super[AnyChildPath].uriOption)
 }

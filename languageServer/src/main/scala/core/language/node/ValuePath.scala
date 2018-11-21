@@ -13,5 +13,5 @@ case class ValuePath(path: NodePath, field: NodeField) extends SourceElement {
 
   override def range: Option[SourceRange] = path.current.sources.get(field)
 
-  override def fileRange: Option[FileRange] = range.flatMap(p => path.uriOption.map(u => FileRange(u, p)))
+  override def uriOption: Option[String] = path.uriOption
 }

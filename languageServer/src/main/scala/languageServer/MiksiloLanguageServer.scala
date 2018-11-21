@@ -64,12 +64,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getSourceElementForNode(element: SourceElement, filePosition:FilePosition):Option[SourceElement]={
-//    val nodeIsInsideOtherFile = path.current.startOfUri match{
-//      case Some(uri) => filePosition.uri != uri
-//      case None =>false
-//    }
-//    if(nodeIsInsideOtherFile)
-//      return None
+    if (element.isOutsideFile(filePosition.uri))
+      return None
 
     if(!element.range.exists(r => r.contains(filePosition.position)))
       return None

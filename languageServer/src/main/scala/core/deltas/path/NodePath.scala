@@ -11,8 +11,6 @@ object NodePath {
 trait AnyPath extends SourceElement {
 
   def uriOption: Option[String]
-
-  override def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(r => FileRange(r, p)))
 }
 
 trait NodePath extends NodeLike with AnyPath {
