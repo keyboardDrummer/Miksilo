@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.bigrammar._
-import core.bigrammar.grammars.{BiSequence, Labelled, Sequence, WithTrivia}
+import core.bigrammar.grammars.{Labelled, Sequence, WithTrivia}
 import core.deltas.NodeGrammarWriter
 import core.deltas.grammars.BodyGrammar
 import core.language.Language
@@ -67,7 +67,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     expressionGrammar.addAlternative(numberGrammar)
     expressionGrammar.addAlternative(additionGrammar)
 
-    def lr(l: BiGrammar, r: BiGrammar) = new BiSequence(l, r, Sequence.identity, true)
+    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, Sequence.identity)
     grammars.find(BodyGrammar).inner = expressionGrammar
     val expectedBeforeAdditionGrammar = lr(expressionGrammar.as(Left), WithTrivia.withTrivia(lr("+",
       WithTrivia.withTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))

@@ -45,7 +45,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
       return //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
 
     grammar.value match {
-      case sequence: Sequence =>
+      case sequence: BiSequence =>
         val left = sequence.getLeftChildren.drop(1).head
         val child = grammar.children.find(ref => ref.value == left).get
         injectTrivia(grammars, child, horizontal)

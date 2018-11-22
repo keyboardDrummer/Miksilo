@@ -84,7 +84,7 @@ object PrintBiGrammar {
         return left
 
       choice
-    case sequence: Sequence =>
+    case sequence: BiSequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[BiFailure])
@@ -119,7 +119,7 @@ object PrintBiGrammar {
   }
 
   def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case sequence: Sequence =>
+    case sequence: BiSequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[ValueGrammar])

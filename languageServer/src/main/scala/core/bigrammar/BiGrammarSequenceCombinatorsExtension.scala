@@ -25,12 +25,12 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarSequenceCombinatorsExtension
 
-  def ~~<(right: BiGrammar): BiGrammar = this ~< new BiSequence(printSpace, right, Sequence.ignoreLeft, true)
+  def ~~<(right: BiGrammar): BiGrammar = this ~< leftRight(printSpace, right, Sequence.ignoreLeft)
 
   def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
 
   def ~~(right: BiGrammar): BiGrammar = {
-    new BiSequence(grammar, printSpace, Sequence.ignoreRight, true) ~ right
+    leftRight(grammar, printSpace, Sequence.ignoreRight) ~ right
   }
 
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
@@ -49,7 +49,7 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
 
-  def ~~>(right: BiGrammar): BiGrammar = new BiSequence(grammar, printSpace, Sequence.ignoreRight, true) ~> right
+  def ~~>(right: BiGrammar): BiGrammar = leftRight(grammar, printSpace, Sequence.ignoreRight) ~> right
 
   def * : ManyHorizontal = many
 

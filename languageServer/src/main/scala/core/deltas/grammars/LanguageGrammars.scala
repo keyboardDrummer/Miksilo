@@ -15,10 +15,11 @@ object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey
 class LanguageGrammars extends GrammarCatalogue {
+  import BiGrammarWriter._
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, WithTrivia.withTrivia(new BiSequence(bodyGrammar, trivia, Sequence.ignoreRight, true), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
+  create(ProgramGrammar, WithTrivia.withTrivia(leftRight(bodyGrammar, trivia, Sequence.ignoreRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
   def root: Labelled = find(ProgramGrammar)
 

@@ -8,6 +8,7 @@ trait DefaultBiGrammarWriter extends BiGrammarWriter {
 
   implicit def stringToAstGrammar(value: String): BiGrammarExtension =
     new BiGrammarExtension(BiGrammarWriter.stringToGrammar(value))
+
   implicit def grammarToAstGrammar(value: BiGrammar): BiGrammarExtension = new BiGrammarExtension(value)
 
   class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {

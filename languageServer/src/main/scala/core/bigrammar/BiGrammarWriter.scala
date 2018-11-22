@@ -19,6 +19,12 @@ trait BiGrammarWriter {
     i => i.toString
   )
 
+  def leftRight(left: BiGrammar, right: BiGrammar, bijective: SequenceBijective) =
+    new BiSequence(left, right, bijective, true)
+
+  def topBottom(top: BiGrammar, bottom: BiGrammar, bijective: SequenceBijective) =
+    new BiSequence(top, bottom, bijective, false)
+
   def failure: BiGrammar = BiFailure()
 
   def value(value: Any): BiGrammar = ValueGrammar(value)

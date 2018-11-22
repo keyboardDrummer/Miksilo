@@ -49,7 +49,7 @@ object BiGrammarToParser extends CommonParserWriter {
 
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
-      case sequence: core.bigrammar.grammars.Sequence =>
+      case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
         val parser = new core.parsers.Sequence[Input, Result, Result, Result](firstParser, secondParser, (firstResult: Result, secondResult: Result) => {

@@ -25,7 +25,7 @@ trait BiGrammar {
   def option: BiGrammar = this.mapSome[Any, Option[Any]](x => Some(x), x => x) | value(None)
 
   def indent(width: Int = 2): BiGrammar =
-    new BiSequence(WhiteSpace(width, 0), this, Sequence.ignoreLeft, true)
+    leftRight(WhiteSpace(width, 0), this, Sequence.ignoreLeft)
 
   def optionToSeq: BiGrammar = this.map[Option[Any], Seq[Any]](
     option => option.fold[Seq[Any]](Seq.empty)(v => Seq(v)),

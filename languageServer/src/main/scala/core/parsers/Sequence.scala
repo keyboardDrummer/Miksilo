@@ -40,9 +40,3 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
     rightDefault <- cache(right)
   } yield combine(leftDefault, rightDefault)
 }
-
-class IgnoreRight[Input <: ParseInput, +Result, +Right](left: Parser[Input, Result], right: Parser[Input, Right]) extends // TODO Optimize IgnoreRight and IgnoreLeft with a custom implementation
-  Sequence[Input, Result, Right, Result](left, right, (l,_) => l)
-
-class IgnoreLeft[Input <: ParseInput, +Left, +Result](left: Parser[Input, Left], right: Parser[Input, Result]) extends
-  Sequence[Input, Left, Result, Result](left, right, (_,r) => r)
