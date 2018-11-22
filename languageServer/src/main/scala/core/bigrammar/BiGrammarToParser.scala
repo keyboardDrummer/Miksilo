@@ -38,8 +38,7 @@ object BiGrammarToParser extends CommonParserWriter {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
-    val valueParser: MapParser[StringReader, Result, Any] = resultParser.map(executeResult)
-    valueParser
+    resultParser.map(executeResult)
   }
 
   private def executeResult(result: Result): Any = {

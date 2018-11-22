@@ -91,7 +91,7 @@ trait Parser[Input <: ParseInput, +Result] {
   def option: Parser[Option[Result]] = this.map(x => Some(x)) | Return[Input, Option[Result]](None)
   def flatMap[NewResult](f: Result => Parser[NewResult]) = new FlatMap(this, f)
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
-  def withDefault[Other >: Result](_default: Other): Parser[Other] = WithDefault[Input, Other](this, _default)
+  def withDefault[Other >: Result](_default: Other): Parser[Other] = WithDefault[Input, Other](this, cache => Some(_default))
 
   def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum) : Parser[Sum] = {
     lazy val result: Parser[Sum] = new Sequence(this, result, reduce).withDefault[Sum](zero) | Return(zero)
@@ -106,6 +106,33 @@ trait Parser[Input <: ParseInput, +Result] {
   def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
     new Sequence(this, (separator ~> this)*, (h: Result, t: List[Result]) => h :: t) |
       Return(List.empty)
+
+  def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Parser[Other] = {
+    val positionParser = new PositionParser[Input]()
+    val outer = this
+    val parseWithRemainder = new Parser[(Result, Input)] {
+      override def parseNaively(input: Input, parseState: ParseState): ParseResult[(Result, Input)] = {
+        val parseResult = outer.parseCached(input, parseState)
+
+        parseResult.map(result => (result, parseResult.remainder))
+      }
+
+      override def getDefault(cache: DefaultCache): Option[(Result, Input)] = None
+    }
+    val withPosition = new Sequence(positionParser, parseWithRemainder,
+      (left: Input, resultRight: (Result, Input)) => addRange(left, resultRight._2, resultRight._1))
+    WithDefault(withPosition, cache => outer.getDefault(cache))
+  }
+
+}
+
+class PositionParser[Input <: ParseInput] extends Parser[Input, Input] {
+
+  override def parseNaively(input: Input, state: ParseState): ParseResult[Input] = {
+    ParseSuccess[Input, Input](input, input, NoFailure)
+  }
+
+  override def getDefault(cache: DefaultCache): Option[Input] = None
 }
 
 trait ParseInput {

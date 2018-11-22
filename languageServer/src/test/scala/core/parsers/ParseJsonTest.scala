@@ -8,7 +8,7 @@ class ParseJsonTest extends FunSuite with CommonParserWriter {
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
-  private lazy val jsonParser: Parser[Any] = WithDefault(stringLiteral | objectParser | wholeNumber, UnknownExpression)
+  private lazy val jsonParser: Parser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
