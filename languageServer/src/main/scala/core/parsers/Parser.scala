@@ -108,32 +108,15 @@ trait Parser[Input <: ParseInput, +Result] {
       Return(List.empty)
 
   def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Parser[Other] = {
-    val positionParser = new PositionParser[Input]()
-    val outer = this
-    val parseWithRemainder = new Parser[(Result, Input)] {
-      override def parseNaively(input: Input, parseState: ParseState): ParseResult[(Result, Input)] = {
-        val parseResult = outer.parseCached(input, parseState)
-
-        parseResult.map(result => (result, parseResult.remainder))
-      }
-
-      override def getDefault(cache: DefaultCache): Option[(Result, Input)] = None
-    }
-    val withPosition = new Sequence(positionParser, parseWithRemainder,
+    val withPosition = new Sequence(
+      new PositionParser[Input](),
+      new WithRemainderParser(this),
       (left: Input, resultRight: (Result, Input)) => addRange(left, resultRight._2, resultRight._1))
-    WithDefault(withPosition, cache => outer.getDefault(cache))
+    WithDefault(withPosition, cache => this.getDefault(cache))
   }
-
 }
 
-class PositionParser[Input <: ParseInput] extends Parser[Input, Input] {
 
-  override def parseNaively(input: Input, state: ParseState): ParseResult[Input] = {
-    ParseSuccess[Input, Input](input, input, NoFailure)
-  }
-
-  override def getDefault(cache: DefaultCache): Option[Input] = None
-}
 
 trait ParseInput {
   def offset: Int
