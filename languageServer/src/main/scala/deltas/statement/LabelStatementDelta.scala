@@ -34,6 +34,6 @@ object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val label = getName(statement)
-    builder.declare(label, parentScope, statement.getMember(Name))
+    builder.declare(label, parentScope, statement.getSourceElement(Name))
   }
 }

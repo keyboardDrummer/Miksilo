@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path._
-import core.language.node.{ValuePath, Node}
+import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.smarts.objects.{NamedDeclaration, Reference}
 import deltas.expressions.{ExpressionDelta, VariableDelta}
@@ -21,7 +21,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
 
   override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, MethodDelta, JavaClassSkeleton, ThisVariableDelta)
 
-  def addThisToVariable(static: Boolean, clazzName: String, variable: ChildPath): Unit = {
+  def addThisToVariable(static: Boolean, clazzName: String, variable: NodeChildPath): Unit = {
     val newVariableName = if (static) clazzName else ThisVariableDelta.thisName
     val selector = MemberSelectorDelta.Shape.createWithSource(
       MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
@@ -40,14 +40,14 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
       val reference: Reference = maybeGraphNode.get.asInstanceOf[Reference]
       val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
       maybeDeclaration.foreach(declaration => {
-        val declarationNode = declaration.origin.get.asInstanceOf[ValuePath].path.current
+        val declarationNode = declaration.origin.get.asInstanceOf[FieldPath].parent.current
         declarationNode.shape match {
           case MethodDelta.Shape =>
             val method: Method[Node] = declarationNode
-            addThisToVariable(method.isStatic, clazz.name, variable.asInstanceOf[ChildPath])
+            addThisToVariable(method.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
           case FieldDeclarationDelta.Shape =>
             val field: Field[Node] = declarationNode
-            addThisToVariable(field.isStatic, clazz.name, variable.asInstanceOf[ChildPath])
+            addThisToVariable(field.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
           case _ =>
         }
       })

@@ -2,7 +2,7 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
@@ -37,7 +37,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)
 
     val newStatements = Seq[Node](startLabel, _if)
-    whileLoopPath.asInstanceOf[SequenceElement].replaceWith(newStatements)
+    whileLoopPath.asInstanceOf[NodeSequenceElement].replaceWith(newStatements)
   }
 
   override def dependencies: Set[Contract] = Set(IfThenDelta, BlockDelta, LabelStatementDelta, GotoStatementDelta)

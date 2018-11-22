@@ -48,8 +48,4 @@ trait LanguageServerTest extends FunSuite {
     server.didOpen(item)
     TextDocumentIdentifier(item.uri)
   }
-
-  def sendChange(server: LanguageServer, change: TextDocumentContentChangeEvent, uri: String = itemUri, version: Long = 1): Unit = {
-    server.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(uri, version), Seq(change)))
-  }
 }

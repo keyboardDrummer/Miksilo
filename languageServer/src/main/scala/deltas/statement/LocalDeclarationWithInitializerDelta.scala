@@ -2,7 +2,7 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
@@ -50,7 +50,7 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     path.removeField(Initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = withInitializer.node.asInstanceOf[SequenceElement]
+    val originSequence = withInitializer.node.asInstanceOf[NodeSequenceElement]
     originSequence.replaceWith(Seq(path.current, assignmentStatement))
   }
 

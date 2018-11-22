@@ -33,6 +33,6 @@ object VerilogClassDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val _clazz: Class[NodePath] = path
-    builder.declare(_clazz.name, parentScope, _clazz.getMember(Name))
+    builder.declare(_clazz.name, parentScope, _clazz.getSourceElement(Name))
   }
 }

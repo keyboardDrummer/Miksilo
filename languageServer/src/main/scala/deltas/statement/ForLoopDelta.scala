@@ -2,7 +2,7 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.expressions.ExpressionDelta
@@ -39,7 +39,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
     val block = BlockDelta.Shape.create(BlockDelta.Statements -> newStatements)
-    forLoopPath.asInstanceOf[SequenceElement].replaceWith(block)
+    forLoopPath.asInstanceOf[NodeSequenceElement].replaceWith(block)
   }
 
   implicit class ForLoop[T <: NodeLike](val node: T) extends NodeWrapper[T] {

@@ -2,7 +2,7 @@ package core.deltas.path
 
 import core.language.node.{Node, NodeField}
 
-trait AnyChildPath extends AnyPath {
+trait ChildPath extends AnyPath {
   def replaceWith(replacement: Any): Unit
   def parent: NodePath
   val field: NodeField
@@ -10,7 +10,7 @@ trait AnyChildPath extends AnyPath {
   override def uriOption: Option[String] = parent.uriOption
 }
 
-trait ChildPath extends NodePath with AnyChildPath {
+trait NodeChildPath extends NodePath with ChildPath {
   def current: Node
-  override def uriOption: Option[String] = super[NodePath].uriOption.orElse(super[AnyChildPath].uriOption)
+  override def uriOption: Option[String] = super[NodePath].uriOption.orElse(super[ChildPath].uriOption)
 }

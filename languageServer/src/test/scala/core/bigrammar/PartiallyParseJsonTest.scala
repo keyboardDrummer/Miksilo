@@ -5,7 +5,7 @@ import core.language.node.GrammarKey
 import core.parsers.strings.{StringParserWriter, StringReader}
 import org.scalatest.FunSuite
 
-class ParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringParserWriter {
+class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringParserWriter {
 
   object Json extends GrammarKey
   val jsonGrammar = new Labelled(Json)
