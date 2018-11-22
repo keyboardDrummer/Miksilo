@@ -6,7 +6,7 @@ import core.deltas.grammars.TriviasGrammar
 trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {
 
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true): BiGrammar =
-    if (grammar.containsParser()) WithTrivia.withTrivia(grammar, new Labelled(TriviasGrammar, new ManyHorizontal(ParseWhiteSpace)), horizontal) else grammar
+    if (grammar.containsParser()) new WithTrivia(grammar, new Labelled(TriviasGrammar, new ManyHorizontal(ParseWhiteSpace)), horizontal) else grammar
 
   implicit def stringAsGrammar(value: String): BiGrammarExtension = new BiGrammarExtension(value)
   implicit class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {

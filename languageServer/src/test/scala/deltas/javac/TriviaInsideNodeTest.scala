@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.bigrammar._
-import core.bigrammar.grammars.{Labelled, Sequence, WithTrivia}
+import core.bigrammar.grammars.{Labelled, BiSequence, WithTrivia}
 import core.deltas.NodeGrammarWriter
 import core.deltas.grammars.BodyGrammar
 import core.language.Language
@@ -45,7 +45,7 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
     language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
     TriviaInsideNode.transformGrammars(grammars, new Language())
-    val expectedParentGrammar = WithTrivia.withTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
+    val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
   }
 
@@ -67,17 +67,17 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     expressionGrammar.addAlternative(numberGrammar)
     expressionGrammar.addAlternative(additionGrammar)
 
-    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, Sequence.identity)
+    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, BiSequence.identity)
     grammars.find(BodyGrammar).inner = expressionGrammar
-    val expectedBeforeAdditionGrammar = lr(expressionGrammar.as(Left), WithTrivia.withTrivia(lr("+",
-      WithTrivia.withTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
+    val expectedBeforeAdditionGrammar = lr(expressionGrammar.as(Left), new WithTrivia(lr("+",
+      new WithTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
     val expectedBeforeNumberGrammar = (number : BiGrammar).as(Value)
     assertResult(expectedBeforeAdditionGrammar.toString)(additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult(expectedBeforeNumberGrammar.toString)(numberGrammar.inner.toString) //TODO use actual equality instead of toString
     TriviaInsideNode.transformGrammars(grammars, language)
 
     val expectedAdditionGrammar = expressionGrammar.as(Left) ~ lr("+", expressionGrammar.as(Right))
-    val expectedNumberGrammar = WithTrivia.withTrivia((number : BiGrammar).as(Value), grammars.trivia)
+    val expectedNumberGrammar = new WithTrivia((number : BiGrammar).as(Value), grammars.trivia)
     assertResult("1" + expectedAdditionGrammar.toString)("1" + additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult("2" + expectedNumberGrammar.toString)("2" + numberGrammar.inner.toString) //TODO use actual equality instead of toString
   }

@@ -132,12 +132,12 @@ class JavaStyleCommentsTest
     TriviaInsideNode.transformGrammars(language.grammars, language)
 
     val expectedStatementGrammar: BiGrammar =
-      new NodeGrammar(WithTrivia.withTrivia("statement", language.grammars.trivia, false), ParentClass)
+      new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
 
     import DefaultBiGrammarWriter._
     val expectedBlockGrammar = "{" %>
       new Labelled(StatementDelta.Grammar).manyVertical.as(BlockDelta.Statements).indent() %<
-      WithTrivia.withTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false) asNode(BlockDelta.Shape)
+      new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false) asNode(BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

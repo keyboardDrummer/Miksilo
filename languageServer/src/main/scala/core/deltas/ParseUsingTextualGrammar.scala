@@ -17,16 +17,14 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
     val parseResult: ParseResult[Node] = parseStream(parser, inputStream)
+    parseResult.getPartial.foreach(program => {
+      compilation.program = program
+      compilation.program.startOfUri = Some(uri)
+    })
     parseResult match {
-      case success: ParseSuccess[Node] =>
-        compilation.program = success.result
-        compilation.program.startOfUri = Some(uri)
       case failure: ParseFailure[Node] =>
-        failure.partialResult.foreach(program => {
-          compilation.program = program
-          compilation.program.startOfUri = Some(uri)
-        })
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
+      case _ =>
     }
   }
 

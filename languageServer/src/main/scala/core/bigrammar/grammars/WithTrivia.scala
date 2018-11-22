@@ -1,22 +1,9 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.{BiGrammar, DefaultBiGrammarWriter}
-
-object WithTrivia extends DefaultBiGrammarWriter {
-  def withTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true): BiGrammar = {
-    new WithTrivia(grammar, trivia, horizontal)
-  }
-
-  def getWithTrivia(grammar: BiGrammar): Option[WithTrivia] = {
-    grammar match {
-      case sequence: WithTrivia => Some(sequence)
-      case _ => None
-    }
-  }
-}
+import core.bigrammar.BiGrammar
 
 class WithTrivia(grammar: BiGrammar, trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true)
-  extends BiSequence(trivia, grammar, Sequence.ignoreLeft, horizontal) {
+  extends BiSequence(trivia, grammar, BiSequence.ignoreLeft, horizontal) {
   def getGrammar: BiGrammar = second
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true

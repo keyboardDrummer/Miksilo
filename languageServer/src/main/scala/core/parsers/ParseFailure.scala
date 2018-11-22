@@ -17,11 +17,15 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
   override def successful: Boolean = false
 
   override def toString: String = message
+
+  override def getPartial = partialResult
 }
 
 trait ParseResult[Input <: ParseInput, +Result] {
   def successful: Boolean
   def map[NewResult](f: Result => NewResult): ParseResult[Input, NewResult]
+
+  def getPartial: Option[Result]
   def get: Result
   def remainder: Input
 }
@@ -45,6 +49,8 @@ case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder:
   override def get: Result = result
 
   override def successful: Boolean = true
+
+  override def getPartial = Some(result)
 }
 
 trait OptionFailure[+Result] {

@@ -18,8 +18,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
     val descendants = grammars.root.descendants
     for(path <- descendants)
     {
-      WithTrivia.getWithTrivia(path.value) match {
-        case Some(trivia) =>
+      path.value match {
+        case trivia: WithTrivia =>
           if (!visited.contains(path.value)) {
             visited += path.value
 
@@ -32,7 +32,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
         case _ =>
       }
     }
-    System.out.append("")
   }
 
   private def hasLeftNode(path: GrammarPath) = {
@@ -41,7 +40,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    if (WithTrivia.getWithTrivia(grammar.value).nonEmpty)
+    if (grammar.value.isInstanceOf[WithTrivia])
       return //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
 
     grammar.value match {
@@ -65,8 +64,8 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def placeTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
-    if (WithTrivia.getWithTrivia(grammar.value).isEmpty && grammar.value.containsParser()) {
-      grammar.set(WithTrivia.withTrivia(grammar.value, grammars.trivia, horizontal))
+    if (!grammar.value.isInstanceOf[WithTrivia] && grammar.value.containsParser()) {
+      grammar.set(new WithTrivia(grammar.value, grammars.trivia, horizontal))
     }
   }
 
