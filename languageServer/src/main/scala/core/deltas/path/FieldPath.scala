@@ -3,13 +3,11 @@ package core.deltas.path
 import core.language.node.{Node, NodeField, SourceRange}
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
-
+  override def current: Node = super[FieldPath].current.asInstanceOf[Node]
+  override def range: Option[SourceRange] = super[FieldPath].range.orElse(super[NodeChildPath].range)
 }
 
-/** A path to a value in an AST. This is similar to a NodePath, except that the value doesn't have to be of type Node.
-  */
 case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
-  def current: Node = parent.current(field).asInstanceOf[Node]
 
   override def parentOption: Option[NodePath] = Some(parent)
 
@@ -25,7 +23,9 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
 
-  override def range: Option[SourceRange] = parent.current.sources.get(field).orElse(current.position)
+  override def range: Option[SourceRange] = parent.current.sources.get(field)
+
+  override def current = parent.current(field)
 }
 
 

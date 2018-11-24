@@ -83,8 +83,8 @@ trait Parser[Input <: ParseInput, +Result] {
   final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
 
   def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result, b: Right) => (a,b))
-  def ~<[Right](right: Parser[Right]) = new Sequence(this, right, (a: Result, _) => a)
-  def ~>[Right](right: Parser[Right]) = new Sequence(this, right, (_, b: Right) => b)
+  def ~<[Right](right: Parser[Right]) = new Sequence(this, right, (a: Result, _: Right) => a)
+  def ~>[Right](right: Parser[Right]) = new Sequence(this, right, (_: Result, b: Right) => b)
   def |[Other >: Result](other: => Parser[Other]) = new OrElse[Input, Result, Other, Other](this, other)
   def |||[Other >: Result](other: => Parser[Other]) = new BiggestOfTwo[Input, Result, Other, Other](this, other)
   def map[NewResult](f: Result => NewResult) = new MapParser(this, f)

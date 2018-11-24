@@ -93,7 +93,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   override def get(key: NodeField): Option[Any] = data.get(key)
 
-  def position: Option[SourceRange] =
+  def range: Option[SourceRange] =
     if (sources.values.isEmpty) None
     else Some(SourceRange(sources.values.map(p => p.start).min(PositionOrdering), sources.values.map(p => p.end).max))
 
