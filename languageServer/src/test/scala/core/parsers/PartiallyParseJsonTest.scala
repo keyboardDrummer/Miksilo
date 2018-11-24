@@ -3,7 +3,7 @@ package core.parsers
 import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
 
-class ParseJsonTest extends FunSuite with CommonParserWriter {
+class PartiallyParseJsonTest extends FunSuite with CommonParserWriter {
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"

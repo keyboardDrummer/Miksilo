@@ -7,7 +7,6 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.NodeGrammar
 
-
 //noinspection ZeroIndexToHead
 object TriviaInsideNode extends DeltaWithGrammar {
 

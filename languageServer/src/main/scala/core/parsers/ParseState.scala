@@ -11,7 +11,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
   val callStackSet = mutable.HashSet[ParseNode[Input]]()
   val callStack = mutable.Stack[Parser[Input, _]]()
   var parsersPartOfACycle: Set[Parser[Input, _]] = Set.empty
-  val parsersWithBackEdges = mutable.HashSet[Parser[Input, _]]() //TODO possible this can be only the parsers.
+  val parsersWithBackEdges = mutable.HashSet[Parser[Input, _]]()
 
   def putIntermediate(key: ParseNode[Input], value: ParseResult[Input, Any]): Unit = {
     recursionIntermediates.put(key, value)
