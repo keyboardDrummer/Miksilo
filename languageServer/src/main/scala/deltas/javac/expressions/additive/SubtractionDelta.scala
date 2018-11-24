@@ -29,10 +29,10 @@ object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta 
 
   override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta, SubtractIntegerDelta)
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
-    val withoutSubtraction = additiveGrammar.inner //We're doing this to get "-" to behave right associative. Hope this doesn't have any bad side-effects.
+    val withoutSubtraction = additiveGrammar.inner
     val parseSubtraction = (additiveGrammar.as(FirstKey) ~~< "-") ~~ withoutSubtraction.as(SecondKey) asNode SubtractionKey
     additiveGrammar.addAlternative(parseSubtraction)
   }
