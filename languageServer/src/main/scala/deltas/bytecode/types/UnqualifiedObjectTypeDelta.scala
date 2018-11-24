@@ -2,8 +2,8 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
@@ -25,7 +25,7 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
 
   def neww(className: String): Node = Shape.create(Name -> className)
 
-  def getName(objectType: NodeLike): String = objectType(Name).asInstanceOf[String]
+  def getName(objectType: NodeLike): String = objectType.getValue(Name).asInstanceOf[String]
 
   object Name extends NodeField
 

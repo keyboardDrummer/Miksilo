@@ -1,10 +1,10 @@
 package deltas.bytecode.simpleBytecode
 
+import core.bigrammar.grammars.Labelled
 import core.bigrammar.{BiGrammar, GrammarReference}
-import core.bigrammar.grammars.{IgnoreLeft, Labelled}
+import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
-import core.deltas._
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.{ClassFile, ConstantPoolGrammar}
@@ -37,8 +37,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    inlineConstantPoolReferences(language)
     simplifyConstantEntryGrammars(language)
+    inlineConstantPoolReferences(language)
     removeConstantPoolGrammar(language)
   }
 
@@ -64,8 +64,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
     for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
-      val ignoreLeft = grammars.find(entry.shape).find(p => p.value.isInstanceOf[IgnoreLeft]).get
-      ignoreLeft.set(ignoreLeft.value.asInstanceOf[IgnoreLeft].sequence.second)
+      val entryGrammar = grammars.find(entry.shape).find(g => g.value.isInstanceOf[NodeGrammar]).get.value.asInstanceOf[NodeGrammar]
+      entryGrammar.inner = entry.getConstantEntryGrammar(grammars)
     }
   }
 

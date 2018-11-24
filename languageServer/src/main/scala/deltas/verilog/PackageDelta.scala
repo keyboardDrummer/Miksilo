@@ -32,7 +32,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   implicit class Package[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
   }
 
@@ -44,7 +44,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val _package: Package[NodePath] = path
-    val packageDeclaration = builder.declare(_package.name, parentScope, path.getMember(Name))
+    val packageDeclaration = builder.declare(_package.name, parentScope, path.getSourceElement(Name))
     val packageScope = builder.declareScope(packageDeclaration, debugName = "package")
 
     for(member <- _package.members) {

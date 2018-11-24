@@ -3,7 +3,7 @@ package deltas.javac.classes.skeleton
 import core.bigrammar.BiGrammar
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
 import core.document.BlankLine
 import core.language.node._
 import core.language.{Compilation, Language}
@@ -36,13 +36,13 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]) = node(ClassImports) = value
 
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def name_=(value: String): Unit = node(Name) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]) = node(Members) = value
 
-    def parent: Option[String] = node(ClassParent).asInstanceOf[Option[String]]
+    def parent: Option[String] = node.getValue(ClassParent).asInstanceOf[Option[String]]
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
@@ -79,7 +79,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
     case UnqualifiedObjectTypeDelta.Shape =>
         val newName = classCompiler.fullyQualify(UnqualifiedObjectTypeDelta.getName(_type))
-      _type.asInstanceOf[ChildPath].replaceWith(QualifiedObjectTypeDelta.neww(newName))
+      _type.asInstanceOf[NodeChildPath].replaceWith(QualifiedObjectTypeDelta.neww(newName))
     case _ =>
   }
 
@@ -188,7 +188,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     }
 
     //TODO here there should be an instance, a static, and a lexical scope.
-    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getMember(Name))
+    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members

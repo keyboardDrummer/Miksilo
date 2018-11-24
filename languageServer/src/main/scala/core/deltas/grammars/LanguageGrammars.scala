@@ -15,10 +15,11 @@ object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey
 class LanguageGrammars extends GrammarCatalogue {
+  import BiGrammarWriter._
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
-  create(ProgramGrammar, new WithTrivia(new IgnoreRight(new LeftRight(bodyGrammar, trivia)), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
+  create(ProgramGrammar, new WithTrivia(leftRight(bodyGrammar, trivia, BiSequence.ignoreRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
   def root: Labelled = find(ProgramGrammar)
 
@@ -29,18 +30,17 @@ class LanguageGrammars extends GrammarCatalogue {
   class BiGrammarExtension(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
     with BiGrammarSequenceCombinatorsExtension
   {
-    def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean = true) =
+    private def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean) =
       if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
 
     def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
     def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
 
-    def ~(other: BiGrammar) = new LeftRight(grammar, addTriviaIfUseful(other))
+    override def sequence(other: BiGrammar, bijective: SequenceBijective, horizontal: Boolean): BiGrammar =
+      new BiSequence(grammar, addTriviaIfUseful(other, horizontal), bijective, horizontal)
 
-    def many = new ManyHorizontal(addTriviaIfUseful(grammar))
-
-    def %(bottom: BiGrammar) = new TopBottom(grammar, addTriviaIfUseful(bottom, false))
+    def many = new ManyHorizontal(addTriviaIfUseful(grammar, true))
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }

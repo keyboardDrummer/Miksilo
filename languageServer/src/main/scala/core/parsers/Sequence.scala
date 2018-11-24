@@ -17,9 +17,8 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
               addFailure(leftSuccess.biggestFailure.map(l => combine(l, rightSuccess.result)))
 
           case rightFailure: ParseFailure[Right] =>
-            val maybeRightDefault = right.getDefault(state)
-            if (leftSuccess.biggestFailure.offset > rightFailure.offset && maybeRightDefault.nonEmpty) {
-              val rightDefault = maybeRightDefault.get
+            if (leftSuccess.biggestFailure.offset > rightFailure.offset && rightFailure.partialResult.nonEmpty) {
+              val rightDefault = rightFailure.partialResult.get
               leftSuccess.biggestFailure.map(l => combine(l, rightDefault)).asInstanceOf[ParseFailure[Result]]
             }
             else {
@@ -41,9 +40,3 @@ class Sequence[Input <: ParseInput, +Left, +Right, +Result](left: Parser[Input, 
     rightDefault <- cache(right)
   } yield combine(leftDefault, rightDefault)
 }
-
-class IgnoreRight[Input <: ParseInput, +Result, +Right](left: Parser[Input, Result], right: Parser[Input, Right]) extends // TODO Optimize IgnoreRight and IgnoreLeft with a custom implementation
-  Sequence[Input, Result, Right, Result](left, right, (l,_) => l)
-
-class IgnoreLeft[Input <: ParseInput, +Left, +Result](left: Parser[Input, Left], right: Parser[Input, Result]) extends
-  Sequence[Input, Left, Result, Result](left, right, (_,r) => r)

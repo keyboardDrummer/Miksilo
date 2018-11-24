@@ -1,11 +1,11 @@
 package deltas.bytecode.constants
 
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode._
 
-object InterfaceMethodRefConstant extends ConstantEntry {
+object InterfaceMethodRefConstant extends ConstantPoolEntry {
 
   object InterfaceMethodRefConstantKey extends NodeShape
 
@@ -38,5 +38,5 @@ object InterfaceMethodRefConstant extends ConstantEntry {
   override def description: String = "Defines the interface method reference constant, " +
     "which refers to a method by class name, method name and signature."
 
-  override def getName = "InterfaceMethodref"
+  override val getName = "InterfaceMethodref"
 }

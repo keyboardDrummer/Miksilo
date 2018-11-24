@@ -21,8 +21,6 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   def runPhases(): Unit = {
     for(phase <- language.compilerPhases) {
       phase.action(this)
-      if (diagnostics.nonEmpty)
-        return
     }
   }
 

@@ -3,11 +3,11 @@ package deltas.bytecode.constants
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Identifier, StringLiteral}
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 
-object Utf8ConstantDelta extends ConstantEntry {
+object Utf8ConstantDelta extends ConstantPoolEntry {
   override def shape = Utf8ConstantKey
 
   object Utf8ConstantKey extends NodeShape
@@ -34,5 +34,5 @@ object Utf8ConstantDelta extends ConstantEntry {
 
   override def description: String = "A string constant"
 
-  override def getName = "Utf8"
+  override val getName = "Utf8"
 }

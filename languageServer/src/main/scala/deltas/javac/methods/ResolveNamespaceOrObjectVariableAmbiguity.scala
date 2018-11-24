@@ -1,6 +1,6 @@
 package deltas.javac.methods
 
-import core.language.node.ValuePath
+import core.deltas.path.FieldPath
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import core.smarts.types.TypesAreEqual
 import core.smarts.types.objects.TypeFromDeclaration
@@ -13,7 +13,7 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
     namespaceOrObjectVariableDeclaration match {
       case e:NamedDeclaration =>
         e.origin match {
-          case Some(fieldLocation: ValuePath) => fieldLocation.field match {
+          case Some(fieldLocation: FieldPath) => fieldLocation.field match {
             case JavaClassSkeleton.Name => //TODO allow referencing packages.
               solver.unifyDeclarations(scopeDeclaration, namespaceOrObjectVariableDeclaration)
             case _ =>

@@ -1,11 +1,11 @@
 package deltas.javac
 
 import core.bigrammar._
-import core.bigrammar.grammars.{Labelled, LeftRight, WithTrivia}
-import core.deltas.grammars.BodyGrammar
-import core.language.node.{GrammarKey, NodeField, NodeShape}
+import core.bigrammar.grammars.{Labelled, BiSequence, WithTrivia}
 import core.deltas.NodeGrammarWriter
+import core.deltas.grammars.BodyGrammar
 import core.language.Language
+import core.language.node.{GrammarKey, NodeField, NodeShape}
 import deltas.javac.trivia.TriviaInsideNode
 import org.scalatest.FunSuite
 
@@ -67,15 +67,16 @@ class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
     expressionGrammar.addAlternative(numberGrammar)
     expressionGrammar.addAlternative(additionGrammar)
 
+    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, BiSequence.identity)
     grammars.find(BodyGrammar).inner = expressionGrammar
-    val expectedBeforeAdditionGrammar = new LeftRight(expressionGrammar.as(Left), new WithTrivia(new LeftRight("+",
+    val expectedBeforeAdditionGrammar = lr(expressionGrammar.as(Left), new WithTrivia(lr("+",
       new WithTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))
     val expectedBeforeNumberGrammar = (number : BiGrammar).as(Value)
     assertResult(expectedBeforeAdditionGrammar.toString)(additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult(expectedBeforeNumberGrammar.toString)(numberGrammar.inner.toString) //TODO use actual equality instead of toString
     TriviaInsideNode.transformGrammars(grammars, language)
 
-    val expectedAdditionGrammar = expressionGrammar.as(Left) ~ new LeftRight("+", expressionGrammar.as(Right))
+    val expectedAdditionGrammar = expressionGrammar.as(Left) ~ lr("+", expressionGrammar.as(Right))
     val expectedNumberGrammar = new WithTrivia((number : BiGrammar).as(Value), grammars.trivia)
     assertResult("1" + expectedAdditionGrammar.toString)("1" + additionGrammar.inner.toString) //TODO use actual equality instead of toString
     assertResult("2" + expectedNumberGrammar.toString)("2" + numberGrammar.inner.toString) //TODO use actual equality instead of toString

@@ -25,10 +25,10 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def compileToFile(inputStream: InputStream, outputFile: File): Compilation = {
-    val state: Compilation = compile(inputStream)
+    val compilation: Compilation = compile(inputStream)
 
-    PrintByteCodeToOutputDirectory.perform(outputFile, state)
-    state
+    PrintByteCodeToOutputDirectory.perform(outputFile, compilation)
+    compilation
   }
 
   def compile(input: InputStream): Compilation = {

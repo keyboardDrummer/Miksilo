@@ -9,7 +9,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeFieldInfo.FieldInfoWrapper
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.attributes.{AttributeNameKey, ByteCodeAttribute}
-import deltas.bytecode.constants.{ClassInfoConstant, ConstantEntry}
+import deltas.bytecode.constants.{ClassInfoConstant, ConstantPoolEntry}
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.javac.classes.ConstantPool
 
@@ -60,7 +60,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar {
   def getBytes(compilation: Compilation, node: Node): Seq[Byte] = hasBytes(compilation, node.shape).getBytes(compilation, node)
 
   val hasBytes = new ShapeProperty[HasBytes]
-  val constantEntries = new ShapeProperty[ConstantEntry]
+  val constantEntries = new ShapeProperty[ConstantPoolEntry]
   val attributesByName = new Property[mutable.HashMap[String, ByteCodeAttribute]](mutable.HashMap.empty)
   val constantReferences = new ShapeProperty[Map[NodeField, NodeShape]]
 

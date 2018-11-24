@@ -11,7 +11,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
   val callStackSet = mutable.HashSet[ParseNode[Input]]()
   val callStack = mutable.Stack[Parser[Input, _]]()
   var parsersPartOfACycle: Set[Parser[Input, _]] = Set.empty
-  val nodesWithBackEdges = mutable.HashSet[Parser[Input, _]]() //TODO possible this can be only the parsers.
+  val parsersWithBackEdges = mutable.HashSet[Parser[Input, _]]()
 
   def putIntermediate(key: ParseNode[Input], value: ParseResult[Input, Any]): Unit = {
     recursionIntermediates.put(key, value)
@@ -23,7 +23,7 @@ class ParseState[Input <: ParseInput](val resultCache: Cache[ParseNode[Input], P
 
   def getPreviousResult[Result](node: ParseNode[Input]): Option[ParseResult[Input, Result]] = {
     if (callStackSet.contains(node)) {
-      nodesWithBackEdges.add(node.parser)
+      parsersWithBackEdges.add(node.parser)
       val index = callStack.indexOf(node.parser)
       parsersPartOfACycle ++= callStack.take(index + 1)
       return Some(recursionIntermediates.getOrElse(node,
@@ -47,9 +47,14 @@ class DefaultCache {
   var values = mutable.Map.empty[Parser[_, _], Option[_]]
 
   def apply[Result](parser: Parser[_, Result]): Option[Result] = {
-    values.getOrElseUpdate(parser, {
-      values.put(parser, None)
-      parser.getDefault(this)
-    }).asInstanceOf[Option[Result]]
+    values.get(parser) match {
+      case Some(v) =>
+        v.asInstanceOf[Option[Result]]
+      case None =>
+        values.put(parser, None)
+        val value = parser.getDefault(this)
+        values.put(parser, value)
+        value
+    }
   }
 }

@@ -2,7 +2,7 @@ package deltas.javac.classes
 
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeShape}
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.{NodeChildPath, NodePath}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -19,7 +19,7 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
     val elements = getParts(_import)
     val fullPackage: String = elements.reduce((a, b) => a + "." + b)
-    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[ChildPath], parentScope)
+    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[NodeChildPath], parentScope)
     val packageScope = builder.getDeclaredScope(packageDeclaration)
     builder.importScope(parentScope, packageScope)
   }

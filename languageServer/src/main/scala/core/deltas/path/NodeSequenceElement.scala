@@ -2,7 +2,7 @@ package core.deltas.path
 
 import core.language.node.{Node, NodeField, SourceRange}
 
-case class SequenceElement(parent: NodePath, field: NodeField, index: Int) extends ChildPath
+case class NodeSequenceElement(parent: NodePath, field: NodeField, index: Int) extends NodeChildPath
 {
   val current: Node = parent.current(field).asInstanceOf[Seq[Node]](index)
   def sequence: Seq[NodePath] = parent(field).asInstanceOf[Seq[NodePath]]
@@ -21,13 +21,11 @@ case class SequenceElement(parent: NodePath, field: NodeField, index: Int) exten
   override def hashCode(): Int = parent.hashCode() * field.hashCode() * index
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case other: SequenceElement => other.parent.equals(parent) && other.field.equals(field) && other.index == index
+    case other: NodeSequenceElement => other.parent.equals(parent) && other.field.equals(field) && other.index == index
     case _ => false
   }
 
   override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
   override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
-
-  override def range: Option[SourceRange] = current.asNode.position
 }

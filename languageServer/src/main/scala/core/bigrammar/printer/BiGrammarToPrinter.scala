@@ -1,16 +1,18 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
-import core.responsiveDocument.ResponsiveDocument
+import core.responsiveDocument.{ResponsiveDocument, ResponsiveLeftRight, ResponsiveTopBottom}
 
 import scala.collection.mutable
 
 object BiGrammarToPrinter {
   def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    printer.write(WithMap(outerValue, Map.empty)).run(Map.empty).get._2
+    val printResult = printer.write(WithMap(outerValue, Map.empty))
+    printResult.run(Map.empty).get._2
   }
 }
 
@@ -35,10 +37,13 @@ class BiGrammarToPrinter {
           new NestPrinter(labelled.inner, labelledToPrinter(labelled))
         case many: ManyHorizontal => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left ~ right)
         case many: ManyVertical => new ManyPrinter(toPrinterCached(many.inner), (left, right) => left % right)
-        case sequence: LeftRight => new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
-          (left, right) => left ~ right)
-        case topBottom: TopBottom => new SequencePrinter(toPrinterCached(topBottom.first), toPrinterCached(topBottom.second),
-          (topDoc, bottomDoc) => topDoc % bottomDoc)
+        case sequence: BiSequence =>
+          val inner = new SequencePrinter(toPrinterCached(sequence.first), toPrinterCached(sequence.second),
+            (first, second) =>
+              if (sequence.horizontal) ResponsiveLeftRight(first, second)
+              else ResponsiveTopBottom(first, second))
+          val deconstruct = (withMap: AnyWithMap) => sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
+          new MapGrammarWithMapPrinter(inner, deconstruct)
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)

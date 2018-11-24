@@ -10,7 +10,7 @@ import deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 
-object NameAndTypeConstant extends ConstantEntry {
+object NameAndTypeConstant extends ConstantPoolEntry {
 
   object Shape extends NodeShape
 
@@ -59,5 +59,5 @@ object NameAndTypeConstant extends ConstantEntry {
 
   override def description: String = "Defines the name and type constant, which contains a name and a field or method descriptor."
 
-  override def getName = "NameAndType"
+  override val getName = "NameAndType"
 }

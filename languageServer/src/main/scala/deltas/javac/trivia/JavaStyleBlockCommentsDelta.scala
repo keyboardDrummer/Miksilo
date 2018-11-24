@@ -6,7 +6,7 @@ import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 
-object JavaStyleBlockCommentsDelta extends DeltaWithGrammar {
+object JavaStyleBlockCommentsDelta extends DeltaWithGrammar with DefaultBiGrammarWriter {
 
   override def description: String = "Adds Java-style block comments to the language"
 
@@ -15,11 +15,10 @@ object JavaStyleBlockCommentsDelta extends DeltaWithGrammar {
   }
 
   val commentGrammar: BiGrammar = {
-    import BasicSequenceCombinators._
 
     val comment = RegexGrammar("""/\*+[^*]*\*+(?:[^/*][^*]*\*+)*/""".r)
     val coloredComment = Colorize(comment, TokenTypes.COMMENT_MULTILINE)
-    (coloredComment ~ printSpace).ignoreRight
+    coloredComment ~< printSpace
   }
 
   override def dependencies: Set[Contract] = Set.empty

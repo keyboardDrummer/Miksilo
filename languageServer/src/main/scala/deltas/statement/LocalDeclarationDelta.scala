@@ -15,7 +15,7 @@ object LocalDeclarationDelta extends StatementInstance
 
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
   }
 
   override def dependencies: Set[Contract] = Set(StatementDelta)
@@ -53,6 +53,6 @@ object LocalDeclarationDelta extends StatementInstance
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val _languageType = statement(Type).asInstanceOf[NodePath]
     val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
-    builder.declare(statement.name, parentScope, statement.getMember(Name), Some(_type))
+    builder.declare(statement.name, parentScope, statement.getSourceElement(Name), Some(_type))
   }
 }

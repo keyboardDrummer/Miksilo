@@ -38,7 +38,7 @@ object PostFixIncrementDelta extends ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(IntTypeDelta.constraintType, _type)
-    val name = plusPlus(Target).asInstanceOf[String]
-    builder.resolve(name, plusPlus.getMember(Target), parentScope, Some(_type))
+    val name = plusPlus.getValue(Target).asInstanceOf[String]
+    builder.resolve(name, plusPlus.getSourceElement(Target), parentScope, Some(_type))
   }
 }

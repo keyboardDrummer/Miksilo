@@ -7,6 +7,7 @@ import core.responsiveDocument.ResponsiveDocument
 import scala.language.implicitConversions
 
 object BiGrammarWriter extends BiGrammarWriter
+
 trait BiGrammarWriter {
 
   def identifier: BiGrammar = Identifier()
@@ -17,6 +18,12 @@ trait BiGrammarWriter {
     s => Integer.parseInt(s),
     i => i.toString
   )
+
+  def leftRight(left: BiGrammar, right: BiGrammar, bijective: SequenceBijective) =
+    new BiSequence(left, right, bijective, true)
+
+  def topBottom(top: BiGrammar, bottom: BiGrammar, bijective: SequenceBijective) =
+    new BiSequence(top, bottom, bijective, false)
 
   def failure: BiGrammar = BiFailure()
 

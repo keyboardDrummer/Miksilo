@@ -1,6 +1,6 @@
 package deltas.javac.statements
 
-import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.node._
 import core.language.{Compilation, Language}
@@ -27,7 +27,7 @@ object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
     val replacement = BlockDelta.neww(Seq(ifThen,
       ifThenElse.elseStatement,
       LabelStatementDelta.neww(endLabel)))
-    ifElsePath.asInstanceOf[ChildPath].replaceWith(replacement)
+    ifElsePath.asInstanceOf[NodeChildPath].replaceWith(replacement)
   }
 
   def shape: NodeShape = IfThenElseDelta.Shape

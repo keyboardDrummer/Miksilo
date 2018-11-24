@@ -2,11 +2,11 @@ package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
 
-object LongInfoConstant extends ConstantEntry {
+object LongInfoConstant extends ConstantPoolEntry {
 
   implicit class LongConstantEntry(node: Node) {
     def value: Long = node(LongEntryValue).asInstanceOf[Long]
@@ -21,11 +21,10 @@ object LongInfoConstant extends ConstantEntry {
   override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = PrintByteCode.byteToBytes(5) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
-    import grammars._
     number.as(LongEntryValue)
   }
 
   override def description: String = "Add the long constant entry."
 
-  override def getName = "Long"
+  override val getName = "Long"
 }

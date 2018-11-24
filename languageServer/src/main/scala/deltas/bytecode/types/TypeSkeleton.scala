@@ -24,8 +24,7 @@ object TypeSkeleton extends DeltaWithGrammar {
 
   def getByteCodeString(state: Language)(_type: Node): String = {
       val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
-      val rendered = BiGrammarToPrinter.toDocument(_type, grammar).renderString()
-      rendered
+      BiGrammarToPrinter.toDocument(_type, grammar).renderString()
   }
 
   val hasTypes = new ShapeProperty[HasTypeDelta]

@@ -44,7 +44,7 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
     Keyword("L", reserved = false) ~> inner ~< ";"
   }
 
-  def getName(objectType: NodeLike): QualifiedClassName = objectType(Name).asInstanceOf[QualifiedClassName]
+  def getName(objectType: NodeLike): QualifiedClassName = objectType.getValue(Name).asInstanceOf[QualifiedClassName]
 
   override def getStackSize: Int = 1
 

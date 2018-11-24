@@ -2,16 +2,16 @@ package deltas.bytecode.extraConstants
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import deltas.bytecode.PrintByteCode
-import deltas.bytecode.constants.ConstantEntry
+import deltas.bytecode.constants.ConstantPoolEntry
 import deltas.javac.classes.skeleton.QualifiedClassName
 
 /**
   * This is a virtual constant that translates into a UTF8Constant.
   */
-object QualifiedClassNameConstantDelta extends ConstantEntry {
+object QualifiedClassNameConstantDelta extends ConstantPoolEntry {
   override def shape = Key
 
   object Key extends NodeShape
@@ -38,5 +38,5 @@ object QualifiedClassNameConstantDelta extends ConstantEntry {
 
   override def description: String = "A qualified class name constant"
 
-  override def getName = "Utf8" //TODO do I want this?
+  override val getName = "Utf8" //TODO do I want this?
 }

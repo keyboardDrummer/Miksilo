@@ -1,18 +1,23 @@
-package core.parsers
+package core.bigrammar
 
-import core.parsers.strings.StringReader
+import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral, WithDefault}
+import core.language.node.GrammarKey
+import core.parsers.strings.{StringParserWriter, StringReader}
 import org.scalatest.FunSuite
 
-class ParseJsonTest extends FunSuite with CommonParserWriter {
+class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringParserWriter {
 
-  private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
-  private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
+  object Json extends GrammarKey
+  val jsonGrammar = new Labelled(Json)
+  private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
+  private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
-  private lazy val jsonParser: Parser[Any] = WithDefault(stringLiteral | objectParser | wholeNumber, UnknownExpression)
+  jsonGrammar.inner = new WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
+  val jsonParser = BiGrammarToParser.toParser(jsonGrammar)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parseWholeInput(StringReader(input.toCharArray))
+    val result = jsonParser.parse(StringReader(input.toCharArray))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }
@@ -72,6 +77,16 @@ class ParseJsonTest extends FunSuite with CommonParserWriter {
     val input = """{"person":3,"second""""
     val expectation = List(("person", "3"), ("second", UnknownExpression))
     assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  test("real life example") {
+    val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subsc"""
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subsc",UnknownExpression))))))))
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  test("some test that triggers the case that Sequence left and right fail, the left failure is bigger and the right has no default but a partialResult") {
+
   }
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {

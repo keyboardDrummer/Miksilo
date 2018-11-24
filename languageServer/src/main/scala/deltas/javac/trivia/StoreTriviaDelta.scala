@@ -5,11 +5,11 @@ import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, BiGrammarToParser, StateFull, WithMap}
+import core.bigrammar.{BiGrammar, StateFull, WithMap}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
-import core.language.node.{Key, NodeField, NodeGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
+import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {
@@ -70,12 +70,12 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
       override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = for {
         key <- TryState.fromStateM(getFieldAndIncrementCounter)
-        value = from.map.getOrElse(key, Seq.empty)
-        result <- triviaPrinter.write(WithMap[Any](value, from.map))
+        value = from.namedValues.getOrElse(key, Seq.empty)
+        result <- triviaPrinter.write(WithMap[Any](value, from.namedValues))
       } yield result
     }
 
-    override def print(toDocumentInner: (BiGrammar) => ResponsiveDocument): ResponsiveDocument = "StoreTrivias"
+    override def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument = "StoreTrivias"
 
     override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 

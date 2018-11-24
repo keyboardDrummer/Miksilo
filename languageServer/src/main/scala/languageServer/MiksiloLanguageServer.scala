@@ -60,20 +60,36 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getSourceElement(position: FilePosition): SourceElement = {
-    def getForNode(node: NodePath): SourceElement = {
-      val childPositions = node.dataView.flatMap(kv => {
-        val value = kv._2
-        val childPaths = NodeLike.getNodeLikesFromValue[NodePath](value)
-        if (childPaths.isEmpty) {
-          Seq(node.getMember(kv._1))
-        } else {
-          childPaths.map(child => getForNode(child))
-        }
-      })
-      val childPosition = childPositions.find(kv => kv.fileRange.exists(r => r.contains(position)))
-      childPosition.fold[SourceElement](node)(x => x)
+    getSourceElementForNode(getCompilation.root, position).get
+  }
+
+  def getSourceElementForNode(element: SourceElement, filePosition:FilePosition):Option[SourceElement]={
+    if (element.isOutsideFile(filePosition.uri))
+      return None
+
+    if(!element.range.exists(r => r.contains(filePosition.position)))
+      return None
+
+    element match {
+      case path: NodePath =>
+        val childResults = path.dataView.values.flatMap((fieldValue: Any) => {
+          val childrenForField = getSourceElementsFromPath[NodePath](fieldValue)
+          childrenForField.flatMap(child => getSourceElementForNode(child,filePosition).toSeq)
+        })
+
+        Some(childResults.headOption.getOrElse({
+          element
+        }))
+      case _ => Some(element)
     }
-    getForNode(getCompilation.root)
+  }
+
+  def getSourceElementsFromPath[Self <: NodeLike](value: Any): Seq[SourceElement] = value match {
+    case nodeLike: SourceElement =>
+      Seq(nodeLike)
+    case sequence: Seq[_] =>
+      sequence.collect({ case nodeLikeChild: SourceElement => nodeLikeChild })
+    case _ => Seq.empty
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}

@@ -48,23 +48,23 @@ class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenc
     val grammarDocument = getExpressionGrammarDocument
 
     val expectedError = """could not deconstruct value
-Value: (WithMap(Undefined,Map()),Map())
-Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMap(Add(Value(4),Undefined),Map()),Map())
-Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-Grammar: | StringKey ()* * ()* StringKey | number | ( ()* StringKey ()* )
-Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-Grammar: | StringKey ()* + ()* StringKey | StringKey
-Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-Grammar: | StringKey % ()* % ? ()* StringKey % ()* % : ()* StringKey | StringKey
-Depth: 23
-Partial:
-    (3 * (4 + ("""
+                          |Value: (WithMap(Undefined,Map()),Map())
+                          |Grammar: | multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
+                          |Value: (WithMap(Add(Value(4),Undefined),Map()),Map())
+                          |Grammar: | add TriviasGrammar + TriviasGrammar add | multiply
+                          |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+                          |Grammar: | multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
+                          |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+                          |Grammar: | add TriviasGrammar + TriviasGrammar add | multiply
+                          |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+                          |Grammar: | multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
+                          |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+                          |Grammar: | add TriviasGrammar + TriviasGrammar add | multiply
+                          |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
+                          |Grammar: | expression % TriviasGrammar ? TriviasGrammar expression % TriviasGrammar : TriviasGrammar expression | add
+                          |Depth: 25
+                          |Partial:
+                          |    (3 * (4 + (""".stripMargin
 
     try
     {

@@ -3,7 +3,7 @@ package deltas.javac.statements
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeGrammar, NodeShape}
-import core.deltas.path.{NodePath, PathRoot, SequenceElement}
+import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
@@ -36,7 +36,7 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   def addEndLabel(whilePath: NodePath): String = {
     val method = whilePath.findAncestorShape(MethodDelta.Shape) //TODO break away from method dependency
     val endLabel = LabelDelta.getUniqueLabel("whileEnd", method)
-    whilePath.asInstanceOf[SequenceElement].replaceWith(Seq(whilePath.current, statement.LabelStatementDelta.neww(endLabel)))
+    whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(whilePath.current, statement.LabelStatementDelta.neww(endLabel)))
     endLabel
   }
 

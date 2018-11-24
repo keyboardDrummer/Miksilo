@@ -9,7 +9,7 @@ import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 
-object FieldRefConstant extends ConstantEntry {
+object FieldRefConstant extends ConstantPoolEntry {
 
   object FieldRef extends NodeShape
 
@@ -60,5 +60,5 @@ object FieldRefConstant extends ConstantEntry {
 
   override def description: String = "Defines the field reference constant, which reference to a field by class name, field name and type."
 
-  override def getName = "Fieldref"
+  override val getName = "Fieldref"
 }

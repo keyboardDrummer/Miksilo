@@ -25,7 +25,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
             val grammar = trivia.getGrammar
             if (hasLeftNode(new RootGrammar(grammar))) {
               path.set(trivia.getGrammar)
-              injectTrivia(grammars, path, trivia.inner.isInstanceOf[LeftRight])
+              injectTrivia(grammars, path, trivia.horizontal)
             }
           }
         case _ =>
@@ -39,8 +39,11 @@ object TriviaInsideNode extends DeltaWithGrammar {
   }
 
   def injectTrivia(grammars: LanguageGrammars, grammar: GrammarReference, horizontal: Boolean): Unit = {
+    if (grammar.value.isInstanceOf[WithTrivia])
+      return //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
+
     grammar.value match {
-      case sequence: Sequence =>
+      case sequence: BiSequence =>
         val left = sequence.getLeftChildren.drop(1).head
         val child = grammar.children.find(ref => ref.value == left).get
         injectTrivia(grammars, child, horizontal)
@@ -51,7 +54,6 @@ object TriviaInsideNode extends DeltaWithGrammar {
       case _:Choice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
-      case _:WithTrivia => //TODO if we consider the grammars as a graph and only move WithTrivia's from all incoming edges at once, then we wouldn't need this hack.
       case _:BiFailure =>
       case _ =>
         if (grammar.children.length == 1)

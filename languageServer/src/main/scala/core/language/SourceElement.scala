@@ -12,5 +12,14 @@ trait SourceElement {
   /*
   A None value means the element is not part of the source.
    */
-  def fileRange: Option[FileRange]
+  def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(u => FileRange(u, p)))
+
+  def uriOption: Option[String]
+
+  def isOutsideFile(uri: String): Boolean = {
+    uriOption match {
+      case Some(nodeUri) => uri != nodeUri
+      case None => false
+    }
+  }
 }

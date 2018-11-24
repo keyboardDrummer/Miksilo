@@ -27,7 +27,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
   object Name extends NodeField
 
   implicit class Field[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node(Name).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
     def _type: T = node(Type).asInstanceOf[T]
   }
 
@@ -91,7 +91,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
     val field: Field[NodePath] = path
-    builder.declare(field.name, parentScope, path.getMember(Name), Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
+    builder.declare(field.name, parentScope, path.getSourceElement(Name), Some(TypeSkeleton.getType(compilation, builder, field._type, parentScope)))
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {

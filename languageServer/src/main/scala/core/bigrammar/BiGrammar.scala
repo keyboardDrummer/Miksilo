@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Choice, Labelled, LeftRight, MapGrammar}
+import core.bigrammar.grammars._
 import core.document.WhiteSpace
 import core.language.node.GrammarKey
 import util.{GraphBasics, Utility}
@@ -24,7 +24,8 @@ trait BiGrammar {
   def |(other: BiGrammar) = new Choice(this, other)
   def option: BiGrammar = this.mapSome[Any, Option[Any]](x => Some(x), x => x) | value(None)
 
-  def indent(width: Int = 2): BiGrammar = new LeftRight(WhiteSpace(width, 0), this).ignoreLeft
+  def indent(width: Int = 2): BiGrammar =
+    leftRight(WhiteSpace(width, 0), this, BiSequence.ignoreLeft)
 
   def optionToSeq: BiGrammar = this.map[Option[Any], Seq[Any]](
     option => option.fold[Seq[Any]](Seq.empty)(v => Seq(v)),
@@ -38,7 +39,8 @@ trait BiGrammar {
     mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))
 
   def mapSome[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => Option[T]): BiGrammar =
-    new MapGrammar(this, value => afterParsing(value.asInstanceOf[T]),
+    new MapGrammar(this,
+      value => afterParsing(value.asInstanceOf[T]),
       value => Utility.cast[U](value).flatMap(value => beforePrinting(value)))
 
   def children: Seq[BiGrammar]

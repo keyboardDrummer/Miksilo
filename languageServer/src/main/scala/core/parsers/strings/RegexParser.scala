@@ -10,7 +10,8 @@ case class RegexParser(regex: Regex) extends Parser[StringReader, String] {
       case Some(matched) =>
         ParseSuccess(
           inputs.array.subSequence(inputs.offset, inputs.offset + matched.end).toString,
-          inputs.drop(matched.end), NoFailure)        case None =>
+          inputs.drop(matched.end), NoFailure)
+      case None =>
         val nextCharacter =
           if (inputs.array.length == inputs.offset) "end of source"
           else inputs.array.charAt(inputs.offset)

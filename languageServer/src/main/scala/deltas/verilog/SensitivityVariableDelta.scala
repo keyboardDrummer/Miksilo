@@ -13,8 +13,8 @@ object SensitivityVariableDelta extends NodeGrammarWriter {
   object Name extends NodeField
 
   implicit class SensitivityVariable[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node(Name).asInstanceOf[String]
-    def edge: String = node(Edge).asInstanceOf[String]
+    def name: String = node.getValue(Name).asInstanceOf[String]
+    def edge: String = node.getValue(Edge).asInstanceOf[String]
   }
 
   def neww(edge: String, name: String): SensitivityVariable[Node] = Shape.create(Edge -> edge, Name -> name)

@@ -1,8 +1,8 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.language.node.GrammarKey
 import core.document.Empty
+import core.language.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
@@ -28,14 +28,18 @@ object PrintBiGrammar {
   def toDocument(grammar: BiGrammar): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
   private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case sequence: LeftRight => withChoiceParenthesis(sequence.first) ~~ withChoiceParenthesis(sequence.second)
-    case topBottom: TopBottom => withChoiceParenthesis(topBottom.first) ~~ "%" ~~withChoiceParenthesis(topBottom.second)
+    case sequence: BiSequence =>
+      val first = withChoiceParenthesis(sequence.first)
+      val second = withChoiceParenthesis(sequence.second)
+      if (sequence.horizontal) first ~~ second
+      else first ~~ "%" ~~ second
     case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
     case many:ManyVertical => withParenthesis(many.inner) ~ "%*"
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
     case regex: RegexGrammar => s"Regex(${regex.regex})"
     case keyword: Keyword => keyword.value
+    case _: Identifier => "Identifier"
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
@@ -43,12 +47,6 @@ object PrintBiGrammar {
     case NumberGrammar => "number"
     case StringLiteral => "string"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
-    case ignore: IgnoreLeft =>
-      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
-      toDocumentInner(sequenceLike.first) ~ "~>" ~ toDocumentInner(sequenceLike.second)
-    case ignore: IgnoreRight =>
-      val sequenceLike = ignore.inner.asInstanceOf[Sequence]
-      toDocumentInner(sequenceLike.first) ~ "~<" ~ toDocumentInner(sequenceLike.second)
     case map: MapGrammarWithMap => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
     case custom: CustomGrammar => custom.print(toDocumentInner)
@@ -86,7 +84,7 @@ object PrintBiGrammar {
         return left
 
       choice
-    case sequence: Sequence =>
+    case sequence: BiSequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[BiFailure])
@@ -121,7 +119,7 @@ object PrintBiGrammar {
   }
 
   def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case sequence: Sequence =>
+    case sequence: BiSequence =>
       val left = sequence.first
       val right = sequence.second
       if (left.isInstanceOf[ValueGrammar])

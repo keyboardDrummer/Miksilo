@@ -17,8 +17,8 @@ object MethodParameters extends NodeGrammarWriter {
               bodyScope: Scope): Unit = {
 
     val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-    val name = parameter(Name).asInstanceOf[String]
-    builder.declare(name, bodyScope, parameter.getMember(Name), Some(parameterType))
+    val name = parameter.getValue(Name).asInstanceOf[String]
+    builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
   }
 
   implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] {

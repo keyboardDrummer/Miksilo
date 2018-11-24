@@ -67,7 +67,7 @@ object SuperCallExpression extends ExpressionInstance with ConvertsToByteCodeDel
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
     val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
     val parentName = clazz.parent.get
-    val superClass = builder.resolve(parentName, call.getMember(ClassParent), parentScope)
+    val superClass = builder.resolve(parentName, call.getSourceElement(ClassParent), parentScope)
     val superScope = builder.getDeclaredScope(superClass)
 
     val superReference = new Reference(constructorName, Some(call))

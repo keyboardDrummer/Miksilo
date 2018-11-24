@@ -7,7 +7,8 @@ import core.parsers.strings.StringReader
 
 import scala.collection.mutable
 
-case class WithMap[+T](value: T, map: Map[Any,Any]) {}
+case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {
+}
 
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter {
@@ -37,24 +38,28 @@ object BiGrammarToParser extends CommonParserWriter {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
-    val valueParser = resultParser.map(result => result(Map.empty[Any, Any])._2.value)
-    valueParser
+    resultParser.map(executeResult)
+  }
+
+  private def executeResult(result: Result): Any = {
+    val afterStateRun = result(Map.empty[Any, Any])
+    afterStateRun._2.value
   }
 
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
     grammar match {
-      case sequence: core.bigrammar.grammars.Sequence =>
+      case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
         val parser = new core.parsers.Sequence(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
-          val result: Result = (state: State) => {
-            val firstMap = firstResult(state)
-            val secondMap = secondResult(firstMap._1)
-            val resultValue = (firstMap._2.value, secondMap._2.value)
-            val resultMap = firstMap._2.map ++ secondMap._2.map
-            (secondMap._1, WithMap[Any](resultValue, resultMap)): (State, WithMap[Any])
+          for {
+            first <- firstResult
+            second <- secondResult
+          } yield {
+            val resultValue = sequence.bijective.construct(first.value, second.value)
+            val resultMap = first.namedValues ++ second.namedValues
+            WithMap[Any](resultValue, resultMap)
           }
-          result
         })
         parser
       case choice: Choice =>
@@ -70,7 +75,7 @@ object BiGrammarToParser extends CommonParserWriter {
         val innerParser = recursive(many.inner)
         val parser = innerParser.many[StateFull[WithMap[List[Any]]]](
           StateFull.value(WithMap(List.empty[Any], Map.empty[Any, Any])),
-          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.map ++ w2.map))))
+          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.namedValues ++ w2.namedValues))))
 
         parser
       case mapGrammar: MapGrammarWithMap =>

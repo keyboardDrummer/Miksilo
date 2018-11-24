@@ -57,7 +57,7 @@ trait Parser[Input <: ParseInput, +Result] {
         state.withNodeOnStack(node, () => {
           var result = parseNaively(input, state)
           result match {
-            case success: ParseSuccess[Result] if state.nodesWithBackEdges.contains(this) =>
+            case success: ParseSuccess[Result] if state.parsersWithBackEdges.contains(this) =>
               result = growResult(node, success, state)
             case _ =>
           }
@@ -82,15 +82,16 @@ trait Parser[Input <: ParseInput, +Result] {
 
   final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
 
-  def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result,b: Right) => (a,b))
-  def ~<[Right](right: Parser[Right]) = new IgnoreRight(this, right)
-  def ~>[Right](right: Parser[Right]) = new IgnoreLeft(this, right)
+  def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result, b: Right) => (a,b))
+  def ~<[Right](right: Parser[Right]) = new Sequence(this, right, (a: Result, _: Right) => a)
+  def ~>[Right](right: Parser[Right]) = new Sequence(this, right, (_: Result, b: Right) => b)
   def |[Other >: Result](other: => Parser[Other]) = new OrElse[Input, Result, Other, Other](this, other)
   def |||[Other >: Result](other: => Parser[Other]) = new BiggestOfTwo[Input, Result, Other, Other](this, other)
   def map[NewResult](f: Result => NewResult) = new MapParser(this, f)
+  def option: Parser[Option[Result]] = this.map(x => Some(x)) | Return[Input, Option[Result]](None)
   def flatMap[NewResult](f: Result => Parser[NewResult]) = new FlatMap(this, f)
   def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(this, predicate, getMessage)
-  def withDefault[Other >: Result](_default: Other) = WithDefault(this, _default)
+  def withDefault[Other >: Result](_default: Other): Parser[Other] = WithDefault[Input, Other](this, cache => Some(_default))
 
   def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum) : Parser[Sum] = {
     lazy val result: Parser[Sum] = new Sequence(this, result, reduce).withDefault[Sum](zero) | Return(zero)
@@ -105,6 +106,14 @@ trait Parser[Input <: ParseInput, +Result] {
   def manySeparated(separator: Parser[Any]): Parser[List[Result]] =
     new Sequence(this, (separator ~> this)*, (h: Result, t: List[Result]) => h :: t) |
       Return(List.empty)
+
+  def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Parser[Other] = {
+    val withPosition = new Sequence(
+      new PositionParser[Input](),
+      new WithRemainderParser(this),
+      (left: Input, resultRight: (Result, Input)) => addRange(left, resultRight._2, resultRight._1))
+    WithDefault(withPosition, cache => this.getDefault(cache))
+  }
 }
 
 trait ParseInput {

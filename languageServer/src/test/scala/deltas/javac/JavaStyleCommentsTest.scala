@@ -12,7 +12,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.statement.{BlockDelta, StatementDelta}
-import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
+import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -131,11 +131,13 @@ class JavaStyleCommentsTest
     language.grammars.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammars, language)
 
-    val expectedStatementGrammar: BiGrammar = new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+    val expectedStatementGrammar: BiGrammar =
+      new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
 
-    val expectedBlockGrammar = new TopBottom(new TopBottom("{",
-      new ManyVertical(new Labelled(StatementDelta.Grammar)).as(BlockDelta.Statements).indent()).ignoreLeft,
-      new WithTrivia("}", language.grammars.trivia, false)).ignoreRight.asNode(BlockDelta.Shape)
+    import DefaultBiGrammarWriter._
+    val expectedBlockGrammar = "{" %>
+      new Labelled(StatementDelta.Grammar).manyVertical.as(BlockDelta.Statements).indent() %<
+      new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false) asNode(BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }
@@ -159,10 +161,9 @@ class JavaStyleCommentsTest
   }
 
   test("comments are maintained in bytecode") {
-    val initialCompiler = TestLanguageBuilder.build(JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(PrettyPrint())))
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta) ++
-      initialCompiler.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta))))
-    val result = utils.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
+    val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta) ++
+      JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(PrettyPrint(), TriviaInsideNode, StoreTriviaDelta, JavaStyleBlockCommentsDelta))))
+    val result = language.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
   }
