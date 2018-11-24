@@ -15,15 +15,15 @@ import deltas.javac.expressions.additive.AdditionDelta.{Left, Right, additionOrS
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
 object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
-  object SubtractionKey extends NodeShape
-  object FirstKey extends NodeField
-  object SecondKey extends NodeField
+  object Shape extends NodeShape
+  object Left extends NodeField
+  object Right extends NodeField
 
   implicit class Subtraction[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def left: T = node(FirstKey).asInstanceOf[T]
+    def left: T = node(Left).asInstanceOf[T]
     def left_=(value: T): Unit = node(Left) = value
 
-    def right: T = node(SecondKey).asInstanceOf[T]
+    def right: T = node(Right).asInstanceOf[T]
     def right_=(value: T): Unit = node(Right) = value
   }
 
@@ -33,17 +33,17 @@ object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta 
     import grammars._
     val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
     val withoutSubtraction = additiveGrammar.inner
-    val parseSubtraction = (additiveGrammar.as(FirstKey) ~~< "-") ~~ withoutSubtraction.as(SecondKey) asNode SubtractionKey
+    val parseSubtraction = (additiveGrammar.as(Left) ~~< "-") ~~ withoutSubtraction.as(Right) asNode Shape
     additiveGrammar.addAlternative(parseSubtraction)
   }
 
   def subtraction(first: Any, second: Any): Node = subtraction(first.asInstanceOf[Node], second.asInstanceOf[Node])
 
-  def subtraction(first: Node, second: Node) = new Node(SubtractionKey,
-    FirstKey -> first,
-    SecondKey -> second)
+  def subtraction(first: Node, second: Node) = new Node(Shape,
+    Left -> first,
+    Right -> second)
 
-  override val shape = SubtractionKey
+  override val shape = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     val subtraction: Subtraction[NodePath] = expression
