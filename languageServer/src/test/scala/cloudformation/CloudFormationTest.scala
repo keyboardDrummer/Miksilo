@@ -78,6 +78,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |      "Properties": {
         |        "Subsc"
       """.stripMargin
+    val server = new MiksiloLanguageServer(CloudFormationLanguage.language)
     val document = openDocument(server, program)
     val start = new HumanPosition(6, 14)
     val result = server.complete(DocumentPosition(document, start))
