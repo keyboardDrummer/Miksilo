@@ -2,8 +2,8 @@ package deltas.javac.expressions.additive
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -11,7 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.additive.AdditionDelta.{Left, Right, additionOrSubtractionConstraints}
+import deltas.javac.expressions.additive.AdditionDelta.additionOrSubtractionConstraints
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
 object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
@@ -33,7 +33,7 @@ object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta 
     import grammars._
     val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
     val withoutSubtraction = additiveGrammar.inner
-    val parseSubtraction = (additiveGrammar.as(Left) ~~< "-") ~~ withoutSubtraction.as(Right) asNode Shape
+    val parseSubtraction = additiveGrammar.as(Left) ~~< "-" ~~ withoutSubtraction.as(Right) asNode Shape
     additiveGrammar.addAlternative(parseSubtraction)
   }
 

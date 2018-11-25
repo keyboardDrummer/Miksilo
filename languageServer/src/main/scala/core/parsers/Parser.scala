@@ -82,6 +82,11 @@ trait Parser[Input <: ParseInput, +Result] {
 
   final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
 
+  def addAlternative[Other >: Result](getAlternative: (Parser[Other], Parser[Other]) => Parser[Other]): Parser[Other] = {
+    lazy val result: Parser[Other] = new Lazy(this ||| getAlternative(this, result))
+    result
+  }
+
   def ~[Right](right: => Parser[Right]) = new Sequence(this, right, (a: Result, b: Right) => (a,b))
   def ~<[Right](right: Parser[Right]) = new Sequence(this, right, (a: Result, _: Right) => a)
   def ~>[Right](right: Parser[Right]) = new Sequence(this, right, (_: Result, b: Right) => b)
