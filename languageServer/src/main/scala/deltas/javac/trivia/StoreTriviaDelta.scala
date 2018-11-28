@@ -5,7 +5,7 @@ import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, StateFull, WithMap}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, StateFull, WithMap}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
@@ -52,7 +52,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       (newState, field)
     }
 
-    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
+    override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result] = {
       val triviaParser = recursive(triviaGrammar)
       triviaParser.map(statefulTrivias =>
         for {
@@ -101,7 +101,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       resetAndRestoreCounter(TryState.fromStateM(inner)).run(state).get
     }
 
-    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
+    override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result] = {
       recursive(node).map(result => resetAndRestoreCounter(result))
     }
 

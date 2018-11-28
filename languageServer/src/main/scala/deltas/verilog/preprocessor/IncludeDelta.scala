@@ -23,20 +23,20 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
     val filePath: Path = rootDirectory / Path.apply(fileName)
     val input = preprocessor.compilation.fileSystem.getFile(filePath.toString())
 
-    val parser: Parser[Any] = parserProp.get(compilation)
+    val parser: BiGrammarToParser.Processor[Any] = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult match {
-      case success: ParseSuccess[_] =>
+      case success: BiGrammarToParser.PS[_] =>
         val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
-      case failure: ParseFailure[_] =>
+      case failure: BiGrammarToParser.PF[_] =>
         val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(failure)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }
   }
 
-  val parserProp = new Property[Parser[Any]](null)
+  val parserProp = new Property[BiGrammarToParser.Processor[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

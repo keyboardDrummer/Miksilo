@@ -3,7 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
-import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.document.{Empty, Text}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -20,5 +20,5 @@ case class Parse(grammar: BiGrammar) extends CustomGrammar {
     override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = TryState.value(Empty)
   }
 
-  override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = recursive(grammar)
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result] = recursive(grammar)
 }

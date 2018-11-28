@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
-import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.parsers.strings.StringReader
 import core.responsiveDocument.ResponsiveDocument
 
@@ -22,7 +22,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
       case string: String =>
         if (verifyWhenPrinting) {
           parser.parseWholeInput(new StringReader(string)) match {
-            case success: ParseSuccess[_] if success.result.equals(from.value) => TryState.value(string)
+            case success: BiGrammarToParser.PS[_] if success.result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")
           }
         }

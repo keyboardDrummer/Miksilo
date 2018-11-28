@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
-import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
@@ -10,7 +10,7 @@ import scala.util.matching.Regex
 object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
   val regex: Regex = """\s+""".r
 
-  override def getParser(keywords: scala.collection.Set[String]): Parser[Any] =
+  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Processor[Any] =
     new RegexGrammar(regex).getParser(keywords)
 
   override def write(from: WithMap[Any]): TryState[ResponsiveDocument] =

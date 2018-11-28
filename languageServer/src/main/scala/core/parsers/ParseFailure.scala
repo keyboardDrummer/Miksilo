@@ -21,8 +21,7 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
   override def getPartial = partialResult
 }
 
-trait ParseResult[Input <: ParseInput, +Result] {
-  def successful: Boolean
+trait ParseResult[Input <: ParseInput, +Result] extends ParseResultLike[Input, Result] {
   def map[NewResult](f: Result => NewResult): ParseResult[Input, NewResult]
 
   def getPartial: Option[Result]
