@@ -81,7 +81,7 @@ trait EditorParsers extends Parsers {
     extends EditorParser[Result] {
     override def parseNaively(input: Input, state: ParseState): PR[Result] = {
       original.parseCached(input, state) match {
-        case failure: PF[Result] if failure.partialResult.isEmpty =>
+        case failure: PF[Result] if failure.partialResult.isEmpty || failure.remainder == input =>
           new PF[Result](_getDefault(state.defaultCache), failure.remainder, failure.message)
         case x => x
       }

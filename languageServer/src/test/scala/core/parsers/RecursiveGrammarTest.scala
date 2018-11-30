@@ -69,7 +69,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
   }
 
   test("Ordered choice operator in the wrong order fails") {
-    lazy val expression: EditorParser[Any] = optional ~ ("e" | expression ~ "s")
+    lazy val expression: EditorParser[Any] = optional ~ choice("e", expression ~ "s", true)
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
   }
