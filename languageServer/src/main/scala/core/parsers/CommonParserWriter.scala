@@ -4,13 +4,13 @@ import core.parsers.strings.StringParserWriter
 
 trait CommonParserWriter extends StringParserWriter {
 
-  def identifier: Processor[String] =
+  def identifier: EditorParser[String] =
     elem(Character.isJavaIdentifierStart, "identifier start") ~
       (elem(Character.isJavaIdentifierPart(_: Char), "identifier part")*) ^^ (t => (t._1 :: t._2).mkString)
 
 
   /** An integer, without sign or with a negative sign. */
-  def wholeNumber: Processor[String] =
+  def wholeNumber: EditorParser[String] =
     """-?\d+""".r
   /** Number following one of these rules:
     *
@@ -19,7 +19,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - An integer followed by a decimal point and fractional part. For example: `3.14`
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
-  def decimalNumber: Processor[String] =
+  def decimalNumber: EditorParser[String] =
     """(\d+(\.\d*)?|\d*\.\d+)""".r
   /** Double quotes (`"`) enclosing a sequence of:
     *
@@ -28,7 +28,7 @@ trait CommonParserWriter extends StringParserWriter {
     *    of the letters `b`, `f`, `n`, `r` or `t`
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
-  def stringLiteral: Processor[String] =
+  def stringLiteral: EditorParser[String] =
     literal("\"") ~> """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
@@ -38,6 +38,6 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `e` or `E` and an optionally signed integer
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
-  def floatingPointNumber: Processor[String] =
+  def floatingPointNumber: Parser[String] =
     """-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r
 }

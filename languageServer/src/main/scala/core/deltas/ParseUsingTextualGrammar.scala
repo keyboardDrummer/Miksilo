@@ -28,12 +28,12 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
     }
   }
 
-  def parseStream[T](parser: BiGrammarToParser.Processor[T], input: InputStream): BiGrammarToParser.ProcessResult[T] = {
+  def parseStream[T](parser: BiGrammarToParser.EditorParser[T], input: InputStream): BiGrammarToParser.ProcessResult[T] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }
 
-  val parserProp = new Property[BiGrammarToParser.Processor[Node]](null)
+  val parserProp = new Property[BiGrammarToParser.EditorParser[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

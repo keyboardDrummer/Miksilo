@@ -10,10 +10,11 @@ trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input = StringReader
 
+  implicit def literalToExtensions(value: String): EditorParserExtensions[String] = Literal(value)
   implicit def literal(value: String): Literal = Literal(value)
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 
-  case class Literal(value: String) extends Processor[String] {
+  case class Literal(value: String) extends EditorParser[String] {
     override def parseNaively(inputs: StringReader, cache: ParseState): PR[String] = {
       var index = 0
       val array = inputs.array
@@ -32,7 +33,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getDefault(cache: DefaultCache): Option[String] = Some(value)
   }
 
-  case class RegexParser(regex: Regex) extends Processor[String] {
+  case class RegexParser(regex: Regex) extends EditorParser[String] {
     override def parseNaively(inputs: StringReader, cache: ParseState): PR[String] = {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) =>

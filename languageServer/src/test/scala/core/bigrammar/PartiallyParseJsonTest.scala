@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral, WithDefault}
+import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
 import core.parsers.strings.{StringParserWriter, StringReader}
 import org.scalatest.FunSuite
@@ -12,7 +12,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with S
   private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
-  jsonGrammar.inner = new WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
+  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
   val jsonParser = BiGrammarToParser.toParser(jsonGrammar)
 
   test("object with single member with number value") {
@@ -91,19 +91,19 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with S
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
     val result = jsonParser.parseWholeInput(StringReader(input.toCharArray))
-    val failure: ParseFailure[Any] = getFailure(result)
+    val failure: PF[Any] = getFailure(result)
     assert(failure.partialResult.nonEmpty)
     assertResult(expectation)(failure.partialResult.get)
   }
 
-  private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
-    assert(result.isInstanceOf[ParseFailure[_]])
-    result.asInstanceOf[ParseFailure[Any]]
+  private def getFailure(result: PR[Any]): PF[Any] = {
+    assert(result.isInstanceOf[PF[_]])
+    result.asInstanceOf[PF[Any]]
   }
 
-  private def getSuccessValue(result: ParseResult[Any]) = {
-    assert(result.isInstanceOf[ParseSuccess[_]])
-    result.asInstanceOf[ParseSuccess[Any]].result
+  private def getSuccessValue(result: PR[Any]) = {
+    assert(result.isInstanceOf[PS[_]])
+    result.asInstanceOf[PS[Any]].result
   }
 }
 

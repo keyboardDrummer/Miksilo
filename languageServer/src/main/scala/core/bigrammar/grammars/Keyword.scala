@@ -7,5 +7,5 @@ case class Keyword(value: String, reserved: Boolean = true, verifyWhenPrinting: 
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Processor[String] = BiGrammarToParser.literal(value)
+  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.EditorParser[String] = BiGrammarToParser.literal(value)
 }

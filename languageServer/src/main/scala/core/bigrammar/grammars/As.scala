@@ -22,8 +22,8 @@ case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new AsPrinter(recursive(inner), field)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result] = {
-    val innerParser: BiGrammarToParser.Processor[Result] = recursive(inner).
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result] = {
+    val innerParser: BiGrammarToParser.EditorParser[Result] = recursive(inner).
       map(result => result.map { case WithMap(value, state) =>
       WithMap(Unit, state + (field -> value))
     })

@@ -4,32 +4,37 @@ import util.cache.{Cache, InfiniteCache}
 
 // TODO misschien proberen door te parsen wanneer er een failure plaatsvindt, zodat ik bij 'missende input' gewoon verder ga. Ik zou ook nog recovery parsers kunnen toevoegen zoals in de paper, maar dat lijkt overkil.
 
-trait Parsers extends Processors {
+trait EditorParsers extends Parsers {
 
+  type Self[+R] = EditorParser[R]
   type ProcessResult[+R] = ParseResult[Input, R]
   type PF[+R] = ParseFailure[Input, R]
   type PR[+R] = ParseResult[Input, R]
   type PS[+R] = ParseSuccess[Input, R]
 
-  override def leftRight[Left, Right, NewResult](left: Processor[Left],
-                                                 right: => Processor[Right],
-                                                 combine: (Left, Right) => NewResult): Processor[NewResult] =
+  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
+                                                 right: => EditorParser[Right],
+                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] =
     new Sequence(left, right, combine)
 
-  override def succeed[NR](result: NR): Processor[NR] = Return(result)
+  override def succeed[NR](result: NR): EditorParser[NR] = Return(result)
   def fail(message: String): Fail = Fail(message)
 
-  override def choice[Result](first: Processor[Result], other: => Processor[Result], leftIsAlwaysBigger: Boolean): Processor[Result] =
+  override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
     if (leftIsAlwaysBigger) new OrElse(first, other) else new BiggestOfTwo(first, other)
 
-  override def flatMap[Result, NewResult](left: Processor[Result], f: Result => Processor[NewResult]) = new FlatMap(left, f)
+  override def flatMap[Result, NewResult](left: EditorParser[Result], f: Result => EditorParser[NewResult]): EditorParser[NewResult] = new FlatMap(left, f)
 
-  implicit class Parser[+Result](val processor: Processor[Result]) {
+  trait EditorParser[+Result] extends Parser[Result] with HasGetDefault[Result] {
+    final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
+  }
 
-    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(processor, predicate, getMessage)
+  implicit class EditorParserExtensions[+Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
 
-    def withDefault[Other >: Result](_default: Other): Processor[Other] =
-      WithDefault[Other](processor, cache => Some(_default))
+    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
+
+    def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
+      WithDefault[Other](parser, cache => Some(_default))
 
     def parseWholeInput(input: Input,
                         cache: Cache[PN, PR[Any]] = new InfiniteCache()):
@@ -41,7 +46,7 @@ trait Parsers extends Processors {
     def parse(input: Input,
               cache: Cache[PN, PR[Any]] = new InfiniteCache()): PR[Result] = {
       val state = new ParseState(cache)
-      processor.parseIteratively(input, state) match {
+      parser.parseIteratively(input, state) match {
         case success: PS[Result] =>
           if (success.remainder.atEnd) success
           else {
@@ -52,10 +57,10 @@ trait Parsers extends Processors {
       }
     }
 
-    //  def addAlternative[Other >: Result](getAlternative: (Parser[Other], Parser[Other]) => Parser[Other]): Parser[Other] = {
-    //    lazy val result: Parser[Other] = new Lazy(this ||| getAlternative(this, result))
-    //    result
-    //  }
+      def addAlternative[Other >: Result](getAlternative: (EditorParser[Other], EditorParser[Other]) => EditorParser[Other]): EditorParser[Other] = {
+        lazy val result: EditorParser[Other] = new EditorLazy(parser | getAlternative(parser, result))
+        result
+      }
 
 //    override def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Processor[Sum] = {
 //      lazy val recursive: Processor[Sum] = leftRight(processor, result, reduce).withDefault[Sum](zero)
@@ -63,17 +68,17 @@ trait Parsers extends Processors {
 //      result
 //    }
 
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Processor[Other] = {
+    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
       val withPosition = new Sequence(
         new PositionParser(),
-        new WithRemainderParser(processor),
+        new WithRemainderParser(parser),
         (left: Input, resultRight: (Result, Input)) => addRange(left, resultRight._2, resultRight._1))
-      WithDefault(withPosition, cache => processor.getDefault(cache))
+      WithDefault(withPosition, cache => parser.getDefault(cache))
     }
   }
 
-  case class WithDefault[+Result](original: Processor[Result], _getDefault: DefaultCache => Option[Result])
-    extends Processor[Result] {
+  case class WithDefault[+Result](original: Parser[Result], _getDefault: DefaultCache => Option[Result])
+    extends EditorParser[Result] {
     override def parseNaively(input: Input, state: ParseState): PR[Result] = {
       original.parseCached(input, state) match {
         case failure: PF[Result] if failure.partialResult.isEmpty =>
@@ -86,10 +91,10 @@ trait Parsers extends Processors {
       _getDefault(cache)
   }
 
-  class Sequence[+Left, +Right, +Result](left: Processor[Left],
-                                         _right: => Processor[Right],
-                                         combine: (Left, Right) => Result) extends Processor[Result] {
-    lazy val right: Processor[Right] = _right
+  class Sequence[+Left, +Right, +Result](left: EditorParser[Left],
+                                         _right: => EditorParser[Right],
+                                         combine: (Left, Right) => Result) extends EditorParser[Result] {
+    lazy val right: EditorParser[Right] = _right
 
     override def parseNaively(input: Input, state: ParseState): PR[Result] = {
       val leftResult = left.parseCached(input, state)
@@ -126,8 +131,8 @@ trait Parsers extends Processors {
     } yield combine(leftDefault, rightDefault)
   }
 
-  class OrElse[+First <: Result, +Second <: Result, +Result](first: Processor[First], _second: => Processor[Second])
-    extends Processor[Result] {
+  class OrElse[+First <: Result, +Second <: Result, +Result](first: EditorParser[First], _second: => EditorParser[Second])
+    extends EditorParser[Result] {
     lazy val second = _second
 
     override def parseNaively(input: Input, cache: ParseState): PR[Result] = {
@@ -152,8 +157,8 @@ trait Parsers extends Processors {
     }
   }
 
-  class BiggestOfTwo[+First <: Result, +Second <: Result, +Result](first: Processor[First], _second: => Processor[Second])
-    extends Processor[Result] {
+  class BiggestOfTwo[+First <: Result, +Second <: Result, +Result](first: EditorParser[First], _second: => EditorParser[Second])
+    extends EditorParser[Result] {
     lazy val second = _second
 
     override def parseNaively(input: Input, state: ParseState): PR[Result] = {
@@ -181,14 +186,14 @@ trait Parsers extends Processors {
     }
   }
 
-  case class Return[+Result](value: Result) extends Processor[Result] {
+  case class Return[+Result](value: Result) extends EditorParser[Result] {
     override def parseNaively(inputs: Input, cache: ParseState): PR[Result] = ParseSuccess(value, inputs, NoFailure)
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
   }
 
-  class FlatMap[+Result, +NewResult](left: Processor[Result], getRight: Result => Processor[NewResult])
-    extends Processor[NewResult] {
+  class FlatMap[+Result, +NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult])
+    extends EditorParser[NewResult] {
 
     override def parseNaively(input: Input, state: ParseState): PR[NewResult] = {
       val leftResult = left.parseCached(input, state)
@@ -230,13 +235,13 @@ trait Parsers extends Processors {
     } yield rightDefault
   }
 
-  case class Fail(message: String) extends Processor[Nothing] {
+  case class Fail(message: String) extends EditorParser[Nothing] {
     override def parseNaively(input: Input, cache: ParseState): PR[Nothing] = ParseFailure(None, input, message)
 
     override def getDefault(cache: DefaultCache): Option[Nothing] = None
   }
 
-  class PositionParser extends Processor[Input] {
+  class PositionParser extends EditorParser[Input] {
 
     override def parseNaively(input: Input, state: ParseState): PR[Input] = {
       ParseSuccess[Input, Input](input, input, NoFailure)
@@ -245,8 +250,8 @@ trait Parsers extends Processors {
     override def getDefault(cache: DefaultCache): Option[Input] = None
   }
 
-  class WithRemainderParser[Result](original: Processor[Result])
-    extends Processor[(Result, Input)] {
+  class WithRemainderParser[Result](original: Parser[Result])
+    extends EditorParser[(Result, Input)] {
 
     override def parseNaively(input: Input, parseState: ParseState): PR[(Result, Input)] = {
       val parseResult = original.parseCached(input, parseState)
@@ -257,8 +262,8 @@ trait Parsers extends Processors {
     override def getDefault(cache: DefaultCache): Option[(Result, Input)] = None
   }
 
-  case class Filter[Other, +Result <: Other](original: Processor[Result], predicate: Other => Boolean, getMessage: Other => String)
-    extends Processor[Result] {
+  case class Filter[Other, +Result <: Other](original: EditorParser[Result], predicate: Other => Boolean, getMessage: Other => String)
+    extends EditorParser[Result] {
     override def parseNaively(input: Input, state: ParseState): PR[Result] = original.parseNaively(input, state) match {
       case success: PS[Result] =>
         if (predicate(success.result)) success
@@ -270,5 +275,10 @@ trait Parsers extends Processors {
 
     override def getDefault(cache: DefaultCache): Option[Result] =
       original.getDefault(cache).filter(predicate)
+  }
+
+  class EditorLazy[+Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParser[Result] {
+
+    override def getDefault(cache: DefaultCache): Option[Result] = cache(inner.asInstanceOf[EditorParser[Result]])
   }
 }

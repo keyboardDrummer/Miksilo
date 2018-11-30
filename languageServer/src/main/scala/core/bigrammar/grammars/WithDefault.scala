@@ -10,7 +10,7 @@ class WithDefault(inner: BiGrammar, _default: Any) extends CustomGrammar {
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result] =
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result] =
     recursive(inner).withDefault[Result](BiGrammarToParser.valueToResult(_default))
 
   override def children: Seq[BiGrammar] = Seq(inner)

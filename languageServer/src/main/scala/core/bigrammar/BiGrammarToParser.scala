@@ -20,7 +20,7 @@ object BiGrammarToParser extends CommonParserWriter {
   def toStringParser(grammar: BiGrammar): String => PR[Any] =
     input => toParser(grammar).parseWholeInput(new StringReader(input))
 
-  def toParser(grammar: BiGrammar): Processor[Any] = {
+  def toParser(grammar: BiGrammar): EditorParser[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -32,9 +32,9 @@ object BiGrammarToParser extends CommonParserWriter {
     toParser(grammar, keywords)
   }
 
-  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): Processor[Any] = {
-    val cache: mutable.Map[BiGrammar, Processor[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => Processor[Result] = grammar => {
+  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): EditorParser[Any] = {
+    val cache: mutable.Map[BiGrammar, EditorParser[Result]] = mutable.Map.empty
+    lazy val recursive: BiGrammar => EditorParser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
@@ -46,7 +46,7 @@ object BiGrammarToParser extends CommonParserWriter {
     afterStateRun._2.value
   }
 
-  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Processor[Result], grammar: BiGrammar): Processor[Result] = {
+  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => EditorParser[Result], grammar: BiGrammar): EditorParser[Result] = {
     grammar match {
       case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
@@ -87,7 +87,7 @@ object BiGrammarToParser extends CommonParserWriter {
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
-        new Lazy(inner) //Laziness to prevent infinite recursion
+        new EditorLazy(inner) //Laziness to prevent infinite recursion
     }
   }
 }

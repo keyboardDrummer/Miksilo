@@ -1,4 +1,4 @@
 package core.parsers
 
-trait ParserWriter extends Parsers {
+trait ParserWriter extends EditorParsers {
 }

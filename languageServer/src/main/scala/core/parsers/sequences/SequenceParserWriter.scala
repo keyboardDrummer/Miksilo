@@ -8,7 +8,7 @@ trait SequenceParserWriter extends ParserWriter {
 
   def elem(predicate: Elem => Boolean, kind: String) = new ElemPredicate(predicate, kind)
 
-  case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends Processor[Elem] {
+  case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
     override def parseNaively(input: Input, cache: ParseState): PR[Elem] = {
       if (input.atEnd) {
         return ParseFailure(None, input, s"$kind expected but end of source found")

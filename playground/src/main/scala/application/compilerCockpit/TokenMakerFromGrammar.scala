@@ -3,7 +3,7 @@ package application.compilerCockpit
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
-import core.parsers.strings.{StringParserWriter, StringReader}
+import core.parsers.strings.StringReader
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 
@@ -11,13 +11,13 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 
 case class MyToken(tokenType: Int, text: String)
-class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker with StringParserWriter {
+class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
-  val parser: Parser[Seq[MyToken]] = {
+  val parser: EditorParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
 
-    val tokenParsers: Set[Parser[MyToken]] = reachables.collect({
+    val tokenParsers: Set[BiGrammarToParser.EditorParser[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
         literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
@@ -43,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker with 
 
     resetTokenList()
 
-    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWholeInput(new StringReader(text.toString))
+    val resultOption: PR[Seq[MyToken]] = parser.parseWholeInput(new StringReader(text.toString))
     var start = text.offset
     if (resultOption.successful) {
       val tokens = resultOption.get

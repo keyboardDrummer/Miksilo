@@ -23,7 +23,7 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
     val filePath: Path = rootDirectory / Path.apply(fileName)
     val input = preprocessor.compilation.fileSystem.getFile(filePath.toString())
 
-    val parser: BiGrammarToParser.Processor[Any] = parserProp.get(compilation)
+    val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult match {
       case success: BiGrammarToParser.PS[_] =>
@@ -36,7 +36,7 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
     }
   }
 
-  val parserProp = new Property[BiGrammarToParser.Processor[Any]](null)
+  val parserProp = new Property[BiGrammarToParser.EditorParser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

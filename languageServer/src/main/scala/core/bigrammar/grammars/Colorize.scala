@@ -17,5 +17,5 @@ case class Colorize(var inner: BiGrammar, _type: Int) extends CustomGrammar {
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]) = recursive(inner)
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]) = recursive(inner)
 }

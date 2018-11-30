@@ -10,5 +10,5 @@ trait CustomGrammar extends BiGrammar with StringParserWriter {
 
   def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
-  def toParser(recursive: BiGrammar => BiGrammarToParser.Processor[Result]): BiGrammarToParser.Processor[Result]
+  def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result]
 }

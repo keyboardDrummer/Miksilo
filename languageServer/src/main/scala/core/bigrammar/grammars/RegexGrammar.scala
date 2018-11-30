@@ -6,7 +6,7 @@ import scala.util.matching.Regex
 
 case class RegexGrammar(regex: Regex, verifyWhenPrinting: Boolean = false)
   extends StringGrammar(verifyWhenPrinting) {
-  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.Processor[Any] = BiGrammarToParser.regex(regex)
+  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.EditorParser[Any] = BiGrammarToParser.regex(regex)
 
   override def hashCode(): Int = regex.toString().hashCode
 
