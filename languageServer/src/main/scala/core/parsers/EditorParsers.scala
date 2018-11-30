@@ -62,12 +62,6 @@ trait EditorParsers extends Parsers {
         result
       }
 
-//    override def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Processor[Sum] = {
-//      lazy val recursive: Processor[Sum] = leftRight(processor, result, reduce).withDefault[Sum](zero)
-//      lazy val result: Processor[Sum] = choice(recursive, succeed(zero), leftIsAlwaysBigger = true)
-//      result
-//    }
-
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
       val withPosition = new Sequence(
         new PositionParser(),
@@ -135,12 +129,12 @@ trait EditorParsers extends Parsers {
     extends EditorParser[Result] {
     lazy val second = _second
 
-    override def parseNaively(input: Input, cache: ParseState): PR[Result] = {
-      val firstResult = first.parseCached(input, cache)
-      firstResult match {
+    override def parseNaively(input: Input, state: ParseState): PR[Result] = {
+      val firstResult = first.parseCached(input, state)
+      val result = firstResult match {
         case _: PS[Result] => firstResult
         case firstFailure: PF[Result] =>
-          val secondResult = second.parseCached(input, cache)
+          val secondResult = second.parseCached(input, state)
           secondResult match {
             case secondSuccess: PS[Result] =>
               val biggestFailure = firstFailure.getBiggest(secondSuccess.biggestFailure)
@@ -149,6 +143,7 @@ trait EditorParsers extends Parsers {
               firstFailure.getBiggest(secondFailure)
           }
       }
+      getDefault(state).fold[PR[Result]](result)(d => result.addDefault[Result](d))
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = {
@@ -164,7 +159,7 @@ trait EditorParsers extends Parsers {
     override def parseNaively(input: Input, state: ParseState): PR[Result] = {
       val firstResult = first.parseCached(input, state)
       val secondResult = second.parseCached(input, state)
-      (firstResult, secondResult) match {
+      val result = (firstResult, secondResult) match {
         case (firstSuccess: PS[Result], secondSuccess: PS[Result]) =>
           if (firstSuccess.remainder.offset > secondSuccess.remainder.offset)
             firstSuccess.addFailure(secondSuccess.biggestFailure)
@@ -178,6 +173,7 @@ trait EditorParsers extends Parsers {
           firstFailure.getBiggest(secondFailure)
         case _ => throw new Exception("can not occur")
       }
+      getDefault(state).fold[PR[Result]](result)(d => result.addDefault[Result](d))
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = {

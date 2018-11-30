@@ -55,9 +55,6 @@ trait Parsers {
 
   trait Parser[+Result] {
 
-    //  type ParseSuccess[+R] = core.parsers.ParseSuccess[Input, R]
-    //  type ParseFailure[+R] = core.parsers.ParseFailure[Input, R]
-
     /**
       * When implementing, make sure that when returning a failure,
       * if this Parser's default has a value, then the failure must do so to.
