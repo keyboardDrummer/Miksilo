@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import core.parsers.ParseResult
+import core.parsers.editorParsers.ParseResult
 import core.parsers.strings.StringReader
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage

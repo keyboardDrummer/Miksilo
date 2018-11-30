@@ -1,7 +1,8 @@
 package core.parsers
 
-import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
+import strings.CommonParserWriter
+import strings.StringReader
 
 class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
 

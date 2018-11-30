@@ -1,16 +1,18 @@
-package core.parsers
+package core.parsers.core
 
+import core.parsers.editorParsers._
 import util.cache.{Cache, InfiniteCache}
 
-// TODO misschien proberen door te parsen wanneer er een failure plaatsvindt, zodat ik bij 'missende input' gewoon verder ga. Ik zou ook nog recovery parsers kunnen toevoegen zoals in de paper, maar dat lijkt overkil.
-
-trait EditorParsers extends Parsers {
+trait EditorParserWriter extends ParserWriters {
 
   type Self[+R] = EditorParser[R]
   type ProcessResult[+R] = ParseResult[Input, R]
   type PF[+R] = ParseFailure[Input, R]
   type PR[+R] = ParseResult[Input, R]
   type PS[+R] = ParseSuccess[Input, R]
+  type PState = EditorParseState
+
+  override def fail[R](input: Input, message: String): ParseFailure[Input, Nothing] = ParseFailure(None, input, message)
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -26,7 +28,11 @@ trait EditorParsers extends Parsers {
   override def flatMap[Result, NewResult](left: EditorParser[Result], f: Result => EditorParser[NewResult]): EditorParser[NewResult] = new FlatMap(left, f)
 
   trait EditorParser[+Result] extends Parser[Result] with HasGetDefault[Result] {
-    final def getDefault(state: ParseState): Option[Result] = getDefault(state.defaultCache)
+    final def getDefault(state: PState): Option[Result] = getDefault(state.defaultCache)
+  }
+
+  class EditorParseState(resultCache: Cache[ParseNode, ProcessResult[Any]]) extends ParseState(resultCache) {
+    val defaultCache = new DefaultCache()
   }
 
   implicit class EditorParserExtensions[+Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
@@ -45,7 +51,7 @@ trait EditorParsers extends Parsers {
 
     def parse(input: Input,
               cache: Cache[PN, PR[Any]] = new InfiniteCache()): PR[Result] = {
-      val state = new ParseState(cache)
+      val state = new EditorParseState(cache)
       parser.parseIteratively(input, state) match {
         case success: PS[Result] =>
           if (success.remainder.atEnd) success
@@ -57,10 +63,12 @@ trait EditorParsers extends Parsers {
       }
     }
 
-      def addAlternative[Other >: Result](getAlternative: (EditorParser[Other], EditorParser[Other]) => EditorParser[Other]): EditorParser[Other] = {
-        lazy val result: EditorParser[Other] = new EditorLazy(parser | getAlternative(parser, result))
-        result
-      }
+    override def map[NewResult](f: Result => NewResult) = new MapParser(parser, f)
+
+    def addAlternative[Other >: Result](getAlternative: (EditorParser[Other], EditorParser[Other]) => EditorParser[Other]): EditorParser[Other] = {
+      lazy val result: EditorParser[Other] = new EditorLazy(parser | getAlternative(parser, result))
+      result
+    }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
       val withPosition = new Sequence(
@@ -73,7 +81,7 @@ trait EditorParsers extends Parsers {
 
   case class WithDefault[+Result](original: Parser[Result], _getDefault: DefaultCache => Option[Result])
     extends EditorParser[Result] {
-    override def parseNaively(input: Input, state: ParseState): PR[Result] = {
+    override def parseNaively(input: Input, state: PState): PR[Result] = {
       original.parseCached(input, state) match {
         case failure: PF[Result] if failure.partialResult.isEmpty || failure.remainder == input =>
           new PF[Result](_getDefault(state.defaultCache), failure.remainder, failure.message)
@@ -90,7 +98,7 @@ trait EditorParsers extends Parsers {
                                          combine: (Left, Right) => Result) extends EditorParser[Result] {
     lazy val right: EditorParser[Right] = _right
 
-    override def parseNaively(input: Input, state: ParseState): PR[Result] = {
+    override def parseNaively(input: Input, state: PState): PR[Result] = {
       val leftResult = left.parseCached(input, state)
       leftResult match {
         case leftSuccess: PS[Left] =>
@@ -129,7 +137,7 @@ trait EditorParsers extends Parsers {
     extends EditorParser[Result] {
     lazy val second = _second
 
-    override def parseNaively(input: Input, state: ParseState): PR[Result] = {
+    override def parseNaively(input: Input, state: PState): PR[Result] = {
       val firstResult = first.parseCached(input, state)
       val result = firstResult match {
         case _: PS[Result] => firstResult
@@ -156,7 +164,7 @@ trait EditorParsers extends Parsers {
     extends EditorParser[Result] {
     lazy val second = _second
 
-    override def parseNaively(input: Input, state: ParseState): PR[Result] = {
+    override def parseNaively(input: Input, state: PState): PR[Result] = {
       val firstResult = first.parseCached(input, state)
       val secondResult = second.parseCached(input, state)
       val result = (firstResult, secondResult) match {
@@ -183,7 +191,7 @@ trait EditorParsers extends Parsers {
   }
 
   case class Return[+Result](value: Result) extends EditorParser[Result] {
-    override def parseNaively(inputs: Input, cache: ParseState): PR[Result] = ParseSuccess(value, inputs, NoFailure)
+    override def parseNaively(inputs: Input, cache: PState): PR[Result] = ParseSuccess(value, inputs, NoFailure)
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
   }
@@ -191,7 +199,7 @@ trait EditorParsers extends Parsers {
   class FlatMap[+Result, +NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult])
     extends EditorParser[NewResult] {
 
-    override def parseNaively(input: Input, state: ParseState): PR[NewResult] = {
+    override def parseNaively(input: Input, state: PState): PR[NewResult] = {
       val leftResult = left.parseCached(input, state)
       leftResult match {
         case leftSuccess: PS[Result] =>
@@ -231,15 +239,23 @@ trait EditorParsers extends Parsers {
     } yield rightDefault
   }
 
+  class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
+    override def parseNaively(input: Input, cache: PState): PR[NewResult] = {
+      original.parseCached(input, cache).map(f)
+    }
+
+    override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
+  }
+
   case class Fail(message: String) extends EditorParser[Nothing] {
-    override def parseNaively(input: Input, cache: ParseState): PR[Nothing] = ParseFailure(None, input, message)
+    override def parseNaively(input: Input, cache: PState): PR[Nothing] = ParseFailure(None, input, message)
 
     override def getDefault(cache: DefaultCache): Option[Nothing] = None
   }
 
   class PositionParser extends EditorParser[Input] {
 
-    override def parseNaively(input: Input, state: ParseState): PR[Input] = {
+    override def parseNaively(input: Input, state: PState): PR[Input] = {
       ParseSuccess[Input, Input](input, input, NoFailure)
     }
 
@@ -249,7 +265,7 @@ trait EditorParsers extends Parsers {
   class WithRemainderParser[Result](original: Parser[Result])
     extends EditorParser[(Result, Input)] {
 
-    override def parseNaively(input: Input, parseState: ParseState): PR[(Result, Input)] = {
+    override def parseNaively(input: Input, parseState: PState): PR[(Result, Input)] = {
       val parseResult = original.parseCached(input, parseState)
 
       parseResult.map(result => (result, parseResult.remainder))
@@ -260,7 +276,7 @@ trait EditorParsers extends Parsers {
 
   case class Filter[Other, +Result <: Other](original: EditorParser[Result], predicate: Other => Boolean, getMessage: Other => String)
     extends EditorParser[Result] {
-    override def parseNaively(input: Input, state: ParseState): PR[Result] = original.parseNaively(input, state) match {
+    override def parseNaively(input: Input, state: PState): PR[Result] = original.parseNaively(input, state) match {
       case success: PS[Result] =>
         if (predicate(success.result)) success
         else ParseFailure(this.getDefault(state), success.remainder, getMessage(success.result)).getBiggest(success.biggestFailure)

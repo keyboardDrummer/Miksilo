@@ -1,18 +1,21 @@
-package core.parsers
+package core.parsers.core
 
 import util.cache.Cache
 
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait Parsers {
+trait ParserWriters {
 
   type Input <: ParseInput
   type ProcessResult[+ _] <: ParseResultLike[Input, _]
   type PN = ParseNode
   type Self[+R] <: Parser[R]
+  type PState <: ParseState
 
   case class ParseNode(input: Input, parser: Parser[Any])
+
+  def fail[R](input: Input, message: String): ProcessResult[R]
 
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
@@ -59,9 +62,9 @@ trait Parsers {
       * When implementing, make sure that when returning a failure,
       * if this Parser's default has a value, then the failure must do so to.
       */
-    def parseNaively(input: Input, state: ParseState): ProcessResult[Result]
+    def parseNaively(input: Input, state: PState): ProcessResult[Result]
 
-    def parseCached(input: Input, state: ParseState): ProcessResult[Result] = {
+    def parseCached(input: Input, state: PState): ProcessResult[Result] = {
       val node = ParseNode(input, this)
       state.resultCache.get(node).getOrElse({
         val value = parseIteratively(input, state)
@@ -72,7 +75,7 @@ trait Parsers {
       }).asInstanceOf[ProcessResult[Result]]
     }
 
-    def parseIteratively(input: Input, state: ParseState): ProcessResult[Result] = {
+    def parseIteratively(input: Input, state: PState): ProcessResult[Result] = {
       val node = ParseNode(input, this)
       state.getPreviousResult(node) match {
         case None =>
@@ -88,7 +91,7 @@ trait Parsers {
       }
     }
 
-    private def growResult[GR >: Result](node: PN, parser: Parser[GR], previous: ProcessResult[GR], state: ParseState): ProcessResult[GR] = {
+    private def growResult[GR >: Result](node: PN, parser: Parser[GR], previous: ProcessResult[GR], state: PState): ProcessResult[GR] = {
       state.putIntermediate(node, previous)
 
       val nextResult: ProcessResult[GR] = parser.parseNaively(node.input, state)
@@ -105,7 +108,6 @@ trait Parsers {
 
     type PR[+R] = ProcessResult[R]
 
-    val defaultCache = new DefaultCache()
     val recursionIntermediates = mutable.HashMap[PN, PR[Any]]()
     val callStackSet = mutable.HashSet[PN]()
     val callStack = mutable.Stack[Parser[Any]]()
@@ -126,7 +128,7 @@ trait Parsers {
         val index = callStack.indexOf(node.parser)
         parsersPartOfACycle ++= callStack.take(index + 1)
         return Some(recursionIntermediates.getOrElse(node,
-          ParseFailure[Input, Result](None, node.input, "Traversed back edge without a previous result")).
+          fail[Result](node.input, "Traversed back edge without a previous result")).
           asInstanceOf[ProcessResult[Result]])
       }
       None
@@ -146,9 +148,9 @@ trait Parsers {
     lazy val inner: Parser[Result] = _inner
 
     // We skip caching and left-recursion handling on lazy by redirecting parseCaching to the inner.
-    override def parseCached(input: Input, cache: ParseState): ProcessResult[Result] = inner.parseCached(input, cache)
-    override def parseIteratively(input: Input, cache: ParseState): ProcessResult[Result] = inner.parseIteratively(input, cache)
-    override def parseNaively(input: Input, cache: ParseState): ProcessResult[Result] = inner.parseNaively(input, cache)
+    override def parseCached(input: Input, state: PState): ProcessResult[Result] = inner.parseCached(input, state)
+    override def parseIteratively(input: Input, state: PState): ProcessResult[Result] = inner.parseIteratively(input, state)
+    override def parseNaively(input: Input, state: PState): ProcessResult[Result] = inner.parseNaively(input, state)
   }
 }
 

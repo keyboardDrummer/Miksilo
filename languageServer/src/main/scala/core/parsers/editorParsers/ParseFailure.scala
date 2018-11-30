@@ -1,4 +1,6 @@
-package core.parsers
+package core.parsers.editorParsers
+
+import core.parsers.core.{ParseInput, ParseResultLike}
 
 case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Result], remainder: Input, message: String)
   extends ParseResult[Input, Result] with OptionFailure[Result] {

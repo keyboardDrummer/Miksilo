@@ -1,7 +1,7 @@
 package core.deltas
 
 import core.language.node.SourceRange
-import core.parsers.ParseFailure
+import core.parsers.editorParsers.ParseFailure
 import core.parsers.strings.{StringParserWriter, StringReader}
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition

@@ -1,4 +1,4 @@
-package core.parsers
+package core.parsers.editorParsers
 
 import scala.collection.mutable
 

@@ -2,8 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers._
-import core.parsers.strings.StringReader
+import core.parsers.strings.{CommonParserWriter, StringReader}
 
 import scala.collection.mutable
 

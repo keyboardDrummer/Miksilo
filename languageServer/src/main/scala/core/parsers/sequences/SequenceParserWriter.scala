@@ -1,15 +1,16 @@
 package core.parsers.sequences
 
-import core.parsers._
+import core.parsers.core.EditorParserWriter
+import core.parsers.editorParsers.{DefaultCache, NoFailure, ParseFailure, ParseSuccess}
 
-trait SequenceParserWriter extends ParserWriter {
+trait SequenceParserWriter extends EditorParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
 
-  def elem(predicate: Elem => Boolean, kind: String) = new ElemPredicate(predicate, kind)
+  def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
 
   case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
-    override def parseNaively(input: Input, cache: ParseState): PR[Elem] = {
+    override def parseNaively(input: Input, cache: PState): PR[Elem] = {
       if (input.atEnd) {
         return ParseFailure(None, input, s"$kind expected but end of source found")
       }

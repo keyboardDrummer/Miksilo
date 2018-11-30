@@ -1,6 +1,4 @@
-package core.parsers
-
-import core.parsers.strings.StringParserWriter
+package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 

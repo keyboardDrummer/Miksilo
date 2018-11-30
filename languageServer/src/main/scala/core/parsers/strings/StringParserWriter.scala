@@ -1,7 +1,6 @@
 package core.parsers.strings
 
-import core.parsers
-import core.parsers._
+import core.parsers.editorParsers.{DefaultCache, NoFailure, ParseFailure, ParseSuccess}
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.util.matching.Regex
@@ -15,7 +14,7 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 
   case class Literal(value: String) extends EditorParser[String] {
-    override def parseNaively(inputs: StringReader, cache: ParseState): PR[String] = {
+    override def parseNaively(inputs: StringReader, state: PState): PR[String] = {
       var index = 0
       val array = inputs.array
       while(index < value.length) {
@@ -23,7 +22,7 @@ trait StringParserWriter extends SequenceParserWriter {
         if (array.length <= arrayIndex) {
           return ParseFailure(Some(value), inputs, s"expected '$value' but end of source found")
         } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-          return parsers.ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found '${array.subSequence(inputs.offset, arrayIndex + 1)}'")
+          return ParseFailure(Some(value), inputs.drop(index), s"expected '$value' but found '${array.subSequence(inputs.offset, arrayIndex + 1)}'")
         }
         index += 1
       }
@@ -34,7 +33,7 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   case class RegexParser(regex: Regex) extends EditorParser[String] {
-    override def parseNaively(inputs: StringReader, cache: ParseState): PR[String] = {
+    override def parseNaively(inputs: StringReader, state: PState): PR[String] = {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) =>
           ParseSuccess(
