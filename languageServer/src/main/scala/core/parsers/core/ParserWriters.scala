@@ -1,5 +1,6 @@
 package core.parsers.core
 
+import core.bigrammar.grammars.Parse
 import util.cache.Cache
 
 import scala.collection.mutable
@@ -15,17 +16,22 @@ trait ParserWriters {
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
+  def succeed[Result](result: Result): Self[Result]
+
   def fail[R](input: Input, message: String): ProcessResult[R]
-
-  def leftRight[Left, Right, NewResult](left: Self[Left],
-                                        right: => Self[Right],
-                                        combine: (Left, Right) => NewResult): Self[NewResult]
-
-  def succeed[NR](result: NR): Self[NR]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
 
-  def flatMap[Result, NewResult](left: Self[Result], f: Result => Self[NewResult]): Self[NewResult]
+  def flatMap[Result, NewResult](left: Self[Result], getRight: Result => Self[NewResult]): Self[NewResult]
+
+  def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] =
+    flatMap(original, (result: Result) => succeed(f(result)))
+
+  def leftRight[Left, Right, NewResult](left: Self[Left],
+                                        right: => Self[Right],
+                                        combine: (Left, Right) => NewResult): Self[NewResult] = {
+    flatMap(left, (leftResult: Left) => map(right, (rightResult: Right) => combine(leftResult, rightResult)))
+  }
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
     def |[Other >: Result](other: => Self[Other]) = choice(parser, other)
@@ -36,7 +42,7 @@ trait ParserWriters {
 
     def ~>[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreLeft[Result, Right])
 
-    def map[NewResult](f: Result => NewResult): Self[NewResult] = flatMap(parser, (r: Result) => succeed(f(r)))
+    def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriters.this.map(parser, f)
 
     def option: Self[Option[Result]] = choice(this.map(x => Some(x)), succeed[Option[Result]](None))
 
@@ -57,11 +63,6 @@ trait ParserWriters {
   }
 
   trait Parser[+Result] {
-
-    /**
-      * When implementing, make sure that when returning a failure,
-      * if this Parser's default has a value, then the failure must do so to.
-      */
     def parseNaively(input: Input, state: PState): ProcessResult[Result]
 
     def parseCached(input: Input, state: PState): ProcessResult[Result] = {
@@ -81,7 +82,7 @@ trait ParserWriters {
         case None =>
           state.withNodeOnStack(node, () => {
             var result = parseNaively(input, state)
-            if (result.successful && state.parsersWithBackEdges.contains(this)) {
+            if (result.getSuccessRemainder.nonEmpty && state.parsersWithBackEdges.contains(this)) { // TODO don't use nonEmpty.
               result = growResult(node, this, result, state)
             }
             result
@@ -95,11 +96,12 @@ trait ParserWriters {
       state.putIntermediate(node, previous)
 
       val nextResult: ProcessResult[GR] = parser.parseNaively(node.input, state)
-      if (nextResult.successful && nextResult.remainder.offset > previous.remainder.offset) {
-        growResult(node, parser, nextResult, state)
-      } else {
-        state.removeIntermediate(node)
-        previous
+      nextResult.getSuccessRemainder match {
+        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
+          growResult(node, parser, nextResult, state)
+        case None =>
+          state.removeIntermediate(node)
+          previous
       }
     }
   }
@@ -160,8 +162,8 @@ object Processor {
 }
 
 trait ParseResultLike[Input <: ParseInput, +Result] {
-  def successful: Boolean
-  def remainder: Input
+  def getSuccessRemainder: Option[Input]
+  def successful: Boolean = getSuccessRemainder.nonEmpty
 }
 
 trait ParseInput {

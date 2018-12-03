@@ -16,7 +16,7 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
 
   override def get: Result = throw new Exception("get was called on a ParseFailure")
 
-  override def successful: Boolean = false
+  override def getSuccessRemainder: Option[Input] = None
 
   override def toString: String = message
 
@@ -55,7 +55,7 @@ case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder:
 
   override def get: Result = result
 
-  override def successful: Boolean = true
+  override def getSuccessRemainder: Option[Input] = Some(remainder)
 
   override def getPartial = Some(result)
 
