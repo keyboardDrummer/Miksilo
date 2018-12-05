@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import core.parsers.editorParsers.ParseResult
+import core.parsers.editorParsers.EditorParseResult
 import core.parsers.strings.StringReader
 import deltas.ClearPhases
 import deltas.javac.JavaLanguage
@@ -42,7 +42,7 @@ object TestGrammarUtils extends FunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar): ParseResult[_, Any] = {
+  def parse(example: String, grammarDocument: BiGrammar): EditorParseResult[_, Any] = {
     val parser = BiGrammarToParser.toParser(grammarDocument)
     parser.parseWholeInput(new StringReader(example))
   }

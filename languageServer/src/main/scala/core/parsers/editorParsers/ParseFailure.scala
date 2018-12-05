@@ -3,7 +3,7 @@ package core.parsers.editorParsers
 import core.parsers.core.{ParseInput, ParseResultLike}
 
 case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Result], remainder: Input, message: String)
-  extends ParseResult[Input, Result] with OptionFailure[Result] {
+  extends EditorParseResult[Input, Result] with OptionFailure[Result] {
 
   override def map[NewResult](f: Result => NewResult): ParseFailure[Input, NewResult] =
     ParseFailure(partialResult.map(r => f(r)), remainder, message)
@@ -29,17 +29,17 @@ case class ParseFailure[Input <: ParseInput, +Result](partialResult: Option[Resu
 
 }
 
-trait ParseResult[Input <: ParseInput, +Result] extends ParseResultLike[Input, Result] {
-  def map[NewResult](f: Result => NewResult): ParseResult[Input, NewResult]
+trait EditorParseResult[Input <: ParseInput, +Result] extends ParseResultLike[Input, Result] {
+  def map[NewResult](f: Result => NewResult): EditorParseResult[Input, NewResult]
 
   def getPartial: Option[Result]
   def get: Result
   def remainder: Input
 
-  def addDefault[Other >: Result](value: Other): ParseResult[Input, Other]
+  def addDefault[Other >: Result](value: Other): EditorParseResult[Input, Other]
 }
 
-case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result]) extends ParseResult[Input, Result] {
+case class ParseSuccess[Input <: ParseInput, +Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result]) extends EditorParseResult[Input, Result] {
   override def map[NewResult](f: Result => NewResult): ParseSuccess[Input, NewResult] = {
     ParseSuccess(f(result), remainder, biggestFailure.map(f))
   }

@@ -1,15 +1,14 @@
 package core.parsers.core
 
-import core.bigrammar.grammars.Parse
 import util.cache.Cache
 
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait ParserWriters {
+trait ParserWriter {
 
   type Input <: ParseInput
-  type ProcessResult[+ _] <: ParseResultLike[Input, _]
+  type ParseResult[+ _] <: ParseResultLike[Input, _]
   type PN = ParseNode
   type Self[+R] <: Parser[R]
   type PState <: ParseState
@@ -17,8 +16,10 @@ trait ParserWriters {
   case class ParseNode(input: Input, parser: Parser[Any])
 
   def succeed[Result](result: Result): Self[Result]
+  def fail[Result](message: String): Self[Result]
+  def lazyParser[Result](inner: => Self[Result]): Self[Result]
 
-  def fail[R](input: Input, message: String): ProcessResult[R]
+  def failure[Result](input: Input, message: String): ParseResult[Result]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
 
@@ -34,6 +35,12 @@ trait ParserWriters {
   }
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
+
+    def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other]): Self[Other] = {
+      lazy val result: Self[Other] = lazyParser(parser | getAlternative(parser, result))
+      result
+    }
+
     def |[Other >: Result](other: => Self[Other]) = choice(parser, other)
 
     def ~[Right](right: => Self[Right]) = leftRight(parser, right, (a: Result, b: Right) => (a, b))
@@ -42,12 +49,23 @@ trait ParserWriters {
 
     def ~>[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreLeft[Result, Right])
 
-    def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriters.this.map(parser, f)
+    def flatMap[NewResult](getRight: Result => Self[NewResult]): Self[NewResult] =
+      ParserWriter.this.flatMap(parser, getRight)
+
+    def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriter.this.map(parser, f)
 
     def option: Self[Option[Result]] = choice(this.map(x => Some(x)), succeed[Option[Result]](None))
 
+    def repN(amount: Int): Self[List[Result]] = {
+      if (amount == 0) {
+        succeed(List.empty[Result])
+      } else {
+        leftRight[Result, List[Result], List[Result]](parser, repN(amount - 1), (a,b) => a :: b)
+      }
+    }
+
     def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = {
-      lazy val result: Self[Sum] = choice(leftRight(parser, result, reduce), succeed(zero), true)
+      lazy val result: Self[Sum] = choice(leftRight(parser, result, reduce), succeed(zero), leftIsAlwaysBigger = true)
       result
     }
 
@@ -63,9 +81,9 @@ trait ParserWriters {
   }
 
   trait Parser[+Result] {
-    def parseNaively(input: Input, state: PState): ProcessResult[Result]
+    def parseNaively(input: Input, state: PState): ParseResult[Result]
 
-    def parseCached(input: Input, state: PState): ProcessResult[Result] = {
+    def parseCached(input: Input, state: PState): ParseResult[Result] = {
       val node = ParseNode(input, this)
       state.resultCache.get(node).getOrElse({
         val value = parseIteratively(input, state)
@@ -73,10 +91,10 @@ trait ParserWriters {
           state.resultCache.add(node, value)
         }
         value
-      }).asInstanceOf[ProcessResult[Result]]
+      }).asInstanceOf[ParseResult[Result]]
     }
 
-    def parseIteratively(input: Input, state: PState): ProcessResult[Result] = {
+    def parseIteratively(input: Input, state: PState): ParseResult[Result] = {
       val node = ParseNode(input, this)
       state.getPreviousResult(node) match {
         case None =>
@@ -92,23 +110,23 @@ trait ParserWriters {
       }
     }
 
-    private def growResult[GR >: Result](node: PN, parser: Parser[GR], previous: ProcessResult[GR], state: PState): ProcessResult[GR] = {
+    private def growResult[GR >: Result](node: PN, parser: Parser[GR], previous: ParseResult[GR], state: PState): ParseResult[GR] = {
       state.putIntermediate(node, previous)
 
-      val nextResult: ProcessResult[GR] = parser.parseNaively(node.input, state)
+      val nextResult: ParseResult[GR] = parser.parseNaively(node.input, state)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
           growResult(node, parser, nextResult, state)
-        case None =>
+        case _ =>
           state.removeIntermediate(node)
           previous
       }
     }
   }
 
-  class ParseState(val resultCache: Cache[ParseNode, ProcessResult[Any]]) {
+  class ParseState(val resultCache: Cache[ParseNode, ParseResult[Any]]) {
 
-    type PR[+R] = ProcessResult[R]
+    type PR[+R] = ParseResult[R]
 
     val recursionIntermediates = mutable.HashMap[PN, PR[Any]]()
     val callStackSet = mutable.HashSet[PN]()
@@ -130,8 +148,8 @@ trait ParserWriters {
         val index = callStack.indexOf(node.parser)
         parsersPartOfACycle ++= callStack.take(index + 1)
         return Some(recursionIntermediates.getOrElse(node,
-          fail[Result](node.input, "Traversed back edge without a previous result")).
-          asInstanceOf[ProcessResult[Result]])
+          failure[Result](node.input, "Traversed back edge without a previous result")).
+          asInstanceOf[ParseResult[Result]])
       }
       None
     }
@@ -150,9 +168,9 @@ trait ParserWriters {
     lazy val inner: Parser[Result] = _inner
 
     // We skip caching and left-recursion handling on lazy by redirecting parseCaching to the inner.
-    override def parseCached(input: Input, state: PState): ProcessResult[Result] = inner.parseCached(input, state)
-    override def parseIteratively(input: Input, state: PState): ProcessResult[Result] = inner.parseIteratively(input, state)
-    override def parseNaively(input: Input, state: PState): ProcessResult[Result] = inner.parseNaively(input, state)
+    override def parseCached(input: Input, state: PState): ParseResult[Result] = inner.parseCached(input, state)
+    override def parseIteratively(input: Input, state: PState): ParseResult[Result] = inner.parseIteratively(input, state)
+    override def parseNaively(input: Input, state: PState): ParseResult[Result] = inner.parseNaively(input, state)
   }
 }
 
@@ -164,6 +182,7 @@ object Processor {
 trait ParseResultLike[Input <: ParseInput, +Result] {
   def getSuccessRemainder: Option[Input]
   def successful: Boolean = getSuccessRemainder.nonEmpty
+  def get: Result
 }
 
 trait ParseInput {

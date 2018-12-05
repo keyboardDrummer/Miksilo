@@ -3,14 +3,14 @@ package deltas.bytecode.readJar
 import java.io.BufferedInputStream
 
 import core.deltas._
-import core.language.node.Node
+import core.language.node.{Node, SourceRange}
 import core.language.{Compilation, Language}
-import core.parsers.bytes.ByteArrayReader
+import core.parsers.bytes.ByteReader
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-
-import scala.collection.immutable
+import langserver.types.{Diagnostic, DiagnosticSeverity}
+import languageServer.HumanPosition
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 
@@ -23,13 +23,15 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
     val bis = new BufferedInputStream(inputStream)
-    val inputBytes: immutable.Seq[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte)
-    val parseResult: ClassFileParser.ParseResult[Node] = parser(new ByteArrayReader(0, inputBytes))
+    val inputBytes: Array[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
+    val parseResult: ClassFileParser.ParseResult[Node] = parser.parse(ByteReader(inputBytes))
     if (parseResult.successful) {
       compilation.program = parseResult.get
       compilation.program.startOfUri = Some(uri)
     } else {
-      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseException(parseResult.toString)))
+      val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)),
+        Some(DiagnosticSeverity.Error), None, None, "File was not a JVM classfile")
+      compilation.diagnostics ++= List(FileDiagnostic(uri, diagnostic))
     }
   }
 

@@ -16,7 +16,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: BiGrammarToParser.ProcessResult[Node] = parseStream(parser, inputStream)
+    val parseResult: BiGrammarToParser.ParseResult[Node] = parseStream(parser, inputStream)
     parseResult.getPartial.foreach(program => {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
@@ -28,7 +28,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
     }
   }
 
-  def parseStream[T](parser: BiGrammarToParser.EditorParser[T], input: InputStream): BiGrammarToParser.ProcessResult[T] = {
+  def parseStream[T](parser: BiGrammarToParser.EditorParser[T], input: InputStream): BiGrammarToParser.ParseResult[T] = {
     val reader = new StringReader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }

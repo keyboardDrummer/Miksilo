@@ -1,7 +1,7 @@
 package core.parsers.sequences
 
 import core.parsers.core.EditorParserWriter
-import core.parsers.editorParsers.{DefaultCache, NoFailure, ParseFailure, ParseSuccess}
+import core.parsers.editorParsers.{DefaultCache, NoFailure, ParseSuccess}
 
 trait SequenceParserWriter extends EditorParserWriter {
   type Elem
@@ -10,9 +10,9 @@ trait SequenceParserWriter extends EditorParserWriter {
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
 
   case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
-    override def parseNaively(input: Input, cache: PState): PR[Elem] = {
+    override def parseNaively(input: Input, cache: PState): ParseResult[Elem] = {
       if (input.atEnd) {
-        return ParseFailure(None, input, s"$kind expected but end of source found")
+        return failure(input, s"$kind expected but end of source found")
       }
 
       val char = input.head
@@ -20,7 +20,7 @@ trait SequenceParserWriter extends EditorParserWriter {
         ParseSuccess(char, input.tail, NoFailure)
       }
       else
-        ParseFailure(None, input, s"'$char' was not a $kind")
+        failure(input, s"'$char' was not a $kind")
     }
 
     override def getDefault(cache: DefaultCache): Option[Elem] = None

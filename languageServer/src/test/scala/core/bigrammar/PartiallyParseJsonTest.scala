@@ -17,7 +17,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with S
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parse(StringReader(input.toCharArray))
+    val result = jsonParser.parseWholeInput(StringReader(input.toCharArray))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }
