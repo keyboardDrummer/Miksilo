@@ -1,14 +1,13 @@
 package core.deltas
 
 import core.language.node.SourceRange
-import core.parsers.editorParsers.ParseFailure
-import core.parsers.strings.{StringParserWriter, StringReader}
 import langserver.types.{Diagnostic, DiagnosticSeverity}
 import languageServer.HumanPosition
+import core.bigrammar.BiGrammarToParser._
 
-object DiagnosticUtil extends StringParserWriter {
+object DiagnosticUtil {
 
-  def getDiagnosticFromParseFailure(failure: ParseFailure[StringReader, Any]): Diagnostic = {
+  def getDiagnosticFromParseFailure(failure: ParseFailure[Any]): Diagnostic = {
     val row = failure.remainder.position.line
     val column = failure.remainder.position.column
     Diagnostic(SourceRange(HumanPosition(row, column), HumanPosition(row, column + 1)), Some(DiagnosticSeverity.Error), None, None, failure.message)

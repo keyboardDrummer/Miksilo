@@ -8,7 +8,7 @@ import scala.language.higherKinds
 trait ParserWriter {
 
   type Input <: ParseInput
-  type ParseResult[+ _] <: ParseResultLike[Input, _]
+  type ParseResult[+Result] <: ParseResultLike[Result]
   type PN = ParseNode
   type Self[+R] <: Parser[R]
   type PState <: ParseState
@@ -25,14 +25,15 @@ trait ParserWriter {
 
   def flatMap[Result, NewResult](left: Self[Result], getRight: Result => Self[NewResult]): Self[NewResult]
 
-  def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] =
-    flatMap(original, (result: Result) => succeed(f(result)))
+  def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
+    //= flatMap(original, (result: Result) => succeed(f(result)))
 
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
-                                        combine: (Left, Right) => NewResult): Self[NewResult] = {
-    flatMap(left, (leftResult: Left) => map(right, (rightResult: Right) => combine(leftResult, rightResult)))
-  }
+                                        combine: (Left, Right) => NewResult): Self[NewResult]
+//  = {
+//    flatMap(left, (leftResult: Left) => map(right, (rightResult: Right) => combine(leftResult, rightResult)))
+//  }
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
@@ -172,17 +173,25 @@ trait ParserWriter {
     override def parseIteratively(input: Input, state: PState): ParseResult[Result] = inner.parseIteratively(input, state)
     override def parseNaively(input: Input, state: PState): ParseResult[Result] = inner.parseNaively(input, state)
   }
+
+  trait ParseResultLike[+Result] {
+    def getSuccessRemainder: Option[Input]
+    def successful: Boolean = getSuccessRemainder.nonEmpty
+    def get: Result
+    def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
+  }
+
+  class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
+    override def parseNaively(input: Input, state: PState) = {
+      val result = original.parseCached(input, state)
+      result.map(f)
+    }
+  }
 }
 
 object Processor {
   def ignoreLeft[Left, Right](left: Left, right: Right): Right = right
   def ignoreRight[Left, Right](left: Left, right: Right): Left = left
-}
-
-trait ParseResultLike[Input <: ParseInput, +Result] {
-  def getSuccessRemainder: Option[Input]
-  def successful: Boolean = getSuccessRemainder.nonEmpty
-  def get: Result
 }
 
 trait ParseInput {

@@ -6,14 +6,13 @@ import util.cache.{Cache, InfiniteCache}
 trait EditorParserWriter extends ParserWriter {
 
   type Self[+R] = EditorParser[R]
-  type ParseResult[+R] = EditorParseResult[Input, R]
-  type PF[+R] = ParseFailure[Input, R]
-  type PR[+R] = EditorParseResult[Input, R]
-  type PS[+R] = ParseSuccess[Input, R]
-  type PState = EditorParseState
+  type ParseResult[+R] = EditorParseResult[R]
+  type PF[+R] = ParseFailure[R] // TODO remove
+  type PR[+R] = EditorParseResult[R] // TODO remove
+  type PS[+R] = ParseSuccess[R] //TODO remove
+  type PState = EditorParseState // TODO remove
 
-
-  override def failure[R](input: Input, message: String): ParseFailure[Input, Nothing] = ParseFailure(None, input, message)
+  override def failure[R](input: Input, message: String): ParseFailure[Nothing] = ParseFailure(None, input, message)
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -255,7 +254,7 @@ trait EditorParserWriter extends ParserWriter {
   class PositionParser extends EditorParser[Input] {
 
     override def parseNaively(input: Input, state: PState): PR[Input] = {
-      ParseSuccess[Input, Input](input, input, NoFailure)
+      ParseSuccess[Input](input, input, NoFailure)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
@@ -292,4 +291,82 @@ trait EditorParserWriter extends ParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[Result] = cache(inner.asInstanceOf[EditorParser[Result]])
   }
+
+  case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String)
+    extends EditorParseResult[Result] with OptionFailure[Result] {
+
+    override def map[NewResult](f: Result => NewResult): ParseFailure[NewResult] =
+      ParseFailure(partialResult.map(r => f(r)), remainder, message)
+
+    override def offset: Int = remainder.offset
+
+    def getBiggest[Other >: Result](other: OptionFailure[Other]): ParseFailure[Other] = {
+      if (offset > other.offset) this else other.asInstanceOf[ParseFailure[Result]]
+    }
+
+    override def get: Result = throw new Exception("get was called on a ParseFailure")
+
+    override def getSuccessRemainder: Option[Input] = None
+
+    override def toString: String = message
+
+    override def getPartial = partialResult
+
+    override def addDefault[Other >: Result](value: Other): ParseFailure[Other] = partialResult match {
+      case _: Some[Result] => this
+      case None => ParseFailure(Some(value), remainder, message)
+    }
+
+  }
+
+  trait EditorParseResult[+Result] extends ParseResultLike[Result] {
+
+    def getPartial: Option[Result]
+    def get: Result
+    def remainder: Input
+
+    def addDefault[Other >: Result](value: Other): EditorParseResult[Other]
+  }
+
+  case class ParseSuccess[+Result](result: Result, remainder: Input, biggestFailure: OptionFailure[Result])
+    extends EditorParseResult[Result] {
+    override def map[NewResult](f: Result => NewResult): ParseSuccess[NewResult] = {
+      ParseSuccess[NewResult](f(result), remainder, biggestFailure.map(f))
+    }
+
+    def biggestRealFailure: Option[ParseFailure[Result]] = biggestFailure match {
+      case failure: ParseFailure[Result] => Some(failure)
+      case _ => None
+    }
+
+    def addFailure[Other >: Result](other: OptionFailure[Other]): ParseSuccess[Other] =
+      if (biggestFailure.offset > other.offset) this else
+        ParseSuccess(result, remainder, other)
+
+    override def get: Result = result
+
+    override def getSuccessRemainder: Option[Input] = Some(remainder)
+
+    override def getPartial = Some(result)
+
+    override def addDefault[Other >: Result](value: Other) = biggestFailure match {
+      case NoFailure => this
+      case f: ParseFailure[Result] => ParseSuccess(result, remainder, f.addDefault(value))
+    }
+  }
+
+  trait OptionFailure[+Result] {
+    def offset: Int
+    def partialResult: Option[Result]
+    def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
+  }
+
+  object NoFailure extends OptionFailure[Nothing] {
+    override def offset: Int = -1
+
+    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
+
+    override def partialResult: Option[Nothing] = None
+  }
+
 }

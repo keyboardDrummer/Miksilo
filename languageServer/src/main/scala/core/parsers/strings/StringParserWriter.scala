@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{DefaultCache, NoFailure, ParseFailure, ParseSuccess}
+import core.parsers.editorParsers.DefaultCache
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.util.matching.Regex

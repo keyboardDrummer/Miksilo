@@ -22,7 +22,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase with StringParserWriter {
       compilation.program.startOfUri = Some(uri)
     })
     parseResult match {
-      case failure: BiGrammarToParser.PF[Node] =>
+      case failure: BiGrammarToParser.ParseFailure[Node] =>
         compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(failure)))
       case _ =>
     }
