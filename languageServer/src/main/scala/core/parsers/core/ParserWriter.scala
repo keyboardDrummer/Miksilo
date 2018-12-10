@@ -85,6 +85,9 @@ trait ParserWriter {
     def parseNaively(input: Input, state: PState): ParseResult[Result]
 
     def parseCached(input: Input, state: PState): ParseResult[Result] = {
+      if (state.resultCache == null)
+        return parseNaively(input, state) //TODO find a nicer way
+
       val node = ParseNode(input, this)
       state.resultCache.get(node).getOrElse({
         val value = parseIteratively(input, state)
@@ -96,12 +99,15 @@ trait ParserWriter {
     }
 
     def parseIteratively(input: Input, state: PState): ParseResult[Result] = {
+      if (state.resultCache == null)
+        return parseNaively(input, state) //TODO find a nicer way
+
       val node = ParseNode(input, this)
       state.getPreviousResult(node) match {
         case None =>
           state.withNodeOnStack(node, () => {
             var result = parseNaively(input, state)
-            if (result.getSuccessRemainder.nonEmpty && state.parsersWithBackEdges.contains(this)) { // TODO don't use nonEmpty.
+            if (result.successful && state.parsersWithBackEdges.contains(this)) {
               result = growResult(node, this, result, state)
             }
             result

@@ -23,6 +23,8 @@ trait BasicParserWriter extends ParserWriter {
   override def flatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]): Parser[NewResult] =
     new FlatMap(left, getRight)
 
+  override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
+
   class SuccessParser[+Result](result: Result) extends Parser[Result] {
     override def parseNaively(input: Input, state: ParseState) = ParseSuccess(result, input)
   }

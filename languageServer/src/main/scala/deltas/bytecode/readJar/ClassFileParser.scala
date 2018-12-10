@@ -12,7 +12,7 @@ object ClassFileParser extends ByteParserWriter {
   def classFileParser: Parser[Node] = {
     for {
       _ <- elems(PrintByteCode.cafeBabeBytes)
-      versionCode <- ParseFloat
+      versionCode <- ParseInteger
       constantPool <- constantPoolParser
       accessFlags <- accessFlagParser
       thisIndex <- ParseShort
@@ -36,8 +36,8 @@ object ClassFileParser extends ByteParserWriter {
   def constantsParser(constantCount: Int): Parser[List[Any]] = constantCount match {
     case 0 => succeed(List.empty)
     case _ => for {
-      result<- constantParser
-      result <- constantsParser(constantCount - result.entriesConsumed).map(rest => result.constant :: rest)
+      constantResult <- constantParser
+      result <- constantsParser(constantCount - constantResult.entriesConsumed).map(rest => constantResult.constant :: rest)
     } yield result
   }
 

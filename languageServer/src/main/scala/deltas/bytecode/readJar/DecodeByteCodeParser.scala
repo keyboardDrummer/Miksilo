@@ -24,7 +24,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     val inputStream = compilation.fileSystem.getFile(uri)
     val bis = new BufferedInputStream(inputStream)
     val inputBytes: Array[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
-    val parseResult: ClassFileParser.ParseResult[Node] = parser.parse(ByteReader(inputBytes))
+    val parseResult: ClassFileParser.ParseResult[Node] = parser.parse(ByteReader(inputBytes), null)
     if (parseResult.successful) {
       compilation.program = parseResult.get
       compilation.program.startOfUri = Some(uri)
