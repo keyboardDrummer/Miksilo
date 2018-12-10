@@ -35,7 +35,7 @@ trait ErrorReportingParserWriter extends ParserWriter {
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
     override def parseNaively(input: Input, state: ParseState) = {
-      (first.parseCached(input, state), second.parseCached(input, state)) match {
+      (state.parseCached(first, input), state.parseCached(second, input)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
         case (_:Failure, secondResult) => secondResult
@@ -46,8 +46,8 @@ trait ErrorReportingParserWriter extends ParserWriter {
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
     override def parseNaively(input: Input, state: ParseState) = {
-      left.parseCached(input, state) match {
-        case ParseSuccess(leftResult, leftRemainder) => right.parseCached(leftRemainder, state) match {
+      state.parseCached(left, input) match {
+        case ParseSuccess(leftResult, leftRemainder) => state.parseCached(right, leftRemainder) match {
           case ParseSuccess(rightResult, rightRemainder) => ParseSuccess(combine(leftResult, rightResult), rightRemainder)
           case f: Failure => f
         }
@@ -58,8 +58,8 @@ trait ErrorReportingParserWriter extends ParserWriter {
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
     override def parseNaively(input: Input, state: ParseState) = {
-      left.parseCached(input, state) match {
-        case ParseSuccess(leftResult, leftRemainder) => getRight(leftResult).parseCached(leftRemainder, state)
+      state.parseCached(left, input) match {
+        case ParseSuccess(leftResult, leftRemainder) => state.parseCached(getRight(leftResult), leftRemainder)
         case f: Failure => f
       }
     }
@@ -101,7 +101,7 @@ trait ErrorReportingParserWriter extends ParserWriter {
               cache: Cache[PN, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
       val state = new ParseState(cache)
-      parser.parseIteratively(input, state)
+      state.parseIteratively(parser, input)
     }
   }
 }

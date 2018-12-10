@@ -71,7 +71,7 @@ trait EditorParserWriter extends ParserWriter {
               cache: Cache[PN, PR[Any]] = new InfiniteCache()): PR[Result] = {
 
       val state = new EditorParseState(cache)
-      parser.parseIteratively(input, state)
+      state.parseIteratively(parser, input)
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
@@ -86,7 +86,7 @@ trait EditorParserWriter extends ParserWriter {
   case class WithDefault[+Result](original: Parser[Result], _getDefault: DefaultCache => Option[Result])
     extends EditorParser[Result] {
     override def parseNaively(input: Input, state: PState): PR[Result] = {
-      original.parseCached(input, state) match {
+      state.parseCached(original, input) match {
         case failure: PF[Result] if failure.partialResult.isEmpty || failure.remainder == input =>
           new PF[Result](_getDefault(state.defaultCache), failure.remainder, failure.message)
         case x => x
@@ -103,10 +103,10 @@ trait EditorParserWriter extends ParserWriter {
     lazy val right: EditorParser[Right] = _right
 
     override def parseNaively(input: Input, state: PState): PR[Result] = {
-      val leftResult = left.parseCached(input, state)
+      val leftResult = state.parseCached(left, input)
       leftResult match {
         case leftSuccess: PS[Left] =>
-          val rightResult = right.parseCached(leftSuccess.remainder, state)
+          val rightResult = state.parseCached(right, leftSuccess.remainder)
           rightResult match {
             case rightSuccess: PS[Right] =>
               rightSuccess.map(r => combine(leftSuccess.result, r)).
@@ -142,11 +142,11 @@ trait EditorParserWriter extends ParserWriter {
     lazy val second = _second
 
     override def parseNaively(input: Input, state: PState): PR[Result] = {
-      val firstResult = first.parseCached(input, state)
+      val firstResult = state.parseCached(first, input)
       val result = firstResult match {
         case _: PS[Result] => firstResult
         case firstFailure: PF[Result] =>
-          val secondResult = second.parseCached(input, state)
+          val secondResult = state.parseCached(second, input)
           secondResult match {
             case secondSuccess: PS[Result] =>
               val biggestFailure = firstFailure.getBiggest(secondSuccess.biggestFailure)
@@ -169,8 +169,8 @@ trait EditorParserWriter extends ParserWriter {
     lazy val second = _second
 
     override def parseNaively(input: Input, state: PState): PR[Result] = {
-      val firstResult = first.parseCached(input, state)
-      val secondResult = second.parseCached(input, state)
+      val firstResult = state.parseCached(first, input)
+      val secondResult = state.parseCached(second, input)
       val result = (firstResult, secondResult) match {
         case (firstSuccess: PS[Result], secondSuccess: PS[Result]) =>
           if (firstSuccess.remainder.offset > secondSuccess.remainder.offset)
@@ -204,11 +204,11 @@ trait EditorParserWriter extends ParserWriter {
     extends EditorParser[NewResult] {
 
     override def parseNaively(input: Input, state: PState): PR[NewResult] = {
-      val leftResult = left.parseCached(input, state)
+      val leftResult = state.parseCached(left, input)
       leftResult match {
         case leftSuccess: PS[Result] =>
           val right = getRight(leftSuccess.result)
-          val rightResult = right.parseCached(leftSuccess.remainder, state)
+          val rightResult = state.parseCached(right, leftSuccess.remainder)
           rightResult match {
             case rightSuccess: PS[NewResult] =>
               rightSuccess.
@@ -244,8 +244,8 @@ trait EditorParserWriter extends ParserWriter {
   }
 
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
-    override def parseNaively(input: Input, cache: PState): PR[NewResult] = {
-      original.parseCached(input, cache).map(f)
+    override def parseNaively(input: Input, state: PState): PR[NewResult] = {
+      state.parseCached(original, input).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
@@ -264,7 +264,7 @@ trait EditorParserWriter extends ParserWriter {
     extends EditorParser[(Result, Input)] {
 
     override def parseNaively(input: Input, parseState: PState): PR[(Result, Input)] = {
-      val parseResult = original.parseCached(input, parseState)
+      val parseResult = parseState.parseCached(original, input)
 
       parseResult.map(result => (result, parseResult.remainder))
     }

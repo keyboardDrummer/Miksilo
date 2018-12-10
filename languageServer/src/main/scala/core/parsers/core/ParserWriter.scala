@@ -2,6 +2,7 @@ package core.parsers.core
 
 import util.cache.Cache
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.higherKinds
 
@@ -83,73 +84,69 @@ trait ParserWriter {
 
   trait Parser[+Result] {
     def parseNaively(input: Input, state: PState): ParseResult[Result]
-
-    def parseCached(input: Input, state: PState): ParseResult[Result] = {
-      if (state.resultCache == null)
-        return parseNaively(input, state) //TODO find a nicer way
-
-      val node = ParseNode(input, this)
-      state.resultCache.get(node).getOrElse({
-        val value = parseIteratively(input, state)
-        if (!state.parsersPartOfACycle.contains(this)) {
-          state.resultCache.add(node, value)
-        }
-        value
-      }).asInstanceOf[ParseResult[Result]]
-    }
-
-    def parseIteratively(input: Input, state: PState): ParseResult[Result] = {
-      if (state.resultCache == null)
-        return parseNaively(input, state) //TODO find a nicer way
-
-      val node = ParseNode(input, this)
-      state.getPreviousResult(node) match {
-        case None =>
-          state.withNodeOnStack(node, () => {
-            var result = parseNaively(input, state)
-            if (result.successful && state.parsersWithBackEdges.contains(this)) {
-              result = growResult(node, this, result, state)
-            }
-            result
-          })
-
-        case Some(result) => result
-      }
-    }
-
-    private def growResult[GR >: Result](node: PN, parser: Parser[GR], previous: ParseResult[GR], state: PState): ParseResult[GR] = {
-      state.putIntermediate(node, previous)
-
-      val nextResult: ParseResult[GR] = parser.parseNaively(node.input, state)
-      nextResult.getSuccessRemainder match {
-        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
-          growResult(node, parser, nextResult, state)
-        case _ =>
-          state.removeIntermediate(node)
-          previous
-      }
-    }
   }
 
   class ParseState(val resultCache: Cache[ParseNode, ParseResult[Any]]) {
 
-    type PR[+R] = ParseResult[R]
+    this: PState =>
 
-    val recursionIntermediates = mutable.HashMap[PN, PR[Any]]()
+    val recursionIntermediates = mutable.HashMap[PN, ParseResult[Any]]()
     val callStackSet = mutable.HashSet[PN]()
     val callStack = mutable.Stack[Parser[Any]]()
     var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
     val parsersWithBackEdges = mutable.HashSet[Parser[Any]]() //TODO possible this can be only the parsers.
 
-    def putIntermediate(key: PN, value: PR[Any]): Unit = {
-      recursionIntermediates.put(key, value)
+    def parseCached[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+      if (resultCache == null)
+        return parser.parseNaively(input, this) //TODO find a nicer way
+
+      val node = ParseNode(input, parser)
+      resultCache.get(node).getOrElse({
+        val value = parseIteratively(parser, input)
+        if (!parsersPartOfACycle.contains(parser)) {
+          resultCache.add(node, value)
+        }
+        value
+      }).asInstanceOf[ParseResult[Result]]
     }
 
-    def removeIntermediate(node: PN): Unit = {
-      recursionIntermediates.remove(node)
+    def parseIteratively[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+      if (resultCache == null)
+        return parser.parseNaively(input, this) //TODO find a nicer way
+
+      val node = ParseNode(input, parser)
+      getPreviousResult(node) match {
+        case None =>
+
+          callStackSet.add(node)
+          callStack.push(node.parser)
+          var result = parser.parseNaively(input, this)
+          if (result.successful && parsersWithBackEdges.contains(parser)) {
+            result = growResult(node, parser, result, this)
+          }
+          callStackSet.remove(node)
+          callStack.pop()
+          result
+
+        case Some(result) => result
+      }
     }
 
-    def getPreviousResult[Result](node: PN): Option[PR[Result]] = {
+    @tailrec
+    private def growResult[Result](node: PN, parser: Parser[Result], previous: ParseResult[Result], state: PState): ParseResult[Result] = {
+      recursionIntermediates.put(node, previous)
+
+      val nextResult: ParseResult[Result] = parser.parseNaively(node.input, state)
+      nextResult.getSuccessRemainder match {
+        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
+          growResult(node, parser, nextResult, state)
+        case _ =>
+          recursionIntermediates.remove(node)
+          previous
+      }
+    }
+
+    def getPreviousResult[Result](node: PN): Option[ParseResult[Result]] = {
       if (callStackSet.contains(node)) {
         parsersWithBackEdges.add(node.parser)
         val index = callStack.indexOf(node.parser)
@@ -160,23 +157,11 @@ trait ParserWriter {
       }
       None
     }
-
-    def withNodeOnStack[T](node: PN, action: () => T): T = {
-      callStackSet.add(node)
-      callStack.push(node.parser)
-      val result = action()
-      callStackSet.remove(node)
-      callStack.pop()
-      result
-    }
   }
 
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner: Parser[Result] = _inner
 
-    // We skip caching and left-recursion handling on lazy by redirecting parseCaching to the inner.
-    override def parseCached(input: Input, state: PState): ParseResult[Result] = inner.parseCached(input, state)
-    override def parseIteratively(input: Input, state: PState): ParseResult[Result] = inner.parseIteratively(input, state)
     override def parseNaively(input: Input, state: PState): ParseResult[Result] = inner.parseNaively(input, state)
   }
 
@@ -189,7 +174,7 @@ trait ParserWriter {
 
   class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
     override def parseNaively(input: Input, state: PState) = {
-      val result = original.parseCached(input, state)
+      val result = state.parseCached(original, input)
       result.map(f)
     }
   }
