@@ -83,16 +83,16 @@ trait ParserWriter {
   }
 
   trait Parser[+Result] {
-    def parseNaively(input: Input, state: PState): ParseResult[Result]
+    def parse(input: Input, state: PState): ParseResult[Result]
   }
 
   trait PState {
-    def parseCached[Result](parser: Parser[Result], input: Input): ParseResult[Result]
+    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result]
     def extraState: ExtraState
   }
 
   class EmptyParseState(val extraState: ExtraState) extends PState {
-    override def parseCached[Result](parser: Parser[Result], input: Input) = parser.parseNaively(input, this)
+    override def parse[Result](parser: Parser[Result], input: Input) = parser.parse(input, this)
   }
 
   class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends PState {
@@ -103,7 +103,7 @@ trait ParserWriter {
     var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
     val parsersWithBackEdges = mutable.HashSet[Parser[Any]]()
 
-    def parseCached[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
 
       val node = ParseNode(input, parser)
       resultCache.get(node).getOrElse({
@@ -122,7 +122,7 @@ trait ParserWriter {
 
           callStackSet.add(node)
           callStack.push(node.parser)
-          var result = parser.parseNaively(input, this)
+          var result = parser.parse(input, this)
           if (result.successful && parsersWithBackEdges.contains(parser)) {
             result = growResult(node, parser, result, this)
           }
@@ -138,7 +138,7 @@ trait ParserWriter {
     private def growResult[Result](node: PN, parser: Parser[Result], previous: ParseResult[Result], state: PState): ParseResult[Result] = {
       recursionIntermediates.put(node, previous)
 
-      val nextResult: ParseResult[Result] = parser.parseNaively(node.input, state)
+      val nextResult: ParseResult[Result] = parser.parse(node.input, state)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
           growResult(node, parser, nextResult, state)
@@ -164,7 +164,7 @@ trait ParserWriter {
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner: Parser[Result] = _inner
 
-    override def parseNaively(input: Input, state: PState): ParseResult[Result] = inner.parseNaively(input, state)
+    override def parse(input: Input, state: PState): ParseResult[Result] = inner.parse(input, state)
   }
 
   trait ParseResultLike[+Result] {
@@ -175,8 +175,8 @@ trait ParserWriter {
   }
 
   class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
-    override def parseNaively(input: Input, state: PState) = {
-      val result = state.parseCached(original, input)
+    override def parse(input: Input, state: PState) = {
+      val result = state.parse(original, input)
       result.map(f)
     }
   }
