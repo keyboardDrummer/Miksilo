@@ -10,7 +10,7 @@ trait EditorParserWriter extends ParserWriter {
   type PF[+R] = ParseFailure[R] // TODO remove
   type PR[+R] = EditorParseResult[R] // TODO remove
   type PS[+R] = ParseSuccess[R] //TODO remove
-  type PState = EditorParseState // TODO remove
+  type ExtraState = DefaultCache
 
   override def failure[R](input: Input, message: String): ParseFailure[Nothing] = ParseFailure(None, input, message)
 
@@ -29,11 +29,7 @@ trait EditorParserWriter extends ParserWriter {
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
   trait EditorParser[+Result] extends Parser[Result] with HasGetDefault[Result] {
-    final def getDefault(state: PState): Option[Result] = getDefault(state.defaultCache)
-  }
-
-  class EditorParseState(resultCache: Cache[ParseNode, ParseResult[Any]]) extends ParseState(resultCache) {
-    val defaultCache = new DefaultCache()
+    final def getDefault(state: PState): Option[Result] = getDefault(state.extraState)
   }
 
   override def fail[Result](message: String) = Fail(message)
@@ -41,7 +37,7 @@ trait EditorParserWriter extends ParserWriter {
   case class Fail(message: String) extends EditorParser[Nothing] {
     override def getDefault(cache: DefaultCache) = None
 
-    override def parseNaively(input: Input, state: EditorParseState) = ParseFailure(None, input, message)
+    override def parseNaively(input: Input, state: PState) = ParseFailure(None, input, message)
   }
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
@@ -70,7 +66,7 @@ trait EditorParserWriter extends ParserWriter {
     def parse(input: Input,
               cache: Cache[PN, PR[Any]] = new InfiniteCache()): PR[Result] = {
 
-      val state = new EditorParseState(cache)
+      val state = new PackratParseState(cache, new DefaultCache)
       state.parseIteratively(parser, input)
     }
 
@@ -88,7 +84,7 @@ trait EditorParserWriter extends ParserWriter {
     override def parseNaively(input: Input, state: PState): PR[Result] = {
       state.parseCached(original, input) match {
         case failure: PF[Result] if failure.partialResult.isEmpty || failure.remainder == input =>
-          new PF[Result](_getDefault(state.defaultCache), failure.remainder, failure.message)
+          new PF[Result](_getDefault(state.extraState), failure.remainder, failure.message)
         case x => x
       }
     }

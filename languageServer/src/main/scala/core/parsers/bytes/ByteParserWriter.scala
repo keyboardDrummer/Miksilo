@@ -32,7 +32,7 @@ trait ByteParserWriter extends BasicParserWriter {
 
   case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
-    override def parseNaively(input: ByteReader, state: ParseState) = {
+    override def parseNaively(input: ByteReader, state: PState) = {
       ParseSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
   }

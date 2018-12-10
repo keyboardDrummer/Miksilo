@@ -12,7 +12,7 @@ trait ParserWriter {
   type ParseResult[+Result] <: ParseResultLike[Result]
   type PN = ParseNode
   type Self[+R] <: Parser[R]
-  type PState <: ParseState
+  type ExtraState
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
@@ -86,23 +86,28 @@ trait ParserWriter {
     def parseNaively(input: Input, state: PState): ParseResult[Result]
   }
 
-  class ParseState(val resultCache: Cache[ParseNode, ParseResult[Any]]) {
+  trait PState {
+    def parseCached[Result](parser: Parser[Result], input: Input): ParseResult[Result]
+    def extraState: ExtraState
+  }
 
-    this: PState =>
+  class EmptyParseState(val extraState: ExtraState) extends PState {
+    override def parseCached[Result](parser: Parser[Result], input: Input) = parser.parseNaively(input, this)
+  }
+
+  class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends PState {
 
     val recursionIntermediates = mutable.HashMap[PN, ParseResult[Any]]()
     val callStackSet = mutable.HashSet[PN]()
     val callStack = mutable.Stack[Parser[Any]]()
     var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
-    val parsersWithBackEdges = mutable.HashSet[Parser[Any]]() //TODO possible this can be only the parsers.
+    val parsersWithBackEdges = mutable.HashSet[Parser[Any]]()
 
     def parseCached[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-      if (resultCache == null)
-        return parser.parseNaively(input, this) //TODO find a nicer way
 
       val node = ParseNode(input, parser)
       resultCache.get(node).getOrElse({
-        val value = parseIteratively(parser, input)
+        val value: ParseResult[Result] = parseIteratively[Result](parser, input)
         if (!parsersPartOfACycle.contains(parser)) {
           resultCache.add(node, value)
         }
@@ -111,9 +116,6 @@ trait ParserWriter {
     }
 
     def parseIteratively[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-      if (resultCache == null)
-        return parser.parseNaively(input, this) //TODO find a nicer way
-
       val node = ParseNode(input, parser)
       getPreviousResult(node) match {
         case None =>

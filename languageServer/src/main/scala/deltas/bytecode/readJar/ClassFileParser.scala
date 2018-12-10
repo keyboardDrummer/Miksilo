@@ -1,7 +1,7 @@
 package deltas.bytecode.readJar
 
 import core.language.node.Node
-import core.parsers.bytes.ByteParserWriter
+import core.parsers.bytes.{ByteParserWriter, ByteReader}
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.constants._
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
@@ -9,7 +9,11 @@ import deltas.javac.classes.ConstantPool
 
 object ClassFileParser extends ByteParserWriter {
 
-  def classFileParser: Parser[Node] = {
+  def parse(bytes: Array[Byte]): ParseResult[Node] = {
+    classFileParser.parseNaively(ByteReader(bytes), new EmptyParseState(()))
+  }
+
+  lazy val classFileParser: Parser[Node] = {
     for {
       _ <- elems(PrintByteCode.cafeBabeBytes)
       versionCode <- ParseInteger

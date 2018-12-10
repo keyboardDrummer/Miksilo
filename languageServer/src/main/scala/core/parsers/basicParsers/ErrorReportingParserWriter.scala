@@ -6,7 +6,7 @@ import util.cache.{Cache, InfiniteCache}
 trait ErrorReportingParserWriter extends ParserWriter {
   type ParseResult[+R] = ReportingParseResult[R]
   override type Self[+R] = Parser[R]
-  override type PState = ParseState
+  override type ExtraState = Unit
 
   override def succeed[Result](result: Result) = new SuccessParser(result)
 
@@ -26,15 +26,15 @@ trait ErrorReportingParserWriter extends ParserWriter {
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   class SuccessParser[+Result](result: Result) extends Parser[Result] {
-    override def parseNaively(input: Input, state: ParseState) = ParseSuccess(result, input)
+    override def parseNaively(input: Input, state: PState) = ParseSuccess(result, input)
   }
 
   case class FailureParser(message: String) extends Parser[Nothing] {
-    override def parseNaively(input: Input, state: ParseState) = Failure(input, message)
+    override def parseNaively(input: Input, state: PState) = Failure(input, message)
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
-    override def parseNaively(input: Input, state: ParseState) = {
+    override def parseNaively(input: Input, state: PState) = {
       (state.parseCached(first, input), state.parseCached(second, input)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
@@ -45,7 +45,7 @@ trait ErrorReportingParserWriter extends ParserWriter {
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
-    override def parseNaively(input: Input, state: ParseState) = {
+    override def parseNaively(input: Input, state: PState) = {
       state.parseCached(left, input) match {
         case ParseSuccess(leftResult, leftRemainder) => state.parseCached(right, leftRemainder) match {
           case ParseSuccess(rightResult, rightRemainder) => ParseSuccess(combine(leftResult, rightResult), rightRemainder)
@@ -57,7 +57,7 @@ trait ErrorReportingParserWriter extends ParserWriter {
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
-    override def parseNaively(input: Input, state: ParseState) = {
+    override def parseNaively(input: Input, state: PState) = {
       state.parseCached(left, input) match {
         case ParseSuccess(leftResult, leftRemainder) => state.parseCached(getRight(leftResult), leftRemainder)
         case f: Failure => f
@@ -100,7 +100,7 @@ trait ErrorReportingParserWriter extends ParserWriter {
     def parse(input: Input,
               cache: Cache[PN, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
-      val state = new ParseState(cache)
+      val state = new PackratParseState(cache, ())
       state.parseIteratively(parser, input)
     }
   }
