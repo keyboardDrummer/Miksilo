@@ -13,6 +13,7 @@ import deltas.javac.types.TypeAbstraction
 import util.{SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.{File, Path}
+import BiGrammarToParser._
 
 class TestClassFileDecompiler extends FunSuite {
 
@@ -22,7 +23,7 @@ class TestClassFileDecompiler extends FunSuite {
     val language = compiler.language
 
     val grammar = language.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar)
-    val parser = BiGrammarToParser.toStringParser(grammar)
+    val parser = toStringParser(grammar)
     val parseResult = parser(signature)
     val result = parseResult.get.asInstanceOf[Node]
   }
@@ -32,7 +33,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val result = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))(signature).get.asInstanceOf[Node]
+    val result = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
@@ -40,7 +41,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val parser = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
     val result = parser(signature).get.asInstanceOf[Node]
   }
 
@@ -49,7 +50,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val parser = BiGrammarToParser.toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val parser = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
     val result = parser(signature).get.asInstanceOf[Node]
   }
 

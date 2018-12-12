@@ -2,8 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers._
-import core.parsers.strings.StringReader
+import core.parsers.strings.{CommonParserWriter, StringReader}
 
 import scala.collection.mutable
 
@@ -20,7 +19,7 @@ object BiGrammarToParser extends CommonParserWriter {
   def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
     input => toParser(grammar).parseWholeInput(new StringReader(input))
 
-  def toParser(grammar: BiGrammar): Parser[Any] = {
+  def toParser(grammar: BiGrammar): EditorParser[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -32,9 +31,9 @@ object BiGrammarToParser extends CommonParserWriter {
     toParser(grammar, keywords)
   }
 
-  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): Parser[Any] = {
-    val cache: mutable.Map[BiGrammar, Parser[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => Parser[Result] = grammar => {
+  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): EditorParser[Any] = {
+    val cache: mutable.Map[BiGrammar, EditorParser[Result]] = mutable.Map.empty
+    lazy val recursive: BiGrammar => EditorParser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
@@ -46,12 +45,12 @@ object BiGrammarToParser extends CommonParserWriter {
     afterStateRun._2.value
   }
 
-  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Parser[Result], grammar: BiGrammar): Parser[Result] = {
+  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => EditorParser[Result], grammar: BiGrammar): EditorParser[Result] = {
     grammar match {
       case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = new core.parsers.Sequence(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
+        val parser = leftRight(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
           for {
             first <- firstResult
             second <- secondResult
@@ -65,8 +64,7 @@ object BiGrammarToParser extends CommonParserWriter {
       case choice: Choice =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
-        if (choice.firstBeforeSecond) firstParser | secondParser
-        else firstParser ||| secondParser
+        firstParser | secondParser
 
       case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
@@ -88,7 +86,7 @@ object BiGrammarToParser extends CommonParserWriter {
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
-        new Lazy(inner) //Laziness to prevent infinite recursion
+        new EditorLazy(inner) //Laziness to prevent infinite recursion
     }
   }
 }

@@ -1,9 +1,10 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.printer.{Printer, TryState}
-import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.parsers.strings.StringReader
 import core.responsiveDocument.ResponsiveDocument
+import BiGrammarToParser._
 
 /**
   * Takes a grammar for parsing, and uses toString for printing.

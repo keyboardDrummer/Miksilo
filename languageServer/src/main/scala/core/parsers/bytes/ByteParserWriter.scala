@@ -3,72 +3,56 @@ package core.parsers.bytes
 import java.nio.ByteBuffer
 
 import core.language.node.Node
+import core.parsers.basicParsers.BasicParserWriter
+import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
-import scala.util.parsing.combinator.Parsers
+case class ByteReader(array: Array[Byte], offset: Int = 0) extends ParseInput {
 
-trait ByteParserWriter extends Parsers {
+  def drop(amount: Int): ByteReader = ByteReader(array, offset + amount)
+
+  def head: Byte = array(offset)
+
+  def tail: ByteReader = drop(1)
+
+  override def atEnd: Boolean = offset == array.length
+}
+
+trait ByteParserWriter extends BasicParserWriter {
+  type Input = ByteReader
   type Elem = Byte
 
-  val parseUtf8: Parser[Node] = ParseShort.flatMap(length => new ParseString(length)).map(s => Utf8ConstantDelta.create(s))
-  class ParseString(length: Int) extends Parser[String] {
-     override def apply(in: Input): ParseResult[String] = {
-       val (bytes, rest) = splitInput(in, length)
-       Success(new String(bytes.toArray, 0, length, "UTF-8"), rest)
-     }
-   }
+  val ParseInteger = XBytes(4).map(bytes => bytes.getInt)
+  val ParseFloat = XBytes(4).map(bytes => bytes.getFloat)
+  val ParseDouble = XBytes(8).map(bytes => bytes.getDouble())
+  val ParseLong = XBytes(8).map(bytes => bytes.getLong())
+  val ParseByte = XBytes(1).map(bytes => bytes.get())
+  val ParseShort = XBytes(2).map(bytes => bytes.getShort())
+  val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
 
-   object ParseInteger extends Parser[Int] {
-     override def apply(in: Input): ParseResult[Int] = {
-       val (bytes, rest) = splitInput(in, 4)
-       Success(ByteBuffer.wrap(bytes.toArray).getInt, rest)
-     }
-   }
+  case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
-   object ParseFloat extends Parser[Float] {
-     override def apply(in: Input): ParseResult[Float] = {
-       val (bytes, rest) = splitInput(in, 4)
-       Success(ByteBuffer.wrap(bytes.toArray).getFloat, rest)
-     }
-   }
-
-  object ParseDouble extends Parser[Double]
-  {
-    override def apply(in: Input): ParseResult[Double] = {
-      val (bytes, rest) = splitInput(in, 8)
-      Success(ByteBuffer.wrap(bytes.toArray).getDouble, rest)
+    override def parse(input: ByteReader, state: PState) = {
+      ParseSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
   }
 
-  object ParseLong extends Parser[Long] {
-    override def apply(in: Input): ParseResult[Long] = {
-      val (bytes, rest) = splitInput(in, 8)
-      Success(ByteBuffer.wrap(bytes.toArray).getLong, rest)
-    }
+  def parseString(length: Int) =
+    XBytes(length).map(bytes => {
+      new String(bytes.array(), bytes.position(), length, "UTF-8")
+    })
+
+  def elems(bytes: Seq[Byte]) = {
+    XBytes(bytes.length).flatMap(parsedBytes => {
+      val destination = new Array[Byte](bytes.length)
+      parsedBytes.get(destination)
+      val result = if (destination sameElements bytes) {
+        succeed(())
+      }
+      else {
+        fail(s"parsed bytes '$parsedBytes' were not equal to expected bytes $bytes")
+      }
+      result
+    })
   }
-
-  object ParseByte extends Parser[Byte] {
-     override def apply(in: Input): ParseResult[Elem] = {
-       Success(in.first, in.rest)
-     }
-   }
-
-   def splitInput(in: Input, index: Int): (List[Byte], Input) = index match {
-     case 0 => (List.empty, in)
-     case n =>
-       val (nextList, nextInput) = splitInput(in.rest, index - 1)
-       (in.first :: nextList, nextInput)
-   }
-
-   object ParseShort extends Parser[Short] {
-     override def apply(in: Input): ParseResult[Short] = {
-       val (bytes, rest) = splitInput(in, 2)
-       Success(ByteBuffer.wrap(bytes.toArray).getShort, rest)
-     }
-   }
-
-   def elems(elements: Seq[Byte]): Parser[Unit] = elements.headOption match {
-     case Some(head) => elem(head) ~> elems(elements.drop(1))
-     case None => success(())
-   }
- }
+}

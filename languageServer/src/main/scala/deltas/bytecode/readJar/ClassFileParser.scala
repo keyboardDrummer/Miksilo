@@ -1,7 +1,7 @@
 package deltas.bytecode.readJar
 
 import core.language.node.Node
-import core.parsers.bytes.ByteParserWriter
+import core.parsers.bytes.{ByteParserWriter, ByteReader}
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.constants._
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton, PrintByteCode}
@@ -9,7 +9,11 @@ import deltas.javac.classes.ConstantPool
 
 object ClassFileParser extends ByteParserWriter {
 
-  def classFileParser: Parser[Node] = {
+  def parse(bytes: Array[Byte]): ParseResult[Node] = {
+    classFileParser.parse(ByteReader(bytes), new EmptyParseState(()))
+  }
+
+  lazy val classFileParser: Parser[Node] = {
     for {
       _ <- elems(PrintByteCode.cafeBabeBytes)
       versionCode <- ParseInteger
@@ -34,17 +38,17 @@ object ClassFileParser extends ByteParserWriter {
   } yield new ConstantPool(constants)
 
   def constantsParser(constantCount: Int): Parser[List[Any]] = constantCount match {
-    case 0 => success(List.empty)
+    case 0 => succeed(List.empty)
     case _ => for {
-      ConstantParseResult(constant, entriesConsumed) <- constantParser
-      result <- constantsParser(constantCount - entriesConsumed).map(rest => constant :: rest)
+      constantResult <- constantParser
+      result <- constantsParser(constantCount - constantResult.entriesConsumed).map(rest => constantResult.constant :: rest)
     } yield result
   }
 
   def attributeParser: Parser[Node] = for {
     nameIndex <- ParseShort
     length <- ParseInteger
-    bytes <- repN(length, ParseByte)
+    bytes <- ParseByte.repN(length)
   } yield UnParsedAttribute.construct(nameIndex, bytes)
 
   def methodParser: Parser[Node] = for {
@@ -56,7 +60,7 @@ object ClassFileParser extends ByteParserWriter {
 
   def sizedSequenceParser[T](inner: Parser[T]): Parser[Seq[T]] = for {
     amount <- ParseShort
-    items <- repN(amount, inner)
+    items <- inner.repN(amount)
   } yield items
 
   def fieldParser: Parser[Node] = for {
@@ -88,7 +92,7 @@ object ClassFileParser extends ByteParserWriter {
     nameAndTypeIndex <- ParseShort
   } yield InterfaceMethodRefConstant.methodRef(classRefIndex, nameAndTypeIndex)
 
-  def utf8Parser: Parser[Node] = parseUtf8
+  def utf8Parser: Parser[Node] = ParseUtf8
 
   def nameAndTypeParser: Parser[Node] = for {
     nameIndex <- ParseShort
@@ -102,8 +106,8 @@ object ClassFileParser extends ByteParserWriter {
   def doubleParser = ParseDouble.map(double => DoubleInfoConstant.construct(double))
 
   case class ConstantParseResult(constant: Any, entriesConsumed: Int)
-  def consumeOne(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 1))
-  def consumeTwo(parser: Parser[Any]) = parser.map(constant => new ConstantParseResult(constant, 2))
+  def consumeOne(parser: Parser[Any]) = parser.map(constant => ConstantParseResult(constant, 1))
+  def consumeTwo(parser: Parser[Any]) = parser.map(constant => ConstantParseResult(constant, 2))
 
   def methodHandleParser: Parser[Any] = for {
     referenceKind <- ParseByte
@@ -119,7 +123,7 @@ object ClassFileParser extends ByteParserWriter {
     nameAndTypeIndex <- ParseShort
   } yield InvokeDynamicConstant.construct(bootstrapMethodIndex, nameAndTypeIndex)
 
-  def constantParser: Parser[ConstantParseResult] = ParseByte.into {
+  def constantParser: Parser[ConstantParseResult] = ParseByte.flatMap {
     case 1 => consumeOne(utf8Parser)
     case 3 => consumeOne(integerParser)
     case 4 => consumeOne(ParseFloat)
@@ -134,6 +138,6 @@ object ClassFileParser extends ByteParserWriter {
     case 15 => consumeOne(methodHandleParser)
     case 16 => consumeOne(methodTypeParser)
     case 18 => consumeOne(invokeDynamicParser)
-    case _ => failure("There is no constant starting here.")
+    case _ => fail("There is no constant starting here.")
   }
 }

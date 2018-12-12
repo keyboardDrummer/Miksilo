@@ -1,14 +1,15 @@
 package core.parsers
 
-import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
+import strings.CommonParserWriter
+import strings.StringReader
 
 class PartiallyParseJsonTest extends FunSuite with CommonParserWriter {
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
-  private lazy val jsonParser: Parser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
+  private lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""

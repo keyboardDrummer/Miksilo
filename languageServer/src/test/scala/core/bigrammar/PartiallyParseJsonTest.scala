@@ -1,23 +1,25 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral, WithDefault}
+import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
-import core.parsers.strings.{StringParserWriter, StringReader}
+import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
 
-class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringParserWriter {
+class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
+
+  import BiGrammarToParser._
 
   object Json extends GrammarKey
   val jsonGrammar = new Labelled(Json)
   private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
-  jsonGrammar.inner = new WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
-  val jsonParser = BiGrammarToParser.toParser(jsonGrammar)
+  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
+  val jsonParser = toParser(jsonGrammar)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parse(StringReader(input.toCharArray))
+    val result = jsonParser.parseWholeInput(StringReader(input.toCharArray))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }

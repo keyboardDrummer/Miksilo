@@ -2,7 +2,7 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
-class Choice(var left: BiGrammar, var right: BiGrammar, val firstBeforeSecond: Boolean = false) extends BiGrammar
+class Choice(var left: BiGrammar, var right: BiGrammar) extends BiGrammar
 {
   override def children = Seq(left, right)
 
