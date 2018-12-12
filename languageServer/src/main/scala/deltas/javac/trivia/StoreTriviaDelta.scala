@@ -11,6 +11,7 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
+import BiGrammarToParser._
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 
@@ -52,7 +53,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       (newState, field)
     }
 
-    override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result] = {
+    override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] = {
       val triviaParser = recursive(triviaGrammar)
       triviaParser.map(statefulTrivias =>
         for {
@@ -101,7 +102,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       resetAndRestoreCounter(TryState.fromStateM(inner)).run(state).get
     }
 
-    override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result] = {
+    override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] = {
       recursive(node).map(result => resetAndRestoreCounter(result))
     }
 

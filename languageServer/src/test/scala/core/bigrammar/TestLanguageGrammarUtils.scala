@@ -11,7 +11,7 @@ import deltas.ClearPhases
 import deltas.javac.JavaLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
-
+import BiGrammarToParser._
 
 case class StringKey(value: String) extends GrammarKey {
   override lazy val toString: String = value
@@ -41,8 +41,8 @@ object TestGrammarUtils extends FunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar): BiGrammarToParser.ParseResultLike[Any] = {
-    val parser = BiGrammarToParser.toParser(grammarDocument)
+  def parse(example: String, grammarDocument: BiGrammar): ParseResultLike[Any] = {
+    val parser = toParser(grammarDocument)
     parser.parseWholeInput(new StringReader(example))
   }
 }

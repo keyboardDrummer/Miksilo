@@ -17,6 +17,7 @@ import deltas.javac.types.{MethodType, TypeAbstraction}
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
+import BiGrammarToParser._
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
 
@@ -29,7 +30,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
   override def inject(language: Language): Unit = {
     super.inject(language)
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
-    val parser = BiGrammarToParser.toStringParser(typeGrammar)
+    val parser = toStringParser(typeGrammar)
     val sourceLessParser = (input: String) => {
       val result = parser(input)
       result.map(r => r.asInstanceOf[Node].visit(node => {

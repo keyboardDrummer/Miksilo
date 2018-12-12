@@ -4,14 +4,15 @@ import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.responsiveDocument.ResponsiveDocument
+import BiGrammarToParser._
 
 class WithDefault(inner: BiGrammar, _default: Any) extends CustomGrammar {
   override def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument = toDocumentInner(inner) ~ "withDefault: " ~ _default.toString
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]): BiGrammarToParser.EditorParser[Result] =
-    recursive(inner).withDefault[Result](BiGrammarToParser.valueToResult(_default))
+  override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] =
+    recursive(inner).withDefault[Result](valueToResult(_default))
 
   override def children: Seq[BiGrammar] = Seq(inner)
 

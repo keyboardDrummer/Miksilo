@@ -1,19 +1,18 @@
 package deltas.verilog.preprocessor
 
-import core.bigrammar.BiGrammarToParser
+import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars.{ParseWhiteSpace, StringLiteral}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeShape}
-import core.parsers.strings.StringParserWriter
 import core.smarts.FileDiagnostic
 import deltas.verilog.VerilogFileDelta.VerilogFile
 
 import scala.reflect.io.Path
 
-object IncludeDelta extends DirectiveDelta with StringParserWriter {
+object IncludeDelta extends DirectiveDelta {
   override def description: String = "Adds the `include <filename> directive"
 
   override def apply(preprocessor: Preprocessor, path: NodePath): Unit = {
@@ -26,21 +25,21 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult match {
-      case success: BiGrammarToParser.ParseSuccess[_] =>
+      case success: ParseSuccess[_] =>
         val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
-      case failure: BiGrammarToParser.ParseFailure[_] =>
+      case failure: ParseFailure[_] =>
         val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(failure)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }
   }
 
-  val parserProp = new Property[BiGrammarToParser.EditorParser[Any]](null)
+  val parserProp = new Property[EditorParser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, BiGrammarToParser.toParser(language.grammars.root))
+    parserProp.add(language, toParser(language.grammars.root))
   }
 
   override def dependencies: Set[Contract] = Set(PreprocessorDelta)

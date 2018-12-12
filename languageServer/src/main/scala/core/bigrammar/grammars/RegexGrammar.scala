@@ -4,9 +4,11 @@ import core.bigrammar.BiGrammarToParser
 
 import scala.util.matching.Regex
 
+import BiGrammarToParser._
+
 case class RegexGrammar(regex: Regex, verifyWhenPrinting: Boolean = false)
   extends StringGrammar(verifyWhenPrinting) {
-  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.EditorParser[Any] = BiGrammarToParser.regex(regex)
+  override def getParser(keywords: scala.collection.Set[String]): EditorParser[Any] = BiGrammarToParser.regex(regex)
 
   override def hashCode(): Int = regex.toString().hashCode
 

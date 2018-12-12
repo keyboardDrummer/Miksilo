@@ -2,10 +2,12 @@ package core.bigrammar
 
 import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
-import core.parsers.strings.{StringParserWriter, StringReader}
+import core.parsers.strings.StringReader
 import org.scalatest.FunSuite
 
-class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with StringParserWriter {
+class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
+
+  import BiGrammarToParser._
 
   object Json extends GrammarKey
   val jsonGrammar = new Labelled(Json)
@@ -13,7 +15,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with S
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression
   jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
-  val jsonParser = BiGrammarToParser.toParser(jsonGrammar)
+  val jsonParser = toParser(jsonGrammar)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
@@ -96,12 +98,12 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter with S
     assertResult(expectation)(failure.partialResult.get)
   }
 
-  private def getFailure(result: BiGrammarToParser.ParseResult[Any]): ParseFailure[Any] = {
+  private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
     assert(result.isInstanceOf[ParseFailure[_]])
     result.asInstanceOf[ParseFailure[Any]]
   }
 
-  private def getSuccessValue(result: BiGrammarToParser.ParseResult[Any]) = {
+  private def getSuccessValue(result: ParseResult[Any]) = {
     assert(result.isInstanceOf[ParseSuccess[_]])
     result.asInstanceOf[ParseSuccess[Any]].result
   }
