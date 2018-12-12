@@ -77,19 +77,19 @@ class PartiallyParseJsonTest extends FunSuite with CommonParserWriter {
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
     val result = jsonParser.parseWholeInput(StringReader(input.toCharArray))
-    val failure: PF[Any] = getFailure(result)
+    val failure: ParseFailure[Any] = getFailure(result)
     assert(failure.partialResult.nonEmpty)
     assertResult(expectation)(failure.partialResult.get)
   }
 
-  private def getFailure(result: PR[Any]): PF[Any] = {
-    assert(result.isInstanceOf[PF[_]])
-    result.asInstanceOf[PF[Any]]
+  private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
+    assert(result.isInstanceOf[ParseFailure[_]])
+    result.asInstanceOf[ParseFailure[Any]]
   }
 
-  private def getSuccessValue(result: PR[Any]) = {
-    assert(result.isInstanceOf[PS[_]])
-    result.asInstanceOf[PS[Any]].result
+  private def getSuccessValue(result: ParseResult[Any]) = {
+    assert(result.isInstanceOf[ParseSuccess[_]])
+    result.asInstanceOf[ParseSuccess[Any]].result
   }
 }
 

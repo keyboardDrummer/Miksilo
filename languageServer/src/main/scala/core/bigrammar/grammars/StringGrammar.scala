@@ -22,7 +22,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
       case string: String =>
         if (verifyWhenPrinting) {
           parser.parseWholeInput(new StringReader(string)) match {
-            case success: BiGrammarToParser.PS[_] if success.result.equals(from.value) => TryState.value(string)
+            case success: BiGrammarToParser.ParseSuccess[_] if success.result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")
           }
         }

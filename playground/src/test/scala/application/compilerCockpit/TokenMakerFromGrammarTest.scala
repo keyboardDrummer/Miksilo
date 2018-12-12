@@ -26,7 +26,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
         |    }
         |}""".stripMargin
 
-    val resultOption: BiGrammarToParser.PR[Seq[MyToken]] = tokenMaker.parser.parseWholeInput(new StringReader(text))
+    val resultOption: BiGrammarToParser.ParseResult[Seq[MyToken]] = tokenMaker.parser.parseWholeInput(new StringReader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val space = MyToken(TokenTypes.WHITESPACE, " ")

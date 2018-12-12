@@ -14,7 +14,7 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 
   case class Literal(value: String) extends EditorParser[String] {
-    override def parse(inputs: StringReader, state: PState): PR[String] = {
+    override def parse(inputs: StringReader, state: PState): ParseResult[String] = {
       var index = 0
       val array = inputs.array
       while(index < value.length) {
@@ -33,7 +33,7 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   case class RegexParser(regex: Regex) extends EditorParser[String] {
-    override def parse(inputs: StringReader, state: PState): PR[String] = {
+    override def parse(inputs: StringReader, state: PState): ParseResult[String] = {
       regex.findPrefixMatchOf(new SubSequence(inputs.array, inputs.offset)) match {
         case Some(matched) =>
           ParseSuccess(

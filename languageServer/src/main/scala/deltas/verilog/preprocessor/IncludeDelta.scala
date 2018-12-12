@@ -26,11 +26,11 @@ object IncludeDelta extends DirectiveDelta with StringParserWriter {
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult match {
-      case success: BiGrammarToParser.PS[_] =>
+      case success: BiGrammarToParser.ParseSuccess[_] =>
         val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
-      case failure: BiGrammarToParser.PF[_] =>
+      case failure: BiGrammarToParser.ParseFailure[_] =>
         val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(failure)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }

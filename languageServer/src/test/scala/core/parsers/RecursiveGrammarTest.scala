@@ -11,8 +11,8 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
 
     val input = "aaa"
     val parseResult = head.parseWholeInput(new StringReader(input))
-    assert(parseResult.isInstanceOf[PS[_]])
-    val result = parseResult.asInstanceOf[PS[Any]]
+    assert(parseResult.isInstanceOf[ParseSuccess[_]])
+    val result = parseResult.asInstanceOf[ParseSuccess[Any]]
     val expectation = (("a","a"),"a")
     assertResult(expectation)(result.result)
   }
@@ -24,13 +24,13 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
     val headParseResult = head.parseWholeInput(new StringReader(input))
-    assert(headParseResult.isInstanceOf[PS[_]])
-    val headSuccess = headParseResult.asInstanceOf[PS[Any]]
+    assert(headParseResult.isInstanceOf[ParseSuccess[_]])
+    val headSuccess = headParseResult.asInstanceOf[ParseSuccess[Any]]
     assertResult(expectation)(headSuccess.result)
 
     val secondParseResult = second.parseWholeInput(new StringReader(input))
-    assert(secondParseResult.isInstanceOf[PS[_]])
-    val secondSuccess = secondParseResult.asInstanceOf[PS[Any]]
+    assert(secondParseResult.isInstanceOf[ParseSuccess[_]])
+    val secondSuccess = secondParseResult.asInstanceOf[ParseSuccess[Any]]
     assertResult(expectation)(secondSuccess.result)
   }
 
@@ -81,7 +81,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     val input = "c"
     val expectation = ("a", ("b", "b"))
     val result = parser.parseWholeInput(new StringReader(input))
-    assertResult(expectation)(result.asInstanceOf[PF[Any]].partialResult.get)
+    assertResult(expectation)(result.asInstanceOf[ParseFailure[Any]].partialResult.get)
   }
 
   // a cycle of lazy parsers causes a stack overflow, since they have no cycle check, but with a sequence in between it just fails.
@@ -89,7 +89,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     lazy val first: EditorParser[Any] = new EditorLazy(first) ~ "a"
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
-    val result = parseResult.asInstanceOf[PF[Any]]
+    val result = parseResult.asInstanceOf[ParseFailure[Any]]
     val expectation = None
     assertResult(expectation)(result.partialResult)
   }
@@ -99,7 +99,7 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a").withDefault("yes")
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
-    val result = parseResult.asInstanceOf[PF[Any]]
+    val result = parseResult.asInstanceOf[ParseFailure[Any]]
     val expectation = Some("yes") //Could have been ("yes","a") with different implementation
     assertResult(expectation)(result.partialResult)
   }

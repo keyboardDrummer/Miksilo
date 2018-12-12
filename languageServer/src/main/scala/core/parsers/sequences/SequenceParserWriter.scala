@@ -1,7 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.EditorParserWriter
-import core.parsers.editorParsers.DefaultCache
+import core.parsers.editorParsers.{DefaultCache, EditorParserWriter}
 
 trait SequenceParserWriter extends EditorParserWriter {
   type Elem
