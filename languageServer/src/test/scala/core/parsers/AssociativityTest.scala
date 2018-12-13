@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import strings.CommonParserWriter
 import strings.StringReader
 
-class AmbiguityTest extends FunSuite with CommonParserWriter {
+class AssociativityTest extends FunSuite with CommonParserWriter {
 
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber

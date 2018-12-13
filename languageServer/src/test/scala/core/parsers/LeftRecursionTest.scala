@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import strings.CommonParserWriter
 import strings.StringReader
 
-class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
+class LeftRecursionTest extends FunSuite with CommonParserWriter {
 
   test("left recursion with lazy indirection") {
     lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
@@ -51,25 +51,32 @@ class RecursiveGrammarTest extends FunSuite with CommonParserWriter {
     assert(result.successful, result.toString) // This one fails in PackratParsers, not idea why. I think it succeeds for us because it detects the cycle in the '+' production since the optional has already been parsed.
   }
 
-  test("Optional before recursive") {
+  /**
+   * This fails similarly to (a | ab) ~ bc.
+   * The optional causes it to be something like:
+   *   expression1 = "a" ~ expression2 ~ "s" | "e"
+   *   expression2 = expression2 ~ "s" | "e"
+   * The expression2 will parse an "s", even though expression1 still needs to parse "s"
+  */
+  test("Optional before recursive FAILS") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | "e"
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
   }
 
-  test("Optional before recursive and seed") {
+  test("Optional before recursive and seed FAILS") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optional ~ "e"
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString) // This fails because the left-recursion in expression is not detected, because the + production starts with 'comments' which always succeeds. If we switch to allowing multiple results, then we could detect the left recursion.
   }
 
-  test("Different optionals before recursive and seed") {
+  test("Different optionals before recursive and seed FAILS") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optionalCopy ~ "e"
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
   }
 
-  test("Ordered choice operator in the wrong order fails") {
+  test("Ordered choice operator in the wrong order FAILS") {
     lazy val expression: EditorParser[Any] = optional ~ choice("e", expression ~ "s", true)
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
