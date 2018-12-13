@@ -83,7 +83,7 @@ trait ParserWriter {
   }
 
   trait Parser[+Result] {
-    def parse(input: Input, state: PState): ParseResult[Result]
+    def parseInternal(input: Input, state: PState): ParseResult[Result]
   }
 
   trait PState {
@@ -92,7 +92,7 @@ trait ParserWriter {
   }
 
   class EmptyParseState(val extraState: ExtraState) extends PState {
-    override def parse[Result](parser: Parser[Result], input: Input) = parser.parse(input, this)
+    override def parse[Result](parser: Parser[Result], input: Input) = parser.parseInternal(input, this)
   }
 
   class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends PState {
@@ -122,7 +122,7 @@ trait ParserWriter {
 
           callStackSet.add(node)
           callStack.push(node.parser)
-          var result = parser.parse(input, this)
+          var result = parser.parseInternal(input, this)
           if (result.successful && parsersWithBackEdges.contains(parser)) {
             result = growResult(node, parser, result, this)
           }
@@ -138,7 +138,7 @@ trait ParserWriter {
     private def growResult[Result](node: PN, parser: Parser[Result], previous: ParseResult[Result], state: PState): ParseResult[Result] = {
       recursionIntermediates.put(node, previous)
 
-      val nextResult: ParseResult[Result] = parser.parse(node.input, state)
+      val nextResult: ParseResult[Result] = parser.parseInternal(node.input, state)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
           growResult(node, parser, nextResult, state)
@@ -164,7 +164,7 @@ trait ParserWriter {
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner: Parser[Result] = _inner
 
-    override def parse(input: Input, state: PState): ParseResult[Result] = inner.parse(input, state)
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = inner.parseInternal(input, state)
   }
 
   trait ParseResultLike[+Result] {
@@ -175,7 +175,7 @@ trait ParserWriter {
   }
 
   class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
-    override def parse(input: Input, state: PState) = {
+    override def parseInternal(input: Input, state: PState) = {
       val result = state.parse(original, input)
       result.map(f)
     }

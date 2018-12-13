@@ -10,7 +10,7 @@ import deltas.javac.classes.ConstantPool
 object ClassFileParser extends ByteParserWriter {
 
   def parse(bytes: Array[Byte]): ParseResult[Node] = {
-    classFileParser.parse(ByteReader(bytes), new EmptyParseState(()))
+    classFileParser.parseInternal(ByteReader(bytes), new EmptyParseState(()))
   }
 
   lazy val classFileParser: Parser[Node] = {

@@ -34,7 +34,7 @@ trait EditorParserWriter extends ParserWriter {
   case class Fail(message: String) extends EditorParser[Nothing] {
     override def getDefault(cache: DefaultCache) = None
 
-    override def parse(input: Input, state: PState) = ParseFailure(None, input, message)
+    override def parseInternal(input: Input, state: PState) = ParseFailure(None, input, message)
   }
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
@@ -78,7 +78,7 @@ trait EditorParserWriter extends ParserWriter {
 
   case class WithDefault[+Result](original: Parser[Result], _getDefault: DefaultCache => Option[Result])
     extends EditorParser[Result] {
-    override def parse(input: Input, state: PState): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = {
       state.parse(original, input) match {
         case failure: ParseFailure[Result] if failure.partialResult.isEmpty || failure.remainder == input =>
           new ParseFailure[Result](_getDefault(state.extraState), failure.remainder, failure.message)
@@ -95,7 +95,7 @@ trait EditorParserWriter extends ParserWriter {
                                          combine: (Left, Right) => Result) extends EditorParser[Result] {
     lazy val right: EditorParser[Right] = _right
 
-    override def parse(input: Input, state: PState): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = {
       val leftResult = state.parse(left, input)
       leftResult match {
         case leftSuccess: ParseSuccess[Left] =>
@@ -134,7 +134,7 @@ trait EditorParserWriter extends ParserWriter {
     extends EditorParser[Result] {
     lazy val second = _second
 
-    override def parse(input: Input, state: PState): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = {
       val firstResult = state.parse(first, input)
       val result = firstResult match {
         case _: ParseSuccess[Result] => firstResult
@@ -161,7 +161,7 @@ trait EditorParserWriter extends ParserWriter {
     extends EditorParser[Result] {
     lazy val second = _second
 
-    override def parse(input: Input, state: PState): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = {
       val firstResult = state.parse(first, input)
       val secondResult = state.parse(second, input)
       val result = (firstResult, secondResult) match {
@@ -188,7 +188,7 @@ trait EditorParserWriter extends ParserWriter {
   }
 
   case class Succeed[+Result](value: Result) extends EditorParser[Result] {
-    override def parse(inputs: Input, cache: PState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
+    override def parseInternal(inputs: Input, cache: PState): ParseResult[Result] = ParseSuccess(value, inputs, NoFailure)
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
   }
@@ -196,7 +196,7 @@ trait EditorParserWriter extends ParserWriter {
   class FlatMap[+Result, +NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult])
     extends EditorParser[NewResult] {
 
-    override def parse(input: Input, state: PState): ParseResult[NewResult] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[NewResult] = {
       val leftResult = state.parse(left, input)
       leftResult match {
         case leftSuccess: ParseSuccess[Result] =>
@@ -237,7 +237,7 @@ trait EditorParserWriter extends ParserWriter {
   }
 
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
-    override def parse(input: Input, state: PState): ParseResult[NewResult] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[NewResult] = {
       state.parse(original, input).map(f)
     }
 
@@ -246,7 +246,7 @@ trait EditorParserWriter extends ParserWriter {
 
   class PositionParser extends EditorParser[Input] {
 
-    override def parse(input: Input, state: PState): ParseResult[Input] = {
+    override def parseInternal(input: Input, state: PState): ParseResult[Input] = {
       ParseSuccess[Input](input, input, NoFailure)
     }
 
@@ -256,7 +256,7 @@ trait EditorParserWriter extends ParserWriter {
   class WithRemainderParser[Result](original: Parser[Result])
     extends EditorParser[(Result, Input)] {
 
-    override def parse(input: Input, parseState: PState): ParseResult[(Result, Input)] = {
+    override def parseInternal(input: Input, parseState: PState): ParseResult[(Result, Input)] = {
       val parseResult = parseState.parse(original, input)
 
       parseResult.map(result => (result, parseResult.remainder))
@@ -267,7 +267,7 @@ trait EditorParserWriter extends ParserWriter {
 
   case class Filter[Other, +Result <: Other](original: EditorParser[Result], predicate: Other => Boolean, getMessage: Other => String)
     extends EditorParser[Result] {
-    override def parse(input: Input, state: PState): ParseResult[Result] = original.parse(input, state) match {
+    override def parseInternal(input: Input, state: PState): ParseResult[Result] = original.parseInternal(input, state) match {
       case success: ParseSuccess[Result] =>
         if (predicate(success.result)) success
         else ParseFailure(this.getDefault(state), success.remainder, getMessage(success.result)).getBiggest(success.biggestFailure)

@@ -26,15 +26,15 @@ trait BasicParserWriter extends ParserWriter {
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   class SuccessParser[+Result](result: Result) extends Parser[Result] {
-    override def parse(input: Input, state: PState) = ParseSuccess(result, input)
+    override def parseInternal(input: Input, state: PState) = ParseSuccess(result, input)
   }
 
   object FailureParser extends Parser[Nothing] {
-    override def parse(input: Input, state: PState) = Failure
+    override def parseInternal(input: Input, state: PState) = Failure
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
-    override def parse(input: Input, state: PState) = {
+    override def parseInternal(input: Input, state: PState) = {
       (state.parse(first, input), state.parse(second, input)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
@@ -45,7 +45,7 @@ trait BasicParserWriter extends ParserWriter {
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
-    override def parse(input: Input, state: PState) = {
+    override def parseInternal(input: Input, state: PState) = {
       state.parse(left, input) match {
         case Failure => Failure
         case ParseSuccess(leftResult, leftRemainder) => state.parse(right, leftRemainder) match {
@@ -57,7 +57,7 @@ trait BasicParserWriter extends ParserWriter {
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
-    override def parse(input: Input, state: PState) = {
+    override def parseInternal(input: Input, state: PState) = {
       state.parse(left, input) match {
         case Failure => Failure
         case ParseSuccess(leftResult, leftRemainder) => state.parse(getRight(leftResult), leftRemainder)
