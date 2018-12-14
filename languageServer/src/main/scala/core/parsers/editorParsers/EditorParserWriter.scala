@@ -166,7 +166,7 @@ trait EditorParserWriter extends ParserWriter {
       val secondResult = state.parse(second, input)
       val result = (firstResult, secondResult) match {
         case (firstSuccess: ParseSuccess[Result], secondSuccess: ParseSuccess[Result]) =>
-          if (firstSuccess.remainder.offset > secondSuccess.remainder.offset)
+          if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset)
             firstSuccess.addFailure(secondSuccess.biggestFailure)
           else
             secondSuccess.addFailure(firstSuccess.biggestFailure)
