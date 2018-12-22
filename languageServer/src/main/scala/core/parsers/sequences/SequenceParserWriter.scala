@@ -16,7 +16,7 @@ trait SequenceParserWriter extends EditorParserWriter {
 
       val char = input.head
       if (predicate(char)) {
-        ParseSuccess(char, input.tail, NoFailure)
+        success(char, input.tail)
       }
       else
         failure(input, s"'$char' was not a $kind")

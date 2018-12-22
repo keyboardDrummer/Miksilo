@@ -1,10 +1,10 @@
-package core.parsers
+package core.parsers.ambigiousEditorParser
 
+import core.parsers.ambiguousEditorParsers.AmbiguousEditorParserWriter
+import core.parsers.strings.{CommonParserWriter, StringReader}
 import org.scalatest.FunSuite
-import strings.CommonParserWriter
-import strings.StringReader
 
-class PartiallyParseJsonTest extends FunSuite with CommonParserWriter {
+class PartiallyParseJsonTest extends FunSuite with CommonParserWriter with AmbiguousEditorParserWriter {
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
@@ -83,13 +83,13 @@ class PartiallyParseJsonTest extends FunSuite with CommonParserWriter {
   }
 
   private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
-    assert(result.isInstanceOf[ParseFailure[_]])
-    result.asInstanceOf[ParseFailure[Any]]
+    assert(!result.successful)
+    result.biggestFailure.asInstanceOf[ParseFailure[Any]]
   }
 
   private def getSuccessValue(result: ParseResult[Any]) = {
-    assert(result.isInstanceOf[ParseSuccess[_]])
-    result.asInstanceOf[ParseSuccess[Any]].result
+    assert(result.successful)
+    result.get
   }
 }
 

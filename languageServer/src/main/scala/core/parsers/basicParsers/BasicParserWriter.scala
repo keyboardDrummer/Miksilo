@@ -1,12 +1,15 @@
 package core.parsers.basicParsers
 
-import core.parsers.core.ParserWriter
+import core.parsers.core.UnambiguousParserWriter
 import util.cache.{Cache, InfiniteCache}
 
-trait BasicParserWriter extends ParserWriter {
+trait BasicParserWriter extends UnambiguousParserWriter {
   type ParseResult[+R] = SimpleParseResult[R]
   override type Self[+R] = Parser[R]
   override type ExtraState = Unit
+
+
+  override def success[Result](result: Result, remainder: Input) = ParseSuccess(result, remainder)
 
   override def succeed[Result](result: Result) = new SuccessParser(result)
 
@@ -65,7 +68,7 @@ trait BasicParserWriter extends ParserWriter {
     }
   }
 
-  trait SimpleParseResult[+R] extends ParseResultLike[R] {}
+  trait SimpleParseResult[+R] extends UnambiguousParseResult[R] {}
 
   case class ParseSuccess[+R](result: R, remainder: Input) extends SimpleParseResult[R] {
     override def getSuccessRemainder = Some(remainder)
@@ -88,7 +91,7 @@ trait BasicParserWriter extends ParserWriter {
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
     def parseWholeInput(input: Input,
-                        cache: Cache[PN, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+                        cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
       parse(input, cache) match {
         case success: ParseSuccess[Result] if !success.remainder.atEnd => Failure
@@ -97,7 +100,7 @@ trait BasicParserWriter extends ParserWriter {
     }
 
     def parse(input: Input,
-              cache: Cache[PN, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+              cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
       val state = new PackratParseState(cache, ())
       state.parseIteratively(parser, input)

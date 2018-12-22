@@ -1,20 +1,19 @@
-package core.parsers
+package core.parsers.ambigiousEditorParser
 
+import core.parsers.ambiguousEditorParsers.AmbiguousEditorParserWriter
+import core.parsers.strings.{CommonParserWriter, StringReader}
 import org.scalatest.FunSuite
-import strings.CommonParserWriter
-import strings.StringReader
 
-class LeftRecursionTest extends FunSuite with CommonParserWriter {
+class LeftRecursionTest extends FunSuite with CommonParserWriter with AmbiguousEditorParserWriter {
 
   test("left recursion with lazy indirection") {
     lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
 
     val input = "aaa"
     val parseResult = head.parseWholeInput(new StringReader(input))
-    assert(parseResult.isInstanceOf[ParseSuccess[_]])
-    val result = parseResult.asInstanceOf[ParseSuccess[Any]]
+    assert(parseResult.successful)
     val expectation = (("a","a"),"a")
-    assertResult(expectation)(result.result)
+    assertResult(expectation)(parseResult.get)
   }
 
   test("left recursion inside left recursion") {
@@ -24,14 +23,12 @@ class LeftRecursionTest extends FunSuite with CommonParserWriter {
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
     val headParseResult = head.parseWholeInput(new StringReader(input))
-    assert(headParseResult.isInstanceOf[ParseSuccess[_]])
-    val headSuccess = headParseResult.asInstanceOf[ParseSuccess[Any]]
-    assertResult(expectation)(headSuccess.result)
+    assert(headParseResult.successful)
+    assertResult(expectation)(headParseResult.get)
 
     val secondParseResult = second.parseWholeInput(new StringReader(input))
-    assert(secondParseResult.isInstanceOf[ParseSuccess[_]])
-    val secondSuccess = secondParseResult.asInstanceOf[ParseSuccess[Any]]
-    assertResult(expectation)(secondSuccess.result)
+    assert(secondParseResult.successful)
+    assertResult(expectation)(secondParseResult.get)
   }
 
   val optional: EditorParserExtensions[Any] =  literal("a").*
@@ -64,22 +61,22 @@ class LeftRecursionTest extends FunSuite with CommonParserWriter {
     assert(!result.successful, result.toString)
   }
 
-  test("Optional before recursive and seed FAILS") {
+  test("Optional before recursive and seed") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optional ~ "e"
     val result = expression.parseWholeInput(aesReader)
-    assert(!result.successful, result.toString) // This fails because the left-recursion in expression is not detected, because the + production starts with 'comments' which always succeeds. If we switch to allowing multiple results, then we could detect the left recursion.
+    assert(result.successful, result.toString) // This fails because the left-recursion in expression is not detected, because the + production starts with 'comments' which always succeeds. If we switch to allowing multiple results, then we could detect the left recursion.
   }
 
-  test("Different optionals before recursive and seed FAILS") {
+  test("Different optionals before recursive and seed") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optionalCopy ~ "e"
     val result = expression.parseWholeInput(aesReader)
-    assert(!result.successful, result.toString)
+    assert(result.successful, result.toString)
   }
 
-  test("Ordered choice operator in the wrong order FAILS") {
-    lazy val expression: EditorParser[Any] = optional ~ choice("e", expression ~ "s", true)
+  test("Ordered choice operator in the wrong order") {
+    lazy val expression: EditorParser[Any] = optional ~ choice("e", expression ~ "s", leftIsAlwaysBigger = true)
     val result = expression.parseWholeInput(aesReader)
-    assert(!result.successful, result.toString)
+    assert(result.successful, result.toString)
   }
 
   test("Recursive defaults") {
@@ -88,7 +85,7 @@ class LeftRecursionTest extends FunSuite with CommonParserWriter {
     val input = "c"
     val expectation = ("a", ("b", "b"))
     val result = parser.parseWholeInput(new StringReader(input))
-    assertResult(expectation)(result.asInstanceOf[ParseFailure[Any]].partialResult.get)
+    assertResult(expectation)(result.biggestFailure.asInstanceOf[ParseFailure[Any]].partialResult.get)
   }
 
   // a cycle of lazy parsers causes a stack overflow, since they have no cycle check, but with a sequence in between it just fails.
@@ -96,7 +93,7 @@ class LeftRecursionTest extends FunSuite with CommonParserWriter {
     lazy val first: EditorParser[Any] = new EditorLazy(first) ~ "a"
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
-    val result = parseResult.asInstanceOf[ParseFailure[Any]]
+    val result = parseResult.biggestFailure.asInstanceOf[ParseFailure[Any]]
     val expectation = None
     assertResult(expectation)(result.partialResult)
   }
@@ -106,7 +103,7 @@ class LeftRecursionTest extends FunSuite with CommonParserWriter {
     lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a").withDefault("yes")
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
-    val result = parseResult.asInstanceOf[ParseFailure[Any]]
+    val result = parseResult.biggestFailure.asInstanceOf[ParseFailure[Any]]
     val expectation = Some("yes") //Could have been ("yes","a") with different implementation
     assertResult(expectation)(result.partialResult)
   }

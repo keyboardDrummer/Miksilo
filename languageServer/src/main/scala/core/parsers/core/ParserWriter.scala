@@ -1,21 +1,17 @@
 package core.parsers.core
 
-import util.cache.Cache
-
-import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.language.higherKinds
 
 trait ParserWriter {
 
   type Input <: ParseInput
   type ParseResult[+Result] <: ParseResultLike[Result]
-  type PN = ParseNode
   type Self[+R] <: Parser[R]
   type ExtraState
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
+  def success[Result](result: Result, remainder: Input): ParseResult[Result]
   def succeed[Result](result: Result): Self[Result]
   def fail[Result](message: String): Self[Result]
   def lazyParser[Result](inner: => Self[Result]): Self[Result]
@@ -95,72 +91,6 @@ trait ParserWriter {
     override def parse[Result](parser: Parser[Result], input: Input) = parser.parseInternal(input, this)
   }
 
-  class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends ParseStateLike {
-
-    val recursionIntermediates = mutable.HashMap[PN, ParseResult[Any]]()
-    val callStackSet = mutable.HashSet[PN]()
-    val callStack = mutable.Stack[Parser[Any]]()
-    var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
-    val parsersWithBackEdges = mutable.HashSet[Parser[Any]]()
-
-    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-
-      val node = ParseNode(input, parser)
-      resultCache.get(node).getOrElse({
-        val value: ParseResult[Result] = parseIteratively[Result](parser, input)
-        if (!parsersPartOfACycle.contains(parser)) {
-          resultCache.add(node, value)
-        }
-        value
-      }).asInstanceOf[ParseResult[Result]]
-    }
-
-    def parseIteratively[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-      val node = ParseNode(input, parser)
-      getPreviousResult(node) match {
-        case None =>
-
-          callStackSet.add(node)
-          callStack.push(node.parser)
-          var result = parser.parseInternal(input, this)
-          if (result.successful && parsersWithBackEdges.contains(parser)) {
-            result = growResult(node, parser, result, this)
-          }
-          callStackSet.remove(node)
-          callStack.pop()
-          result
-
-        case Some(result) => result
-      }
-    }
-
-    @tailrec
-    private def growResult[Result](node: PN, parser: Parser[Result], previous: ParseResult[Result], state: ParseStateLike): ParseResult[Result] = {
-      recursionIntermediates.put(node, previous)
-
-      val nextResult: ParseResult[Result] = parser.parseInternal(node.input, state)
-      nextResult.getSuccessRemainder match {
-        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
-          growResult(node, parser, nextResult, state)
-        case _ =>
-          recursionIntermediates.remove(node)
-          previous
-      }
-    }
-
-    def getPreviousResult[Result](node: PN): Option[ParseResult[Result]] = {
-      if (callStackSet.contains(node)) {
-        parsersWithBackEdges.add(node.parser)
-        val index = callStack.indexOf(node.parser)
-        parsersPartOfACycle ++= callStack.take(index + 1)
-        return Some(recursionIntermediates.getOrElse(node,
-          failure[Result](node.input, "Traversed back edge without a previous result")).
-          asInstanceOf[ParseResult[Result]])
-      }
-      None
-    }
-  }
-
   class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
     lazy val inner: Parser[Result] = _inner
 
@@ -168,10 +98,8 @@ trait ParserWriter {
   }
 
   trait ParseResultLike[+Result] {
-    def getSuccessRemainder: Option[Input]
-    def successful: Boolean = getSuccessRemainder.nonEmpty
-    def get: Result
     def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
+    def successful: Boolean
   }
 
   class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
