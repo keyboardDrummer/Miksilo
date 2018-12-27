@@ -11,12 +11,12 @@ trait ParserWriter {
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
-  def success[Result](result: Result, remainder: Input): ParseResult[Result]
   def succeed[Result](result: Result): Self[Result]
+  def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
   def fail[Result](message: String): Self[Result]
   def lazyParser[Result](inner: => Self[Result]): Self[Result]
 
-  def failure[Result](input: Input, message: String): ParseResult[Result]
+  def newFailure[Result](input: Input, message: String): ParseResult[Result]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
 
@@ -75,7 +75,7 @@ trait ParserWriter {
 
     def manySeparated(separator: Self[Any]): Self[List[Result]] =
       leftRight(parser, (separator ~> parser).*, (h: Result, t: List[Result]) => h :: t) |
-        succeed(List.empty)
+        succeed(List.empty[Result])
   }
 
   trait Parser[+Result] {
@@ -97,8 +97,16 @@ trait ParserWriter {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = inner.parseInternal(input, state)
   }
 
+  case class Success[+Result](result: Result, remainder: Input) {
+    def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
+  }
+
   trait ParseResultLike[+Result] {
-    def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
+    def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = {
+      flatMap(s => newSuccess(f(s.result), s.remainder))
+    }
+
+    def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult]
     def successful: Boolean
   }
 
@@ -118,4 +126,14 @@ object Processor {
 trait ParseInput {
   def offset: Int
   def atEnd: Boolean
+}
+
+trait NotCorrectingParserWriter extends ParserWriter {
+  type Self[+Result] = Parser[Result]
+
+  def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
+  class SuccessParser[+Result](result: Result) extends Parser[Result] {
+    override def parseInternal(input: Input, state: ParseStateLike) = newSuccess(result, input)
+  }
+
 }

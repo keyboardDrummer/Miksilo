@@ -99,13 +99,13 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   }
 
   private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
-    assert(result.isInstanceOf[ParseFailure[_]])
-    result.asInstanceOf[ParseFailure[Any]]
+    assert(!result.successful)
+    result.biggestRealFailure.get
   }
 
   private def getSuccessValue(result: ParseResult[Any]) = {
-    assert(result.isInstanceOf[ParseSuccess[_]])
-    result.asInstanceOf[ParseSuccess[Any]].result
+    assert(result.successful)
+    result.get
   }
 }
 

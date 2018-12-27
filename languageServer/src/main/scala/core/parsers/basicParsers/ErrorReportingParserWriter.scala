@@ -1,16 +1,14 @@
 package core.parsers.basicParsers
 
-import core.parsers.core.UnambiguousParserWriter
+import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
 import util.cache.{Cache, InfiniteCache}
 
-trait ErrorReportingParserWriter extends UnambiguousParserWriter {
+trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
   type ParseResult[+R] = ReportingParseResult[R]
   override type Self[+R] = Parser[R]
   override type ExtraState = Unit
 
-  override def succeed[Result](result: Result) = new SuccessParser(result)
-
-  override def failure[R](input: Input, message: String) = Failure(input, message)
+  override def newFailure[R](input: Input, message: String) = Failure(input, message)
 
   override def fail[Result](message: String) = FailureParser(message)
 
@@ -24,10 +22,6 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter {
     new FlatMap(left, getRight)
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
-
-  class SuccessParser[+Result](result: Result) extends Parser[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = ParseSuccess(result, input)
-  }
 
   case class FailureParser(message: String) extends Parser[Nothing] {
     override def parseInternal(input: Input, state: ParseStateLike) = Failure(input, message)
@@ -47,8 +41,8 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter {
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
       state.parse(left, input) match {
-        case ParseSuccess(leftResult, leftRemainder) => state.parse(right, leftRemainder) match {
-          case ParseSuccess(rightResult, rightRemainder) => ParseSuccess(combine(leftResult, rightResult), rightRemainder)
+        case leftSuccess: ParseSuccess[Left] => state.parse(right, leftSuccess.remainder) match {
+          case rightSuccess: ParseSuccess[Right] => rightSuccess.map(r => combine(leftSuccess.result, r))
           case f: Failure => f
         }
         case f: Failure => f
@@ -59,7 +53,7 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter {
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
       state.parse(left, input) match {
-        case ParseSuccess(leftResult, leftRemainder) => state.parse(getRight(leftResult), leftRemainder)
+        case leftSuccess: ParseSuccess[Result] => state.parse(getRight(leftSuccess.result), leftSuccess.remainder)
         case f: Failure => f
       }
     }
@@ -67,12 +61,14 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter {
 
   trait ReportingParseResult[+R] extends UnambiguousParseResult[R] { }
 
-  case class ParseSuccess[+R](result: R, remainder: Input) extends ReportingParseResult[R] {
+  class ParseSuccess[+R](result: R, remainder: Input) extends Success[R](result, remainder) with ReportingParseResult[R] {
     override def getSuccessRemainder = Some(remainder)
 
     override def get = result
 
-    override def map[NewResult](f: R => NewResult) = ParseSuccess(f(result), remainder)
+    override def map[NewResult](f: R => NewResult) = new ParseSuccess(f(result), remainder)
+
+    override def flatMap[NewResult](f: Success[R] => ReportingParseResult[NewResult]) = f(this)
   }
 
   case class Failure(remainder: Input, message: String) extends ReportingParseResult[Nothing] {
@@ -81,6 +77,8 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter {
     override def get = throw new NoSuchElementException("Cannot call get on a Failure")
 
     override def map[NewResult](f: Nothing => NewResult) = this
+
+    override def flatMap[NewResult](f: Success[Nothing] => ReportingParseResult[NewResult]) = this
   }
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)

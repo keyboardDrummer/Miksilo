@@ -3,7 +3,7 @@ package core.parsers.bytes
 import java.nio.ByteBuffer
 
 import core.language.node.Node
-import core.parsers.basicParsers.BasicParserWriter
+import core.parsers.basicParsers.NoErrorReportingParserWriter
 import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
@@ -18,7 +18,7 @@ case class ByteReader(array: Array[Byte], offset: Int = 0) extends ParseInput {
   override def atEnd: Boolean = offset == array.length
 }
 
-trait ByteParserWriter extends BasicParserWriter {
+trait ByteParserWriter extends NoErrorReportingParserWriter {
   type Input = ByteReader
   type Elem = Byte
 
@@ -33,7 +33,7 @@ trait ByteParserWriter extends BasicParserWriter {
   case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
     override def parseInternal(input: ByteReader, state: ParseStateLike) = {
-      ParseSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
+      newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
   }
 

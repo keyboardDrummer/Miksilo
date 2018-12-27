@@ -92,7 +92,7 @@ trait AmbiguousParserWriter extends ParserWriter {
         val index = callStack.indexOf(node.parser)
         parsersPartOfACycle ++= callStack.take(index + 1)
         return Some(recursionIntermediates.getOrElse(node,
-          failure[Result](node.input, "Traversed back edge without a previous result")).
+          newFailure[Result](node.input, "Traversed back edge without a previous result")).
           asInstanceOf[ParseResult[Result]])
       }
       None

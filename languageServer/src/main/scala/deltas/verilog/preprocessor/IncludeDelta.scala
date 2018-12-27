@@ -24,13 +24,13 @@ object IncludeDelta extends DirectiveDelta {
 
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
-    parseResult match {
-      case success: ParseSuccess[_] =>
+    parseResult.successOption match {
+      case Some(success) =>
         val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
-      case failure: ParseFailure[_] =>
-        val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(failure)
+      case None =>
+        val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)
         compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
     }
   }

@@ -22,8 +22,8 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
-          parser.parseWholeInput(new StringReader(string)) match {
-            case success: ParseSuccess[_] if success.result.equals(from.value) => TryState.value(string)
+          parser.parseWholeInput(new StringReader(string)).successOption match {
+            case Some(success) if success.result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")
           }
         }

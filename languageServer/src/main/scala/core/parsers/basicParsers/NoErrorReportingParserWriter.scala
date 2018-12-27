@@ -1,19 +1,18 @@
 package core.parsers.basicParsers
 
-import core.parsers.core.UnambiguousParserWriter
+import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
 import util.cache.{Cache, InfiniteCache}
 
-trait BasicParserWriter extends UnambiguousParserWriter {
+trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
   type ParseResult[+R] = SimpleParseResult[R]
   override type Self[+R] = Parser[R]
   override type ExtraState = Unit
 
-
-  override def success[Result](result: Result, remainder: Input) = ParseSuccess(result, remainder)
+  override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
 
   override def succeed[Result](result: Result) = new SuccessParser(result)
 
-  override def failure[R](input: Input, message: String) = Failure
+  override def newFailure[R](input: Input, message: String) = SimpleParseResult(None)
 
   override def fail[Result](message: String) = FailureParser
 
@@ -28,62 +27,54 @@ trait BasicParserWriter extends UnambiguousParserWriter {
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
-  class SuccessParser[+Result](result: Result) extends Parser[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = ParseSuccess(result, input)
-  }
-
   object FailureParser extends Parser[Nothing] {
-    override def parseInternal(input: Input, state: ParseStateLike) = Failure
+    override def parseInternal(input: Input, state: ParseStateLike) = failureSingleton
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      (state.parse(first, input), state.parse(second, input)) match {
-        case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
-          if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
-        case (Failure, secondResult) => secondResult
-        case (firstResult, _) => firstResult
+      val firstResult = state.parse(first, input)
+      val secondResult = state.parse(second, input)
+      (firstResult.successOption, secondResult.successOption) match {
+        case (Some(firstSuccess), Some(secondSuccess)) =>
+          if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
+        case (None, _) => secondResult
+        case (_, None) => firstResult
       }
     }
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.parse(left, input) match {
-        case Failure => Failure
-        case ParseSuccess(leftResult, leftRemainder) => state.parse(right, leftRemainder) match {
-          case Failure => Failure
-          case ParseSuccess(rightResult, rightRemainder) => ParseSuccess(combine(leftResult, rightResult), rightRemainder)
-        }
+      val leftResult = state.parse(left, input)
+      leftResult.successOption match {
+        case None => failureSingleton
+        case Some(leftSuccess) => state.parse(right, leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.parse(left, input) match {
-        case Failure => Failure
-        case ParseSuccess(leftResult, leftRemainder) => state.parse(getRight(leftResult), leftRemainder)
+      state.parse(left, input).successOption match {
+        case None => failureSingleton
+        case Some(leftSuccess) => state.parse(getRight(leftSuccess.result), leftSuccess.remainder)
       }
     }
   }
 
-  trait SimpleParseResult[+R] extends UnambiguousParseResult[R] {}
+  val failureSingleton = new SimpleParseResult[Nothing](None)
 
-  case class ParseSuccess[+R](result: R, remainder: Input) extends SimpleParseResult[R] {
-    override def getSuccessRemainder = Some(remainder)
+  case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends UnambiguousParseResult[Result] { // TODO Don't use nested Option
 
-    override def get = result
+    override def getSuccessRemainder = successOption.map(s => s.remainder)
 
-    override def map[NewResult](f: R => NewResult) = ParseSuccess(f(result), remainder)
-  }
+    override def get = successOption.get.result
 
-  object Failure extends SimpleParseResult[Nothing] {
-    override def getSuccessRemainder = None
+    override def map[NewResult](f: Result => NewResult) = SimpleParseResult(successOption.map(s => s.map(f)))
 
-    override def get = throw new NoSuchElementException("Cannot call get on a Failure")
-
-    override def map[NewResult](f: Nothing => NewResult) = this
+    override def flatMap[NewResult](f: Success[Result] => SimpleParseResult[NewResult]) =
+      successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
   }
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)
@@ -93,9 +84,10 @@ trait BasicParserWriter extends UnambiguousParserWriter {
     def parseWholeInput(input: Input,
                         cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
-      parse(input, cache) match {
-        case success: ParseSuccess[Result] if !success.remainder.atEnd => Failure
-        case f => f
+      val parseResult = parse(input, cache)
+      parseResult.successOption match {
+        case Some(success) if !success.remainder.atEnd => failureSingleton
+        case _ => parseResult
       }
     }
 

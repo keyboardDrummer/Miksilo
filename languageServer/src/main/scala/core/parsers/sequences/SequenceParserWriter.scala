@@ -11,15 +11,15 @@ trait SequenceParserWriter extends EditorParserWriter {
   case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
     override def parseInternal(input: Input, cache: ParseStateLike): ParseResult[Elem] = {
       if (input.atEnd) {
-        return failure(input, s"$kind expected but end of source found")
+        return newFailure(input, s"$kind expected but end of source found")
       }
 
       val char = input.head
       if (predicate(char)) {
-        success(char, input.tail)
+        newSuccess(char, input.tail)
       }
       else
-        failure(input, s"'$char' was not a $kind")
+        newFailure(input, s"'$char' was not a $kind")
     }
 
     override def getDefault(cache: DefaultCache): Option[Elem] = None
