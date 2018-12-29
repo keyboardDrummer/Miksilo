@@ -38,11 +38,12 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"initialize","params":{"rootUri":"someRootUri","capabilities":{}},"id":0}""".stripMargin
     val initializePromise = serverAndClient.client.initialize(InitializeParams(None, "someRootUri", ClientCapabilities()))
-    initializePromise.future.map(result => {
-      assert(result.capabilities == serverAndClient.server.getCapabilities)
-      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
-      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
-    })
+
+    val result = Await.result(initializePromise.future, Duration.Inf)
+
+    assert(result.capabilities == serverAndClient.server.getCapabilities)
+    assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+    assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
   it("can open document") {
