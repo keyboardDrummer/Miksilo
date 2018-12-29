@@ -41,7 +41,7 @@ object TestGrammarUtils extends FunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar): ParseResultLike[Any] = {
+  def parse(example: String, grammarDocument: BiGrammar): EditorParseResult[Any] = {
     val parser = toParser(grammarDocument)
     parser.parseWholeInput(new StringReader(example))
   }

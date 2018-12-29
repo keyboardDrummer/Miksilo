@@ -2,15 +2,15 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
+import core.parsers.editorParsers.UnambiguousEditorParserWriter
 import core.parsers.strings.{CommonParserWriter, StringReader}
 
 import scala.collection.mutable
 
-case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {
-}
+case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParserWriter {
+object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter  {
   type AnyWithMap = WithMap[Any]
   type Result = StateFull[AnyWithMap]
 

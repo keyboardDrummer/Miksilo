@@ -20,5 +20,4 @@ class DefaultCache {
 
 trait HasGetDefault[+Result] {
   def getDefault(cache: DefaultCache): Option[Result]
-
 }

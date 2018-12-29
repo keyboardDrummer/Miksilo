@@ -1,11 +1,12 @@
 package core.parsers.strings
 
+import core.parsers.editorParsers.UnambiguousEditorParserWriter
+
 trait CommonParserWriter extends StringParserWriter {
 
   def identifier: EditorParser[String] =
     elem(Character.isJavaIdentifierStart, "identifier start") ~
       (elem(Character.isJavaIdentifierPart(_: Char), "identifier part")*) ^^ (t => (t._1 :: t._2).mkString)
-
 
   /** An integer, without sign or with a negative sign. */
   def wholeNumber: EditorParser[String] =
