@@ -183,12 +183,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
     extends UnambiguousParseResult[Result] with EditorResult [Result] {
 
-    if (successOption.isEmpty && biggestRealFailure.isEmpty) {
-      System.out.append("jo")
-    }
-
-    def resultOption: Option[Result] = successOption.map(s => s.result)
-    def get: Result = resultOption.get
+    def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)
     def remainder: Input = getSuccessRemainder.getOrElse(biggestFailure.asInstanceOf[ParseFailure[Result]].remainder)
 
     def addDefault[Other >: Result](value: Other) = biggestFailure match {

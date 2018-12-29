@@ -59,16 +59,18 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
     }
   }
 
-  trait ReportingParseResult[+R] extends UnambiguousParseResult[R] { }
+  trait ReportingParseResult[+Result] extends UnambiguousParseResult[Result] { }
 
-  class ParseSuccess[+R](result: R, remainder: Input) extends Success[R](result, remainder) with ReportingParseResult[R] {
+  class ParseSuccess[+Result](result: Result, remainder: Input) extends Success[Result](result, remainder) with ReportingParseResult[Result] {
     override def getSuccessRemainder = Some(remainder)
 
     override def get = result
 
-    override def map[NewResult](f: R => NewResult) = new ParseSuccess(f(result), remainder)
+    override def map[NewResult](f: Result => NewResult) = new ParseSuccess(f(result), remainder)
 
-    override def flatMap[NewResult](f: Success[R] => ReportingParseResult[NewResult]) = f(this)
+    override def flatMap[NewResult](f: Success[Result] => ReportingParseResult[NewResult]) = f(this)
+
+    override def resultOption = Some(result)
   }
 
   case class Failure(remainder: Input, message: String) extends ReportingParseResult[Nothing] {
@@ -79,6 +81,8 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
     override def map[NewResult](f: Nothing => NewResult) = this
 
     override def flatMap[NewResult](f: Success[Nothing] => ReportingParseResult[NewResult]) = this
+
+    override def resultOption = None
   }
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)

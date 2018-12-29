@@ -108,6 +108,8 @@ trait ParserWriter {
 
     def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult]
     def successful: Boolean
+    def resultOption: Option[Result]
+    def get = resultOption.get
   }
 
   class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {

@@ -75,6 +75,8 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
     override def flatMap[NewResult](f: Success[Result] => SimpleParseResult[NewResult]) =
       successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
+
+    override def resultOption = successOption.map(s => s.result)
   }
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)

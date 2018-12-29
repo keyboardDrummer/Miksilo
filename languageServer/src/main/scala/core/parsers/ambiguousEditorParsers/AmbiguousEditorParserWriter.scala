@@ -125,8 +125,6 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   case class EditorParseResult[+Result](successes: List[Success[Result]], biggestFailure: OptionFailure[Result])
     extends AmbiguousParseResult[Result] with EditorResult[Result] {
 
-    def get: Result = successes.head.result
-
     override def map[NewResult](f: Result => NewResult): EditorParseResult[NewResult] = {
       EditorParseResult[NewResult](successes.map(r => r.map(f)), biggestFailure.map(f))
     }

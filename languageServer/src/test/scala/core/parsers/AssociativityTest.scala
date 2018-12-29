@@ -1,10 +1,11 @@
-package core.parsers.ambigiousEditorParser
+package core.parsers
 
-import core.parsers.ambiguousEditorParsers.AmbiguousEditorParserWriter
-import core.parsers.strings.{CommonParserWriter, StringReader}
 import org.scalatest.FunSuite
+import strings.StringReader
+import editorParsers.EditorParserWriter
+import strings.CommonParserWriter
 
-class AssociativityTest extends FunSuite with AmbiguousEditorParserWriter with CommonParserWriter {
+trait AssociativityTest extends FunSuite with CommonParserWriter with EditorParserWriter {
 
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber
@@ -28,19 +29,6 @@ class AssociativityTest extends FunSuite with AmbiguousEditorParserWriter with C
     val result = expr.parseWholeInput(new StringReader(input))
     assert(result.successful)
     assertResult(("1",("2","3")))(result.get)
-  }
-
-  test("if-then-else is left-associative by default") {
-    lazy val expr = wholeNumber
-    lazy val stmt: EditorParser[Any] = expr |
-      "if" ~> expr ~ "then" ~ stmt ~ "else" ~ stmt |
-      "if" ~> expr ~ "then" ~ stmt
-    val input = "if1thenif2then3else4"
-    val result = stmt.parseWholeInput(new StringReader(input))
-    assert(result.successful)
-
-    val nestedIf = (("2", "then"), "3")
-    assertResult((((("1","then"),nestedIf),"else"),"4"))(result.get)
   }
 
   test("if-then-else can be made right-associative") {
