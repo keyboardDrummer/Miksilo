@@ -10,7 +10,7 @@ import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
-import deltas.javac.methods.assignment.AssignmentSkeleton
+import deltas.javac.methods.assignment.AssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
@@ -41,7 +41,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val field: Field[NodePath] = node
     val name: String = field.name
 
-    val assignment = AssignmentSkeleton.neww(VariableDelta.neww(name), localDeclaration.initializer)
+    val assignment = AssignmentDelta.neww(VariableDelta.neww(name), localDeclaration.initializer)
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
     initializerStatements += assignmentStatement
     field.node.shape = FieldDeclarationDelta.Shape

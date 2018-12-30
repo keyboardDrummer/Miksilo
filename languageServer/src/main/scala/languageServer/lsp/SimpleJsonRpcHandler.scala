@@ -28,7 +28,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
 
-    val result = Promise[Response]
+    val result = Promise[Response]()
     connection.sendRequest(requestMessage, {
       case success: JsonRpcResponseSuccessMessage =>
         responseFormat.reads(success.result) match {

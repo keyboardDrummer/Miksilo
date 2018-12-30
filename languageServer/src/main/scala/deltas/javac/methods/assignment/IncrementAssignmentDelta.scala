@@ -11,17 +11,17 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Defines the += operator."
 
-  override def dependencies: Set[Contract] = Set(AdditionDelta, AssignmentSkeleton)
+  override def dependencies: Set[Contract] = Set(AdditionDelta, AssignmentDelta)
 
   def incrementAssignment(target: Node, value: Node) =
-    new Node(IncrementAssignmentKey, AssignmentSkeleton.Target -> target, AssignmentSkeleton.Value -> value)
+    new Node(IncrementAssignmentKey, AssignmentDelta.Target -> target, AssignmentDelta.Value -> value)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
-    val assignmentTarget = find(AssignmentSkeleton.AssignmentTargetGrammar)
-    val incrementAssignmentGrammar = assignmentTarget.as(AssignmentSkeleton.Target) ~~
-      ("+=" ~~> assignmentGrammar.as(AssignmentSkeleton.Value)) asNode IncrementAssignmentKey
+    val assignmentTarget = find(AssignmentDelta.AssignmentTargetGrammar)
+    val incrementAssignmentGrammar = assignmentTarget.as(AssignmentDelta.Target) ~~
+      ("+=" ~~> assignmentGrammar.as(AssignmentDelta.Value)) asNode IncrementAssignmentKey
     assignmentGrammar.addAlternative(incrementAssignmentGrammar)
   }
 
@@ -29,9 +29,9 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     val target = getTarget(incrementAssignment)
     val value = getValue(incrementAssignment)
     val newValue = AdditionDelta.Shape.createWithSource(
-      AdditionDelta.Left -> incrementAssignment.current(AssignmentSkeleton.Target),
-      AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentSkeleton.Value))
-    val assignment = AssignmentSkeleton.neww(target, newValue)
+      AdditionDelta.Left -> incrementAssignment.current(AssignmentDelta.Target),
+      AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentDelta.Value))
+    val assignment = AssignmentDelta.neww(target, newValue)
     incrementAssignment.replaceData(assignment)
   }
 
@@ -42,10 +42,10 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   object IncrementAssignmentKey extends NodeShape
 
   def getValue[T <: NodeLike](incrementAssignment: T): T = {
-    incrementAssignment(AssignmentSkeleton.Value).asInstanceOf[T]
+    incrementAssignment(AssignmentDelta.Value).asInstanceOf[T]
   }
 
   def getTarget[T <: NodeLike](incrementAssignment: T): T = {
-    incrementAssignment(AssignmentSkeleton.Target).asInstanceOf[T]
+    incrementAssignment(AssignmentDelta.Target).asInstanceOf[T]
   }
 }

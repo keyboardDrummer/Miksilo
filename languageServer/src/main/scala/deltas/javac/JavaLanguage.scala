@@ -33,14 +33,12 @@ import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.prefix.NotDelta
 import deltas.javac.expressions.relational.{AddRelationalPrecedence, GreaterThanDelta, LessThanDelta}
 import deltas.javac.methods._
-import deltas.javac.methods.assignment.{AssignToVariable, AssignmentPrecedence, AssignmentSkeleton, IncrementAssignmentDelta}
+import deltas.javac.methods.assignment._
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 import deltas.statement._
-
-
 
 //TODO split the compilation to ByteCode from the language definition
 object JavaLanguage {
@@ -73,7 +71,7 @@ object JavaLanguage {
       ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta, SelectField, MemberSelectorDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode,
-    IncrementAssignmentDelta, AssignToVariable, AssignmentSkeleton,
+    IncrementAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, AssignmentDelta,
     AssignmentPrecedence, PostFixIncrementToByteCodeDelta, VariableToByteCodeDelta) ++
     Seq(MethodDelta, AccessibilityFieldsDelta) ++
     Seq(SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta) ++ javaClassSkeleton

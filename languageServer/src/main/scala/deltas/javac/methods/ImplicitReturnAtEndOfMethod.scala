@@ -14,7 +14,7 @@ object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
     for (method <- methods) {
       val statements = method.body.statements
       val hasNoReturn = statements.isEmpty ||
-        (statements.last.shape != ReturnExpressionDelta.ReturnInteger && statements.last.shape != ReturnVoidDelta.ReturnVoidKey)
+        (statements.last.shape != ReturnExpressionDelta.Shape && statements.last.shape != ReturnVoidDelta.ReturnVoidKey)
       if (hasNoReturn) {
         method.body.statements = statements ++ Seq(ReturnVoidDelta._return)
       }
