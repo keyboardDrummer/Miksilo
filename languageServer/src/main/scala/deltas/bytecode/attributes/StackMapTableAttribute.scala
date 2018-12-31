@@ -17,7 +17,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
 
   val entry = Utf8ConstantDelta.create("StackMapTable")
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = Set(IntTypeDelta, ByteCodeSkeleton)
 
   object FrameOffset extends NodeField
 

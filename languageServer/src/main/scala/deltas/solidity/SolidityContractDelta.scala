@@ -8,7 +8,7 @@ import core.language.Language
 import core.language.node.{NodeField, NodeShape}
 import deltas.expressions.ExpressionDelta
 
-object ContractDelta extends DeltaWithGrammar {
+object SolidityContractDelta extends DeltaWithGrammar {
 
   object Shape extends NodeShape
   object ContractType extends NodeField

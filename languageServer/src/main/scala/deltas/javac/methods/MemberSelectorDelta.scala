@@ -7,7 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.classes._
-import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
+import deltas.javac.classes.skeleton.ClassSignature
 
 object MemberSelectorDelta extends DeltaWithGrammar {
 
@@ -58,5 +58,5 @@ object MemberSelectorDelta extends DeltaWithGrammar {
 
   override def description: String = "Defines the selector grammar <expression>.<identifier>"
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

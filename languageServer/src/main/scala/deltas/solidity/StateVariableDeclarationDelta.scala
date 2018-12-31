@@ -23,10 +23,10 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar {
     val modifiers = (printSpace ~ ("public" | "internal" | "private" | "constant")).many.as(Modifiers)
     val initializer = (printSpace ~ "=" ~~ expression).option.as(Initializer)
     val grammar = typeGrammar.as(Type) ~ modifiers ~~ identifier.as(Name) ~ initializer ~ ";" asNode Shape
-    find(ContractDelta.Members).addAlternative(grammar)
+    find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Introduce contract fields"
 
-  override def dependencies = Set(SolidityTypeDelta, ContractDelta, ExpressionDelta)
+  override def dependencies = Set(SolidityTypeDelta, SolidityContractDelta, ExpressionDelta)
 }

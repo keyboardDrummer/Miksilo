@@ -53,7 +53,7 @@ trait InstructionInstance extends InstructionWithGrammar
     }
   }
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = super.dependencies ++ Set(ByteCodeSkeleton)
 
   def getVariableUpdates(instruction: Node, typeState: ProgramTypeState): Map[Int, Node] = Map.empty
   def getSignature(instruction: Node, typeState: ProgramTypeState, language: Language): InstructionSignature

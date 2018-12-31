@@ -37,7 +37,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
     val blockGrammar: BiGrammar = find(BlockDelta.Grammar)
     val body = ";" ~> value(Seq.empty).as(Body) | blockGrammar.as(Body)
     val grammar = "function" ~~ name ~ parameterList.as(Parameters) ~ modifiers ~ returnValues ~~ body
-    find(ContractDelta.Members).addAlternative(grammar)
+    find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity functions"
@@ -57,7 +57,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use
     val blockGrammar: BiGrammar = find(BlockDelta.Grammar)
     val body = blockGrammar.as(SolidityFunctionDelta.Body)
     val grammar = "constructor" ~ parameterList.as(SolidityFunctionDelta.Parameters) ~ modifiers ~~ body
-    find(ContractDelta.Members).addAlternative(grammar)
+    find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity constructors"

@@ -115,7 +115,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       Seq.empty[Node]
   }
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
+  override def dependencies: Set[Contract] = Set(StackMapTableAttribute, ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
 
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."

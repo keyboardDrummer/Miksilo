@@ -20,8 +20,7 @@ object CallDelta extends DeltaWithGrammar {
     import grammars._
     val core = find(ExpressionDelta.LastPrecedenceGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val calleerGrammar = find(MemberSelectorDelta.Shape) //TODO switch to expression to be more generic.
-    val calleeGrammar = create(CallDelta.Callee, calleerGrammar)
+    val calleeGrammar = create(CallDelta.Callee, find(MemberSelectorDelta.Shape))
     val callArguments = create(CallDelta.CallArgumentsGrammar, expression.manySeparated(",").inParenthesis)
     val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asNode CallDelta.Shape
     core.addAlternative(parseCall)

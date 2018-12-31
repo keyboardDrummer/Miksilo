@@ -6,7 +6,7 @@ import core.deltas.path._
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.smarts.objects.{NamedDeclaration, Reference}
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expressions.VariableDelta
 import deltas.javac.classes.FieldDeclarationDelta.Field
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
@@ -15,11 +15,23 @@ import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.call._
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
-object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with DeltaWithGrammar {
+object CallVariable extends DeltaWithGrammar {
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    val callee = grammars.find(CallDelta.Callee)
+    callee.addAlternative(grammars.find(VariableDelta.Shape))
+  }
+
+  override def description = "Allow calling a variable as a method."
+
+  override def dependencies = Set(CallDelta, VariableDelta)
+}
+
+object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, MethodDelta, JavaClassSkeleton, ThisVariableDelta)
+  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, MethodDelta, JavaClassSkeleton, CallVariable, ThisVariableDelta)
 
   def addThisToVariable(static: Boolean, clazzName: String, variable: NodeChildPath): Unit = {
     val newVariableName = if (static) clazzName else ThisVariableDelta.thisName
@@ -52,11 +64,5 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase with De
         }
       })
     })
-  }
-
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val callee = grammars.find(CallDelta.Callee)
-    val expression = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
-    callee.inner = expression
   }
 }
