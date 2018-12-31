@@ -1,6 +1,6 @@
 package deltas.javac.expressions.relational
 
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.{GreaterThanInstructionDelta, LessThanInstructionDelta}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
-object GreaterThanDelta extends ComparisonOperatorDelta with ConvertsToByteCodeDelta { //TODO move more code into comparisonOperatorDelta.
+object GreaterThanDelta extends DeltaWithGrammar with ComparisonOperatorDelta with ConvertsToByteCodeDelta { //TODO move more code into comparisonOperatorDelta.
 
   override def description: String = "Adds the > operator."
 

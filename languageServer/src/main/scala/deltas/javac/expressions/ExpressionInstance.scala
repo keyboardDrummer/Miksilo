@@ -9,7 +9,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 
-trait ExpressionInstance extends DeltaWithGrammar with HasShape {
+trait ExpressionInstance extends Delta with HasShape {
 
   override def inject(language: Language): Unit = {
     super.inject(language)

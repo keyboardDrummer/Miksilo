@@ -9,7 +9,7 @@ import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.extraBooleanInstructions.LessThanInstructionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
-object LessThanDelta extends ComparisonOperatorDelta with ConvertsToByteCodeDelta { //TODO move more code into comparisonOperatorDelta.
+object LessThanDelta extends DeltaWithGrammar with ComparisonOperatorDelta with ConvertsToByteCodeDelta { //TODO move more code into comparisonOperatorDelta.
 
   override def description: String = "Adds the < operator."
 

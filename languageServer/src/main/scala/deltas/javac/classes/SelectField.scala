@@ -18,7 +18,7 @@ import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 
-object SelectField extends ExpressionInstance with ConvertsToByteCodeDelta with ReferenceExpressionDelta {
+object SelectField extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta with ReferenceExpressionDelta {
 
   override def description: String = "Enables using the . operator to select a field from a class."
 

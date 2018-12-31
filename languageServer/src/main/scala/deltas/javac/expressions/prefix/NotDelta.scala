@@ -1,5 +1,6 @@
 package deltas.javac.expressions.prefix
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.path.NodePath
@@ -12,7 +13,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
-object NotDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object NotDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   object NotKey extends NodeShape
 

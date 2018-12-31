@@ -1,6 +1,6 @@
 package deltas.javac.constructor
 
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeShape}
@@ -21,7 +21,7 @@ import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, To
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
-object SuperCallExpression extends ExpressionInstance with ConvertsToByteCodeDelta {
+object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a super constructor."
 

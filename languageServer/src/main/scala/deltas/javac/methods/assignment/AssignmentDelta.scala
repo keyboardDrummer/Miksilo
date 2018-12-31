@@ -12,7 +12,7 @@ import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
-object AssignmentDelta extends ExpressionInstance {
+object AssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 

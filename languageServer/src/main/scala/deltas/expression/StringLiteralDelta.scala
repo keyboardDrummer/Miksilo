@@ -1,7 +1,7 @@
 package deltas.expression
 
 import core.bigrammar.grammars.StringLiteral
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
@@ -12,7 +12,7 @@ import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
-object StringLiteralDelta extends ExpressionInstance {
+object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the usage of string literals."
 

@@ -15,7 +15,7 @@ import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
-object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object EqualityDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
   def getFirst[T <: NodeLike](equality: T): T = equality(FirstKey).asInstanceOf[T]

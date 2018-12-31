@@ -14,20 +14,19 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(AdditionDelta, AssignmentDelta)
 
   def incrementAssignment(target: Node, value: Node) =
-    new Node(IncrementAssignmentKey, AssignmentDelta.Target -> target, AssignmentDelta.Value -> value)
+    new Node(Shape, AssignmentDelta.Target -> target, AssignmentDelta.Value -> value)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(AssignmentDelta.AssignmentTargetGrammar)
     val incrementAssignmentGrammar = assignmentTarget.as(AssignmentDelta.Target) ~~
-      ("+=" ~~> assignmentGrammar.as(AssignmentDelta.Value)) asNode IncrementAssignmentKey
+      ("+=" ~~> assignmentGrammar.as(AssignmentDelta.Value)) asNode Shape
     assignmentGrammar.addAlternative(incrementAssignmentGrammar)
   }
 
   def transformIncrementAssignment(incrementAssignment: NodePath, state: Language): Unit = {
     val target = getTarget(incrementAssignment)
-    val value = getValue(incrementAssignment)
     val newValue = AdditionDelta.Shape.createWithSource(
       AdditionDelta.Left -> incrementAssignment.current(AssignmentDelta.Target),
       AdditionDelta.Right -> incrementAssignment.getWithSource(AssignmentDelta.Value))
@@ -36,10 +35,10 @@ object IncrementAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(IncrementAssignmentKey, obj => transformIncrementAssignment(obj, compilation))
+    PathRoot(program).visitShape(Shape, obj => transformIncrementAssignment(obj, compilation))
   }
 
-  object IncrementAssignmentKey extends NodeShape
+  object Shape extends NodeShape
 
   def getValue[T <: NodeLike](incrementAssignment: T): T = {
     incrementAssignment(AssignmentDelta.Value).asInstanceOf[T]

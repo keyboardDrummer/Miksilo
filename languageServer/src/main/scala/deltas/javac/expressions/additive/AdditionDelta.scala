@@ -2,25 +2,23 @@ package deltas.javac.expressions.additive
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.NodePath
+import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ConstraintSolver}
-import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
-import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.ExpressionInstance
 
-object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the + operator."
 
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta, AddIntegersDelta)
+  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
@@ -28,17 +26,6 @@ object AdditionDelta extends DeltaWithGrammar with ExpressionInstance with Conve
     val additiveGrammar = find(AdditivePrecedenceDelta.Grammar)
     val parseAddition = additiveGrammar.as(Left) ~~< "+" ~~ additiveGrammar.as(Right) asNode Shape
     additiveGrammar.addAlternative(parseAddition)
-  }
-
-  override def toByteCode(addition: NodePath, compilation: Compilation): Seq[Node] = {
-    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
-    val firstInstructions = toInstructions(addition.left)
-    val secondInstructions = toInstructions(addition.right)
-    firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {
-      case x if x == IntTypeDelta.intType => Seq(AddIntegersDelta.addIntegers())
-      case x if x == LongTypeDelta.longType => Seq(AddLongsDelta.addLongs())
-      case _ => throw new NotImplementedError()
-    })
   }
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {

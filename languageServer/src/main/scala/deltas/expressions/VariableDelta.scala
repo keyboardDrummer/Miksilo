@@ -1,5 +1,6 @@
 package deltas.expressions
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
@@ -12,7 +13,7 @@ import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 
-object VariableDelta extends ExpressionInstance with ReferenceExpressionDelta {
+object VariableDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 
   implicit class Variable[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def name: String = node.getValue(Name).asInstanceOf[String]

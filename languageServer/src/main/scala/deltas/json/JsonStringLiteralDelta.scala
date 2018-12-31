@@ -1,7 +1,7 @@
 package deltas.json
 
 import core.bigrammar.grammars.RegexGrammar
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
@@ -14,7 +14,7 @@ import deltas.javac.expressions.ExpressionInstance
 
 import scala.util.matching.Regex
 
-object JsonStringLiteralDelta extends ExpressionInstance {
+object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the usage of JSON string literals, in which the String is considered an identifier, and the quotes are not part of the position"
 

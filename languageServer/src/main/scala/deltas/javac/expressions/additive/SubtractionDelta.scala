@@ -14,7 +14,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.additive.AdditionDelta.additionOrSubtractionConstraints
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
-object SubtractionDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object SubtractionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
   object Shape extends NodeShape
   object Left extends NodeField
   object Right extends NodeField

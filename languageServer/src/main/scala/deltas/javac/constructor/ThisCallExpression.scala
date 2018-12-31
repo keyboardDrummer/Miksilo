@@ -1,6 +1,6 @@
 package deltas.javac.constructor
 
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeShape}
@@ -15,7 +15,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 import deltas.javac.methods.call.CallDelta
 
-object ThisCallExpression extends ExpressionInstance with ConvertsToByteCodeDelta {
+object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a different constructor using 'this'"
 

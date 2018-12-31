@@ -12,7 +12,7 @@ import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 
-object NullDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object NullDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   val _null = new Node(Shape)
 

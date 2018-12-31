@@ -10,12 +10,9 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import core.smarts.{ConstraintBuilder, ResolvesToType}
 import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.call.CallDelta.{Call, Shape}
 
-//TODO move this into object. Can be done once the old getType is out of ExpressionInstance
-trait CallDelta extends DeltaWithGrammar with ExpressionInstance {
+object CallDelta extends DeltaWithGrammar {
 
   override def description: String = "Introduces function calls of the form <callee>(<argument list>)"
 
@@ -25,22 +22,10 @@ trait CallDelta extends DeltaWithGrammar with ExpressionInstance {
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val calleerGrammar = find(MemberSelectorDelta.Shape) //TODO switch to expression to be more generic.
     val calleeGrammar = create(CallDelta.Callee, calleerGrammar)
-    val callArguments = create(CallDelta.CallArgumentsGrammar, "(" ~> expression.manySeparated(",") ~< ")")
+    val callArguments = create(CallDelta.CallArgumentsGrammar, expression.manySeparated(",").inParenthesis)
     val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asNode CallDelta.Shape
     core.addAlternative(parseCall)
   }
-
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
-    val call: Call[NodePath] = path
-    val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, call.callee, parentScope)
-    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
-  }
-
-  override def shape: NodeShape = Shape
-}
-
-object CallDelta {
-
 
   object Shape extends NodeShape
 
@@ -68,4 +53,6 @@ object CallDelta {
     val functionType = FunctionType.curry(callTypes, returnType)
     builder.add(new ResolvesToType(methodReference, builder.declarationVariable(), functionType))
   }
+
+  override def dependencies = Set(MemberSelectorDelta, ExpressionDelta)
 }

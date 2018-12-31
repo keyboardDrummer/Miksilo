@@ -1,6 +1,6 @@
 package deltas.javac.expressions.postfix
 
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
@@ -14,7 +14,7 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.MethodDelta
 
-object PostFixIncrementDelta extends ExpressionInstance {
+object PostFixIncrementDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override val shape = Shape
 

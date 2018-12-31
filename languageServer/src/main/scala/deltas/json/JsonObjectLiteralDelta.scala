@@ -1,7 +1,7 @@
 package deltas.json
 
 import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
-import core.deltas.Delta
+import core.deltas.{Delta, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
@@ -15,7 +15,7 @@ import deltas.javac.expressions.ExpressionInstance
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
-object JsonObjectLiteralDelta extends ExpressionInstance with Delta {
+object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance with Delta {
 
   override def description: String = "Adds the JSON object literal to expressions"
 

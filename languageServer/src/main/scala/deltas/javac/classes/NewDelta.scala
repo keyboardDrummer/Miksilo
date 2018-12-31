@@ -13,15 +13,15 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
+import deltas.expressions.ExpressionDelta
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Arguments
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
-import deltas.expressions.ExpressionDelta
 
-object NewDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object NewDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables using the new keyword to create a new object."
 
@@ -35,6 +35,7 @@ object NewDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
+
     val objectGrammar = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
     val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape

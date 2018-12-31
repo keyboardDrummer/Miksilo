@@ -1,5 +1,6 @@
 package deltas.json
 
+import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeField, NodeShape}
@@ -10,7 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
-object JsonArrayLiteralDelta extends ExpressionInstance {
+object JsonArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the JSON array literal to expressions"
 
