@@ -1,8 +1,10 @@
 package deltas.javac.expressions.relational
 
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.Compilation
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node._
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
@@ -11,16 +13,16 @@ import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.types.BooleanTypeDelta
 
-trait ComparisonOperatorDelta extends ExpressionInstance {
+trait ComparisonOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
+
+  def neww(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
+
+  val shape: NodeShape = Shape
 
   implicit class ComparisonOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(Left).asInstanceOf[T]
     def right: T = node(Right).asInstanceOf[T]
   }
-
-  def neww(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
-
-  val shape: NodeShape = Shape
 
   object Shape extends NodeShape
 
@@ -45,4 +47,15 @@ trait ComparisonOperatorDelta extends ExpressionInstance {
     BooleanTypeDelta.booleanType
   }
 
+  def keyword: String
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
+    import grammars._
+
+    val relationalGrammar = find(AddRelationalPrecedenceDelta.RelationalExpressionGrammar)
+    val parseLessThan = ((relationalGrammar.as(Left) ~~< keyword) ~~ relationalGrammar.as(Right)).asNode(Shape)
+    relationalGrammar.addAlternative(parseLessThan)
+  }
+
+  override def dependencies: Set[Contract] = Set(AddRelationalPrecedenceDelta)
 }

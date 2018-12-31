@@ -6,7 +6,7 @@ import core.language.Language
 import core.language.node.GrammarKey
 import deltas.expressions.ExpressionDelta
 
-object AddRelationalPrecedence extends DeltaWithGrammar {
+object AddRelationalPrecedenceDelta extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
