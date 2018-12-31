@@ -7,13 +7,13 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.{ExpressionDelta, VariableDelta}
-import deltas.javac.methods.assignment.AssignmentDelta
+import deltas.javac.methods.assignment.EqualsAssignmentDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(AssignmentDelta, ExpressionAsStatementDelta, LocalDeclarationDelta)
+  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, ExpressionAsStatementDelta, LocalDeclarationDelta)
 
   implicit class LocalDeclarationWithInitializer[T <: NodeLike](node: T) extends LocalDeclaration[T](node) {
     def initializer: T = node(Initializer).asInstanceOf[T]
@@ -44,9 +44,9 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val name: String = withInitializer.name
     path.shape = LocalDeclarationDelta.Shape
     val target = VariableDelta.neww(name)
-    val assignment = AssignmentDelta.Shape.createWithSource(
-      AssignmentDelta.Target -> target,
-      AssignmentDelta.Value -> path.getWithSource(Initializer))
+    val assignment = EqualsAssignmentDelta.Shape.createWithSource(
+      EqualsAssignmentDelta.Target -> target,
+      EqualsAssignmentDelta.Value -> path.getWithSource(Initializer))
     path.removeField(Initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)

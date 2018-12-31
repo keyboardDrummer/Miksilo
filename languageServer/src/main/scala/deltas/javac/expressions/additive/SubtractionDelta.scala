@@ -8,13 +8,12 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.expressions.ExpressionDelta
+import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.expressions.additive.AdditionDelta.additionOrSubtractionConstraints
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 
-object SubtractionDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object SubtractionDelta extends DeltaWithGrammar with ExpressionInstance {
   object Shape extends NodeShape
   object Left extends NodeField
   object Right extends NodeField
@@ -27,7 +26,7 @@ object SubtractionDelta extends DeltaWithGrammar with ExpressionInstance with Co
     def right_=(value: T): Unit = node(Right) = value
   }
 
-  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta, SubtractIntegerDelta)
+  override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -53,14 +52,6 @@ object SubtractionDelta extends DeltaWithGrammar with ExpressionInstance with Co
     TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)
     TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, secondType)
     IntTypeDelta.intType
-  }
-
-  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    val subtraction: Subtraction[NodePath] = expression
-    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
-    val firstInstructions = toInstructions(subtraction.left)
-    val secondInstructions = toInstructions(subtraction.right)
-    firstInstructions ++ secondInstructions ++ Seq(SubtractIntegerDelta.subtractInteger)
   }
 
   override def description: String = "Adds the - operator."

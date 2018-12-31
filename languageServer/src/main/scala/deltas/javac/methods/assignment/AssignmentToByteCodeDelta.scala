@@ -10,7 +10,7 @@ import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateIn
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.javac.methods.assignment.AssignmentDelta.{getAssignmentTarget, getAssignmentValue}
+import deltas.javac.methods.assignment.EqualsAssignmentDelta.{getTarget, getValue}
 
 trait HasAssignFromStackByteCode {
   def getAssignFromStackByteCode(compilation: Compilation, path: NodePath): Seq[Node]
@@ -20,9 +20,9 @@ object AssignmentToByteCodeDelta extends ConvertsToByteCodeDelta {
   val hasAssignFromStackByteCode = new ShapeProperty[HasAssignFromStackByteCode]
 
   override def toByteCode(assignment: NodePath, compilation: Compilation): Seq[Node] = {
-    val value = getAssignmentValue(assignment)
+    val value = getValue(assignment)
     val valueInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(value)
-    val target = getAssignmentTarget(assignment)
+    val target = getTarget(assignment)
     val assignInstructions = hasAssignFromStackByteCode(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
     val valueType = ExpressionDelta.getType(compilation)(value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
@@ -35,7 +35,7 @@ object AssignmentToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def description = "Allows converting assignments to bytecode"
 
-  override def dependencies = Set(StoreAddressDelta, StoreIntegerDelta, AssignmentDelta)
+  override def dependencies = Set(StoreAddressDelta, StoreIntegerDelta, EqualsAssignmentDelta)
 
-  override def shape = AssignmentDelta.Shape
+  override def shape = EqualsAssignmentDelta.Shape
 }

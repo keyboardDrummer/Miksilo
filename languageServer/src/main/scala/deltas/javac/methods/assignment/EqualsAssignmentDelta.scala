@@ -12,11 +12,11 @@ import core.smarts.types.objects.Type
 import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
-object AssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
+object EqualsAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 
-  def getAssignmentTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
+  def getTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
-  def getAssignmentValue[T <: NodeLike](assignment: T): T = assignment(Value).asInstanceOf[T]
+  def getValue[T <: NodeLike](assignment: T): T = assignment(Value).asInstanceOf[T]
 
   override def dependencies: Set[Contract] = Set(AssignmentPrecedence)
 
@@ -41,17 +41,16 @@ object AssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
   override val shape = Shape
 
   override def getType(assignment: NodePath, compilation: Compilation): Node = {
-    val target = getAssignmentTarget(assignment)
+    val target = getTarget(assignment)
     ExpressionDelta.getType(compilation)(target)
   }
-
 
   override def description: String = "Enables assignment to an abstract target using the = operator."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, assignment: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val value = getAssignmentValue(assignment)
+    val value = getValue(assignment)
     val valueType = ExpressionDelta.getType(compilation, builder, value, parentScope)
-    val target = getAssignmentTarget(assignment)
+    val target = getTarget(assignment)
     val targetType = ExpressionDelta.getType(compilation, builder, target, parentScope)
     builder.typesAreEqual(targetType, _type)
     builder.isFirstSubsetOfSecond(valueType, targetType)

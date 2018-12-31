@@ -20,7 +20,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   override def description: String = "Enables assigning to a variable."
 
-  override def dependencies: Set[Contract] = Set(AssignmentDelta, VariableDelta)
+  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, VariableDelta)
 
   override def inject(language: Language): Unit = {
     AssignmentToByteCodeDelta.hasAssignFromStackByteCode.add(language, VariableDelta.Shape,
@@ -44,7 +44,7 @@ object AssignToVariable extends DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    val targetGrammar = grammars.find(AssignmentDelta.AssignmentTargetGrammar)
+    val targetGrammar = grammars.find(EqualsAssignmentDelta.AssignmentTargetGrammar)
     val variableGrammar = grammars.find(VariableDelta.Shape)
     targetGrammar.addAlternative(variableGrammar)
   }
