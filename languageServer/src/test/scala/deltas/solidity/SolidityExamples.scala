@@ -6,7 +6,7 @@ import util.TestLanguageBuilder
 class SolidityExamples extends FunSuite {
   val solidity = TestLanguageBuilder.build(Solidity.deltas)
 
-  test("My first solidity program") {
+  test("contract, fields, functions, return expression, assignment") {
     val program = """pragma solidity ^0.4.0;
                     |
                     |contract MyFirstContract {
@@ -34,7 +34,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("second") {
+  test("interface, funciton call, comment, various expressions") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -72,26 +72,57 @@ class SolidityExamples extends FunSuite {
                     |    function loan() public returns (bool) {
                     |        return value > 0;
                     |    }
-                    |}
+                    |}""".stripMargin
+
+    val compilation = solidity.compile(program)
+    assertResult(Seq.empty)(compilation.diagnostics)
+  }
+
+  test("assert/require/revert") {
+
+    val program = """pragma solidity ^0.4.0;
                     |
-                    |contract MyFirstContract is Bank(10) {
-                    |    string private name;
-                    |    uint private age;
-                    |
-                    |    function setName(string newName) public {
-                    |        name = newName;
+                    |contract TestThrows {
+                    |    function testAssert() public pure {
+                    |        assert(1 == 2);
                     |    }
                     |
-                    |    function getName() public view returns (string) {
-                    |        return name;
+                    |    function testRequire() public pure {
+                    |        require(2 == 1);
                     |    }
                     |
-                    |    function setAge(uint newAge) public {
-                    |        age = newAge;
+                    |    function testRevert() public pure {
+                    |        revert();
+                    |    }
+                    |}""".stripMargin
+
+    val compilation = solidity.compile(program)
+    assertResult(Seq.empty)(compilation.diagnostics)
+  }
+
+  test("library import") {
+
+    val program = """pragma solidity ^0.4.0;
+                    |
+                    |import "browser/library.sol";
+                    |
+                    |contract TestLibrary {
+                    |    using IntExtended for uint;
+                    |
+                    |    function testIncrement(uint _base) public pure returns (uint) {
+                    |        return IntExtended.increment(_base);
                     |    }
                     |
-                    |    function getAge() public view returns (uint) {
-                    |        return age;
+                    |    function testDecrement(uint _base) public pure returns (uint) {
+                    |        return IntExtended.decrement(_base);
+                    |    }
+                    |
+                    |    function testIncrementByValue(uint _base, uint _value) public pure returns (uint) {
+                    |        return _base.incrementByValue(_value);
+                    |    }
+                    |
+                    |    function testDecrementByValue(uint _base, uint _value) public pure returns (uint) {
+                    |        return _base.decrementByValue(_value);
                     |    }
                     |}""".stripMargin
 

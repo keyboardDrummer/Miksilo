@@ -6,3 +6,4 @@ object GreaterThanDelta extends ComparisonOperatorDelta {
 
   override def keyword = ">"
 }
+
