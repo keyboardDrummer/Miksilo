@@ -6,7 +6,9 @@ import ambiguousEditorParsers.AmbiguousEditorParserWriter
 class AmbiguousParserTest extends AssociativityTest
   with LeftRecursionTest
   with PartiallyParseJsonTest
-  with AmbiguousEditorParserWriter {
+  with AmbiguousEditorParserWriter
+  with ErrorReportingTest {
+
   test("Optional before recursive and seed") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optional ~ "e"
     val result = expression.parseWholeInput(aesReader)

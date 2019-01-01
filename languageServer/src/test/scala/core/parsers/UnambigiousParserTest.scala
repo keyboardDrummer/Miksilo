@@ -6,7 +6,8 @@ import editorParsers.UnambiguousEditorParserWriter
 class UnambigiousParserTest extends AssociativityTest
   with LeftRecursionTest
   with UnambiguousEditorParserWriter
-  with PartiallyParseJsonTest {
+  with PartiallyParseJsonTest
+  with ErrorReportingTest {
 
   test("if-then-else is right-associative by default") {
     lazy val expr = wholeNumber
