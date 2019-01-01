@@ -11,7 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.ByteCodeMethodInfo
 import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
 object TernaryDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {

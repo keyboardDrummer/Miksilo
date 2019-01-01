@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 
 object NullDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {

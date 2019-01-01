@@ -7,8 +7,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.statement.{BlockDelta, StatementDelta}

@@ -2,11 +2,11 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
+import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.expressions.ExpressionDelta
-import deltas.expressions.ExpressionDelta.Expression
+import deltas.expression.ExpressionDelta
+import deltas.expression.ExpressionDelta.Expression
 import deltas.javac.statements.ExpressionAsStatementDelta
 
 object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {

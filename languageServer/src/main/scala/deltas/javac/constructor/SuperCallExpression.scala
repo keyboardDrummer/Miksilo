@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._

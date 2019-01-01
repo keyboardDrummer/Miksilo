@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
 class SolidityExamples extends FunSuite {
-  val solidity = TestLanguageBuilder.build(Solidity.deltas)
+  val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)
 
   test("contract, fields, functions, return expression, assignment") {
     val program = """pragma solidity ^0.4.0;

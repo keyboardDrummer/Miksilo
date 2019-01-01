@@ -19,8 +19,7 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}

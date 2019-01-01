@@ -6,7 +6,7 @@ import core.language.Compilation
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 
 object NamespaceOrObjectExpression {
 

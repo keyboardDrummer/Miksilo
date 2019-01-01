@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
 object IfThenDelta extends DeltaWithGrammar with StatementInstance {

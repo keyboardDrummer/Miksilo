@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.statement.{StatementDelta, StatementInstance}
 

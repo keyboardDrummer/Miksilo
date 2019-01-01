@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.types.BooleanTypeDelta
 

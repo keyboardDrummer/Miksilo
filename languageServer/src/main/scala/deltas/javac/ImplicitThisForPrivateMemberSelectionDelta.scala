@@ -5,7 +5,7 @@ import core.deltas.path._
 import core.language.Compilation
 import core.language.node.Node
 import core.smarts.objects.{NamedDeclaration, Reference}
-import deltas.expressions.VariableDelta
+import deltas.expression.VariableDelta
 import deltas.javac.classes.FieldDeclarationDelta.Field
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass

@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
 
 object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {

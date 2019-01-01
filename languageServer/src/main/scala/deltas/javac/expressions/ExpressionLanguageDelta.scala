@@ -5,7 +5,7 @@ import core.deltas.path.PathRoot
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 
 //TODO. This delta is WIP and currently just used for testing.
 object ExpressionLanguageDelta extends DeltaWithGrammar {

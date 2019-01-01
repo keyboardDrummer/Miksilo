@@ -8,8 +8,8 @@ import core.language.{Compilation, Language}
 import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.VariableDelta
-import deltas.expressions.VariableDelta.Variable
+import deltas.expression.VariableDelta
+import deltas.expression.VariableDelta.Variable
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object PortTypeSpecifierDelta extends DeltaWithGrammar with HasConstraintsDelta {

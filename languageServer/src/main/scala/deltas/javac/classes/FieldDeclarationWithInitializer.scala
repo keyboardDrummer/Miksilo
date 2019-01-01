@@ -6,7 +6,7 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}

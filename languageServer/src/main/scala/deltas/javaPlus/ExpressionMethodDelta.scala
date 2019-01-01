@@ -4,7 +4,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.methods.MethodDelta.{Name, _}

@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
-import deltas.expressions.VariableDelta
+import deltas.expression.VariableDelta
 import deltas.javac.methods.call.CallDelta
 
 object CallVariableDelta extends DeltaWithGrammar {

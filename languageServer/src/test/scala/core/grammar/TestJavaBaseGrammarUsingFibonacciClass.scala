@@ -3,8 +3,7 @@ package core.grammar
 import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{Node, NodeComparer}
 import deltas.bytecode.types._
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._

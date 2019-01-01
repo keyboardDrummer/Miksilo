@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
 import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
 import deltas.bytecode.types._
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.ReturnExpressionDelta.getReturnValue
 

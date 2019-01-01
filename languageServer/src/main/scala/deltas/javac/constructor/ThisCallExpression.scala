@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}

@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName

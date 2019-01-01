@@ -5,7 +5,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar {
   //TypeName ( 'public' | 'internal' | 'private' | 'constant' )* Identifier ('=' Expression)? ';'

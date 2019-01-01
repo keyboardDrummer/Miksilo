@@ -1,4 +1,4 @@
-package deltas.expressions
+package deltas.expression
 
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars

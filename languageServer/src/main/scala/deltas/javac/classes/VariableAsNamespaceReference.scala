@@ -7,7 +7,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.VariableDelta.{Shape, Variable}
+import deltas.expression.VariableDelta.{Shape, Variable}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
 import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, ResolveNamespaceOrObjectVariableAmbiguity, VariableToByteCodeDelta}
 

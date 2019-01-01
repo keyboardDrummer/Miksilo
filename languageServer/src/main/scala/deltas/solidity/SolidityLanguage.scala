@@ -1,8 +1,7 @@
 package deltas.solidity
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ArrayLiteralDelta, ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.SelectFieldDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -14,7 +13,7 @@ import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.javac.trivia.SlashSlashLineCommentsDelta
 import deltas.statement.{BlockDelta, IfThenDelta, StatementDelta}
 
-object Solidity {
+object SolidityLanguage {
 
   private val genericDeltas = Seq(
     SlashSlashLineCommentsDelta,
@@ -27,7 +26,7 @@ object Solidity {
     DecrementAssignmentDelta, SubtractionDelta,
     IncrementAssignmentDelta, AdditionDelta, AdditivePrecedenceDelta,
     AssignToVariable, VariableDelta, EqualsAssignmentDelta, AssignmentPrecedence,
-    IntLiteralDelta,
+    ArrayLiteralDelta, IntLiteralDelta,
     ExpressionDelta)
 
   val deltas = Seq(ParseUsingTextualGrammar,

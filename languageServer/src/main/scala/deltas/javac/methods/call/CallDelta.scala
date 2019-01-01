@@ -9,7 +9,7 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import core.smarts.{ConstraintBuilder, ResolvesToType}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.methods.MemberSelectorDelta
 
 object CallDelta extends DeltaWithGrammar {

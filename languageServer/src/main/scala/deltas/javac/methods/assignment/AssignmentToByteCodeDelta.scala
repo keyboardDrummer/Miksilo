@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
 import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateInstructionDelta}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.assignment.EqualsAssignmentDelta.{getTarget, getValue}
 

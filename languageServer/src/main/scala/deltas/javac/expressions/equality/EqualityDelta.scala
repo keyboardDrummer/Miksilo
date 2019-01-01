@@ -12,7 +12,7 @@ import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.types.BooleanTypeDelta
 
 object EqualityDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {

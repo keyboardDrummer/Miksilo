@@ -12,8 +12,8 @@ import deltas.bytecode.types.ArrayTypeDelta.Shape
 import deltas.bytecode.types.IntTypeDelta.IntTypeKey
 import deltas.bytecode.types.LongTypeDelta.LongTypeKey
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
-import deltas.expressions.VariableDelta
-import deltas.expressions.VariableDelta.Variable
+import deltas.expression.VariableDelta
+import deltas.expression.VariableDelta.Variable
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {

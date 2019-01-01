@@ -2,11 +2,11 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
+import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.methods.assignment.EqualsAssignmentDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}

@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.document.BlankLine
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 
 object SolidityContractDelta extends DeltaWithGrammar {
 

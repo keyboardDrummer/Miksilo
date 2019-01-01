@@ -9,7 +9,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
 object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {

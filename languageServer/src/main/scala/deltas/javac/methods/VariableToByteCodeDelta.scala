@@ -8,8 +8,8 @@ import deltas.bytecode.coreInstructions.integers.LoadIntegerDelta
 import deltas.bytecode.coreInstructions.longs.LoadLongDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
-import deltas.expressions.VariableDelta
-import deltas.expressions.VariableDelta._
+import deltas.expression.VariableDelta
+import deltas.expression.VariableDelta._
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.types.BooleanTypeDelta
 

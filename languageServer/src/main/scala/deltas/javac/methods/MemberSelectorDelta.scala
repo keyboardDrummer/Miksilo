@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.ClassSignature
 

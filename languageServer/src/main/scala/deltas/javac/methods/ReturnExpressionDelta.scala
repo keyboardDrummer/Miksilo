@@ -7,7 +7,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.statement.{StatementDelta, StatementInstance}
 
 object ReturnExpressionDelta extends StatementInstance

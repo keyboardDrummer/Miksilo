@@ -5,7 +5,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
-import deltas.expressions.VariableDelta
+import deltas.expression.VariableDelta
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.call.CallDelta
 import deltas.statement.BlockDelta

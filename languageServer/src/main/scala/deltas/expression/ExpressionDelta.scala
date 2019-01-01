@@ -1,9 +1,9 @@
-package deltas.expressions
+package deltas.expression
 
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node._
+import core.deltas.{Contract, DeltaWithGrammar, ShapeProperty}
+import core.language.node.{GrammarKey, Node, NodeLike, NodeWrapper}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope

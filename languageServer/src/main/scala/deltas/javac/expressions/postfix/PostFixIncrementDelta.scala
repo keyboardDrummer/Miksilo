@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.IncrementIntegerDelta
 import deltas.bytecode.types.IntTypeDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.MethodDelta
 

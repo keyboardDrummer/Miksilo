@@ -1,4 +1,4 @@
-package deltas.json
+package deltas.expression
 
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
@@ -8,12 +8,11 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expressions.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 
-object JsonArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
-  override def description: String = "Adds the JSON array literal to expressions"
+  override def description: String = "Adds the array literal to expressions"
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
