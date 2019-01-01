@@ -6,7 +6,7 @@ import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 
-object JavaStyleLineCommentsDelta extends DeltaWithGrammar {
+object SlashSlashLineCommentsDelta extends DeltaWithGrammar {
 
   override def description: String = "Adds Java-style line comments to the language"
 

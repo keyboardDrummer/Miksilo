@@ -27,3 +27,5 @@ object CustomModifierDelta extends DeltaWithGrammar {
 
   override def dependencies = Set(SolidityFunctionDelta, BlockDelta)
 }
+
+

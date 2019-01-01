@@ -15,7 +15,7 @@ object EventDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val typeGrammar = find(SolidityTypeDelta.Shape)
+    val typeGrammar = find(TypeDelta.Grammar)
 
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       "indexed".spacedOption.as(ParameterIndexed) ~

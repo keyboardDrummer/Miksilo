@@ -11,13 +11,13 @@ import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.methods.assignment._
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.trivia.JavaStyleLineCommentsDelta
+import deltas.javac.trivia.SlashSlashLineCommentsDelta
 import deltas.statement.{BlockDelta, IfThenDelta, StatementDelta}
 
 object Solidity {
 
   private val genericDeltas = Seq(
-    JavaStyleLineCommentsDelta,
+    SlashSlashLineCommentsDelta,
     CallVariable, CallDelta, MemberSelectorDelta,
     IfThenDelta,
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
@@ -33,11 +33,12 @@ object Solidity {
   val deltas = Seq(ParseUsingTextualGrammar,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
-    UsingForDeclarationDelta, EventDelta, CustomModifierDelta,
+    UsingForDeclarationDelta, EventDelta, CustomModifierDelta, EnumDelta,
     SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
-    Seq(SolidityContractDelta, ObjectTypeDelta, PragmaDelta) ++
+    Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
-    Seq(SolidityFile, SolidityTypeDelta) ++
+    Seq(SolidityFile) ++
+    Seq(ElementaryTypeDelta, DynamicArrayTypeDelta, ObjectTypeDelta, TypeDelta) ++
     genericDeltas
 
   val language = LanguageFromDeltas

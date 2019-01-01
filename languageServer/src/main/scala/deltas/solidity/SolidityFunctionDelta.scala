@@ -4,11 +4,11 @@ import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
-import core.language.node.{NodeField, NodeGrammar, NodeShape}
+import core.language.node.{NodeField, NodeShape}
 import deltas.expressions.VariableDelta
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.call.CallDelta
-import deltas.statement.{BlockDelta, StatementDelta}
+import deltas.statement.BlockDelta
 
 object SolidityFunctionDelta extends DeltaWithGrammar {
 
@@ -23,7 +23,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val typeGrammar = find(SolidityTypeDelta.Shape)
+    val typeGrammar = find(TypeDelta.Grammar)
     val storageLocation: BiGrammar = "memory" | "storage" | "calldata"
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       storageLocation.spacedOption.as(ParameterStorageLocation) ~
@@ -46,6 +46,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
 
   override def description = "Adds solidity functions"
 
-  override def dependencies = Set(SolidityTypeDelta, BlockDelta)
+  override def dependencies = Set(TypeDelta, BlockDelta)
 }
+
 

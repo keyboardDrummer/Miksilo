@@ -18,7 +18,7 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val typeGrammar = find(SolidityTypeDelta.Shape)
+    val typeGrammar = find(TypeDelta.Grammar)
     val expression: BiGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val modifiers = (printSpace ~ ("public" | "internal" | "private" | "constant")).many.as(Modifiers)
     val initializer = (printSpace ~ "=" ~~ expression).option.as(Initializer)
@@ -28,5 +28,5 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar {
 
   override def description = "Introduce contract fields"
 
-  override def dependencies = Set(SolidityTypeDelta, SolidityContractDelta, ExpressionDelta)
+  override def dependencies = Set(TypeDelta, SolidityContractDelta, ExpressionDelta)
 }

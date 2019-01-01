@@ -5,19 +5,19 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
 
-object ObjectTypeDelta extends DeltaWithGrammar { // TODO merge with QualifiedObjectTypeDelta
+object DynamicArrayTypeDelta extends DeltaWithGrammar { // TODO merge with ArrayTypeDelta
 
   object Shape extends NodeShape
-  object Parts extends NodeField
+  object ElementType extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val grammar = identifier.someSeparated(".").as(Parts) asLabelledNode Shape
-    find(TypeDelta.Grammar).addAlternative(grammar)
+    val typeGrammar = find(TypeDelta.Grammar)
+    val grammar = typeGrammar.as(ElementType) ~< "[]" asNode Shape
+    typeGrammar.addAlternative(grammar)
   }
 
-  override def description = "Adds qualified object types"
+  override def description = "Adds dynamic array types"
 
   override def dependencies = Set(TypeDelta)
 }
-
