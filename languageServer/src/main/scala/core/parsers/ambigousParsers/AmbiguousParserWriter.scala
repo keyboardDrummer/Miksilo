@@ -91,8 +91,7 @@ trait AmbiguousParserWriter extends ParserWriter {
         parsersWithBackEdges.add(node.parser)
         val index = callStack.indexOf(node.parser)
         parsersPartOfACycle ++= callStack.take(index + 1)
-        return Some(recursionIntermediates.getOrElse(node,
-          newFailure[Result](node.input, "Traversed back edge without a previous result")).
+        return Some(recursionIntermediates.getOrElse(node, abort).
           asInstanceOf[ParseResult[Result]])
       }
       None

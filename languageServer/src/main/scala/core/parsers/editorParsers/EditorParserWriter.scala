@@ -133,13 +133,17 @@ trait EditorParserWriter extends ParserWriter {
         return result
       }
 
-      val failure = result.biggestFailure.asInstanceOf[ParseFailure[Result]]
-      if (failure.partialResult.isEmpty || failure.remainder == input) {
-        val _default = getDefault(state.extraState)
-        if (_default.nonEmpty) {
-          return newFailure(_default, failure.remainder, failure.message)
+      result.biggestFailure match {
+        case failure: ParseFailure[Result] =>
+          if (failure.partialResult.isEmpty || failure.remainder == input) {
+            val _default = getDefault(state.extraState)
+            if (_default.nonEmpty) {
+              return newFailure(_default, failure.remainder, failure.message)
+          }
         }
+        case _ =>
       }
+
       result
     }
 
