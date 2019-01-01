@@ -1,8 +1,9 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.language.node.{Key, NodeField}
+import core.language.node.{Key, NodeField, NodeGrammar, NodeShape}
 import util.{ExtendedType, GraphBasics, Property}
+
 import scala.collection.concurrent._
 
 object GrammarPath {
@@ -28,6 +29,10 @@ trait GrammarPath {
   def ancestorGrammars: Set[BiGrammar]
   def ancestors: Seq[GrammarPath]
   def findGrammar(grammar: BiGrammar): Option[GrammarReference] = find(p => p.value == grammar)
+
+  def findAsNode(shape: NodeShape): GrammarReference = {
+    find(p => p.value match { case node: NodeGrammar => node.shape == shape; case _ => false}).get
+  }
 
   def findAs(field: NodeField): GrammarReference = {
     find(p => p.value match { case as:As => as.field == field; case _ => false}).get

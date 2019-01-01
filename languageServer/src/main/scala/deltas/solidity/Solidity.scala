@@ -4,6 +4,7 @@ import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
 import deltas.expression.IntLiteralDelta
 import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javac.CallVariable
+import deltas.javac.classes.SelectFieldDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.javac.expressions.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, GreaterThanOrEqualDelta}
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
@@ -20,6 +21,7 @@ object Solidity {
     CallVariable, CallDelta, MemberSelectorDelta,
     IfThenDelta,
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
+    SelectFieldDelta, MemberSelectorDelta,
     EqualsComparisonDelta,
     GreaterThanOrEqualDelta, GreaterThanDelta, AddRelationalPrecedenceDelta,
     DecrementAssignmentDelta, SubtractionDelta,
@@ -29,7 +31,9 @@ object Solidity {
     ExpressionDelta)
 
   val deltas = Seq(ParseUsingTextualGrammar,
-    UsingForDeclarationDelta,
+    NumberLiteralUnitsDelta,
+    EmitStatementDelta,
+    UsingForDeclarationDelta, EventDelta, CustomModifierDelta,
     SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
     Seq(SolidityContractDelta, ObjectTypeDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++

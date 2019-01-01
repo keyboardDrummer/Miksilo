@@ -24,3 +24,5 @@ object UsingForDeclarationDelta extends DeltaWithGrammar {
 
   override def dependencies = Set(SolidityContractDelta)
 }
+
+

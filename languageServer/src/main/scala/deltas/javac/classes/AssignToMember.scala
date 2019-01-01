@@ -7,23 +7,22 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.expressions.VariableDelta
-import deltas.javac.classes.SelectField._
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
-import deltas.javac.methods.assignment.{EqualsAssignmentDelta, AssignmentToByteCodeDelta}
+import deltas.javac.methods.assignment.{AssignmentToByteCodeDelta, EqualsAssignmentDelta}
 
 object AssignToMember extends DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, SelectField)
+  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, SelectFieldDelta)
 
   override def inject(language: Language): Unit = {
     AssignmentToByteCodeDelta.hasAssignFromStackByteCode.add(language, MemberSelectorDelta.Shape,
       (compilation: Compilation, selector: NodePath) => {
       val compiler = JavaClassSkeleton.getClassCompiler(compilation)
       val classOrObjectReference = MemberSelectorDelta.getClassOrObjectReference(selector, compiler)
-      val fieldRefIndex = getFieldRef(selector, compiler, classOrObjectReference)
+      val fieldRefIndex = SelectFieldToByteCodeDelta.getFieldRef(selector, compiler, classOrObjectReference)
 
       val _object = (selector: MemberSelector[NodePath]).target
       val objectInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(_object)

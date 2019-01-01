@@ -5,12 +5,12 @@ import core.bigrammar.grammars.{FieldPosition, MapGrammarWithMap}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMap}
 
-class NodeGrammar(inner: BiGrammar, val key: NodeShape)
+class NodeGrammar(inner: BiGrammar, val shape: NodeShape)
   extends MapGrammarWithMap(inner,
-    input => NodeGrammar.construct(input, key),
-    obj => NodeGrammar.destruct(obj, key))
+    input => NodeGrammar.construct(input, shape),
+    obj => NodeGrammar.destruct(obj, shape))
 {
-  override def withChildren(newChildren: Seq[BiGrammar]): MapGrammarWithMap = new NodeGrammar(newChildren(0), key)
+  override def withChildren(newChildren: Seq[BiGrammar]): MapGrammarWithMap = new NodeGrammar(newChildren(0), shape)
 }
 
 object NodeGrammar {

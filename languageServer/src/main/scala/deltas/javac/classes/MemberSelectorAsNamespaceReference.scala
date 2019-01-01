@@ -12,7 +12,7 @@ import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta,
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape}
 
 object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
-  override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(SelectFieldDelta, JavaClassSkeleton)
 
   override def inject(language: Language): Unit = {
     MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, selector) => {
