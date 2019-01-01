@@ -2,11 +2,9 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
+import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node.{Node, NodeGrammar, NodeShape}
 import core.language.{Compilation, Language}
-import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
 
 import scala.collection.mutable
 
@@ -17,7 +15,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def description: String = "Moves the control flow to the start of the while loop."
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, WhileLoopDelta, LabelStatementDelta)
+  override def dependencies: Set[Contract] = Set(WhileLoopDelta, LabelStatementDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[NodePath, String]()
@@ -31,8 +29,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def addStartLabel(whilePath: NodePath): String = {
-    val method = whilePath.findAncestorShape(MethodDelta.Shape) //TODO break away from method dependency
-    val startLabel = LabelDelta.getUniqueLabel("whileStart", method)
+    val startLabel = LabelStatementDelta.getUniqueLabel("whileStart", whilePath)
     whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(LabelStatementDelta.neww(startLabel), whilePath.current))
     startLabel
   }

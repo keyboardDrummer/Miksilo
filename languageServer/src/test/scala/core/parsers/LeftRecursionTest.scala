@@ -82,9 +82,19 @@ trait LeftRecursionTest extends FunSuite with CommonParserWriter with EditorPars
   }
 
   test("only recursive with sequence indirection and default, " +
-    "only applies the default after failing the recursion") {
+    "does not apply the default after failing the recursion") {
     lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a").withDefault("yes")
     val input = "aaa"
+    val parseResult = first.parseWholeInput(new StringReader(input))
+    assert(!parseResult.successful)
+    val expectation = None
+    assertResult(expectation)(parseResult.resultOption)
+  }
+
+  test("recursive with sequence indirection and default, " +
+    "applies the default after failing the recursion") {
+    lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a" | "a").withDefault("yes")
+    val input = "notavailable"
     val parseResult = first.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
     val expectation = Some("yes") //Could have been ("yes","a") with different implementation

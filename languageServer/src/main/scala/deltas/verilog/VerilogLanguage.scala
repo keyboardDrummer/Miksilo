@@ -11,7 +11,8 @@ import deltas.verilog.preprocessor.{IncludeDelta, PreprocessorDelta}
 
 object VerilogLanguage {
   val genericDeltas: Seq[Delta] = Seq(JavaStyleBlockCommentsDelta, SlashSlashLineCommentsDelta,
-    ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
+    ForLoopDelta, BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
+    IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
     IntLiteralDelta, VariableDelta, ExpressionDelta,
     SolveConstraintsDelta)
 

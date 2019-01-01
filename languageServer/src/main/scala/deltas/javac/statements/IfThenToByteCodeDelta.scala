@@ -20,8 +20,8 @@ object IfThenToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val ifThen: IfThen[NodePath] = statement
-    val method = ifThen.findAncestorShape(ByteCodeMethodInfo.Shape)
-    val endLabelName = LabelDelta.getUniqueLabel("ifEnd", method)
+    val methodInfo = ifThen.findAncestorShape(ByteCodeMethodInfo.Shape)
+    val endLabelName = LabelDelta.getUniqueLabel("ifEnd", methodInfo)
     val end = InferredStackFrames.label(endLabelName)
     val jumpToEndIfFalse = LabelledLocations.ifZero(endLabelName)
     val toInstructionsExpr = ToByteCodeSkeleton.getToInstructions(compilation)

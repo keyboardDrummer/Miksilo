@@ -20,7 +20,7 @@ import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeCons
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
 import deltas.expression.IntLiteralDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expressions.{ExpressionDelta, VariableDelta}
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -29,12 +29,12 @@ import deltas.javac.expressions._
 import deltas.javac.expressions.additive._
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import deltas.javac.expressions.literals._
-import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
+import deltas.javac.expressions.postfix.{PostFixIncrementDelta, PostFixIncrementToByteCodeDelta}
 import deltas.javac.expressions.prefix.NotDelta
 import deltas.javac.expressions.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, GreaterThanToByteCodeDelta, LessThanDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment._
-import deltas.javac.methods.call.CallStaticOrInstanceDelta
+import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements._
 import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
@@ -67,19 +67,21 @@ object JavaLanguage {
   val noVariableSyntaxSugarStatements = Seq(IfThenElseToIfThenAndGotoDelta, ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)
   def javaMethod: Seq[Delta] = Delta.spliceAndFilterBottom(syntaxSugarStatements, //Desugar first because ImplicitThisForPrivateMemberSelection requires variables analysis.)
-    Seq(ImplicitReturnAtEndOfMethod, ThisVariableDelta,
-      ReturnExpressionToByteCodeDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta,
-      SelectFieldToByteCodeDelta, SelectFieldDelta, MemberSelectorDelta) ++ blockWithVariables)
+    Seq(ImplicitReturnAtEndOfMethod, ReturnExpressionToByteCodeDelta, ReturnExpressionDelta, ReturnVoidDelta, CallStaticOrInstanceDelta,
+      SelectFieldToByteCodeDelta, SelectFieldDelta) ++ blockWithVariables)
 
-  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode,
+  def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode, LocalDeclarationDelta,
     IncrementAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, EqualsAssignmentDelta,
-    AssignmentPrecedence, PostFixIncrementToByteCodeDelta, VariableToByteCodeDelta) ++
-    Seq(MethodDelta, AccessibilityFieldsDelta) ++
-    Seq(SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta) ++ javaClassSkeleton
+    AssignmentPrecedence, PostFixIncrementToByteCodeDelta, PostFixIncrementDelta, VariableToByteCodeDelta) ++
+    Seq(SolveConstraintsDelta,
+      ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, MethodDelta, AccessibilityFieldsDelta,
+      CallVariableDelta, VariableDelta, CallDelta, MemberSelectorDelta) ++ javaClassSkeleton
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock
 
-  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++ Seq(GotoToByteCodeDelta, LabelToByteCodeDelta, IfThenElseDelta,
+  def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++
+    Seq(GotoToByteCodeDelta, GotoStatementDelta, LabelToByteCodeDelta, LabelStatementDelta,
+      IfThenElseDelta,
     IfThenToByteCodeDelta, IfThenDelta,
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression

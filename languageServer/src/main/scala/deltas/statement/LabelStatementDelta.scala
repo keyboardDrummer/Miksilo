@@ -7,8 +7,15 @@ import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.bytecode.simpleBytecode.LabelDelta
+import deltas.javac.methods.MethodDelta
 
 object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
+  def getUniqueLabel(suggestion: String, path: NodePath) = {
+    val method = path.findAncestorShape(MethodDelta.Shape) // TODO use scope graph to find nearest scope
+    LabelDelta.getUniqueLabel("whileStart", method)
+  }
+
   override val shape = Shape
 
   object Shape extends NodeShape
