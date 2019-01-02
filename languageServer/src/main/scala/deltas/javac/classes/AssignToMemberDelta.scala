@@ -13,7 +13,7 @@ import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
 import deltas.javac.methods.assignment.{AssignmentToByteCodeDelta, EqualsAssignmentDelta}
 
-object AssignToMember extends DeltaWithGrammar {
+object AssignToMemberDelta extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, SelectFieldDelta)
 

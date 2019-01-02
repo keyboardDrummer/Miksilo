@@ -2,10 +2,9 @@ package deltas.bytecode.types
 
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.Node
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language
-import deltas.bytecode.ByteCodeSkeleton
+import core.language.node.Node
 import deltas.bytecode.types.TypeSkeleton.HasSuperTypes
 
 trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with HasSuperTypes {
@@ -18,7 +17,7 @@ trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with
 
   def getSuperTypes(_type: Node): Seq[Node]
 
-  override def dependencies: Set[Contract] = Set(TypeSkeleton, ByteCodeSkeleton)
+  override def dependencies: Set[Contract] = Set(TypeSkeleton)
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val javaGrammar: BiGrammar = getJavaGrammar(grammars)

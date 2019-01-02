@@ -61,7 +61,7 @@ object JavaLanguage {
   }
 
   def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
-  def fields = Seq(FieldDeclarationDelta, AssignToMember)
+  def fields = Seq(FieldDeclarationDelta, AssignToMemberDelta)
 
   val noVariableSyntaxSugarStatements = Seq(IfThenElseToIfThenAndGotoDelta, ForLoopContinueDelta, ForLoopDelta, BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta)
   private val syntaxSugarStatements = noVariableSyntaxSugarStatements ++ Seq(LocalDeclarationWithInitializerDelta)

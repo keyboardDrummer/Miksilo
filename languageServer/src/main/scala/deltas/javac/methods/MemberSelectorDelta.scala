@@ -11,6 +11,8 @@ import deltas.javac.classes.skeleton.ClassSignature
 
 object MemberSelectorDelta extends DeltaWithGrammar {
 
+  override def description: String = "Defines the selector grammar <expression>.<identifier>"
+
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def member: String = node.getValue(Member).asInstanceOf[String]
     def target: T = node(Target).asInstanceOf[T]
@@ -55,8 +57,6 @@ object MemberSelectorDelta extends DeltaWithGrammar {
   }
 
   val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
-
-  override def description: String = "Defines the selector grammar <expression>.<identifier>"
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }
