@@ -1,7 +1,7 @@
 package deltas.solidity
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import deltas.expression.{ArrayLiteralDelta, ExpressionDelta, IntLiteralDelta, VariableDelta}
+import deltas.expression._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.SelectFieldDelta
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -26,10 +26,10 @@ object SolidityLanguage {
     DecrementAssignmentDelta, SubtractionDelta,
     IncrementAssignmentDelta, AdditionDelta, AdditivePrecedenceDelta,
     AssignToVariable, VariableDelta, EqualsAssignmentDelta, AssignmentPrecedence,
-    ArrayLiteralDelta, IntLiteralDelta,
+    ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
     ExpressionDelta)
 
-  val deltas = Seq(ParseUsingTextualGrammar,
+  val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
     UsingForDeclarationDelta, EventDelta, CustomModifierDelta, EnumDelta,
@@ -37,8 +37,10 @@ object SolidityLanguage {
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
     Seq(SolidityFile) ++
-    Seq(ElementaryTypeDelta, DynamicArrayTypeDelta, ObjectTypeDelta, TypeDelta) ++
-    genericDeltas
+    Seq(ElementaryTypeDelta, FixedSizeArrayTypeDelta, DynamicArrayTypeDelta,
+      ObjectTypeDelta, TypeDelta)
+
+  val deltas = soliditySpecificDeltas ++ genericDeltas
 
   val language = LanguageFromDeltas
 }

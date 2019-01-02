@@ -21,3 +21,18 @@ object DynamicArrayTypeDelta extends DeltaWithGrammar { // TODO merge with Array
 
   override def dependencies = Set(TypeDelta)
 }
+
+object StructDelta extends DeltaWithGrammar {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+//    structDefinition
+//      : 'struct' identifier
+//    '{' ( variableDeclaration ';' (variableDeclaration ';')* )? '}' ;
+
+//    variableDeclaration
+//      : typeName storageLocation? identifier ;
+  }
+
+  override def description = "Adds solidity structs"
+
+  override def dependencies = Set(SolidityContractDelta)
+}
