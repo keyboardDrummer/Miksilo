@@ -1,9 +1,9 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
+import deltas.expression.PostFixIncrementDelta
 import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.{BasicImportDelta, FieldDeclarationDelta}
-import deltas.javac.expressions.postfix.PostFixIncrementDelta
 import deltas.javac.methods.assignment.{AssignToVariable, IncrementAssignmentDelta}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelectorDelta}
 import deltas.statement.LocalDeclarationWithInitializerDelta

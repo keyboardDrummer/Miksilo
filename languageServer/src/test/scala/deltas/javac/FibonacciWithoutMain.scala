@@ -2,11 +2,11 @@ package deltas.javac
 
 import core.language.node.Node
 import deltas.bytecode.types.IntTypeDelta
+import deltas.expression.relational.LessThanDelta
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
-import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters, ReturnExpressionDelta}
 import deltas.statement.BlockDelta

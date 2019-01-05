@@ -39,7 +39,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
     val stateMutability = "pure" | "view" | "payable"
     val modifiers = create(Modifiers, (printSpace ~ (modifierInvocation | stateMutability | "external" | "public" | "internal" | "private")).many.as(Modifiers))
     val returnValues = printSpace ~ "returns" ~~ parameterList.as(ReturnValues) | value(Seq.empty).as(ReturnValues)
-    val blockGrammar: BiGrammar = find(BlockDelta.Grammar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = (";" ~> value(Seq.empty) | blockGrammar).as(Body)
     val grammar = "function" ~~ name ~ parameterList.as(Parameters) ~ modifiers ~ returnValues ~~ body
     find(SolidityContractDelta.Members).addAlternative(grammar)

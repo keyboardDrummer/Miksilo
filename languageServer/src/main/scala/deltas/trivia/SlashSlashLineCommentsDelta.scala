@@ -1,4 +1,4 @@
-package deltas.javac.trivia
+package deltas.trivia
 
 import core.bigrammar.grammars.{Colorize, RegexGrammar}
 import core.bigrammar.{BiGrammar, TokenTypes}
@@ -8,14 +8,14 @@ import core.language.Language
 
 object SlashSlashLineCommentsDelta extends DeltaWithGrammar {
 
-  override def description: String = "Adds Java-style line comments to the language"
+  override def description: String = "Adds // line comments to the language"
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     grammars.find(TriviaGrammar).addAlternative(commentGrammar)
   }
 
   val commentGrammar: BiGrammar = {
-    val comment = RegexGrammar("""//[^(\n)]*\n""".r)
+    val comment = RegexGrammar("""//[^\n]*\n""".r)
     Colorize(comment, TokenTypes.COMMENT_EOL)
   }
 

@@ -1,4 +1,4 @@
-package deltas.javac.trivia
+package deltas.trivia
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.BiGrammarToParser.Result

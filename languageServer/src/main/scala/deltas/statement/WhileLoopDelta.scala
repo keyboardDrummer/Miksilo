@@ -6,7 +6,6 @@ import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.expression.ExpressionDelta
-import deltas.javac.methods.MethodDelta
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -17,7 +16,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val statementGrammar = find(StatementDelta.Grammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val blockGrammar = find(BlockDelta.Grammar)
+    val blockGrammar = find(BlockDelta.BlockGramar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
         blockGrammar.as(Body) asLabelledNode Shape
     statementGrammar.addAlternative(whileGrammar)

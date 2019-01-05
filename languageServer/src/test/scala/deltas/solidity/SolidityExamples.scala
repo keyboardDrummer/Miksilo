@@ -233,4 +233,80 @@ class SolidityExamples extends FunSuite {
     val compilation = solidity.compile(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
+
+  test("jeroen") {
+
+    val program = """pragma solidity ^0.5.0;
+                    |
+                    |contract EndUser {
+                    |
+                    |    /* An end user A can do the following:
+                    |        1) Carry their personal data
+                    |        2) List trusted authorities that can update the data
+                    |        3) Subscribe to other end users' updates
+                    |        4) Give permission to other end users to read user A's updates
+                    |    */
+                    |
+                    |    // A user's personal data.
+                    |    // States whether the user has @syphilis.
+                    |    // Data about the user is issued by @issuer, at @dateIssued.
+                    |    struct PersonalData {
+                    |        bool syphilis;
+                    |        uint256 dateIssued;
+                    |        address issuer;
+                    |    }
+                    |
+                    |    // Initialize user data storage
+                    |    PersonalData private pdata;
+                    |
+                    |    // Initialize trusted data issuer registry
+                    |    address[] private trustedIssuers;
+                    |
+                    |    address owner;
+                    |
+                    |    constructor ( ) public {
+                    |        owner = msg.sender;
+                    |    }
+                    |
+                    |    // A modifier restricting action to trusted data issuers
+                    |    modifier onlyTrusted {
+                    |        bool isTrusted = false;
+                    |
+                    |        // Check if msg.sender is a trusted issuer
+                    |        for ( uint i = 0; i < trustedIssuers.length; i++)
+                    |            if ( msg.sender == trustedIssuers[i] ) {
+                    |                isTrusted = true;
+                    |                break;
+                    |            }
+                    |
+                    |        require ( isTrusted ); _;
+                    |
+                    |    }
+                    |
+                    |    modifier onlyOwner {
+                    |        require ( msg.sender == owner ); _;
+                    |    }
+                    |
+                    |    // Issue a data update to the end user, if sender is trusted
+                    |    function updateData ( bool syphilisYet ) public onlyTrusted {
+                    |        pdata.syphilis = syphilisYet;
+                    |        pdata.dateIssued = now;
+                    |        pdata.issuer = msg.sender;
+                    |    }
+                    |
+                    |    // Add a new data issuer to the registry of trusted issuers
+                    |    function startTrusting ( address newIssuer ) public onlyOwner {
+                    |        trustedIssuers.push( newIssuer );
+                    |    }
+                    |
+                    |    //function stopTrusting ( address badIssuer ) public onlyOwner {
+                    |        // TODO does pop work by reference?
+                    |        // TODO what if issuer not in list?
+                    |      //  trustedIssuers.pop ( badIssuer );
+                    |    //}
+                    |}""".stripMargin
+
+    val compilation = solidity.compile(program)
+    assertResult(Seq.empty)(compilation.diagnostics)
+  }
 }

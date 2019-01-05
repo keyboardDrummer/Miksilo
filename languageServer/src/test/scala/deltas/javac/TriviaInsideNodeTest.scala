@@ -6,7 +6,7 @@ import core.deltas.NodeGrammarWriter
 import core.deltas.grammars.BodyGrammar
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
-import deltas.javac.trivia.TriviaInsideNode
+import deltas.trivia.TriviaInsideNode
 import org.scalatest.FunSuite
 
 class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {

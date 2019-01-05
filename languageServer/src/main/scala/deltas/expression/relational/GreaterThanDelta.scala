@@ -1,4 +1,4 @@
-package deltas.javac.expressions.relational
+package deltas.expression.relational
 
 object GreaterThanDelta extends ComparisonOperatorDelta {
 
@@ -6,4 +6,3 @@ object GreaterThanDelta extends ComparisonOperatorDelta {
 
   override def keyword = ">"
 }
-

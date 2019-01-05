@@ -20,7 +20,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val statementGrammar = find(StatementDelta.Grammar)
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val blockGrammar = find(BlockDelta.Grammar)
+    val blockGrammar = find(BlockDelta.BlockOrStatementGrammar)
     val forLoopGrammar = "for" ~> (statementGrammar.as(Initializer) ~
       expressionGrammar.as(Condition) ~< ";" ~
       expressionGrammar.as(Increment)).inParenthesis %

@@ -3,27 +3,30 @@ package deltas.solidity
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
 import deltas.bytecode.types.{ArrayTypeDelta, TypeSkeleton}
 import deltas.expression._
+import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
 import deltas.javac.expressions.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.javac.expressions.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, GreaterThanOrEqualDelta}
 import deltas.javac.methods.assignment._
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.trivia.SlashSlashLineCommentsDelta
 import deltas.statement._
+import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
 
 object SolidityLanguage {
 
   private val genericDeltas = Seq(
-    SlashSlashLineCommentsDelta,
+    SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta,
     LocalDeclarationWithInitializerDelta, LocalDeclarationDelta,
     CallVariableDelta, CallDelta, MemberSelectorDelta,
+    ForLoopDelta, BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
     IfThenDelta,
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
     EqualsComparisonDelta,
+    LessThanDelta,
     GreaterThanOrEqualDelta, GreaterThanDelta, AddRelationalPrecedenceDelta,
+    PostFixIncrementDelta,
     DecrementAssignmentDelta, SubtractionDelta,
     IncrementAssignmentDelta, AdditionDelta, AdditivePrecedenceDelta,
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,

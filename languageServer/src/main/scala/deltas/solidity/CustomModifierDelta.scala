@@ -15,7 +15,7 @@ object CustomModifierDelta extends DeltaWithGrammar {
     import grammars._
     val parameterList = find(SolidityFunctionDelta.Parameters)
 
-    val blockGrammar: BiGrammar = find(BlockDelta.Grammar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = blockGrammar.as(SolidityFunctionDelta.Body)
     val optionalParameters = (parameterList | value(Seq.empty)).as(SolidityFunctionDelta.Parameters)
     val grammar = "modifier" ~~ identifier.as(SolidityFunctionDelta.Name) ~

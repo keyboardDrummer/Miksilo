@@ -5,13 +5,14 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.{Node, NodeShape}
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
+import deltas.expression.PostFixIncrementDelta
 import deltas.javac.expressions.ConvertsToByteCodeDelta
-import deltas.javac.expressions.postfix.PostFixIncrementDelta.Target
+import deltas.expression.PostFixIncrementDelta.Target
 import deltas.javac.methods.MethodDelta
 
 object PostFixIncrementToByteCodeDelta extends ConvertsToByteCodeDelta {
 
-  override def dependencies: Set[Contract] = Set(PostFixIncrementDelta, MethodDelta)
+  override def dependencies: Set[Contract] = Set(IncrementIntegerDelta, PostFixIncrementDelta, MethodDelta)
 
   override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)

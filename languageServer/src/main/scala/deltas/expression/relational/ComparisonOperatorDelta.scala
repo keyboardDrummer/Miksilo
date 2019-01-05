@@ -1,4 +1,4 @@
-package deltas.javac.expressions.relational
+package deltas.expression.relational
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -13,22 +13,27 @@ import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.types.BooleanTypeDelta
 
-trait ComparisonOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
-
-  def neww(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
-
-  val shape: NodeShape = Shape
+object ComparisonOperatorDelta {
 
   implicit class ComparisonOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(Left).asInstanceOf[T]
     def right: T = node(Right).asInstanceOf[T]
   }
 
-  object Shape extends NodeShape
-
   object Left extends NodeField
 
   object Right extends NodeField
+
+}
+
+trait ComparisonOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
+  import ComparisonOperatorDelta._
+
+  def neww(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
+
+  val shape: NodeShape = Shape
+
+  object Shape extends NodeShape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType. Share code with other comparisons.

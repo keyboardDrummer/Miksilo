@@ -3,21 +3,21 @@ package core.grammar
 import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{Node, NodeComparer}
 import deltas.bytecode.types._
+import deltas.expression.relational.LessThanDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
-import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.trivia.JavaStyleBlockCommentsDelta
+import deltas.trivia.SlashStarBlockCommentsDelta
 import deltas.statement.BlockDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
+  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
 {
 
   test("BasicClass") {

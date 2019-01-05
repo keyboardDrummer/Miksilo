@@ -4,12 +4,12 @@ import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
-import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, SlashSlashLineCommentsDelta}
+import deltas.trivia.{SlashStarBlockCommentsDelta, SlashSlashLineCommentsDelta}
 import deltas.statement.{ForLoopDelta, _}
 import deltas.verilog.preprocessor.{IncludeDelta, PreprocessorDelta}
 
 object VerilogLanguage {
-  val genericDeltas: Seq[Delta] = Seq(JavaStyleBlockCommentsDelta, SlashSlashLineCommentsDelta,
+  val genericDeltas: Seq[Delta] = Seq(SlashStarBlockCommentsDelta, SlashSlashLineCommentsDelta,
     ForLoopDelta, BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
     IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
     IntLiteralDelta, VariableDelta, ExpressionDelta,

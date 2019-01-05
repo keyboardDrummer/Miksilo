@@ -17,7 +17,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use
     val parameterList = find(SolidityFunctionDelta.Parameters)
 
     val modifiers = find(SolidityFunctionDelta.Modifiers)
-    val blockGrammar: BiGrammar = find(BlockDelta.Grammar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = blockGrammar.as(SolidityFunctionDelta.Body)
     val grammar = "constructor" ~ parameterList.as(SolidityFunctionDelta.Parameters) ~ modifiers ~~ body
     find(SolidityContractDelta.Members).addAlternative(grammar)

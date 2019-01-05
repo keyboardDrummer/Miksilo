@@ -19,7 +19,8 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
+import deltas.expression.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, LessThanDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, PostFixIncrementDelta, VariableDelta}
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -28,14 +29,14 @@ import deltas.javac.expressions._
 import deltas.javac.expressions.additive._
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import deltas.javac.expressions.literals._
-import deltas.javac.expressions.postfix.{PostFixIncrementDelta, PostFixIncrementToByteCodeDelta}
+import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.prefix.NotDelta
-import deltas.javac.expressions.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, GreaterThanToByteCodeDelta, LessThanDelta}
+import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment._
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements._
-import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
 import deltas.statement._
 
@@ -50,7 +51,7 @@ object JavaLanguage {
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
-    Set(ConstantPoolIndices, JavaStyleBlockCommentsDelta, StoreTriviaDelta,
+    Set(ConstantPoolIndices, SlashStarBlockCommentsDelta, StoreTriviaDelta,
       TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta)
 
   def javaCompilerDeltas: Seq[Delta] = {
@@ -86,7 +87,7 @@ object JavaLanguage {
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
-    AddEqualityPrecedence, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
+    AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
     SubtractionToByteCodeDelta, SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas
 

@@ -1,27 +1,23 @@
-package deltas.javac.expressions.postfix
+package deltas.expression
 
-import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.IncrementIntegerDelta
 import deltas.bytecode.types.IntTypeDelta
-import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.ExpressionInstance
-import deltas.javac.methods.MethodDelta
 
 object PostFixIncrementDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionDelta, MethodDelta, IncrementIntegerDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   override def getType(expression: NodePath, compilation: Compilation): Node = IntTypeDelta.intType
-
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._

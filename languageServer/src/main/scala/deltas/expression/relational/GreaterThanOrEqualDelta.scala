@@ -1,4 +1,4 @@
-package deltas.javac.expressions.relational
+package deltas.expression.relational
 
 object GreaterThanOrEqualDelta extends ComparisonOperatorDelta {
 

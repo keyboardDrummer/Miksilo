@@ -1,4 +1,4 @@
-package deltas.javac.expressions.relational
+package deltas.expression.relational
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
